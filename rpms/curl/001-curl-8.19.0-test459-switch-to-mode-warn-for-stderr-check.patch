@@ -1,0 +1,33 @@
+From 4d4c2c8e09a87de6b66da014cd9e485836e0be43 Mon Sep 17 00:00:00 2001
+From: Daniel Stenberg <daniel@haxx.se>
+Date: Thu, 12 Mar 2026 16:41:47 +0100
+Subject: [PATCH] test459: switch to mode="warn" for stderr check
+
+In a -j192 build, this output used a three-digit number for the output,
+thus wrapping differently and causing it to error.
+
+Reported-by: Carlos Henrique Lima Melara
+
+Closes #20910
+
+(cherry picked from commit d20fa5cd39dea166c013e2377bfbe68e5d54506e)
+---
+ tests/data/test459 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/data/test459 b/tests/data/test459
+index 7a2e1db7b3..91f2d67bca 100644
+--- a/tests/data/test459
++++ b/tests/data/test459
+@@ -53,7 +53,7 @@ Content-Type: application/x-www-form-urlencoded
+ 
+ arg
+ </protocol>
+-<stderr mode="text">
++<stderr mode="warn">
+ Warning: %LOGDIR/config:1 Option 'data' uses argument with unquoted whitespace.%SP
+ Warning: This may cause side-effects. Consider double quotes.
+ </stderr>
+-- 
+2.53.0
+
