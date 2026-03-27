@@ -3,7 +3,7 @@
   "modification_reason": "Pre-existing modification - requires review",
   "modification_status": "modified",
   "release": "1",
-  "sha": "dc7f2fb5be3e150ab29ebe69fc1997dbea526b40",
+  "sha": "1619e672e732ca630cadecf1157f9b6e3a916298",
   "source": "https://src.fedoraproject.org/rpms/ruff.git",
-  "version": "0.15.7"
+  "version": "0.15.8"
 }
