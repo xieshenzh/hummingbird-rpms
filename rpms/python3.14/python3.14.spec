@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python-2.0.1
 
 
@@ -438,6 +438,12 @@ Patch477: 00477-raise-an-error-when-importing-stdlib-modules-compiled-for-a-diff
 #   or a string with OpenSSL hash name as the "digestmod" argument.
 #   The argument must be specified (instead of defaulting to 'md5').
 Patch329: 00329-fips.patch
+
+# 00478 # d9d794656850591a4e6aeddcf853505aeea08028
+# CVE-2026-4519
+#
+# Reject leading dashes in webbrowser URLs (GH-146214)
+Patch478: 00478-cve-2026-4519.patch
 
 # (New patches go here ^^^)
 #
@@ -1992,6 +1998,9 @@ CheckPython freethreading
 # ======================================================
 
 %changelog
+* Thu Mar 26 2026 Lumír Balhar <lbalhar@redhat.com> - 3.14.3-2
+- Security fix for CVE-2026-4519 (rhbz#2449730)
+
 * Wed Feb 04 2026 Karolina Surma <ksurma@redhat.com> - 3.14.3-1
 - Update to Python 3.14.3
 - Fix CVE-2025-15366, CVE-2025-15367
