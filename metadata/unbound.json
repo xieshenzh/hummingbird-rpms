@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "10",
-  "sha": "2ec051502725628163fc7fc600b71341574a3b14",
+  "release": "11",
+  "sha": "c400bb086a2b2fbd79fe63060713aa5d449f77fd",
   "source": "https://src.fedoraproject.org/rpms/unbound.git",
   "version": "1.24.2"
 }
