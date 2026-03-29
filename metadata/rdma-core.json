@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "1",
-  "sha": "258dd5b7e72cae72a0e0b53dfe2df653fad6cbe2",
+  "sha": "42e49258f8887389f2e0ae21c42f16af8e0845f7",
   "source": "https://src.fedoraproject.org/rpms/rdma-core.git",
-  "version": "61.0",
-  "modification_status": "clean"
+  "version": "62.0"
 }
