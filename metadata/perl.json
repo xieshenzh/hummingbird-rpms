@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "523",
-  "sha": "81a462d69e2236a8506ad17a71424d49011321e8",
+  "release": "524",
+  "sha": "a6fb59f96e92d928431d9892e22dfc22bd006809",
   "source": "https://src.fedoraproject.org/rpms/perl.git",
-  "version": "5.42.1"
+  "version": "5.42.2"
 }
