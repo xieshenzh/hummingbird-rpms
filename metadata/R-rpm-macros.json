@@ -2,7 +2,7 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "a2711a27ad3fcd352ae765bddf2763ef8471afca",
+  "sha": "4d517cd65f57989c9f8fe67a16b37fd9ed5e53fb",
   "source": "https://src.fedoraproject.org/rpms/R-rpm-macros.git",
-  "version": "1.3.6"
+  "version": "1.3.7"
 }
