@@ -3215,8 +3215,8 @@ spec:
         - x86_64
     - name: build-platforms
       value:
-        - "linux/x86_64"
-        - "linux/arm64"
+        - "linux-c2xlarge/amd64"
+        - "linux-c2xlarge/arm64"
     - name: specfile
       value: "curl.spec"
     - name: monorepo-subdir
