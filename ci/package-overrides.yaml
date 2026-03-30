@@ -32,6 +32,12 @@ bootc:
 cloud-init:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+curl:
+  # Larger builders needed for parallel test suite under valgrind
+  build_platforms:
+    - "linux-c2xlarge/amd64"
+    - "linux-c2xlarge/arm64"
+
 dotnet8.0:
   timeout_hours: 12
 
