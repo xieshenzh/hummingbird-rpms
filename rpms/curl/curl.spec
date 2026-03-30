@@ -374,7 +374,7 @@ for size in minimal full; do (
     serial_excludes=$(for t in $serial_tests; do printf ' !%s' "$t"; done)
     # run the bulk of tests in parallel, excluding serial ones
     # cap at 64 jobs to avoid overwhelming system resources on high-CPU machines
-    test_jobs=$(( %{_smp_build_ncpus} * 7 ))
+    test_jobs=$(( %{_smp_build_ncpus} * 3 ))
     [ $test_jobs -gt 64 ] && test_jobs=64
     TFLAGS="-v -j${test_jobs}${serial_excludes}" make test-nonflaky
     # run serial tests one at a time
