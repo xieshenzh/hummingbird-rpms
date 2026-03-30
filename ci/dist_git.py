@@ -35,8 +35,9 @@ RENAMED_PACKAGES_JSON = ROOT_DIR / 'ci' / 'renamed_packages.json'
 
 # Match %autorelease in spec files (possibly with braces/options like -b, -e, etc.)
 # Can be anywhere, not just in the Release: line, as some packages like nodejs* use
-# it through indirect macros.
-AUTORELEASE_PATTERN = r'%\{?\??autorelease(?:\}|\b)'
+# it through indirect macros.  Nothing after %autorelease ever needs to be preserved,
+# so we consume everything to end of line.
+AUTORELEASE_PATTERN = r'%\{?\??autorelease.*'
 
 # Global imports dict, loaded at startup
 imports: dict[str, 'PackageMetadata'] = {}

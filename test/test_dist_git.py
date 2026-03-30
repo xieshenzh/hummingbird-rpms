@@ -361,6 +361,7 @@ def test_import_with_ref(workdir: Path, upstream_repos: dict[str, Path]) -> None
 @pytest.mark.parametrize('release_line,expected_release', [
     ('Release: %autorelease', 'Release: 5%{?dist}\n'),
     ('Release:        %{autorelease}', 'Release:        5%{?dist}\n'),  # Preserves whitespace
+    ('Release: %autorelease -p -s snapshot123', 'Release: 5%{?dist}\n'),  # Arguments consumed
 ])
 def test_import_autorelease(workdir: Path, upstream_repos: dict[str, Path], dist_git_module,
                             release_line: str, expected_release: str) -> None:
