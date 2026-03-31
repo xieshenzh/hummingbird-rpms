@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "0.61.20260213git6067afd",
-  "sha": "03c659eb59c42ecbca6b522b7d4df8222a55289b",
+  "release": "0.62.20260213git6067afd",
+  "sha": "10ae99a60fa82e911d04df30760d4b9be52797c4",
   "source": "https://src.fedoraproject.org/rpms/libyuv.git",
   "version": "0"
 }
