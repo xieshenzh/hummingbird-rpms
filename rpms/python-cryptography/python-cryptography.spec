@@ -5,7 +5,7 @@
 %global srcname cryptography
 
 Name:           python-%{srcname}
-Version:        46.0.5
+Version:        46.0.6
 Release:        1%{?dist}
 Summary:        PyCA's cryptography library
 
@@ -30,7 +30,7 @@ ExclusiveArch:  %{rust_arches}
 BuildRequires:  openssl-devel
 BuildRequires:  gcc
 BuildRequires:  gnupg2
-%if 0%{?fedora} && ! 0%{?hummingbird}
+%if 0%{?fedora} && !0%{?hummingbird}
 BuildRequires:  rust-packaging
 %else
 BuildRequires:  cargo-rpm-macros >= 26
@@ -42,7 +42,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-setuptools-rust >= 0.11.4
 
 %if %{with tests}
-%if 0%{?fedora} && ! 0%{?hummingbird}
+%if 0%{?fedora} && !0%{?hummingbird}
 BuildRequires:  python%{python3_pkgversion}-certifi
 BuildRequires:  python%{python3_pkgversion}-hypothesis >= 1.11.4
 BuildRequires:  python%{python3_pkgversion}-iso8601
