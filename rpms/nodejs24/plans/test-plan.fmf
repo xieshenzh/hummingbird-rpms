@@ -1,9 +1,7 @@
----
-summary: Package test suite
+# Shared metadata between plans
 discover:
   how: fmf
   url: https://gitlab.com/redhat/centos-stream/tests/nodejs
-  filter: "component:nodejs24"
 environment:
   NODEJS_MAIN_PACKAGE: nodejs24
   NODEJS_DEVEL_PACKAGE: nodejs24-devel
@@ -12,12 +10,39 @@ environment:
   NODE_BIN: /usr/bin/node-24
   NPM_BIN: /usr/bin/npm-24
   NODE_INCLUDE_PATH: /usr/include/node
-prepare:
-  - name: install tested packages
-    how: install
-    package:
-      - ${NODEJS_MAIN_PACKAGE}
-      - ${NODEJS_DEVEL_PACKAGE}
 execute:
   how: tmt
-...
+
+/main:
+  summary: Public downstream Node.js tests
+  discover+:
+    filter: "component:nodejs24 & tag:-bins"
+  prepare:
+    - name: install tested packages
+      how: install
+      package:
+        - ${NODEJS_MAIN_PACKAGE}
+        - ${NODEJS_DEVEL_PACKAGE}
+
+# introduced in F44
+/bin-packages-integration:
+  summary: Testing different install/swap scenarios
+  environment+:
+    OTHER_VERSION_TO_TEST_SWAPS: 22
+  prepare:
+  - name: remove nodejs from previous tests
+    how: shell
+    script: dnf remove -y 'nodejs*'
+  - name: remove tsflags
+    summary: Those prevent dnf from downloading any docs (minimal container stuff)
+    how: shell
+    script: sed -i 's/tsflags=nodocs/# tsflags=nodocs/' /etc/dnf/dnf.conf
+  - name: install man-db
+    how: install
+    package:
+      - man-db
+  - name: build-man-index
+    how: shell
+    script: mandb -c
+  discover+:
+      filter: 'tag:bins'
