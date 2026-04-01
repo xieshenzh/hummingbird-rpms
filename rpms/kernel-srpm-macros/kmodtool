@@ -190,7 +190,7 @@ EOF
 
     if [ "" != "$override_preamble" ]
     then
-        cat "$override_preamble"
+        cat "$override_preamble" | dashvariant=${dashvariant} envsubst
     fi
 
 cat <<EOF
