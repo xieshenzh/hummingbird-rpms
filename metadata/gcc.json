@@ -4,5 +4,6 @@
   "sha": "fef47e540ee170873511546e35fc912cceed23f1",
   "source": "https://src.fedoraproject.org/rpms/gcc.git",
   "version": "15.2.1",
-  "modification_status": "clean"
+  "modification_status": "modified",
+  "modification_reason": "Disable non-essential language frontends"
 }
