@@ -1,5 +1,7 @@
 [archive]
 
+[licensing]
+detector = "askalono"
 [[licensing.licenses]]
 path = "docs/LICENSE.md"
 sha256sum = "60619c2bcd9ee1b479943ae5504fed8f55ee63a1abb7c0dc76f96cca4fc019b7"
@@ -13,11 +15,6 @@ expression = "Unlicense"
 [[licensing.licenses]]
 path = "vendor/github.com/alecthomas/chroma/v2/COPYING"
 sha256sum = "e7bf754e7153012a3a8ff697d21acd6c12e590d6a55f2aef8ee83616aa9a795f"
-expression = "MIT"
-
-[[licensing.licenses]]
-path = "vendor/github.com/bep/golibsass/libsass_src/COPYING"
-sha256sum = "619c195be45054a9b8d6e4c114381fe0a015fddc9663ca7940660312b74d7592"
 expression = "MIT"
 
 [[licensing.licenses]]
