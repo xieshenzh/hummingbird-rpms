@@ -59,10 +59,13 @@ redhat_kmp_has_post_hooks	1
 	%global kmodtool %{-s*}%{!-s:/usr/lib/rpm/redhat/kmodtool} \
 	%global kmod_version %{-v*}%{!-v:%{version}} \
 	%global kmod_release %{-r*}%{!-r:%{release}} \
-	%global latest_kernel %({ rpm -q --qf '%%{VERSION}-%%{RELEASE}.%%{ARCH}\\\\n' kernel-rt-devel kernel-aarch64-devel kernel-devel | grep -v 'is not installed' | /usr/lib/rpm/redhat/rpmsort -r | head -n 1; echo '%%%%{nil}'; } | head -n 1) \
+	%global latest_kernel %({ rpm -q --qf '%%{VERSION}-%%{RELEASE}.%%{ARCH}\\\\n' `rpm -qa | grep -E "^kernel(-rt)?(-16k|-64k|-aarch64)?(-debug)?-devel" | /usr/lib/rpm/redhat/rpmsort -r | head -n 1`; echo '%%%%{nil}'; } | head -n 1) \
 	%{!?kernel_version:%{expand:%%global kernel_version %{latest_kernel}}} \
 	%global kverrel %(%{kmodtool} verrel %{?kernel_version} 2>/dev/null) \
 	flavors="default" \
+	if [ "$(arch)" = "aarch64" ]; then \
+		flavors="$flavors 64k" \
+	fi \
 	if [ -z "%*" ]; then \
 		flavors_to_build=$flavors \
 	elif [ -z "%{-x}" ]; then \

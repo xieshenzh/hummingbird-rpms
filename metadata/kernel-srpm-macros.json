@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
-  "release": "28",
-  "sha": "a8cc6d6c589217eb539f1aa8be152f63a79cab45",
+  "modification_status": "clean",
+  "release": "29",
+  "sha": "1a190c5d6169d0c85fd6cec865ae4afe619e4bf8",
   "source": "https://src.fedoraproject.org/rpms/kernel-srpm-macros.git",
-  "version": "1.0",
-  "modification_status": "clean"
+  "version": "1.0"
 }
