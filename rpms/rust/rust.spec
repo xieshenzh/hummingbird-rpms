@@ -1,6 +1,6 @@
 Name:           rust
 Version:        1.94.1
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        The Rust Programming Language
 License:        (Apache-2.0 OR MIT) AND (Artistic-2.0 AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0 AND Unicode-3.0)
 # ^ written as: (rust itself) and (bundled libraries)
@@ -71,7 +71,7 @@ ExclusiveArch:  %{rust_arches}
 %bcond_with bundled_sqlite3
 %endif
 
-%if 0%{?rhel}
+%if 0%{?rhel} || 0%{?hummingbird}
 # Disable cargo->libgit2->libssh2 on RHEL, as it's not approved for FIPS (rhbz1732949)
 %bcond_without disabled_libssh2
 %else
