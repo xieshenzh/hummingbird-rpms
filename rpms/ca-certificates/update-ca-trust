@@ -33,7 +33,7 @@ usage() {
 		populate the ../pki/tls/certs with the directory-hash symbolic links.)
 
 		--rhbz2387674: A temporary compatibility option that restores several
-		legacy certificate-bundle symlinks (e.g., /etc/ssl/cert.pem) to
+		legacy certificate-bundle symlinks (e.g., /etc/pki/tls/cert.pem) to
 		address issues with older software.
 		These symlinks will be removed on ca-certificate updates or reinstalls,
 		so you'll have to re-run this command after ca-certificates updates if
@@ -102,10 +102,9 @@ extract() {
 	    esac
 	done
 
-	if [[ "$compat" = "true" && -n "$USER_DEST" ]]; then
-		echo "Error: arguments '-o DIR|--output DIR' and '--rhbz2387674' can't be used together"
+	if [ "$compat" = "true" ] && [ -n "$USER_DEST" ]; then
+		echo "Error: arguments '-o DIR|--output DIR' and '--rhbz2387674' can't be used together" >&2
 		exit 1
-	
 	fi
 
 	if [ -n "$USER_DEST" ]; then
@@ -128,6 +127,7 @@ extract() {
 
 	# OpenSSL PEM bundle that includes trust flags
 	# (BEGIN TRUSTED CERTIFICATE)
+	/usr/bin/trust extract --format=openssl-bundle --filter=certificates --overwrite --comment "$DEST/openssl/ca-bundle.trust.crt"
 	/usr/bin/trust extract --format=pem-bundle --filter=ca-anchors --overwrite --comment --purpose server-auth "$DEST/pem/tls-ca-bundle.pem"
 	/usr/bin/trust extract --format=pem-bundle --filter=ca-anchors --overwrite --comment --purpose email "$DEST/pem/email-ca-bundle.pem"
 	/usr/bin/trust extract --format=pem-bundle --filter=ca-anchors --overwrite --comment --purpose code-signing "$DEST/pem/objsign-ca-bundle.pem"
@@ -142,21 +142,16 @@ extract() {
 		# print warning message
 		rhbz2387674_msg
 
-		# bring back bundle in openssl trust format
-		/usr/bin/trust extract --format=openssl-bundle --filter=certificates --overwrite --comment "$DEST_CERTS/ca-bundle.trust.crt"
-
 		# create symlinks to /etc/pki/tls/..
 		ln -sf "$DEST/pem/tls-ca-bundle.pem" "$DEST_CERTS/../cert.pem"
 		ln -sf "$DEST/pem/tls-ca-bundle.pem" "$DEST_CERTS/ca-certificates.crt"
 		ln -sf "$DEST/pem/tls-ca-bundle.pem" "$DEST_CERTS/ca-bundle.crt"
-
-		# create symlinks to /etc/ssl/ the certs folder is already sym-linked
-		ln -sf "$DEST/pem/tls-ca-bundle.pem" "/etc/ssl/cert.pem"
+		ln -sf "$DEST/openssl/ca-bundle.trust.crt" "$DEST_CERTS/ca-bundle.trust.crt"
 	fi
 
 	if [ -z "$USER_DEST" ]; then
 		find "$DEST/pem/directory-hash" -type l -regextype posix-extended \
-		     -regex '.*/[0-9a-f]{8}\.[0-9]+' | while read link; do
+		     -regex '.*/[0-9a-f]{8}\.[0-9]+' | while IFS= read -r link; do
 			target=$(readlink -f "$link")
 			new_link="$DEST_CERTS/$(basename "$link")"
 			ln -s "$target" "$new_link"
