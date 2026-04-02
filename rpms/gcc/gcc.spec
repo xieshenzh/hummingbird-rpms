@@ -38,7 +38,7 @@
 %else
 %global multilib_64_archs sparc64 ppc64 ppc64p7 x86_64
 %endif
-%if 0%{?rhel} > 7
+%if 0%{?rhel} > 7 || 0%{?hummingbird}
 %global build_ada 0
 %global build_objc 0
 %global build_go 0
@@ -156,7 +156,7 @@
 Summary: Various compilers (C, C++, Objective-C, ...)
 Name: gcc
 Version: %{gcc_version}
-Release: %{gcc_release}%{?dist}
+Release: %{gcc_release}.1%{?dist}
 # License notes for some of the less obvious ones:
 #   gcc/doc/cppinternals.texi: Linux-man-pages-copyleft-2-para
 #   isl: MIT, BSD-2-Clause
