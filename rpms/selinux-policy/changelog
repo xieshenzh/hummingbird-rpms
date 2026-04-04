@@ -1,3 +1,26 @@
+* Fri Apr 03 2026 Zdenek Pytela <zpytela@redhat.com> - 43.6-1
+- Allow accountsd dbus chat with systemd-homed
+- Allow accountsd read accountsd_share_t files
+- Fix file context specification for /usr/share/accountsservice
+- Allow xdm_exec_t be an entrypoint of login_userdomain
+- Allow sshd-session send a generic signal to sshd-auth
+- Allow virtnetworkd get attributes of filesystems with extended attributes
+- Allow Polkit to get attributes of user terminals
+- Allow nfsidmap connect to xdm over a unix stream socket
+
+* Thu Apr 02 2026 Zdenek Pytela <zpytela@redhat.com> - 43.5-1
+- Allow virtnetworkd get attributes of filesystems with extended attributes
+- Allow Polkit to get attributes of user terminals
+- Allow nfsidmap connect to xdm over a unix stream socket
+- Label /usr/share/accountsservice with accountsd_share_t
+- Allow systemd-resolved write to systemd-networkd socket
+- Dontaudit setroubleshootd read root's home files like .rpmmacros
+- Support sandboxing features for sysadm_t
+- Allow unconfined_t mounton on itself (bsc#1261035)
+
+* Tue Mar 31 2026 Zdenek Pytela <zpytela@redhat.com> - 43.4-2
+- Remove unnecessary dependencies
+
 * Fri Mar 27 2026 Zdenek Pytela <zpytela@redhat.com> - 43.4-1
 - update support for polkit agent helper (bsc#1251931)
 - Add auth_nnp_domtrans_chkpwd()
