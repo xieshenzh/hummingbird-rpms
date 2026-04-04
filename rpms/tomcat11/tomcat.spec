@@ -31,7 +31,7 @@
 %global jspspec 4.0
 %global major_version 11
 %global minor_version 0
-%global micro_version 20
+%global micro_version 21
 %global packdname apache-tomcat-%{version}-src
 %global servletspec 6.1
 %global elspec 6.0
@@ -530,6 +530,9 @@ install -m0644 -D tomcat.sysusers.conf %{buildroot}%{_sysusersdir}/tomcat.conf
 %{appdir}/ROOT
 
 %changelog
+* Sat Apr 4 2026 Hummingbird <hummingbird@redhat.com> - 1:11.0.21-0.1
+- Update to 11.0.21
+
 * Wed Mar 25 2026 Hummingbird <hummingbird@redhat.com> - 1:11.0.20-0.1
 - Update to 11.0.20
 
