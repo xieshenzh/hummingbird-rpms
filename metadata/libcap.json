@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
-  "release": "3",
-  "sha": "516924a6ceff74ee29091bcda31a42e8b4ae5aec",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "b9b71a7af9315905b2c728e5fc4fc455685da0a4",
   "source": "https://src.fedoraproject.org/rpms/libcap.git",
-  "version": "2.77",
-  "modification_status": "clean"
+  "version": "2.78"
 }
