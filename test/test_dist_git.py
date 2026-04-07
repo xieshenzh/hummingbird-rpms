@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -79,7 +80,7 @@ def upstream_repos(tmp_path: Path) -> dict[str, Path]:
     # Create a simple spec file
     (vanilla_dir / 'vanilla.spec').write_text("""Name: vanilla
 Version: 1.0
-Release: 1
+Release: 1%{?dist}
 Summary: Test package vanilla
 License: MIT
 
@@ -102,7 +103,7 @@ Test package
     choc_spec = chocolate_dir / 'chocolate.spec'
     choc_spec.write_text("""Name: chocolate
 Version: 10
-Release: 1
+Release: 1%{?dist}
 Summary: Test package chocolate
 License: GPL
 
@@ -118,7 +119,7 @@ Test package chocolate
     subprocess.run(['git', 'checkout', '-b', 'f40'], cwd=chocolate_dir, check=True)
     choc_spec.write_text("""Name: chocolate
 Version: 4
-Release: 1
+Release: 1%{?dist}
 Summary: Test package chocolate
 License: GPL
 
@@ -2332,3 +2333,539 @@ def test_update_proceeds_when_track_version_matches(workdir: Path, upstream_repo
     with open(metadata_file) as f:
         metadata = json.load(f)
     assert metadata['version'] == '1.5'
+
+
+def test_rebuild(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test rebuild command bumps Release field correctly."""
+    # Import vanilla package
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Rebuild the package
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla',
+         '--reason', 'test rebuild'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify Release was bumped
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    spec_content = vanilla_spec.read_text()
+    assert 'Release: 1.1%{?dist}' in spec_content
+
+    # Verify commit message
+    subject, body = get_last_commit_info(workdir)
+    assert subject == 'Rebuild vanilla: test rebuild'
+
+    # Verify git status is clean
+    status_result = subprocess.run(
+        ['git', 'status', '--porcelain'],
+        cwd=workdir, capture_output=True, check=True, text=True
+    )
+    assert status_result.stdout == ''
+
+    # Verify metadata was NOT changed (rebuilds don't affect modification_status)
+    metadata_file = workdir / 'metadata' / 'vanilla.json'
+    with open(metadata_file) as f:
+        metadata = json.load(f)
+    assert metadata['modification_status'] == 'clean'
+    assert metadata['version'] == '1.0'
+    assert metadata['release'] == '1'
+
+
+def test_rebuild_already_bumped(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test rebuild increments existing .N suffix."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Modify to have Release: 2.1%{?dist}
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    spec_content = vanilla_spec.read_text()
+    # After import, the file has %{?dist} added, so replace the whole line
+    modified_content = re.sub(
+        r'^Release:.*$',
+        'Release: 2.1%{?dist}',
+        spec_content,
+        flags=re.MULTILINE
+    )
+    vanilla_spec.write_text(modified_content)
+    subprocess.run(['git', 'commit', '-a', '-m', 'Bump to 2.1'], cwd=workdir, check=True)
+
+    # Rebuild again
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla',
+         '--reason', 'second rebuild'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify Release was bumped to 2.2
+    spec_content = vanilla_spec.read_text()
+    assert 'Release: 2.2%{?dist}' in spec_content
+
+    # Verify commit message
+    subject, _ = get_last_commit_info(workdir)
+    assert subject == 'Rebuild vanilla: second rebuild'
+
+
+def test_rebuild_dry_run(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test --dry-run prevents commit."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    initial_subject, _ = get_last_commit_info(workdir)
+
+    # Rebuild with --dry-run
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), '--dry-run', 'rebuild', 'vanilla',
+         '--reason', 'test'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify spec was modified
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    spec_content = vanilla_spec.read_text()
+    assert 'Release: 1.1%{?dist}' in spec_content
+
+    # Verify no new commit
+    subject, _ = get_last_commit_info(workdir)
+    assert subject == initial_subject
+
+    # Verify git status shows modified files
+    status_result = subprocess.run(
+        ['git', 'status', '--porcelain'],
+        cwd=workdir, capture_output=True, check=True, text=True
+    )
+    assert 'vanilla.spec' in status_result.stdout
+
+
+def test_rebuild_preserves_macros(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test rebuild preserves macros in Release field."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Modify to have Release with macro: 8.%{revision}%{?dist}
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    spec_content = vanilla_spec.read_text()
+    # After import, the file has %{?dist} added, so replace the whole line
+    modified_content = re.sub(
+        r'^Release:.*$',
+        'Release: 8.%{revision}%{?dist}',
+        spec_content,
+        flags=re.MULTILINE
+    )
+    vanilla_spec.write_text(modified_content)
+    subprocess.run(['git', 'commit', '-a', '-m', 'Use macro in Release'], cwd=workdir, check=True)
+
+    # Rebuild
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla',
+         '--reason', 'test macro preservation'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify Release was bumped but macro preserved
+    spec_content = vanilla_spec.read_text()
+    assert 'Release: 8.%{revision}.1%{?dist}' in spec_content
+
+
+def test_rebuild_nonexistent_package(workdir: Path) -> None:
+    """Test rebuild fails gracefully for nonexistent package."""
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'nonexistent',
+         '--reason', 'test'],
+        cwd=workdir, capture_output=True, text=True
+    )
+
+    assert result.returncode != 0
+    assert "Package 'nonexistent' not found" in result.stderr
+
+
+def test_bump_release_helper(dist_git_module) -> None:
+    """Test bump_release helper function logic."""
+    bump = dist_git_module.bump_release
+
+    # Basic bump
+    assert bump('3') == '3.1'
+    assert bump('1') == '1.1'
+
+    # Already bumped
+    assert bump('3.1') == '3.2'
+    assert bump('3.2') == '3.3'
+    assert bump('1.99') == '1.100'
+
+    # With macros
+    assert bump('8.%{revision}') == '8.%{revision}.1'
+    assert bump('8.%{revision}.1') == '8.%{revision}.2'
+
+    # Complex release strings
+    assert bump('10') == '10.1'
+    assert bump('0') == '0.1'
+
+    # With upstream_release parameter (smart bumping for Fedora releases with dots)
+    # Scenario: Fedora ships Release: 3.1, we rebuild it -> should become 3.1.1
+    assert bump('3.1', upstream_release='3.1') == '3.1.1'
+
+    # Scenario: We already rebuilt Fedora's 3.1 to 3.1.1, rebuild again -> 3.1.2
+    assert bump('3.1.1', upstream_release='3.1') == '3.1.2'
+
+    # Scenario: Fedora ships Release: 5, we rebuild it -> 5.1 (same as before)
+    assert bump('5', upstream_release='5') == '5.1'
+
+    # Scenario: We already rebuilt Fedora's 3 to 3.1, rebuild again -> 3.2
+    # (upstream is still 3, current is 3.1, so current != upstream -> increment logic)
+    assert bump('3.1', upstream_release='3') == '3.2'
+
+    # Scenario: No upstream info (None) - falls back to old behavior
+    assert bump('3.1', upstream_release=None) == '3.2'
+    assert bump('3', upstream_release=None) == '3.1'
+
+    # Real-world release strings from the repo:
+
+    # libyuv: ends with non-digit letters, so no .N match -> append .1
+    assert bump('0.62.20260213git6067afd') == '0.62.20260213git6067afd.1'
+    assert bump('0.62.20260213git6067afd.1') == '0.62.20260213git6067afd.2'
+
+    # libedit: macro with non-digit suffix -> no .N match -> append .1
+    assert bump('58.%{snap}cvs') == '58.%{snap}cvs.1'
+    assert bump('58.%{snap}cvs.1') == '58.%{snap}cvs.2'
+
+    # ansible-packaging: Fedora ships 20.1 (dotted), first rebuild -> 20.1.1
+    assert bump('20.1', upstream_release='20.1') == '20.1.1'
+    assert bump('20.1.1', upstream_release='20.1') == '20.1.2'
+
+    # python-gitlab: Fedora ships 1.1, already rebuilt to 1.2 -> 1.3
+    assert bump('1.2', upstream_release='1.1') == '1.3'
+
+    # Fedora pre-release (0.N pattern): first rebuild -> 0.1.1, not 0.2
+    assert bump('0.1', upstream_release='0.1') == '0.1.1'
+    assert bump('0.1.1', upstream_release='0.1') == '0.1.2'
+
+
+def test_rebuild_all(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test rebuild --all rebuilds all packages with one commit per package."""
+    # Import two packages
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Get commit count before rebuild
+    result = subprocess.run(
+        ['git', 'rev-list', '--count', 'HEAD'],
+        cwd=workdir, capture_output=True, check=True, text=True
+    )
+    commits_before = int(result.stdout.strip())
+
+    # Rebuild all packages
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', '--all',
+         '--reason', 'test rebuild all'],
+        cwd=workdir, check=True,
+    )
+
+    # Get commit count after rebuild
+    result = subprocess.run(
+        ['git', 'rev-list', '--count', 'HEAD'],
+        cwd=workdir, capture_output=True, check=True, text=True
+    )
+    commits_after = int(result.stdout.strip())
+
+    # Should have created 2 commits (one per package)
+    assert commits_after - commits_before == 2
+
+    # Verify both spec files were updated
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    assert 'Release: 1.1%{?dist}' in vanilla_spec.read_text()
+
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    assert 'Release: 1.1%{?dist}' in chocolate_spec.read_text()
+
+    # Verify commit messages
+    result = subprocess.run(
+        ['git', 'log', '--format=%s', '-2'],
+        cwd=workdir, capture_output=True, check=True, text=True
+    )
+    commit_subjects = result.stdout.strip().split('\n')
+    # Commits are in reverse order (newest first)
+    assert 'Rebuild chocolate: test rebuild all' in commit_subjects or 'Rebuild vanilla: test rebuild all' in commit_subjects
+    assert len([s for s in commit_subjects if 'Rebuild' in s and 'test rebuild all' in s]) == 2
+
+
+def test_rebuild_all_vs_package_mutually_exclusive(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test that --all and package name are mutually exclusive."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Should fail when both --all and package name are specified
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla', '--all',
+         '--reason', 'test'],
+        cwd=workdir, capture_output=True, text=True
+    )
+    assert result.returncode != 0
+    assert 'Cannot specify both package names and --all' in result.stderr
+
+
+def test_rebuild_requires_package_or_all(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test that rebuild requires either package name or --all."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Should fail when neither --all nor package name is specified
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', '--reason', 'test'],
+        cwd=workdir, capture_output=True, text=True
+    )
+    assert result.returncode != 0
+    assert 'Must specify either package name(s) or --all' in result.stderr
+
+
+def test_rebuild_rejects_macro_without_dist(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test that rebuild rejects macros that don't end with %{?dist}."""
+    # Import vanilla
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Modify spec to use a macro in Release field WITHOUT %{?dist}
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    spec_content = vanilla_spec.read_text()
+    modified_content = re.sub(
+        r'^Release:.*$',
+        'Release: %{some_macro}',
+        spec_content,
+        flags=re.MULTILINE
+    )
+    vanilla_spec.write_text(modified_content)
+    subprocess.run(['git', 'commit', '-a', '-m', 'Use macro in Release'], cwd=workdir, check=True)
+
+    # Rebuild should fail with clear error
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla',
+         '--reason', 'test'],
+        cwd=workdir, capture_output=True, text=True
+    )
+    assert result.returncode != 0
+    assert 'uses macros in Release field without' in result.stderr
+    assert 'requires manual rebuild' in result.stderr
+
+
+def test_rebuild_macro_with_dist(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test that rebuild handles macro-based Release that ends with %{?dist}."""
+    # Import vanilla
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Modify spec to use a macro in Release field WITH %{?dist}
+    # Simulates packages like rpm (%{baserelease}%{?dist}) or gcc (%{gcc_release}%{?dist})
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    spec_content = vanilla_spec.read_text()
+    modified_content = re.sub(
+        r'^Release:.*$',
+        'Release: %{my_macro}%{?dist}',
+        spec_content,
+        flags=re.MULTILINE
+    )
+    vanilla_spec.write_text(modified_content)
+    subprocess.run(['git', 'commit', '-a', '-m', 'Use macro with dist'], cwd=workdir, check=True)
+
+    # First rebuild: should add .1
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla',
+         '--reason', 'first rebuild'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify Release was updated correctly
+    spec_content = vanilla_spec.read_text()
+    assert 'Release: %{my_macro}.1%{?dist}' in spec_content
+
+    # Second rebuild: should increment to .2
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla',
+         '--reason', 'second rebuild'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify Release was incremented
+    spec_content = vanilla_spec.read_text()
+    assert 'Release: %{my_macro}.2%{?dist}' in spec_content
+
+
+def test_rebuild_with_content_after_dist(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test that rebuild preserves content after %{?dist}."""
+    # Import vanilla
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Modify spec to have content after %{?dist} (like unbound)
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    spec_content = vanilla_spec.read_text()
+    modified_content = re.sub(
+        r'^Release:.*$',
+        'Release: 5%{?dist} %{?extra_version:-e %{extra_version}}',
+        spec_content,
+        flags=re.MULTILINE
+    )
+    vanilla_spec.write_text(modified_content)
+    subprocess.run(['git', 'commit', '-a', '-m', 'Add extra_version'], cwd=workdir, check=True)
+
+    # Rebuild
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla',
+         '--reason', 'first rebuild'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify Release was updated and content after dist was preserved
+    spec_content = vanilla_spec.read_text()
+    assert 'Release: 5.1%{?dist} %{?extra_version:-e %{extra_version}}' in spec_content
+
+    # Second rebuild
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla',
+         '--reason', 'second rebuild'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify increment and preservation
+    spec_content = vanilla_spec.read_text()
+    assert 'Release: 5.2%{?dist} %{?extra_version:-e %{extra_version}}' in spec_content
+
+
+def test_rebuild_real_world_release_strings(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test rebuild handles real-world Release field patterns seen in the repo."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+
+    cases = [
+        # (initial Release line, expected after first rebuild, expected after second rebuild)
+        # libyuv-style: long timestamp string with no trailing digit
+        ('0.62.20260213git6067afd%{?dist}',
+         '0.62.20260213git6067afd.1%{?dist}',
+         '0.62.20260213git6067afd.2%{?dist}'),
+        # ansible-packaging-style: Fedora ships dotted release (20.1)
+        # Upstream release in metadata is also "20.1", so first rebuild -> 20.1.1
+        ('20.1%{?dist}', '20.1.1%{?dist}', '20.1.2%{?dist}'),
+        # Fedora pre-release pattern (0.N): must not be treated as already-bumped
+        ('0.1%{?dist}', '0.1.1%{?dist}', '0.1.2%{?dist}'),
+        # Content after %{?dist} preserved (unbound-style)
+        ('11%{?dist} %{?extra_version:-e %{extra_version}}',
+         '11.1%{?dist} %{?extra_version:-e %{extra_version}}',
+         '11.2%{?dist} %{?extra_version:-e %{extra_version}}'),
+    ]
+
+    for initial, after_first, after_second in cases:
+        # Set Release to initial value and update metadata to match (simulates fresh import)
+        spec_content = vanilla_spec.read_text()
+        modified = re.sub(r'^Release:.*$', f'Release: {initial}', spec_content, flags=re.MULTILINE)
+        vanilla_spec.write_text(modified)
+
+        # Update metadata release to the plain value (without %{?dist} and trailing content)
+        metadata_file = workdir / 'metadata' / 'vanilla.json'
+        import json
+        metadata = json.loads(metadata_file.read_text())
+        # Strip %{?dist} and anything after it so upstream_release matches what bump_release expects
+        upstream_rel = re.sub(r'%\{\??dist\}.*', '', initial).strip()
+        metadata['release'] = upstream_rel
+        metadata_file.write_text(json.dumps(metadata, indent=2) + '\n')
+
+        subprocess.run(['git', 'commit', '-a', '-m', f'Set Release: {initial}'],
+                       cwd=workdir, check=True)
+
+        # First rebuild
+        subprocess.run(
+            [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla', '--reason', 'first'],
+            cwd=workdir, check=True,
+        )
+        assert after_first in vanilla_spec.read_text(), \
+            f"After first rebuild of {initial!r}: expected {after_first!r}"
+
+        # Second rebuild (upstream_release in metadata is still the original)
+        subprocess.run(
+            [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla', '--reason', 'second'],
+            cwd=workdir, check=True,
+        )
+        assert after_second in vanilla_spec.read_text(), \
+            f"After second rebuild of {initial!r}: expected {after_second!r}"
+
+
+def test_rebuild_all_continues_on_failure(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test that rebuild --all continues processing when some packages fail."""
+    # Import two packages
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Break vanilla by using a macro in Release
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    spec_content = vanilla_spec.read_text()
+    modified_content = re.sub(
+        r'^Release:.*$',
+        'Release: %{broken_macro}',
+        spec_content,
+        flags=re.MULTILINE
+    )
+    vanilla_spec.write_text(modified_content)
+    subprocess.run(['git', 'commit', '-a', '-m', 'Break vanilla'], cwd=workdir, check=True)
+
+    # Rebuild all with --dry-run
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), '--dry-run', 'rebuild', '--all',
+         '--reason', 'test all'],
+        cwd=workdir, capture_output=True, text=True
+    )
+
+    # Should exit with error code since one package failed
+    assert result.returncode == 1
+
+    # Should show failure for vanilla
+    assert 'Failed to rebuild vanilla' in result.stderr
+    assert 'uses macros in Release field' in result.stderr
+
+    # Should show success for chocolate
+    assert 'Rebuilding chocolate' in result.stderr
+    assert 'Updated Release: to 1.1%{?dist} in chocolate.spec' in result.stderr
+
+    # Should show summary
+    assert 'Rebuild Summary:' in result.stdout
+    assert 'Total packages: 2' in result.stdout
+    assert 'Failed rebuilds: 1' in result.stdout
+    assert 'Failed packages:' in result.stdout
+    assert '- vanilla' in result.stdout
+
+    # chocolate should be modified (in dry-run), vanilla should not
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    assert 'Release: 1.1%{?dist}' in chocolate_spec.read_text()
+
+    # vanilla should still have the broken macro
+    assert 'Release: %{broken_macro}' in vanilla_spec.read_text()
