@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Lower parallel test multiplier to avoid valgrind contention on small builders",
   "modification_status": "modified",
-  "release": "2",
-  "sha": "f28e76422afd01201245bfad881902d2961c3e1d",
+  "release": "3",
+  "sha": "9821ffef8df4d04216000f7fa65777a9e3fb6677",
   "source": "https://src.fedoraproject.org/rpms/curl.git",
   "version": "8.19.0"
 }
