@@ -1,0 +1,61 @@
+From 66082fac360cdb650626e8a99a8bcb6294752291 Mon Sep 17 00:00:00 2001
+From: "github-actions[bot]"
+ <41898282+github-actions[bot]@users.noreply.github.com>
+Date: Tue, 24 Feb 2026 15:14:10 +0000
+Subject: [PATCH 1/2] Backport testing fix for Starlette 1.0.0rc1
+
+---
+ tests/integrations/starlette/test_starlette.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/tests/integrations/starlette/test_starlette.py b/tests/integrations/starlette/test_starlette.py
+index 0cb33e15..801cd53b 100644
+--- a/tests/integrations/starlette/test_starlette.py
++++ b/tests/integrations/starlette/test_starlette.py
+@@ -144,7 +144,12 @@ def starlette_app_factory(middleware=None, debug=True):
+             "request": request,
+             "msg": "Hello Template World!",
+         }
+-        return templates.TemplateResponse("trace_meta.html", template_context)
++        if STARLETTE_VERSION >= (1,):
++            return templates.TemplateResponse(
++                request, "trace_meta.html", template_context
++            )
++        else:
++            return templates.TemplateResponse("trace_meta.html", template_context)
+ 
+     all_methods = [
+         "CONNECT",
+-- 
+2.53.0
+
+
+From 29d7affd7f79ced4ba0402c41b2c03b0e891d552 Mon Sep 17 00:00:00 2001
+From: Alex Alderman Webb <alexander.webb@sentry.io>
+Date: Mon, 23 Mar 2026 10:49:30 +0100
+Subject: [PATCH 2/2] fix(starlette): Catch Jinja2Templates ImportError (#5741)
+
+---
+ sentry_sdk/integrations/starlette.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/sentry_sdk/integrations/starlette.py b/sentry_sdk/integrations/starlette.py
+index 0b797ebc..dac9887e 100644
+--- a/sentry_sdk/integrations/starlette.py
++++ b/sentry_sdk/integrations/starlette.py
+@@ -552,7 +552,11 @@ def patch_templates() -> None:
+     except ImportError:
+         return  # Nothing to do
+ 
+-    from starlette.templating import Jinja2Templates  # type: ignore
++    # https://github.com/Kludex/starlette/commit/96479daca2e4bd8157f68d914fd162aa94eff73a
++    try:
++        from starlette.templating import Jinja2Templates  # type: ignore
++    except ImportError:
++        return
+ 
+     old_jinja2templates_init = Jinja2Templates.__init__
+ 
+-- 
+2.53.0
+
