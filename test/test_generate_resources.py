@@ -47,7 +47,8 @@ def mock_repo(tmp_path):
             release_org: registry.stage.redhat.io/hummingbird-tech-preview
             single_component_mode: true
             service_account_name: hummingbird-rpm-release-staging
-            pulp_domain: public-hummingbird-staging
+            pulp_unsigned_domain: public-hummingbird-staging-unsigned
+            pulp_signed_domain: public-hummingbird-staging
             pulp_secret_name: hummingbird-pulp-credentials-staging-secret
             pipeline_revision: development
             component_filter:
@@ -85,7 +86,8 @@ class TestBuildRelengVariables:
         assert variables["release_tenant"] == "rhtap-releng-tenant"
         assert variables["branch"] == "main"
         assert variables["tenant"] == "hummingbird-tenant"
-        assert variables["pulp_domain"] == "public-hummingbird-staging"
+        assert variables["pulp_unsigned_domain"] == "public-hummingbird-staging-unsigned"
+        assert variables["pulp_signed_domain"] == "public-hummingbird-staging"
         assert variables["pulp_secret_name"] == "hummingbird-pulp-credentials-staging-secret"
         assert variables["pipeline_revision"] == "development"
 
@@ -169,7 +171,7 @@ class TestGenerateReleng:
 
         doc = yaml.safe_load(output)
         pulp = doc["spec"]["data"]["pulp"]
-        assert pulp["domain"] == "public-hummingbird-staging"
+        assert pulp["domain"] == "public-hummingbird-staging-unsigned"
         assert pulp["secretName"] == "hummingbird-pulp-credentials-staging-secret"
 
     def test_parameterized_pipeline_revision(self, gen_module, mock_repo):

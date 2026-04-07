@@ -13,8 +13,21 @@ spec:
   data:
     intention: production
     pulp:
-      domain: {{ pulp_domain }}
+      domain: {{ pulp_unsigned_domain }}
       secretName: {{ pulp_secret_name }}
+    signOptions:
+      signKeytab:
+        principal: "konflux-release-signing-prod@IPA.REDHAT.COM"
+        name: "keytab"
+        secret: "konflux-release-signing-prod-sa"
+      signPipelineImage: "quay.io/konflux-ci/signing:latest"
+      signPipelineServiceAccount: "signing-pipeline-sa"
+      skipUploadToPulp: true
+      artifactStorageSecret: "signing-artifact-storage-prod"
+      signKeyAlias:
+        key: "release4,release2,ima"
+      unsignedRpmsDomain: {{ pulp_unsigned_domain }}
+      signedRpmsDomain: {{ pulp_signed_domain }}
     releaseNotes:
       product_id: [1071]
       product_name: "Red Hat Hardened Images"

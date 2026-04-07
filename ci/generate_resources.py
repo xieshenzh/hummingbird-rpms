@@ -228,7 +228,8 @@ def build_releng_variables() -> dict:
         "release_tenant": global_config["release_tenant"],
         "branch": global_config["branch"],
         "tenant": global_config["tenant"],
-        "pulp_domain": rpa_config["pulp_domain"],
+        "pulp_unsigned_domain": rpa_config["pulp_unsigned_domain"],
+        "pulp_signed_domain": rpa_config["pulp_signed_domain"],
         "pulp_secret_name": rpa_config["pulp_secret_name"],
         "pipeline_revision": rpa_config["pipeline_revision"],
     }
