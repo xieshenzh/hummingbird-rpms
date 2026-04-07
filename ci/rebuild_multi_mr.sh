@@ -8,6 +8,7 @@
 #   ./ci/rebuild_multi_mr.sh --base abc1234               # Use a specific commit SHA as base
 #   ./ci/rebuild_multi_mr.sh --max-updates=5              # Create at most 5 MRs
 #   ./ci/rebuild_multi_mr.sh --dry-run                    # Show what would be done, don't push
+#   ./ci/rebuild_multi_mr.sh --force                      # Delete stale remote branches (e.g. from closed MRs) before pushing
 #
 # Environment variables:
 #   CHORE_MR_GITLAB_TOKEN    - GitLab API token with write_repository scope (for HTTPS remotes)
@@ -20,6 +21,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 BASE="origin/main"
 MAX_UPDATES=0  # 0 means unlimited
 DRY_RUN=false
+FORCE=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -43,9 +45,13 @@ while [[ $# -gt 0 ]]; do
             DRY_RUN=true
             shift
             ;;
+        --force)
+            FORCE=true
+            shift
+            ;;
         *)
             echo "Unknown option: $1" >&2
-            echo "Usage: $0 [--base REF] [--max-updates=N] [--dry-run]" >&2
+            echo "Usage: $0 [--base REF] [--max-updates=N] [--dry-run] [--force]" >&2
             exit 1
             ;;
     esac
@@ -59,6 +65,9 @@ if [[ "${DRY_RUN}" == true ]]; then
     echo "Mode: DRY-RUN (no MRs will be created)"
 else
     echo "Mode: PRODUCTION (MRs will be created)"
+fi
+if [[ "${FORCE}" == true ]]; then
+    echo "Force: yes (stale remote branches will be deleted)"
 fi
 if [[ ${MAX_UPDATES} -gt 0 ]]; then
     echo "Max MRs: ${MAX_UPDATES}"
@@ -130,6 +139,13 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
             break
         fi
         continue
+    fi
+
+    # If --force is set and the remote branch already exists (e.g. from a previously
+    # closed MR), delete it so create_mr.sh doesn't mistake it for an open MR.
+    if [[ "${FORCE}" == true ]] && git ls-remote --exit-code --heads origin "${BRANCH_NAME}" >/dev/null 2>&1; then
+        echo "  → Remote branch ${BRANCH_NAME} exists, deleting (--force)..."
+        git push origin --delete "${BRANCH_NAME}"
     fi
 
     # Create branch at base and cherry-pick the rebuild commit.
