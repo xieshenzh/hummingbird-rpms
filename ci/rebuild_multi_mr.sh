@@ -51,9 +51,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Configuration
-TARGET_BRANCH=${CI_DEFAULT_BRANCH:-main}
-
 echo "========================================"
 echo "Rebuild Multi-MR"
 echo "========================================"

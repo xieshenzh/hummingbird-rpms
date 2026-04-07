@@ -80,7 +80,7 @@ def upstream_repos(tmp_path: Path) -> dict[str, Path]:
     # Create a simple spec file
     (vanilla_dir / 'vanilla.spec').write_text("""Name: vanilla
 Version: 1.0
-Release: 1
+Release: 1%{?dist}
 Summary: Test package vanilla
 License: MIT
 
@@ -103,7 +103,7 @@ Test package
     choc_spec = chocolate_dir / 'chocolate.spec'
     choc_spec.write_text("""Name: chocolate
 Version: 10
-Release: 1
+Release: 1%{?dist}
 Summary: Test package chocolate
 License: GPL
 
@@ -119,7 +119,7 @@ Test package chocolate
     subprocess.run(['git', 'checkout', '-b', 'f40'], cwd=chocolate_dir, check=True)
     choc_spec.write_text("""Name: chocolate
 Version: 4
-Release: 1
+Release: 1%{?dist}
 Summary: Test package chocolate
 License: GPL
 
@@ -2527,6 +2527,27 @@ def test_bump_release_helper(dist_git_module) -> None:
     assert bump('3.1', upstream_release=None) == '3.2'
     assert bump('3', upstream_release=None) == '3.1'
 
+    # Real-world release strings from the repo:
+
+    # libyuv: ends with non-digit letters, so no .N match -> append .1
+    assert bump('0.62.20260213git6067afd') == '0.62.20260213git6067afd.1'
+    assert bump('0.62.20260213git6067afd.1') == '0.62.20260213git6067afd.2'
+
+    # libedit: macro with non-digit suffix -> no .N match -> append .1
+    assert bump('58.%{snap}cvs') == '58.%{snap}cvs.1'
+    assert bump('58.%{snap}cvs.1') == '58.%{snap}cvs.2'
+
+    # ansible-packaging: Fedora ships 20.1 (dotted), first rebuild -> 20.1.1
+    assert bump('20.1', upstream_release='20.1') == '20.1.1'
+    assert bump('20.1.1', upstream_release='20.1') == '20.1.2'
+
+    # python-gitlab: Fedora ships 1.1, already rebuilt to 1.2 -> 1.3
+    assert bump('1.2', upstream_release='1.1') == '1.3'
+
+    # Fedora pre-release (0.N pattern): first rebuild -> 0.1.1, not 0.2
+    assert bump('0.1', upstream_release='0.1') == '0.1.1'
+    assert bump('0.1.1', upstream_release='0.1') == '0.1.2'
+
 
 def test_rebuild_all(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     """Test rebuild --all rebuilds all packages with one commit per package."""
@@ -2731,6 +2752,66 @@ def test_rebuild_with_content_after_dist(workdir: Path, upstream_repos: dict[str
     # Verify increment and preservation
     spec_content = vanilla_spec.read_text()
     assert 'Release: 5.2%{?dist} %{?extra_version:-e %{extra_version}}' in spec_content
+
+
+def test_rebuild_real_world_release_strings(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test rebuild handles real-world Release field patterns seen in the repo."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+
+    cases = [
+        # (initial Release line, expected after first rebuild, expected after second rebuild)
+        # libyuv-style: long timestamp string with no trailing digit
+        ('0.62.20260213git6067afd%{?dist}',
+         '0.62.20260213git6067afd.1%{?dist}',
+         '0.62.20260213git6067afd.2%{?dist}'),
+        # ansible-packaging-style: Fedora ships dotted release (20.1)
+        # Upstream release in metadata is also "20.1", so first rebuild -> 20.1.1
+        ('20.1%{?dist}', '20.1.1%{?dist}', '20.1.2%{?dist}'),
+        # Fedora pre-release pattern (0.N): must not be treated as already-bumped
+        ('0.1%{?dist}', '0.1.1%{?dist}', '0.1.2%{?dist}'),
+        # Content after %{?dist} preserved (unbound-style)
+        ('11%{?dist} %{?extra_version:-e %{extra_version}}',
+         '11.1%{?dist} %{?extra_version:-e %{extra_version}}',
+         '11.2%{?dist} %{?extra_version:-e %{extra_version}}'),
+    ]
+
+    for initial, after_first, after_second in cases:
+        # Set Release to initial value and update metadata to match (simulates fresh import)
+        spec_content = vanilla_spec.read_text()
+        modified = re.sub(r'^Release:.*$', f'Release: {initial}', spec_content, flags=re.MULTILINE)
+        vanilla_spec.write_text(modified)
+
+        # Update metadata release to the plain value (without %{?dist} and trailing content)
+        metadata_file = workdir / 'metadata' / 'vanilla.json'
+        import json
+        metadata = json.loads(metadata_file.read_text())
+        # Strip %{?dist} and anything after it so upstream_release matches what bump_release expects
+        upstream_rel = re.sub(r'%\{\??dist\}.*', '', initial).strip()
+        metadata['release'] = upstream_rel
+        metadata_file.write_text(json.dumps(metadata, indent=2) + '\n')
+
+        subprocess.run(['git', 'commit', '-a', '-m', f'Set Release: {initial}'],
+                       cwd=workdir, check=True)
+
+        # First rebuild
+        subprocess.run(
+            [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla', '--reason', 'first'],
+            cwd=workdir, check=True,
+        )
+        assert after_first in vanilla_spec.read_text(), \
+            f"After first rebuild of {initial!r}: expected {after_first!r}"
+
+        # Second rebuild (upstream_release in metadata is still the original)
+        subprocess.run(
+            [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'vanilla', '--reason', 'second'],
+            cwd=workdir, check=True,
+        )
+        assert after_second in vanilla_spec.read_text(), \
+            f"After second rebuild of {initial!r}: expected {after_second!r}"
 
 
 def test_rebuild_all_continues_on_failure(workdir: Path, upstream_repos: dict[str, Path]) -> None:

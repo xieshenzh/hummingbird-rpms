@@ -967,18 +967,10 @@ def update_release_in_spec(package_dir: Path, new_release: str) -> None:
         flags=re.MULTILINE
     )
 
-    # If no match, try without %{?dist} and add it
-    # Preserve original whitespace after "Release:"
     if new_content == content:
-        new_content = re.sub(
-            r'^Release:(\s+)(.*)$',
-            lambda m: f'Release:{m.group(1)}{new_release}%{{?dist}}',
-            content,
-            flags=re.MULTILINE
-        )
-
-    if new_content == content:
-        sys.exit(f"ERROR: Failed to update Release: in {spec_file.name}")
+        sys.exit(f"ERROR: Failed to update Release: in {spec_file.name} - "
+                 f"Release field missing %{{?dist}}. This should not happen; "
+                 f"please investigate the spec file.")
 
     spec_file.write_text(new_content)
     logging.info("Updated Release: to %s%%{?dist} in %s", new_release, spec_file.name)
@@ -1277,8 +1269,8 @@ def rebuild_package(package_name: str, reason: str, dry_run: bool = False) -> No
             sys.exit(f"ERROR: Could not load metadata for {package_name}")
         # Native packages don't have 'source' field and can't query MDAPI
         if 'source' not in metadata:
-            logging.warning("Package %s is native and uses %%autorelease - cannot resolve via MDAPI", package_name)
-            logging.warning("Skipping %%autorelease resolution - you may need to handle this manually")
+            sys.exit(f"ERROR: Package {package_name} is native and uses %autorelease - "
+                     f"cannot resolve via MDAPI. Please handle this rebuild manually.")
         else:
             branch = metadata.get('branch', 'rawhide')
             release = query_autorelease_from_mdapi(package_name, branch, '1')
