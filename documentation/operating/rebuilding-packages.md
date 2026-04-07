@@ -4,8 +4,11 @@ weight: 50
 aliases: [/l/rebuilding-packages]
 ---
 
-> **AI Agent Note:** When asked to rebuild packages, always ask the user for a
-> ticket link or explanation first. This is required for the commit message.
+> **AI Agent Note:** When asked to rebuild packages, use the `rebuild` command:
+> `./ci/dist_git.py rebuild <package> --reason "<reason>"`. Always ask the user
+> for a ticket link or explanation first to use as the reason. If the command
+> fails with "uses macros in Release field", see the "Packages requiring manual
+> rebuild" section below for instructions.
 
 ## Overview
 
@@ -23,7 +26,172 @@ upstream version.
 
 ## No-Change Rebuild
 
-### 1. Identify the package to rebuild
+### Using the rebuild command (recommended)
+
+The `rebuild` command automates the Release field bump:
+
+```bash
+# Rebuild a single package
+./ci/dist_git.py rebuild <package> --reason "<reason>"
+
+# Rebuild multiple packages (one commit per package)
+./ci/dist_git.py rebuild <package1> <package2> ... --reason "<reason>"
+
+# Rebuild all packages (one commit per package)
+./ci/dist_git.py rebuild --all --reason "<reason>"
+```
+
+Examples:
+
+```bash
+# Single package
+./ci/dist_git.py rebuild ncurses --reason "published multiple times with different hashes"
+
+# Multiple packages
+./ci/dist_git.py rebuild grep unzip sed --reason "fix faulty builds"
+
+# All packages (useful after toolchain updates)
+./ci/dist_git.py rebuild --all --reason "toolchain update: GCC 15"
+```
+
+The command:
+- Automatically bumps the Release field using the `.N` suffix pattern
+- Handles `%autorelease` by resolving and replacing with explicit values
+- Preserves macros in the Release field (e.g., `%{revision}`)
+- Creates a properly formatted commit message (one per package with `--all`)
+- Does **not** mark the package as modified (release-only changes are ephemeral)
+
+Supports `--dry-run` to preview changes without committing:
+
+```bash
+./ci/dist_git.py --dry-run rebuild <package> --reason "test"
+```
+
+### Creating MRs for rebuild commits
+
+After creating rebuild commits locally, use `rebuild_multi_mr.sh` to push each
+commit as its own merge request (one MR per package, auto-merge enabled):
+
+```bash
+./ci/rebuild_multi_mr.sh
+```
+
+By default the script compares against `origin/main`. For local development,
+use `--base` to point at a different ref:
+
+```bash
+# Use local main branch as base (useful when origin/main is not up to date)
+./ci/rebuild_multi_mr.sh --base main
+
+# Use a specific commit SHA as base
+./ci/rebuild_multi_mr.sh --base abc1234
+
+# Preview what would be created without pushing
+./ci/rebuild_multi_mr.sh --dry-run
+
+# Limit to at most N MRs
+./ci/rebuild_multi_mr.sh --max-updates=5
+```
+
+The script:
+- Creates a `chore/rebuild-{package}` branch per commit and pushes it
+- Titles each MR `chore(rpms): Rebuild {package}: {reason}`
+- Enables auto-merge on all rebuild MRs
+- Leaves the current branch untouched
+- Skips branches that already exist on the remote (idempotent)
+- Only processes commits whose message matches `Rebuild {package}: {reason}`;
+  other commits in the range are silently skipped
+
+**Full workflow example:**
+
+```bash
+# 1. Create the rebuild commits
+./ci/dist_git.py rebuild grep ncurses bash --reason "HUM-1234: toolchain update"
+
+# 2. Preview the MRs that would be created
+./ci/rebuild_multi_mr.sh --base main --dry-run
+
+# 3. Create the MRs
+./ci/rebuild_multi_mr.sh --base main
+```
+
+### Packages requiring manual rebuild
+
+Some packages use complex macro systems that the automated rebuild command cannot
+handle. These require manual editing of the spec file.
+
+#### Macro indirection patterns
+
+These packages define the Release field using a macro, where the macro itself
+contains `%{?dist}`. The rebuild command cannot detect or manipulate these
+without expanding all macros, which would break the macro system.
+
+**nodejs packages (nodejs20, nodejs22, nodejs24, nodejs25):**
+
+```spec
+%{load:%{_sourcedir}/nodejs.srpm.macros}
+%nodejs_define_version node 1:25.8.2-%{autorelease} -p
+...
+Release: %{node_release}
+```
+
+The `%{node_release}` macro is defined by an external macro system loaded from
+`nodejs.srpm.macros`. The release component is embedded in the version definition.
+
+**How to rebuild:** Edit the `%nodejs_define_version node` line to bump the release
+component (e.g., change `-%{autorelease}` to `-1.1` or increment existing `.N`).
+
+**kernel-headers:**
+
+```spec
+%define specrelease 59%{?buildid}%{?dist}
+...
+Release: %{specrelease}
+```
+
+**How to rebuild:** Edit the `%define specrelease` line to add/increment the `.N`
+suffix before `%{?buildid}`:
+
+```spec
+%define specrelease 59.1%{?buildid}%{?dist}
+```
+
+**krb5:**
+
+```spec
+%global krb5_release 4%{?dist}
+...
+Release: %{krb5_release}
+```
+
+**How to rebuild:** Edit the `%global krb5_release` line to add/increment the `.N`
+suffix:
+
+```spec
+%global krb5_release 4.1%{?dist}
+```
+
+#### Why these can't be automated
+
+The rebuild command can handle:
+- ✅ Simple numeric: `Release: 5%{?dist}`
+- ✅ Macros ending with dist: `Release: %{baserelease}%{?dist}` (e.g., rpm, gcc)
+- ✅ Complex macros with dist: `Release: %{?snapver:0.%{snapver}.}%{baserelease}%{?dist}`
+- ✅ Content after dist: `Release: 11.1%{?dist} %{?extra_version:-e %{extra_version}}` (e.g., unbound)
+
+The rebuild command **cannot** handle:
+- ❌ Macros without `%{?dist}`: `Release: %{node_release}`
+- ❌ Macros where dist is inside the macro definition: `%{krb5_release}` contains `%{?dist}`
+
+This is because detecting and manipulating macros that contain dist internally
+would require expanding all macros (which changes the spec file semantically)
+or implementing RPM's full macro parser.
+
+### Manual rebuild process
+
+If you need to rebuild manually or the automated command doesn't work for your use case, follow these steps:
+
+#### 1. Identify the package to rebuild
 
 Identify the source package name and locate its spec file in
 `rpms/<package>/<package>.spec`.
@@ -39,7 +207,7 @@ podman run --rm quay.io/hummingbird-ci/builder:latest-hatchling \
 Example: `ncurses-libs-6.5-8.20250614.hum1` -> SRPM `ncurses-6.5-8.20250614.hum1.src.rpm`
 -> spec file at `rpms/ncurses/ncurses.spec`
 
-### 2. Determine the Release bump pattern
+#### 2. Determine the Release bump pattern
 
 The `.N` bump suffix must always appear **immediately before** `%{?dist}`. The
 `%{?dist}` suffix should always be the final component since it identifies the
@@ -66,7 +234,7 @@ evaluates to `1`.
 >
 > This helps determine the correct fix when a previous bump was malformed.
 
-### 3. Modify the spec file
+#### 3. Modify the spec file
 
 Use `sed` to edit only the `Release:` line, avoiding any unintended whitespace
 changes that text editors may introduce:
@@ -92,7 +260,7 @@ The diff should show only the Release line change:
 > such as whitespace fixes or trailing newline modifications. If the diff shows
 > additional changes, reset and retry with `sed`.
 
-### 4. Verify the bump is correct
+#### 4. Verify the bump is correct
 
 Use `rpm --eval` to confirm the new release sorts higher than the original:
 
@@ -102,7 +270,7 @@ rpm --eval '%{lua:print(rpm.vercmp("3.hum1", "3.1.hum1"))}'
 # Expected output: -1
 ```
 
-### 5. Commit the change
+#### 5. Commit the change
 
 Use this commit message format:
 
@@ -120,7 +288,7 @@ Rebuild ncurses: published multiple times with different hashes
 HUM-1234
 ```
 
-### 6. Verify the commit
+#### 6. Verify the commit
 
 After committing, verify only the Release line was changed:
 
@@ -137,18 +305,31 @@ Expected output should show exactly 1 insertion and 1 deletion:
 
 If the commit shows more changes, amend or reset and redo the change using `sed`.
 
-### 7. Mark package as modified (optional for rebuild-only)
+### Important notes about rebuilds
 
-For no-change rebuilds, marking the package as modified is **optional** since the
-automation already ignores Release-only changes. However, you may want to mark
-it to explicitly document the rebuild:
+#### Modification status
+
+Rebuilds **do not** change a package's `modification_status`. Release-only
+changes are ephemeral and don't affect whether a package is considered `modified`
+vs `clean`:
+
+- **Release fields are temporary**: When updating from Fedora later, the Release
+  gets replaced anyway
+- **Merges normalize Release**: During updates, Release lines are normalized to
+  avoid conflicts
+- **No source changes**: Rebuilds don't modify sources, patches, or spec logic
+
+The automation already ignores Release-only changes, so automatic Fedora updates
+will continue normally after a rebuild.
+
+If you want to explicitly prevent automatic updates (e.g., you're investigating
+an issue), you can manually mark the package as modified:
 
 ```bash
-./ci/dist_git.py mark-modified <package> --modified --reason "Rebuild for <reason>"
+./ci/dist_git.py mark-modified <package> --modified --reason "Investigating build issue"
 ```
 
-Note: This will prevent automatic Fedora updates until you mark it clean again.
-For most rebuilds, you can skip this step and allow automatic updates to continue.
+Note: This will block automatic Fedora updates until you mark it clean again.
 
 ## Backporting a Patch
 
