@@ -5,7 +5,7 @@
 
 Name:           hummingbird-release
 Version:        20251124
-Release:        1.9%{?dist}
+Release:        1.10%{?dist}
 Summary:        %{distro} release files
 License:        GPL-2.0-or-later
 URL:            https://hummingbird-project.io/
@@ -27,7 +27,7 @@ Source201:      LICENSE
 
 Source500:      hummingbird.repo
 
-Source603:      RPM-GPG-KEY-hummingbird-SHA256
+Source603:      RPM-GPG-KEY-hummingbird-release
 
 
 %package -n hummingbird-repos
