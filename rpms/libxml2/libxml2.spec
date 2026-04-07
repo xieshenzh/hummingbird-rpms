@@ -1,29 +1,31 @@
 Name:           libxml2
-Version:        2.12.10
-Release:        6%{?dist}
+Version:        2.15.2
+Release:        0.1%{?dist}
 Summary:        Library providing XML and HTML support
 
 # list.c, dict.c and few others use ISC-Veillard
-# the conformance and test suite data in
-# Source1, Source2 and Source3 is covered by W3C
+# the conformance test suite data in Source1 is covered by W3C
 License:        MIT AND ISC-Veillard AND W3C
 URL:            https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
-Source0:        https://download.gnome.org/sources/%{name}/2.12/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/2.15/%{name}-%{version}.tar.xz
 # https://www.w3.org/XML/Test/xmlconf-20080827.html
 Source1:        https://www.w3.org/XML/Test/xmlts20080827.tar.gz
-# https://www.w3.org/XML/2004/xml-schema-test-suite/index.html
-Source2:        https://www.w3.org/XML/2004/xml-schema-test-suite/xmlschema2002-01-16/xsts-2002-01-16.tar.gz
-Source3:        https://www.w3.org/XML/2004/xml-schema-test-suite/xmlschema2004-01-14/xsts-2004-01-14.tar.gz
 Patch0:         libxml2-multilib.patch
 # Patch from openSUSE.
 # See:  https://bugzilla.gnome.org/show_bug.cgi?id=789714
-Patch1:         libxml2-2.12.0-python3-unicode-errors.patch
+Patch1:         libxml2-2.15.2-python3-unicode-errors.patch
+# Fix memory leak in catalog resolve cache cleanup
+# https://gitlab.gnome.org/GNOME/libxml2/-/merge_requests/393
+Patch2:         libxml2-2.15.2-catalog-leak.patch
 
 BuildRequires:  cmake-rpm-macros
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(liblzma)
+BuildRequires:  /usr/bin/xsltproc
+BuildRequires:  docbook-style-xsl
+BuildRequires:  doxygen
 
 %description
 This library allows to manipulate XML files. It includes support
@@ -89,8 +91,8 @@ find doc -type f -executable -print -exec chmod 0644 {} ';'
 %configure \
     --enable-static \
     --with-legacy \
-    --with-ftp \
-    --with-python=%{__python3}
+    --with-docs \
+    --with-python
 %make_build
 
 %install
@@ -102,42 +104,30 @@ touch -m --reference=%{buildroot}%{_includedir}/libxml2/libxml/parser.h %{buildr
 find %{buildroot} -type f -name '*.la' -print -delete
 rm -vf %{buildroot}{%{python2_sitearch},%{python3_sitearch}}/*.a
 rm -vrf %{buildroot}%{_datadir}/doc/
-gzip -9 -c doc/libxml2-api.xml > doc/libxml2-api.xml.gz
 
 %check
 # Tests require the XML conformance suite.
 tar -xzvf %{SOURCE1}
 %make_build check
 rm -rf xmlconf
-# Schema tests use the schema test suite.
-cp %{SOURCE2} %{SOURCE3} xstc/
-pushd xstc
-mkdir Tests
-%make_build tests
-popd
 # As the directory is copied to the devel subpackage, remove any build
 # artifacts.
-(cd doc/examples ; make clean ; rm -rf .deps Makefile)
+make -C example clean
+rm -rf example/.deps example/Makefile
 
 %ldconfig_scriptlets
 
 %files
 %license Copyright
 %doc NEWS README.md
-%{_libdir}/libxml2.so.2*
+%{_libdir}/libxml2.so.16*
 %{_bindir}/xmlcatalog
 %{_bindir}/xmllint
 %{_mandir}/man1/xmlcatalog.1*
 %{_mandir}/man1/xmllint.1*
 
 %files devel
-%doc doc/*.html
-%doc doc/tutorial doc/libxml2-api.xml.gz
-%doc doc/examples
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/aclocal/libxml.m4
-%{_datadir}/gtk-doc/html/libxml2/
+%doc example
 %{_includedir}/libxml2/
 %{_libdir}/libxml2.so
 %{_libdir}/pkgconfig/libxml-2.0.pc
@@ -150,8 +140,7 @@ popd
 %{_libdir}/libxml2.a
 
 %files -n python3-%{name}
-%doc doc/*.py
-%{python3_sitearch}/libxml2mod.so
+%{python3_sitearch}/libxml2mod*.so
 %{python3_sitelib}/libxml2.py
 %{python3_sitelib}/__pycache__/libxml2.*
 %{python3_sitelib}/drv_libxml2.py
