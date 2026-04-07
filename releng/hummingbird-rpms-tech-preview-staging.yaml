@@ -13,8 +13,21 @@ spec:
   data:
     intention: production
     pulp:
-      domain: public-hummingbird
+      domain: hummingbird-unsigned
       secretName: hummingbird-pulp-credentials-production-secret
+    signOptions:
+      signKeytab:
+        principal: "konflux-release-signing-prod@IPA.REDHAT.COM"
+        name: "keytab"
+        secret: "konflux-release-signing-prod-sa"
+      signPipelineImage: "quay.io/konflux-ci/signing:latest"
+      signPipelineServiceAccount: "signing-pipeline-sa"
+      skipUploadToPulp: true
+      artifactStorageSecret: "signing-artifact-storage-prod"
+      signKeyAlias:
+        key: "release4,release2,ima"
+      unsignedRpmsDomain: hummingbird-unsigned
+      signedRpmsDomain: public-hummingbird
     releaseNotes:
       product_id: [1071]
       product_name: "Red Hat Hardened Images"
@@ -886,7 +899,7 @@ spec:
         - name: url
           value: "https://github.com/konflux-ci/release-service-catalog.git"
         - name: revision
-          value: 1b14a7824406264358b43426a3430e03e24e3e49
+          value: e1dfcdc0c9a0ffde549e8b500e3a5ea2950f5a87
         - name: pathInRepo
           value: "pipelines/managed/push-rpms-to-pulp/push-rpms-to-pulp.yaml"
       resolver: git
