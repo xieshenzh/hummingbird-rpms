@@ -1,4 +1,4 @@
-%global glibcsrcdir glibc-2.42-55-gebd45473f5
+%global glibcsrcdir glibc-2.42-61-ga56a2943d2
 %global glibcversion 2.42
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
@@ -152,7 +152,7 @@ Version: %{glibcversion}
 # - It allows using the Release number without the %%dist tag in the dependency
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
-%global baserelease 10.1
+%global baserelease 11
 Release: %{baserelease}%{?dist}
 
 # Licenses:
@@ -2388,6 +2388,16 @@ update_gconv_modules_cache ()
 %endif
 
 %changelog
+* Tue Apr 07 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-11
+- Auto-sync with upstream branch release/2.42/master,
+  commit a56a2943d2ce541102c630142c2eae0fbfc5886b:
+- tests: fix tst-rseq with Linux 7.0 (Michael Jeanson)
+- elf: parse /proc/self/maps as the last resort to find the gap for tst-link-map-contiguous-ldso (Xi Ruoyao)
+- resolv: Check hostname for validity (CVE-2026-4438) (Carlos O'Donell)
+- resolv: Count records correctly (CVE-2026-4437) (Carlos O'Donell)
+- posix: Run tst-wordexp-reuse-mem test (Florian Weimer)
+- iconvdata: Fix invalid pointer arithmetic in ANSI_X3.110 module (Florian Weimer)
+
 * Wed Feb 18 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-10
 - Auto-sync with upstream branch release/2.42/master,
   commit ebd45473f5421e0fced5ba2cde0f1aaa36e79b61:
