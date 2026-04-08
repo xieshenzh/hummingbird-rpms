@@ -20,7 +20,7 @@ rpas:
     pulp_unsigned_domain: hummingbird-unsigned
     pulp_signed_domain: public-hummingbird
     pulp_secret_name: hummingbird-pulp-credentials-production-secret
-    pipeline_revision: e1dfcdc0c9a0ffde549e8b500e3a5ea2950f5a87 # rpm signing feature branch
+    pipeline_revision: hummingbird-rpm-signing # rpm signing feature branch
     skip_pyxis_mr: true  # Set to true to skip pyxis-repo-configs MR for this RPA
     component_filter:
       path_prefix: rpms/  # Only components from this directory (e.g., images/, rpms/)

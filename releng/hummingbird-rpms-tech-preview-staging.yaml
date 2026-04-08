@@ -899,7 +899,7 @@ spec:
         - name: url
           value: "https://github.com/konflux-ci/release-service-catalog.git"
         - name: revision
-          value: e1dfcdc0c9a0ffde549e8b500e3a5ea2950f5a87
+          value: hummingbird-rpm-signing
         - name: pathInRepo
           value: "pipelines/managed/push-rpms-to-pulp/push-rpms-to-pulp.yaml"
       resolver: git
