@@ -5,7 +5,7 @@
 
 Name:    keyutils
 Version: 1.6.3
-Release: 7%{?buildid}%{?dist}
+Release: 7%{?buildid}.1%{?dist}
 Summary: Linux Key Management Utilities
 License: GPL-2.0-or-later AND LGPL-2.1-or-later
 Url:   https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git
