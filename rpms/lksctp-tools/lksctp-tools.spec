@@ -1,7 +1,7 @@
 Name:    lksctp-tools
 Summary: User-space access to Linux Kernel SCTP
 Version: 1.0.21
-Release: 3%{?dist}
+Release: 3.1%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.0-only AND MIT
 Group:   System Environment/Libraries
 URL:     https://github.com/sctp/lksctp-tools/wiki
