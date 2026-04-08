@@ -1,7 +1,7 @@
 Summary: Stub to allow choosing Ruby runtime
 Name: rubypick
 Version: 1.1.1
-Release: 24%{?dist}
+Release: 24.1%{?dist}
 License: MIT
 URL: https://github.com/fedora-ruby/rubypick
 Source0: https://github.com/fedora-ruby/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
