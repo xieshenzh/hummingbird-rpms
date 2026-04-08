@@ -15,7 +15,7 @@
 Summary: Utility for determining file types
 Name: file
 Version: 5.47
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 
 # Main license is BSD-2-Clause-Darwin
 # Shipped exceptions:
