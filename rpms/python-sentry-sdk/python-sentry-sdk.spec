@@ -55,7 +55,7 @@ Version:        2.48.0
 %forgemeta
 
 Name:           python-sentry-sdk
-Release:        4%{?dist}
+Release:        4.1%{?dist}
 Summary:        The new Python SDK for Sentry.io
 License:        MIT
 URL:            https://sentry.io/for/python/
