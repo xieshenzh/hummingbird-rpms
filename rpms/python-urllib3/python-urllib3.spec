@@ -6,7 +6,7 @@
 
 Name:           python-urllib3
 Version:        2.6.3
-Release:        2.1%{?dist}
+Release:        2.2%{?dist}
 Summary:        HTTP library with thread-safe connection pooling, file post, and more
 
 # SPDX
