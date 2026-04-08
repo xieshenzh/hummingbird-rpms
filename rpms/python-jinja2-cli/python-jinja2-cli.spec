@@ -8,7 +8,7 @@ yml and toml formats.
 
 Name:           python-%{pypi_name}
 Version:        0.8.2
-Release:        20.1%{?dist}
+Release:        20.2%{?dist}
 Summary:        %sum
 
 # Automatically converted from old format: BSD - review is highly recommended.
