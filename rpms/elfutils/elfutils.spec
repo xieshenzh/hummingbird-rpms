@@ -5,7 +5,7 @@
 Name: elfutils
 Version: 0.194
 %global baserelease 5
-Release: %{baserelease}%{?dist}
+Release: %{baserelease}.1%{?dist}
 URL: http://elfutils.org/
 %global source_url ftp://sourceware.org/pub/elfutils/%{version}/
 License: GPL-3.0-or-later AND (GPL-2.0-or-later OR LGPL-3.0-or-later) AND GFDL-1.3-no-invariants-or-later
