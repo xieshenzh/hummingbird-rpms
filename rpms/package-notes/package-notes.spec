@@ -1,6 +1,6 @@
 Name:           package-notes
 Version:        0.17
-Release:        3%{?dist}
+Release:        3.1%{?dist}
 Summary:        ELF Package and Dlopen Notes
 License:        0BSD
 URL:            https://github.com/systemd/package-notes
