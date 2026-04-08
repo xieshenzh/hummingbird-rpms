@@ -19,7 +19,7 @@
 
 Name:		zlib-ng
 Version:	2.3.3
-Release:	5%{?dist}
+Release:	5.1%{?dist}
 Summary:	Zlib replacement with optimizations
 License:	Zlib
 Url:		https://github.com/zlib-ng/zlib-ng
