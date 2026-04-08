@@ -8,7 +8,7 @@
 
 Name:           rust-add-determinism
 Version:        0.7.2
-Release:        4%{?dist}
+Release:        4.1%{?dist}
 Summary:        RPM buildroot helper to make builds reproducible and hardlink identical files
 
 License:        GPL-3.0-or-later
