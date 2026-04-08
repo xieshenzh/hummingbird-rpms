@@ -4,7 +4,7 @@
 Name:		libyuv
 Summary:	YUV conversion and scaling functionality library
 Version:	0
-Release:	0.62.20260213git6067afd%{?dist}
+Release:	0.62.20260213git6067afd.1%{?dist}
 License:	BSD-3-Clause
 Url:		https://chromium.googlesource.com/libyuv/libyuv
 VCS:		git:%{url}
