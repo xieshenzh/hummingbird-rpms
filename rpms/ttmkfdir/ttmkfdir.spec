@@ -1,7 +1,7 @@
 Summary: Utility to create fonts.scale files for truetype fonts
 Name: ttmkfdir
 Version: 3.0.9
-Release: 74%{?dist}
+Release: 74.1%{?dist}
 # Only licensing attribution is in README, no version.
 License: LGPL-2.0-or-later
 # This is a Red Hat maintained package which is specific to
