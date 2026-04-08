@@ -1,6 +1,6 @@
 Name:           capstone
 Version:        5.0.6
-Release:        4%{?dist}
+Release:        4.1%{?dist}
 Summary:        A lightweight multi-platform, multi-architecture disassembly framework
 License:        BSD-3-Clause AND BSD-4-Clause AND APSL-2.0 AND NCSA AND MIT
 URL:            http://www.capstone-engine.org/
