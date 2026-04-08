@@ -61,7 +61,7 @@
 Name:          tomcat11
 Epoch:         1
 Version:       %{major_version}.%{minor_version}.%{micro_version}
-Release:       0.1%{?dist}
+Release:       0.1.1%{?dist}
 Summary:       Apache Servlet/JSP Engine, RI for Servlet %{servletspec}/JSP %{jspspec} API
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
