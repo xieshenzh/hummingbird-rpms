@@ -3,7 +3,7 @@
 
 Name:           python-%{srcname}
 Version:        2.26.1
-Release:        18.1%{?dist}
+Release:        18.2%{?dist}
 Summary:        Typing stubs for requests
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0
