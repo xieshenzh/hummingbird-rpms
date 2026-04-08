@@ -2,7 +2,7 @@
 
 Name:           protobuf-c
 Version:        1.5.2
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        C bindings for Google's Protocol Buffers
 
 License:        BSD-2-Clause
