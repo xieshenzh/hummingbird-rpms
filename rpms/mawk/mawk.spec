@@ -2,7 +2,7 @@
 
 Name:		mawk
 Version:	1.3.4
-Release:	6.%{pver}%{?dist}
+Release:	6.%{pver}.1%{?dist}
 Epoch:		1
 Summary:	Interpreter for the AWK programming language
 License:	GPL-2.0-only
