@@ -1,6 +1,6 @@
 Name:           python3-mypy
 Version:        1.18.2
-Release:        4%{?dist}
+Release:        4.1%{?dist}
 Summary:        A static type checker for Python
 
 # The files under lib-python and lib-typing/3.2 are Python-licensed, but this
