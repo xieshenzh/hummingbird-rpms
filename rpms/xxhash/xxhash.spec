@@ -1,6 +1,6 @@
 Name:		xxhash
 Version:	0.8.3
-Release:	4%{?dist}
+Release:	4.1%{?dist}
 Summary:	Extremely fast hash algorithm
 
 #		The source for the library (xxhash.c and xxhash.h) is BSD-2-Clause
