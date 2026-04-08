@@ -7,7 +7,7 @@
 
 Name:           libgit2
 Version:        1.9.2
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        C implementation of the Git core methods as a library with a solid API
 # Automatically converted from old format: GPLv2 with exceptions - review is highly recommended.
 License:        LicenseRef-Callaway-GPLv2-with-exceptions
