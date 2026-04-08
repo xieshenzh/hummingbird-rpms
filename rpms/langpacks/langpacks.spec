@@ -1,6 +1,6 @@
 Name:      langpacks
 Version:   4.3
-Release:   1.1%{?dist}
+Release:   1.2%{?dist}
 Summary:   Langpacks meta-package
 
 License:   GPL-2.0-or-later
