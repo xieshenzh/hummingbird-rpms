@@ -1,7 +1,7 @@
 Summary: The basic required files for the root user's directory
 Name: rootfiles
 Version: 9.0
-Release: 6%{?dist}
+Release: 6.1%{?dist}
 License: LicenseRef-Not-Copyrightable
 
 # This is a Red Hat maintained package which is specific to
