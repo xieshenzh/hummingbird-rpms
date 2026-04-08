@@ -21,7 +21,7 @@
 
 Name:           lua-rpm-macros
 Version:        1
-Release:        17%{?dist}
+Release:        17.1%{?dist}
 Summary:        The common Lua RPM macros
 
 License:        MIT
