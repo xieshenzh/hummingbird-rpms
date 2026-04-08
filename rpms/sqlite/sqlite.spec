@@ -13,7 +13,7 @@
 Summary: Library that implements an embeddable SQL database engine
 Name: sqlite
 Version: %{rpmver}
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: blessing
 URL: http://www.sqlite.org/
 
