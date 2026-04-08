@@ -6,7 +6,7 @@ encoding / transcoding video applications.}
 
 Name:           svt-av1
 Version:        3.1.2
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        Scalable Video Technology for AV1 Encoder
 
 # Main library: BSD-3-Clause-Clear and AOMPL
