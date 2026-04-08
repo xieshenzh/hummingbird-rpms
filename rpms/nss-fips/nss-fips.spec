@@ -12,7 +12,7 @@
 Summary: FIPS validated cryptographic modules for NSS
 Name: nss-fips
 Version: %{rhel_nss_version}
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 
 # The source tarball contains the RHEL binary RPMs with NIST-validated FIPS modules
 Source0: %{name}-%{version}.tar.gz
