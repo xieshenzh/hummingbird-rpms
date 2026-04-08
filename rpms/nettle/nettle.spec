@@ -24,7 +24,7 @@
 
 Name:           nettle
 Version:        3.10.1
-Release:        3%{?dist}
+Release:        3.1%{?dist}
 Summary:        A low-level cryptographic library
 
 License:        LGPL-3.0-or-later OR GPL-2.0-or-later
