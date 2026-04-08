@@ -9,7 +9,7 @@
 
 Name:           %{githubname}
 Version:        %{githubver}
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        Libbpf library
 
 License:        LGPL-2.1-only OR BSD-2-Clause
@@ -51,7 +51,7 @@ developing applications that use %{name}
 %package usdt-devel
 Summary:        The header for defining USDTs
 Version:        %{usdtver}
-Release:        5%{?dist}
+Release:        1.1%{?dist}
 BuildArch:      noarch
 
 %description usdt-devel
