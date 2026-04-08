@@ -4,7 +4,7 @@
 Summary:        Fedora package repositories
 Name:           fedora-repos
 Version:        43
-Release:        1.2%{?dist}
+Release:        1.3%{?dist}
 License:        MIT
 URL:            https://fedoraproject.org/
 
