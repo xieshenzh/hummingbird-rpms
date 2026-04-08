@@ -1,7 +1,7 @@
 Name:           perl-podlators
 Epoch:          1
 Version:        6.0.2
-Release:        521%{?dist}
+Release:        521.1%{?dist}
 Summary:        Format POD source into various output formats
 # pod/perlpodstyle.pod:     FSFAP
 # other files:              GPL-1.0-or-later OR Artistic-1.0-Perl
