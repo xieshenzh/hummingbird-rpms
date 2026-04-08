@@ -26,7 +26,7 @@ Summary:      A ZIP archive management extension
 Name:         %{php_base}-pecl-zip
 Version:      %{upstream_version}%{?upstream_prever:~%{upstream_prever}}
 %forgemeta
-Release:      3%{?dist}
+Release:      3.1%{?dist}
 License:      PHP-3.01
 URL:          %{forgeurl}
 Source0:      %{forgesource}
