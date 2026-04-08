@@ -54,7 +54,7 @@ License:        MIT AND PSF-2.0 AND GPL-2.0-or-later
   %{load:macros.python-srpm}
 %endif
 Version:        %{__default_python3_version}
-Release:        12%{?dist}
+Release:        12.1%{?dist}
 
 BuildArch:      noarch
 
