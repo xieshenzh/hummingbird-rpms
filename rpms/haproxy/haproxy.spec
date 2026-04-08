@@ -8,7 +8,7 @@
 
 Name:           haproxy
 Version:        3.0.17
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        HAProxy reverse proxy for high availability environments
 
 License:        GPL-2.0-or-later
