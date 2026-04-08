@@ -27,7 +27,7 @@ Name:           llhttp
 Version:        9.3.1
 %global so_version 9.3
 %global previous_so_version 9.2
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        Port of http_parser to llparse
 
 # SPDX
