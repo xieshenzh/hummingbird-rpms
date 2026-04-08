@@ -34,7 +34,7 @@ end
 
 Name:           crypto-policies
 Version:        %{git_date}
-Release:        4.git%{git_commit_hash}%{?dist}
+Release:        4.git%{git_commit_hash}.1%{?dist}
 Summary:        System-wide crypto policies
 
 License:        LGPL-2.1-or-later
