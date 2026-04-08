@@ -897,7 +897,7 @@ spec:
     pipelineRef:
       params:
         - name: url
-          value: "https://github.com/konflux-ci/release-service-catalog.git"
+          value: https://gitlab.com/redhat/hummingbird/pipelines/release-service-catalog.git
         - name: revision
           value: hummingbird-rpm-signing
         - name: pathInRepo

@@ -51,6 +51,7 @@ def mock_repo(tmp_path):
             pulp_signed_domain: public-hummingbird-staging
             pulp_secret_name: hummingbird-pulp-credentials-staging-secret
             pipeline_revision: development
+            pipeline_url: https://github.com/konflux-ci/release-service-catalog.git
             component_filter:
               path_prefix: rpms/
               exclude_patterns: []
@@ -90,6 +91,7 @@ class TestBuildRelengVariables:
         assert variables["pulp_signed_domain"] == "public-hummingbird-staging"
         assert variables["pulp_secret_name"] == "hummingbird-pulp-credentials-staging-secret"
         assert variables["pipeline_revision"] == "development"
+        assert variables["pipeline_url"] == "https://github.com/konflux-ci/release-service-catalog.git"
 
     def test_component_list_from_packages(self, gen_module, mock_repo):
         with patch.object(gen_module, "ROOT_DIR", mock_repo):
@@ -182,6 +184,15 @@ class TestGenerateReleng:
         params = doc["spec"]["pipeline"]["pipelineRef"]["params"]
         revision_param = next(p for p in params if p["name"] == "revision")
         assert revision_param["value"] == "development"
+
+    def test_parameterized_pipeline_url(self, gen_module, mock_repo):
+        with patch.object(gen_module, "ROOT_DIR", mock_repo):
+            output = gen_module.generate_releng()
+
+        doc = yaml.safe_load(output)
+        params = doc["spec"]["pipeline"]["pipelineRef"]["params"]
+        url_param = next(p for p in params if p["name"] == "url")
+        assert url_param["value"] == "https://github.com/konflux-ci/release-service-catalog.git"
 
     def test_components_have_rpm_content_type(self, gen_module, mock_repo):
         with patch.object(gen_module, "ROOT_DIR", mock_repo):
