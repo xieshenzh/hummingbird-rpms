@@ -1,6 +1,6 @@
 Name: rdma-core
 Version: 62.0
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 Summary: RDMA core userspace libraries and daemons
 
 # Almost everything is licensed under the OFA dual GPLv2, 2 Clause BSD license
