@@ -2,7 +2,7 @@
 
 Name:           libarchive
 Version:        3.8.6
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        A library for handling streaming archive formats
 
 # Licenses:
