@@ -9,7 +9,7 @@ Version:        0.15.9
 # https://pagure.io/fesco/issue/3197. It also has a corresponding exception in
 # EPEL, but only in leading branches and only until version 1.0; see
 # https://pagure.io/epel/issue/350.
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        Extremely fast Python linter and code formatter
 
 # The license of the ruff project is MIT, except:
