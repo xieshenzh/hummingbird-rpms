@@ -3,7 +3,7 @@
 
 Name:           python-%{pypi_name}
 Version:        7.1.0
-Release:        1.2%{?dist}
+Release:        1.3%{?dist}
 Summary:        Interact with GitLab API
 
 # Automatically converted from old format: LGPLv3 - review is highly recommended.
