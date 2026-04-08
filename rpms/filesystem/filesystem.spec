@@ -3,7 +3,7 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
 Version: 3.18
-Release: 56%{?dist}
+Release: 56.1%{?dist}
 License: LicenseRef-Fedora-Public-Domain
 # This package is a downstream-only project
 URL: https://src.fedoraproject.org/rpms/filesystem
