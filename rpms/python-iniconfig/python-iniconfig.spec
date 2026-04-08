@@ -1,6 +1,6 @@
 Name:               python-iniconfig
 Version:            2.3.0
-Release:            2.1%{?dist}
+Release:            2.2%{?dist}
 Summary:            Brain-dead simple parsing of ini files
 # SPDX
 License:            MIT
