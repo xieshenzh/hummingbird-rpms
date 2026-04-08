@@ -370,6 +370,7 @@ BuildRequires: procps
 # This package provides %%{_bindir}/ruby-mri therefore it is marked by this
 # virtual provide. It can be installed as dependency of rubypick.
 Provides: ruby(runtime_executable) = %{ruby_release}
+Provides: ruby = %{version}-%{release}
 
 %description
 Ruby is the interpreted scripting language for quick and easy
@@ -380,6 +381,7 @@ straight-forward, and extensible.
 
 %package devel
 Summary:    A Ruby development environment
+Provides:   ruby-devel = %{version}-%{release}
 Requires:   %{name}%{?_isa} = %{version}-%{release}
 # This would not be needed if ~50 packages depending on -devel used
 # --disable-gems
@@ -394,6 +396,9 @@ Ruby or an application embedding Ruby.
 
 %package libs
 Summary:    Libraries necessary to run Ruby
+Provides:   ruby-libs = %{version}-%{release}
+Conflicts:  ruby3.4-libs
+Conflicts:  ruby3.3-libs
 Provides:   ruby(release) = %{ruby_release}
 
 # Virtual provides for CCAN copylibs.
@@ -415,6 +420,8 @@ This package includes the libruby, necessary to run Ruby.
 # TODO: Rename or not rename to ruby-rubygems?
 %package -n %{_rubygem_pkg}-rubygems
 Summary:    The Ruby standard for packaging ruby libraries
+Provides:   rubygem-rubygems = %{rubygems_version}-%{release}
+Provides:   rubygems = %{rubygems_version}-%{release}
 Version:    %{rubygems_version}
 # BSD-2-Clause OR Ruby:
 #   lib/rubygems/net-http/
@@ -454,6 +461,7 @@ libraries.
 
 %package -n %{_rubygem_pkg}-devel
 Summary:    Macros and development tools for packaging RubyGems
+Provides:   rubygem-devel = %{rubygems_version}-%{release}
 Version:    %{rubygems_version}
 License:    MIT
 Requires:   ruby(rubygems) >= %{version}-%{release}
@@ -473,6 +481,7 @@ Macros and development tools for packaging RubyGems.
 
 %package default-gems
 Summary:    Default gems which are part of Ruby StdLib
+Provides:   ruby-default-gems = %{version}-%{release}
 Supplements: ruby(rubygems)
 # Obsoleted by Ruby 3.0 in F34 timeframe.
 Obsoletes: rubygem-openssl < 2.2.0-145
@@ -485,6 +494,7 @@ StdLib.
 
 %package -n %{_rubygem_pkg}-irb
 Summary:    The Interactive Ruby
+Provides:   rubygem-irb = %{irb_version}-%{release}
 Version:    %{irb_version}
 License:    Ruby OR BSD-2-Clause
 Provides:   irb = %{version}-%{release}
@@ -498,6 +508,7 @@ from the terminal.
 
 %package -n %{_rubygem_pkg}-rdoc
 Summary:    A tool to generate HTML and command-line documentation for Ruby projects
+Provides:   rubygem-rdoc = %{rdoc_version}-%{release}
 Version:    %{rdoc_version}
 # BSD-3-Clause: lib/rdoc/generator/darkfish.rb
 # CC-BY-2.5: lib/rdoc/generator/template/darkfish/images/loadingAnimation.gif
@@ -533,6 +544,7 @@ This package contains documentation for %{name}.
 
 %package -n %{_rubygem_pkg}-bigdecimal
 Summary:    BigDecimal provides arbitrary-precision floating point decimal arithmetic
+Provides:   rubygem-bigdecimal = %{bigdecimal_version}-%{release}
 Version:    %{bigdecimal_version}
 # dtoa: missing/dtoa.c
 License:    (Ruby OR BSD-2-Clause) AND dtoa
@@ -553,6 +565,7 @@ conversion between base 10 and base 2.
 
 %package -n %{_rubygem_pkg}-io-console
 Summary:    IO/Console is a simple console utilizing library
+Provides:   rubygem-io-console = %{io_console_version}-%{release}
 Version:    %{io_console_version}
 License:    Ruby OR BSD-2-Clause
 Provides:   bundled(rubygem-io-console) = %{io_console_version}
@@ -564,6 +577,7 @@ provide higher layer features, such like curses and readline.
 
 %package -n %{_rubygem_pkg}-json
 Summary:    This is a JSON implementation as a Ruby extension in C
+Provides:   rubygem-json = %{json_version}-%{release}
 Version:    %{json_version}
 # Apache-2.0 OR BSL-1.0: ext/json/vendor/ryu.h
 # MIT: ext/json/vendor/jeaiii-ltoa.h
@@ -587,6 +601,7 @@ markup language.
 
 %package -n %{_rubygem_pkg}-psych
 Summary:    A libyaml wrapper for Ruby
+Provides:   rubygem-psych = %{psych_version}%{?psych_prerelease:~%{sub %{psych_prerelease} 2 -1}}-%{release}
 Version:    %{psych_version}%{?psych_prerelease:~%{sub %{psych_prerelease} 2 -1}}
 License:    MIT
 Provides:   bundled(rubygem-psych) = %{psych_version}%{?psych_prerelease:~%{sub %{psych_prerelease} 2 -1}}
@@ -600,6 +615,7 @@ serialize and de-serialize most Ruby objects to and from the YAML format.
 
 %package -n %{_rubygem_pkg}-bundler
 Summary:    Library and utilities to manage a Ruby application's gem dependencies
+Provides:   rubygem-bundler = %{bundler_version}-%{release}
 Version:    %{bundler_version}
 # BSD-2-Clause OR Ruby:
 #   lib/bundler/vendor/fileutils
@@ -637,6 +653,7 @@ many machines, systematically and repeatably.
 
 %package bundled-gems
 Summary:    Bundled gems which are part of Ruby StdLib
+Provides:   ruby-bundled-gems = %{version}-%{release}
 Provides:   bundled(rubygem-abbrev) = %{abbrev_version}
 Provides:   bundled(rubygem-base64) = %{base64_version}
 Provides:   bundled(rubygem-benchmark) = %{benchmark_version}
@@ -676,6 +693,7 @@ needs to be listed in Gemfile to be used by Bundler.
 
 %package -n %{_rubygem_pkg}-minitest
 Summary:    Minitest provides a complete suite of testing facilities
+Provides:   rubygem-minitest = %{minitest_version}-%{release}
 Version:    %{minitest_version}
 License:    MIT
 Provides:   bundled(rubygem-minitest) = %{minitest_version}
@@ -695,6 +713,7 @@ output.
 
 %package -n %{_rubygem_pkg}-power_assert
 Summary:    Power Assert for Ruby
+Provides:   rubygem-power_assert = %{power_assert_version}-%{release}
 Version:    %{power_assert_version}
 License:    Ruby OR BSD-2-Clause
 Provides:   bundled(rubygem-power_assert) = %{power_assert_version}
@@ -708,6 +727,7 @@ condition is not satisfied.
 
 %package -n %{_rubygem_pkg}-rake
 Summary:    Ruby based make-like utility
+Provides:   rubygem-rake = %{rake_version}-%{release}
 Version:    %{rake_version}
 License:    MIT
 Provides:   rake = %{version}-%{release}
@@ -721,6 +741,7 @@ specified in standard Ruby syntax.
 
 %package -n %{_rubygem_pkg}-rbs
 Summary:    Type signature for Ruby
+Provides:   rubygem-rbs = %{rbs_version}-%{release}
 Version:    %{rbs_version}
 License:    Ruby OR BSD-2-Clause
 Provides:   bundled(rubygem-rbs) = %{rbs_version}
@@ -732,6 +753,7 @@ definitions.
 
 %package -n %{_rubygem_pkg}-test-unit
 Summary:    An xUnit family unit testing framework for Ruby
+Provides:   rubygem-test-unit = %{test_unit_version}-%{release}
 Version:    %{test_unit_version}
 # lib/test/unit/diff.rb is a double license of the Ruby license and PSF license.
 License:    (Ruby OR BSD-2-Clause) AND (Ruby OR BSD-2-Clause OR Python-2.0.1)
@@ -746,6 +768,7 @@ writing tests, checking results and automated testing in Ruby.
 
 
 %package -n %{_rubygem_pkg}-racc
+Provides:   rubygem-racc = %{racc_version}-%{release}
 Version:    %{racc_version}
 Summary:    Racc is a LALR(1) parser generator
 License:    Ruby OR BSD-2-Clause
@@ -759,6 +782,7 @@ It is written in Ruby itself, and generates Ruby program.
 
 %package -n %{_rubygem_pkg}-rexml
 Summary:    An XML toolkit for Ruby
+Provides:   rubygem-rexml = %{rexml_version}-%{release}
 Version:    %{rexml_version}
 License:    BSD-2-Clause
 URL:        https://github.com/ruby/rexml
@@ -779,6 +803,7 @@ features such as XPath.
 
 %package -n %{_rubygem_pkg}-rss
 Summary:    Family of libraries that support various formats of XML "feeds"
+Provides:   rubygem-rss = %{rss_version}-%{release}
 Version:    %{rss_version}
 License:    BSD-2-Clause
 URL:        https://github.com/ruby/rss
@@ -794,6 +819,7 @@ to read and create these feeds.
 
 %package -n %{_rubygem_pkg}-typeprof
 Summary:    TypeProf is a type analysis tool for Ruby code based on abstract interpretation
+Provides:   rubygem-typeprof = %{typeprof_version}-%{release}
 Version:    %{typeprof_version}
 License:    MIT
 URL:        https://github.com/ruby/typeprof

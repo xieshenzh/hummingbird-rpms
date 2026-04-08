@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_reason": "Add unversioned Provides for ruby and rubygem subpackages",
+  "modification_status": "modified",
   "release": "30",
   "sha": "95c21e57751a564afe4457e7f5a5c0393ec5f8bd",
   "source": "https://src.fedoraproject.org/rpms/ruby.git",
-  "version": "4.0.0",
-  "modification_status": "modified",
-  "modification_reason": "Pre-existing modification - requires review"
+  "version": "4.0.0"
 }
