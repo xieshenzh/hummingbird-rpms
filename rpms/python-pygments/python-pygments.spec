@@ -5,7 +5,7 @@
 
 Name:           python-pygments
 Version:        2.19.2
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        Syntax highlighting engine written in Python
 
 License:        BSD-2-Clause
