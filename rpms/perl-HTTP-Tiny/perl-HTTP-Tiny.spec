@@ -3,7 +3,7 @@
 
 Name:           perl-HTTP-Tiny
 Version:        0.092
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        Small, simple, correct HTTP/1.1 client
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/HTTP-Tiny
