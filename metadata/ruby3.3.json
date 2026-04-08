@@ -1,9 +1,9 @@
 {
   "branch": "f41",
+  "modification_reason": "Add unversioned Provides and use basepackagename for filesystem paths",
+  "modification_status": "modified",
   "release": "21",
   "sha": "5716be76df6996dc455fbd319765aa0546aa80eb",
   "source": "https://src.fedoraproject.org/rpms/ruby.git",
-  "version": "3.3.10",
-  "modification_status": "modified",
-  "modification_reason": "Pre-existing modification - requires review"
+  "version": "3.3.10"
 }

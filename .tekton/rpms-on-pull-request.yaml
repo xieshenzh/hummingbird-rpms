@@ -24855,7 +24855,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/ruby3.3/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/ruby3.3/***, test/rpms/ruby3.3.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
@@ -24924,7 +24924,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/ruby3.4/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/ruby3.4/***, test/rpms/ruby3.4.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
@@ -24993,7 +24993,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/ruby4.0/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/ruby4.0/***, test/rpms/ruby4.0.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main

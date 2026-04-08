@@ -21,7 +21,7 @@
 # -d                 Use default gem install location.
 #
 %gem_instdir() %{gem_dir}/gems/%{gem_name_version %{?1}}
-%gem_extdir_mri() %{gem_archdir}/%{name}/%{gem_name_version %{?1}}
+%gem_extdir_mri() %{gem_archdir}/%{basepackagename}/%{gem_name_version %{?1}}
 %gem_libdir() %{gem_instdir %{?1}}/lib
 %gem_cache() %{gem_dir}/cache/%{gem_name_version %{?1}}.gem
 %gem_spec(d) %{gem_dir}/specifications%{?-d:/default}/%{gem_name_version %{?1}}.gemspec

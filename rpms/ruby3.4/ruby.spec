@@ -347,6 +347,7 @@ BuildRequires: procps
 # This package provides %%{_bindir}/ruby-mri therefore it is marked by this
 # virtual provide. It can be installed as dependency of rubypick.
 Provides: ruby(runtime_executable) = %{ruby_release}
+Provides: ruby = %{version}-%{release}
 
 %description
 Ruby is the interpreted scripting language for quick and easy
@@ -357,6 +358,7 @@ straight-forward, and extensible.
 
 %package devel
 Summary:    A Ruby development environment
+Provides:   ruby-devel = %{version}-%{release}
 Requires:   %{name}%{?_isa} = %{version}-%{release}
 # This would not be needed if ~50 packages depending on -devel used
 # --disable-gems
@@ -371,6 +373,9 @@ Ruby or an application embedding Ruby.
 
 %package libs
 Summary:    Libraries necessary to run Ruby
+Provides:   ruby-libs = %{version}-%{release}
+Conflicts:  ruby4.0-libs
+Conflicts:  ruby3.3-libs
 Provides:   ruby(release) = %{ruby_release}
 
 # Virtual provides for CCAN copylibs.
@@ -419,6 +424,8 @@ Recommends: rubygem(io-console)
 Requires:   rubygem(psych) >= %{psych_version}%{?psych_prerelease:~%{sub %{psych_prerelease} 2 -1}}
 Provides:   gem = %{version}-%{release}
 Provides:   ruby(rubygems) = %{version}-%{release}
+Provides:   rubygem-rubygems = %{rubygems_version}-%{release}
+Provides:   rubygems = %{rubygems_version}-%{release}
 Provides:   bundled(rubygems) = %{rubygems_version}
 # https://github.com/rubygems/rubygems/pull/1189#issuecomment-121600910
 Provides:   bundled(rubygem-molinillo) = %{rubygems_molinillo_version}
@@ -441,6 +448,7 @@ libraries.
 Summary:    Macros and development tools for packaging RubyGems
 Version:    %{rubygems_version}
 License:    MIT
+Provides:   rubygem-devel = %{rubygems_version}-%{release}
 Requires:   ruby(rubygems) >= %{version}-%{release}
 # Needed for RDoc documentation format generation.
 Requires:   rubygem(json) >= %{json_version}
@@ -458,6 +466,7 @@ Macros and development tools for packaging RubyGems.
 
 %package default-gems
 Summary:    Default gems which are part of Ruby StdLib
+Provides:   ruby-default-gems = %{version}-%{release}
 Supplements: ruby(rubygems)
 # Obsoleted by Ruby 2.7 in F32 timeframe.
 Obsoletes: rubygem-did_you_mean < 1.4.0-130
@@ -475,6 +484,7 @@ Summary:    The Interactive Ruby
 Version:    %{irb_version}
 License:    Ruby OR BSD-2-Clause
 Provides:   irb = %{version}-%{release}
+Provides:   rubygem-irb = %{irb_version}-%{release}
 Provides:   bundled(rubygem-irb) = %{irb_version}
 # Obsoleted by Ruby 2.6 in F30 timeframe.
 Provides:   ruby(irb) = %{ruby_version}%{?development_release}-%{release}
@@ -502,6 +512,7 @@ Requires:   rubygem(io-console)
 Requires:   rubygem(json) >= %{json_version}
 Provides:   rdoc = %{version}-%{release}
 Provides:   ri = %{version}-%{release}
+Provides:   rubygem-rdoc = %{rdoc_version}-%{release}
 Provides:   bundled(rubygem-rdoc) = %{rdoc_version}
 BuildArch:  noarch
 
@@ -525,6 +536,7 @@ Summary:    BigDecimal provides arbitrary-precision floating point decimal arith
 Version:    %{bigdecimal_version}
 # dtoa: missing/dtoa.c
 License:    (Ruby OR BSD-2-Clause) AND dtoa
+Provides:   rubygem-bigdecimal = %{bigdecimal_version}-%{release}
 Provides:   bundled(rubygem-bigdecimal) = %{bigdecimal_version}
 
 %description -n %{_rubygem_pkg}-bigdecimal
@@ -544,6 +556,7 @@ conversion between base 10 and base 2.
 Summary:    IO/Console is a simple console utilizing library
 Version:    %{io_console_version}
 License:    Ruby OR BSD-2-Clause
+Provides:   rubygem-io-console = %{io_console_version}-%{release}
 Provides:   bundled(rubygem-io-console) = %{io_console_version}
 
 %description -n %{_rubygem_pkg}-io-console
@@ -555,6 +568,7 @@ provide higher layer features, such like curses and readline.
 Summary:    This is a JSON implementation as a Ruby extension in C
 Version:    %{json_version}
 License:    Ruby OR BSD-2-Clause
+Provides:   rubygem-json = %{json_version}-%{release}
 Provides:   bundled(rubygem-json) = %{json_version}
 
 %description -n %{_rubygem_pkg}-json
@@ -568,6 +582,7 @@ markup language.
 Summary:    A libyaml wrapper for Ruby
 Version:    %{psych_version}%{?psych_prerelease:~%{sub %{psych_prerelease} 2 -1}}
 License:    MIT
+Provides:   rubygem-psych = %{psych_version}-%{release}
 Provides:   bundled(rubygem-psych) = %{psych_version}%{?psych_prerelease:~%{sub %{psych_prerelease} 2 -1}}
 
 %description -n %{_rubygem_pkg}-psych
@@ -592,6 +607,7 @@ Version:    %{bundler_version}
 #   lib/rubygems/resolver/molinillo
 License:    MIT AND (Ruby OR BSD-2-Clause)
 Requires:   rubygem(io-console)
+Provides:   rubygem-bundler = %{bundler_version}-%{release}
 Provides:   bundled(rubygem-bundler) = %{bundler_version}
 # https://github.com/bundler/bundler/issues/3647
 Provides:   bundled(rubygem-connection_pool) = %{bundler_connection_pool_version}
@@ -616,6 +632,7 @@ many machines, systematically and repeatably.
 
 %package bundled-gems
 Summary:    Bundled gems which are part of Ruby StdLib
+Provides:   ruby-bundled-gems = %{version}-%{release}
 Provides:   bundled(rubygem-abbrev) = %{abbrev_version}
 Provides:   bundled(rubygem-base64) = %{base64_version}
 Provides:   bundled(rubygem-csv) = %{csv_version}
@@ -650,6 +667,7 @@ needs to be listed in Gemfile to be used by Bundler.
 Summary:    Minitest provides a complete suite of testing facilities
 Version:    %{minitest_version}
 License:    MIT
+Provides:   rubygem-minitest = %{minitest_version}-%{release}
 Provides:   bundled(rubygem-minitest) = %{minitest_version}
 BuildArch:  noarch
 
@@ -672,6 +690,7 @@ output.
 Summary:    Power Assert for Ruby
 Version:    %{power_assert_version}
 License:    Ruby OR BSD-2-Clause
+Provides:   rubygem-power_assert = %{power_assert_version}-%{release}
 Provides:   bundled(rubygem-power_assert) = %{power_assert_version}
 BuildArch:  noarch
 
@@ -686,6 +705,7 @@ Summary:    Ruby based make-like utility
 Version:    %{rake_version}
 License:    MIT
 Provides:   rake = %{version}-%{release}
+Provides:   rubygem-rake = %{rake_version}-%{release}
 Provides:   bundled(rubygem-rake) = %{rake_version}
 BuildArch:  noarch
 
@@ -698,6 +718,7 @@ specified in standard Ruby syntax.
 Summary:    Type signature for Ruby
 Version:    %{rbs_version}
 License:    Ruby OR BSD-2-Clause
+Provides:   rubygem-rbs = %{rbs_version}-%{release}
 Provides:   bundled(rubygem-rbs) = %{rbs_version}
 
 %description -n %{_rubygem_pkg}-rbs
@@ -710,6 +731,7 @@ Summary:    An xUnit family unit testing framework for Ruby
 Version:    %{test_unit_version}
 # lib/test/unit/diff.rb is a double license of the Ruby license and PSF license.
 License:    (Ruby OR BSD-2-Clause) AND (Ruby OR BSD-2-Clause OR Python-2.0.1)
+Provides:   rubygem-test-unit = %{test_unit_version}-%{release}
 Provides:   bundled(rubygem-test-unit) = %{test_unit_version}
 BuildArch:  noarch
 
@@ -725,6 +747,7 @@ Version:    %{racc_version}
 Summary:    Racc is a LALR(1) parser generator
 License:    Ruby OR BSD-2-Clause
 URL:        https://github.com/ruby/racc
+Provides:   rubygem-racc = %{racc_version}-%{release}
 Provides:   bundled(rubygem-racc) = %{racc_version}
 
 %description -n %{_rubygem_pkg}-racc
@@ -737,6 +760,7 @@ Summary:    An XML toolkit for Ruby
 Version:    %{rexml_version}
 License:    BSD-2-Clause
 URL:        https://github.com/ruby/rexml
+Provides:   rubygem-rexml = %{rexml_version}-%{release}
 Provides:   bundled(rubygem-rexml) = %{rexml_version}
 BuildArch:  noarch
 
@@ -757,6 +781,7 @@ Summary:    Family of libraries that support various formats of XML "feeds"
 Version:    %{rss_version}
 License:    BSD-2-Clause
 URL:        https://github.com/ruby/rss
+Provides:   rubygem-rss = %{rss_version}-%{release}
 Provides:   bundled(rubygem-rss) = %{rss_version}
 BuildArch:  noarch
 
@@ -772,6 +797,7 @@ Summary:    TypeProf is a type analysis tool for Ruby code based on abstract int
 Version:    %{typeprof_version}
 License:    MIT
 URL:        https://github.com/ruby/typeprof
+Provides:   rubygem-typeprof = %{typeprof_version}-%{release}
 Provides:   bundled(rubygem-typeprof) = %{typeprof_version}
 BuildArch:  noarch
 
@@ -882,13 +908,13 @@ done
 # Ensure there is not forgotten any certificate.
 test ! "$(ls -A %{buildroot}%{rubygems_dir}/rubygems/ssl_certs/ 2>/dev/null)"
 
-# Move macros file into proper place and replace the %%{name} macro, since it
-# would be wrongly evaluated during build of other packages.
+# Move macros file into proper place and replace the %%{basepackagename} macro,
+# since it would be wrongly evaluated during build of other packages.
 mkdir -p %{buildroot}%{_rpmmacrodir}
 install -m 644 %{SOURCE4} %{buildroot}%{_rpmmacrodir}/macros.ruby
-sed -i "s/%%{name}/%{name}/" %{buildroot}%{_rpmmacrodir}/macros.ruby
+sed -i "s/%%{basepackagename}/%{basepackagename}/" %{buildroot}%{_rpmmacrodir}/macros.ruby
 install -m 644 %{SOURCE5} %{buildroot}%{_rpmmacrodir}/macros.rubygems
-sed -i "s/%%{name}/%{name}/" %{buildroot}%{_rpmmacrodir}/macros.rubygems
+sed -i "s/%%{basepackagename}/%{basepackagename}/" %{buildroot}%{_rpmmacrodir}/macros.rubygems
 
 # Install dependency generators.
 mkdir -p %{buildroot}%{_fileattrsdir}
@@ -908,7 +934,7 @@ mv %{buildroot}%{ruby_libdir}/gems %{buildroot}%{gem_dir}
 # TODO: These folders should go into rubygem-filesystem but how to achieve it,
 # since noarch package cannot provide arch dependent subpackages?
 # http://rpm.org/ticket/78
-mkdir -p %{buildroot}%{_exec_prefix}/lib{,64}/gems/%{name}
+mkdir -p %{buildroot}%{_exec_prefix}/lib{,64}/gems/%{basepackagename}
 
 # Move bundled rubygems to %%gem_dir and %%gem_extdir_mri
 # make symlinks for io-console, which is considered to be part of stdlib by other Gems
@@ -978,7 +1004,7 @@ ln -s %{gem_extdir_mri psych}/psych.so %{buildroot}%{ruby_libarchdir}/psych.so
 # the extensions directory might be empty).
 # TODO: Get information about extension form .gemspec files.
 find %{buildroot}%{gem_dir}/extensions/*-%{_target_os}/%{major_minor_version}.*/* -maxdepth 0 \
-  -exec mv '{}' %{buildroot}%{_libdir}/gems/%{name}/ \; \
+  -exec mv '{}' %{buildroot}%{_libdir}/gems/%{basepackagename}/ \; \
   || echo "No gem binary extensions to move."
 
 # Remove the extension sources and library copies from `lib` dir.
@@ -1473,7 +1499,7 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 %dir %{gem_dir}/specifications
 %dir %{gem_dir}/specifications/default
 %dir %{_exec_prefix}/lib*/gems
-%dir %{_exec_prefix}/lib*/gems/%{name}
+%dir %{_exec_prefix}/lib*/gems/%{basepackagename}
 
 %exclude %{gem_dir}/cache/*
 

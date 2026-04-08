@@ -1,0 +1,204 @@
+---
+# Tests for the ruby4.0 package
+# Verify unversioned Provides and Fedora-compatible filesystem paths
+
+provides-ruby:
+  command: |
+    # Verify the main ruby4.0 package provides unversioned 'ruby'
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ruby4.0" ]]; then
+      echo "Skipping: This test only runs on ruby4.0 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    provides=$(rpm -qp --provides "${TEST_RPM}")
+    if echo "${provides}" | grep -q "^ruby = "; then
+      echo "PASS: ruby4.0 provides unversioned 'ruby'"
+      echo "${provides}" | grep "^ruby = "
+    else
+      TEST_FAIL "ruby4.0 does not provide unversioned 'ruby'"
+    fi
+
+provides-ruby-devel:
+  command: |
+    # Verify the ruby4.0-devel package provides unversioned 'ruby-devel'
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ruby4.0-devel" ]]; then
+      echo "Skipping: This test only runs on ruby4.0-devel (got: ${rpm_name})"
+      exit 0
+    fi
+
+    provides=$(rpm -qp --provides "${TEST_RPM}")
+    if echo "${provides}" | grep -q "^ruby-devel = "; then
+      echo "PASS: ruby4.0-devel provides unversioned 'ruby-devel'"
+      echo "${provides}" | grep "^ruby-devel = "
+    else
+      TEST_FAIL "ruby4.0-devel does not provide unversioned 'ruby-devel'"
+    fi
+
+provides-ruby-libs:
+  command: |
+    # Verify the ruby4.0-libs package provides unversioned 'ruby-libs'
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ruby4.0-libs" ]]; then
+      echo "Skipping: This test only runs on ruby4.0-libs (got: ${rpm_name})"
+      exit 0
+    fi
+
+    provides=$(rpm -qp --provides "${TEST_RPM}")
+    if echo "${provides}" | grep -q "^ruby-libs = "; then
+      echo "PASS: ruby4.0-libs provides unversioned 'ruby-libs'"
+      echo "${provides}" | grep "^ruby-libs = "
+    else
+      TEST_FAIL "ruby4.0-libs does not provide unversioned 'ruby-libs'"
+    fi
+
+provides-rubygem-test-unit:
+  command: |
+    # Verify rubygem4.0-test-unit provides unversioned 'rubygem-test-unit'
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "rubygem4.0-test-unit" ]]; then
+      echo "Skipping: This test only runs on rubygem4.0-test-unit (got: ${rpm_name})"
+      exit 0
+    fi
+
+    provides=$(rpm -qp --provides "${TEST_RPM}")
+    if echo "${provides}" | grep -q "^rubygem-test-unit = "; then
+      echo "PASS: rubygem4.0-test-unit provides unversioned 'rubygem-test-unit'"
+      echo "${provides}" | grep "^rubygem-test-unit = "
+    else
+      TEST_FAIL "rubygem4.0-test-unit does not provide unversioned 'rubygem-test-unit'"
+    fi
+
+provides-rubygem-json:
+  command: |
+    # Verify rubygem4.0-json provides unversioned 'rubygem-json'
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "rubygem4.0-json" ]]; then
+      echo "Skipping: This test only runs on rubygem4.0-json (got: ${rpm_name})"
+      exit 0
+    fi
+
+    provides=$(rpm -qp --provides "${TEST_RPM}")
+    if echo "${provides}" | grep -q "^rubygem-json = "; then
+      echo "PASS: rubygem4.0-json provides unversioned 'rubygem-json'"
+      echo "${provides}" | grep "^rubygem-json = "
+    else
+      TEST_FAIL "rubygem4.0-json does not provide unversioned 'rubygem-json'"
+    fi
+
+provides-rubygem-bundler:
+  command: |
+    # Verify rubygem4.0-bundler provides unversioned 'rubygem-bundler'
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "rubygem4.0-bundler" ]]; then
+      echo "Skipping: This test only runs on rubygem4.0-bundler (got: ${rpm_name})"
+      exit 0
+    fi
+
+    provides=$(rpm -qp --provides "${TEST_RPM}")
+    if echo "${provides}" | grep -q "^rubygem-bundler = "; then
+      echo "PASS: rubygem4.0-bundler provides unversioned 'rubygem-bundler'"
+      echo "${provides}" | grep "^rubygem-bundler = "
+    else
+      TEST_FAIL "rubygem4.0-bundler does not provide unversioned 'rubygem-bundler'"
+    fi
+
+paths-libs-use-ruby-not-ruby4:
+  command: |
+    # Verify ruby4.0-libs installs to /usr/lib64/ruby/ not /usr/lib64/ruby4.0/
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ruby4.0-libs" ]]; then
+      echo "Skipping: This test only runs on ruby4.0-libs (got: ${rpm_name})"
+      exit 0
+    fi
+
+    files=$(rpm -qlp "${TEST_RPM}")
+    if echo "${files}" | grep -q "^/usr/lib64/ruby/"; then
+      echo "PASS: ruby4.0-libs installs to /usr/lib64/ruby/"
+    else
+      TEST_FAIL "ruby4.0-libs does not install to /usr/lib64/ruby/"
+    fi
+
+    if echo "${files}" | grep -q "^/usr/lib64/ruby4.0/"; then
+      TEST_FAIL "ruby4.0-libs still uses versioned path /usr/lib64/ruby4.0/"
+    else
+      echo "PASS: No files under /usr/lib64/ruby4.0/"
+    fi
+
+    if echo "${files}" | grep -q "^/usr/share/ruby/"; then
+      echo "PASS: ruby4.0-libs installs to /usr/share/ruby/"
+    else
+      TEST_FAIL "ruby4.0-libs does not install to /usr/share/ruby/"
+    fi
+
+paths-devel-use-ruby-not-ruby4:
+  command: |
+    # Verify ruby4.0-devel installs headers to /usr/include/ruby/ not /usr/include/ruby4.0/
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ruby4.0-devel" ]]; then
+      echo "Skipping: This test only runs on ruby4.0-devel (got: ${rpm_name})"
+      exit 0
+    fi
+
+    files=$(rpm -qlp "${TEST_RPM}")
+    if echo "${files}" | grep -q "^/usr/include/ruby"; then
+      echo "PASS: ruby4.0-devel installs headers under /usr/include/"
+    else
+      TEST_FAIL "ruby4.0-devel does not install headers under /usr/include/"
+    fi
+
+paths-gem-extensions-use-ruby:
+  command: |
+    # Verify gem extension directories use /usr/lib64/gems/ruby/ not /usr/lib64/gems/ruby4.0/
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "rubygem4.0-json" ]]; then
+      echo "Skipping: This test only runs on rubygem4.0-json (got: ${rpm_name})"
+      exit 0
+    fi
+
+    files=$(rpm -qlp "${TEST_RPM}")
+    if echo "${files}" | grep -q "^/usr/lib64/gems/ruby/"; then
+      echo "PASS: gem extensions install to /usr/lib64/gems/ruby/"
+      echo "${files}" | grep "^/usr/lib64/gems/ruby/" | head -3
+    else
+      TEST_FAIL "gem extensions do not install to /usr/lib64/gems/ruby/"
+    fi
+
+    if echo "${files}" | grep -q "^/usr/lib64/gems/ruby4.0/"; then
+      TEST_FAIL "gem extensions still use versioned path /usr/lib64/gems/ruby4.0/"
+    else
+      echo "PASS: No files under /usr/lib64/gems/ruby4.0/"
+    fi
+
+paths-ruby-binary:
+  command: |
+    # Verify ruby4.0 package includes /usr/bin/ruby
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ruby4.0" ]]; then
+      echo "Skipping: This test only runs on ruby4.0 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    files=$(rpm -qlp "${TEST_RPM}")
+    if echo "${files}" | grep -q "^/usr/bin/ruby$"; then
+      echo "PASS: ruby4.0 includes /usr/bin/ruby"
+    else
+      TEST_FAIL "ruby4.0 does not include /usr/bin/ruby"
+    fi
+
+paths-pkgconfig:
+  command: |
+    # Verify ruby4.0-devel installs ruby.pc (not ruby4.0.pc)
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ruby4.0-devel" ]]; then
+      echo "Skipping: This test only runs on ruby4.0-devel (got: ${rpm_name})"
+      exit 0
+    fi
+
+    files=$(rpm -qlp "${TEST_RPM}")
+    if echo "${files}" | grep -q "pkgconfig/ruby.pc"; then
+      echo "PASS: ruby4.0-devel provides ruby.pc"
+    else
+      TEST_FAIL "ruby4.0-devel does not provide ruby.pc"
+    fi
