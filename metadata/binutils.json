@@ -1,8 +1,8 @@
 {
   "branch": "f43",
-  "release": "4",
-  "sha": "1ff5036d073647776041628b5646fef4f2b832d4",
+  "modification_status": "clean",
+  "release": "5",
+  "sha": "4c95d31d7dc88cf0cb400572d393b1f147d03802",
   "source": "https://src.fedoraproject.org/rpms/binutils.git",
-  "version": "2.45.1",
-  "modification_status": "clean"
+  "version": "2.45.1"
 }
