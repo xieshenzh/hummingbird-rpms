@@ -16,7 +16,7 @@ in a minimal diff.}
 
 Name:           python-specfile
 Version:        %{package_version}
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 
 Summary:        A library for parsing and manipulating RPM spec files
 License:        MIT
