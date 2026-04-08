@@ -28,7 +28,7 @@
 
 Name:           json-c
 Version:        0.18
-Release:        8%{?dist}
+Release:        8.1%{?dist}
 Summary:        JSON implementation in C
 
 License:        MIT
