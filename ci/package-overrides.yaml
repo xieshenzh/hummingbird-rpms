@@ -67,8 +67,8 @@ glibc:
     - "linux-d160-c8xlarge/amd64"
 
 golang-fips1.25:
-  # Use CentOS lookaside cache (forked from CentOS Stream, not Fedora)
-  forked_from: "https://gitlab.com/redhat/centos-stream/rpms"
+  # Use hummingbird lookaside cache
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 java-21-openjdk-portable:
   timeout_hours: 8

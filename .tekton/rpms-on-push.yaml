@@ -6852,7 +6852,7 @@ spec:
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/golang-fips1-25-main:{{revision}}
     - name: package-name
-      value: golang
+      value: golang-fips1.25
     - name: target-branch
       value: '{{target_branch}}'
     - name: build-architectures
@@ -6872,7 +6872,7 @@ spec:
     - name: dist-git-client-configdir
       value: "mock/"
     - name: forked-from
-      value: "https://gitlab.com/redhat/centos-stream/rpms"
+      value: "https://gitlab.com/redhat/hummingbird/rpms"
   pipelineRef:
     resolver: bundles
     params:

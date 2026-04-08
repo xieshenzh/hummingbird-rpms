@@ -115,7 +115,7 @@
 %global go_api 1.25
 # Use only for prerelease versions
 #global go_prerelease rc3
-%global go_patch 7
+%global go_patch 8
 %global go_version %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease:~%{go_prerelease}}
 %global go_source %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease}
 # Go FIPS package release
@@ -134,7 +134,7 @@
 
 Name:           %{basepackagename}%{go_api}
 Version:	%{go_version}
-Release:        1.2%{?dist}
+Release:        0.1%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
@@ -201,7 +201,7 @@ Provides: bundled(golang(golang.org/x/crypto)) = 0.39.0
 Provides: bundled(golang(golang.org/x/mod)) = 0.25.0
 Provides: bundled(golang(golang.org/x/net)) = 0.41.0
 Provides: bundled(golang(golang.org/x/sync)) = 0.15.0
-Provides: bundled(golang(golang.org/x/sys)) = 0.33.0
+Provides: bundled(golang(golang.org/x/sys)) = 0.33.1.0.20260225210015.e0c9f78de999
 Provides: bundled(golang(golang.org/x/telemetry)) = 0.0.0.20250606142133.60998feb31a8
 Provides: bundled(golang(golang.org/x/term)) = 0.32.0
 Provides: bundled(golang(golang.org/x/text)) = 0.26.0
