@@ -33,7 +33,6 @@ BuildRequires: systemd
 BuildRequires: libcap-ng-devel
 BuildRequires: %{pypkg}-devel
 BuildRequires: gcc
-BuildRequires: rubygem-asciidoctor
 BuildRequires: po4a
 BuildRequires: sqlite-devel
 %ifarch ppc64le
@@ -353,7 +352,6 @@ export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 	--disable-raw \
 	--enable-hardlink \
 	--enable-fdformat \
-	--enable-asciidoc \
 	--with-python=%{pyver} \
 	--with-systemd \
 	--with-udev \
