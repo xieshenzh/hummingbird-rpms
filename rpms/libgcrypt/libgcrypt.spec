@@ -1,6 +1,6 @@
 Name: libgcrypt
 Version: 1.12.1
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 URL: https://www.gnupg.org/
 Source0: https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-%{version}.tar.bz2
 Source1: https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-%{version}.tar.bz2.sig
