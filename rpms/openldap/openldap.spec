@@ -20,7 +20,7 @@
 
 Name: openldap
 Version: 2.6.13
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 Summary: LDAP support libraries
 License: OLDAP-2.8
 URL: http://www.openldap.org/
