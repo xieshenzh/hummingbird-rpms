@@ -4,7 +4,7 @@
 
 Name:           sysprof
 Version:        50~rc
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        A system-wide Linux profiler
 
 License:        GPL-2.0-or-later AND GPL-3.0-or-later AND CC-BY-SA-4.0 AND CC0-1.0 AND BSD-2-Clause-Patent
