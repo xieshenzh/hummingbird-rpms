@@ -242,6 +242,7 @@ def build_releng_variables() -> dict:
         "pulp_signed_domain": rpa_config["pulp_signed_domain"],
         "pulp_secret_name": rpa_config["pulp_secret_name"],
         "pipeline_revision": rpa_config["pipeline_revision"],
+        "pipeline_url": rpa_config["pipeline_url"],
     }
 
 
