@@ -5,7 +5,7 @@
 Summary: X.Org X11 libXi runtime library
 Name: libXi
 Version: 1.8.2
-Release: 4%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 4%{?gitdate:.%{gitdate}git%{gitversion}}.1%{?dist}
 License: MIT-open-group AND SMLNJ AND MIT
 URL: http://www.x.org
 
