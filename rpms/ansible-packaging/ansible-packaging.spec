@@ -2,7 +2,7 @@
 
 Name:           ansible-packaging
 Version:        1
-Release:        20.1%{?dist}
+Release:        20.1.1%{?dist}
 Summary:        RPM packaging macros and generators for Ansible collections
 
 License:        GPL-3.0-or-later
