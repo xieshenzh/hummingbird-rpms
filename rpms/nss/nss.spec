@@ -4,10 +4,10 @@
 # - reset %%{nspr_release} to 1, when updating %%{nspr_version}
 # - increment %%{nspr_version}, when updating the NSS part only
 %global baserelease 1
-%global nss_release %baserelease
+%global nss_release %{baserelease}.1
 # use "%%global nspr_release %%[%%baserelease+n]" to handle offsets when
 # release number between nss and nspr are different.
-%global nspr_release %[%baserelease+3]
+%global nspr_release %[%baserelease+3].1
 # only need to update this as we added new
 # algorithms under nss policy control
 %global crypto_policies_version 20240521
