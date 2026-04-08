@@ -41,12 +41,14 @@
 # The value is read and used by the %%pytest and %%tox macros:
 %_set_pytest_addopts %global __pytest_addopts --ignore=%{_pyproject_builddir}
 
-%pyproject_wheel(C:) %{expand:\\\
+%pyproject_wheel(C:d:) %{expand:\\\
 %_set_pytest_addopts
+%{-d:pushd "%{-d*}"}
 mkdir -p "%{_pyproject_builddir}"
 %{_pyproject_build_flags} \\\
 TMPDIR="%{_pyproject_builddir}" \\\
 %{__python3} -Bs %{_rpmconfigdir}/redhat/pyproject_wheel.py %{?**} %{_pyproject_wheeldir}
+%{-d:popd}
 }
 
 
@@ -172,11 +174,12 @@ fi
     ]"\
   ]
 
-%pyproject_buildrequires(rRxtNwpe:g:C:) %{expand:\\\
+%pyproject_buildrequires(rRxtNwpe:g:C:d:) %{expand:\\\
 %_set_pytest_addopts
 # The default flags expect the package note file to exist
 # see https://bugzilla.redhat.com/show_bug.cgi?id=2097535
 %{?_package_note_flags:%_generate_package_note_file}
+%{-d:pushd "%{-d*}" >&2}
 %{-R:
 %{-r:%{error:The -R and -r options are mutually exclusive}}
 %{-x:%{error:The -R and -x options are mutually exclusive}}
@@ -230,6 +233,7 @@ if [ -f %{__python3} ]; then
 fi
 # Incomplete .dist-info dir might confuse importlib.metadata
 rm -rfv *.dist-info/ >&2
+%{-d:popd >&2}
 }
 
 

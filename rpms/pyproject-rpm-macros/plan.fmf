@@ -6,10 +6,10 @@ discover:
     tests:
     - name: c9s_mockbuild
       path: /
-      test: NAME="CentOS Stream" VERSION_ID=9 tests/mocktest.sh pyproject-rpm-macros
+      test: ID=centos VERSION_ID=9 tests/mocktest.sh pyproject-rpm-macros
     - name: c10s_mockbuild
       path: /
-      test: NAME="CentOS Stream" VERSION_ID=10 tests/mocktest.sh pyproject-rpm-macros
+      test: ID=centos VERSION_ID=10 tests/mocktest.sh pyproject-rpm-macros
     - name: pytest
       path: /tests
       test: ./mocktest.sh python-pytest
@@ -111,10 +111,10 @@ discover:
       test: ./mocktest.sh config-settings-test
     - name: isort_c9s
       path: /tests
-      test: NAME="CentOS Stream" VERSION_ID=9 ./mocktest.sh python-isort
+      test: ID=centos VERSION_ID=9 ./mocktest.sh python-isort
     - name: isort_c10s
       path: /tests
-      test: NAME="CentOS Stream" VERSION_ID=10 ./mocktest.sh python-isort
+      test: ID=centos VERSION_ID=10 ./mocktest.sh python-isort
 prepare:
   - name: Install dependencies
     how: install
