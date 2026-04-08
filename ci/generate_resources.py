@@ -88,11 +88,17 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
                 # Fallback to default naming if no spec file found
                 rpm_data["specfile"] = f"{dname}.spec"
 
+            # Check for overrides
+            pkg_config = package_overrides.get(dname, {})
+
             # Determine the upstream package name for Tekton pipeline
             #
             # For most packages, the directory name (dname) matches the package name.
             # However, for renamed packages (e.g., golang1.25, ruby3.3, tomcat10),
             # we need the upstream package name for lookaside cache and SRPM naming.
+            #
+            # When forked_from points to hummingbird, we use the directory name
+            # since the hummingbird lookaside cache uses hummingbird package names.
             #
             # Native packages (Hummingbird-specific) have no source URL in metadata,
             # so we use the directory name directly.
@@ -100,12 +106,19 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
             metadata = load_yaml_file(metadata_file)
             upstream_name = dname  # Default to directory name
 
+            forked_from = pkg_config.get("forked_from", "")
+            is_hummingbird = "hummingbird" in forked_from
+
             if metadata and metadata.get("modification_status") == "native":
                 # Native packages: Use directory name (no upstream source)
                 # Examples: chunkah, hummingbird-release, openssl-fips-provider
                 upstream_name = dname
+            elif is_hummingbird:
+                # Hummingbird lookaside cache: Use directory name
+                # Examples: golang-fips1.25, nss-fips
+                upstream_name = dname
             elif metadata and "source" in metadata:
-                # Fedora packages: Extract from source URL to handle renamed packages
+                # Fedora/CentOS packages: Extract from source URL to handle renamed packages
                 # Examples:
                 #   - rpms/golang1.25 -> source: .../golang.git -> upstream_name: golang
                 #   - rpms/ruby3.3 -> source: .../ruby.git -> upstream_name: ruby
@@ -114,9 +127,6 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
 
             # Store upstream package name for use in pipeline
             rpm_data["package_name"] = upstream_name
-
-            # Check for overrides
-            pkg_config = package_overrides.get(dname, {})
 
             if "timeout_hours" in pkg_config:
                 rpm_data["timeout_hours"] = pkg_config["timeout_hours"]
