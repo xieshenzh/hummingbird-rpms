@@ -24,7 +24,7 @@
 
 Name:           %{upstream_name}%{?v2_suffix}
 Version:        2.15.2
-Release:        7%{?dist}
+Release:        7.1%{?dist}
 Summary:        Module metadata manipulation library
 
 # COPYING:      MIT
