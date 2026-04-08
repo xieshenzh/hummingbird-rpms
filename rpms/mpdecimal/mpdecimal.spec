@@ -6,7 +6,7 @@
 
 Name:           mpdecimal
 Version:        4.0.1
-Release:        %autorelease
+Release:        3.1%{?dist}
 Summary:        Library for general decimal arithmetic
 License:        BSD-2-Clause
 
