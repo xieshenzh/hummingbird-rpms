@@ -18,7 +18,7 @@
 Summary: FIPS validated cryptographic module for OpenSSL
 Name: openssl-fips-provider
 Version: 3.0.7
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 
 # The source tarball contains the RHEL openssl SRPMs and binary RPMs
 # that include the NIST-validated FIPS module
