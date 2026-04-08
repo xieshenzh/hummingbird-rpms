@@ -939,13 +939,13 @@ done
 # Ensure there is not forgotten any certificate.
 test ! "$(ls -A %{buildroot}%{rubygems_dir}/rubygems/ssl_certs/ 2>/dev/null)"
 
-# Move macros file into proper place and replace the %%{name} macro, since it
-# would be wrongly evaluated during build of other packages.
+# Move macros file into proper place and replace the %%{basepackagename} macro,
+# since it would be wrongly evaluated during build of other packages.
 mkdir -p %{buildroot}%{_rpmmacrodir}
 install -m 644 %{SOURCE4} %{buildroot}%{_rpmmacrodir}/macros.ruby
-sed -i "s/%%{name}/%{name}/" %{buildroot}%{_rpmmacrodir}/macros.ruby
+sed -i "s/%%{basepackagename}/%{basepackagename}/" %{buildroot}%{_rpmmacrodir}/macros.ruby
 install -m 644 %{SOURCE5} %{buildroot}%{_rpmmacrodir}/macros.rubygems
-sed -i "s/%%{name}/%{name}/" %{buildroot}%{_rpmmacrodir}/macros.rubygems
+sed -i "s/%%{basepackagename}/%{basepackagename}/" %{buildroot}%{_rpmmacrodir}/macros.rubygems
 
 # Install dependency generators.
 mkdir -p %{buildroot}%{_fileattrsdir}
@@ -965,7 +965,7 @@ mv %{buildroot}%{ruby_libdir}/gems %{buildroot}%{gem_dir}
 # TODO: These folders should go into rubygem-filesystem but how to achieve it,
 # since noarch package cannot provide arch dependent subpackages?
 # http://rpm.org/ticket/78
-mkdir -p %{buildroot}%{_exec_prefix}/lib{,64}/gems/%{name}
+mkdir -p %{buildroot}%{_exec_prefix}/lib{,64}/gems/%{basepackagename}
 
 # Move bundled rubygems to %%gem_dir and %%gem_extdir_mri
 # make symlinks for io-console, which is considered to be part of stdlib by other Gems
@@ -1009,7 +1009,7 @@ ln -s %{gem_extdir_mri psych}/psych.so %{buildroot}%{ruby_libarchdir}/psych.so
 # the extensions directory might be empty).
 # TODO: Get information about extension form .gemspec files.
 find %{buildroot}%{gem_dir}/extensions/*-%{_target_os}/%{major_minor_version}.*/* -maxdepth 0 \
-  -exec mv '{}' %{buildroot}%{_libdir}/gems/%{name}/ \; \
+  -exec mv '{}' %{buildroot}%{_libdir}/gems/%{basepackagename}/ \; \
   || echo "No gem binary extensions to move."
 
 # Remove the extension sources and library copies from `lib` dir.
@@ -1496,7 +1496,7 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 %dir %{gem_dir}/specifications
 %dir %{gem_dir}/specifications/default
 %dir %{_exec_prefix}/lib*/gems
-%dir %{_exec_prefix}/lib*/gems/%{name}
+%dir %{_exec_prefix}/lib*/gems/%{basepackagename}
 
 %exclude %{gem_dir}/cache/*
 
