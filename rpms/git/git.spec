@@ -23,7 +23,8 @@
 
 # Settings for Fedora and EL == 9
 # In EL >= 10 docbook5-style-xsl, needed by asciidoctor, is unwanted package
-%if 0%{?fedora} || 0%{?rhel} == 9
+# In Hummingbird, rubygem-asciidoctor is broken in the buildroot
+%if (0%{?fedora} || 0%{?rhel} == 9) && !0%{?hummingbird}
 %bcond_without              asciidoctor
 %else
 %bcond_with                 asciidoctor
@@ -79,7 +80,7 @@
 
 Name:           git
 Version:        2.53.0
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        Fast Version Control System
 License:        BSD-3-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT
 URL:            https://git-scm.com/

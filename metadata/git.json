@@ -4,5 +4,6 @@
   "sha": "3528d9bead08dab09413ba360d30dda65445453a",
   "source": "https://src.fedoraproject.org/rpms/git.git",
   "version": "2.53.0",
-  "modification_status": "clean"
+  "modification_reason": "disable asciidoctor (rubygem-asciidoctor broken in buildroot)",
+  "modification_status": "modified"
 }
