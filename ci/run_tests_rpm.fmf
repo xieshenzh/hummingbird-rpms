@@ -110,6 +110,13 @@ discover:
             fi
           done
 
+          # Skip testing if no RPMs match the current architecture
+          # (e.g., x86_64-only packages like libipt running on aarch64)
+          if [[ ${#rpm_files[@]} -eq 0 ]]; then
+            echo "No binary RPMs found for architecture ${current_arch}, skipping tests"
+            exit 0
+          fi
+
           # Get source RPM path
           src_rpm_file=$(ls -1 "${srpms_dir}/"*.src.rpm)
 
