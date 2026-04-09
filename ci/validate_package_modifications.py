@@ -298,9 +298,14 @@ def check_local_modifications(package_name: str, last_sync_sha: str | None) -> t
             for hunk in result.stdout.split('\n@@'):
                 # Check 1: No additions to %changelog section
                 if '%changelog' in hunk:
+                    in_changelog = False
                     for line in hunk.split('\n'):
-                        if line.startswith('+') and not line.startswith('+++'):
-                            # Found an addition in a hunk that contains %changelog
+                        # Track when we've passed the %changelog marker
+                        if '%changelog' in line and not line.startswith('-'):
+                            in_changelog = True
+                            continue
+                        if in_changelog and line.startswith('+') and not line.startswith('+++'):
+                            # Found an addition after %changelog
                             subject_result = run_git('log', '--format=%s', '-n1', commit_sha, cwd=ROOT_DIR)
                             subject = subject_result.stdout.strip()
                             return False, (
