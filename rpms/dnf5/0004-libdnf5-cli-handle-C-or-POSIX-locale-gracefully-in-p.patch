@@ -1,0 +1,146 @@
+From 39347c2ca8482b5999fabac042318ba9db65ca12 Mon Sep 17 00:00:00 2001
+From: Kan-Ru Chen <kanru@kanru.info>
+Date: Sun, 1 Mar 2026 17:29:30 +0900
+Subject: [PATCH] libdnf5-cli: handle C or POSIX locale gracefully in
+ progressbar width calculation
+
+Upstream commit: 7b137b9148ec9f025162bbfe817de1a32830fc3d
+
+Correctly detect error result from the mbrtowc() function and return early.
+Update the test to cover both C.UTF-8 and C (POSIX) locale.
+
+Fixes: #2553
+Signed-off-by: Kan-Ru Chen <kanru@kanru.info>
+Petr Pisar: Ported to 5.4.0.0.
+---
+ libdnf5-cli/progressbar/progress_bar.cpp          |  4 +++-
+ test/libdnf5-cli/CMakeLists.txt                   | 12 +++++++++++-
+ test/libdnf5-cli/test_progressbar.cpp             | 15 +++++++++++++++
+ test/libdnf5-cli/test_progressbar.hpp             |  2 ++
+ test/libdnf5-cli/test_progressbar_interactive.cpp |  8 +++++---
+ 5 files changed, 36 insertions(+), 5 deletions(-)
+
+diff --git a/libdnf5-cli/progressbar/progress_bar.cpp b/libdnf5-cli/progressbar/progress_bar.cpp
+index 6656769..54506d4 100644
+--- a/libdnf5-cli/progressbar/progress_bar.cpp
++++ b/libdnf5-cli/progressbar/progress_bar.cpp
+@@ -98,7 +98,9 @@ const ProgressBar::Impl::MessageMetrics & ProgressBar::Impl::get_message_metrics
+         // calculate the display width of the character
+         wchar_t wc;
+         auto bytes_consumed = std::mbrtowc(&wc, message.data(), message.size(), &mbstate);
+-        if (bytes_consumed <= 0) {
++        // mbrtowc returns 0 if a null wide character was found.
++        // it returns (size_t)-1 or (size_t)-2 on invalid or incomplete wide character.
++        if (bytes_consumed == 0 || bytes_consumed >= SIZE_MAX-1) {
+             break;
+         }
+         auto char_width = static_cast<std::size_t>(wcwidth(wc));
+diff --git a/test/libdnf5-cli/CMakeLists.txt b/test/libdnf5-cli/CMakeLists.txt
+index 18d99d6..6251e02 100644
+--- a/test/libdnf5-cli/CMakeLists.txt
++++ b/test/libdnf5-cli/CMakeLists.txt
+@@ -19,4 +19,14 @@ target_link_directories(run_tests_cli PRIVATE ${CMAKE_BINARY_DIR}/libdnf5)
+ target_link_libraries(run_tests_cli PRIVATE stdc++ libdnf5 libdnf5-cli test_shared)
+ 
+ 
+-add_test(NAME test_libdnf_cli COMMAND run_tests_cli)
++add_test(NAME test_libdnf_cli_C_UTF8 COMMAND run_tests_cli)
++set_tests_properties(test_libdnf_cli_C_UTF8 PROPERTIES
++    RUN_SERIAL TRUE
++    ENVIRONMENT "LC_ALL=C.UTF-8"
++)
++
++add_test(NAME test_libdnf_cli_C COMMAND run_tests_cli)
++set_tests_properties(test_libdnf_cli_C PROPERTIES
++     RUN_SERIAL TRUE
++     ENVIRONMENT "LC_ALL=C"
++ )
+diff --git a/test/libdnf5-cli/test_progressbar.cpp b/test/libdnf5-cli/test_progressbar.cpp
+index 4f094da..948bf2e 100644
+--- a/test/libdnf5-cli/test_progressbar.cpp
++++ b/test/libdnf5-cli/test_progressbar.cpp
+@@ -24,6 +24,8 @@
+ 
+ #include <libdnf5-cli/progressbar/download_progress_bar.hpp>
+ #include <libdnf5-cli/progressbar/multi_progress_bar.hpp>
++#include <clocale>
++#include <cstring>
+ 
+ 
+ CPPUNIT_TEST_SUITE_REGISTRATION(ProgressbarTest);
+@@ -33,6 +35,9 @@ void ProgressbarTest::setUp() {
+     setenv("DNF5_FORCE_INTERACTIVE", "0", 1);
+     // Force columns to 70 to make output independ of where it is run
+     setenv("FORCE_COLUMNS", "70", 1);
++    // Wide characters do not work at all until we set locales in the code
++    // Different locale variants are parameterized in ctest
++    setlocale(LC_ALL, "");
+ }
+ 
+ void ProgressbarTest::tearDown() {
+@@ -40,6 +45,16 @@ void ProgressbarTest::tearDown() {
+     unsetenv("FORCE_COLUMNS");
+ }
+ 
++void ProgressbarTest::test_progress_bar_multi_byte_character() {
++    auto progress_bar = std::make_unique<libdnf5::cli::progressbar::DownloadProgressBar>(10, "test");
++    progress_bar->set_ticks(4);
++    progress_bar->set_state(libdnf5::cli::progressbar::ProgressBarState::STARTED);
++    progress_bar->add_message(libdnf5::cli::progressbar::MessageType::WARNING, "Created symlink '/etc/systemd/user/sockets.target.wants/pipewire.socket' \342\206\222 '/usr/lib/systemd/user/pipewire.socket'.");
++    auto num_lines = progress_bar->calculate_messages_terminal_lines(106);
++    auto expected = strcmp(setlocale(LC_ALL, NULL), "C") == 0 ? 1UL : 2UL;
++    CPPUNIT_ASSERT_EQUAL(expected, num_lines);
++}
++
+ void ProgressbarTest::test_download_progress_bar() {
+     // In non interactive mode download progress bar is printed only when finished.
+ 
+diff --git a/test/libdnf5-cli/test_progressbar.hpp b/test/libdnf5-cli/test_progressbar.hpp
+index 3b831f8..700e841 100644
+--- a/test/libdnf5-cli/test_progressbar.hpp
++++ b/test/libdnf5-cli/test_progressbar.hpp
+@@ -27,6 +27,7 @@
+ class ProgressbarTest : public CppUnit::TestCase {
+     CPPUNIT_TEST_SUITE(ProgressbarTest);
+ 
++    CPPUNIT_TEST(test_progress_bar_multi_byte_character);
+     CPPUNIT_TEST(test_download_progress_bar);
+     CPPUNIT_TEST(test_multi_progress_bar);
+     CPPUNIT_TEST(test_multi_progress_bar_unfinished);
+@@ -37,6 +38,7 @@ public:
+     void setUp() override;
+     void tearDown() override;
+ 
++    void test_progress_bar_multi_byte_character();
+     void test_download_progress_bar();
+     void test_multi_progress_bar();
+     void test_multi_progress_bar_unfinished();
+diff --git a/test/libdnf5-cli/test_progressbar_interactive.cpp b/test/libdnf5-cli/test_progressbar_interactive.cpp
+index 760bb01..515bc76 100644
+--- a/test/libdnf5-cli/test_progressbar_interactive.cpp
++++ b/test/libdnf5-cli/test_progressbar_interactive.cpp
+@@ -152,7 +152,8 @@ void ProgressbarInteractiveTest::setUp() {
+     // Force columns to 70 to make output independ of where it is run
+     setenv("FORCE_COLUMNS", "70", 1);
+     // Wide characters do not work at all until we set locales in the code
+-    setlocale(LC_ALL, "C.UTF-8");
++    // Different locale variants are parameterized in ctest
++    setlocale(LC_ALL, "");
+ }
+ 
+ void ProgressbarInteractiveTest::tearDown() {
+@@ -314,8 +315,9 @@ void ProgressbarInteractiveTest::test_download_progress_bar_with_long_messages()
+         download_progress_bar_raw->pop_message();
+         oss << multi_progress_bar;
+         expected = "\\[1/1\\] test                     40% | ????? ??B\\/s |   4.0   B | ???????\n";
+-        // two "cursor up" lines expected
+-        CPPUNIT_ASSERT_EQUAL(2, count_cursor_up_lines(oss.str()));
++        // locale dependent
++        auto expected_lines = strcmp(setlocale(LC_ALL, NULL), "C") == 0 ? 1 : 2;
++        CPPUNIT_ASSERT_EQUAL(expected_lines, count_cursor_up_lines(oss.str()));
+     }
+ }
+ 
+-- 
+2.53.0
+
