@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "e173b5f3bfe08d06c9775e49283fdd4b47d825c7",
+  "source": "https://src.fedoraproject.org/rpms/podman.git",
+  "version": "5.8.1"
+}
