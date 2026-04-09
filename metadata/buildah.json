@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Disable tests subpackage: circular dependency between podman and buildah tests",
+  "modification_status": "modified",
   "release": "1",
   "sha": "c85bd0303826695c3112884c001bddc825bf992d",
   "source": "https://src.fedoraproject.org/rpms/buildah.git",

@@ -9,6 +9,8 @@
 
 %global gomodulesmode GO111MODULE=on
 
+%bcond tests 0
+
 %if %{defined fedora}
 %define build_with_btrfs 1
 %if 0%{?fedora} >= 43
@@ -38,7 +40,7 @@ Epoch: 2
 Version: 1.43.1
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -87,6 +89,7 @@ or
 
 # This subpackage is only intended for CI testing.
 # Not meant for end user/customer usage.
+%if %{with tests}
 %package tests
 Summary: Tests for %{name}
 
@@ -109,6 +112,7 @@ Requires: git-daemon
 %{summary}
 
 This package contains system tests for %{name}
+%endif
 
 %prep
 %autosetup -Sgit -n %{name}-%{version}
@@ -143,6 +147,7 @@ export BUILDTAGS+=" containers_image_sequoia"
 %endif
 
 %gobuild -o bin/%{name} ./cmd/%{name}
+%if %{with tests}
 %gobuild -o bin/imgtype ./tests/imgtype
 %gobuild -o bin/copy ./tests/copy
 %gobuild -o bin/tutorial ./tests/tutorial
@@ -151,11 +156,13 @@ export BUILDTAGS+=" containers_image_sequoia"
 %gobuild -o bin/passwd ./tests/passwd
 %gobuild -o bin/crash ./tests/crash
 %gobuild -o bin/wait ./tests/wait
+%endif
 %{__make} docs
 
 %install
 make DESTDIR=%{buildroot} PREFIX=%{_prefix} install install.completions
 
+%if %{with tests}
 install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
 cp -pav tests/. %{buildroot}/%{_datadir}/%{name}/test/system
 cp bin/imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
@@ -168,6 +175,7 @@ cp bin/crash %{buildroot}/%{_bindir}/%{name}-crash
 cp bin/wait %{buildroot}/%{_bindir}/%{name}-wait
 
 rm %{buildroot}%{_datadir}/%{name}/test/system/tools/build/*
+%endif
 
 #define license tag if not already defined
 %{!?_licensedir:%global license %doc}
@@ -184,6 +192,7 @@ rm %{buildroot}%{_datadir}/%{name}/test/system/tools/build/*
 %dir %{_datadir}/bash-completion/completions
 %{_datadir}/bash-completion/completions/%{name}
 
+%if %{with tests}
 %files tests
 %license LICENSE
 %{_bindir}/%{name}-imgtype
@@ -195,6 +204,7 @@ rm %{buildroot}%{_datadir}/%{name}/test/system/tools/build/*
 %{_bindir}/%{name}-crash
 %{_bindir}/%{name}-wait
 %{_datadir}/%{name}/test
+%endif
 
 %changelog
 %autochangelog
