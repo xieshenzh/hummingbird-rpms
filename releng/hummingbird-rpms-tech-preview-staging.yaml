@@ -296,6 +296,8 @@ spec:
           contentType: rpm
         - name: graphite2-main
           contentType: rpm
+        - name: graphviz-main
+          contentType: rpm
         - name: grep-main
           contentType: rpm
         - name: groff-main
