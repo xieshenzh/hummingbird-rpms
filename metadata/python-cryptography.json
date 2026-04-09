@@ -3,7 +3,7 @@
   "modification_reason": "Hummingbird-specific build configuration",
   "modification_status": "modified",
   "release": "1",
-  "sha": "a9ab9d1bf787757291dc8322cd11ef6e0ee7e22e",
+  "sha": "afdec098409ef320bacd5ff5046dad2de1a4a138",
   "source": "https://src.fedoraproject.org/rpms/python-cryptography.git",
-  "version": "46.0.6"
+  "version": "46.0.7"
 }
