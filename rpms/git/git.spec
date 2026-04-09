@@ -23,7 +23,8 @@
 
 # Settings for Fedora and EL == 9
 # In EL >= 10 docbook5-style-xsl, needed by asciidoctor, is unwanted package
-%if 0%{?fedora} || 0%{?rhel} == 9
+# In Hummingbird, rubygem-asciidoctor is broken in the buildroot
+%if (0%{?fedora} || 0%{?rhel} == 9) && !0%{?hummingbird}
 %bcond_without              asciidoctor
 %else
 %bcond_with                 asciidoctor
