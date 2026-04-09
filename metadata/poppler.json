@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "7",
+  "sha": "f3ee2cebf8754a08a89000a651640a38c1f71add",
+  "source": "https://src.fedoraproject.org/rpms/poppler.git",
+  "version": "26.01.0"
+}
