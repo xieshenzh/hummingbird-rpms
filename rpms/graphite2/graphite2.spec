@@ -44,7 +44,9 @@ Includes and definitions for developing with graphite2.
 
 
 %build
-%cmake -DGRAPHITE2_COMPARE_RENDERER=OFF
+# Upstream cmake_minimum_required is below 3.5; CMake 4.0 dropped that compat.
+# https://fedoraproject.org/wiki/Changes/CMake4.0
+%cmake -DGRAPHITE2_COMPARE_RENDERER=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 %cmake_build
 
 
