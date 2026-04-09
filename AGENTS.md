@@ -9,6 +9,7 @@ Common operational tasks that users or AI agents may need to perform:
 | Add native package          | [Adding Native Packages](documentation/operating/adding-native-packages.md)        | Add new package not imported from Fedora                 |
 | Rebuild package (no-change) | [Rebuilding Packages](documentation/operating/rebuilding-packages.md)              | Faulty RPM published; need to bump Release for rebuild   |
 | Backport a patch            | [Rebuilding Packages](documentation/operating/rebuilding-packages.md)              | Fast-track an upstream fix not yet in Fedora             |
+| Debug build failures        | [Debugging Build Failures](documentation/operating/debugging-build-failures.md)    | Investigate and fix failed package builds                |
 | Mark package modified       | [Package Modification Tracking](documentation/operating/package-modification-tracking.md) | Track local changes; prevent automatic Fedora updates    |
 | Set package basename        | [Package Modification Tracking](documentation/operating/package-modification-tracking.md) | Set basename/track_version for versioned packages        |
 | Track upstream versions     | [Package Modification Tracking](documentation/operating/package-modification-tracking.md) | Enable/disable upstream version checking for a package   |
