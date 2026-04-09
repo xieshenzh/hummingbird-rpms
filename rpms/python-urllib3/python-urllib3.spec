@@ -6,7 +6,7 @@
 
 Name:           python-urllib3
 Version:        2.6.3
-Release:        2.2%{?dist}
+Release:        3%{?dist}
 Summary:        HTTP library with thread-safe connection pooling, file post, and more
 
 # SPDX
@@ -84,6 +84,11 @@ Recommends:     python3-urllib3+socks
 %prep
 %autosetup -n urllib3-%{version}
 %setup -q -n urllib3-%{version} -T -D -b 1
+
+# Allow setuptools-scm 10+
+# Upstream PR pins to <11: https://github.com/urllib3/urllib3/pull/4954
+# We don't pin if we don't have to -- the build should fail if it doesn't work with future versions.
+sed -i 's/setuptools-scm>=8,<10/setuptools-scm>=8/' pyproject.toml
 
 # Make sure that the RECENT_DATE value doesn't get too far behind what the current date is.
 # RECENT_DATE must not be older that 2 years from the build time, or else test_recent_date
