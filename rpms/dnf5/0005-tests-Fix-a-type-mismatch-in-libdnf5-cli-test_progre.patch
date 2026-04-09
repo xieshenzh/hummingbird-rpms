@@ -1,0 +1,61 @@
+From 1f121caf2772127b40c004b1fd5219626d0338c6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 17 Mar 2026 11:01:34 +0100
+Subject: [PATCH] tests: Fix a type mismatch in libdnf5-cli/test_progressbar
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream commit: 63b34412da9b3239c1296d37f8b22d276ced452d
+
+Building tests on i686 architecture failed like this:
+
+    In file included from /usr/include/cppunit/TestCase.h:6,
+		     from /builddir/build/BUILD/dnf5-5.4.0.0-build/dnf5-5.4.0.0/test/libdnf5-cli/test_progressbar.hpp:24,
+		     from /builddir/build/BUILD/dnf5-5.4.0.0-build/dnf5-5.4.0.0/test/libdnf5-cli/test_progressbar.cpp:21:
+    /builddir/build/BUILD/dnf5-5.4.0.0-build/dnf5-5.4.0.0/test/libdnf5-cli/test_progressbar.cpp: In member function ‘void ProgressbarTest::test_progress_bar_multi_byte_character()’:
+    /builddir/build/BUILD/dnf5-5.4.0.0-build/dnf5-5.4.0.0/test/libdnf5-cli/test_progressbar.cpp:55:5: error: no matching function for call to ‘assertEquals(long unsigned int&, unsigned int&, CppUnit::SourceLine, const char [1])’
+       55 |     CPPUNIT_ASSERT_EQUAL(expected, num_lines);
+	  |     ^
+      • there is 1 candidate
+	• candidate 1: ‘template<class T> void CppUnit::assertEquals(const T&, const T&, SourceLine, const std::string&)’
+	  /usr/include/cppunit/TestAssert.h:161:6:
+	    161 | void assertEquals( const T& expected,
+		|      ^~~~~~~~~~~~
+	  • template argument deduction/substitution failed:
+	    •   deduced conflicting types for parameter ‘const T’ (‘long unsigned int’ and ‘unsigned int’)
+	      /builddir/build/BUILD/dnf5-5.4.0.0-build/dnf5-5.4.0.0/test/libdnf5-cli/test_progressbar.cpp:55:5:
+		 55 |     CPPUNIT_ASSERT_EQUAL(expected, num_lines);
+		    |     ^
+
+The cause was a comparison between two variables of different types,
+size_t and unsigned long int, that have a different rank on 32-bit
+platforms, leading to a template argument mismatch.
+
+This flaw was introduced in commit
+7b137b9148ec9f025162bbfe817de1a32830fc3d ("libdnf5-cli: handle C or
+POSIX locale gracefully in progressbar width calculation").
+
+This patch fixes it.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=2443774
+---
+ test/libdnf5-cli/test_progressbar.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/libdnf5-cli/test_progressbar.cpp b/test/libdnf5-cli/test_progressbar.cpp
+index 948bf2e..88fec36 100644
+--- a/test/libdnf5-cli/test_progressbar.cpp
++++ b/test/libdnf5-cli/test_progressbar.cpp
+@@ -51,7 +51,7 @@ void ProgressbarTest::test_progress_bar_multi_byte_character() {
+     progress_bar->set_state(libdnf5::cli::progressbar::ProgressBarState::STARTED);
+     progress_bar->add_message(libdnf5::cli::progressbar::MessageType::WARNING, "Created symlink '/etc/systemd/user/sockets.target.wants/pipewire.socket' \342\206\222 '/usr/lib/systemd/user/pipewire.socket'.");
+     auto num_lines = progress_bar->calculate_messages_terminal_lines(106);
+-    auto expected = strcmp(setlocale(LC_ALL, NULL), "C") == 0 ? 1UL : 2UL;
++    std::size_t expected = strcmp(setlocale(LC_ALL, NULL), "C") == 0 ? 1U : 2U;
+     CPPUNIT_ASSERT_EQUAL(expected, num_lines);
+ }
+ 
+-- 
+2.53.0
+
