@@ -151,6 +151,10 @@ Patch67:          nss-3.118-ml-dsa-unittests.patch
 
 Patch70:          nss-3.118.1-fix-test-typo.patch
 
+# Fix dbtests.sh for sqlite 3.50+ which changed hex blob literals from X'' to x''
+# Already used in Fedora rawhide (f45) to fix the same issue
+Patch71:          nss-dbtests-sqlite-mangling.patch
+
 Patch100:         nspr-config-pc.patch
 Patch101:         nspr-gcc-atomics.patch
 
