@@ -30,7 +30,7 @@ src-rpm-rebuild:
     "${TEST_ENGINE}" start "${container_id}"
 
     # Install build dependencies
-    "${TEST_ENGINE}" exec --user 0 -e HOME=/root "${container_id}" dnf install -y rpm-build
+    "${TEST_ENGINE}" exec --user 0 -e HOME=/root "${container_id}" dnf install -y rpm-build dnf5-plugins
 
     # Install the source RPM
     "${TEST_ENGINE}" exec --user 0 -e HOME=/root "${container_id}" rpm -i /tmp/test.src.rpm
