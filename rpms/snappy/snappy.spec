@@ -2,7 +2,6 @@
 %bcond gbench %[ !0%{?rhel} ]
 %bcond gtest %[ !0%{?rhel} ]
 
-%global __cmake_in_source_build 1
 Name:           snappy
 Version:        1.2.2
 Release:        4.1%{?dist}
@@ -50,8 +49,12 @@ developing applications that use %{name}.
 
 %build
 # gtest 1.17.0 requires C++17 or later
-%cmake -DCMAKE_CXX_STANDARD=17 %{!?with_gbench:-DSNAPPY_BUILD_BENCHMARKS=OFF} %{!?with_gtest:-DSNAPPY_BUILD_TESTS=OFF} .
-%make_build
+# Use %%cmake_build/%%cmake_install/%%ctest instead of %%make_build/%%make_install/ctest
+# because cmake-rpm-macros 4.x defaults to the Ninja generator, not Unix Makefiles.
+# https://fedoraproject.org/wiki/Changes/CMake_ninja_default
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/CMake/
+%cmake -DCMAKE_CXX_STANDARD=17 %{!?with_gbench:-DSNAPPY_BUILD_BENCHMARKS=OFF} %{!?with_gtest:-DSNAPPY_BUILD_TESTS=OFF}
+%cmake_build
 
 # create pkgconfig file
 cat << EOF >snappy.pc
@@ -71,13 +74,13 @@ EOF
 %install
 rm -rf %{buildroot}
 chmod 644 *.txt AUTHORS COPYING NEWS README.md
-%make_install
+%cmake_install
 install -m644 -D snappy.pc %{buildroot}%{_libdir}/pkgconfig/snappy.pc
 rm -rf %{buildroot}%{_datadir}/doc/snappy/
 rm -rf %{buildroot}%{_datadir}/doc/snappy-devel/
 
 %check
-ctest -V %{?_smp_mflags}
+%ctest
 
 
 %ldconfig_scriptlets
