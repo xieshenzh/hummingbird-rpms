@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Pre-existing modification - requires review",
   "modification_status": "modified",
-  "release": "2",
-  "sha": "1daa87719088e94ed51fd9d27dcbbd1c1dd3f68b",
+  "release": "3",
+  "sha": "9d97f42ba8c3edafcf8854210faaff6d154fc9f3",
   "source": "https://src.fedoraproject.org/rpms/python-urllib3.git",
   "version": "2.6.3"
 }
