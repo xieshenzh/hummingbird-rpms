@@ -69,8 +69,10 @@ def parse_args(argv=None):
         action='append',
         help='Configuration settings to pass to the PEP 517 backend',
     )
+    parser.add_argument('-d', help=argparse.SUPPRESS)  # processed by RPM macro
     args = parser.parse_args(argv)
     args.config_settings = parse_config_settings_args(args.config_settings)
+    del args.d
     return args
 
 

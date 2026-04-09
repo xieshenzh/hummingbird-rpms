@@ -14,6 +14,7 @@ BuildRequires:  python3-devel
 %description
 This package tests that we can build and install 2 wheels at once.
 One of them is "noarch" and one has an extension module.
+This also tests the -d option for %%pyproject_buildrequires/%%pyproject_wheel.
 
 
 %prep
@@ -23,22 +24,17 @@ tar xf %{SOURCE2}
 
 
 %generate_buildrequires
-cd markupsafe-%{markupsafe_version}
-%pyproject_buildrequires -R
-cd ../tldr-%{tldr_version}
-%pyproject_buildrequires -R
-cd ..
+%pyproject_buildrequires -R -d markupsafe-%{markupsafe_version}
+%pyproject_buildrequires -R -d tldr-%{tldr_version}
 
 
 %build
-cd markupsafe-%{markupsafe_version}
-%pyproject_wheel
-cd ../tldr-%{tldr_version}
-%pyproject_wheel
-cd ..
+%pyproject_wheel -d markupsafe-%{markupsafe_version}
+%pyproject_wheel -d tldr-%{tldr_version}
 
 
 %install
+set -o pipefail
 (
 # This should install both the wheels:
 %pyproject_install

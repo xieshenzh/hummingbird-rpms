@@ -168,6 +168,37 @@ The `%pyproject_buildrequires` macro also accepts the `-r` flag for backward com
 it means "include runtime dependencies" which has been the default since version 0-53.
 
 
+Building wheels from custom directories
+---------------------------------------
+
+The `%pyproject_buildrequires` and `%pyproject_wheel` macros accept a `-d` flag
+to specify a working directory.
+
+For example:
+
+    %pyproject_wheel -d bindings/python
+
+Is roughly equivalent to:
+
+    pushd bindings/python
+    %pyproject_wheel
+    popd
+
+If you use `%pyproject_wheel` to build multiple wheels, for example like this:
+
+    %pyproject_wheel -d project_a
+    %pyproject_wheel -d project_b
+
+You still only call `%pyproject_install` once and it will install all such wheels.
+Support for `%pyproject_save_files` with multiple wheels is not implemented.
+
+If you use `%pyproject_buildrequires -d ...` for multiple co-dependent packages
+in one spec file, it will create one or more build time dependencies
+on the packages you are currently building.
+The only currently supported way to avoid some of such unnecessary BuildRequires
+is to use the `-R` flag to avoid generating BuildRequires based on runtime dependencies.
+
+
 Passing config settings to build backends
 -----------------------------------------
 

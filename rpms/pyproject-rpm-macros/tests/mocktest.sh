@@ -1,21 +1,21 @@
 #!/usr/bin/bash -eux
-if [ -z "${VERSION_ID-}" ] && [ -z "${NAME-}" ]; then
+if [ -z "${VERSION_ID-}" ] && [ -z "${ID-}" ]; then
   . /etc/os-release
 fi
 
 version=$(echo "${VERSION_ID}" | cut -d. -f1)
 arch=$(rpm --eval '%{_arch}')
 
-case $NAME in
-  "Fedora Linux"|"Fedora")
-    if [ "${VARIANT_ID-}" == "eln" ]; then
+case $ID in
+  "fedora")
+  if [ "${VARIANT_ID-}" == "eln" ]; then
       version="eln"
     fi
     mock="fedora-${version}-${arch}"
     repos="local"
     ;;
 
-  "CentOS Stream"|"Red Hat Enterprise Linux")
+  "centos"|"rhel")
     case $version in
       9)
         mock="centos-stream+epel-next-${version}-${arch}"

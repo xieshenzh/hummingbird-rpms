@@ -58,6 +58,7 @@ Summary:        %{summary}
 %check
 # This tox should run all the toxenvs specified via -e in %%pyproject_buildrequires
 # We only run some of the tests (running all of them requires network connection and is slow)
+set -o pipefail
 %tox -- -- -k test_version -Wdefault --ignore testing/test_hg_git.py | tee toxlog
 
 # Internal check for our macros: Assert both toxenvs were executed.
