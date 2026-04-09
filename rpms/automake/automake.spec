@@ -93,7 +93,7 @@ BuildRequires: sharutils
 BuildREquires: texlive-dvips
 BuildRequires: texinfo-tex
 BuildRequires: vala
-%if !0%{?rhel:1}
+%if !0%{?rhel:1} && !0%{?hummingbird:1}
 BuildRequires: gcc-objc
 BuildRequires: gcc-objc++
 BuildRequires: imake
