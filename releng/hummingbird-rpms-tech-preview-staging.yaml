@@ -915,7 +915,7 @@ spec:
     pipelineRef:
       params:
         - name: url
-          value: https://gitlab.com/redhat/hummingbird/pipelines/release-service-catalog.git
+          value: https://github.com/scoheb/release-service-catalog.git
         - name: revision
           value: hummingbird-rpm-signing
         - name: pathInRepo
