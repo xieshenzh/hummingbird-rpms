@@ -1,12 +1,17 @@
 # Contributing to Hummingbird RPMs
 
-Thank you for your interest in contributing! This repository contains RPM packaging, minimal tests, and CI plumbing used by Hummingbird to build, lint, and validate RPMs in containers and Testing Farm.
+Thank you for your interest in contributing! This repository contains RPM packaging, minimal tests,
+and CI plumbing used by Hummingbird to build, lint, and validate RPMs in containers and Testing
+Farm.
 
-This guide is adapted from the Hummingbird containers contribution guide and aligned with our workflows and tooling. See the original for broader context: [Hummingbird Containers CONTRIBUTING](https://gitlab.com/redhat/hummingbird/containers/-/blob/main/CONTRIBUTING.md).
+This guide is adapted from the Hummingbird containers contribution guide and aligned with our
+workflows and tooling. See the original for broader context:
+[Hummingbird Containers CONTRIBUTING](https://gitlab.com/redhat/hummingbird/containers/-/blob/main/CONTRIBUTING.md).
 
 ## Code of Conduct
 
-Be respectful and constructive. By participating, you agree to uphold a professional and inclusive environment.
+Be respectful and constructive. By participating, you agree to uphold a professional and inclusive
+environment.
 
 ## Repository layout
 
@@ -39,29 +44,32 @@ Build a package's SRPM and RPMs using the Konflux-aligned environment:
 
 ### Building in Lima VM
 
-When building inside a Lima VM (macOS users), use the `--build-dir` flag to specify a directory on the VM's native filesystem. This avoids permission issues with mock's bootstrap process on macOS mounts:
+When building inside a Lima VM (macOS users), use the `--build-dir` flag to specify a directory on
+the VM's native filesystem. This avoids permission issues with mock's bootstrap process on macOS
+mounts:
 
 ```bash
 limactl shell fedora bash -c 'cd /path/to/repo && ./ci/build_rpms.sh --build-dir /tmp/rpm-build <package_name>'
 ```
 
-The build directory must be on the VM's native filesystem (not a macOS mount) to ensure Linux file ownership, permissions, and symlinks work correctly with `/var/lib/mock`.
+The build directory must be on the VM's native filesystem (not a macOS mount) to ensure Linux file
+ownership, permissions, and symlinks work correctly with `/var/lib/mock`.
 
 ### Interactive repository debugging
 
-To investigate package/dependency/installability issues, you can run an interactive shell in the same environment used by the package builds:
+To investigate package/dependency/installability issues, you can run an interactive shell in the
+same environment used by the package builds:
 
 ```bash
 ./ci/build_rpms.sh --shell-before setup
 ```
 
-This will show you the `mock` command that would be used to build the `setup`
-package, and drop you into a shell in the same environment before executing the
-build, with `dnf` available. You can then run the command manually and inspect
-the environment, repositories, and package metadata.
+This will show you the `mock` command that would be used to build the `setup` package, and drop you
+into a shell in the same environment before executing the build, with `dnf` available. You can then
+run the command manually and inspect the environment, repositories, and package metadata.
 
-If you want it to actually build the local package first, so that you can
-include it in your investigation, use `--shell-after` instead:
+If you want it to actually build the local package first, so that you can include it in your
+investigation, use `--shell-after` instead:
 
 ```bash
 ./ci/build_rpms.sh --shell-after setup
@@ -91,17 +99,21 @@ Run the default and package-specific tests against one or more built RPMs:
 Notes:
 
 - Tests run inside a Podman container.
-- The test image defaults to `quay.io/hummingbird/core-runtime:latest-builder`. You can override via `TEST_IMAGE`:
+- The test image defaults to `quay.io/hummingbird/core-runtime:latest-builder`. You can override via
+  `TEST_IMAGE`:
 
 ```bash
 TEST_IMAGE=quay.io/hummingbird/core-runtime:specific-tag ./ci/run_tests_rpm.sh --rpm /path/to/pkg.rpm <package_name>
 ```
 
-- Container execution is performed as root with `HOME=/root` to avoid XDG state permission issues in dnf5.
+- Container execution is performed as root with `HOME=/root` to avoid XDG state permission issues in
+  dnf5.
 
 ## Test in tmt/Testing Farm locally
 
-You can drive the same FMF test locally with tmt. The FMF test expects an OCI artifact that contains RPMs, referenced via `IMAGE_URL` (Testing Farm sets this automatically). For local trials you can point to any compatible OCI artifact or skip the ORAS pull logic and directly call the script.
+You can drive the same FMF test locally with tmt. The FMF test expects an OCI artifact that contains
+RPMs, referenced via `IMAGE_URL` (Testing Farm sets this automatically). For local trials you can
+point to any compatible OCI artifact or skip the ORAS pull logic and directly call the script.
 
 ```bash
 # If using an OCI artifact with RPMs
@@ -111,25 +123,35 @@ IMAGE_URL="oci://registry/namespace/artifact:tag_or_digest" tmt run -a
 ./ci/run_tests_rpm.sh --rpm /path/to/pkg.rpm --src-rpm /path/to/pkg.src.rpm <package_name>
 ```
 
-If you need longer time in Testing Farm, the FMF test includes `duration`, which you can adjust in `ci/run_tests_rpm.fmf`.
+If you need longer time in Testing Farm, the FMF test includes `duration`, which you can adjust in
+`ci/run_tests_rpm.fmf`.
 
 ## Dist-git Imports
 
-The `ci/dist_git.py` tool imports Fedora/CentOS dist-git packages into the `rpms/` directory. We expect most packages to not have (permanent) Hummingbird specific changes, so most of them will keep syncing with upstream dist-gits. In most cases that will be Fedora rawhide, but for some packages we may pick a different upstream, e.g. stable Fedora or even CentOS Stream.
+The `ci/dist_git.py` tool imports Fedora/CentOS dist-git packages into the `rpms/` directory. We
+expect most packages to not have (permanent) Hummingbird specific changes, so most of them will keep
+syncing with upstream dist-gits. In most cases that will be Fedora rawhide, but for some packages we
+may pick a different upstream, e.g. stable Fedora or even CentOS Stream.
 
-The status of all imports is tracked in [imports.json](./imports.json). Active Fedora releases are tracked in [upstream-releases.json](./upstream-releases.json), which is updated from the Bodhi API. Note that `rawhide` is automatically resolved to the highest numbered Fedora release at runtime and is not stored in the JSON file.
+The status of all imports is tracked in [imports.json](./imports.json). Active Fedora releases are
+tracked in [upstream-releases.json](./upstream-releases.json), which is updated from the Bodhi API.
+Note that `rawhide` is automatically resolved to the highest numbered Fedora release at runtime and
+is not stored in the JSON file.
 
 See `./ci/dist_git.py --help` for all available options. Some examples:
 
-- Update upstream-releases.json from Bodhi API (should be done periodically, e.g., when new Fedora versions are released):
+- Update upstream-releases.json from Bodhi API (should be done periodically, e.g., when new Fedora
+  versions are released):
 
 ```bash
 ./ci/dist_git.py update-releases
 ```
 
-This fetches the latest Fedora releases from Bodhi. The `rawhide` branch automatically resolves to the highest numbered Fedora version (e.g., if f43 and f44 are available, rawhide uses f44).
+This fetches the latest Fedora releases from Bodhi. The `rawhide` branch automatically resolves to
+the highest numbered Fedora version (e.g., if f43 and f44 are available, rawhide uses f44).
 
-- Import a new package. This requires specifying the dist-git URL (with `fedora/` being a shortcut for the Fedora dist-git URL) and optionally a branch (default: rawhide):
+- Import a new package. This requires specifying the dist-git URL (with `fedora/` being a shortcut
+  for the Fedora dist-git URL) and optionally a branch (default: rawhide):
 
 ```bash
 ./ci/dist_git.py import fedora/bash
@@ -146,24 +168,29 @@ This fetches the latest Fedora releases from Bodhi. The `rawhide` branch automat
 ./ci/dist_git.py update bash
 ```
 
-This only imports changes if these were actually built in Koji, to ensure we only import changes which are meant to be released. You can disable this check with `--skip-build-check`.
+This only imports changes if these were actually built in Koji, to ensure we only import changes
+which are meant to be released. You can disable this check with `--skip-build-check`.
 
-- Re-sync a package to upstream, discarding any local modifications. We use this after Fedora adopted our change, or it is no longer relevant:
+- Re-sync a package to upstream, discarding any local modifications. We use this after Fedora
+  adopted our change, or it is no longer relevant:
 
 ```bash
 ./ci/dist_git.py sync bash
 ```
 
-All of these commands automatically commit changes with descriptive commit messages including the upstream SHA. To avoid that, you can use the `--dry-run` option.
+All of these commands automatically commit changes with descriptive commit messages including the
+upstream SHA. To avoid that, you can use the `--dry-run` option.
 
-- Enable upstream version tracking for a package (used by `check_upstream_versions.py check`). These commands modify the metadata file but do not create a git commit:
+- Enable upstream version tracking for a package (used by `check_upstream_versions.py check`). These
+  commands modify the metadata file but do not create a git commit:
 
 ```bash
 ./ci/dist_git.py set-upstream bash --track
 ./ci/dist_git.py set-upstream bash --no-track
 ```
 
-- Check upstream version status. The `check` subcommand checks tracked packages; `list` shows all packages in a table:
+- Check upstream version status. The `check` subcommand checks tracked packages; `list` shows all
+  packages in a table:
 
 ```bash
 ./ci/check_upstream_versions.py check
@@ -173,13 +200,14 @@ All of these commands automatically commit changes with descriptive commit messa
 
 ## Package-specific overrides
 
-Per-package build configuration can be customized in `ci/package-overrides.yaml`. If a package is not listed, it uses default settings.
+Per-package build configuration can be customized in `ci/package-overrides.yaml`. If a package is
+not listed, it uses default settings.
 
 Available options:
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `timeout_hours` | Build timeout in hours | 4 |
+| Option            | Description                                             | Default           |
+| ----------------- | ------------------------------------------------------- | ----------------- |
+| `timeout_hours`   | Build timeout in hours                                  | 4                 |
 | `build_platforms` | List of MPLs (instance sizes) for multi-platform builds | Pipeline defaults |
 
 Example configuration:
@@ -197,7 +225,8 @@ llvm:
     - "linux-d160-c8xlarge/amd64"
 ```
 
-All available MPLs can be found in the [Konflux multi-platform builds documentation](https://konflux.pages.redhat.com/docs/users/getting-started/multi-platform-builds.html).
+All available MPLs can be found in the
+[Konflux multi-platform builds documentation](https://konflux.pages.redhat.com/docs/users/getting-started/multi-platform-builds.html).
 
 After modifying overrides, regenerate the pipeline files:
 
@@ -205,7 +234,8 @@ After modifying overrides, regenerate the pipeline files:
 make generate
 ```
 
-This updates `.tekton/rpms-on-push.yaml` and `.tekton/rpms-on-pull-request.yaml` with the new configuration.
+This updates `.tekton/rpms-on-push.yaml` and `.tekton/rpms-on-pull-request.yaml` with the new
+configuration.
 
 ## Branching and pull requests
 
@@ -223,10 +253,14 @@ This updates `.tekton/rpms-on-push.yaml` and `.tekton/rpms-on-pull-request.yaml`
 ## Packaging and testing guidelines
 
 - Spec files should be reproducible and minimal.
-- Prefer pinned container digests for CI images where feasible. If a tag and digest are both present (`name:tag@sha256:<digest>`), the digest is authoritative for content selection.
-- Default tests in `ci/default-tests/tests-rpm.yml` must be fast, deterministic, and safe for all packages.
-- Package-specific tests (`rpms/<package>/tests-rpm.yml`) can override or extend defaults. Keep them bounded in runtime and dependencies.
-- When possible, capture flaky or environmental issues under `known_issues` in test YAML with clear matching patterns and descriptions.
+- Prefer pinned container digests for CI images where feasible. If a tag and digest are both present
+  (`name:tag@sha256:<digest>`), the digest is authoritative for content selection.
+- Default tests in `ci/default-tests/tests-rpm.yml` must be fast, deterministic, and safe for all
+  packages.
+- Package-specific tests (`rpms/<package>/tests-rpm.yml`) can override or extend defaults. Keep them
+  bounded in runtime and dependencies.
+- When possible, capture flaky or environmental issues under `known_issues` in test YAML with clear
+  matching patterns and descriptions.
 
 ## Style
 
@@ -242,12 +276,15 @@ This updates `.tekton/rpms-on-push.yaml` and `.tekton/rpms-on-pull-request.yaml`
 
 ## Reporting issues
 
-Open an issue describing the problem, reproduction steps, and environment. Attach logs (build/test) when possible. If the failure is intermittent, call that out explicitly.
+Open an issue describing the problem, reproduction steps, and environment. Attach logs (build/test)
+when possible. If the failure is intermittent, call that out explicitly.
 
 ## Licensing
 
-Ensure files include appropriate licenses and that any third-party content is compatible with the project's license.
+Ensure files include appropriate licenses and that any third-party content is compatible with the
+project's license.
 
 ## Thank you
 
-Your contributions make the Hummingbird RPMs better for everyone. We appreciate your time and feedback!
+Your contributions make the Hummingbird RPMs better for everyone. We appreciate your time and
+feedback!

@@ -9,21 +9,29 @@ arguments:
 
 # GitLab MR Failure Analyzer
 
-Investigate failing Konflux tests in a GitLab merge request by fetching PipelineRun details, TaskRun logs, and error analysis. Generate a detailed forensic report documenting all investigation steps.
+Investigate failing Konflux tests in a GitLab merge request by fetching PipelineRun details, TaskRun
+logs, and error analysis. Generate a detailed forensic report documenting all investigation steps.
 
-**Scope:** This command focuses exclusively on analyzing FAILING Konflux tests. It does not report on:
+**Scope:** This command focuses exclusively on analyzing FAILING Konflux tests. It does not report
+on:
 
 - GitLab-native CI pipeline jobs
 - Overall merge readiness
 
-**Note on successful tests:** Data.5 fetches ALL PipelineRuns and TaskRuns for the commit (both passing and failing). While the primary focus is analyzing failures, successful tests are available for **comparison purposes** when it helps explain why something failed (e.g., "Package A built successfully but Package B failed - here's what's different").
+**Note on successful tests:** Data.5 fetches ALL PipelineRuns and TaskRuns for the commit (both
+passing and failing). While the primary focus is analyzing failures, successful tests are available
+for **comparison purposes** when it helps explain why something failed (e.g., "Package A built
+successfully but Package B failed - here's what's different").
 
 **Approach:**
 
-- **Efficient bulk fetching**: Uses Kubernetes label selectors to retrieve all PipelineRuns and TaskRuns for a commit in just 2 API calls per cluster (one for PipelineRuns, one for TaskRuns)
-- **Comprehensive data**: Fetches both passing and failing tests, enabling comparison during analysis
+- **Efficient bulk fetching**: Uses Kubernetes label selectors to retrieve all PipelineRuns and
+  TaskRuns for a commit in just 2 API calls per cluster (one for PipelineRuns, one for TaskRuns)
+- **Comprehensive data**: Fetches both passing and failing tests, enabling comparison during
+  analysis
 - **On-demand logs**: Only fetches logs when needed to explain failures
-- **Partial reports**: If some clusters are unavailable, the analysis continues with accessible clusters
+- **Partial reports**: If some clusters are unavailable, the analysis continues with accessible
+  clusters
 
 Use this for debugging and root cause analysis of failures, not for general CI status overview.
 
@@ -31,9 +39,11 @@ Use this for debugging and root cause analysis of failures, not for general CI s
 
 **This command uses pseudo-code for AI interpretation, not literal bash scripting.**
 
-The workflow steps describe WHAT needs to happen at a conceptual level, not HOW to implement it with specific code. This design:
+The workflow steps describe WHAT needs to happen at a conceptual level, not HOW to implement it with
+specific code. This design:
 
-- Allows flexibility in choosing implementation details (jq queries, data structures, error handling patterns)
+- Allows flexibility in choosing implementation details (jq queries, data structures, error handling
+  patterns)
 - Maintains focus on logic and requirements rather than syntax
 - Enables adaptation to different execution environments
 - Facilitates iteration without rewriting concrete code blocks
@@ -50,31 +60,41 @@ When modifying this command:
 These constraints must be followed:
 
 - **File Operations**: All file I/O limited to temporary directory only
-- **API Calls**: Use `glab api` for GitLab, `../containers/ci/internal/k8s_helper.py` for Kubernetes/Kubearchive
-- **Recommended Commands**: `glab api` for GitLab API, `../containers/ci/internal/k8s_helper.py` for K8s/Kubearchive access, `jq` for JSON parsing, `sed` for URL parsing, `curl` for Testing Farm, `python3` for complex data processing
+- **API Calls**: Use `glab api` for GitLab, `../containers/ci/internal/k8s_helper.py` for
+  Kubernetes/Kubearchive
+- **Recommended Commands**: `glab api` for GitLab API, `../containers/ci/internal/k8s_helper.py` for
+  K8s/Kubearchive access, `jq` for JSON parsing, `sed` for URL parsing, `curl` for Testing Farm,
+  `python3` for complex data processing
 - **SSL Verification**: Always enabled - no `--insecure` flags
 - **Work Log**: Build incrementally - append to report.md after each step with timestamps
-- **Error Handling**: Fetch on-demand and provide partial reports - individual test failures should not prevent analysis of other tests
-- **Shell Persistence**: Each tool invocation may use a new shell - persist state via files in temp directory, not shell variables
-- **Progress Logging**: Echo user-visible progress messages at the start of each major step (e.g., "=== Data.3: Fetching commit statuses ===") so users can see what's happening
-- **Relative Paths in Reports**: Use relative paths in markdown links (e.g., `logs/file.xml`) not absolute file:// URLs
+- **Error Handling**: Fetch on-demand and provide partial reports - individual test failures should
+  not prevent analysis of other tests
+- **Shell Persistence**: Each tool invocation may use a new shell - persist state via files in temp
+  directory, not shell variables
+- **Progress Logging**: Echo user-visible progress messages at the start of each major step (e.g.,
+  "=== Data.3: Fetching commit statuses ===") so users can see what's happening
+- **Relative Paths in Reports**: Use relative paths in markdown links (e.g., `logs/file.xml`) not
+  absolute file:// URLs
 
 ## Allowed API Endpoints
 
 ### GitLab API (via glab)
 
-Use `glab api` command for all GitLab API access. Output is JSON to stdout (pipe to `jq` for parsing).
+Use `glab api` command for all GitLab API access. Output is JSON to stdout (pipe to `jq` for
+parsing).
 
 **Commands:**
 
 - `glab api /projects/{encoded_project}/merge_requests/{iid}` - Get MR details
-- `glab api --paginate /projects/{encoded_project}/repository/commits/{sha}/statuses` - Get commit statuses
+- `glab api --paginate /projects/{encoded_project}/repository/commits/{sha}/statuses` - Get commit
+  statuses
 
 ### Kubernetes/Kubearchive API (via k8s_helper.py)
 
 Use `../containers/ci/internal/k8s_helper.py` for all Kubernetes and Kubearchive API access.
 
-**Note:** The k8s_helper.py script lives in the containers repository. Run it relative to this repo: `python3 ../containers/ci/internal/k8s_helper.py`
+**Note:** The k8s_helper.py script lives in the containers repository. Run it relative to this repo:
+`python3 ../containers/ci/internal/k8s_helper.py`
 
 **Commands:**
 
@@ -96,7 +116,8 @@ python3 ../containers/ci/internal/k8s_helper.py --cluster-url <url-with-namespac
 
 The `--cluster-url` parameter must contain both cluster domain and namespace:
 
-- Konflux UI: `https://konflux-ui.apps.kflux-prd-rh03.nnv1.p1.openshiftapps.com/ns/hummingbird-tenant/pipelinerun/...`
+- Konflux UI:
+  `https://konflux-ui.apps.kflux-prd-rh03.nnv1.p1.openshiftapps.com/ns/hummingbird-tenant/pipelinerun/...`
 - Direct: `https://anything.apps.kflux-prd-rh03.nnv1.p1.openshiftapps.com/ns/hummingbird-tenant/`
 
 The helper extracts:
@@ -111,7 +132,9 @@ The helper extracts:
 
 **Data sources:**
 
-The helper automatically fetches from both Kubearchive (historical data) and K8s API (live data), then combines and deduplicates results. This ensures complete data coverage even if resources have been deleted from the live cluster.
+The helper automatically fetches from both Kubearchive (historical data) and K8s API (live data),
+then combines and deduplicates results. This ensures complete data coverage even if resources have
+been deleted from the live cluster.
 
 **Authentication:**
 
@@ -125,7 +148,8 @@ oc login --server=https://api.kflux-prd-rh03.nnv1.p1.openshiftapps.com:6443
 
 Base URL: `https://artifacts.osci.redhat.com/testing-farm/{request-id}`
 
-Testing Farm is an external testing service integrated with Konflux. The artifacts URL is found in GitLab commit status `target_url` for TEST PipelineRuns.
+Testing Farm is an external testing service integrated with Konflux. The artifacts URL is found in
+GitLab commit status `target_url` for TEST PipelineRuns.
 
 **Key endpoints:**
 
@@ -159,16 +183,20 @@ Testing Farm is an external testing service integrated with Konflux. The artifac
 
 ## RPM Build Pipeline Structure
 
-The rpms repository builds RPM packages using Konflux pipelines. Understanding the pipeline structure helps diagnose failures:
+The rpms repository builds RPM packages using Konflux pipelines. Understanding the pipeline
+structure helps diagnose failures:
 
 ### Pipeline Types
 
 **BUILD Pipelines** (`{package}-main-on-pull-request-*`):
+
 - Build individual RPM packages
 - One pipeline per package changed in the MR
-- Key steps: `clone-repository`, `process-sources`, `prepare-mock-config`, `calculate-deps-{arch}`, `rpmbuild-{arch}`
+- Key steps: `clone-repository`, `process-sources`, `prepare-mock-config`, `calculate-deps-{arch}`,
+  `rpmbuild-{arch}`
 
 **TEST Pipelines** (`rpms-main-testing-farm-{arch}-*`):
+
 - Run integration tests via Testing Farm
 - One pipeline per architecture (x86-64, aarch64)
 - Tests RPMs after successful builds
@@ -176,18 +204,22 @@ The rpms repository builds RPM packages using Konflux pipelines. Understanding t
 ### Common Failure Patterns
 
 **calculate-deps failures:**
+
 - Missing dependencies in the repo
 - Dependency version conflicts
-- **Parallel build timing**: Package A depends on Package B, but both started building simultaneously
+- **Parallel build timing**: Package A depends on Package B, but both started building
+  simultaneously
 - Architecture-specific dependency issues (fails on x86-64/aarch64 but succeeds on ppc64le/s390x)
 
 **rpmbuild failures:**
+
 - Compilation errors
 - Missing build dependencies
 - Spec file issues
 - Patch application failures
 
 **Testing Farm failures:**
+
 - RPM installation failures
 - Test script errors
 - Timeout issues
@@ -227,11 +259,14 @@ Log: Extracted project and MR IID
 
 **Progress:** Echo "=== Setup.3: Creating temporary workspace ==="
 
-Create a deterministic temporary directory based on project name and MR IID to avoid conflicts with concurrent runs:
+Create a deterministic temporary directory based on project name and MR IID to avoid conflicts with
+concurrent runs:
 
-- Sanitize project path for use in directory name: replace `/` with `-` (e.g., `redhat/hummingbird/rpms` -> `redhat-hummingbird-rpms`)
+- Sanitize project path for use in directory name: replace `/` with `-` (e.g.,
+  `redhat/hummingbird/rpms` -> `redhat-hummingbird-rpms`)
 - Path: `/tmp/analyze-failures-${SANITIZED_PROJECT}-mr${MR_IID}`
-- If this directory already exists, purge it completely first: `rm -rf /tmp/analyze-failures-${SANITIZED_PROJECT}-mr${MR_IID}`
+- If this directory already exists, purge it completely first:
+  `rm -rf /tmp/analyze-failures-${SANITIZED_PROJECT}-mr${MR_IID}`
 - Create fresh directory with subdirectories:
   - `api-responses/` - for JSON responses from APIs
   - `logs/` - for pod logs
@@ -250,7 +285,8 @@ Initialize `report.md` with work log header.
 
 **Progress:** Echo "=== Setup.4: Initializing work log ==="
 
-Set up a mechanism to append work log entries to `report.md` throughout the workflow as a bulleted list. Each major step should add an entry.
+Set up a mechanism to append work log entries to `report.md` throughout the workflow as a bulleted
+list. Each major step should add an entry.
 
 Log:
 
@@ -263,14 +299,17 @@ Log:
 
 **Progress:** Echo "=== Data.1: Parsing remaining MR URL details ==="
 
-Parse the MR URL to extract remaining details (project path and MR IID already extracted in Setup.2):
+Parse the MR URL to extract remaining details (project path and MR IID already extracted in
+Setup.2):
 
 - GitLab host: `sed -n 's#^\(https://[^/]*\).*#\1#p'`
-- URL-encode project path using `printf '%s' "$PROJECT_PATH" | jq -sRr @uri` (NOT `echo` - it adds trailing newline)
+- URL-encode project path using `printf '%s' "$PROJECT_PATH" | jq -sRr @uri` (NOT `echo` - it adds
+  trailing newline)
 
 Log: Parsed full MR URL details
 
-**Known Issue:** Using `echo` for piping to jq will add a newline character to the encoded output. Always use `printf '%s'` instead.
+**Known Issue:** Using `echo` for piping to jq will add a newline character to the encoded output.
+Always use `printf '%s'` instead.
 
 #### Data.2: Fetch MR Details
 
@@ -290,7 +329,9 @@ Extract from response using jq:
 - `state` - MR state
 - `web_url` - MR URL
 
-Store these values for later use in a file that can be sourced by bash. **IMPORTANT**: When writing variables to a file for sourcing, properly quote all values to handle special characters (colons, spaces, etc.). Use format: `VAR_NAME="value"` not `VAR_NAME=value`.
+Store these values for later use in a file that can be sourced by bash. **IMPORTANT**: When writing
+variables to a file for sourcing, properly quote all values to handle special characters (colons,
+spaces, etc.). Use format: `VAR_NAME="value"` not `VAR_NAME=value`.
 
 Log: Fetched MR details, will analyze commit {sha}
 
@@ -298,9 +339,11 @@ Log: Fetched MR details, will analyze commit {sha}
 
 **Progress:** Echo "=== Data.3: Fetching commit statuses and identifying failing tests ==="
 
-Call GitLab API with automatic pagination: `glab api --paginate /projects/{encoded_project}/repository/commits/{sha}/statuses`
+Call GitLab API with automatic pagination:
+`glab api --paginate /projects/{encoded_project}/repository/commits/{sha}/statuses`
 
-The `--paginate` flag automatically handles pagination and returns all results. Use `jq -s 'add'` to combine the paginated JSON arrays into a single array.
+The `--paginate` flag automatically handles pagination and returns all results. Use `jq -s 'add'` to
+combine the paginated JSON arrays into a single array.
 
 Save combined response to `api-responses/commit-statuses.json`.
 
@@ -324,7 +367,8 @@ Save any failing test's `target_url` to use in Data.4 (all tests use the same cl
 
 Count the number of failing tests. If zero, skip remaining steps.
 
-**Note:** There is only one Konflux cluster per MR. All tests run on the same cluster and namespace. The `k8s_helper.py` script will extract cluster domain and namespace from the URL.
+**Note:** There is only one Konflux cluster per MR. All tests run on the same cluster and namespace.
+The `k8s_helper.py` script will extract cluster domain and namespace from the URL.
 
 Log: Number of failing Konflux tests identified, saved example URL for cluster access
 
@@ -336,7 +380,8 @@ Log: Number of failing Konflux tests identified, saved example URL for cluster a
 
 If no failing Konflux tests were found in Data.3, skip this step entirely.
 
-**Note:** There is only one Konflux cluster per MR. Use the `target_url` from any failing test saved in Data.3.
+**Note:** There is only one Konflux cluster per MR. Use the `target_url` from any failing test saved
+in Data.3.
 
 **Fetch PipelineRuns:**
 
@@ -375,16 +420,18 @@ If fetch fails (e.g., no kubeconfig credentials, cluster inaccessible):
 
 - Log error and exit - cannot proceed without Kubernetes access
 - This is a fatal error
-- **Hint:** Run `oc login --server=https://api.kflux-prd-rh03.nnv1.p1.openshiftapps.com:6443` to refresh credentials
+- **Hint:** Run `oc login --server=https://api.kflux-prd-rh03.nnv1.p1.openshiftapps.com:6443` to
+  refresh credentials
 
-**Note:** The helper fetches from both Kubearchive (historical data) and K8s API (live data), ensuring complete coverage even if resources have been deleted from the live cluster.
+**Note:** The helper fetches from both Kubearchive (historical data) and K8s API (live data),
+ensuring complete coverage even if resources have been deleted from the live cluster.
 
 **Bulk Fetch Testing Farm Data (for Failed TEST PipelineRuns only):**
 
-After fetching all PipelineRuns and TaskRuns, immediately fetch Testing Farm results for failed TEST PipelineRuns:
+After fetching all PipelineRuns and TaskRuns, immediately fetch Testing Farm results for failed TEST
+PipelineRuns:
 
 1. **Identify failed TEST PipelineRuns**:
-
    - Read `pipelineruns.json` (JSON array)
    - For each PipelineRun in the array:
      - Check if it has label `pac.test.appstudio.openshift.io/sha` (TEST PipelineRun)
@@ -394,35 +441,39 @@ After fetching all PipelineRuns and TaskRuns, immediately fetch Testing Farm res
    - Save mapping: `{pr-name}|{component}` to temp list
 
 2. **Extract Testing Farm request IDs for failed TEST PipelineRuns**:
-
    - For each failed TEST PipelineRun (from temp list):
-     - Find scheduler TaskRun in `taskruns.json` array by matching name pattern: `{pr-name}-scheduler-*`
-     - Extract TF request URL from TaskRun's `.status.results[] | select(.name == "tf-request") | .value`
+     - Find scheduler TaskRun in `taskruns.json` array by matching name pattern:
+       `{pr-name}-scheduler-*`
+     - Extract TF request URL from TaskRun's
+       `.status.results[] | select(.name == "tf-request") | .value`
      - Extract request ID from URL (last path component)
      - Save to `analysis/tf-mapping.txt`: `{pr-name}|{component}|{tf-request-id}`
    - Log: "Extracted N Testing Farm request IDs for failed tests"
 
 3. **Batch fetch all results.xml for failed tests**:
-
    - For each TF request ID from `analysis/tf-mapping.txt`:
      - Fetch `https://artifacts.osci.redhat.com/testing-farm/{request-id}/results.xml`
      - Save as `logs/tf-results-{request-id}.xml`
      - These are small files (~50KB), quick to fetch
    - If any fetch fails (404, timeout), note in log but continue with others
-   - Log: "Fetched M Testing Farm results.xml files for failed tests (N successful, P failed/unavailable)"
+   - Log: "Fetched M Testing Farm results.xml files for failed tests (N successful, P
+     failed/unavailable)"
 
 4. **Parse results.xml to structured summaries for failed tests**:
-
    - For each results.xml that was successfully fetched:
      - Use **Python with xml.etree.ElementTree** for reliable parsing (avoid awk/sed for XML)
      - Extract:
        - Overall result: `//testsuites/@overall-result` (via xmllint)
        - Total tests: `count(//testcase)` (via xmllint)
-       - Failed test details: Parse with Python to get name, time, log URLs from `<log name="testout.log">` elements
-     - Export environment variables for Python script to access (TMPDIR, TF_REQUEST_ID, PR_NAME, COMPONENT, etc.)
+       - Failed test details: Parse with Python to get name, time, log URLs from
+         `<log name="testout.log">` elements
+     - Export environment variables for Python script to access (TMPDIR, TF_REQUEST_ID, PR_NAME,
+       COMPONENT, etc.)
      - Save structured data as `analysis/tf-summary-{request-id}.json` with format:
 
-**Known Issue:** Parsing XML with awk/sed is complex and error-prone. Use Python's xml.etree.ElementTree for reliable extraction of nested elements and attributes. Remember to `export` environment variables before running Python heredoc scripts.
+**Known Issue:** Parsing XML with awk/sed is complex and error-prone. Use Python's
+xml.etree.ElementTree for reliable extraction of nested elements and attributes. Remember to
+`export` environment variables before running Python heredoc scripts.
 
 ```json
 {
@@ -444,7 +495,10 @@ After fetching all PipelineRuns and TaskRuns, immediately fetch Testing Farm res
 
 - Log: "Parsed M Testing Farm results for failed tests"
 
-**Rationale:** Fetching Testing Farm data in bulk for all failed TEST PipelineRuns here allows Analysis.1 to do pattern detection across all failures before fetching any test logs. This is much faster than fetching TF data one-by-one during analysis. Successful tests don't need investigation, so we skip them.
+**Rationale:** Fetching Testing Farm data in bulk for all failed TEST PipelineRuns here allows
+Analysis.1 to do pattern detection across all failures before fetching any test logs. This is much
+faster than fetching TF data one-by-one during analysis. Successful tests don't need investigation,
+so we skip them.
 
 #### Data.5: Organize Fetched Resources
 
@@ -457,7 +511,8 @@ Extract individual resources from the JSON arrays:
 - Read from: `pipelineruns.json` (JSON array)
 - For each item in the array:
   - Extract: `name` from `.metadata.name`, `status` from `.status.conditions[0].reason`
-  - Determine type: BUILD (has label `pipelinesascode.tekton.dev/sha`) or TEST (has label `pac.test.appstudio.openshift.io/sha`)
+  - Determine type: BUILD (has label `pipelinesascode.tekton.dev/sha`) or TEST (has label
+    `pac.test.appstudio.openshift.io/sha`)
   - Save to: `api-responses/pipelinerun-{name}-{status}-{build|test}.json`
 
 **For TaskRuns:**
@@ -481,7 +536,8 @@ Any other status indicates a failure or abnormal termination:
 - "Cancelled" / "PipelineRunCancelled" - cancelled
 - Other statuses - investigate as potential failures
 
-Focus investigation on both BUILD and TEST PipelineRuns with non-successful status. BUILD failures (e.g., `{package}-main-on-pull-request-*`) are common in RPM builds due to dependency issues.
+Focus investigation on both BUILD and TEST PipelineRuns with non-successful status. BUILD failures
+(e.g., `{package}-main-on-pull-request-*`) are common in RPM builds due to dependency issues.
 
 **Summary tracking:**
 
@@ -502,7 +558,8 @@ Total failures: N
 
 This makes it immediately clear how many failures exist and what type they are.
 
-**Note:** The k8s_helper.py already fetched from both Kubearchive (historical) and K8s API (live), combining and deduplicating results to ensure completeness.
+**Note:** The k8s_helper.py already fetched from both Kubearchive (historical) and K8s API (live),
+combining and deduplicating results to ensure completeness.
 
 ### Analysis Phase
 
@@ -510,9 +567,11 @@ This makes it immediately clear how many failures exist and what type they are.
 
 **Progress:** Echo "=== Analysis.1: Analyzing all failures ==="
 
-**Goal:** Investigate each PipelineRun failure individually to understand what happened, then summarize across failures to identify common issues.
+**Goal:** Investigate each PipelineRun failure individually to understand what happened, then
+summarize across failures to identify common issues.
 
-**Approach:** Investigate each failure on its own first (understand the specifics), then group by commonalities (understand the patterns).
+**Approach:** Investigate each failure on its own first (understand the specifics), then group by
+commonalities (understand the patterns).
 
 **Note:** Use `../containers/ci/internal/k8s_helper.py` for fetching logs when needed.
 
@@ -535,7 +594,8 @@ For each PipelineRun file with non-successful status (i.e., not "Succeeded" or "
 - **Architecture**: infer from PipelineRun name or labels (aarch64/x86-64/ppc64le/s390x)
 - **Failure message**: `.status.conditions[0].message`
 
-**Note:** Common non-successful statuses include "Failed", "PipelineRunTimeout", "Cancelled", "PipelineRunCancelled", etc.
+**Note:** Common non-successful statuses include "Failed", "PipelineRunTimeout", "Cancelled",
+"PipelineRunCancelled", etc.
 
 **2. Investigate based on type:**
 
@@ -549,26 +609,22 @@ For each PipelineRun file with non-successful status (i.e., not "Succeeded" or "
 **How to investigate:**
 
 1. **Find failed TaskRun**:
-
    - Look at PipelineRun's `.status.childReferences[]`
    - Find TaskRun with failed status
    - Load its file: `taskrun-{name}-Failed.json`
 
 2. **Get failure details from TaskRun**:
-
    - Failure message: `.status.conditions[0].message`
    - Pod name: `.status.podName`
    - If failure message is clear enough, you may not need logs
 
 3. **Identify the failed step** (common RPM build steps):
-
    - `calculate-deps-{arch}`: Dependency resolution failed
    - `rpmbuild-{arch}`: RPM compilation/build failed
    - `process-sources`: Source processing failed
    - `prepare-mock-config`: Mock configuration failed
 
 4. **Fetch pod logs if needed** (when failure message isn't clear):
-
    - Extract pod name from failed TaskRun's `.status.podName` field
    - Use k8s_helper.py to fetch logs (namespace auto-detected from URL):
 
@@ -580,7 +636,6 @@ For each PipelineRun file with non-successful status (i.e., not "Succeeded" or "
    - The helper automatically tries both Kubearchive and K8s API
 
 5. **Analyze for root cause**:
-
    - Read last 100 lines of log
    - Look for error patterns:
      - **Dependency issues**: "No package", "nothing provides", "Requires:", "conflicts with"
@@ -592,7 +647,6 @@ For each PipelineRun file with non-successful status (i.e., not "Succeeded" or "
    - Extract 3-5 key error lines
 
 6. **Document findings**:
-
    - Root cause summary (1 sentence)
    - Key error messages
    - Evidence files used
@@ -654,18 +708,15 @@ For each PipelineRun file with non-successful status (i.e., not "Succeeded" or "
 **How to investigate:**
 
 1. **Find failed TaskRun** (same as BUILD):
-
    - Look at PipelineRun's `.status.childReferences[]`
    - Find TaskRun with failed status
    - Load: `taskrun-{name}-Failed.json`
 
 2. **Get failure details**:
-
    - Failure message: `.status.conditions[0].message`
    - Pod name: `.status.podName`
 
 3. **Fetch pod logs if needed**:
-
    - Extract pod name from failed TaskRun's `.status.podName` field
    - Use k8s_helper.py to fetch logs (namespace auto-detected from URL):
 
@@ -677,13 +728,11 @@ For each PipelineRun file with non-successful status (i.e., not "Succeeded" or "
    - The helper automatically tries both Kubearchive and K8s API
 
 4. **Analyze for root cause**:
-
    - Read last 100 lines
    - Look for test-specific errors
    - Extract key error messages
 
 5. **Document findings**:
-
    - Root cause summary
    - Key error messages
    - Evidence files used
@@ -696,9 +745,14 @@ Save to `analysis/individual-failures.jsonl` (JSON Lines - one JSON object per l
 {"pipelinerun": "pr-name", "type": "BUILD|TEST-TF|TEST-OTHER", "package": "...", "arch": "aarch64|x86-64|ppc64le|s390x", "failed_step": "calculate-deps|rpmbuild|...", "root_cause": "summary", "key_errors": ["line1", "line2"], "failed_tests": ["test1"] (if TEST-TF), "evidence": ["logs/...", "api-responses/..."], "cluster": "...", "namespace": "..."}
 ```
 
-**Implementation Note:** Use simple heredoc or cat for JSON generation rather than complex `jq -n` with multiple variables. Simpler approaches are more reliable and easier to debug. Ensure proper escaping of quotes in error messages.
+**Implementation Note:** Use simple heredoc or cat for JSON generation rather than complex `jq -n`
+with multiple variables. Simpler approaches are more reliable and easier to debug. Ensure proper
+escaping of quotes in error messages.
 
-**Known Issue:** When looping over files with `for file in pipelinerun-*-Failed-build.json`, the loop runs for every matching file INCLUDING when extracting PR_NAME from the filename, creating duplicate records. Always check the actual number of files vs records created. The loop should only iterate once per actual file.
+**Known Issue:** When looping over files with `for file in pipelinerun-*-Failed-build.json`, the
+loop runs for every matching file INCLUDING when extracting PR_NAME from the filename, creating
+duplicate records. Always check the actual number of files vs records created. The loop should only
+iterate once per actual file.
 
 Log: "Investigated N failed PipelineRuns (X BUILD, Y TEST-TF, Z TEST-OTHER)"
 
@@ -708,7 +762,8 @@ Log: "Investigated N failed PipelineRuns (X BUILD, Y TEST-TF, Z TEST-OTHER)"
 
 **Progress:** Echo "=== Analysis.1b: Grouping failures by root cause ==="
 
-**Goal:** Identify common patterns across individual failures to show which issues affect multiple builds/tests.
+**Goal:** Identify common patterns across individual failures to show which issues affect multiple
+builds/tests.
 
 **How to summarize:**
 
@@ -738,11 +793,13 @@ Log: "Investigated N failed PipelineRuns (X BUILD, Y TEST-TF, Z TEST-OTHER)"
 
 3. **Identify cross-architecture impact**:
    - If grouped failures include multiple architectures -> mark as cross-arch
-   - If failure only on some architectures (e.g., x86-64/aarch64 but not ppc64le/s390x) -> note the pattern
+   - If failure only on some architectures (e.g., x86-64/aarch64 but not ppc64le/s390x) -> note the
+     pattern
 
 4. **Check for parallel build timing issues**:
    - Compare PipelineRun start times
-   - If Package A depends on Package B, and both started at the same time, this is likely the root cause
+   - If Package A depends on Package B, and both started at the same time, this is likely the root
+     cause
    - **Recommendation**: Split into separate MRs or rebuild after dependency is available
 
 5. **Output summary**:
@@ -788,7 +845,9 @@ Save to `analysis/failure-summary.json`:
 
 Log: "Summarized failures: N groups affecting M failures, P unique failures"
 
-**Note:** Grouping is helpful for showing patterns, but each failure was already individually investigated in Analysis.1a. The summary just helps identify which issues affect multiple components/architectures.
+**Note:** Grouping is helpful for showing patterns, but each failure was already individually
+investigated in Analysis.1a. The summary just helps identify which issues affect multiple
+components/architectures.
 
 **For each failed PipelineRun**, create an explanation record containing:
 
@@ -855,7 +914,8 @@ Log: "Generated explanations for all failures (N BUILD, M TEST-TF, P TEST-OTHER)
 
 Build the final report in markdown format with the following sections:
 
-**IMPORTANT - Link Format:** All file paths in the report must be **relative paths** from the temporary directory, NOT absolute `file://` URLs. For example:
+**IMPORTANT - Link Format:** All file paths in the report must be **relative paths** from the
+temporary directory, NOT absolute `file://` URLs. For example:
 
 - Good: `logs/tf-results-abc123.xml`
 - Bad: `file:///tmp/tmp.xyz/logs/tf-results-abc123.xml`
@@ -870,25 +930,29 @@ This makes the report portable and the links clickable when the report is moved 
 - If no failures: "No failing Konflux tests found"
 - If failures exist: count and summary
 
-**2. Key Findings** (actionable guidance for humans):
-After analyzing all failures in Analysis.1, synthesize using the pattern detection:
+**2. Key Findings** (actionable guidance for humans): After analyzing all failures in Analysis.1,
+synthesize using the pattern detection:
 
-- **All failures must be fixed**: List all root causes grouped by pattern - these are blockers for merge
+- **All failures must be fixed**: List all root causes grouped by pattern - these are blockers for
+  merge
   - For each pattern: "{root-cause-summary} ({N} failures: packages/archs affected)"
   - For singletons: "{root-cause-summary} (1 failure: package)"
 - **Failure breakdown by root cause**:
   - Group failures by their root cause from Analysis.1b
   - Show how many failures each root cause accounts for
   - Example: "sendmail calculate-deps: 2 failures on x86-64 and aarch64"
-- **Cross-architecture impact**: Which failures occur on multiple architectures vs single architecture
+- **Cross-architecture impact**: Which failures occur on multiple architectures vs single
+  architecture
 - **Parallel build timing issues**: If detected, clearly explain:
   - Which packages have dependencies on each other
   - When each package started building
   - **Recommendation**: "Split into separate MRs" or "Rebuild after dependency is merged"
 - **Recommended fix order**: Prioritize by number of failures resolved
 - **Quick wins**: Which single fixes would resolve the most failures
-- **Direct links to representative evidence**: For each root cause, provide relative path links to the representative logs used for analysis:
-  - **Make the root cause title (bold text) a clickable link** to the most representative human-readable artifact (typically the test output log if fetched, otherwise results.xml)
+- **Direct links to representative evidence**: For each root cause, provide relative path links to
+  the representative logs used for analysis:
+  - **Make the root cause title (bold text) a clickable link** to the most representative
+    human-readable artifact (typically the test output log if fetched, otherwise results.xml)
   - List additional evidence below:
     - Testing Farm results.xml: `logs/tf-results-{request-id}.xml`
     - Test output logs: `logs/tf-{description}.log` (if fetched - include all relevant logs)
@@ -899,10 +963,15 @@ After analyzing all failures in Analysis.1, synthesize using the pattern detecti
 **Example format:**
 
 ```markdown
-**[sendmail calculate-deps: missing setup dependency](logs/build-sendmail-pod.log)** (2 failures on x86-64, aarch64):
-- Parallel build timing: setup and sendmail started at 19:32:41, but sendmail finished (failed) at 19:39 while setup didn't complete until 19:46
-- Build log: [`logs/build-sendmail-calculate-deps-x86-64-pod.log`](logs/build-sendmail-calculate-deps-x86-64-pod.log)
-- PipelineRun JSON: [`api-responses/pipelinerun-sendmail-main-on-pull-request-j9kmf-Failed-build.json`](api-responses/pipelinerun-sendmail-main-on-pull-request-j9kmf-Failed-build.json)
+**[sendmail calculate-deps: missing setup dependency](logs/build-sendmail-pod.log)** (2 failures on
+x86-64, aarch64):
+
+- Parallel build timing: setup and sendmail started at 19:32:41, but sendmail finished (failed) at
+  19:39 while setup didn't complete until 19:46
+- Build log:
+  [`logs/build-sendmail-calculate-deps-x86-64-pod.log`](logs/build-sendmail-calculate-deps-x86-64-pod.log)
+- PipelineRun JSON:
+  [`api-responses/pipelinerun-sendmail-main-on-pull-request-j9kmf-Failed-build.json`](api-responses/pipelinerun-sendmail-main-on-pull-request-j9kmf-Failed-build.json)
 - **Recommendation**: Split setup and sendmail into separate MRs, merge setup first
 ```
 
@@ -927,7 +996,8 @@ For each root cause group:
     - PipelineRun JSON: `api-responses/pipelinerun-{representative-name}-Failed-build.json`
     - Build logs: `logs/build-{package}-{pod-name}.log`
     - Testing Farm results: `logs/tf-results-{request-id}.xml`
-    - Test output logs: `logs/tf-{description}.log` (list all logs that were fetched for this failure pattern)
+    - Test output logs: `logs/tf-{description}.log` (list all logs that were fetched for this
+      failure pattern)
 - **All affected PipelineRuns** (list):
   - For each PipelineRun in this group:
     - Name and link to Konflux UI
@@ -953,16 +1023,22 @@ For singleton failures (not part of a pattern):
 
 **5. Downloaded Artifacts** (append to report.md):
 
-- List all PipelineRun JSON files with relative path links: `[pipelinerun-{name}-{status}.json](api-responses/pipelinerun-{name}-{status}.json)` (grouped by status for clarity)
-- List all TaskRun JSON files with relative path links (if relevant): `[taskrun-{name}-{status}.json](api-responses/taskrun-{name}-{status}.json)`
+- List all PipelineRun JSON files with relative path links:
+  `[pipelinerun-{name}-{status}.json](api-responses/pipelinerun-{name}-{status}.json)` (grouped by
+  status for clarity)
+- List all TaskRun JSON files with relative path links (if relevant):
+  `[taskrun-{name}-{status}.json](api-responses/taskrun-{name}-{status}.json)`
 - List all build log files: `[build-{package}-{pod-name}.log](logs/build-{package}-{pod-name}.log)`
-- List all Testing Farm results.xml files with relative path links: `[tf-results-{request-id}.xml](logs/tf-results-{request-id}.xml)`
-- List all fetched test logs with relative path links: `[tf-{description}.log](logs/tf-{description}.log)`
+- List all Testing Farm results.xml files with relative path links:
+  `[tf-results-{request-id}.xml](logs/tf-results-{request-id}.xml)`
+- List all fetched test logs with relative path links:
+  `[tf-{description}.log](logs/tf-{description}.log)`
 - Include full absolute path to temporary directory at the top of this section
 
 **Note:**
 
-- The filename convention includes status for easy identification: `-Failed`, `-Succeeded`, `-Running`, etc.
+- The filename convention includes status for easy identification: `-Failed`, `-Succeeded`,
+  `-Running`, etc.
 - All artifact paths in the list should be markdown links using relative paths for portability
 
 Combine all sections into the final `report.md` file.
@@ -989,21 +1065,26 @@ If no failing tests were found, display:
 - Commit SHA analyzed
 - MR is clear from Konflux perspective (but note: GitLab jobs not checked)
 
-**Note:** Even if some PipelineRuns/TaskRuns were unavailable, the analysis completes successfully with partial results for what was accessible.
+**Note:** Even if some PipelineRuns/TaskRuns were unavailable, the analysis completes successfully
+with partial results for what was accessible.
 
 ## Error Handling
 
-**Philosophy:** Provide partial reports when possible. Only fail for errors that prevent any analysis.
+**Philosophy:** Provide partial reports when possible. Only fail for errors that prevent any
+analysis.
 
 ### Fatal Errors (exit immediately - cannot continue)
 
-- **Setup.1**: Missing required commands -> Exit with message "Required command not found: {command}"
-- **Setup.1**: k8s_helper.py not found -> Exit with message "k8s_helper.py not found at ../containers/ci/internal/k8s_helper.py - ensure containers repo is checked out"
+- **Setup.1**: Missing required commands -> Exit with message "Required command not found:
+  {command}"
+- **Setup.1**: k8s_helper.py not found -> Exit with message "k8s_helper.py not found at
+  ../containers/ci/internal/k8s_helper.py - ensure containers repo is checked out"
 - **Setup.2**: Invalid MR URL format -> Exit with message "Invalid MR URL format"
 - **Setup.3**: Cannot create temp directory -> Exit with message "Cannot create temporary workspace"
 - **Data.2**: GitLab API failure -> Exit with message "Cannot fetch MR details"
 - **Data.3**: Commit statuses API failure -> Exit with message "Cannot fetch commit statuses"
-- **Data.4**: Kubernetes auth failure (401) -> Exit with message "Kubernetes credentials expired - run: oc login --server=https://api.kflux-prd-rh03.nnv1.p1.openshiftapps.com:6443"
+- **Data.4**: Kubernetes auth failure (401) -> Exit with message "Kubernetes credentials expired -
+  run: oc login --server=<https://api.kflux-prd-rh03.nnv1.p1.openshiftapps.com:6443>"
 
 ### Non-Fatal Errors (log warning, mark as unavailable, continue with available data)
 
@@ -1012,9 +1093,13 @@ If no failing tests were found, display:
   - Note in explanation
   - Continue with available data
 
-**Note on Resource Availability:** The k8s_helper.py fetches from both Kubearchive (historical) and K8s API (live). If resources are unavailable from both sources, this indicates an authentication or connectivity issue.
+**Note on Resource Availability:** The k8s_helper.py fetches from both Kubearchive (historical) and
+K8s API (live). If resources are unavailable from both sources, this indicates an authentication or
+connectivity issue.
 
-**Partial Report Behavior:** Even if some logs are unavailable, the command completes successfully and reports on what WAS available. This allows useful analysis based on PipelineRun/TaskRun metadata even without logs.
+**Partial Report Behavior:** Even if some logs are unavailable, the command completes successfully
+and reports on what WAS available. This allows useful analysis based on PipelineRun/TaskRun metadata
+even without logs.
 
 ### Command Exit Code Handling
 

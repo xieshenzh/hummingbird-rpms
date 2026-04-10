@@ -5,7 +5,9 @@ weight: 55
 
 ## Overview
 
-When `./ci/build_rpms.sh` fails to build a package, you can use the `--shell-after` flag to drop into an interactive debugging environment. This preserves the build state and allows you to investigate failures, modify files, and re-run the build without starting over.
+When `./ci/build_rpms.sh` fails to build a package, you can use the `--shell-after` flag to drop
+into an interactive debugging environment. This preserves the build state and allows you to
+investigate failures, modify files, and re-run the build without starting over.
 
 ## Quick Start
 
@@ -14,7 +16,8 @@ When `./ci/build_rpms.sh` fails to build a package, you can use the `--shell-aft
 ./ci/build_rpms.sh --shell-after <package>
 ```
 
-After the build completes (success or failure), you'll be dropped into a mock shell inside the build environment.
+After the build completes (success or failure), you'll be dropped into a mock shell inside the build
+environment.
 
 ## Understanding the Build Environment
 
@@ -34,7 +37,8 @@ When you use `--shell-after`, you're placed directly in the **mock shell**.
 
 ### Key directories in the mock shell
 
-- `/builddir/build/BUILD/<package>-*/` - Unpacked source tree (modify and re-run build/test commands here)
+- `/builddir/build/BUILD/<package>-*/` - Unpacked source tree (modify and re-run build/test commands
+  here)
 - `/builddir/build/originals/<package>.spec` - The spec file (modify to test spec changes)
 - `/builddir/build/SOURCES/` - Source tarballs and patches
 - `/builddir/build/BUILDROOT/` - Install root (where %install places files)
@@ -43,7 +47,8 @@ When you use `--shell-after`, you're placed directly in the **mock shell**.
 
 ### 1. Connect to the outer container
 
-To get a second shell without killing your existing mock shell session, connect to the outer container:
+To get a second shell without killing your existing mock shell session, connect to the outer
+container:
 
 ```bash
 # In another terminal, find the running container
@@ -67,7 +72,8 @@ grep -i error /results/build.log
 
 ### 3. Enter the mock shell
 
-To investigate or modify the build environment, you can get an additional shell in the mock chroot, particularly for agents which cannot use the initial interactive `--shell-after` from above.
+To investigate or modify the build environment, you can get an additional shell in the mock chroot,
+particularly for agents which cannot use the initial interactive `--shell-after` from above.
 
 ```bash
 # From the outer container, chroot into the mock build environment
@@ -80,7 +86,8 @@ The recommended approach for debugging is to extract and re-run specific command
 
 #### Fast iteration: Extract and re-run specific commands (recommended)
 
-For quick iteration while developing a fix, extract the exact build or test command from the build log and run it directly:
+For quick iteration while developing a fix, extract the exact build or test command from the build
+log and run it directly:
 
 ```bash
 # From the outer container, find what command the failing phase runs
@@ -96,7 +103,8 @@ podman exec -u root <container-id> chroot /var/lib/mock/local-x86_64/root \
   su mockbuild -c "cd /builddir/build/BUILD/<package>-*/... && <actual-command>"
 ```
 
-**For build failures during %build:** Look for `Executing(%build)` in the log, find commands like `make` or `ninja`, then re-run them:
+**For build failures during %build:** Look for `Executing(%build)` in the log, find commands like
+`make` or `ninja`, then re-run them:
 
 ```bash
 # Example: extract the build command
@@ -118,11 +126,15 @@ podman exec -u root <container-id> chroot /var/lib/mock/local-x86_64/root \
   su mockbuild -c "cd /builddir/build/BUILD/<package>-*/... && ctest --output-on-failure"
 ```
 
-This approach is fast because it skips rpmbuild overhead and goes straight to the failing command. It works with the preserved BUILD directory from `--shell-after` and is ideal when you're modifying source files and want quick feedback.
+This approach is fast because it skips rpmbuild overhead and goes straight to the failing command.
+It works with the preserved BUILD directory from `--shell-after` and is ideal when you're modifying
+source files and want quick feedback.
 
-**Modifying source files:** Edit files directly in `/builddir/build/BUILD/<package>-*/` and re-run the command to test your changes quickly.
+**Modifying source files:** Edit files directly in `/builddir/build/BUILD/<package>-*/` and re-run
+the command to test your changes quickly.
 
-**Modifying the spec file:** You can also test spec file changes by editing `/builddir/build/originals/<package>.spec` in the mock chroot:
+**Modifying the spec file:** You can also test spec file changes by editing
+`/builddir/build/originals/<package>.spec` in the mock chroot:
 
 ```bash
 # From the host, edit the spec file in the mock chroot
@@ -137,12 +149,15 @@ podman exec -u root <container-id> chroot /var/lib/mock/local-x86_64/root \
 
 #### Full validation: Apply fixes and rebuild with build_rpms.sh
 
-Manual `rpmbuild` in the preserved environment may not work reliably for all packages due to complex build dependencies and environment requirements.
+Manual `rpmbuild` in the preserved environment may not work reliably for all packages due to complex
+build dependencies and environment requirements.
 
 Once you've identified a fix using the fast iteration approach:
 
-1. **Exit the debug environment** and apply your fix to the actual source files or spec file in `rpms/<package>/`
+1. **Exit the debug environment** and apply your fix to the actual source files or spec file in
+   `rpms/<package>/`
 2. **Test the complete build** using the build script:
+
    ```bash
    ./ci/build_rpms.sh <package>
    ```

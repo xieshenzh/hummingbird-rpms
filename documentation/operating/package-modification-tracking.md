@@ -6,29 +6,27 @@ aliases: [/l/package-modification-tracking]
 
 ## Overview
 
-The RPMs repository tracks whether packages have been locally modified from their
-Fedora upstream source. This tracking prevents automatic updates from overwriting
-local changes like backported patches or custom modifications.
+The RPMs repository tracks whether packages have been locally modified from their Fedora upstream
+source. This tracking prevents automatic updates from overwriting local changes like backported
+patches or custom modifications.
 
 ## Modification Status Types
 
-Each package metadata file (`metadata/<package>.json`) contains a `modification_status`
-field with one of three values:
+Each package metadata file (`metadata/<package>.json`) contains a `modification_status` field with
+one of three values:
 
-| Status     | Meaning                                    | Auto-updates |
-|------------|--------------------------------------------|--------------|
-| `clean`    | Unmodified Fedora import                   | ✅ Allowed   |
-| `modified` | Local changes (patches, spec modifications)| ❌ Blocked   |
-| `native`   | Hummingbird-native package (not from Fedora)| ❌ Blocked  |
+| Status     | Meaning                                      | Auto-updates |
+| ---------- | -------------------------------------------- | ------------ |
+| `clean`    | Unmodified Fedora import                     | ✅ Allowed   |
+| `modified` | Local changes (patches, spec modifications)  | ❌ Blocked   |
+| `native`   | Hummingbird-native package (not from Fedora) | ❌ Blocked   |
 
-An optional `track_upstream` string field controls whether a package is
-checked by `check_upstream_versions.py` for new upstream releases (via
-release-monitoring.org). Set it to `"latest"` to track the latest version,
-or to a version prefix like `"1.26"` to constrain updates to that series.
-Its presence enables tracking; omit the field to disable it. The `check`
-subcommand only checks packages with `track_upstream` set when no explicit
-package arguments are given. The `list` subcommand shows all packages
-regardless of this field.
+An optional `track_upstream` string field controls whether a package is checked by
+`check_upstream_versions.py` for new upstream releases (via release-monitoring.org). Set it to
+`"latest"` to track the latest version, or to a version prefix like `"1.26"` to constrain updates to
+that series. Its presence enables tracking; omit the field to disable it. The `check` subcommand
+only checks packages with `track_upstream` set when no explicit package arguments are given. The
+`list` subcommand shows all packages regardless of this field.
 
 ## Checking Package Status
 
@@ -79,11 +77,13 @@ To see what changes exist in a modified package compared to upstream Fedora:
 ```
 
 **What's shown:**
+
 - By default, the diff ignores Release: number changes (no-change rebuilds)
 - Trailing whitespace and blank line changes are ignored
 - Use `--raw` to see absolutely everything, including Release: bumps
 
 **Package types:**
+
 - **Modified packages**: Shows the differences
 - **Clean packages**: Shows nothing (useful for verification)
 - **Native packages**: Skips with message "no upstream to diff against"
@@ -111,40 +111,40 @@ Examples:
   --reason "Add custom service unit for Hummingbird"
 ```
 
-The reason field is **required** and should be concise but descriptive. It helps
-future maintainers understand why the package can't be auto-updated.
+The reason field is **required** and should be concise but descriptive. It helps future maintainers
+understand why the package can't be auto-updated.
 
 ### Mark as Clean
 
-Use this to re-enable automatic updates after confirming your changes are no
-longer needed (e.g., the fix landed in Fedora):
+Use this to re-enable automatic updates after confirming your changes are no longer needed (e.g.,
+the fix landed in Fedora):
 
 ```bash
 ./ci/dist_git.py mark-modified <package> --clean
 ```
 
-This removes the `modified` status and allows the package to receive automatic
-updates from Fedora again.
+This removes the `modified` status and allows the package to receive automatic updates from Fedora
+again.
 
 ### Configure Upstream Tracking
 
-Use `set-upstream` to configure upstream tracking settings for a package.
-Each flag independently sets or clears one metadata field. At least one
-flag is required; omitted flags leave their fields untouched.
+Use `set-upstream` to configure upstream tracking settings for a package. Each flag independently
+sets or clears one metadata field. At least one flag is required; omitted flags leave their fields
+untouched.
 
 ```bash
 ./ci/dist_git.py set-upstream <package> [flags]
 ```
 
-| Flag | Sets field | Clears with |
-|---|---|---|
-| `--track-version latest` | `track_upstream: "latest"` | `--no-track-version` |
-| `--track-version VER` | `track_upstream: "VER"` | `--no-track-version` |
-| `--project-id ID` | `release_monitoring_project_id` (int) | `--no-project-id` |
-| `--project-id NAME` | `release_monitoring_project_id` (str) | `--no-project-id` |
+| Flag                     | Sets field                            | Clears with          |
+| ------------------------ | ------------------------------------- | -------------------- |
+| `--track-version latest` | `track_upstream: "latest"`            | `--no-track-version` |
+| `--track-version VER`    | `track_upstream: "VER"`               | `--no-track-version` |
+| `--project-id ID`        | `release_monitoring_project_id` (int) | `--no-project-id`    |
+| `--project-id NAME`      | `release_monitoring_project_id` (str) | `--no-project-id`    |
 
-Each set/clear pair is mutually exclusive (can't pass `--track-version`
-and `--no-track-version` together).
+Each set/clear pair is mutually exclusive (can't pass `--track-version` and `--no-track-version`
+together).
 
 **Examples:**
 
@@ -171,31 +171,27 @@ and `--no-track-version` together).
 
 **Metadata fields:**
 
-| Field                          | Description                                           | Example            |
-|--------------------------------|-------------------------------------------------------|--------------------|
-| `track_upstream`               | `"latest"` or version prefix to constrain updates     | `"latest"`, `"1.26"`|
-| `release_monitoring_project_id`| Anitya project ID (int) or upstream name (str)        | `13254`, `"golang"` |
+| Field                           | Description                                       | Example              |
+| ------------------------------- | ------------------------------------------------- | -------------------- |
+| `track_upstream`                | `"latest"` or version prefix to constrain updates | `"latest"`, `"1.26"` |
+| `release_monitoring_project_id` | Anitya project ID (int) or upstream name (str)    | `13254`, `"golang"`  |
 
 These fields affect two systems:
 
-- **`dist_git.py update`**: When `track_upstream` is a version prefix, skips
-  upstream versions that don't match. For example, `track_upstream: "1.26"`
-  allows `1.26`, `1.26.0`, `1.26.3` but rejects `1.27.0`.
-- **`check_upstream_versions.py`**: When `release_monitoring_project_id` is an
-  integer, queries the v2 API directly by Anitya project ID. When it is a
-  string, queries release-monitoring.org using that name instead of the RPM
-  package name (e.g., looks up `golang` instead of `golang1.26`). When absent,
-  uses the RPM package name. When `track_upstream` is a version prefix, filters
-  the reported upstream versions to only those matching the prefix. Only
-  packages with `track_upstream` set are checked by
-  `check_upstream_versions.py check` when no explicit package arguments are
-  given.
+- **`dist_git.py update`**: When `track_upstream` is a version prefix, skips upstream versions that
+  don't match. For example, `track_upstream: "1.26"` allows `1.26`, `1.26.0`, `1.26.3` but rejects
+  `1.27.0`.
+- **`check_upstream_versions.py`**: When `release_monitoring_project_id` is an integer, queries the
+  v2 API directly by Anitya project ID. When it is a string, queries release-monitoring.org using
+  that name instead of the RPM package name (e.g., looks up `golang` instead of `golang1.26`). When
+  absent, uses the RPM package name. When `track_upstream` is a version prefix, filters the reported
+  upstream versions to only those matching the prefix. Only packages with `track_upstream` set are
+  checked by `check_upstream_versions.py check` when no explicit package arguments are given.
 
-Find release-monitoring.org project IDs by searching on
-https://release-monitoring.org.
+Find release-monitoring.org project IDs by searching on <https://release-monitoring.org>.
 
-The project ID can be combined with a version prefix to filter versions
-returned by the project ID lookup:
+The project ID can be combined with a version prefix to filter versions returned by the project ID
+lookup:
 
 ```json
 {
@@ -206,18 +202,16 @@ returned by the project ID lookup:
 
 ## Per-Package Update Hooks
 
-When `check_upstream_versions.py check --update` updates a package, by
-default it sets `Version:` to the new upstream version and `Release:` to
-`0.1%{?dist}` (unless `%autorelease` is used), adds a changelog entry,
-and downloads new sources from the URLs declared in the spec. Some
-packages need custom logic (e.g. generating stripped tarballs or patching
-macro-based version lines). A per-package hooks file lets you override or
-extend these default phases without changing `check_upstream_versions.py`
-itself.
+When `check_upstream_versions.py check --update` updates a package, by default it sets `Version:` to
+the new upstream version and `Release:` to `0.1%{?dist}` (unless `%autorelease` is used), adds a
+changelog entry, and downloads new sources from the URLs declared in the spec. Some packages need
+custom logic (e.g. generating stripped tarballs or patching macro-based version lines). A
+per-package hooks file lets you override or extend these default phases without changing
+`check_upstream_versions.py` itself.
 
 ### Hooks file location
 
-```
+```text
 metadata/<package>.update-hooks.yaml
 ```
 
@@ -225,18 +219,17 @@ For example, `metadata/nodejs25.update-hooks.yaml`.
 
 ### Hook phases
 
-The YAML file supports three optional keys. Each value is a shell command
-string executed with `bash -eo pipefail -c` in the package directory as
-the working directory.
+The YAML file supports three optional keys. Each value is a shell command string executed with
+`bash -eo pipefail -c` in the package directory as the working directory.
 
-| Phase | Behaviour |
-|---|---|
-| `update_spec` | **Replaces** the default update that sets `Version:` to the new upstream version and `Release:` to `0.1%{?dist}`. A changelog entry is still added automatically. |
+| Phase              | Behaviour                                                                                                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `update_spec`      | **Replaces** the default update that sets `Version:` to the new upstream version and `Release:` to `0.1%{?dist}`. A changelog entry is still added automatically.                       |
 | `download_sources` | **Replaces** the default URL-based source download. Must print one filename per line to stdout for files to upload to the lookaside cache. Redirect any other output to stderr (`>&2`). |
-| `post_update` | **Additive** — runs after spec + sources are ready. No default equivalent. |
+| `post_update`      | **Additive** — runs after spec + sources are ready. No default equivalent.                                                                                                              |
 
-Omitting a phase means the default logic runs for that phase. Packages
-without a hooks file behave identically to before.
+Omitting a phase means the default logic runs for that phase. Packages without a hooks file behave
+identically to before.
 
 Unknown phase keys in the YAML cause a `ValueError` (fail-fast).
 
@@ -244,30 +237,31 @@ Unknown phase keys in the YAML cause a `ValueError` (fail-fast).
 
 Every hook receives these environment variables:
 
-| Variable | Example |
-|---|---|
-| `UPDATE_PACKAGE` | `nodejs25` |
-| `UPDATE_OLD_VERSION` | `25.6.1` |
-| `UPDATE_NEW_VERSION` | `25.8.2` |
-| `UPDATE_SPEC_FILE` | `/home/rpms/rpms/nodejs25/nodejs25.spec` |
-| `UPDATE_PACKAGE_DIR` | `/home/rpms/rpms/nodejs25` |
-| `UPDATE_SOURCES_FILE` | `/home/rpms/rpms/nodejs25/sources` |
-| `UPDATE_ROOT_DIR` | `/home/rpms` |
+| Variable              | Example                                  |
+| --------------------- | ---------------------------------------- |
+| `UPDATE_PACKAGE`      | `nodejs25`                               |
+| `UPDATE_OLD_VERSION`  | `25.6.1`                                 |
+| `UPDATE_NEW_VERSION`  | `25.8.2`                                 |
+| `UPDATE_SPEC_FILE`    | `/home/rpms/rpms/nodejs25/nodejs25.spec` |
+| `UPDATE_PACKAGE_DIR`  | `/home/rpms/rpms/nodejs25`               |
+| `UPDATE_SOURCES_FILE` | `/home/rpms/rpms/nodejs25/sources`       |
+| `UPDATE_ROOT_DIR`     | `/home/rpms`                             |
 
 ### Example
 
-See [`metadata/nodejs25.update-hooks.yaml`](../../../metadata/nodejs25.update-hooks.yaml)
-for a working example that uses all three hook phases.
+See [`metadata/nodejs25.update-hooks.yaml`](../../../metadata/nodejs25.update-hooks.yaml) for a
+working example that uses all three hook phases.
 
 ## How Auto-Updates Work
 
-The `./ci/dist_git.py update` command (used by automation) checks modification
-status before updating packages:
+The `./ci/dist_git.py update` command (used by automation) checks modification status before
+updating packages:
 
 - **clean packages**: Updated automatically when new Fedora versions are available
 - **modified packages**: Automatically merged with upstream changes (conflicts create draft MRs)
 - **native packages**: Update blocked (not sourced from Fedora)
-- **version-constrained packages**: Skipped if upstream version doesn't match `track_upstream` prefix
+- **version-constrained packages**: Skipped if upstream version doesn't match `track_upstream`
+  prefix
 
 To force-update a modified package (discarding local changes):
 
@@ -275,19 +269,21 @@ To force-update a modified package (discarding local changes):
 ./ci/dist_git.py sync <package>
 ```
 
-The `sync` command bypasses the modification check and force-updates to the
-latest upstream version. After syncing, the package is automatically marked
-clean.
+The `sync` command bypasses the modification check and force-updates to the latest upstream version.
+After syncing, the package is automatically marked clean.
 
 ## Resolving Merge Conflicts
 
-When modified packages are updated from Fedora, `dist_git.py update` attempts to automatically merge local changes with the new upstream version using git's three-way merge. When conflicts occur, the update still succeeds but creates a commit with conflict markers, and the automation files a draft merge request labeled with `CONFLICT:` for manual resolution.
+When modified packages are updated from Fedora, `dist_git.py update` attempts to automatically merge
+local changes with the new upstream version using git's three-way merge. When conflicts occur, the
+update still succeeds but creates a commit with conflict markers, and the automation files a draft
+merge request labeled with `CONFLICT:` for manual resolution.
 
 ### Understanding Conflict Markers
 
 Git uses this conflict marker structure:
 
-```
+```text
 <<<<<<< HEAD
 Fedora's version (new upstream)
 =======
@@ -300,12 +296,14 @@ Hummingbird's local modifications
 ### Update branch/MR structure
 
 MRs are created on branches following the pattern:
-```
+
+```text
 chore/dist-git-update-PACKAGENAME
 ```
 
-These branches are automatically created by the `dist_git_update` GitLab schedule.
-If they have conflicts, they result in draft MRs with:
+These branches are automatically created by the `dist_git_update` GitLab schedule. If they have
+conflicts, they result in draft MRs with:
+
 - Title prefix: `CONFLICT: chore(rpms): Update ...`
 - Description listing the conflicting files
 - `no-test` label to skip CI tests (saves resources since conflicts need manual resolution)
@@ -313,12 +311,14 @@ If they have conflicts, they result in draft MRs with:
 ### Resolution Process
 
 1. **Check out the conflict branch:**
+
    ```bash
    git fetch origin
    git checkout origin/chore/dist-git-update-PACKAGENAME
    ```
 
 2. **Examine the conflict:**
+
    ```bash
    # Find all files with conflict markers
    git grep "^<<<<<<< HEAD" rpms/PACKAGENAME/
@@ -328,6 +328,7 @@ If they have conflicts, they result in draft MRs with:
    ```
 
 3. **Understand the local changes:**
+
    ```bash
    # Review commit history to understand why changes were made
    git log --oneline -- rpms/PACKAGENAME/
@@ -344,19 +345,24 @@ If they have conflicts, they result in draft MRs with:
    - Check spec file comments (e.g., NOTE: comments) for packaging details
 
    Decide which version to accept:
-   - **Accept HEAD (Fedora)** for: release number lags, fixed workarounds that Fedora improved or addressed differently
-   - **Keep hummingbird-local** for: security patches not in Fedora, FIPS requirements, critical fixes, and other permanent modifications
+   - **Accept HEAD (Fedora)** for: release number lags, fixed workarounds that Fedora improved or
+     addressed differently
+   - **Keep hummingbird-local** for: security patches not in Fedora, FIPS requirements, critical
+     fixes, and other permanent modifications
    - **Merge both** for: test skip lists, independent changes that don't conflict logically
-   - **When in doubt:** Accept Fedora's version for packaging metadata (Release:, subpackage versions),
-     keep Hummingbird's version for functional changes (patches, dependencies, build options)
+   - **When in doubt:** Accept Fedora's version for packaging metadata (Release:, subpackage
+     versions), keep Hummingbird's version for functional changes (patches, dependencies, build
+     options)
 
-4. **Resolve the conflict:** Edit the file to choose the appropriate version
-   (HEAD, hummingbird-local, or merge both). Verify no markers remain:
-     ```bash
-     git grep -E "^(<<<<<<<|=======|>>>>>>>)" rpms/PACKAGENAME/
-     ```
+4. **Resolve the conflict:** Edit the file to choose the appropriate version (HEAD,
+   hummingbird-local, or merge both). Verify no markers remain:
+
+   ```bash
+   git grep -E "^(<<<<<<<|=======|>>>>>>>)" rpms/PACKAGENAME/
+   ```
 
 5. **Validate the resolution:** Check that local modifications are preserved:
+
    ```bash
    # Check the diff against upstream (works on working tree, staging not required)
    ./ci/dist_git.py diff PACKAGENAME
@@ -365,25 +371,26 @@ If they have conflicts, they result in draft MRs with:
    git log -p -- rpms/PACKAGENAME/
    ```
 
-   The diff should show only the intended local modifications (ignoring Release: bumps).
-   This confirms the merge preserved your changes correctly. Note: `dist_git.py diff`
-   compares the filesystem working tree against upstream, so it works before or after
-   staging.
+   The diff should show only the intended local modifications (ignoring Release: bumps). This
+   confirms the merge preserved your changes correctly. Note: `dist_git.py diff` compares the
+   filesystem working tree against upstream, so it works before or after staging.
 
 6. **Amend the commit:**
+
    ```bash
    git add rpms/PACKAGENAME/
    git commit --amend --no-edit
    ```
 
 7. **Push the resolution:**
+
    ```bash
    git push origin HEAD:chore/dist-git-update-PACKAGENAME --force-with-lease --push-option merge_request.unlabel=no-test
    ```
 
-   This removes the `no-test` label from the MR, which triggers CI tests to run and
-   verifies the resolution works correctly. Some developers might have `origin` as
-   read-only remote, and a different writable remote (e.g. `originw`).
+   This removes the `no-test` label from the MR, which triggers CI tests to run and verifies the
+   resolution works correctly. Some developers might have `origin` as read-only remote, and a
+   different writable remote (e.g. `originw`).
 
 ### Common Conflicts
 
@@ -392,13 +399,16 @@ If they have conflicts, they result in draft MRs with:
 The `nss` package builds `nspr` as a subpackage with its own release number offset.
 
 **BACKGROUND:**
+
 - `nss` builds both `nss` and `nspr` RPMs from the same source
 - `nspr_release` uses an offset (`%[%baserelease+n]`) to avoid NVR clashes
-- The spec file NOTE explains: reset to 1 when `nspr_version` changes, increment when only `nss` changes
+- The spec file NOTE explains: reset to 1 when `nspr_version` changes, increment when only `nss`
+  changes
 - Fedora manages these offsets in their ecosystem to prevent conflicts
 
 **CONFLICT EXAMPLE:**
-```
+
+```text
 <<<<<<< HEAD
 %global nspr_release %[%baserelease+3]
 =======
@@ -406,8 +416,8 @@ The `nss` package builds `nspr` as a subpackage with its own release number offs
 >>>>>>> hummingbird-local
 ```
 
-**REASONING:**
-When updating to a new upstream `nss` version from Fedora:
+**REASONING:** When updating to a new upstream `nss` version from Fedora:
+
 - Accept Fedora's `nspr_release` offset (HEAD) - they manage NVR clashes
 - Our local offset was specific to Hummingbird rebuilds
 - New upstream version should reset to Fedora's packaging values
@@ -415,25 +425,21 @@ When updating to a new upstream `nss` version from Fedora:
 
 **RESOLUTION:** Accept HEAD (Fedora's value)
 
-
 ## Special Case: Rebuild-Only Changes
 
-Release-only changes (no-change rebuilds) are automatically ignored by the
-modification detection logic. This means:
+Release-only changes (no-change rebuilds) are automatically ignored by the modification detection
+logic. This means:
 
-- Bumping `Release: 3%{?dist}` → `Release: 3.1%{?dist}` does **not** mark the
-  package as modified
+- Bumping `Release: 3%{?dist}` → `Release: 3.1%{?dist}` does **not** mark the package as modified
 - The package can still receive automatic Fedora updates
-- The Release bump will be preserved if the update doesn't change the upstream
-  Release field
+- The Release bump will be preserved if the update doesn't change the upstream Release field
 
-You **do not need** to mark packages as modified for rebuild-only changes,
-unless you want to explicitly prevent automatic updates for other reasons.
+You **do not need** to mark packages as modified for rebuild-only changes, unless you want to
+explicitly prevent automatic updates for other reasons.
 
 ## CI Validation
 
-The CI pipeline validates modification status consistency using
-`make check`, which runs:
+The CI pipeline validates modification status consistency using `make check`, which runs:
 
 ```bash
 ./ci/validate_package_modifications.py --all
@@ -448,8 +454,8 @@ This validation ensures:
 5. Native packages do not have source/branch/sha fields (Hummingbird-native only)
 6. Git commit history matches the declared modification status
 
-The validation runs on every merge request and push to main, failing the build
-if metadata is inconsistent.
+The validation runs on every merge request and push to main, failing the build if metadata is
+inconsistent.
 
 For local development, run the full validation:
 
@@ -468,21 +474,26 @@ Or validate specific packages:
 The validation script has two modes:
 
 **Fast mode (default)**: Checks git commit history patterns
+
 ```bash
 ./ci/validate_package_modifications.py --all
 ```
-This validates that all commits since the last Sync follow standard patterns
-(have Upstream: trailers). Runs in less than a minute for all packages.
+
+This validates that all commits since the last Sync follow standard patterns (have Upstream:
+trailers). Runs in less than a minute for all packages.
 
 **Thorough mode**: Clones upstream repos and compares filesystems
+
 ```bash
 ./ci/validate_package_modifications.py --all --thorough
 ```
-This performs full filesystem comparisons with upstream Fedora repositories.
-Slow and unreliable (hundreds of upstream dist-git clones) but authoritative -
-validates actual state regardless of git commit history.
+
+This performs full filesystem comparisons with upstream Fedora repositories. Slow and unreliable
+(hundreds of upstream dist-git clones) but authoritative - validates actual state regardless of git
+commit history.
 
 For CI and daily development, fast mode is sufficient. Use thorough mode when:
+
 - Debugging discrepancies between metadata and actual state
 - Auditing the entire repository for hidden modifications
 - Investigating why a package can't be updated
@@ -494,10 +505,12 @@ For CI and daily development, fast mode is sufficient. Use thorough mode when:
 1. Add patch file and modify spec (see [Rebuilding Packages](../rebuilding-packages))
 2. Commit the changes
 3. **Mark as modified:**
+
    ```bash
    ./ci/dist_git.py mark-modified dnf5 --modified \
      --reason "Backport reproducible build fix (upstream PR#2522)"
    ```
+
 4. Package is now protected from automatic Fedora updates
 
 ### Re-enabling Auto-Updates
@@ -505,14 +518,19 @@ For CI and daily development, fast mode is sufficient. Use thorough mode when:
 When your backported fix lands in Fedora:
 
 1. Verify the fix is in the latest Fedora version:
+
    ```bash
    ./ci/dist_git.py update dnf5  # This will fail with "modified" error
    ```
+
 2. Mark the package clean:
+
    ```bash
    ./ci/dist_git.py mark-modified dnf5 --clean
    ```
+
 3. Update from Fedora:
+
    ```bash
    ./ci/dist_git.py update dnf5  # Now succeeds
    ```
@@ -535,18 +553,21 @@ No manual marking needed for imports.
 
 ### CI Fails: "Missing modification_status field"
 
-This means a metadata file is missing the required field. This means that the
-package was not imported properly.
+This means a metadata file is missing the required field. This means that the package was not
+imported properly.
 
 ### CI Fails: "Marked as clean but package has modifications"
 
 The package has local changes but metadata says it's clean. To fix:
 
 1. Check what changed:
+
    ```bash
    git log -p -- rpms/<package>/
    ```
+
 2. Mark as modified with the appropriate reason:
+
    ```bash
    ./ci/dist_git.py mark-modified <package> --modified --reason "..."
    ```
@@ -556,23 +577,28 @@ The package has local changes but metadata says it's clean. To fix:
 The package has no local changes but is marked modified. To fix:
 
 1. Verify it's actually clean:
+
    ```bash
    ./ci/dist_git.py update <package>  # Check if upstream matches
    ```
+
 2. If confirmed clean, remove the modified status:
+
    ```bash
    ./ci/dist_git.py mark-modified <package> --clean
    ```
 
-### Update Blocked: "Cannot auto-update <package>"
+### Update Blocked: "Cannot auto-update `<package>`"
 
 This is expected for modified packages. Options:
 
 1. **Wait for fix to land in Fedora**, then mark clean and update
 2. **Force-sync** to discard local changes:
+
    ```bash
    ./ci/dist_git.py sync <package>
    ```
+
 3. **Keep blocked** if the local changes are still needed
 
 ## Related Documentation
