@@ -1,8 +1,8 @@
 {
   "branch": "f43",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "007c7d59dd2e360c4aa0883ebb141042da71251f",
+  "release": "1",
+  "sha": "c731000e1eb1c378524d3d69641757947bac08d6",
   "source": "https://src.fedoraproject.org/rpms/python3.13.git",
-  "version": "3.13.12"
+  "version": "3.13.13"
 }
