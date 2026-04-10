@@ -1,0 +1,26 @@
+# See the documentation for more information:
+# https://packit.dev/docs/configuration/
+
+jobs:
+  - job: pull_from_upstream
+    trigger: release
+    dist_git_branches:
+      rawhide:
+        fast_forward_merge_into:
+          - fedora-all
+          - epel-9
+
+  - job: koji_build
+    trigger: commit
+    allowed_pr_authors:
+      - packit
+      - all_admins
+    dist_git_branches:
+      - fedora-all
+      - epel-9
+
+  - job: bodhi_update
+    trigger: commit
+    dist_git_branches:
+      - fedora-all
+      - epel-9

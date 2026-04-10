@@ -96,6 +96,8 @@ spec:
           contentType: rpm
         - name: apr-util-main
           contentType: rpm
+        - name: apt-libs-main
+          contentType: rpm
         - name: attr-main
           contentType: rpm
         - name: audit-main
