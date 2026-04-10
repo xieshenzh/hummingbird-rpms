@@ -1,0 +1,13 @@
+diff --git a/src/sysctl.c b/src/sysctl.c
+index d750091..bd851bb 100644
+--- a/src/sysctl.c
++++ b/src/sysctl.c
+@@ -612,7 +612,7 @@ static int WriteSetting(
+     }
+     if ((rc == EXIT_SUCCESS && !Quiet) || DryRun) {
+         if (NameOnly) {
+-            printf("%s\n", value);
++            printf("%s\n", dotted_key);
+         } else {
+             if (PrintName) {
+                 printf("%s = %s\n", dotted_key, value);

@@ -96,6 +96,8 @@ spec:
           contentType: rpm
         - name: apr-util-main
           contentType: rpm
+        - name: apt-main
+          contentType: rpm
         - name: attr-main
           contentType: rpm
         - name: audit-main
@@ -574,6 +576,8 @@ spec:
           contentType: rpm
         - name: openblas-srpm-macros-main
           contentType: rpm
+        - name: opendbx-main
+          contentType: rpm
         - name: openldap-main
           contentType: rpm
         - name: openscap-main
@@ -695,6 +699,8 @@ spec:
         - name: popt-main
           contentType: rpm
         - name: postgresql18-main
+          contentType: rpm
+        - name: procps-ng-main
           contentType: rpm
         - name: protobuf-c-main
           contentType: rpm
@@ -881,6 +887,8 @@ spec:
         - name: which-main
           contentType: rpm
         - name: xcaddy-main
+          contentType: rpm
+        - name: xmlsec1-main
           contentType: rpm
         - name: xorg-x11-fonts-main
           contentType: rpm
