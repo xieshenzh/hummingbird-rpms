@@ -4416,6 +4416,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- graphviz ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: graphviz-main
+spec:
+  application: rpms-main
+  componentName: graphviz-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/graphviz-main
+  source:
+    git:
+      context: rpms/graphviz
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: graphviz-main
+  name: graphviz-main
+spec:
+  image:
+    name: hummingbird-tenant/graphviz-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- grep ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1
@@ -12070,6 +12109,45 @@ metadata:
 spec:
   image:
     name: hummingbird-tenant/policycoreutils-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
+# --- poppler ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: poppler-main
+spec:
+  application: rpms-main
+  componentName: poppler-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/poppler-main
+  source:
+    git:
+      context: rpms/poppler
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: poppler-main
+  name: poppler-main
+spec:
+  image:
+    name: hummingbird-tenant/poppler-main
     visibility: public
   notifications:
   - config:

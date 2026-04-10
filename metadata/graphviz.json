@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "d1ffa9e8489b780afa1423757396df20716c697e",
+  "source": "https://src.fedoraproject.org/rpms/graphviz.git",
+  "version": "14.1.4"
+}

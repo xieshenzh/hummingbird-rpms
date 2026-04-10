@@ -296,6 +296,8 @@ spec:
           contentType: rpm
         - name: graphite2-main
           contentType: rpm
+        - name: graphviz-main
+          contentType: rpm
         - name: grep-main
           contentType: rpm
         - name: groff-main
@@ -681,6 +683,8 @@ spec:
         - name: pkgconf-main
           contentType: rpm
         - name: policycoreutils-main
+          contentType: rpm
+        - name: poppler-main
           contentType: rpm
         - name: popt-main
           contentType: rpm
