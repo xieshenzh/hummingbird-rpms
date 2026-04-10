@@ -1,6 +1,6 @@
 Name:           graphite2
 Version:        1.3.14
-Release:        20%{?dist}
+Release:        20.1%{?dist}
 Summary:        Font rendering capabilities for complex non-Roman writing systems
 
 # As per COPYING file this library is tri-licensed
@@ -44,7 +44,9 @@ Includes and definitions for developing with graphite2.
 
 
 %build
-%cmake -DGRAPHITE2_COMPARE_RENDERER=OFF
+# Upstream cmake_minimum_required is below 3.5; CMake 4.0 dropped that compat.
+# https://fedoraproject.org/wiki/Changes/CMake4.0
+%cmake -DGRAPHITE2_COMPARE_RENDERER=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 %cmake_build
 
 
