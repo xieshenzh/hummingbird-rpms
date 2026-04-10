@@ -1,6 +1,6 @@
 {
   "branch": "f43",
-  "modification_reason": "Lower nss-softokn minimum version to 3.90.0 to allow FIPS-certified softokn from RHEL 9.2",
+  "modification_reason": "Lower nss-softokn minimum version to 3.90.0 to allow FIPS-certified softokn from RHEL 9.2; backport dbtests sqlite 3.50+ fix from Fedora rawhide",
   "modification_status": "modified",
   "release": "1",
   "sha": "f97da13cbff826185fa4896bf6529cc44094056d",

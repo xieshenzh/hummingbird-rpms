@@ -4,10 +4,10 @@
 # - reset %%{nspr_release} to 1, when updating %%{nspr_version}
 # - increment %%{nspr_version}, when updating the NSS part only
 %global baserelease 1
-%global nss_release %baserelease
+%global nss_release %{baserelease}.1
 # use "%%global nspr_release %%[%%baserelease+n]" to handle offsets when
 # release number between nss and nspr are different.
-%global nspr_release %[%baserelease+3]
+%global nspr_release %[%baserelease+3].1
 # only need to update this as we added new
 # algorithms under nss policy control
 %global crypto_policies_version 20240521
@@ -150,6 +150,10 @@ Patch66:          nss-3.118-ml-dsa-tls-test.patch
 Patch67:          nss-3.118-ml-dsa-unittests.patch
 
 Patch70:          nss-3.118.1-fix-test-typo.patch
+
+# Fix dbtests.sh for sqlite 3.50+ which changed hex blob literals from X'' to x''
+# Already used in Fedora rawhide (f45) to fix the same issue
+Patch71:          nss-dbtests-sqlite-mangling.patch
 
 Patch100:         nspr-config-pc.patch
 Patch101:         nspr-gcc-atomics.patch
