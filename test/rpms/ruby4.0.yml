@@ -173,7 +173,10 @@ paths-gem-extensions-use-ruby:
 
 paths-ruby-binary:
   command: |
-    # Verify ruby4.0 package includes /usr/bin/ruby
+    # Verify ruby4.0 package includes a ruby binary.
+    # When rubypick is in use (the default), ruby4.0 ships /usr/bin/ruby-mri
+    # and rubypick owns /usr/bin/ruby.  Without rubypick, ruby4.0 owns
+    # /usr/bin/ruby directly.
     rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
     if [[ "${rpm_name}" != "ruby4.0" ]]; then
       echo "Skipping: This test only runs on ruby4.0 (got: ${rpm_name})"
@@ -183,8 +186,10 @@ paths-ruby-binary:
     files=$(rpm -qlp "${TEST_RPM}")
     if echo "${files}" | grep -q "^/usr/bin/ruby$"; then
       echo "PASS: ruby4.0 includes /usr/bin/ruby"
+    elif echo "${files}" | grep -q "^/usr/bin/ruby4.0-mri$"; then
+      echo "PASS: ruby4.0 includes /usr/bin/ruby4.0-mri (rubypick mode)"
     else
-      TEST_FAIL "ruby4.0 does not include /usr/bin/ruby"
+      TEST_FAIL "ruby4.0 does not include /usr/bin/ruby or /usr/bin/ruby4.0-mri"
     fi
 
 paths-pkgconfig:
