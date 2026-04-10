@@ -760,6 +760,7 @@ echo ============================= build serial ==================
 	--without-fiber \
 %endif
 	variant=release threading=multi debug-symbols=on pch=off \
+	cxxstd=20 \
 %if %{with python3}
 	python=%{python3_version} \
 %endif
@@ -898,6 +899,7 @@ echo ============================= install serial ==================
 	--prefix=$RPM_BUILD_ROOT%{_prefix} \
 	--libdir=$RPM_BUILD_ROOT%{_libdir} \
 	variant=release threading=multi debug-symbols=on pch=off \
+	cxxstd=20 \
 %if %{with python3}
 	python=%{python3_version} \
 %endif
