@@ -11,11 +11,11 @@ topic: |
 description: |
   This update includes the following RPMs:
   {%- if advisory.spec.content.artifacts %}
-    {#- Build a dictionary: first find source RPM names per component, then group all RPMs #}
+    {#- Build a dictionary: first find src RPM names per component, then group all RPMs #}
     {%- set src_rpms = {} %}
-    {#- First pass: find source RPM name for each component #}
+    {#- First pass: find src RPM name for each component #}
     {%- for artifact in advisory.spec.content.artifacts %}
-      {%- if artifact.architecture == 'source' %}
+      {%- if artifact.architecture == 'src' %}
         {%- set purl_path = artifact.purl.split('?')[0] %}
         {%- set name_version = purl_path.split('/')[-1] %}
         {%- set src_name = name_version.split('@')[0] %}
@@ -23,7 +23,7 @@ description: |
         {%- set _ = src_rpms.update({artifact.component: {'name': src_name, 'version': src_version, 'rpms': {}}}) %}
       {%- endif %}
     {%- endfor %}
-    {#- Second pass: collect all RPMs under their source RPM, keeping source separate #}
+    {#- Second pass: collect all RPMs under their src RPM, keeping src separate #}
     {%- for artifact in advisory.spec.content.artifacts %}
       {%- set purl_path = artifact.purl.split('?')[0] %}
       {%- set name_version = purl_path.split('/')[-1] %}
@@ -31,8 +31,8 @@ description: |
       {%- set rpm_version = name_version.split('@')[1] %}
       {%- if artifact.component in src_rpms %}
         {%- set src = src_rpms[artifact.component] %}
-        {#- Use different key for source RPMs to keep them separate from binary RPMs #}
-        {%- if artifact.architecture == 'source' %}
+        {#- Use different key for src RPMs to keep them separate from binary RPMs #}
+        {%- if artifact.architecture == 'src' %}
           {%- set rpm_key = rpm_name ~ '.src' %}
           {%- if rpm_key not in src['rpms'] %}
             {%- set _ = src['rpms'].update({rpm_key: {'name': rpm_name, 'version': rpm_version, 'arches': [], 'is_src': true}}) %}
@@ -50,7 +50,7 @@ description: |
         {%- endif %}
       {%- endif %}
     {%- endfor %}
-    {#- Output grouped by source RPM name: binary RPMs first, then source RPM last #}
+    {#- Output grouped by src RPM name: binary RPMs first, then src RPM last #}
     {%- for component, src in src_rpms.items() %}
 
   {{ src['name'] }}:
