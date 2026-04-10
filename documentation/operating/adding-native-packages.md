@@ -1,6 +1,11 @@
-# Adding Native Packages
+---
+title: Adding Native Packages
+description: How to add packages that originate in the Hummingbird repository
+weight: 45
+---
 
-Native packages are packages that originate in the Hummingbird repository rather than being imported from Fedora dist-git.
+Native packages are packages that originate in the Hummingbird repository rather than being imported
+from Fedora dist-git.
 
 ## Steps to Add a Native Package
 
@@ -29,12 +34,14 @@ sha512sum --tag oras-1.3.0.tar.gz oras-1.3.0-vendor.tar.bz2 > sources
 ```
 
 This produces the correct format:
-```
+
+```text
 SHA512 (oras-1.3.0.tar.gz) = fb871c0577f621f7e1f56a54f249f96c659b29c771dad529f9a9e838379b2d56bca9cef03a90071915a568e28e266326989e67359e589a87908c4fc077b14689
 SHA512 (oras-1.3.0-vendor.tar.bz2) = fa23324bf3910c3dc050eb3c0ebfef3224168489679cf1195d668c656c6c53beaac94b4786e45c2cf3782f9437b0d166da9c18e608a3b474b04957ff1dec5226
 ```
 
-**Important**: Use `sha512sum --tag` to generate the BSD-style format. Do not use the default GNU format.
+**Important**: Use `sha512sum --tag` to generate the BSD-style format. Do not use the default GNU
+format.
 
 ### 4. Create Package Metadata
 
@@ -49,6 +56,7 @@ Create `metadata/<package-name>.json`:
 ```
 
 Fields:
+
 - **`modification_status`**: Must be `"native"` for packages not imported from Fedora
 - **`version`**: Package version (must match spec file)
 - **`release`**: Base release number (typically `1.hum1` for new packages)
@@ -62,11 +70,13 @@ make generate-host
 ```
 
 Or directly:
+
 ```bash
 python3 ci/generate_resources.py all
 ```
 
 This updates:
+
 - `konflux-templates/rendered.yml`
 - `.tekton/` pipeline files
 
@@ -79,7 +89,8 @@ git commit -m "Add <package-name>-<version>-<release>
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 ```
 
-**Note**: Source tarballs (`.tar.gz`, `.tar.bz2`, `.tar.xz`) are automatically ignored by `.gitignore` and should be uploaded to the lookaside cache instead.
+**Note**: Source tarballs (`.tar.gz`, `.tar.bz2`, `.tar.xz`) are automatically ignored by
+`.gitignore` and should be uploaded to the lookaside cache instead.
 
 ## Example: Adding oras
 
@@ -113,6 +124,7 @@ git commit -m "Add oras-1.3.0-1.hum1"
 
 ## See Also
 
-- [Package Modification Tracking](package-modification-tracking.md) - Marking packages as modified vs clean
+- [Package Modification Tracking](package-modification-tracking.md) - Marking packages as modified
+  vs clean
 - [Rebuilding Packages](rebuilding-packages.md) - Rebuilding existing packages
 - [Updating Dist-git Packages](updating-dist-git-packages.md) - Importing/updating from Fedora
