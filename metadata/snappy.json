@@ -4,5 +4,6 @@
   "sha": "53a26600710394962486bb130d06af8d6a012b6e",
   "source": "https://src.fedoraproject.org/rpms/snappy.git",
   "version": "1.2.2",
-  "modification_status": "clean"
+  "modification_reason": "Use cmake macros for Ninja generator compatibility (cmake-rpm-macros 4.x)",
+  "modification_status": "modified"
 }
