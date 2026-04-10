@@ -57,28 +57,31 @@ def get_changed_packages_in_mr() -> list[str]:
 
 def find_last_sync_commit(package_name: str) -> str | None:
     """
-    Find the last Sync commit for a package.
+    Find the last Sync or Import commit for a package.
 
     Args:
         package_name: Package name to check
 
     Returns:
-        SHA of the last Sync commit, or None if not found
+        SHA of the last Sync/Import commit, or None if not found
     """
-    # Find the last Sync commit for this package
+    # Find the last Sync or Import commit for this package
     # Note: Sync commits with --mark are empty commits, so we can't filter by path
-    # We search for "Sync <package>" in the subject line
+    # We search for "Sync <package>" or "Import <package>" in the subject line
+    # Multiple --grep flags are OR'd by default in git log
     result = run_git(
         'log',
         '--format=%H',
         '--grep',
         f'^Sync {package_name} ',
+        '--grep',
+        f'^Import {package_name}-',
         cwd=ROOT_DIR,
         check=False
     )
 
     if result.stdout.strip():
-        # Take the first (most recent) Sync commit for this package
+        # Take the first (most recent) Sync/Import commit for this package
         return result.stdout.strip().split('\n')[0]
     return None
 
