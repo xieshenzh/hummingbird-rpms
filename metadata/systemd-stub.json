@@ -1,5 +1,6 @@
 {
-  "version": "1",
+  "modification_reason": "trigger rebuild to sign the RPMs",
+  "modification_status": "modified",
   "release": "2",
-  "modification_status": "native"
+  "version": "1"
 }
