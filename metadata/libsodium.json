@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
-  "release": "3",
-  "sha": "f2cce57111b2f4e4b16e2367021bb81ecdfdda5a",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "1a042bd8d9008c4651cac4544ca30995502d433e",
   "source": "https://src.fedoraproject.org/rpms/libsodium.git",
-  "version": "1.0.21",
-  "modification_status": "clean"
+  "version": "1.0.22"
 }
