@@ -757,7 +757,7 @@ spec:
     - name: git-auth
       secret:
         secretName: '{{git_auth_secret}}'
-# --- apt-libs ---
+# --- apt ---
 ---
 apiVersion: tekton.dev/v1
 kind: PipelineRun
@@ -771,13 +771,13 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/apt-libs/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/apt/***]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
-    appstudio.openshift.io/component: apt-libs-main
+    appstudio.openshift.io/component: apt-main
     pipelines.appstudio.openshift.io/type: build
-  name: apt-libs-main-on-pull-request
+  name: apt-main-on-pull-request
   namespace: hummingbird-tenant
 spec:
   params:
@@ -788,7 +788,7 @@ spec:
     - name: image-expires-after
       value: 5d
     - name: ociStorage
-      value: quay.io/redhat-user-workloads/hummingbird-tenant/apt-libs-main:on-mr-{{pull_request_number}}-{{revision}}
+      value: quay.io/redhat-user-workloads/hummingbird-tenant/apt-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
       value: apt
     - name: target-branch
@@ -804,7 +804,7 @@ spec:
     - name: specfile
       value: "apt.spec"
     - name: monorepo-subdir
-      value: "rpms/apt-libs"
+      value: "rpms/apt"
     - name: mock-config-template-filename-in-sources
       value: "mock/mock.cfg"
   pipelineRef:
@@ -818,7 +818,7 @@ spec:
         # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:df897187705c82ef4fa28e4e5c9ba7861e3fd17a8980d8f25c26db485f220b0d"
   taskRunTemplate:
-    serviceAccountName: build-pipeline-apt-libs-main
+    serviceAccountName: build-pipeline-apt-main
   timeouts:
     pipeline: 4h
     tasks: 4h
@@ -17530,6 +17530,75 @@ spec:
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:df897187705c82ef4fa28e4e5c9ba7861e3fd17a8980d8f25c26db485f220b0d"
   taskRunTemplate:
     serviceAccountName: build-pipeline-openblas-srpm-macros-main
+  timeouts:
+    pipeline: 4h
+    tasks: 4h
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{git_auth_secret}}'
+# --- opendbx ---
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/redhat/hummingbird/rpms/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/opendbx/***]"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: rpms-main
+    appstudio.openshift.io/component: opendbx-main
+    pipelines.appstudio.openshift.io/type: build
+  name: opendbx-main-on-pull-request
+  namespace: hummingbird-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: image-expires-after
+      value: 5d
+    - name: ociStorage
+      value: quay.io/redhat-user-workloads/hummingbird-tenant/opendbx-main:on-mr-{{pull_request_number}}-{{revision}}
+    - name: package-name
+      value: opendbx
+    - name: target-branch
+      value: '{{target_branch}}'
+    - name: build-architectures
+      value:
+        - aarch64
+        - x86_64
+    - name: build-platforms
+      value:
+        - "linux/x86_64"
+        - "linux/arm64"
+    - name: specfile
+      value: "opendbx.spec"
+    - name: monorepo-subdir
+      value: "rpms/opendbx"
+    - name: mock-config-template-filename-in-sources
+      value: "mock/mock.cfg"
+  pipelineRef:
+    resolver: bundles
+    params:
+      - name: name
+        value: build-rpm-package
+      - name: kind
+        value: pipeline
+      - name: bundle
+        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:df897187705c82ef4fa28e4e5c9ba7861e3fd17a8980d8f25c26db485f220b0d"
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-opendbx-main
   timeouts:
     pipeline: 4h
     tasks: 4h

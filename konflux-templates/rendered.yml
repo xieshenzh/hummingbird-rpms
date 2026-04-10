@@ -428,7 +428,7 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
-# --- apt-libs ---
+# --- apt ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1
 kind: Component
@@ -439,14 +439,14 @@ metadata:
     git-provider-url: https://gitlab.com
     mintmaker.appstudio.redhat.com/disabled: "true"
     test.appstudio.openshift.io/comment_strategy: disable_all
-  name: apt-libs-main
+  name: apt-main
 spec:
   application: rpms-main
-  componentName: apt-libs-main
-  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/apt-libs-main
+  componentName: apt-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/apt-main
   source:
     git:
-      context: rpms/apt-libs
+      context: rpms/apt
       revision: main
       url: https://gitlab.com/redhat/hummingbird/rpms.git
 ---
@@ -455,11 +455,11 @@ kind: ImageRepository
 metadata:
   labels:
     appstudio.redhat.com/application: rpms-main
-    appstudio.redhat.com/component: apt-libs-main
-  name: apt-libs-main
+    appstudio.redhat.com/component: apt-main
+  name: apt-main
 spec:
   image:
-    name: hummingbird-tenant/apt-libs-main
+    name: hummingbird-tenant/apt-main
     visibility: public
   notifications:
   - config:
@@ -9977,6 +9977,45 @@ metadata:
 spec:
   image:
     name: hummingbird-tenant/openblas-srpm-macros-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
+# --- opendbx ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: opendbx-main
+spec:
+  application: rpms-main
+  componentName: opendbx-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/opendbx-main
+  source:
+    git:
+      context: rpms/opendbx
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: opendbx-main
+  name: opendbx-main
+spec:
+  image:
+    name: hummingbird-tenant/opendbx-main
     visibility: public
   notifications:
   - config:

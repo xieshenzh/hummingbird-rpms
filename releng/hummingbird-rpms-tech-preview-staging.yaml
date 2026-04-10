@@ -96,7 +96,7 @@ spec:
           contentType: rpm
         - name: apr-util-main
           contentType: rpm
-        - name: apt-libs-main
+        - name: apt-main
           contentType: rpm
         - name: attr-main
           contentType: rpm
@@ -575,6 +575,8 @@ spec:
         - name: oniguruma-main
           contentType: rpm
         - name: openblas-srpm-macros-main
+          contentType: rpm
+        - name: opendbx-main
           contentType: rpm
         - name: openldap-main
           contentType: rpm
