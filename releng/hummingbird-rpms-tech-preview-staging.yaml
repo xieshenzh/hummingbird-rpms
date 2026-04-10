@@ -860,6 +860,8 @@ spec:
           contentType: rpm
         - name: tree-sitter-srpm-macros-main
           contentType: rpm
+        - name: trivy-main
+          contentType: rpm
         - name: ttmkfdir-main
           contentType: rpm
         - name: tzdata-main
