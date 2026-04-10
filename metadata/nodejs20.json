@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Local changes in commit be5558a2",
+  "modification_reason": "trigger rebuild to sign the RPMs",
   "modification_status": "modified",
   "release": "7",
   "sha": "391a5ac40504c3d24494b7382d497cee14eafb12",
