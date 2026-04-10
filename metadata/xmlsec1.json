@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Update to 1.2.42 to fix build with NSPR 4.38+ (ATTRIBUTE_UNUSED removed from NSPR headers)",
+  "modification_status": "modified",
   "release": "4",
   "sha": "ca35a3826dfdde5ae679d85814641da31f4dfbbd",
   "source": "https://src.fedoraproject.org/rpms/xmlsec1.git",

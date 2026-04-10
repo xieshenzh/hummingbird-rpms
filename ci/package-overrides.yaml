@@ -163,3 +163,6 @@ oras:
 
 xcaddy:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+xmlsec1:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
