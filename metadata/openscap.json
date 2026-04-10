@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "sha": "bf5627bf8a35044563c84e7a90638c7a87c1d6a7",
+  "source": "https://src.fedoraproject.org/rpms/openscap.git",
+  "version": "1.4.3"
+}
