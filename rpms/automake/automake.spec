@@ -20,7 +20,7 @@ Summary:    A GNU tool for automatically creating Makefiles
 Name:       automake
 # Any bump here requires libtool rebuild, rhbz#1813010
 Version:    %{api_version}.1
-Release:    4%{?dist}
+Release:    4.1%{?dist}
 
 # To help future rebase, the following licenses were seen in the following files/folders:
 # usr/bin/* - GPL-2.0-or-later
@@ -93,7 +93,7 @@ BuildRequires: sharutils
 BuildREquires: texlive-dvips
 BuildRequires: texinfo-tex
 BuildRequires: vala
-%if !0%{?rhel:1}
+%if !0%{?rhel:1} && !0%{?hummingbird:1}
 BuildRequires: gcc-objc
 BuildRequires: gcc-objc++
 BuildRequires: imake
