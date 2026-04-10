@@ -694,6 +694,8 @@ spec:
           contentType: rpm
         - name: postgresql18-main
           contentType: rpm
+        - name: procps-ng-main
+          contentType: rpm
         - name: protobuf-c-main
           contentType: rpm
         - name: psmisc-main
