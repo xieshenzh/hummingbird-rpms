@@ -1,2 +1,8 @@
 [package]
 cargo-install-lib = false
+cargo-toml-patch-comments = [
+  """\
+  relax rlimit dependency to allow 0.11.x
+  https://github.com/keszybz/add-determinism/pull/76\
+  """,
+]

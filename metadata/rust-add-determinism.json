@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
-  "release": "4",
-  "sha": "fc4a7259a8cea8a7526a6a3a55d91f068d8faf8c",
+  "modification_status": "clean",
+  "release": "2",
+  "sha": "031c7c6c3b1b82755e9638ad31ccd4d4cb38aee8",
   "source": "https://src.fedoraproject.org/rpms/rust-add-determinism.git",
-  "version": "0.7.2",
-  "modification_status": "clean"
+  "version": "0.7.3"
 }
