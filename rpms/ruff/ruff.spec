@@ -1,7 +1,7 @@
 %bcond check 0
 
 Name:           ruff
-Version:        0.15.9
+Version:        0.15.10
 # The ruff package has a permanent exception to the Updates Policy in Fedora,
 # so it can be updated in stable releases across SemVer boundaries (subject to
 # good judgement and actual compatibility of any reverse dependencies). See
@@ -9,7 +9,7 @@ Version:        0.15.9
 # https://pagure.io/fesco/issue/3197. It also has a corresponding exception in
 # EPEL, but only in leading branches and only until version 1.0; see
 # https://pagure.io/epel/issue/350.
-Release:        1.1%{?dist}
+Release:        1%{?dist}
 Summary:        Extremely fast Python linter and code formatter
 
 # The license of the ruff project is MIT, except:
