@@ -74,6 +74,9 @@ rlJournalStart
     while read test_path; do
       if [ -f $BuildDir/libs/$test_path/test/Jamfile* ]; then
         rlRun "cd $BuildDir/libs/$test_path/test"
+        if [ "$test_path" = regex ]; then
+          rlRun "[ -e ../include ] || ln -s ../../ ../include"
+        fi
         rlRun "su -c '/usr/bin/b2 -d1 --build-dir=$TmpDir/test-build &>>$TmpDir/testsuite.log' $BUILD_USER"
         rm -fr $TmpDir/test-build
       else
