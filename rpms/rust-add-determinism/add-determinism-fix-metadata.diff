@@ -1,0 +1,11 @@
+--- add-determinism-0.7.3/Cargo.toml	2006-07-24T01:21:28+00:00
++++ add-determinism-0.7.3/Cargo.toml	2026-03-16T23:54:31.784567+00:00
+@@ -244,7 +244,7 @@
+ default-features = false
+ 
+ [dependencies.rlimit]
+-version = "0.10.2"
++version = ">=0.10.2,<0.12"
+ 
+ [dependencies.selinux]
+ version = "0.4.4"
