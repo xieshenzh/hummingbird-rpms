@@ -45,11 +45,11 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.3
+%global general_version %{pybasever}.4
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2.1%{?dist}
+Release: 1%{?dist}
 License: Python-2.0.1
 
 
@@ -108,21 +108,21 @@ License: Python-2.0.1
 # This needs to be manually updated when we update Python.
 # Explore the sources tarball (you need the version before %%prep is executed):
 #  $ tar -tf Python-%%{upstream_version}.tar.xz | grep whl
-%global pip_version 25.3
+%global pip_version 26.0.1
 %global setuptools_version 79.0.1
 # All of those also include a list of indirect bundled libs:
 # pip
 #  $ %%{_rpmconfigdir}/pythonbundles.py <(unzip -p Lib/ensurepip/_bundled/pip-*.whl pip/_vendor/vendor.txt)
 %global pip_bundled_provides %{expand:
-Provides: bundled(python3dist(cachecontrol)) = 0.14.3
-Provides: bundled(python3dist(certifi)) = 2025.10.5
+Provides: bundled(python3dist(cachecontrol)) = 0.14.4
+Provides: bundled(python3dist(certifi)) = 2026.1.4
 Provides: bundled(python3dist(dependency-groups)) = 1.3.1
 Provides: bundled(python3dist(distlib)) = 0.4
 Provides: bundled(python3dist(distro)) = 1.9
-Provides: bundled(python3dist(idna)) = 3.10
+Provides: bundled(python3dist(idna)) = 3.11
 Provides: bundled(python3dist(msgpack)) = 1.1.2
-Provides: bundled(python3dist(packaging)) = 25
-Provides: bundled(python3dist(platformdirs)) = 4.5
+Provides: bundled(python3dist(packaging)) = 26
+Provides: bundled(python3dist(platformdirs)) = 4.5.1
 Provides: bundled(python3dist(pygments)) = 2.19.2
 Provides: bundled(python3dist(pyproject-hooks)) = 1.2
 Provides: bundled(python3dist(requests)) = 2.32.5
@@ -272,7 +272,6 @@ BuildRequires: libzstd-devel
 BuildRequires: make
 BuildRequires: mpdecimal-devel
 BuildRequires: ncurses-devel
-BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: python-rpm-macros
 BuildRequires: readline-devel
@@ -284,6 +283,10 @@ BuildRequires: tk-devel
 BuildRequires: xz-devel
 BuildRequires: zlib-devel
 BuildRequires: /usr/bin/dtrace
+
+# Support for OpenSSL 4 only landed in Python 3.15 for now
+# https://github.com/python/cpython/issues/146207
+BuildRequires: (openssl-devel < 1:4 or openssl3-devel)
 
 %if %{with tests}
 BuildRequires: gcc-c++
@@ -438,12 +441,6 @@ Patch477: 00477-raise-an-error-when-importing-stdlib-modules-compiled-for-a-diff
 #   or a string with OpenSSL hash name as the "digestmod" argument.
 #   The argument must be specified (instead of defaulting to 'md5').
 Patch329: 00329-fips.patch
-
-# 00478 # d9d794656850591a4e6aeddcf853505aeea08028
-# CVE-2026-4519
-#
-# Reject leading dashes in webbrowser URLs (GH-146214)
-Patch478: 00478-cve-2026-4519.patch
 
 # (New patches go here ^^^)
 #
@@ -637,8 +634,12 @@ Requires: tzdata
 # We avoid this problem by requiring at least the same version of expat that
 # was used during the build time.
 # Other subpackages (like -debug) also need this, but they all depend on -libs.
+# Since expat 2.7.4, the library has versioned symbols and this is no longer needed,
+# as the generated requirement will be in the form of libexpat.so.1(LIBEXPAT_2.7.2) etc.
 %global expat_version %(LANG=C rpm -q --qf '%%{version}' expat.%{_target_cpu} | sed 's/.*not installed/0/')
+%if v"%{expat_version}" < v"2.7.4"
 Requires: expat%{?_isa} >= %{expat_version}
+%endif
 
 
 %description -n %{pkgname}-libs
@@ -837,7 +838,9 @@ License: %{libs_license} AND Apache-2.0 AND ISC AND LGPL-2.1-only AND MPL-2.0 AN
 # See the comments in the definition of main -libs subpackage for detailed explanations
 Provides: bundled(mimalloc) = 2.12
 Requires: tzdata
+%if v"%{expat_version}" < v"2.7.4"
 Requires: expat%{?_isa} >= %{expat_version}
+%endif
 
 # There are files in the standard library that have python shebang.
 # We've filtered the automatic requirement out so libs are installable without
@@ -1178,12 +1181,6 @@ topdir=$(pwd)
 
 DirHoldingGdbPy=%{_usr}/lib/debug/%{_libdir}
 mkdir -p %{buildroot}$DirHoldingGdbPy
-
-# When the actual %%{dynload_dir} exists (it does when python3.X is installed for regen-all)
-# %%{buildroot}%%{dynload_dir} is not created by make install and the extension modules are missing
-# Reported upstream as https://github.com/python/cpython/issues/98782
-# A workaround is to create the directory before running make install
-mkdir -p %{buildroot}%{dynload_dir}
 
 # Multilib support for pyconfig.h
 # 32- and 64-bit versions of pyconfig.h are different. For multilib support
@@ -1998,6 +1995,9 @@ CheckPython freethreading
 # ======================================================
 
 %changelog
+* Wed Apr 08 2026 Karolina Surma <ksurma@redhat.com> - 3.14.4-1
+- Update to Python 3.14.4
+
 * Thu Mar 26 2026 Lumír Balhar <lbalhar@redhat.com> - 3.14.3-2
 - Security fix for CVE-2026-4519 (rhbz#2449730)
 
@@ -2106,4 +2106,3 @@ CheckPython freethreading
 
 * Thu Oct 17 2024 Karolina Surma <ksurma@redhat.com> - 3.14.0~a1-1
 - Initial Python 3.14 package forked from Python 3.13
-

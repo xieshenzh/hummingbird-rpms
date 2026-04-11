@@ -15,10 +15,10 @@ which is tested as working.
  3 files changed, 10 insertions(+)
 
 diff --git a/Lib/test/test_pyexpat.py b/Lib/test/test_pyexpat.py
-index daeaa38a3c..b243f1da14 100644
+index 465f65a03b..3379ab8aa9 100644
 --- a/Lib/test/test_pyexpat.py
 +++ b/Lib/test/test_pyexpat.py
-@@ -847,6 +847,8 @@ def start_element(name, _):
+@@ -905,6 +905,8 @@ def start_element(name, _):
  
          self.assertEqual(started, ['doc'])
  
