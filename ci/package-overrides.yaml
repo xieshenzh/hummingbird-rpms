@@ -135,6 +135,10 @@ ruff:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+rust-rpm-sequoia:
+  # Tracked from CentOS Stream c10s instead of Fedora
+  forked_from: "https://gitlab.com/redhat/centos-stream/rpms"
+
 # Required to prevent running out of storage
 rust:
   timeout_hours: 12
