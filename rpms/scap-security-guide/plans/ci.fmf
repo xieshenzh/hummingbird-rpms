@@ -1,0 +1,8 @@
+summary: CI test plan
+discover:
+    how: fmf
+    url: https://github.com/RHSecurityCompliance/contest
+    test:
+      - /static-checks/rpmbuild-ctest
+execute:
+    how: tmt

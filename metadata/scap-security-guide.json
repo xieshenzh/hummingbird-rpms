@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "3",
+  "sha": "81369569ea551f7a3efd221fbf6cb6b5ea0d503f",
+  "source": "https://src.fedoraproject.org/rpms/scap-security-guide.git",
+  "version": "0.1.80"
+}
