@@ -12,6 +12,7 @@ URL:		https://github.com/ComplianceAsCode/content/
 Source0:	https://github.com/ComplianceAsCode/content/releases/download/v%{version}/scap-security-guide-%{version}.tar.bz2
 BuildArch:	noarch
 
+BuildRequires:	libxml2
 BuildRequires:	libxslt
 BuildRequires:	openscap-scanner >= 1.2.5
 BuildRequires:	cmake >= 2.8
