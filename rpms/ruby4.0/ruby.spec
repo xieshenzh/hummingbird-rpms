@@ -205,7 +205,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 33.1%{?dist}
+Release: 33.2%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -919,9 +919,10 @@ rm -rd ${CONFIG_TARGET_DIR}
 
 # Handle the default ruby symlink
 # Remove the auto-generated symlink first, then conditionally recreate if this is the default version
+# When rubypick is in use, it owns /usr/bin/ruby - don't conflict with it.
 rm -f %{buildroot}%{_bindir}/ruby
-%if 0%{?ruby_default}
-ln -srf %{buildroot}%{_bindir}/%{name}%{?with_rubypick:-mri} \
+%if 0%{?ruby_default} && !%{with rubypick}
+ln -srf %{buildroot}%{_bindir}/%{name} \
         %{buildroot}%{_bindir}/ruby
 %endif
 
@@ -1291,7 +1292,7 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 %license GPL
 %license LEGAL
 %{_bindir}/%{name}%{?with_rubypick:-mri}
-%if 0%{?ruby_default}
+%if 0%{?ruby_default} && !%{with rubypick}
 %{_bindir}/ruby
 %endif
 %{_mandir}/man1/ruby*
