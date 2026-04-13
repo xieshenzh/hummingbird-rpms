@@ -14940,6 +14940,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- scap-security-guide ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: scap-security-guide-main
+spec:
+  application: rpms-main
+  componentName: scap-security-guide-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/scap-security-guide-main
+  source:
+    git:
+      context: rpms/scap-security-guide
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: scap-security-guide-main
+  name: scap-security-guide-main
+spec:
+  image:
+    name: hummingbird-tenant/scap-security-guide-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- sdbus-cpp ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1
