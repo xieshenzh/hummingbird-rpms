@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "53c3cb47f3930a2dd6cf14ca83f8bce519a7bc13",
+  "release": "2",
+  "sha": "b49d07c790a6de6b16a8168cedf111a340a78354",
   "source": "https://src.fedoraproject.org/rpms/hugo.git",
-  "version": "0.159.0"
+  "version": "0.160.1"
 }
