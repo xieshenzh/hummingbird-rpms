@@ -1,6 +1,11 @@
-# Updating Dist-git Packages
+---
+title: Updating Dist-git Packages
+description: How packages are automatically updated from Fedora dist-git
+weight: 40
+---
 
-Packages are automatically updated from Fedora dist-git. Each update creates a separate MR that is automatically approved and merged when CI passes.
+Packages are automatically updated from Fedora dist-git. Each update creates a separate MR that is
+automatically approved and merged when CI passes.
 
 ## Testing Locally
 
@@ -36,8 +41,9 @@ export CHORE_MR_GITLAB_TOKEN="glpat-xxxxxxxxxxxxxxxxxxxx"
 ## Environment Variables
 
 - `CHORE_MR_GITLAB_TOKEN` - GitLab token with `write_repository` scope (required for `--create-mrs`)
-- `CHORE_MR_APPROVAL_GITLAB_TOKEN` - GitLab token with `api` scope for auto-approving MRs (used by CI)
-- `GITLAB_REMOTE_URL` - Target repo (default: https://gitlab.com/redhat/hummingbird/rpms.git)
+- `CHORE_MR_APPROVAL_GITLAB_TOKEN` - GitLab token with `api` scope for auto-approving MRs (used by
+  CI)
+- `GITLAB_REMOTE_URL` - Target repo (default: <https://gitlab.com/redhat/hummingbird/rpms.git>)
 
 ## Flags
 
@@ -46,77 +52,86 @@ export CHORE_MR_GITLAB_TOKEN="glpat-xxxxxxxxxxxxxxxxxxxx"
 - `--max-updates=N` - Stop after finding N updates (limits output MRs created)
 - `--create-mrs` - Actually create MRs (requires token)
 - `--only-package=NAME` - Check only the specified package (for testing/debugging specific packages)
-- `--clean-only` - Skip packages with `modification_status` of 'modified' or 'native', only process clean packages
-- `--modified-only` - Skip packages with `modification_status` of 'clean' or 'native', only process modified packages (mutually exclusive with `--clean-only`)
+- `--clean-only` - Skip packages with `modification_status` of 'modified' or 'native', only process
+  clean packages
+- `--modified-only` - Skip packages with `modification_status` of 'clean' or 'native', only process
+  modified packages (mutually exclusive with `--clean-only`)
 
 ### Using --clean-only
 
-The `--clean-only` flag filters out packages marked as 'modified' or 'native' before attempting updates. This is useful for:
+The `--clean-only` flag filters out packages marked as 'modified' or 'native' before attempting
+updates. This is useful for:
 
-1. **Better failure detection** - Exit code 1 indicates real update failures, not expected errors from modified/native packages
+1. **Better failure detection** - Exit code 1 indicates real update failures, not expected errors
+   from modified/native packages
 2. **Cleaner output** - No error messages for packages that can't be auto-updated by design
 3. **Efficient CI** - Focus on packages that should update automatically
 4. **Performance** - Avoids invoking `dist_git.py` for packages that will fail
 
-Without `--clean-only`, the script attempts to update all packages. Modified/native packages fail with:
-```
+Without `--clean-only`, the script attempts to update all packages. Modified/native packages fail
+with:
+
+```text
 ERROR: Cannot auto-update <package>
        Status: modified/native
        Reason: <reason>
        Use 'sync' to force update or 'mark-modified --clean' to allow updates
 ```
 
-These expected failures can mask genuine update issues. Using `--clean-only` prevents these false failures.
+These expected failures can mask genuine update issues. Using `--clean-only` prevents these false
+failures.
 
 ### Using --modified-only
 
-The `--modified-only` flag filters to only process packages marked as 'modified', skipping clean and native packages. This is useful for checking the merge logic, as well as getting an overview of current merge conflicts.
+The `--modified-only` flag filters to only process packages marked as 'modified', skipping clean and
+native packages. This is useful for checking the merge logic, as well as getting an overview of
+current merge conflicts.
 
 ## Auto-Merge and Auto-Approval
 
 MRs created by this script are configured to:
+
 - **Auto-merge** when pipeline succeeds (set via `merge_request.merge_when_pipeline_succeeds`)
-- **Auto-approve** after 10 minutes via the `chore_mr_approval` CI job (gives Konflux time to post commit statuses)
+- **Auto-approve** after 10 minutes via the `chore_mr_approval` CI job (gives Konflux time to post
+  commit statuses)
 
 ## Version-Constrained Updates
 
-Packages with `track_upstream` set to a version prefix in their metadata are
-version-constrained. This is used for versioned packages like `golang1.26`
-that track a specific upstream version line.
+Packages with `track_upstream` set to a version prefix in their metadata are version-constrained.
+This is used for versioned packages like `golang1.26` that track a specific upstream version line.
 
 ### How It Works
 
-The `track_upstream` and `release_monitoring_project_id` metadata fields work
-together across two systems:
+The `track_upstream` and `release_monitoring_project_id` metadata fields work together across two
+systems:
 
 **`dist_git.py update`** (dist-git sync from Fedora):
 
-When `track_upstream` is a version prefix (e.g., `"1.26"`), the update command
-uses prefix matching:
+When `track_upstream` is a version prefix (e.g., `"1.26"`), the update command uses prefix matching:
+
 - `1.26` matches `1.26`, `1.26.0`, `1.26.3` (allowed)
 - `1.26` does **not** match `1.27.0`, `2.0` (skipped)
 
 Skipped packages log a warning:
-```
+
+```text
 WARNING: Skipping golang1.26: upstream version 1.27.0 doesn't match tracked version 1.26
 ```
 
 **`check_upstream_versions.py`** (release-monitoring.org checks):
 
-When `release_monitoring_project_id` is a string, Anitya is queried using that
-name instead of the RPM package name. For example, `golang1.26` with
-`release_monitoring_project_id: "golang"` queries Anitya for `golang`. When it
-is an integer, the v2 API is queried directly by project ID. When
-`track_upstream` is a version prefix, the list of upstream versions returned by
-Anitya is filtered to only those matching the prefix. This means
-`check_upstream_versions.py check` will report `1.26.5` as the latest version
-for `golang1.26` even if Anitya reports `1.27.0` as the latest `golang` release.
+When `release_monitoring_project_id` is a string, Anitya is queried using that name instead of the
+RPM package name. For example, `golang1.26` with `release_monitoring_project_id: "golang"` queries
+Anitya for `golang`. When it is an integer, the v2 API is queried directly by project ID. When
+`track_upstream` is a version prefix, the list of upstream versions returned by Anitya is filtered
+to only those matching the prefix. This means `check_upstream_versions.py check` will report
+`1.26.5` as the latest version for `golang1.26` even if Anitya reports `1.27.0` as the latest
+`golang` release.
 
-When `--update` is used, the script updates the spec file, downloads new
-sources, and commits the result. Packages that need custom update logic can
-provide a hooks file at `metadata/<package>.update-hooks.yaml` to override the
-spec update, source download, or add a post-update step. See
-[Package Modification Tracking](../package-modification-tracking) for details.
+When `--update` is used, the script updates the spec file, downloads new sources, and commits the
+result. Packages that need custom update logic can provide a hooks file at
+`metadata/<package>.update-hooks.yaml` to override the spec update, source download, or add a
+post-update step. See [Package Modification Tracking](../package-modification-tracking) for details.
 
 ### Setting Up Version Constraints
 
@@ -132,12 +147,15 @@ spec update, source download, or add a post-update step. See
 
 - `dist_git.py`: Version constraint is checked before pre-release and Koji build checks
 - `dist_git.py`: The `sync` command bypasses the version constraint (explicit force operation)
-- `check_upstream_versions.py`: `release_monitoring_project_id` determines the Anitya lookup (int for project ID, string for name, absent for RPM name); `track_upstream` filters versions when set to a prefix
+- `check_upstream_versions.py`: `release_monitoring_project_id` determines the Anitya lookup (int
+  for project ID, string for name, absent for RPM name); `track_upstream` filters versions when set
+  to a prefix
 - Batch operations continue processing other packages after skipping constrained ones
 
 ## Pre-Release Version Filtering
 
-By default, the update mechanism skips pre-release versions to prevent unstable packages from entering the repository automatically. Pre-release patterns include:
+By default, the update mechanism skips pre-release versions to prevent unstable packages from
+entering the repository automatically. Pre-release patterns include:
 
 - **Tilde notation**: `5.3.0~rc1`, `2.0~beta1`, `1.0~alpha` (RPM standard)
 - **Suffix notation**: `5.3.0-rc1`, `2.0.beta1`, `3.0-alpha`, `1.0.dev`
@@ -155,7 +173,7 @@ To explicitly update to a pre-release version:
 ./ci/dist_git.py update --allow-prerelease --skip-build-check
 ```
 
-### Behavior
+### Pre-release filtering behavior
 
 - Pre-release detection occurs before Koji build checks (saves API calls)
 - Skipped packages log a warning with the detected pattern

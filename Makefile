@@ -17,6 +17,26 @@ delete-konflux-comments:
 	podman run -it --rm -e GITLAB_TOKENS='{"gitlab.com":"COM_GITLAB_TOKEN"}' -e COM_GITLAB_TOKEN -v $(PWD):/src:z quay.io/cki/cki-tools:production /src/ci/delete_konflux_comments.py $(ARGS)
 
 
+.PHONY: markdownlint-host markdownlint
+markdownlint-host:
+	markdownlint $$(git ls-files '*.md' ':!rpms/')
+markdownlint:
+	$(PODMAN_RUN) $(PODMAN_IMAGE) make markdownlint-host
+
+.PHONY: check-frontmatter-host
+check-frontmatter-host:
+	@fail=0; \
+	for f in $$(git ls-files 'documentation/*.md' 'documentation/**/*.md'); do \
+	  if ! head -1 "$$f" | grep -q '^---$$'; then \
+	    echo "ERROR: $$f missing Hugo frontmatter (first line must be ---)"; \
+	    fail=1; \
+	  elif ! awk 'NR==1{next} /^---$$/{closed=1;exit} /^title:/{found=1} END{exit !(found && closed)}' "$$f"; then \
+	    echo "ERROR: $$f missing title in frontmatter"; \
+	    fail=1; \
+	  fi; \
+	done; \
+	if [ "$$fail" = 1 ]; then exit 1; fi
+
 .PHONY: check-host check
 check-host:
 	git ls-files -z 'ci/*.sh' | xargs -0 shellcheck --external-sources --enable=all
@@ -30,6 +50,8 @@ check-host:
 	else \
 	  echo "pytest not installed, skipping tests"; \
 	fi
+	$(MAKE) markdownlint-host
+	$(MAKE) check-frontmatter-host
 
 check:
 	$(PODMAN_RUN) $(PODMAN_IMAGE) make check-host

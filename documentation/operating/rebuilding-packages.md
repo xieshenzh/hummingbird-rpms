@@ -5,24 +5,22 @@ aliases: [/l/rebuilding-packages]
 ---
 
 > **AI Agent Note:** When asked to rebuild packages, use the `rebuild` command:
-> `./ci/dist_git.py rebuild <package> --reason "<reason>"`. Always ask the user
-> for a ticket link or explanation first to use as the reason. If the command
-> fails with "uses macros in Release field", see the "Packages requiring manual
-> rebuild" section below for instructions.
+> `./ci/dist_git.py rebuild <package> --reason "<reason>"`. Always ask the user for a ticket link or
+> explanation first to use as the reason. If the command fails with "uses macros in Release field",
+> see the "Packages requiring manual rebuild" section below for instructions.
 
 ## Overview
 
 This document covers two scenarios for triggering a new package build:
 
-1. **No-change rebuild**: Bump the Release field to rebuild with identical
-   sources (e.g., to fix a faulty published RPM or pick up toolchain changes).
+1. **No-change rebuild**: Bump the Release field to rebuild with identical sources (e.g., to fix a
+   faulty published RPM or pick up toolchain changes).
 
-2. **Backporting a patch**: Add an upstream patch that hasn't yet landed in
-   Fedora to fast-track a fix or feature.
+2. **Backporting a patch**: Add an upstream patch that hasn't yet landed in Fedora to fast-track a
+   fix or feature.
 
-Both scenarios use the `.N` release suffix pattern to ensure our builds sort
-higher than the upstream Fedora release while remaining lower than the next
-upstream version.
+Both scenarios use the `.N` release suffix pattern to ensure our builds sort higher than the
+upstream Fedora release while remaining lower than the next upstream version.
 
 ## No-Change Rebuild
 
@@ -55,6 +53,7 @@ Examples:
 ```
 
 The command:
+
 - Automatically bumps the Release field using the `.N` suffix pattern
 - Handles `%autorelease` by resolving and replacing with explicit values
 - Preserves macros in the Release field (e.g., `%{revision}`)
@@ -69,15 +68,15 @@ Supports `--dry-run` to preview changes without committing:
 
 ### Creating MRs for rebuild commits
 
-After creating rebuild commits locally, use `rebuild_multi_mr.sh` to push each
-commit as its own merge request (one MR per package, auto-merge enabled):
+After creating rebuild commits locally, use `rebuild_multi_mr.sh` to push each commit as its own
+merge request (one MR per package, auto-merge enabled):
 
 ```bash
 ./ci/rebuild_multi_mr.sh
 ```
 
-By default the script compares against `origin/main`. For local development,
-use `--base` to point at a different ref:
+By default the script compares against `origin/main`. For local development, use `--base` to point
+at a different ref:
 
 ```bash
 # Use local main branch as base (useful when origin/main is not up to date)
@@ -94,13 +93,14 @@ use `--base` to point at a different ref:
 ```
 
 The script:
+
 - Creates a `chore/rebuild-{package}` branch per commit and pushes it
 - Titles each MR `chore(rpms): Rebuild {package}: {reason}`
 - Enables auto-merge on all rebuild MRs
 - Leaves the current branch untouched
 - Skips branches that already exist on the remote (idempotent)
-- Only processes commits whose message matches `Rebuild {package}: {reason}`;
-  other commits in the range are silently skipped
+- Only processes commits whose message matches `Rebuild {package}: {reason}`; other commits in the
+  range are silently skipped
 
 **Full workflow example:**
 
@@ -117,14 +117,14 @@ The script:
 
 ### Packages requiring manual rebuild
 
-Some packages use complex macro systems that the automated rebuild command cannot
-handle. These require manual editing of the spec file.
+Some packages use complex macro systems that the automated rebuild command cannot handle. These
+require manual editing of the spec file.
 
 #### Macro indirection patterns
 
-These packages define the Release field using a macro, where the macro itself
-contains `%{?dist}`. The rebuild command cannot detect or manipulate these
-without expanding all macros, which would break the macro system.
+These packages define the Release field using a macro, where the macro itself contains `%{?dist}`.
+The rebuild command cannot detect or manipulate these without expanding all macros, which would
+break the macro system.
 
 **nodejs packages (nodejs20, nodejs22, nodejs24, nodejs25):**
 
@@ -135,11 +135,11 @@ without expanding all macros, which would break the macro system.
 Release: %{node_release}
 ```
 
-The `%{node_release}` macro is defined by an external macro system loaded from
-`nodejs.srpm.macros`. The release component is embedded in the version definition.
+The `%{node_release}` macro is defined by an external macro system loaded from `nodejs.srpm.macros`.
+The release component is embedded in the version definition.
 
-**How to rebuild:** Edit the `%nodejs_define_version node` line to bump the release
-component (e.g., change `-%{autorelease}` to `-1.1` or increment existing `.N`).
+**How to rebuild:** Edit the `%nodejs_define_version node` line to bump the release component (e.g.,
+change `-%{autorelease}` to `-1.1` or increment existing `.N`).
 
 **kernel-headers:**
 
@@ -149,8 +149,8 @@ component (e.g., change `-%{autorelease}` to `-1.1` or increment existing `.N`).
 Release: %{specrelease}
 ```
 
-**How to rebuild:** Edit the `%define specrelease` line to add/increment the `.N`
-suffix before `%{?buildid}`:
+**How to rebuild:** Edit the `%define specrelease` line to add/increment the `.N` suffix before
+`%{?buildid}`:
 
 ```spec
 %define specrelease 59.1%{?buildid}%{?dist}
@@ -164,8 +164,7 @@ suffix before `%{?buildid}`:
 Release: %{krb5_release}
 ```
 
-**How to rebuild:** Edit the `%global krb5_release` line to add/increment the `.N`
-suffix:
+**How to rebuild:** Edit the `%global krb5_release` line to add/increment the `.N` suffix:
 
 ```spec
 %global krb5_release 4.1%{?dist}
@@ -174,59 +173,60 @@ suffix:
 #### Why these can't be automated
 
 The rebuild command can handle:
+
 - ✅ Simple numeric: `Release: 5%{?dist}`
 - ✅ Macros ending with dist: `Release: %{baserelease}%{?dist}` (e.g., rpm, gcc)
 - ✅ Complex macros with dist: `Release: %{?snapver:0.%{snapver}.}%{baserelease}%{?dist}`
-- ✅ Content after dist: `Release: 11.1%{?dist} %{?extra_version:-e %{extra_version}}` (e.g., unbound)
+- ✅ Content after dist: `Release: 11.1%{?dist} %{?extra_version:-e %{extra_version}}` (e.g.,
+  unbound)
 
 The rebuild command **cannot** handle:
+
 - ❌ Macros without `%{?dist}`: `Release: %{node_release}`
 - ❌ Macros where dist is inside the macro definition: `%{krb5_release}` contains `%{?dist}`
 
-This is because detecting and manipulating macros that contain dist internally
-would require expanding all macros (which changes the spec file semantically)
-or implementing RPM's full macro parser.
+This is because detecting and manipulating macros that contain dist internally would require
+expanding all macros (which changes the spec file semantically) or implementing RPM's full macro
+parser.
 
 ### Manual rebuild process
 
-If you need to rebuild manually or the automated command doesn't work for your use case, follow these steps:
+If you need to rebuild manually or the automated command doesn't work for your use case, follow
+these steps:
 
 #### 1. Identify the package to rebuild
 
-Identify the source package name and locate its spec file in
-`rpms/<package>/<package>.spec`.
+Identify the source package name and locate its spec file in `rpms/<package>/<package>.spec`.
 
-If you have a binary RPM name, the source package name may differ. Query the
-Hummingbird repos to get the source RPM name:
+If you have a binary RPM name, the source package name may differ. Query the Hummingbird repos to
+get the source RPM name:
 
 ```bash
 podman run --rm quay.io/hummingbird-ci/builder:latest-hatchling \
   dnf5 repoquery --queryformat '%{SOURCERPM}' <binary-package> 2>/dev/null
 ```
 
-Example: `ncurses-libs-6.5-8.20250614.hum1` -> SRPM `ncurses-6.5-8.20250614.hum1.src.rpm`
--> spec file at `rpms/ncurses/ncurses.spec`
+Example: `ncurses-libs-6.5-8.20250614.hum1` -> SRPM `ncurses-6.5-8.20250614.hum1.src.rpm` -> spec
+file at `rpms/ncurses/ncurses.spec`
 
 #### 2. Determine the Release bump pattern
 
-The `.N` bump suffix must always appear **immediately before** `%{?dist}`. The
-`%{?dist}` suffix should always be the final component since it identifies the
-build environment.
+The `.N` bump suffix must always appear **immediately before** `%{?dist}`. The `%{?dist}` suffix
+should always be the final component since it identifies the build environment.
 
 | Current Pattern | Example Before                   | Example After                      |
-|-----------------|----------------------------------|------------------------------------|
+| --------------- | -------------------------------- | ---------------------------------- |
 | Simple numeric  | `Release: 3%{?dist}`             | `Release: 3.1%{?dist}`             |
 | Already bumped  | `Release: 3.1%{?dist}`           | `Release: 3.2%{?dist}`             |
 | With macro      | `Release: 8.%{revision}%{?dist}` | `Release: 8.%{revision}.1%{?dist}` |
 | autorelease     | `Release: %autorelease`          | `Release: 1.1%{?dist}`             |
 
-For `%autorelease`, first resolve its value using `rpmspec`, then replace with
-the resolved value plus `.1`. In the Hummingbird monorepo, `%autorelease` always
-evaluates to `1`.
+For `%autorelease`, first resolve its value using `rpmspec`, then replace with the resolved value
+plus `.1`. In the Hummingbird monorepo, `%autorelease` always evaluates to `1`.
 
-> **Note:** If the Release field is missing `%{?dist}` entirely or looks unusual
-> (e.g., `1build1` instead of `1.1%{?dist}`), flag this to the user for resolution.
-> Check the git history to understand the original value:
+> **Note:** If the Release field is missing `%{?dist}` entirely or looks unusual (e.g., `1build1`
+> instead of `1.1%{?dist}`), flag this to the user for resolution. Check the git history to
+> understand the original value:
 >
 > ```bash
 > git log -p -S "Release:" -- rpms/<package>/<package>.spec
@@ -236,8 +236,8 @@ evaluates to `1`.
 
 #### 3. Modify the spec file
 
-Use `sed` to edit only the `Release:` line, avoiding any unintended whitespace
-changes that text editors may introduce:
+Use `sed` to edit only the `Release:` line, avoiding any unintended whitespace changes that text
+editors may introduce:
 
 ```bash
 sed -i 's/^Release: 3%{?dist}$/Release: 3.1%{?dist}/' rpms/<package>/<package>.spec
@@ -256,9 +256,9 @@ The diff should show only the Release line change:
 + Release: 3.1%{?dist}
 ```
 
-> **Important:** Only modify the Release line. Do not introduce any other changes
-> such as whitespace fixes or trailing newline modifications. If the diff shows
-> additional changes, reset and retry with `sed`.
+> **Important:** Only modify the Release line. Do not introduce any other changes such as whitespace
+> fixes or trailing newline modifications. If the diff shows additional changes, reset and retry
+> with `sed`.
 
 #### 4. Verify the bump is correct
 
@@ -309,21 +309,19 @@ If the commit shows more changes, amend or reset and redo the change using `sed`
 
 #### Modification status
 
-Rebuilds **do not** change a package's `modification_status`. Release-only
-changes are ephemeral and don't affect whether a package is considered `modified`
-vs `clean`:
+Rebuilds **do not** change a package's `modification_status`. Release-only changes are ephemeral and
+don't affect whether a package is considered `modified` vs `clean`:
 
-- **Release fields are temporary**: When updating from Fedora later, the Release
-  gets replaced anyway
-- **Merges normalize Release**: During updates, Release lines are normalized to
-  avoid conflicts
+- **Release fields are temporary**: When updating from Fedora later, the Release gets replaced
+  anyway
+- **Merges normalize Release**: During updates, Release lines are normalized to avoid conflicts
 - **No source changes**: Rebuilds don't modify sources, patches, or spec logic
 
-The automation already ignores Release-only changes, so automatic Fedora updates
-will continue normally after a rebuild.
+The automation already ignores Release-only changes, so automatic Fedora updates will continue
+normally after a rebuild.
 
-If you want to explicitly prevent automatic updates (e.g., you're investigating
-an issue), you can manually mark the package as modified:
+If you want to explicitly prevent automatic updates (e.g., you're investigating an issue), you can
+manually mark the package as modified:
 
 ```bash
 ./ci/dist_git.py mark-modified <package> --modified --reason "Investigating build issue"
@@ -333,21 +331,20 @@ Note: This will block automatic Fedora updates until you mark it clean again.
 
 ## Backporting a Patch
 
-Use this workflow when you need to fast-track an upstream fix or feature that
-hasn't yet been released in Fedora.
+Use this workflow when you need to fast-track an upstream fix or feature that hasn't yet been
+released in Fedora.
 
 ### 1. Obtain the patch
 
-Fetch the patch from the upstream repository. For GitHub PRs, append `.patch`
-to the PR URL:
+Fetch the patch from the upstream repository. For GitHub PRs, append `.patch` to the PR URL:
 
 ```bash
 curl -L https://github.com/<org>/<repo>/pull/<number>.patch \
   > rpms/<package>/<NNNN>-<short-description>.patch
 ```
 
-Name the patch file with a numeric prefix matching the next available `PatchN:`
-slot in the spec file (e.g., `0004-fix-foo.patch` if Patch1-3 already exist).
+Name the patch file with a numeric prefix matching the next available `PatchN:` slot in the spec
+file (e.g., `0004-fix-foo.patch` if Patch1-3 already exist).
 
 ### 2. Add the patch to the spec file
 
@@ -358,9 +355,8 @@ Patch3:         0003-existing-patch.patch
 Patch4:         0004-fix-foo.patch
 ```
 
-The patch will be applied automatically if the spec uses `%autosetup -p1`.
-If the spec uses explicit `%patchN` macros, add the corresponding apply line
-in the `%prep` section.
+The patch will be applied automatically if the spec uses `%autosetup -p1`. If the spec uses explicit
+`%patchN` macros, add the corresponding apply line in the `%prep` section.
 
 ### 3. Bump the Release
 
@@ -384,7 +380,7 @@ Add a new changelog entry at the top of the `%changelog` section:
 - Previous changelog entry
 ```
 
-### 5. Commit the change
+### 5. Commit the patch
 
 Use this commit message format:
 
@@ -405,8 +401,7 @@ Upstream: https://github.com/rpm-software-management/dnf5/pull/2522
 
 ### 6. Mark package as modified
 
-Mark the package as modified to prevent automatic Fedora updates from overwriting
-your backport:
+Mark the package as modified to prevent automatic Fedora updates from overwriting your backport:
 
 ```bash
 ./ci/dist_git.py mark-modified <package> --modified \
@@ -420,8 +415,8 @@ Example:
   --reason "Backport reproducible build sorting fix from upstream PR#2522"
 ```
 
-This ensures the package won't be automatically updated from Fedora until the
-backported patch lands upstream and you explicitly mark it clean again.
+This ensures the package won't be automatically updated from Fedora until the backported patch lands
+upstream and you explicitly mark it clean again.
 
 ### 7. Test the build locally (optional)
 
@@ -435,7 +430,6 @@ Built RPMs will be in `builds/<package>/RPMS/`.
 
 ## Related Operations
 
-- [Excluding Packages from Images][exclude] - temporarily block faulty packages
-  in container builds
+- [Excluding Packages from Images][exclude] - temporarily block faulty packages in container builds
 
 [exclude]: https://hummingbird-project.io/l/excluding-packages-from-images

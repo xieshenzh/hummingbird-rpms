@@ -1,21 +1,23 @@
-# Lookaside Cache Access
+---
+title: Lookaside Cache Access
+description: How to access the S3-based lookaside cache for RPM source tarballs
+weight: 60
+---
 
 ## Overview
 
-Source tarballs for RPM packages are stored in an S3-based lookaside cache
-rather than in git. To upload files to the cache (e.g., when updating a
-package to a new upstream version), you need AWS credentials with the
-appropriate permissions.
+Source tarballs for RPM packages are stored in an S3-based lookaside cache rather than in git. To
+upload files to the cache (e.g., when updating a package to a new upstream version), you need AWS
+credentials with the appropriate permissions.
 
 The `ci/upload-to-lookaside-cache.sh` script handles uploads directly, and
-`ci/check_upstream_versions.py --update` calls it automatically when
-downloading new source archives.
+`ci/check_upstream_versions.py --update` calls it automatically when downloading new source
+archives.
 
 ## Prerequisites
 
 You must be a **poweruser** in the `arr-cloud-aws-core` group
-(`it-cloud-aws-727920394381-poweruser`). Request access to this group if
-you do not already have it.
+(`it-cloud-aws-727920394381-poweruser`). Request access to this group if you do not already have it.
 
 ## Obtaining AWS Credentials
 
@@ -46,17 +48,15 @@ bash-5.2# AWS_IDP_URL=https://auth.redhat.com/auth/realms/EmployeeIDP/protocol/s
     --account 727920394381 --role poweruser
 ```
 
-Replace `<userid>` with your Kerberos user ID. This writes credentials to
-`$HOME/.aws` on the host (bind-mounted into the container).
+Replace `<userid>` with your Kerberos user ID. This writes credentials to `$HOME/.aws` on the host
+(bind-mounted into the container).
 
-**Note:** This overwrites the AWS default profile credentials. If you use
-the default profile for other purposes, back up `$HOME/.aws/credentials`
-before running this command.
+**Note:** This overwrites the AWS default profile credentials. If you use the default profile for
+other purposes, back up `$HOME/.aws/credentials` before running this command.
 
 ## Uploading Files
 
-Once credentials are configured in `$HOME/.aws`, you can upload files to the
-lookaside cache.
+Once credentials are configured in `$HOME/.aws`, you can upload files to the lookaside cache.
 
 ### Manual upload
 
@@ -72,22 +72,19 @@ Example:
 
 ### Automated upload via version checker
 
-`check_upstream_versions.py --update` downloads new source archives and
-uploads them to the lookaside cache automatically:
+`check_upstream_versions.py --update` downloads new source archives and uploads them to the
+lookaside cache automatically:
 
 ```bash
 ./ci/check_upstream_versions.py check --update <package>
 ```
 
-The `check` subcommand only processes packages with `"track_upstream": true`
-in their metadata when no explicit package arguments are given. To see all
-packages and their upstream status, use `check_upstream_versions.py list`.
-See
-[Package Modification Tracking](package-modification-tracking.md) for how
-to enable tracking.
+The `check` subcommand only processes packages with `"track_upstream": true` in their metadata when
+no explicit package arguments are given. To see all packages and their upstream status, use
+`check_upstream_versions.py list`. See
+[Package Modification Tracking](package-modification-tracking.md) for how to enable tracking.
 
 ## See Also
 
-- [Adding Native Packages](adding-native-packages.md) - Adding new packages
-  with source tarballs
+- [Adding Native Packages](adding-native-packages.md) - Adding new packages with source tarballs
 - [Rebuilding Packages](rebuilding-packages.md) - Rebuilding existing packages
