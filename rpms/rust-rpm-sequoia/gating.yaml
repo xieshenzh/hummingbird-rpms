@@ -1,0 +1,9 @@
+--- !Policy
+product_versions:
+  - rhel-10
+decision_context: osci_compose_gate
+rules:
+  - !PassingTestCaseRule {test_case_name: osci.brew-build./plans/ci/fips-disabled-buildroot-disabled.functional}
+  - !PassingTestCaseRule {test_case_name: osci.brew-build./plans/ci/fips-disabled-buildroot-enabled.functional}
+  - !PassingTestCaseRule {test_case_name: osci.brew-build./plans/ci/fips-enabled-buildroot-disabled.functional}
+  - !PassingTestCaseRule {test_case_name: osci.brew-build./plans/ci/fips-enabled-buildroot-enabled.functional}

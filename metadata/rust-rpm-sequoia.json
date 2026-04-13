@@ -1,8 +1,8 @@
 {
-  "branch": "rawhide",
+  "branch": "c10s",
   "modification_status": "clean",
   "release": "1",
-  "sha": "0324d11426d45f0bd8a28c6b1cd28162731e16cd",
-  "source": "https://src.fedoraproject.org/rpms/rust-rpm-sequoia.git",
-  "version": "1.10.1"
+  "sha": "e1f836e33d61d1e1acadde64963d7ca18c4b29b5",
+  "source": "https://gitlab.com/redhat/centos-stream/rpms/rust-rpm-sequoia.git",
+  "version": "1.10.1.1"
 }

@@ -1,0 +1,23 @@
+/fips-disabled-buildroot-disabled:
+  plan:
+    import:
+      url: https://pkgs.devel.redhat.com/git/tests/rust-rpm-sequoia
+      name: /plans/ci/fips-disabled-buildroot-disabled
+
+/fips-disabled-buildroot-enabled:
+  plan:
+    import:
+      url: https://pkgs.devel.redhat.com/git/tests/rust-rpm-sequoia
+      name: /plans/ci/fips-disabled-buildroot-enabled
+
+/fips-enabled-buildroot-disabled:
+  plan:
+    import:
+      url: https://pkgs.devel.redhat.com/git/tests/rust-rpm-sequoia
+      name: /plans/ci/fips-enabled-buildroot-disabled
+
+/fips-enabled-buildroot-enabled:
+  plan:
+    import:
+      url: https://pkgs.devel.redhat.com/git/tests/rust-rpm-sequoia
+      name: /plans/ci/fips-enabled-buildroot-enabled

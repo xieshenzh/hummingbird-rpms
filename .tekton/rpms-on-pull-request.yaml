@@ -26215,6 +26215,10 @@ spec:
       value: "rpms/rust-rpm-sequoia"
     - name: mock-config-template-filename-in-sources
       value: "mock/mock.cfg"
+    - name: dist-git-client-configdir
+      value: "mock/"
+    - name: forked-from
+      value: "https://gitlab.com/redhat/centos-stream/rpms"
   pipelineRef:
     resolver: bundles
     params:
