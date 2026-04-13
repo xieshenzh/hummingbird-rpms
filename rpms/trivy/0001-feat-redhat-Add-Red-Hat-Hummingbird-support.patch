@@ -1,0 +1,268 @@
+From d92470b9034c2033f3993e732be01dfce810b31f Mon Sep 17 00:00:00 2001
+From: Prarit Bhargava <prarit@redhat.com>
+Date: Thu, 19 Mar 2026 14:19:32 -0400
+Subject: [PATCH] feat(redhat): Add Red Hat Hummingbird support
+
+Add support for scanning Red Hat Hummingbird container images.
+
+OS detection is handled through the existing os-release analyzer by
+adding "hummingbird" to the ID-to-OS-family mapping. No dedicated
+analyzer type is needed since Hummingbird uses a standard /etc/os-release
+file, following the same pattern as other projects.
+
+The vulnerability driver reuses the Red Hat advisory database query
+mechanism since Hummingbird advisories share the same CSAF VEX database
+structure. It differs from the RHEL driver in three ways: it uses
+Hummingbird-specific default content sets (public-hummingbird-*-rpms),
+it passes the full date-based version rather than extracting a major
+version number, and it has no end-of-life date restrictions. The driver
+also falls back to looking up advisories by source RPM name when no
+match is found by binary package name, handling VEX feeds that reference
+source rather than binary RPM names.
+
+The RPM analyzer is updated to recognize "Hummingbird" as a known OS
+vendor and to treat packages with ".hum" in the release string as
+official rather than third-party, since Hummingbird RPMs may not set
+the Vendor header tag.
+
+Co-authored-by: Cursor <noreply@cursor.ai>
+Signed-off-by: Prarit Bhargava <prarit@redhat.com>
+---
+ pkg/detector/ospkg/detect.go                  |   2 +
+ pkg/detector/ospkg/hummingbird/hummingbird.go | 126 ++++++++++++++++++
+ pkg/fanal/analyzer/os/release/release.go      |   2 +
+ pkg/fanal/analyzer/pkg/rpm/rpm.go             |  10 +-
+ pkg/fanal/types/const.go                      |   2 +
+ pkg/purl/purl.go                              |   2 +-
+ 6 files changed, 142 insertions(+), 2 deletions(-)
+ create mode 100644 pkg/detector/ospkg/hummingbird/hummingbird.go
+
+diff --git a/pkg/detector/ospkg/detect.go b/pkg/detector/ospkg/detect.go
+index 8f4cff7cf8ed..766ef277444f 100644
+--- a/pkg/detector/ospkg/detect.go
++++ b/pkg/detector/ospkg/detect.go
+@@ -16,6 +16,7 @@ import (
+ 	"github.com/aquasecurity/trivy/pkg/detector/ospkg/debian"
+ 	"github.com/aquasecurity/trivy/pkg/detector/ospkg/driver"
+ 	"github.com/aquasecurity/trivy/pkg/detector/ospkg/echo"
++	"github.com/aquasecurity/trivy/pkg/detector/ospkg/hummingbird"
+ 	"github.com/aquasecurity/trivy/pkg/detector/ospkg/minimos"
+ 	"github.com/aquasecurity/trivy/pkg/detector/ospkg/oracle"
+ 	"github.com/aquasecurity/trivy/pkg/detector/ospkg/photon"
+@@ -62,6 +63,7 @@ var (
+ 		ftypes.Wolfi:              wolfi.NewScanner(),
+ 		ftypes.Chainguard:         chainguard.NewScanner(),
+ 		ftypes.Echo:               echo.NewScanner(),
++		ftypes.Hummingbird:        hummingbird.NewScanner(),
+ 		ftypes.MinimOS:            minimos.NewScanner(),
+ 		ftypes.CoreOS:             coreos.NewScanner(),
+ 	}
+diff --git a/pkg/detector/ospkg/hummingbird/hummingbird.go b/pkg/detector/ospkg/hummingbird/hummingbird.go
+new file mode 100644
+index 000000000000..4dbf7c42fb77
+--- /dev/null
++++ b/pkg/detector/ospkg/hummingbird/hummingbird.go
+@@ -0,0 +1,126 @@
++package hummingbird
++
++import (
++	"context"
++	"fmt"
++	"slices"
++	"sort"
++
++	version "github.com/knqyf263/go-rpm-version"
++	"golang.org/x/xerrors"
++
++	dbTypes "github.com/aquasecurity/trivy-db/pkg/types"
++	redhat "github.com/aquasecurity/trivy-db/pkg/vulnsrc/redhat-oval"
++	"github.com/aquasecurity/trivy-db/pkg/vulnsrc/vulnerability"
++	ftypes "github.com/aquasecurity/trivy/pkg/fanal/types"
++	"github.com/aquasecurity/trivy/pkg/log"
++	"github.com/aquasecurity/trivy/pkg/scan/utils"
++	"github.com/aquasecurity/trivy/pkg/types"
++)
++
++var defaultContentSets = []string{
++	"public-hummingbird-x86_64-rpms",
++	"public-hummingbird-aarch64-rpms",
++	"public-hummingbird-source-rpms",
++}
++
++type Scanner struct {
++	vs redhat.VulnSrc
++}
++
++func NewScanner() *Scanner {
++	return &Scanner{
++		vs: redhat.NewVulnSrc(),
++	}
++}
++
++func (s *Scanner) Detect(ctx context.Context, osVer string, _ *ftypes.Repository, pkgs []ftypes.Package) ([]types.DetectedVulnerability, error) {
++	log.InfoContext(ctx, "Detecting Hummingbird vulnerabilities...",
++		log.String("os_version", osVer), log.Int("pkg_num", len(pkgs)))
++
++	var vulns []types.DetectedVulnerability
++	for _, pkg := range pkgs {
++		detectedVulns, err := s.detect(pkg)
++		if err != nil {
++			return nil, xerrors.Errorf("hummingbird vulnerability detection error: %w", err)
++		}
++		vulns = append(vulns, detectedVulns...)
++	}
++	return vulns, nil
++}
++
++func (s *Scanner) detect(pkg ftypes.Package) ([]types.DetectedVulnerability, error) {
++	var contentSets []string
++	var nvr string
++	if pkg.BuildInfo == nil {
++		contentSets = defaultContentSets
++	} else {
++		contentSets = pkg.BuildInfo.ContentSets
++		nvr = fmt.Sprintf("%s-%s", pkg.BuildInfo.Nvr, pkg.BuildInfo.Arch)
++	}
++
++	advisories, err := s.vs.Get(pkg.Name, contentSets, []string{nvr})
++	if err != nil {
++		return nil, xerrors.Errorf("failed to get Hummingbird advisories: %w", err)
++	}
++
++	// Fall back to source RPM name if no advisories found by binary name.
++	// The VEX feed may reference source RPM names instead of binary RPM names.
++	if len(advisories) == 0 && pkg.SrcName != "" && pkg.SrcName != pkg.Name {
++		advisories, err = s.vs.Get(pkg.SrcName, contentSets, []string{nvr})
++		if err != nil {
++			return nil, xerrors.Errorf("failed to get Hummingbird advisories by source name: %w", err)
++		}
++	}
++
++	uniqAdvisories := make(map[string]dbTypes.Advisory)
++	for _, adv := range advisories {
++		if len(adv.Arches) != 0 && pkg.Arch != "noarch" {
++			if !slices.Contains(adv.Arches, pkg.Arch) {
++				continue
++			}
++		}
++
++		if a, ok := uniqAdvisories[adv.VulnerabilityID]; ok {
++			if version.NewVersion(a.FixedVersion).LessThan(version.NewVersion(adv.FixedVersion)) {
++				uniqAdvisories[adv.VulnerabilityID] = adv
++			}
++		} else {
++			uniqAdvisories[adv.VulnerabilityID] = adv
++		}
++	}
++
++	var vulns []types.DetectedVulnerability
++	for _, adv := range uniqAdvisories {
++		vuln := types.DetectedVulnerability{
++			VulnerabilityID:  adv.VulnerabilityID,
++			VendorIDs:        adv.VendorIDs,
++			PkgID:            pkg.ID,
++			PkgName:          pkg.Name,
++			InstalledVersion: utils.FormatVersion(pkg),
++			FixedVersion:     version.NewVersion(adv.FixedVersion).String(),
++			PkgIdentifier:    pkg.Identifier,
++			Status:           adv.Status,
++			Layer:            pkg.Layer,
++			SeveritySource:   vulnerability.RedHat,
++			Vulnerability: dbTypes.Vulnerability{
++				Severity: adv.Severity.String(),
++			},
++			Custom: adv.Custom,
++		}
++
++		if adv.FixedVersion == "" || version.NewVersion(vuln.InstalledVersion).LessThan(version.NewVersion(adv.FixedVersion)) {
++			vulns = append(vulns, vuln)
++		}
++	}
++
++	sort.Slice(vulns, func(i, j int) bool {
++		return vulns[i].VulnerabilityID < vulns[j].VulnerabilityID
++	})
++	return vulns, nil
++}
++
++// Hummingbird uses date-based versioning and has no EOL dates.
++func (s *Scanner) IsSupportedVersion(_ context.Context, _ ftypes.OSType, _ string) bool {
++	return true
++}
+diff --git a/pkg/fanal/analyzer/os/release/release.go b/pkg/fanal/analyzer/os/release/release.go
+index 30c572c88fbc..2abfd1341e0a 100644
+--- a/pkg/fanal/analyzer/os/release/release.go
++++ b/pkg/fanal/analyzer/os/release/release.go
+@@ -110,6 +110,8 @@ func idToOSFamily(id string) types.OSType {
+ 		return types.CBLMariner
+ 	case "echo":
+ 		return types.Echo
++	case "hummingbird":
++		return types.Hummingbird
+ 	case "minimos":
+ 		return types.MinimOS
+ 	case "coreos":
+diff --git a/pkg/fanal/analyzer/pkg/rpm/rpm.go b/pkg/fanal/analyzer/pkg/rpm/rpm.go
+index e6fa93ebe957..4f513c4a8ef6 100644
+--- a/pkg/fanal/analyzer/pkg/rpm/rpm.go
++++ b/pkg/fanal/analyzer/pkg/rpm/rpm.go
+@@ -53,6 +53,7 @@ var osVendors = []string{
+ 	"Amazon.com",            // Amazon Linux 2
+ 	"CentOS",                // CentOS
+ 	"Fedora Project",        // Fedora
++	"Hummingbird",           // Hummingbird OS
+ 	"Oracle America",        // Oracle Linux
+ 	"Red Hat",               // Red Hat
+ 	"AlmaLinux",             // AlmaLinux
+@@ -257,7 +258,14 @@ func packageProvidedByVendor(pkg *rpmdb.PackageInfo) bool {
+ 	if pkg.Vendor == "" {
+ 		// Official Amazon packages may not contain `Vendor` field:
+ 		// https://github.com/aquasecurity/trivy/issues/5887
+-		return strings.Contains(pkg.Release, "amzn")
++		if strings.Contains(pkg.Release, "amzn") {
++			return true
++		}
++		// Hummingbird packages may not contain the `Vendor` field
++		if strings.Contains(pkg.Release, ".hum") {
++			return true
++		}
++		return false
+ 	}
+ 
+ 	for _, vendor := range osVendors {
+diff --git a/pkg/fanal/types/const.go b/pkg/fanal/types/const.go
+index 7c6cc93b4209..28832e30e8b3 100644
+--- a/pkg/fanal/types/const.go
++++ b/pkg/fanal/types/const.go
+@@ -35,6 +35,7 @@ const (
+ 	Debian             OSType = "debian"
+ 	Echo               OSType = "echo"
+ 	Fedora             OSType = "fedora"
++	Hummingbird        OSType = "hummingbird"
+ 	MinimOS            OSType = "minimos"
+ 	OpenSUSE           OSType = "opensuse"
+ 	OpenSUSELeap       OSType = "opensuse-leap"
+@@ -151,6 +152,7 @@ var (
+ 		Debian,
+ 		Echo,
+ 		Fedora,
++		Hummingbird,
+ 		MinimOS,
+ 		OpenSUSE,
+ 		OpenSUSELeap,
+diff --git a/pkg/purl/purl.go b/pkg/purl/purl.go
+index 03e0e9d075d1..5df8bae1847f 100644
+--- a/pkg/purl/purl.go
++++ b/pkg/purl/purl.go
+@@ -486,7 +486,7 @@ func purlType(t ftypes.TargetType) string {
+ 	case ftypes.Debian, ftypes.Ubuntu, ftypes.Echo:
+ 		return packageurl.TypeDebian
+ 	case ftypes.RedHat, ftypes.CentOS, ftypes.Rocky, ftypes.Alma,
+-		ftypes.Amazon, ftypes.Fedora, ftypes.Oracle, ftypes.OpenSUSE,
++		ftypes.Amazon, ftypes.Fedora, ftypes.Hummingbird, ftypes.Oracle, ftypes.OpenSUSE,
+ 		ftypes.OpenSUSELeap, ftypes.OpenSUSETumbleweed, ftypes.SLES, ftypes.SLEMicro, ftypes.Photon,
+ 		ftypes.Azure, ftypes.CBLMariner, ftypes.CoreOS:
+ 		return packageurl.TypeRPM
+-- 
+2.53.0
+

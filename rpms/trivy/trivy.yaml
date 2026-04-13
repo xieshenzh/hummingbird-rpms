@@ -1,0 +1,3 @@
+db:
+  repository:
+    - quay.io/hummingbird-ci/trivy-db
