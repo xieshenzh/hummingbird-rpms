@@ -5,6 +5,7 @@ set -e
 DEFAULT_RPM_REPOSITORIES="source,x86_64,s390x,ppc64le,aarch64"
 DEFAULT_FILE_REPOSITORIES="metadata,rpm-catalog"
 DEFAULT_TYPE="rpm"
+DEFAULT_FILE_RETAIN_REPO_VERSIONS="1"
 
 usage() {
   cat <<EOF
@@ -22,12 +23,17 @@ Optional:
   --type <type>        Repository type (e.g., rpm, file)
                        Default: ${DEFAULT_TYPE}
   --config <path>      Path to pulp CLI config file (e.g., cli.toml)
+  --retain-repo-versions <n>
+                       For --type file only: set retain_repo_versions to <n> on each
+                       file repository when the current value differs (non-negative integer).
+                       Default for file: ${DEFAULT_FILE_RETAIN_REPO_VERSIONS} if omitted.
   --help               Show this help message
 
 Examples:
   $(basename "$0") --domain my-domain
   $(basename "$0") --domain my-domain --repos "repo1,repo2"
   $(basename "$0") --domain my-domain --type file
+  $(basename "$0") --domain my-domain --type file --retain-repo-versions 1
   $(basename "$0") --domain my-domain --config /path/to/config.toml
 EOF
   exit "${1:-0}"
@@ -37,6 +43,7 @@ PULP_DOMAIN=""
 PULP_REPOSITORIES_STRING=""
 PULP_TYPE=""
 PULP_CONFIG_FILE=""
+PULP_FILE_RETAIN_REPO_VERSIONS=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -72,6 +79,14 @@ while [[ $# -gt 0 ]]; do
       PULP_CONFIG_FILE="$2"
       shift 2
       ;;
+    --retain-repo-versions)
+      if [[ -z "$2" || "$2" == --* ]]; then
+        echo "🔴 error: --retain-repo-versions requires a value"
+        usage 1
+      fi
+      PULP_FILE_RETAIN_REPO_VERSIONS="$2"
+      shift 2
+      ;;
     --help)
       usage 0
       ;;
@@ -87,11 +102,28 @@ if [[ -z "${PULP_DOMAIN}" ]]; then
   usage 1
 fi
 
+if [[ -n "${PULP_FILE_RETAIN_REPO_VERSIONS}" ]]; then
+  if ! [[ "${PULP_FILE_RETAIN_REPO_VERSIONS}" =~ ^[0-9]+$ ]]; then
+    echo "🔴 error: --retain-repo-versions must be a non-negative integer"
+    exit 1
+  fi
+fi
+
 if [[ -z "${PULP_TYPE}" ]]; then
   PULP_TYPE="${DEFAULT_TYPE}"
   echo "ℹ️ Using default repository type: ${PULP_TYPE}"
 else
   echo "ℹ️ Using provided repository type: ${PULP_TYPE}"
+fi
+
+if [[ -n "${PULP_FILE_RETAIN_REPO_VERSIONS}" && "${PULP_TYPE}" != "file" ]]; then
+  echo "🔴 error: --retain-repo-versions is only valid with --type file"
+  exit 1
+fi
+
+if [[ "${PULP_TYPE}" == "file" && -z "${PULP_FILE_RETAIN_REPO_VERSIONS}" ]]; then
+  PULP_FILE_RETAIN_REPO_VERSIONS="${DEFAULT_FILE_RETAIN_REPO_VERSIONS}"
+  echo "ℹ️ Using default retain_repo_versions for file repositories: ${PULP_FILE_RETAIN_REPO_VERSIONS}"
 fi
 
 if [[ -z "${PULP_REPOSITORIES_STRING}" ]]; then
@@ -151,6 +183,31 @@ for PULP_REPOSITORY in "${PULP_REPOSITORIES[@]}"; do
       pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository create --name "${PULP_REPOSITORY}"
       if [[ "${PULP_TYPE}" == "rpm" ]]; then
         pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update --name "${PULP_REPOSITORY}" --autopublish
+      fi
+    fi
+    if [[ "${PULP_TYPE}" == "file" && -n "${PULP_FILE_RETAIN_REPO_VERSIONS}" ]]; then
+      repo_json=$(pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository show \
+        --name "${PULP_REPOSITORY}" --format json) || {
+        echo "🔴 error: failed to read repository '${PULP_REPOSITORY}'"
+        exit 1
+      }
+      need_update=$(echo "${repo_json}" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+cur = data.get('retain_repo_versions')
+want = int(sys.argv[1])
+if cur is None:
+    sys.stdout.write('yes')
+else:
+    sys.stdout.write('yes' if int(cur) != want else 'no')
+" "${PULP_FILE_RETAIN_REPO_VERSIONS}")
+      if [[ "${need_update}" == "yes" ]]; then
+        echo "📝 Setting retain_repo_versions to ${PULP_FILE_RETAIN_REPO_VERSIONS} for '${PULP_REPOSITORY}'..."
+        pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update \
+          --name "${PULP_REPOSITORY}" \
+          --retain-repo-versions "${PULP_FILE_RETAIN_REPO_VERSIONS}"
+      else
+        echo "ℹ️ Repository '${PULP_REPOSITORY}' retain_repo_versions already ${PULP_FILE_RETAIN_REPO_VERSIONS}, skipping update."
       fi
     fi
     # Ensure distribution exists (recreate if it was deleted)
