@@ -8,7 +8,7 @@
 
 Name:           caddy
 Version:        2.10.2
-Release:        5.2%{?dist}
+Release:        5.3%{?dist}
 Summary:        Web server with automatic HTTPS
 URL:            https://caddyserver.com
 
@@ -40,7 +40,7 @@ ExclusiveArch:  %{golang_arches_future}
 %endif
 
 BuildRequires:  systemd-rpm-macros
-%{?systemd_requires}
+%{?systemd_ordering}
 %{?sysusers_requires_compat}
 
 Requires:       system-logos-httpd
