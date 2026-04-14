@@ -356,6 +356,8 @@ spec:
           contentType: rpm
         - name: keyutils-main
           contentType: rpm
+        - name: kmod-main
+          contentType: rpm
         - name: krb5-main
           contentType: rpm
         - name: kubernetes1-35-main
