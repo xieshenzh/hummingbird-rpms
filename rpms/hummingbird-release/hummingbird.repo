@@ -2,7 +2,7 @@
 name=Hummingbird - $basearch
 baseurl=https://koji-s3-cache.hummingbird-project.io/packages.redhat.com/api/pulp-content/public-hummingbird/$arch/
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-hummingbird-release
-gpgcheck=0
+gpgcheck=1
 enabled=1
 sslverify=1
 priority=10
@@ -11,7 +11,7 @@ priority=10
 name=Hummingbird - Source
 baseurl=https://koji-s3-cache.hummingbird-project.io/packages.redhat.com/api/pulp-content/public-hummingbird/source/
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-hummingbird-release
-gpgcheck=0
+gpgcheck=1
 enabled=0
 sslverify=1
 priority=10

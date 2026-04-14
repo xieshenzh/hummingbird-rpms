@@ -8245,7 +8245,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[push]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/hummingbird-release/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/hummingbird-release/***, test/rpms/hummingbird-release.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main

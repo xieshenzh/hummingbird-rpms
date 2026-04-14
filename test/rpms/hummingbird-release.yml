@@ -1,0 +1,110 @@
+---
+# Tests for hummingbird-release package
+# Verifies GPG signature verification is enabled and working
+
+gpg-signature-verification:
+  summary: Install hummingbird-release and verify GPG-signed package installation works
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "hummingbird-repos" ]]; then
+      echo "Skipping: This test only runs on hummingbird-repos (got: ${rpm_name})"
+      exit 0
+    fi
+
+    # Setup: create local repo with our RPMs
+    build_dir=$(mktemp -d)
+    trap 'rm -rf "${build_dir}"' EXIT
+    mkdir -p "${build_dir}/local-repo"
+
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm --user 0 \
+      -v "${CI_REPOS_DIR}:/tmp/repos:ro,z" \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      "${TEST_IMAGE}" \
+      bash -c '
+        set -e
+
+        # Setup repos - use local repo (gpgcheck=0) only for installing
+        # our own hummingbird-release packages
+        cp /tmp/repos/fedora-43.repo /etc/yum.repos.d/
+        printf "%s\n" \
+          "[local-repo]" \
+          "name=Local Repository" \
+          "baseurl=file:///tmp/local-repo" \
+          "enabled=1" \
+          "gpgcheck=0" \
+          "priority=1" \
+          > /etc/yum.repos.d/local.repo
+
+        DNF_FLAGS="-y --nodocs --setopt=install_weak_deps=False"
+
+        # Remove any pre-existing hummingbird packages and GPG keys from
+        # the container image so we test a clean install of our packages
+        dnf ${DNF_FLAGS} remove hummingbird-release hummingbird-repos hummingbird-gpg-keys 2>/dev/null || true
+        rm -f /etc/pki/rpm-gpg/RPM-GPG-KEY-*
+        rm -f /etc/yum.repos.d/hummingbird.repo
+        for key in $(rpm -qa gpg-pubkey*); do
+          rpm -e "${key}"
+        done
+
+        # Install our hummingbird-release packages from local repo
+        # This provides the repo config with gpgcheck=1 and the GPG keys
+        dnf ${DNF_FLAGS} install \
+          hummingbird-release \
+          hummingbird-repos \
+          hummingbird-gpg-keys
+
+        # Verify gpgcheck=1 is active in the installed repo config
+        installed_repo="/etc/yum.repos.d/hummingbird.repo"
+        if ! grep -q "^gpgcheck=1" "${installed_repo}"; then
+          echo "FAIL: gpgcheck=1 not found in installed ${installed_repo}"
+          cat "${installed_repo}"
+          exit 1
+        fi
+        echo "Verified: gpgcheck=1 is set in installed hummingbird.repo"
+
+        # Verify GPG key was installed
+        gpg_key="/etc/pki/rpm-gpg/RPM-GPG-KEY-hummingbird-release"
+        if [[ ! -f ${gpg_key} ]]; then
+          echo "FAIL: GPG key not found at ${gpg_key}"
+          exit 1
+        fi
+        echo "Verified: GPG key installed at ${gpg_key}"
+
+        # Import the GPG key into the RPM database
+        rpmkeys --import "${gpg_key}"
+
+        # Disable the local repo so dnf only uses the hummingbird repo
+        # (which now has gpgcheck=1)
+        dnf config-manager --set-disabled local-repo 2>/dev/null || \
+          sed -i "s/enabled=1/enabled=0/" /etc/yum.repos.d/local.repo
+
+        # Install procps-ng from the hummingbird repo with GPG verification.
+        # With gpgcheck=1, dnf will verify the RPM signature during the install
+        # transaction and refuse to install if the signature is invalid or missing.
+        echo ""
+        echo "=== Installing procps-ng with GPG signature verification ==="
+        dnf ${DNF_FLAGS} install procps-ng
+
+        # Verify procps-ng was installed from the hummingbird repo, confirming
+        # that dnf successfully verified the signature during the install
+        install_repo=$(dnf info --installed procps-ng 2>/dev/null | \
+          grep "^From repo" | cut -d: -f2 | tr -d " ")
+        echo "procps-ng installed from repo: ${install_repo}"
+        if [[ "${install_repo}" != "hummingbird" ]]; then
+          echo "FAIL: procps-ng was not installed from the hummingbird repo (got: ${install_repo})"
+          exit 1
+        fi
+
+        echo ""
+        echo "SUCCESS: procps-ng installed from hummingbird repo with gpgcheck=1"
+      '
