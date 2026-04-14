@@ -1,0 +1,29 @@
+component: libkcapi
+contact: Ondrej Mosnacek <omosnacek@gmail.com>
+
+/upstream:
+    require: [libkcapi-tests]
+    tier: 1
+
+    /basic:
+        summary: Basic functionality
+        test: /usr/libexec/libkcapi/test.sh
+    /encrypt:
+        summary: Encryption/decryption
+        test: /usr/libexec/libkcapi/kcapi-enc-test.sh
+    /encrypt-large:
+        summary: Encryption/decryption of large data
+        test: /usr/libexec/libkcapi/kcapi-enc-test-large.sh
+    /digest:
+        summary: Message digest
+        test: /usr/libexec/libkcapi/kcapi-dgst-test.sh
+    /digest-convenience:
+        summary: Message digest convenience functions
+        test: /usr/libexec/libkcapi/kcapi-convenience.sh
+    /hasher:
+        summary: Checksum helpers
+        test: /usr/libexec/libkcapi/hasher-test.sh
+    /fuzz-test:
+        summary: Fuzz test
+        test: /usr/libexec/libkcapi/kcapi-fuzz-test.sh
+        duration: 2h

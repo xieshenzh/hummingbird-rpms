@@ -1,0 +1,247 @@
+* Sat Aug 13 2022 Ondrej Mosnáček <omosnace@redhat.com> - 1.4.0-2
+- Switch to rpmautospec
+
+* Sat Aug 13 2022 Ondrej Mosnáček <omosnace@redhat.com> - 1.4.0-1
+- Update to upstream version 1.4.0
+- Re-enable cppcheck scanning on Fedora
+- Resolves: rhbz#2056732
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jul 14 2021 Simo Sorce <simo@redhat.com> - 1.3.1-2
+- Remove LTO build suppression by using better symver machinery
+
+* Wed Jul 14 2021 Simo Sorce <simo@redhat.com> - 1.3.1-1
+- Update to upstream version 1.3.1 which fixes ABI issues
+
+* Mon Jul 12 2021 Simo Sorce <simo@redhat.com> - 1.3.0-1
+- Update to upstream version 1.3.0
+
+* Mon Mar 15 2021 Sahana Prasad <sahana@redhat.com> - 1.2.1-1
+- Update to upstream version 1.2.1
+- Remove patch fix MSG_MORE uasge as it is added upstream
+- Remove cppcheck dependency for rhel bz#1931518
+- Add a patch to fix fuzz tests
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Aug 14 2020 Ondrej Mosnáček <omosnace@redhat.com> - 1.2.0-3
+- Require perl-interpreter instead of full perl
+- Backport fix for 5.9 kernels
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon May 25 2020 Sahana Prasad <omosnace@redhat.com> - 1.2.0-1
+- Update to upstream version 1.2.0 tracked by BZ 1839592.
+- Enable kcapi-enc tests as libkcapi BZ 1826022 is fixed.
+- Remove 110-fipshmac-compat.patch as the changes are merged upstream.
+- Remove 100-workaround-cppcheck-bug.patch as the changes are merged upstream.
+
+* Tue May 05 2020 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.5-5
+- Fix the CI test failures
+- Enable building on old kernels
+- Avoid conflicts between different versions of packages
+
+* Thu Apr 23 2020 Tomáš Mráz <tmraz@redhat.com> - 1.1.5-4
+- Add . prefix to files created by fipshmac if -d option is not specified
+
+* Wed Apr 22 2020 Sahana Prasad <sahana@redhat.com> - 1.1.5-3
+- Disables kcapi-enc tests until the kernel bug bz 1826022 is fixed.
+- Produce also the fipscheck replacement package
+
+* Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Tue Aug 13 2019 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.5-1
+- Update to upstream version 1.1.5
+
+* Sat Jul 27 2019 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.4-6
+- Backport patch to fix test failure on aarch64
+- Remove no longer needed ppc64 workaround
+
+* Sat Jul 27 2019 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.4-5
+- Backport patch to fix tests
+
+* Thu Jul 25 2019 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.4-4
+- Work around cppcheck issue
+- Enable gating
+
+* Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Mon May 27 2019 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.4-2
+- Fix FTBFS: hardlink is now in bindir
+
+* Sat Feb 02 2019 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.4-1
+- Update to upstream version 1.1.4
+
+* Fri Feb 01 2019 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.3-3
+- Fix build with new GCC
+
+* Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Thu Aug 23 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.3-1
+- Update to upstream version 1.1.3
+
+* Thu Aug 09 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-16
+- Add missing dependencies to the tests package
+- Update patch from upstream
+
+* Thu Aug 09 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-15
+- Build and tests require perl
+
+* Thu Aug 09 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-14
+- Add missing script to the 'tests' package
+
+* Wed Aug 08 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-13
+- Add missing requires to the 'tests' subpackage
+
+* Tue Aug 07 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-12
+- Produce a subpackage with test scripts
+- Build the 'tests' subpackage conditionally
+
+* Wed Aug 01 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-11
+- Add patch to fix unwanted closing of FD 0
+
+* Tue Jul 31 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-10
+- Remove the kernel headers workaround
+
+* Fri Jul 27 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 1.1.1-9
+- Rebuild for new binutils
+
+* Fri Jul 27 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-8
+- Add more Coverity fixes from upstream
+- Add patch to fix AEAD fuzz test for BE arches
+- Fixup specfile
+
+* Mon Jul 23 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-7
+- Add various fixes from upstream
+- Drop the Requires on kernel package
+
+* Mon Jul 16 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-6
+- Put .hmac files into a separate directory
+
+* Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Thu Jul 12 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-4
+- Add patch to work around FTBFS on rawhide
+
+* Wed Jul 11 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-3
+- Fix off-by-one error in checkfile parsing
+
+* Wed Jul 11 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-2
+- Fix command-line parsing in libkcapi-hmaccalc
+
+* Mon Jun 18 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.1-1
+- Update to upstream version 1.1.1
+
+* Wed May 09 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.0-5
+- Skip CLang static analysis in RHEL
+- Revert "Skip CLang static analysis in RHEL"
+- Use own sha512hmac and fipscheck
+
+* Wed May 02 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.0-4
+- Fix description lines being too long
+
+* Fri Apr 27 2018 Björn Esser <besser82@fedoraproject.org> - 1.1.0-3
+- Fix conditional for hmaccalc replacement
+
+* Mon Apr 16 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.0-2
+- Enable hmaccalc replacements in Fedora 28+
+
+* Thu Apr 12 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.1.0-1
+- Update to upstream version 1.1.0
+
+* Sat Mar 31 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-10
+- Replace single patches with a monolitic one from upstream
+- Obsolete replacements subpackage
+- Ignore failing tests on %%{power64} temporarily
+
+* Thu Mar 08 2018 Ondrej Mosnáček <omosnace@redhat.com> - 1.0.3-9
+- Split up the replacements subpackage
+
+* Mon Feb 26 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-8
+- Increase optmem_max preset to 81920
+
+* Mon Feb 26 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-7
+- Obsoletes work by package name, not by provides (rhbz#1537225)
+
+* Sun Feb 25 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-6
+- Add patch to fix a copy-paste typo
+
+* Sat Feb 17 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-5
+- Add patch to fix build with -Werror
+
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org>
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Sun Feb 04 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-3
+- Switch to %%ldconfig_scriptlets
+
+* Wed Jan 17 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-2
+- Decrease optmem_max preset to 40960
+- Let the build fail, if the minimum kernel version cannot be met
+- Conditionalize the sysctl.d tweak on version of the kernel
+- Conditionalize the name of README.distro on the distro
+
+* Tue Jan 16 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-1
+- Initial import (rhbz#1533929)
+
+* Tue Jan 16 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.13
+- Increase optmem_max preset to 81920
+
+* Tue Jan 16 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.12
+- Add sysctl.d preset and README.fedora
+
+* Mon Jan 15 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.11
+- Make the contents of the -replacements package configurable
+
+* Mon Jan 15 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.10
+- Fix Obsoletes of the -replacements package
+
+* Sun Jan 14 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.9
+- Disable the -replacements package until we have a plan for it
+
+* Sun Jan 14 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.8
+- Move the kcapi-hasher binary to -replacements package, since it is
+  not of much use without the linked invocation names and saves the
+  extra Requires on the -tools package
+
+* Sun Jan 14 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.7
+- Fix internal Requires of sub-packages
+- Hardlink files in %%{_bindir}
+
+* Sun Jan 14 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.6
+- Add patches from upstream
+
+* Sat Jan 13 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.5
+- Add patches from upstream
+
+* Sat Jan 13 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.4
+- Asume the testsuite cannot be run, if the value of optmem_max cannot
+  be obtained
+
+* Sat Jan 13 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.3
+- Move libraries to /%%{_lib} instead of %%{_libdir}, which is useful
+  during boot when the library might be needed before a potentially
+  seperate /usr partition is mounted
+
+* Sat Jan 13 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.2
+- Asume optmem_max is at least 20480, if the real value cannot be obtained
+
+* Fri Jan 12 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.3-0.1
+- New upstream release
+
+* Wed Jan 10 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.2-0.1
+- Initial rpm release (rhbz#1533929)
