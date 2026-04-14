@@ -8,7 +8,7 @@
 #
 
 
-%global gh_commit    72a8f8e653710e18d83e5dd531eb5a71fc3223e6
+%global gh_commit    82a2fbd1372a98d7915cfb092acf05207d9b4113
 %global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_branch    2.0-dev
 %global gh_owner     composer
@@ -16,7 +16,7 @@
 %global api_version  2.9.0
 %global run_version  2.2.2
 
-%global upstream_version 2.9.5
+%global upstream_version 2.9.7
 #global upstream_prever  RC1
 #global upstream_lower   rc1
 
@@ -27,7 +27,7 @@
 
 Name:           composer
 Version:        %{upstream_version}%{?upstream_prever:~%{upstream_lower}}
-Release:        1.1%{?dist}
+Release:        1%{?dist}
 Summary:        Dependency Manager for PHP
 
 # SPDX: composer and all dependencies are MIT
@@ -214,6 +214,12 @@ php -r '
 
 
 %changelog
+* Tue Apr 14 2026 Remi Collet <remi@remirepo.net> - 2.9.7-1
+- update to 2.9.7
+
+* Tue Apr 14 2026 Remi Collet <remi@remirepo.net> - 2.9.6-1
+- update to 2.9.6
+
 * Thu Jan 29 2026 Remi Collet <remi@remirepo.net> - 2.9.5-1
 - update to 2.9.5
 
