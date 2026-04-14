@@ -176,22 +176,30 @@ fi
 for PULP_REPOSITORY in "${PULP_REPOSITORIES[@]}"; do
     echo "🔄 Processing repository: ${PULP_REPOSITORY}"
 
+    repo_created=false
     if pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository show --name "${PULP_REPOSITORY}" >/dev/null 2>&1; then
       echo "ℹ️ Repository '${PULP_REPOSITORY}' already exists. Skipping creation."
     else
       echo "🆕 Repository '${PULP_REPOSITORY}' not found. Creating..."
       pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository create --name "${PULP_REPOSITORY}"
+      repo_created=true
       if [[ "${PULP_TYPE}" == "rpm" ]]; then
         pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update --name "${PULP_REPOSITORY}" --autopublish
       fi
     fi
     if [[ "${PULP_TYPE}" == "file" && -n "${PULP_FILE_RETAIN_REPO_VERSIONS}" ]]; then
-      repo_json=$(pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository show \
-        --name "${PULP_REPOSITORY}" --format json) || {
-        echo "🔴 error: failed to read repository '${PULP_REPOSITORY}'"
-        exit 1
-      }
-      need_update=$(echo "${repo_json}" | python3 -c "
+      if [[ "${repo_created}" == true ]]; then
+        echo "📝 Setting retain_repo_versions to ${PULP_FILE_RETAIN_REPO_VERSIONS} for new repository '${PULP_REPOSITORY}'..."
+        pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update \
+          --name "${PULP_REPOSITORY}" \
+          --retain-repo-versions "${PULP_FILE_RETAIN_REPO_VERSIONS}"
+      else
+        repo_json=$(pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository show \
+          --name "${PULP_REPOSITORY}" --format json) || {
+          echo "🔴 error: failed to read repository '${PULP_REPOSITORY}'"
+          exit 1
+        }
+        need_update=$(echo "${repo_json}" | python3 -c "
 import json, sys
 data = json.load(sys.stdin)
 cur = data.get('retain_repo_versions')
@@ -201,13 +209,14 @@ if cur is None:
 else:
     sys.stdout.write('yes' if int(cur) != want else 'no')
 " "${PULP_FILE_RETAIN_REPO_VERSIONS}")
-      if [[ "${need_update}" == "yes" ]]; then
-        echo "📝 Setting retain_repo_versions to ${PULP_FILE_RETAIN_REPO_VERSIONS} for '${PULP_REPOSITORY}'..."
-        pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update \
-          --name "${PULP_REPOSITORY}" \
-          --retain-repo-versions "${PULP_FILE_RETAIN_REPO_VERSIONS}"
-      else
-        echo "ℹ️ Repository '${PULP_REPOSITORY}' retain_repo_versions already ${PULP_FILE_RETAIN_REPO_VERSIONS}, skipping update."
+        if [[ "${need_update}" == "yes" ]]; then
+          echo "📝 Setting retain_repo_versions to ${PULP_FILE_RETAIN_REPO_VERSIONS} for '${PULP_REPOSITORY}'..."
+          pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update \
+            --name "${PULP_REPOSITORY}" \
+            --retain-repo-versions "${PULP_FILE_RETAIN_REPO_VERSIONS}"
+        else
+          echo "ℹ️ Repository '${PULP_REPOSITORY}' retain_repo_versions already ${PULP_FILE_RETAIN_REPO_VERSIONS}, skipping update."
+        fi
       fi
     fi
     # Ensure distribution exists (recreate if it was deleted)

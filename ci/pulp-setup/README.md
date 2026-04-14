@@ -27,7 +27,9 @@ $ ./create-pulp-resources.sh --domain <domain_name> [OPTIONS]
 | `--repos <list>` | Comma-separated repository names. Defaults: RPM `source,x86_64,s390x,ppc64le,aarch64`; file `metadata,rpm-catalog`. |
 | `--type <type>` | Repository plugin type (e.g. `rpm`, `file`). Default: `rpm`. |
 | `--config <path>` | Path to the Pulp CLI config (e.g. `cli.toml`). If omitted, the CLI default (e.g. `~/.config/pulp/cli.toml`) is used. |
-| `--retain-repo-versions <n>` | **File repositories only.** Sets Pulp `retain_repo_versions` to a non-negative integer. If `--type file` and this flag is omitted, the default is **1**. The script calls `repository update` **only when** the current value differs from `<n>` (reads the live repo with `repository show --format json`). |
+| `--retain-repo-versions <n>` | **File repositories only.** Sets Pulp `retain_repo_versions` to a non-negative integer. If `--type file` and this flag is omitted, the default is **1**. For **existing** repositories, the script calls `repository update` **only when** the current value differs from `<n>` (reads the live repo with `repository show --format json`). Newly created file repositories get `retain_repo_versions` set directly after creation. |
+
+> **Note:** If you re-run with `--type file` and omit `--retain-repo-versions`, the script applies the default **1** and will change existing file repositories whose current `retain_repo_versions` is not already `1`. Pass `--retain-repo-versions <n>` explicitly (including to match a custom value already on the server) to avoid an unintended reset.
 
 Run `./create-pulp-resources.sh --help` for the full usage text from the script.
 
