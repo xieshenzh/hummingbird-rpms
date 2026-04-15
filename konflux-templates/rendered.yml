@@ -15361,6 +15361,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- rust-podman-sequoia ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: rust-podman-sequoia-main
+spec:
+  application: rpms-main
+  componentName: rust-podman-sequoia-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/rust-podman-sequoia-main
+  source:
+    git:
+      context: rpms/rust-podman-sequoia
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: rust-podman-sequoia-main
+  name: rust-podman-sequoia-main
+spec:
+  image:
+    name: hummingbird-tenant/rust-podman-sequoia-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- rust-rav1e ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1
