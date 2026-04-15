@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "86e3f4c9529f75f392176f7f38a6507d2bb90fa8",
+  "release": "1",
+  "sha": "bb11e0db8ac16a2526f60edf2a8a3c4b7e9a0772",
   "source": "https://src.fedoraproject.org/rpms/skopeo.git",
-  "version": "1.22.1"
+  "version": "1.22.2"
 }
