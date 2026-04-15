@@ -1,3 +1,11 @@
+* Wed Apr 08 2026 Vit Mojzis <vmojzis@redhat.com> - 43.6-2
+- Advertise ownership of DPS-related file paths
+- Remove trigger{in|preun} triggers for binsbin and varrun
+- Rebuild policy before running {binsbin|varrun}-convert.sh
+- Use docdir for documentation data directory
+- Move the awk post-requires to the minimum subpackage
+- Fix disabling modules in "%post minimum"
+
 * Fri Apr 03 2026 Zdenek Pytela <zpytela@redhat.com> - 43.6-1
 - Allow accountsd dbus chat with systemd-homed
 - Allow accountsd read accountsd_share_t files
