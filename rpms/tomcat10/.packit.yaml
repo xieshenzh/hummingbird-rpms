@@ -14,7 +14,7 @@ jobs:
 - job: pull_from_upstream
   trigger: release
   dist_git_branches:
-    - fedora-branched
+    - fedora-all
 
 # https://packit.dev/docs/configuration/downstream/koji_build
 - job: koji_build

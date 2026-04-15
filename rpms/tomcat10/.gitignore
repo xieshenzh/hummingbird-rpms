@@ -1,4 +1,4 @@
-apache-tomcat-*-src.tar.gz
+apache-tomcat-*-src.tar.gz*
 results_tomcat
 tomcat*.src.rpm
 apache-tomcat-*-src/

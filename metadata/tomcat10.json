@@ -3,7 +3,7 @@
   "modification_reason": "Local changes in commit 2273cfe5",
   "modification_status": "modified",
   "release": "1",
-  "sha": "fe110db6692c2c41f9d116785d56aa0526a682f5",
+  "sha": "3b9f5a883bb250d182b8274f590bf7a5486e95af",
   "source": "https://src.fedoraproject.org/rpms/tomcat.git",
-  "version": "10.1.46"
+  "version": "10.1.54"
 }

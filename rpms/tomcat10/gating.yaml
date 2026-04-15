@@ -2,11 +2,12 @@
 product_versions:
   - fedora-rawhide
 decision_contexts:
-  - bodhi_update_push_stable
   - bodhi_update_push_testing
+  - bodhi_update_push_stable
 subject_type: koji_build
 rules:
   - !PassingTestCaseRule {test_case_name: fedora-ci.koji-build.rpmdeplint.functional}
+  - !PassingTestCaseRule { test_case_name: fedora-ci.koji-build./plans/smoke.functional }
 product_versions:
   - fedora-*
 decision_contexts:
@@ -14,7 +15,5 @@ decision_contexts:
   - bodhi_update_push_testing
 subject_type: koji_build
 rules:
-  - !PassingTestCaseRule {test_case_name: fedora-ci.koji-build.rpminspect.static-analysis}
   - !PassingTestCaseRule {test_case_name: fedora-ci.koji-build.installability.functional}
-  - !PassingTestCaseRule {test_case_name: fedora-ci.koji-build./plans/javapackages.functional}
-  - !PassingTestCaseRule {test_case_name: fedora-ci.koji-build./plans/smoke.functional}
+  - !PassingTestCaseRule {test_case_name: fedora-ci.koji-build.rpminspect.static-analysis}

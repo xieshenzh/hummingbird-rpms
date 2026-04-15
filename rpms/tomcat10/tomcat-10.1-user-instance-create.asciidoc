@@ -1,0 +1,74 @@
+= tomcat-user-instance-create(1)
+DIMITRIS SOUMIS
+:doctype:       manpage
+:man source:    TOMCAT
+:man manual:    Apache Tomcat
+
+== NAME
+tomcat-user-instance-create - Creates a standalone Tomcat instance with a separate configuration
+
+SYNOPSIS
+*tomcat-user-instance-create* [OPTIONS] DIRECTORYNAME
+
+== DESCRIPTION
+The `tomcat-user-instance-create` script creates a self-contained Tomcat instance in a specified directory.
+This instance has its own configuration, libraries, and web applications, allowing multiple independent Tomcat instances to run on the same system.
+
+The script automatically sets up the required `CATALINA_BASE` structure, including:
+- `bin/startup.sh` – Starts the Tomcat instance.
+- `bin/shutdown.sh` – Stops the Tomcat instance.
+
+By using this script, users can configure and manage multiple Tomcat instances independently of the system-wide Tomcat installation.
+
+== USAGE
+To create a new Tomcat instance, specify the target directory where the instance should be created.
+This directory **must not already exist**, as the script will create it.
+
+If no additional options are provided, the instance will be created with **default** ports and settings.
+
+== OPTIONS
+*-p <HTTPPORT>*::
+Set the TCP port for the default HTTP connector. The default is `8080`.
+
+*-c <CONTROLPORT>*::
+Set the TCP port for the Tomcat shutdown control mechanism. The default is `8005`.
+
+*-w <MAGICWORD>*::
+Set the shutdown keyword. When sent to the control port, this triggers a graceful shutdown of the instance. The default keyword is `SHUTDOWN`.
+
+*-h, --help*::
+Display usage information and exit.
+
+== EXAMPLES
+Create a Tomcat instance in `~/mytomcat` using default ports:
+
+$ tomcat-user-instance-create ~/mytomcat
+
+Create an instance with a custom HTTP and control port:
+
+$ tomcat-user-instance-create -p 9090 -c 9005 ~/mytomcat
+
+Create an instance with a custom shutdown keyword:
+
+$ tomcat-user-instance-create -w "STOPNOW" ~/mytomcat
+
+== NOTES
+- Ensure that the selected HTTP and control ports are not already in use.
+- Ports **below 1024** require root privileges.
+- The created instance is independent of the system-wide Tomcat installation.
+
+== FILES
+The script generates a directory structure similar to:
+
+----
+DIRECTORYNAME/
+|-- bin/
+|   |-- startup.sh
+|   |-- shutdown.sh
+|-- conf/
+|-- logs/
+|-- webapps/
+|-- work/
+|-- temp/
+|-- lib/
+----
