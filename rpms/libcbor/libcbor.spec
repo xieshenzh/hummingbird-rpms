@@ -1,6 +1,6 @@
 Name:		libcbor
-Version:	0.13.0
-Release:	2.1%{?dist}
+Version:	0.14.0
+Release:	1%{?dist}
 Summary:	A CBOR parsing library
 
 License:	MIT
@@ -51,7 +51,7 @@ cp doc/build/man/libcbor.3 %{buildroot}%{_mandir}/man3/
 %files
 %license LICENSE.md
 %doc README.md
-%{_libdir}/libcbor.so.0.13{,.*}
+%{_libdir}/libcbor.so.0.14{,.*}
 
 %files devel
 %{_includedir}/cbor.h
@@ -62,6 +62,10 @@ cp doc/build/man/libcbor.3 %{buildroot}%{_mandir}/man3/
 %{_mandir}/man3/libcbor.3{,.*}
 
 %changelog
+* Wed Apr 15 2026 Attila Lakatos <alakatos@redhat.com> - 0.14.0-1
+- Rebase to 0.14.0
+  Resolves: rhbz#2455835
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
@@ -173,4 +177,3 @@ Resolves: rhbz#1863978
 
 * Wed Jul 19 2017 Marek Tamaskovic <mtamasko@redhat.com> 0.5.0-1
 - Init package.
-
