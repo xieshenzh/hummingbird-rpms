@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "3",
+  "sha": "da2851ca475557e7401c04d175a375c21ca8dd44",
+  "source": "https://src.fedoraproject.org/rpms/llvm21.git",
+  "version": "21.1.8"
+}

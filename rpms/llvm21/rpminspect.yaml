@@ -1,0 +1,29 @@
+---
+inspections:
+    # We need to disable abidiff due to abidiff+testing-farm issues. Ref link:
+    # https://docs.testing-farm.io/Testing%20Farm/0.1/errors.html#TFE-1
+    abidiff: off
+
+badfuncs:
+    # For compiler-rt, we allow the following forbidden functions:
+    # - gethostbyname
+    # - gethostbyname2
+    # - gethostbyaddr
+    # - inet_aton
+    # These are never actually used, and are installed just as interceptors.
+    allowed:
+        /usr/lib*/clang/*/lib/*/libclang_rt.?san.so:
+            - gethostbyaddr
+            - gethostbyname
+            - gethostbyname2
+            - inet_aton
+        /usr/lib*/clang/*/lib/*/libclang_rt.memprof.so:
+            - gethostbyaddr
+            - gethostbyname
+            - gethostbyname2
+            - inet_aton
+
+unicode:
+    ignore:
+        # Ignore bidirectional unicode sequence documentation file
+        - llvm-project-*.src/clang-tools-extra/docs/clang-tidy/checks/misc/misleading-bidirectional.rst

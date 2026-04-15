@@ -1,0 +1,15 @@
+/*.src.rpm
+/*.src.tar.xz
+/*.src.tar.xz.sig
+/*.tar.gz
+/cmake/
+/llvm-*.src/
+/results_llvm/
+/third-party/
+/llvm-git-revision-*.txt
+/llvm-release-*.txt
+/BUILD
+/BUILDROOT
+/out
+/version.spec.inc
+/.gdbinit

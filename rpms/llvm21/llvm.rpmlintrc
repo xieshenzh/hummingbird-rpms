@@ -1,0 +1,49 @@
+## LLVM #############################################################
+
+# This library has no dependencies.
+addFilter("llvm-libs.x86_64: E: shared-lib-without-dependency-information /usr/lib64/libRemarks.so.[0-9]+")
+addFilter("llvm-googletest.x86_64: W: devel-file-in-non-devel-package")
+
+# same for llvm-test utilities
+addFilter("llvm-test.x86_64: W: no-manual-page-for-binary")
+
+# Don't warn about libs in llvm-libs
+addFilter("llvm-libs.x86_64: W: devel-file-in-non-devel-package /usr/lib64/lib")
+# These is ok in the llvm gold plugin
+addFilter("llvm-libs.x86_64: W: shared-lib-calls-exit /usr/lib64/LLVMgold.so")
+addFilter("llvm-libs.x86_64: W: no-soname /usr/lib64/LLVMgold.so")
+
+# These are without documentation
+addFilter("llvm-googletest.x86_64: W: no-documentation")
+addFilter("llvm-libs.x86_64: W: no-documentation")
+addFilter("llvm-static.x86_64: W: no-documentation")
+addFilter("llvm-test.x86_64: W: no-documentation")
+
+## COMPILER-RT ######################################################
+
+# This is a devel package
+addFilter("W: devel-file-in-non-devel-package")
+
+# These symlinks are dangling on x64_64
+addFilter("compiler-rt.x86_64: W: dangling-relative-symlink /usr/lib64/clang/[0-9]+.[0-9]+.[0-9]+/")
+
+addFilter("E: hardcoded-library-path in ../../lib/clang/")
+
+
+## LIBOMP ###########################################################
+
+
+
+## CLANG ############################################################
+
+clang needs libstdc++-devel installed in order to compile c++ programs.
+
+addFilter("E: devel-dependency libstdc\+\+-devel")
+
+addFilter("E: explicit-lib-dependency libstdc\+\+-devel")
+
+# clang installs libear to /usr/lib on all arches, so we have to use
+
+# a hard-coded /usr/lib path in order to move it to the python3 sitelib.
+
+addFilter("E: hardcoded-library-path in %{_prefix}/lib/{libear")

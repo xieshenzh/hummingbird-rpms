@@ -1,0 +1,32 @@
+summary: llvm21 tests for build/PR gating
+context:
+  compat: llvm21
+adjust:
+  - because: "Plan to be ran when either executed locally, or executed by CI system to gate a build or PR."
+    when: >-
+      trigger is defined
+      and trigger != commit
+      and trigger != build
+    enabled: false
+
+discover:
+  - name: llvm-tests
+    how: fmf
+    url: https://src.fedoraproject.org/tests/llvm.git
+    ref: main
+    filter: "tag:-spoils-installation & tag:-not-in-default"
+    adjust-tests:
+      - test~: ";^(./test.sh);PATH=/usr/lib64/llvm21/bin:$PATH \\1;"
+      - require~:
+        - '|^(llvm)|\g<1>21|'
+        - '|^(clang)|\g<1>21|'
+        - '|^(lld(?!b))|\g<1>21|'
+        - '|^(compiler-rt)|\g<1>21|'
+        - '|^(libomp)|\g<1>21|'
+        - '|^(python-lit)|\g<1>21|'
+        - '|^(lldb)|\g<1>21|'
+execute:
+    how: tmt
+provision:
+  hardware:
+    memory: ">= 4 GiB"
