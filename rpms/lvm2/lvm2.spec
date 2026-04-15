@@ -21,7 +21,8 @@
 %global persistent_data_version 0.7.0-0.1.rc6
 %global sanlock_version 5.0.0-1
 
-%global enable_lockd_sanlock %{enable_lvmlockd}
+# Disable sanlock - sanlock-devel >= 5.0.0 only available in rawhide
+%global enable_lockd_sanlock 0
 %if 0%{?rhel} >= 10
 %global enable_lockd_dlm 0
 %else
