@@ -60,8 +60,8 @@
 
 Name:              nginx
 Epoch:             2
-Version:           1.28.3
-Release:           1.1%{?dist}
+Version:           1.30.0
+Release:           1%{?dist}
 
 Summary:           A high performance web server and reverse proxy server
 License:           BSD-2-Clause
@@ -105,9 +105,6 @@ Patch3:            0004-Disable-ENGINE-support.patch
 
 # downstream patch - Compile perl module with O2
 Patch4:            0005-Compile-perl-module-with-O2.patch
-
-# upstream patch - https://github.com/nginx/nginx/pull/1089
-Patch5:            0006-Clarify-binding-behavior-of-t-option.patch
 
 BuildRequires:     make
 BuildRequires:     gcc
