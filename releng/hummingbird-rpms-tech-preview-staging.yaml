@@ -154,6 +154,8 @@ spec:
           contentType: rpm
         - name: cmake-main
           contentType: rpm
+        - name: composefs-main
+          contentType: rpm
         - name: composer-main
           contentType: rpm
         - name: container-selinux-main
