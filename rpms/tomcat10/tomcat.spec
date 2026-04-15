@@ -76,7 +76,6 @@ BuildRequires: javapackages-local-openjdk25
 BuildRequires: aqute-bnd
 BuildRequires: tomcat-jakartaee-migration
 BuildRequires: systemd
-BuildRequires: rubygem-asciidoctor
 
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
 Requires: systemd
@@ -274,8 +273,6 @@ touch HACK
 %{__install} -D -p %{SOURCE8} ${RPM_BUILD_ROOT}%{_bindir}/tomcat-user-instance-create
 %{__install} -D -p %{SOURCE9} ${RPM_BUILD_ROOT}%{userinstancedir}/bin/setenv.sh
 
-asciidoctor -b manpage -D ${RPM_BUILD_ROOT}%{_mandir}/man1 -o tomcat-user-instance-create.1 %{SOURCE10}
-
 for jar in output/build/lib/*.jar; do
     # Skip Jar if empty
     jar tf ${jar} | grep -E -q '.*\.class' || continue
@@ -396,7 +393,6 @@ ln -sr %{libdir} ${RPM_BUILD_ROOT}%{homedir}/lib
 %license LICENSE
 %{userinstancedir}
 %{_bindir}/tomcat-user-instance-create
-%{_mandir}/man1/tomcat-user-instance-create.1*
 
 %files common -f .mfiles-tomcat-common
 %license LICENSE
