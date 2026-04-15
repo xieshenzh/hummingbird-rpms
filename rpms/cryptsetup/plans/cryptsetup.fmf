@@ -1,0 +1,45 @@
+summary: cryptsetup upstream test suite
+environment-file:
+  - plans/env.yaml
+
+prepare:
+  - how: feature
+    epel: enabled
+  - how: install
+    package:
+      - cryptsetup
+      - cryptsetup-devel
+      - cryptsetup-ssh-token
+      - integritysetup
+      - veritysetup
+      - gcc
+      - make
+      - kernel-headers
+      - device-mapper-devel
+      - expect
+      - keyutils
+      - jq
+      - sharutils
+      - glibc
+      - vim-common
+      - sharutils
+      - openssh
+      - openssl
+      - nmap-ncat
+      - sshpass
+      - shadow-utils
+
+discover:
+    how: shell
+    dist-git-source: true
+    tests:
+      - name: upstream-tier0
+        duration: 2h
+        test: exec plans/run-local-tests.sh
+
+execute:
+  - how: tmt
+
+provision:
+  hardware:
+    memory: ">= 3 GB"
