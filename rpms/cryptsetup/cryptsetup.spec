@@ -1,3 +1,5 @@
+%bcond_with doc
+
 Summary: Utility for setting up encrypted disks
 Name: cryptsetup
 Version: 2.8.6
@@ -9,7 +11,9 @@ BuildRequires: openssl-devel, popt-devel, device-mapper-devel
 BuildRequires: libuuid-devel, gcc, json-c-devel
 BuildRequires: libpwquality-devel, libblkid-devel
 BuildRequires: make libssh-devel
+%if %{with doc}
 BuildRequires: asciidoctor
+%endif
 Requires: cryptsetup-libs = %{version}-%{release}
 Requires: libpwquality >= 1.2.0
 Obsoletes: %{name}-reencrypt <= %{version}
@@ -64,11 +68,15 @@ disk integrity protection using dm-integrity kernel module.
 %autosetup -n cryptsetup-%{upstream_version} -p 1
 
 %build
+%if %{without doc}
+# use pre-built man pages from tarball
+%else
 # force regeneration of manual pages from AsciiDoc
 rm -f man/*.8
+%endif
 
 ./autogen.sh
-%configure --enable-fips --enable-pwquality --enable-asciidoc --enable-internal-sse-argon2
+%configure --enable-fips --enable-pwquality %{?with_doc:--enable-asciidoc}%{!?with_doc:--disable-asciidoc} --enable-internal-sse-argon2
 %make_build
 
 %install
