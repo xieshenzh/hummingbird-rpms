@@ -57,8 +57,8 @@ ownership, permissions, and symlinks work correctly with `/var/lib/mock`.
 
 ### Interactive repository debugging
 
-To investigate package/dependency/installability issues, you can run an interactive shell in the
-same environment used by the package builds:
+To investigate package/dependency/installability issues, you can run an interactive shell
+in the same environment used by the package builds:
 
 ```bash
 ./ci/build_rpms.sh --shell-before setup
@@ -273,6 +273,13 @@ configuration.
 - Avoid embedding credentials or secrets; use environment variables or CI secret stores.
 - Prefer pulling images by digest for stability and repeatability in CI.
 - Validate inputs and sanitize any paths used by scripts.
+
+## Resolving CVEs
+
+When *manually* fixing a CVE (e.g., adding a patch or performing a manual
+update), a `Fixes: CVE-YYYY-XXXX` must be added to the MR description
+and/or a commit.  This will indicate to the build system that a CVE fix has
+been submitted for review.
 
 ## Reporting issues
 
