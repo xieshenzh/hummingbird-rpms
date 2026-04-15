@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "3",
+  "sha": "92a7d10456b6c8582010270671002a421a677136",
+  "source": "https://src.fedoraproject.org/rpms/kbd.git",
+  "version": "2.9.0"
+}

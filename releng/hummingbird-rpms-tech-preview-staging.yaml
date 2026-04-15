@@ -352,6 +352,8 @@ spec:
           contentType: rpm
         - name: json-c-main
           contentType: rpm
+        - name: kbd-main
+          contentType: rpm
         - name: kernel-headers-main
           contentType: rpm
         - name: kernel-srpm-macros-main
