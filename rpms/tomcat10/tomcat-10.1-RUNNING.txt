@@ -1,0 +1,133 @@
+================================================================================
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+================================================================================
+
+            ===================================================
+            Running The Apache Tomcat 10.1 Servlet/JSP Container
+            ===================================================
+
+Apache Tomcat 10.1 requires a Java Standard Edition Runtime
+Environment (JRE) version 11 or later.
+
+=============================
+Running With JRE 11 Or Later
+=============================
+
+(1) Download and Install a Java SE Runtime Environment (JRE) or a full Java Development Kit (JDK), release version 11 or later.
+
+(2) Configure Environment Variables
+
+Tomcat is a Java application and does not use environment variables directly.
+Environment variables are used by the Tomcat startup scripts. The scripts use
+the environment variables to prepare the command that starts Tomcat.
+
+The CATALINA_HOME (required) environment variable should be set to the location of the
+root directory of the "binary" distribution of Tomcat. It defaults to /usr/share/tomcat/
+
+The CATALINA_BASE (optional) environment variable specifies location of the root
+directory of the "active configuration" of Tomcat. It defaults to /var/lib/tomcat/
+
+(3) Set JAVA_HOME (required)
+
+Variable is used to specify location of a Java Runtime
+Environment or of a Java Development Kit that is used to start Tomcat.
+
+/usr/libexec/tomcat/tomcat-locate-java.sh script is ran by default when starting the tomcat service
+and tries to set JAVA_HOME, if empty, without any user interaction.
+
+(4) Other variables (optional)
+
+See the comments at the top of /usr/share/tomcat/bin/catalina.sh script for
+the list and a description of each of them.
+
+One frequently used variable is CATALINA_OPTS. It allows specification of
+additional options for the java command that starts Tomcat.
+
+See the Java documentation for the options that affect the Java Runtime
+Environment.
+
+See the "System Properties" page in the Tomcat Configuration Reference for
+the system properties that are specific to Tomcat.
+
+A similar variable is JAVA_OPTS. It is used less frequently. It allows
+specification of options that are used both to start and to stop Tomcat as well
+as for other commands.
+
+Note: Do not use JAVA_OPTS to specify memory limits. You do not need much
+memory for a small process that is used to stop Tomcat. Those settings
+belong to CATALINA_OPTS.
+
+Another frequently used variable is CATALINA_PID. It
+specifies the location of the file where process id of the forked Tomcat
+java process will be written. This setting is optional. It will activate
+the following features:
+
+ *  better protection against duplicate start attempts and
+ *  allows forceful termination of Tomcat process when it does not react to
+    the standard shutdown command.
+
+You can assign those variables in /etc/tomcat/tomcat.conf when running Tomcat as a service.
+
+(4) Start Up Tomcat As A Service
+
+(4.1) Tomcat can be started by executing:
+
+  $systemctl start tomcat.service
+
+(4.2) After startup, the default web applications included with tomcat-webapps package will be
+      available by visiting:
+
+      http://localhost:8080/
+
+(4.3) Further information about configuring and running Tomcat can be found in
+      the documentation included in tomcat-docs-webapp package, as well as on the Tomcat website:
+
+      https://tomcat.apache.org/
+
+(5) Check Tomcat Service Status
+
+$systemctl status tomcat.service
+
+(6) Shut Down Tomcat Service
+
+$systemctl stop tomcat.service
+
+================
+Troubleshooting
+================
+
+There are only really 2 things likely to go wrong during the stand-alone
+Tomcat install:
+
+(1) The most common hiccup is when another web server (or any process for that
+    matter) has laid claim to port 8080.  This is the default HTTP port that
+    Tomcat attempts to bind to at startup.  To change this, open the file:
+
+       $CATALINA_HOME/conf/server.xml
+
+    and search for '8080'.  Change it to a port that isn't in use, and is
+    greater than 1024, as ports less than or equal to 1024 require superuser
+    access to bind under UNIX.
+
+    Restart Tomcat and you're in business.  Be sure that you replace the "8080"
+    in the URL you're using to access Tomcat.  For example, if you change the
+    port to 1977, you would request the URL http://localhost:1977/ in your
+    browser.
+
+(2) The 'localhost' machine isn't found.  This could happen if you're behind a
+    proxy.  If that's the case, make sure the proxy configuration for your
+    browser knows that you shouldn't be going through the proxy to access the
+    "localhost".

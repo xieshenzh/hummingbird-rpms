@@ -1,7 +1,9 @@
 summary: Run javapackages-specific tests
 discover:
   how: fmf
-  url: https://src.fedoraproject.org/tests/javapackages
-  ref: f42
+  url: https://gitlab.com/redhat/centos-stream/tests/javapackages.git
+  ref: main
 execute:
   how: tmt
+context:
+  jpv_flavor: generic
