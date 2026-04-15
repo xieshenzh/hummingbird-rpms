@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
-  "release": "10",
-  "sha": "ad0cabd27eff575f339f1fdce42e84ebe8262433",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "8d7d5667e3dff51a23a343028d8f27395ee03f0c",
   "source": "https://src.fedoraproject.org/rpms/autoconf.git",
-  "version": "2.72",
-  "modification_status": "clean"
+  "version": "2.73"
 }
