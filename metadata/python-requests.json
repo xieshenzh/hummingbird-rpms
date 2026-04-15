@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Pre-existing modification - requires review",
   "modification_status": "modified",
-  "release": "5",
-  "sha": "8fbcd522dae3f5150d2842b39fe2663ba82281c1",
+  "release": "1",
+  "sha": "74ce75e010567e85ed085f78df9b92367ba12fb1",
   "source": "https://src.fedoraproject.org/rpms/python-requests.git",
-  "version": "2.32.5"
+  "version": "2.33.1"
 }
