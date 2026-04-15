@@ -375,12 +375,22 @@ conflicts, they result in draft MRs with:
    confirms the merge preserved your changes correctly. Note: `dist_git.py diff` compares the
    filesystem working tree against upstream, so it works before or after staging.
 
-6. **Amend the commit:**
+6. **Amend the commit:** Record the original conflicted commit SHA, then amend:
 
    ```bash
+   # Record the original conflicted commit SHA
+   ORIGINAL_SHA=$(git rev-parse HEAD)
+
+   # Stage the resolved files and amend the commit
    git add rpms/PACKAGENAME/
-   git commit --amend --no-edit
+   git commit --amend -m "$(git log -1 --format=%B | head -n -1)
+
+   Conflicted-Update: $ORIGINAL_SHA"
    ```
+
+   This preserves the original commit message while adding a `Conflicted-Update:` trailer
+   that records which commit contained the conflict markers. This helps track the resolution
+   history and can be useful for auditing or debugging later.
 
 7. **Push the resolution:**
 
