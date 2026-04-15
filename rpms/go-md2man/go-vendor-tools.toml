@@ -1,0 +1,8 @@
+[archive]
+pre_commands = [
+    # Update go version which defaults to -mod=vendor
+    ["sed", "-i",  "s|go 1.12|go 1.14|", "go.mod"],
+]
+
+[licensing]
+detector = "askalono"
