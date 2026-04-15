@@ -6,8 +6,8 @@
 %bcond extradeps %{undefined rhel}
 
 Name:           python-requests
-Version:        2.32.5
-Release:        5.2%{?dist}
+Version:        2.33.1
+Release:        1%{?dist}
 Summary:        HTTP library, written in Python, for human beings
 
 License:        Apache-2.0
@@ -24,11 +24,6 @@ Patch:          system-certs.patch
 # Upstream PR: https://github.com/psf/requests/pull/5953
 # This change is backported also into RHEL 9.4 (via CS)
 Patch:          support_IPv6_CIDR_in_no_proxy.patch
-
-# Increase chardet upper limit to 7
-# https://github.com/psf/requests/commit/4bd79e397304d46dfccd76f36c07f66c0295ff82
-# Backported to v2.32.5
-Patch:          0001-Increase-chardet-upper-limit-to-7.patch
 
 BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-devel
