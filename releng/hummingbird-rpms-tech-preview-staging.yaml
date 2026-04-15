@@ -144,6 +144,8 @@ spec:
           contentType: rpm
         - name: cargo-rpm-macros-main
           contentType: rpm
+        - name: cargo2rpm-main
+          contentType: rpm
         - name: catatonit-main
           contentType: rpm
         - name: chkconfig-main
