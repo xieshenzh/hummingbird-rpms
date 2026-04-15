@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "23",
+  "sha": "6e8f798faf25f0c47af0ce6e4b004093d09bbcdc",
+  "source": "https://src.fedoraproject.org/rpms/php-patchwork-jsqueeze.git",
+  "version": "2.0.5"
+}

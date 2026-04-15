@@ -694,6 +694,8 @@ spec:
           contentType: rpm
         - name: php-main
           contentType: rpm
+        - name: php-patchwork-jsqueeze-main
+          contentType: rpm
         - name: php-pecl-zip-main
           contentType: rpm
         - name: pkgconf-main
