@@ -570,6 +570,8 @@ spec:
           contentType: rpm
         - name: ngtcp2-main
           contentType: rpm
+        - name: ninja-build-main
+          contentType: rpm
         - name: nodejs20-main
           contentType: rpm
         - name: nodejs22-main
