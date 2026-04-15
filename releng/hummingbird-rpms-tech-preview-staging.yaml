@@ -434,6 +434,8 @@ spec:
           contentType: rpm
         - name: libjpeg-turbo-main
           contentType: rpm
+        - name: libkcapi-main
+          contentType: rpm
         - name: libksba-main
           contentType: rpm
         - name: liblerc-main

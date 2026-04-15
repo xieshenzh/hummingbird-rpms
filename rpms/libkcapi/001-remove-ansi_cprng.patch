@@ -1,0 +1,73 @@
+From 735f55ed1289cd6eb6510f32b8b1c7b39c2e38d1 Mon Sep 17 00:00:00 2001
+From: Stephan Mueller <smueller@chronox.de>
+Date: Wed, 4 Feb 2026 07:53:16 +0100
+Subject: [PATCH] ansi_cprng: remove test as new kernels do not offer it
+
+This algorithm is typically unused anyway.
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ CHANGES.md        |  3 +++
+ configure.ac      |  2 +-
+ test/kcapi-main.c | 24 ------------------------
+ 3 files changed, 4 insertions(+), 25 deletions(-)
+
+diff --git a/CHANGES.md b/CHANGES.md
+index 53d1f28..b164433 100644
+--- a/CHANGES.md
++++ b/CHANGES.md
+@@ -1,3 +1,6 @@
++Changes 1.5.1-prerelease:
++ * remove tests of ansi_cprng
++
+ Changes 1.5.0:
+  * move all sha* applications to the libexec directory to allow them to coexist with other packages sha* applications - the caller is expected to make a symlink to them
+  * add sha3sum
+diff --git a/configure.ac b/configure.ac
+index fbae4f9..9cd2bda 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -11,7 +11,7 @@ dnl 		     enhancements, bug fixes only. Versions with
+ dnl		     a decimal point are pre-releases.
+ m4_define([__KCAPI_MAJVERSION], [1])
+ m4_define([__KCAPI_MINVERSION], [5])
+-m4_define([__KCAPI_PATCHLEVEL], [0])
++m4_define([__KCAPI_PATCHLEVEL], [1])
+ m4_define([KCAPI_VERSION], [__KCAPI_MAJVERSION.__KCAPI_MINVERSION.__KCAPI_PATCHLEVEL])
+ 
+ AC_INIT([libkcapi], [KCAPI_VERSION])
+diff --git a/test/kcapi-main.c b/test/kcapi-main.c
+index 29a7fc5..7556796 100644
+--- a/test/kcapi-main.c
++++ b/test/kcapi-main.c
+@@ -707,30 +707,6 @@ static int auxiliary_tests(void)
+ 	if (aux_test_rng("drbg_nopr_ctr_aes256", NULL, 0))
+ 		ret++;
+ 
+-	if (!is_fips_mode()) {
+-		/* X9.31 RNG must require seed */
+-		printf("X9.31 missing seeding: ");
+-		if (!aux_test_rng("ansi_cprng", NULL, 0))
+-			ret++;
+-		/* X9.31 seed too short */
+-		printf("X9.31 insufficient seeding: ");
+-		if (!aux_test_rng("ansi_cprng",
+-				  (uint8_t *)
+-				  "\x00\x01\x02\x03\x04\x05\x06\x07\x08"
+-				  "\x00\x01\x02\x03\x04\x05\x06\x07\x08", 16))
+-			ret++;
+-		/* X9.31 seed right sized short */
+-		if (aux_test_rng("ansi_cprng",
+-				 (uint8_t *)
+-				 "\x00\x01\x02\x03\x04\x05\x06\x07\x08"
+-				 "\x00\x01\x02\x03\x04\x05\x06\x07\x08"
+-				 "\x00\x01\x02\x03\x04\x05\x06\x07\x08"
+-				 "\x00\x01\x02\x03\x04\x05\x06\x07\x08", 32)) {
+-			printf("Error for ansi_cprng: kernel module ansi_cprng present?\n");
+-			ret++;
+-		}
+-	}
+-
+ 	return ret;
+ }
+ 

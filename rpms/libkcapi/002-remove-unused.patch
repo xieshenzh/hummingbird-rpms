@@ -1,0 +1,33 @@
+From d8c4c8ad67c13fb3ae011f4dfb7d64f7441ce61f Mon Sep 17 00:00:00 2001
+From: Stephan Mueller <smueller@chronox.de>
+Date: Wed, 4 Feb 2026 08:10:35 +0100
+Subject: [PATCH] remove unused function
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ test/kcapi-main.c | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/test/kcapi-main.c b/test/kcapi-main.c
+index 7556796..073a43e 100644
+--- a/test/kcapi-main.c
++++ b/test/kcapi-main.c
+@@ -637,18 +637,6 @@ static int aux_test_rng(const char *name, uint8_t *seed, uint32_t seedlen)
+ 	return 0;
+ }
+ 
+-static int is_fips_mode(void)
+-{
+-	char c;
+-	FILE *f = fopen("/proc/sys/crypto/fips_enabled", "r");
+-	if (!f)
+-		return 0;
+-	if (fread(&c, 1, 1, f) < 1)
+-		c = '0';
+-	fclose(f);
+-	return c == '1';
+-}
+-
+ static int auxiliary_tests(void)
+ {
+ 	struct kcapi_handle *handle = NULL;
