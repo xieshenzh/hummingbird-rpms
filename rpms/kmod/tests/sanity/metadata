@@ -1,0 +1,12 @@
+[General]
+name=kmod gating test
+owner=Ziqian SUN <zsun@redhat.com>
+description=kmod gating test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=15m
+use_pty=false

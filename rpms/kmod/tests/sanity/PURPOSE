@@ -1,0 +1,4 @@
+Defaults to testing currently running kernel modules tools on all architectures.
+
+The test runs on any architecture, check normal kernel modules and compressed kernel modules for sanity
+

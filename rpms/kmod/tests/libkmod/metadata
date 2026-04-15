@@ -1,0 +1,14 @@
+[General]
+name=libkmod gating test
+owner=Susant Sahani <susant@redhat.com>
+description=libkmod gating test
+license=GPLv2
+confidential=no
+destructive=no
+
+[restraint]
+entry_point=./runtest.sh
+max_time=15m
+use_pty=false
+dependencies=gcc,make,libcmocka-devel,kmod-devel
+
