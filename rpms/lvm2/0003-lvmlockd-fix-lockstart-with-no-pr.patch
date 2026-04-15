@@ -1,0 +1,33 @@
+From 23d8118f62e5e65ef1e4c83a1ba4ea6848abd806 Mon Sep 17 00:00:00 2001
+From: David Teigland <teigland@redhat.com>
+Date: Mon, 30 Mar 2026 15:32:20 -0500
+Subject: [PATCH 3/4] lvmlockd: fix lockstart with no pr
+
+When PR is not used for the VG, starting the VG would fail because
+the PR key check was being run and failing.
+
+(cherry picked from commit 1858f02922c31a8d2d348ecc4283716b3a8a920f)
+---
+ lib/locking/lvmlockd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lib/locking/lvmlockd.c b/lib/locking/lvmlockd.c
+index 66ad59c50..8c488773d 100644
+--- a/lib/locking/lvmlockd.c
++++ b/lib/locking/lvmlockd.c
+@@ -1781,10 +1781,11 @@ int lockd_start_vg(struct cmd_context *cmd, struct volume_group *vg, int *exists
+ 	 * used in the in-progress start will be +1.  We want
+ 	 * to use the current generation number in the PR key.
+ 	 */
+-	if (!result && !strcmp(lock_type, "sanlock")) {
++	if (!result && !strcmp(lock_type, "sanlock") && (vg->pr & VG_PR_REQUIRE)) {
+ 		uint32_t prev_gen = (uint32_t)daemon_reply_int(reply, "prev_generation", 0);
+ 		log_debug("lockd start update pr key with prev_gen %u", prev_gen);
+ 		if (!persist_key_update(cmd, vg, prev_gen)) {
++			log_error("Failed to update PR key generation.");
+ 			lockd_stop_vg(cmd, vg);
+ 			ret = 0;
+ 		}
+-- 
+2.53.0
+
