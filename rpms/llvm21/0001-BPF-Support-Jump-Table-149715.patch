@@ -1,0 +1,1354 @@
+From 528baf4740aed86443e3041eb3b6044963f96e1a Mon Sep 17 00:00:00 2001
+From: yonghong-song <yhs@fb.com>
+Date: Tue, 16 Sep 2025 09:27:08 -0700
+Subject: [PATCH] [BPF] Support Jump Table (#149715)
+
+Add jump table (switch statement and computed goto) support for BPF
+backend.
+A `gotox <reg>` insn is implemented and the `<reg>` holds the target
+insn where the gotox will go.
+
+For a switch statement like
+```
+...
+            switch (ctx->x) {
+            case 1: ret_user = 18; break;
+            case 20: ret_user = 6; break;
+            case 16: ret_user = 9; break;
+            case 6: ret_user = 16; break;
+            case 8: ret_user = 14; break;
+            case 30: ret_user = 2; break;
+            default: ret_user = 1; break;
+            }
+...
+```
+and the final binary
+```
+    The final binary:
+       4:       67 01 00 00 03 00 00 00 r1 <<= 0x3
+       5:       18 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 r2 = 0x0 ll
+                0000000000000028:  R_BPF_64_64  BPF.JT.0.0
+       7:       0f 12 00 00 00 00 00 00 r2 += r1
+        ...
+    Symbol table:
+     4: 0000000000000000   240 OBJECT  GLOBAL DEFAULT     4 BPF.JT.0.0
+     5: 0000000000000000     4 OBJECT  GLOBAL DEFAULT     6 ret_user
+     6: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT   UND bar
+     7: 00000000000000f0   256 OBJECT  GLOBAL DEFAULT     4 BPF.JT.0.1
+    and
+  [ 4] .jumptables       PROGBITS        0000000000000000 0001c8 0001f0 00      0   0  1
+```
+Note that for the above example, `-mllvm -bpf-min-jump-table-entries=5`
+should be in compilation flags as the current default
+bpf-min-jump-table-entries is 13. For example.
+```
+clang --target=bpf -mcpu=v4 -O2 -mllvm -bpf-min-jump-table-entries=5 -S -g test.c
+```
+
+For computed goto like
+```
+      int foo(int a, int b) {
+        __label__ l1, l2, l3, l4;
+        void *jt1[] = {[0]=&&l1, [1]=&&l2};
+        void *jt2[] = {[0]=&&l3, [1]=&&l4};
+        int ret = 0;
+
+        goto *jt1[a % 2];
+        l1: ret += 1;
+        l2: ret += 3;
+        goto *jt2[b % 2];
+        l3: ret += 5;
+        l4: ret += 7;
+        return ret;
+      }
+```
+The final binary:
+```
+      12:       bf 23 20 00 00 00 00 00 r3 = (s32)r2
+      13:       67 03 00 00 03 00 00 00 r3 <<= 0x3
+      14:       18 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 r2 = 0x0 ll
+                0000000000000070:  R_BPF_64_64  BPF.JT.0.0
+      16:       0f 32 00 00 00 00 00 00 r2 += r3
+      17:       bf 11 20 00 00 00 00 00 r1 = (s32)r1
+      18:       67 01 00 00 03 00 00 00 r1 <<= 0x3
+      19:       18 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 r3 = 0x0 ll
+                0000000000000098:  R_BPF_64_64  BPF.JT.0.1
+      21:       0f 13 00 00 00 00 00 00 r3 += r1
+
+  [ 4] .jumptables       PROGBITS        0000000000000000 000160 000020 00      0   0  1
+
+     4: 0000000000000000    16 OBJECT  GLOBAL DEFAULT     4 BPF.JT.0.0
+     5: 0000000000000010    16 OBJECT  GLOBAL DEFAULT     4 BPF.JT.0.1
+```
+
+A more complicated test with both switch-statement triggered jump table
+and compute gotos:
+
+```
+$ cat test3.c
+struct simple_ctx {
+        int x;
+        int y;
+        int z;
+};
+
+int ret_user, ret_user2;
+void bar(void);
+int foo(struct simple_ctx *ctx, struct simple_ctx *ctx2, int a, int b)
+{
+        __label__ l1, l2, l3, l4;
+        void *jt1[] = {[0]=&&l1, [1]=&&l2};
+        void *jt2[] = {[0]=&&l3, [1]=&&l4};
+        int ret = 0;
+
+        goto *jt1[a % 2];
+        l1: ret += 1;
+        l2: ret += 3;
+        goto *jt2[b % 2];
+        l3: ret += 5;
+        l4: ret += 7;
+
+        bar();
+
+        switch (ctx->x) {
+        case 1: ret_user = 18; break;
+        case 20: ret_user = 6; break;
+        case 16: ret_user = 9; break;
+        case 6: ret_user = 16; break;
+        case 8: ret_user = 14; break;
+        case 30: ret_user = 2; break;
+        default: ret_user = 1; break;
+        }
+
+        return ret;
+}
+```
+Compile with
+```
+  clang --target=bpf -mcpu=v4 -O2 -S test3.c
+  clang --target=bpf -mcpu=v4 -O2 -c test3.c
+```
+  The binary:
+```
+     /* For computed goto */
+      13:       bf 42 20 00 00 00 00 00 r2 = (s32)r4
+      14:       67 02 00 00 03 00 00 00 r2 <<= 0x3
+      15:       18 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 r1 = 0x0 ll
+                0000000000000078:  R_BPF_64_64  BPF.JT.0.1
+      17:       0f 21 00 00 00 00 00 00 r1 += r2
+      18:       bf 32 20 00 00 00 00 00 r2 = (s32)r3
+      19:       67 02 00 00 03 00 00 00 r2 <<= 0x3
+      20:       18 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 r3 = 0x0 ll
+                00000000000000a0:  R_BPF_64_64  BPF.JT.0.2
+      22:       0f 23 00 00 00 00 00 00 r3 += r2
+
+      /* For switch statement */
+      39:       67 01 00 00 03 00 00 00 r1 <<= 0x3
+      40:       18 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 r2 = 0x0 ll
+                0000000000000140:  R_BPF_64_64  BPF.JT.0.0
+      42:       0f 12 00 00 00 00 00 00 r2 += r1
+```
+You can see jump table symbols are all different.
+
+(cherry picked from commit c3fb2e1cee954338acb83955b157e0a2e82a4849)
+---
+ .../lib/Target/BPF/AsmParser/BPFAsmParser.cpp |   1 +
+ llvm/lib/Target/BPF/BPFAsmPrinter.cpp         | 114 +++++++++++---
+ llvm/lib/Target/BPF/BPFAsmPrinter.h           |  48 ++++++
+ llvm/lib/Target/BPF/BPFISelLowering.cpp       | 143 +++++++++++++++++-
+ llvm/lib/Target/BPF/BPFISelLowering.h         |   8 +-
+ llvm/lib/Target/BPF/BPFInstrInfo.cpp          |  45 ++++++
+ llvm/lib/Target/BPF/BPFInstrInfo.h            |   3 +
+ llvm/lib/Target/BPF/BPFInstrInfo.td           |  26 +++-
+ llvm/lib/Target/BPF/BPFMCInstLower.cpp        |   6 +
+ llvm/lib/Target/BPF/BPFMCInstLower.h          |   6 +-
+ llvm/lib/Target/BPF/BPFSubtarget.cpp          |   4 +
+ llvm/lib/Target/BPF/BPFSubtarget.h            |   3 +-
+ .../BPF/BPFTargetLoweringObjectFile.cpp       |  19 +++
+ .../Target/BPF/BPFTargetLoweringObjectFile.h  |  25 +++
+ llvm/lib/Target/BPF/BPFTargetMachine.cpp      |   3 +-
+ llvm/lib/Target/BPF/CMakeLists.txt            |   1 +
+ llvm/test/CodeGen/BPF/jump_table_blockaddr.ll |  91 +++++++++++
+ .../test/CodeGen/BPF/jump_table_global_var.ll |  83 ++++++++++
+ .../CodeGen/BPF/jump_table_switch_stmt.ll     | 126 +++++++++++++++
+ 19 files changed, 716 insertions(+), 39 deletions(-)
+ create mode 100644 llvm/lib/Target/BPF/BPFAsmPrinter.h
+ create mode 100644 llvm/lib/Target/BPF/BPFTargetLoweringObjectFile.cpp
+ create mode 100644 llvm/lib/Target/BPF/BPFTargetLoweringObjectFile.h
+ create mode 100644 llvm/test/CodeGen/BPF/jump_table_blockaddr.ll
+ create mode 100644 llvm/test/CodeGen/BPF/jump_table_global_var.ll
+ create mode 100644 llvm/test/CodeGen/BPF/jump_table_switch_stmt.ll
+
+diff --git a/llvm/lib/Target/BPF/AsmParser/BPFAsmParser.cpp b/llvm/lib/Target/BPF/AsmParser/BPFAsmParser.cpp
+index a347794a9a30..d96f403d2f81 100644
+--- a/llvm/lib/Target/BPF/AsmParser/BPFAsmParser.cpp
++++ b/llvm/lib/Target/BPF/AsmParser/BPFAsmParser.cpp
+@@ -234,6 +234,7 @@ public:
+         .Case("callx", true)
+         .Case("goto", true)
+         .Case("gotol", true)
++        .Case("gotox", true)
+         .Case("may_goto", true)
+         .Case("*", true)
+         .Case("exit", true)
+diff --git a/llvm/lib/Target/BPF/BPFAsmPrinter.cpp b/llvm/lib/Target/BPF/BPFAsmPrinter.cpp
+index e3843e0e112e..77dc4a75a7d6 100644
+--- a/llvm/lib/Target/BPF/BPFAsmPrinter.cpp
++++ b/llvm/lib/Target/BPF/BPFAsmPrinter.cpp
+@@ -11,52 +11,35 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
++#include "BPFAsmPrinter.h"
+ #include "BPF.h"
+ #include "BPFInstrInfo.h"
+ #include "BPFMCInstLower.h"
+ #include "BTFDebug.h"
+ #include "MCTargetDesc/BPFInstPrinter.h"
+ #include "TargetInfo/BPFTargetInfo.h"
++#include "llvm/BinaryFormat/ELF.h"
+ #include "llvm/CodeGen/AsmPrinter.h"
+ #include "llvm/CodeGen/MachineConstantPool.h"
+ #include "llvm/CodeGen/MachineInstr.h"
++#include "llvm/CodeGen/MachineJumpTableInfo.h"
+ #include "llvm/CodeGen/MachineModuleInfo.h"
++#include "llvm/CodeGen/TargetLowering.h"
+ #include "llvm/IR/Module.h"
+ #include "llvm/MC/MCAsmInfo.h"
++#include "llvm/MC/MCExpr.h"
+ #include "llvm/MC/MCInst.h"
+ #include "llvm/MC/MCStreamer.h"
+ #include "llvm/MC/MCSymbol.h"
++#include "llvm/MC/MCSymbolELF.h"
+ #include "llvm/MC/TargetRegistry.h"
+ #include "llvm/Support/Compiler.h"
+ #include "llvm/Support/raw_ostream.h"
++#include "llvm/Target/TargetLoweringObjectFile.h"
+ using namespace llvm;
+ 
+ #define DEBUG_TYPE "asm-printer"
+ 
+-namespace {
+-class BPFAsmPrinter : public AsmPrinter {
+-public:
+-  explicit BPFAsmPrinter(TargetMachine &TM,
+-                         std::unique_ptr<MCStreamer> Streamer)
+-      : AsmPrinter(TM, std::move(Streamer), ID), BTF(nullptr) {}
+-
+-  StringRef getPassName() const override { return "BPF Assembly Printer"; }
+-  bool doInitialization(Module &M) override;
+-  void printOperand(const MachineInstr *MI, int OpNum, raw_ostream &O);
+-  bool PrintAsmOperand(const MachineInstr *MI, unsigned OpNo,
+-                       const char *ExtraCode, raw_ostream &O) override;
+-  bool PrintAsmMemoryOperand(const MachineInstr *MI, unsigned OpNum,
+-                             const char *ExtraCode, raw_ostream &O) override;
+-
+-  void emitInstruction(const MachineInstr *MI) override;
+-
+-  static char ID;
+-
+-private:
+-  BTFDebug *BTF;
+-};
+-} // namespace
+-
+ bool BPFAsmPrinter::doInitialization(Module &M) {
+   AsmPrinter::doInitialization(M);
+ 
+@@ -69,6 +52,45 @@ bool BPFAsmPrinter::doInitialization(Module &M) {
+   return false;
+ }
+ 
++const BPFTargetMachine &BPFAsmPrinter::getBTM() const {
++  return static_cast<const BPFTargetMachine &>(TM);
++}
++
++bool BPFAsmPrinter::doFinalization(Module &M) {
++  // Remove unused globals which are previously used for jump table.
++  const BPFSubtarget *Subtarget = getBTM().getSubtargetImpl();
++  if (Subtarget->hasGotox()) {
++    std::vector<GlobalVariable *> Targets;
++    for (GlobalVariable &Global : M.globals()) {
++      if (Global.getLinkage() != GlobalValue::PrivateLinkage)
++        continue;
++      if (!Global.isConstant() || !Global.hasInitializer())
++        continue;
++
++      Constant *CV = dyn_cast<Constant>(Global.getInitializer());
++      if (!CV)
++        continue;
++      ConstantArray *CA = dyn_cast<ConstantArray>(CV);
++      if (!CA)
++        continue;
++
++      for (unsigned i = 1, e = CA->getNumOperands(); i != e; ++i) {
++        if (!dyn_cast<BlockAddress>(CA->getOperand(i)))
++          continue;
++      }
++      Targets.push_back(&Global);
++    }
++
++    for (GlobalVariable *GV : Targets) {
++      GV->replaceAllUsesWith(PoisonValue::get(GV->getType()));
++      GV->dropAllReferences();
++      GV->eraseFromParent();
++    }
++  }
++
++  return AsmPrinter::doFinalization(M);
++}
++
+ void BPFAsmPrinter::printOperand(const MachineInstr *MI, int OpNum,
+                                  raw_ostream &O) {
+   const MachineOperand &MO = MI->getOperand(OpNum);
+@@ -150,6 +172,50 @@ void BPFAsmPrinter::emitInstruction(const MachineInstr *MI) {
+   EmitToStreamer(*OutStreamer, TmpInst);
+ }
+ 
++MCSymbol *BPFAsmPrinter::getJTPublicSymbol(unsigned JTI) {
++  SmallString<60> Name;
++  raw_svector_ostream(Name)
++      << "BPF.JT." << MF->getFunctionNumber() << '.' << JTI;
++  MCSymbol *S = OutContext.getOrCreateSymbol(Name);
++  if (auto *ES = static_cast<MCSymbolELF *>(S)) {
++    ES->setBinding(ELF::STB_GLOBAL);
++    ES->setType(ELF::STT_OBJECT);
++  }
++  return S;
++}
++
++void BPFAsmPrinter::emitJumpTableInfo() {
++  const MachineJumpTableInfo *MJTI = MF->getJumpTableInfo();
++  if (!MJTI)
++    return;
++
++  const std::vector<MachineJumpTableEntry> &JT = MJTI->getJumpTables();
++  if (JT.empty())
++    return;
++
++  const TargetLoweringObjectFile &TLOF = getObjFileLowering();
++  const Function &F = MF->getFunction();
++  MCSection *JTS = TLOF.getSectionForJumpTable(F, TM);
++  assert(MJTI->getEntryKind() == MachineJumpTableInfo::EK_BlockAddress);
++  unsigned EntrySize = MJTI->getEntrySize(getDataLayout());
++  OutStreamer->switchSection(JTS);
++  for (unsigned JTI = 0; JTI < JT.size(); JTI++) {
++    ArrayRef<MachineBasicBlock *> JTBBs = JT[JTI].MBBs;
++    if (JTBBs.empty())
++      continue;
++
++    MCSymbol *JTStart = getJTPublicSymbol(JTI);
++    OutStreamer->emitLabel(JTStart);
++    for (const MachineBasicBlock *MBB : JTBBs) {
++      const MCExpr *LHS = MCSymbolRefExpr::create(MBB->getSymbol(), OutContext);
++      OutStreamer->emitValue(LHS, EntrySize);
++    }
++    const MCExpr *JTSize =
++        MCConstantExpr::create(JTBBs.size() * EntrySize, OutContext);
++    OutStreamer->emitELFSize(JTStart, JTSize);
++  }
++}
++
+ char BPFAsmPrinter::ID = 0;
+ 
+ INITIALIZE_PASS(BPFAsmPrinter, "bpf-asm-printer", "BPF Assembly Printer", false,
+diff --git a/llvm/lib/Target/BPF/BPFAsmPrinter.h b/llvm/lib/Target/BPF/BPFAsmPrinter.h
+new file mode 100644
+index 000000000000..0cfb2839c8ff
+--- /dev/null
++++ b/llvm/lib/Target/BPF/BPFAsmPrinter.h
+@@ -0,0 +1,48 @@
++//===-- BPFFrameLowering.h - Define frame lowering for BPF -----*- C++ -*--===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIB_TARGET_BPF_BPFASMPRINTER_H
++#define LLVM_LIB_TARGET_BPF_BPFASMPRINTER_H
++
++#include "BPFTargetMachine.h"
++#include "BTFDebug.h"
++#include "llvm/CodeGen/AsmPrinter.h"
++
++namespace llvm {
++
++class BPFAsmPrinter : public AsmPrinter {
++public:
++  explicit BPFAsmPrinter(TargetMachine &TM,
++                         std::unique_ptr<MCStreamer> Streamer)
++      : AsmPrinter(TM, std::move(Streamer), ID), BTF(nullptr), TM(TM) {}
++
++  StringRef getPassName() const override { return "BPF Assembly Printer"; }
++  bool doInitialization(Module &M) override;
++  bool doFinalization(Module &M) override;
++  void printOperand(const MachineInstr *MI, int OpNum, raw_ostream &O);
++  bool PrintAsmOperand(const MachineInstr *MI, unsigned OpNo,
++                       const char *ExtraCode, raw_ostream &O) override;
++  bool PrintAsmMemoryOperand(const MachineInstr *MI, unsigned OpNum,
++                             const char *ExtraCode, raw_ostream &O) override;
++
++  void emitInstruction(const MachineInstr *MI) override;
++  MCSymbol *getJTPublicSymbol(unsigned JTI);
++  virtual void emitJumpTableInfo() override;
++
++  static char ID;
++
++private:
++  BTFDebug *BTF;
++  TargetMachine &TM;
++
++  const BPFTargetMachine &getBTM() const;
++};
++
++} // namespace llvm
++
++#endif /* LLVM_LIB_TARGET_BPF_BPFASMPRINTER_H */
+diff --git a/llvm/lib/Target/BPF/BPFISelLowering.cpp b/llvm/lib/Target/BPF/BPFISelLowering.cpp
+index f4f414d192df..6e5520c3dbb1 100644
+--- a/llvm/lib/Target/BPF/BPFISelLowering.cpp
++++ b/llvm/lib/Target/BPF/BPFISelLowering.cpp
+@@ -18,6 +18,7 @@
+ #include "llvm/CodeGen/MachineFrameInfo.h"
+ #include "llvm/CodeGen/MachineFunction.h"
+ #include "llvm/CodeGen/MachineInstrBuilder.h"
++#include "llvm/CodeGen/MachineJumpTableInfo.h"
+ #include "llvm/CodeGen/MachineRegisterInfo.h"
+ #include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
+ #include "llvm/CodeGen/ValueTypes.h"
+@@ -38,6 +39,10 @@ static cl::opt<bool> BPFExpandMemcpyInOrder("bpf-expand-memcpy-in-order",
+   cl::Hidden, cl::init(false),
+   cl::desc("Expand memcpy into load/store pairs in order"));
+ 
++static cl::opt<unsigned> BPFMinimumJumpTableEntries(
++    "bpf-min-jump-table-entries", cl::init(13), cl::Hidden,
++    cl::desc("Set minimum number of entries to use a jump table on BPF"));
++
+ static void fail(const SDLoc &DL, SelectionDAG &DAG, const Twine &Msg,
+                  SDValue Val = {}) {
+   std::string Str;
+@@ -67,12 +72,16 @@ BPFTargetLowering::BPFTargetLowering(const TargetMachine &TM,
+ 
+   setOperationAction(ISD::BR_CC, MVT::i64, Custom);
+   setOperationAction(ISD::BR_JT, MVT::Other, Expand);
+-  setOperationAction(ISD::BRIND, MVT::Other, Expand);
+   setOperationAction(ISD::BRCOND, MVT::Other, Expand);
+ 
++  if (!STI.hasGotox())
++    setOperationAction(ISD::BRIND, MVT::Other, Expand);
++
+   setOperationAction(ISD::TRAP, MVT::Other, Custom);
+ 
+   setOperationAction({ISD::GlobalAddress, ISD::ConstantPool}, MVT::i64, Custom);
++  if (STI.hasGotox())
++    setOperationAction({ISD::JumpTable, ISD::BlockAddress}, MVT::i64, Custom);
+ 
+   setOperationAction(ISD::DYNAMIC_STACKALLOC, MVT::i64, Custom);
+   setOperationAction(ISD::STACKSAVE, MVT::Other, Expand);
+@@ -159,6 +168,7 @@ BPFTargetLowering::BPFTargetLowering(const TargetMachine &TM,
+ 
+   setBooleanContents(ZeroOrOneBooleanContent);
+   setMaxAtomicSizeInBitsSupported(64);
++  setMinimumJumpTableEntries(BPFMinimumJumpTableEntries);
+ 
+   // Function alignments
+   setMinFunctionAlignment(Align(8));
+@@ -246,6 +256,10 @@ bool BPFTargetLowering::isZExtFree(SDValue Val, EVT VT2) const {
+   return TargetLoweringBase::isZExtFree(Val, VT2);
+ }
+ 
++unsigned BPFTargetLowering::getJumpTableEncoding() const {
++  return MachineJumpTableInfo::EK_BlockAddress;
++}
++
+ BPFTargetLowering::ConstraintType
+ BPFTargetLowering::getConstraintType(StringRef Constraint) const {
+   if (Constraint.size() == 1) {
+@@ -316,10 +330,14 @@ SDValue BPFTargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
+     report_fatal_error("unimplemented opcode: " + Twine(Op.getOpcode()));
+   case ISD::BR_CC:
+     return LowerBR_CC(Op, DAG);
++  case ISD::JumpTable:
++    return LowerJumpTable(Op, DAG);
+   case ISD::GlobalAddress:
+     return LowerGlobalAddress(Op, DAG);
+   case ISD::ConstantPool:
+     return LowerConstantPool(Op, DAG);
++  case ISD::BlockAddress:
++    return LowerBlockAddress(Op, DAG);
+   case ISD::SELECT_CC:
+     return LowerSELECT_CC(Op, DAG);
+   case ISD::SDIV:
+@@ -780,6 +798,11 @@ SDValue BPFTargetLowering::LowerTRAP(SDValue Op, SelectionDAG &DAG) const {
+   return LowerCall(CLI, InVals);
+ }
+ 
++SDValue BPFTargetLowering::LowerJumpTable(SDValue Op, SelectionDAG &DAG) const {
++  JumpTableSDNode *N = cast<JumpTableSDNode>(Op);
++  return getAddr(N, DAG);
++}
++
+ const char *BPFTargetLowering::getTargetNodeName(unsigned Opcode) const {
+   switch ((BPFISD::NodeType)Opcode) {
+   case BPFISD::FIRST_NUMBER:
+@@ -800,17 +823,17 @@ const char *BPFTargetLowering::getTargetNodeName(unsigned Opcode) const {
+   return nullptr;
+ }
+ 
+-static SDValue getTargetNode(GlobalAddressSDNode *N, const SDLoc &DL, EVT Ty,
+-                             SelectionDAG &DAG, unsigned Flags) {
+-  return DAG.getTargetGlobalAddress(N->getGlobal(), DL, Ty, 0, Flags);
+-}
+-
+ static SDValue getTargetNode(ConstantPoolSDNode *N, const SDLoc &DL, EVT Ty,
+                              SelectionDAG &DAG, unsigned Flags) {
+   return DAG.getTargetConstantPool(N->getConstVal(), Ty, N->getAlign(),
+                                    N->getOffset(), Flags);
+ }
+ 
++static SDValue getTargetNode(JumpTableSDNode *N, const SDLoc &DL, EVT Ty,
++                             SelectionDAG &DAG, unsigned Flags) {
++  return DAG.getTargetJumpTable(N->getIndex(), Ty, Flags);
++}
++
+ template <class NodeTy>
+ SDValue BPFTargetLowering::getAddr(NodeTy *N, SelectionDAG &DAG,
+                                    unsigned Flags) const {
+@@ -827,7 +850,15 @@ SDValue BPFTargetLowering::LowerGlobalAddress(SDValue Op,
+   if (N->getOffset() != 0)
+     report_fatal_error("invalid offset for global address: " +
+                        Twine(N->getOffset()));
+-  return getAddr(N, DAG);
++
++  const GlobalValue *GVal = N->getGlobal();
++  SDLoc DL(Op);
++
++  // Wrap it in a TargetGlobalAddress
++  SDValue Addr = DAG.getTargetGlobalAddress(GVal, DL, MVT::i64);
++
++  // Emit pseudo instruction
++  return SDValue(DAG.getMachineNode(BPF::LDIMM64, DL, MVT::i64, Addr), 0);
+ }
+ 
+ SDValue BPFTargetLowering::LowerConstantPool(SDValue Op,
+@@ -837,6 +868,18 @@ SDValue BPFTargetLowering::LowerConstantPool(SDValue Op,
+   return getAddr(N, DAG);
+ }
+ 
++SDValue BPFTargetLowering::LowerBlockAddress(SDValue Op,
++                                             SelectionDAG &DAG) const {
++  const BlockAddress *BA = cast<BlockAddressSDNode>(Op)->getBlockAddress();
++  SDLoc DL(Op);
++
++  // Wrap it in a TargetBlockAddress
++  SDValue Addr = DAG.getTargetBlockAddress(BA, MVT::i64);
++
++  // Emit pseudo instruction
++  return SDValue(DAG.getMachineNode(BPF::LDIMM64, DL, MVT::i64, Addr), 0);
++}
++
+ unsigned
+ BPFTargetLowering::EmitSubregExt(MachineInstr &MI, MachineBasicBlock *BB,
+                                  unsigned Reg, bool isSigned) const {
+@@ -900,6 +943,86 @@ BPFTargetLowering::EmitInstrWithCustomInserterMemcpy(MachineInstr &MI,
+   return BB;
+ }
+ 
++MachineBasicBlock *BPFTargetLowering::EmitInstrWithCustomInserterLDimm64(
++    MachineInstr &MI, MachineBasicBlock *BB) const {
++  MachineFunction *MF = BB->getParent();
++  const BPFInstrInfo *TII = MF->getSubtarget<BPFSubtarget>().getInstrInfo();
++  const TargetRegisterClass *RC = getRegClassFor(MVT::i64);
++  MachineRegisterInfo &RegInfo = MF->getRegInfo();
++  DebugLoc DL = MI.getDebugLoc();
++
++  // Build address taken map for Global Varaibles and BlockAddresses
++  DenseMap<const BasicBlock *, MachineBasicBlock *> AddressTakenBBs;
++  for (MachineBasicBlock &MBB : *MF) {
++    if (const BasicBlock *BB = MBB.getBasicBlock())
++      if (BB->hasAddressTaken())
++        AddressTakenBBs[BB] = &MBB;
++  }
++
++  MachineOperand &MO = MI.getOperand(1);
++  assert(MO.isBlockAddress() || MO.isGlobal());
++
++  MCRegister ResultReg = MI.getOperand(0).getReg();
++  Register TmpReg = RegInfo.createVirtualRegister(RC);
++
++  std::vector<MachineBasicBlock *> Targets;
++  unsigned JTI;
++
++  if (MO.isBlockAddress()) {
++    auto *BA = MO.getBlockAddress();
++    MachineBasicBlock *TgtMBB = AddressTakenBBs[BA->getBasicBlock()];
++    assert(TgtMBB);
++
++    Targets.push_back(TgtMBB);
++    JTI = MF->getOrCreateJumpTableInfo(getJumpTableEncoding())
++              ->createJumpTableIndex(Targets);
++
++    BuildMI(*BB, MI, DL, TII->get(BPF::LD_imm64), TmpReg)
++        .addJumpTableIndex(JTI);
++    BuildMI(*BB, MI, DL, TII->get(BPF::LDD), ResultReg)
++        .addReg(TmpReg)
++        .addImm(0);
++    MI.eraseFromParent();
++    return BB;
++  }
++
++  // Helper: emit LD_imm64 with operand GlobalAddress or JumpTable
++  auto emitLDImm64 = [&](const GlobalValue *GV = nullptr, unsigned JTI = -1) {
++    auto MIB = BuildMI(*BB, MI, DL, TII->get(BPF::LD_imm64), ResultReg);
++    if (GV)
++      MIB.addGlobalAddress(GV);
++    else
++      MIB.addJumpTableIndex(JTI);
++    MI.eraseFromParent();
++    return BB;
++  };
++
++  // Must be a global at this point
++  const GlobalValue *GVal = MO.getGlobal();
++  const auto *GV = dyn_cast<GlobalVariable>(GVal);
++
++  if (!GV || GV->getLinkage() != GlobalValue::PrivateLinkage ||
++      !GV->isConstant() || !GV->hasInitializer())
++    return emitLDImm64(GVal);
++
++  const auto *CA = dyn_cast<ConstantArray>(GV->getInitializer());
++  if (!CA)
++    return emitLDImm64(GVal);
++
++  for (const Use &Op : CA->operands()) {
++    if (!isa<BlockAddress>(Op))
++      return emitLDImm64(GVal);
++    auto *BA = cast<BlockAddress>(Op);
++    MachineBasicBlock *TgtMBB = AddressTakenBBs[BA->getBasicBlock()];
++    assert(TgtMBB);
++    Targets.push_back(TgtMBB);
++  }
++
++  JTI = MF->getOrCreateJumpTableInfo(getJumpTableEncoding())
++            ->createJumpTableIndex(Targets);
++  return emitLDImm64(nullptr, JTI);
++}
++
+ MachineBasicBlock *
+ BPFTargetLowering::EmitInstrWithCustomInserter(MachineInstr &MI,
+                                                MachineBasicBlock *BB) const {
+@@ -912,6 +1035,7 @@ BPFTargetLowering::EmitInstrWithCustomInserter(MachineInstr &MI,
+                        Opc == BPF::Select_32_64);
+ 
+   bool isMemcpyOp = Opc == BPF::MEMCPY;
++  bool isLDimm64Op = Opc == BPF::LDIMM64;
+ 
+ #ifndef NDEBUG
+   bool isSelectRIOp = (Opc == BPF::Select_Ri ||
+@@ -919,13 +1043,16 @@ BPFTargetLowering::EmitInstrWithCustomInserter(MachineInstr &MI,
+                        Opc == BPF::Select_Ri_32 ||
+                        Opc == BPF::Select_Ri_32_64);
+ 
+-  if (!(isSelectRROp || isSelectRIOp || isMemcpyOp))
++  if (!(isSelectRROp || isSelectRIOp || isMemcpyOp || isLDimm64Op))
+     report_fatal_error("unhandled instruction type: " + Twine(Opc));
+ #endif
+ 
+   if (isMemcpyOp)
+     return EmitInstrWithCustomInserterMemcpy(MI, BB);
+ 
++  if (isLDimm64Op)
++    return EmitInstrWithCustomInserterLDimm64(MI, BB);
++
+   bool is32BitCmp = (Opc == BPF::Select_32 ||
+                      Opc == BPF::Select_32_64 ||
+                      Opc == BPF::Select_Ri_32 ||
+diff --git a/llvm/lib/Target/BPF/BPFISelLowering.h b/llvm/lib/Target/BPF/BPFISelLowering.h
+index 8f60261c10e9..5243d4944667 100644
+--- a/llvm/lib/Target/BPF/BPFISelLowering.h
++++ b/llvm/lib/Target/BPF/BPFISelLowering.h
+@@ -66,6 +66,8 @@ public:
+ 
+   MVT getScalarShiftAmountTy(const DataLayout &, EVT) const override;
+ 
++  unsigned getJumpTableEncoding() const override;
++
+ private:
+   // Control Instruction Selection Features
+   bool HasAlu32;
+@@ -81,6 +83,8 @@ private:
+   SDValue LowerConstantPool(SDValue Op, SelectionDAG &DAG) const;
+   SDValue LowerGlobalAddress(SDValue Op, SelectionDAG &DAG) const;
+   SDValue LowerTRAP(SDValue Op, SelectionDAG &DAG) const;
++  SDValue LowerBlockAddress(SDValue Op, SelectionDAG &DAG) const;
++  SDValue LowerJumpTable(SDValue Op, SelectionDAG &DAG) const;
+ 
+   template <class NodeTy>
+   SDValue getAddr(NodeTy *N, SelectionDAG &DAG, unsigned Flags = 0) const;
+@@ -163,7 +167,9 @@ private:
+   MachineBasicBlock * EmitInstrWithCustomInserterMemcpy(MachineInstr &MI,
+                                                         MachineBasicBlock *BB)
+                                                         const;
+-
++  MachineBasicBlock *
++  EmitInstrWithCustomInserterLDimm64(MachineInstr &MI,
++                                     MachineBasicBlock *BB) const;
+ };
+ }
+ 
+diff --git a/llvm/lib/Target/BPF/BPFInstrInfo.cpp b/llvm/lib/Target/BPF/BPFInstrInfo.cpp
+index 70bc163615f6..bf2b4213201d 100644
+--- a/llvm/lib/Target/BPF/BPFInstrInfo.cpp
++++ b/llvm/lib/Target/BPF/BPFInstrInfo.cpp
+@@ -181,6 +181,11 @@ bool BPFInstrInfo::analyzeBranch(MachineBasicBlock &MBB,
+     if (!isUnpredicatedTerminator(*I))
+       break;
+ 
++    // From base method doc: ... returning true if it cannot be understood ...
++    // Indirect branch has multiple destinations and no true/false concepts.
++    if (I->isIndirectBranch())
++      return true;
++
+     // A terminator that isn't a branch can't easily be handled
+     // by this analysis.
+     if (!I->isBranch())
+@@ -259,3 +264,43 @@ unsigned BPFInstrInfo::removeBranch(MachineBasicBlock &MBB,
+ 
+   return Count;
+ }
++
++int BPFInstrInfo::getJumpTableIndex(const MachineInstr &MI) const {
++  if (MI.getOpcode() != BPF::JX)
++    return -1;
++
++  // The pattern looks like:
++  // %0 = LD_imm64 %jump-table.0   ; load jump-table address
++  // %1 = ADD_rr %0, $another_reg  ; address + offset
++  // %2 = LDD %1, 0                ; load the actual label
++  // JX %2
++  const MachineFunction &MF = *MI.getParent()->getParent();
++  const MachineRegisterInfo &MRI = MF.getRegInfo();
++
++  Register Reg = MI.getOperand(0).getReg();
++  if (!Reg.isVirtual())
++    return -1;
++  MachineInstr *Ldd = MRI.getUniqueVRegDef(Reg);
++  if (Ldd == nullptr || Ldd->getOpcode() != BPF::LDD)
++    return -1;
++
++  Reg = Ldd->getOperand(1).getReg();
++  if (!Reg.isVirtual())
++    return -1;
++  MachineInstr *Add = MRI.getUniqueVRegDef(Reg);
++  if (Add == nullptr || Add->getOpcode() != BPF::ADD_rr)
++    return -1;
++
++  Reg = Add->getOperand(1).getReg();
++  if (!Reg.isVirtual())
++    return -1;
++  MachineInstr *LDimm64 = MRI.getUniqueVRegDef(Reg);
++  if (LDimm64 == nullptr || LDimm64->getOpcode() != BPF::LD_imm64)
++    return -1;
++
++  const MachineOperand &MO = LDimm64->getOperand(1);
++  if (!MO.isJTI())
++    return -1;
++
++  return MO.getIndex();
++}
+diff --git a/llvm/lib/Target/BPF/BPFInstrInfo.h b/llvm/lib/Target/BPF/BPFInstrInfo.h
+index d8bbad44e314..d88e37975980 100644
+--- a/llvm/lib/Target/BPF/BPFInstrInfo.h
++++ b/llvm/lib/Target/BPF/BPFInstrInfo.h
+@@ -58,6 +58,9 @@ public:
+                         MachineBasicBlock *FBB, ArrayRef<MachineOperand> Cond,
+                         const DebugLoc &DL,
+                         int *BytesAdded = nullptr) const override;
++
++  int getJumpTableIndex(const MachineInstr &MI) const override;
++
+ private:
+   void expandMEMCPY(MachineBasicBlock::iterator) const;
+ 
+diff --git a/llvm/lib/Target/BPF/BPFInstrInfo.td b/llvm/lib/Target/BPF/BPFInstrInfo.td
+index b21f1a0eee3b..9d3ac7ffa6ff 100644
+--- a/llvm/lib/Target/BPF/BPFInstrInfo.td
++++ b/llvm/lib/Target/BPF/BPFInstrInfo.td
+@@ -61,6 +61,7 @@ def BPFNoMovsx : Predicate<"!Subtarget->hasMovsx()">;
+ def BPFNoBswap : Predicate<"!Subtarget->hasBswap()">;
+ def BPFHasStoreImm : Predicate<"Subtarget->hasStoreImm()">;
+ def BPFHasLoadAcqStoreRel : Predicate<"Subtarget->hasLoadAcqStoreRel()">;
++def BPFHasGotox : Predicate<"Subtarget->hasGotox()">;
+ 
+ class ImmediateAsmOperand<string name> : AsmOperandClass {
+   let Name = name;
+@@ -216,6 +217,18 @@ class JMP_RI<BPFJumpOp Opc, string OpcodeStr, PatLeaf Cond>
+   let BPFClass = BPF_JMP;
+ }
+ 
++class JMP_IND<BPFJumpOp Opc, string OpcodeStr, list<dag> Pattern>
++    : TYPE_ALU_JMP<Opc.Value, BPF_X.Value,
++                   (outs),
++                   (ins GPR:$dst),
++                   !strconcat(OpcodeStr, " $dst"),
++                   Pattern> {
++  bits<4> dst;
++
++  let Inst{51-48} = dst;
++  let BPFClass = BPF_JMP;
++}
++
+ class JMP_JCOND<BPFJumpOp Opc, string OpcodeStr, list<dag> Pattern>
+     : TYPE_ALU_JMP<Opc.Value, BPF_K.Value,
+                    (outs),
+@@ -281,6 +294,12 @@ defm JSLT : J<BPF_JSLT, "s<", BPF_CC_LT, BPF_CC_LT_32>;
+ defm JSLE : J<BPF_JSLE, "s<=", BPF_CC_LE, BPF_CC_LE_32>;
+ defm JSET : J<BPF_JSET, "&", NoCond, NoCond>;
+ def JCOND : JMP_JCOND<BPF_JCOND, "may_goto", []>;
++
++let Predicates = [BPFHasGotox] in {
++  let isIndirectBranch = 1, isBarrier = 1 in {
++    def JX : JMP_IND<BPF_JA, "gotox", [(brind i64:$dst)]>;
++  }
++}
+ }
+ 
+ // ALU instructions
+@@ -849,8 +868,8 @@ let usesCustomInserter = 1, isCodeGenOnly = 1 in {
+ }
+ 
+ // load 64-bit global addr into register
+-def : Pat<(BPFWrapper tglobaladdr:$in), (LD_imm64 tglobaladdr:$in)>;
+ def : Pat<(BPFWrapper tconstpool:$in), (LD_imm64 tconstpool:$in)>;
++def : Pat<(BPFWrapper tjumptable:$in), (LD_imm64 tjumptable:$in)>;
+ 
+ // 0xffffFFFF doesn't fit into simm32, optimize common case
+ def : Pat<(i64 (and (i64 GPR:$src), 0xffffFFFF)),
+@@ -1372,3 +1391,8 @@ let usesCustomInserter = 1, isCodeGenOnly = 1 in {
+       "#memcpy dst: $dst, src: $src, len: $len, align: $align",
+       [(BPFmemcpy GPR:$dst, GPR:$src, imm:$len, imm:$align)]>;
+ }
++
++// For GlobalValue and BlockAddress.
++let usesCustomInserter = 1, isCodeGenOnly = 1 in {
++  def LDIMM64 : Pseudo<(outs GPR:$dst), (ins i64imm:$addr), "", []>;
++}
+diff --git a/llvm/lib/Target/BPF/BPFMCInstLower.cpp b/llvm/lib/Target/BPF/BPFMCInstLower.cpp
+index 040a1fb75070..7d671d2c464e 100644
+--- a/llvm/lib/Target/BPF/BPFMCInstLower.cpp
++++ b/llvm/lib/Target/BPF/BPFMCInstLower.cpp
+@@ -12,6 +12,8 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "BPFMCInstLower.h"
++#include "BPFAsmPrinter.h"
++#include "BPFISelLowering.h"
+ #include "llvm/CodeGen/AsmPrinter.h"
+ #include "llvm/CodeGen/MachineBasicBlock.h"
+ #include "llvm/CodeGen/MachineInstr.h"
+@@ -19,6 +21,7 @@
+ #include "llvm/MC/MCContext.h"
+ #include "llvm/MC/MCExpr.h"
+ #include "llvm/MC/MCInst.h"
++#include "llvm/MC/MCStreamer.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include "llvm/Support/raw_ostream.h"
+ using namespace llvm;
+@@ -77,6 +80,9 @@ void BPFMCInstLower::Lower(const MachineInstr *MI, MCInst &OutMI) const {
+     case MachineOperand::MO_ConstantPoolIndex:
+       MCOp = LowerSymbolOperand(MO, Printer.GetCPISymbol(MO.getIndex()));
+       break;
++    case MachineOperand::MO_JumpTableIndex:
++      MCOp = LowerSymbolOperand(MO, Printer.getJTPublicSymbol(MO.getIndex()));
++      break;
+     }
+ 
+     OutMI.addOperand(MCOp);
+diff --git a/llvm/lib/Target/BPF/BPFMCInstLower.h b/llvm/lib/Target/BPF/BPFMCInstLower.h
+index 4bd0f1f0bf1c..483edd9a0283 100644
+--- a/llvm/lib/Target/BPF/BPFMCInstLower.h
++++ b/llvm/lib/Target/BPF/BPFMCInstLower.h
+@@ -12,7 +12,7 @@
+ #include "llvm/Support/Compiler.h"
+ 
+ namespace llvm {
+-class AsmPrinter;
++class BPFAsmPrinter;
+ class MCContext;
+ class MCInst;
+ class MCOperand;
+@@ -24,10 +24,10 @@ class MachineOperand;
+ class LLVM_LIBRARY_VISIBILITY BPFMCInstLower {
+   MCContext &Ctx;
+ 
+-  AsmPrinter &Printer;
++  BPFAsmPrinter &Printer;
+ 
+ public:
+-  BPFMCInstLower(MCContext &ctx, AsmPrinter &printer)
++  BPFMCInstLower(MCContext &ctx, BPFAsmPrinter &printer)
+       : Ctx(ctx), Printer(printer) {}
+   void Lower(const MachineInstr *MI, MCInst &OutMI) const;
+ 
+diff --git a/llvm/lib/Target/BPF/BPFSubtarget.cpp b/llvm/lib/Target/BPF/BPFSubtarget.cpp
+index 4167547680b1..a11aa6933147 100644
+--- a/llvm/lib/Target/BPF/BPFSubtarget.cpp
++++ b/llvm/lib/Target/BPF/BPFSubtarget.cpp
+@@ -43,6 +43,8 @@ static cl::opt<bool>
+ static cl::opt<bool> Disable_load_acq_store_rel(
+     "disable-load-acq-store-rel", cl::Hidden, cl::init(false),
+     cl::desc("Disable load-acquire and store-release insns"));
++static cl::opt<bool> Disable_gotox("disable-gotox", cl::Hidden, cl::init(false),
++                                   cl::desc("Disable gotox insn"));
+ 
+ void BPFSubtarget::anchor() {}
+ 
+@@ -66,6 +68,7 @@ void BPFSubtarget::initializeEnvironment() {
+   HasGotol = false;
+   HasStoreImm = false;
+   HasLoadAcqStoreRel = false;
++  HasGotox = false;
+ }
+ 
+ void BPFSubtarget::initSubtargetFeatures(StringRef CPU, StringRef FS) {
+@@ -96,6 +99,7 @@ void BPFSubtarget::initSubtargetFeatures(StringRef CPU, StringRef FS) {
+     HasGotol = !Disable_gotol;
+     HasStoreImm = !Disable_StoreImm;
+     HasLoadAcqStoreRel = !Disable_load_acq_store_rel;
++    HasGotox = !Disable_gotox;
+     return;
+   }
+ }
+diff --git a/llvm/lib/Target/BPF/BPFSubtarget.h b/llvm/lib/Target/BPF/BPFSubtarget.h
+index aed2211265e2..e870dfdc85ec 100644
+--- a/llvm/lib/Target/BPF/BPFSubtarget.h
++++ b/llvm/lib/Target/BPF/BPFSubtarget.h
+@@ -65,7 +65,7 @@ protected:
+ 
+   // whether cpu v4 insns are enabled.
+   bool HasLdsx, HasMovsx, HasBswap, HasSdivSmod, HasGotol, HasStoreImm,
+-      HasLoadAcqStoreRel;
++      HasLoadAcqStoreRel, HasGotox;
+ 
+   std::unique_ptr<CallLowering> CallLoweringInfo;
+   std::unique_ptr<InstructionSelector> InstSelector;
+@@ -94,6 +94,7 @@ public:
+   bool hasGotol() const { return HasGotol; }
+   bool hasStoreImm() const { return HasStoreImm; }
+   bool hasLoadAcqStoreRel() const { return HasLoadAcqStoreRel; }
++  bool hasGotox() const { return HasGotox; }
+ 
+   bool isLittleEndian() const { return IsLittleEndian; }
+ 
+diff --git a/llvm/lib/Target/BPF/BPFTargetLoweringObjectFile.cpp b/llvm/lib/Target/BPF/BPFTargetLoweringObjectFile.cpp
+new file mode 100644
+index 000000000000..997f09870bad
+--- /dev/null
++++ b/llvm/lib/Target/BPF/BPFTargetLoweringObjectFile.cpp
+@@ -0,0 +1,19 @@
++//===------------------ BPFTargetLoweringObjectFile.cpp -------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "BPFTargetLoweringObjectFile.h"
++#include "llvm/MC/MCContext.h"
++#include "llvm/MC/MCSectionELF.h"
++
++using namespace llvm;
++
++MCSection *BPFTargetLoweringObjectFileELF::getSectionForJumpTable(
++    const Function &F, const TargetMachine &TM,
++    const MachineJumpTableEntry *JTE) const {
++  return getContext().getELFSection(".jumptables", ELF::SHT_PROGBITS, 0);
++}
+diff --git a/llvm/lib/Target/BPF/BPFTargetLoweringObjectFile.h b/llvm/lib/Target/BPF/BPFTargetLoweringObjectFile.h
+new file mode 100644
+index 000000000000..f3064c0c8cb8
+--- /dev/null
++++ b/llvm/lib/Target/BPF/BPFTargetLoweringObjectFile.h
+@@ -0,0 +1,25 @@
++//===============-  BPFTargetLoweringObjectFile.h  -*- C++ -*-================//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIB_TARGET_BPF_BPFTARGETLOWERINGOBJECTFILE
++#define LLVM_LIB_TARGET_BPF_BPFTARGETLOWERINGOBJECTFILE
++
++#include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
++#include "llvm/Target/TargetLoweringObjectFile.h"
++
++namespace llvm {
++class BPFTargetLoweringObjectFileELF : public TargetLoweringObjectFileELF {
++
++public:
++  virtual MCSection *
++  getSectionForJumpTable(const Function &F, const TargetMachine &TM,
++                         const MachineJumpTableEntry *JTE) const override;
++};
++} // namespace llvm
++
++#endif // LLVM_LIB_TARGET_BPF_BPFTARGETLOWERINGOBJECTFILE
+diff --git a/llvm/lib/Target/BPF/BPFTargetMachine.cpp b/llvm/lib/Target/BPF/BPFTargetMachine.cpp
+index 527a48035457..d538b6fe1167 100644
+--- a/llvm/lib/Target/BPF/BPFTargetMachine.cpp
++++ b/llvm/lib/Target/BPF/BPFTargetMachine.cpp
+@@ -12,6 +12,7 @@
+ 
+ #include "BPFTargetMachine.h"
+ #include "BPF.h"
++#include "BPFTargetLoweringObjectFile.h"
+ #include "BPFTargetTransformInfo.h"
+ #include "MCTargetDesc/BPFMCAsmInfo.h"
+ #include "TargetInfo/BPFTargetInfo.h"
+@@ -80,7 +81,7 @@ BPFTargetMachine::BPFTargetMachine(const Target &T, const Triple &TT,
+     : CodeGenTargetMachineImpl(T, computeDataLayout(TT), TT, CPU, FS, Options,
+                                getEffectiveRelocModel(RM),
+                                getEffectiveCodeModel(CM, CodeModel::Small), OL),
+-      TLOF(std::make_unique<TargetLoweringObjectFileELF>()),
++      TLOF(std::make_unique<BPFTargetLoweringObjectFileELF>()),
+       Subtarget(TT, std::string(CPU), std::string(FS), *this) {
+   if (!DisableCheckUnreachable) {
+     this->Options.TrapUnreachable = true;
+diff --git a/llvm/lib/Target/BPF/CMakeLists.txt b/llvm/lib/Target/BPF/CMakeLists.txt
+index eade4cacb710..3678f1335ca3 100644
+--- a/llvm/lib/Target/BPF/CMakeLists.txt
++++ b/llvm/lib/Target/BPF/CMakeLists.txt
+@@ -37,6 +37,7 @@ add_llvm_target(BPFCodeGen
+   BPFRegisterInfo.cpp
+   BPFSelectionDAGInfo.cpp
+   BPFSubtarget.cpp
++  BPFTargetLoweringObjectFile.cpp
+   BPFTargetMachine.cpp
+   BPFMIPeephole.cpp
+   BPFMIChecking.cpp
+diff --git a/llvm/test/CodeGen/BPF/jump_table_blockaddr.ll b/llvm/test/CodeGen/BPF/jump_table_blockaddr.ll
+new file mode 100644
+index 000000000000..d5a1d63b644a
+--- /dev/null
++++ b/llvm/test/CodeGen/BPF/jump_table_blockaddr.ll
+@@ -0,0 +1,91 @@
++; Checks generated using command:
++;    llvm/utils/update_test_body.py llvm/test/CodeGen/BPF/jump_table_blockaddr.ll
++
++; RUN: rm -rf %t && split-file %s %t && cd %t
++; RUN: llc -march=bpf -mcpu=v4 < test.ll | FileCheck %s
++;
++; Source code:
++;    int bar(int a) {
++;       __label__ l1, l2;
++;       void * volatile tgt;
++;       int ret = 0;
++;       if (a)
++;         tgt = &&l1; // synthetic jump table generated here
++;       else
++;         tgt = &&l2; // another synthetic jump table
++;       goto *tgt;
++;   l1: ret += 1;
++;   l2: ret += 2;
++;       return ret;
++;     }
++;
++; Compilation Flags:
++;   clang --target=bpf -mcpu=v4 -O2 -emit-llvm -S test.c
++
++.ifdef GEN
++;--- test.ll
++define dso_local range(i32 2, 4) i32 @bar(i32 noundef %a) local_unnamed_addr{
++entry:
++  %tgt = alloca ptr, align 8
++  %tobool.not = icmp eq i32 %a, 0
++  %. = select i1 %tobool.not, ptr blockaddress(@bar, %l2), ptr blockaddress(@bar, %l1)
++  store volatile ptr %., ptr %tgt, align 8
++  %tgt.0.tgt.0.tgt.0.tgt.0. = load volatile ptr, ptr %tgt, align 8
++  indirectbr ptr %tgt.0.tgt.0.tgt.0.tgt.0., [label %l1, label %l2]
++
++l1:                                               ; preds = %entry
++  br label %l2
++
++l2:                                               ; preds = %l1, %entry
++  %ret.0 = phi i32 [ 3, %l1 ], [ 2, %entry ]
++  ret i32 %ret.0
++}
++
++;--- gen
++echo ""
++echo "; Generated checks follow"
++echo ";"
++llc -march=bpf -mcpu=v4 < test.ll \
++  | awk '/# -- End function/ {p=0} /@function/ {p=1} p {print "; CHECK" ": " $0}'
++
++.endif
++
++; Generated checks follow
++;
++; CHECK: 	.type	bar,@function
++; CHECK: bar:                                    # @bar
++; CHECK: .Lbar$local:
++; CHECK: 	.type	.Lbar$local,@function
++; CHECK: 	.cfi_startproc
++; CHECK: # %bb.0:                                # %entry
++; CHECK: 	r2 = BPF.JT.0.0 ll
++; CHECK: 	r2 = *(u64 *)(r2 + 0)
++; CHECK: 	r3 = BPF.JT.0.1 ll
++; CHECK: 	r3 = *(u64 *)(r3 + 0)
++; CHECK: 	if w1 == 0 goto LBB0_2
++; CHECK: # %bb.1:                                # %entry
++; CHECK: 	r3 = r2
++; CHECK: LBB0_2:                                 # %entry
++; CHECK: 	*(u64 *)(r10 - 8) = r3
++; CHECK: 	r1 = *(u64 *)(r10 - 8)
++; CHECK: 	gotox r1
++; CHECK: .Ltmp0:                                 # Block address taken
++; CHECK: LBB0_3:                                 # %l1
++; CHECK: 	w0 = 3
++; CHECK: 	goto LBB0_5
++; CHECK: .Ltmp1:                                 # Block address taken
++; CHECK: LBB0_4:                                 # %l2
++; CHECK: 	w0 = 2
++; CHECK: LBB0_5:                                 # %.split
++; CHECK: 	exit
++; CHECK: .Lfunc_end0:
++; CHECK: 	.size	bar, .Lfunc_end0-bar
++; CHECK: 	.size	.Lbar$local, .Lfunc_end0-bar
++; CHECK: 	.cfi_endproc
++; CHECK: 	.section	.jumptables,"",@progbits
++; CHECK: BPF.JT.0.0:
++; CHECK: 	.quad	LBB0_3
++; CHECK: 	.size	BPF.JT.0.0, 8
++; CHECK: BPF.JT.0.1:
++; CHECK: 	.quad	LBB0_4
++; CHECK: 	.size	BPF.JT.0.1, 8
+diff --git a/llvm/test/CodeGen/BPF/jump_table_global_var.ll b/llvm/test/CodeGen/BPF/jump_table_global_var.ll
+new file mode 100644
+index 000000000000..bbca46850843
+--- /dev/null
++++ b/llvm/test/CodeGen/BPF/jump_table_global_var.ll
+@@ -0,0 +1,83 @@
++; Checks generated using command:
++;    llvm/utils/update_test_body.py llvm/test/CodeGen/BPF/jump_table_global_var.ll
++
++; RUN: rm -rf %t && split-file %s %t && cd %t
++; RUN: llc -march=bpf -mcpu=v4 < test.ll | FileCheck %s
++;
++; Source code:
++;   int foo(unsigned a) {
++;     __label__ l1, l2;
++;     void *jt1[] = {[0]=&&l1, [1]=&&l2};
++;     int ret = 0;
++;
++;     goto *jt1[a % 2];
++;     l1: ret += 1;
++;     l2: ret += 3;
++;     return ret;
++;   }
++;
++; Compilation Flags:
++;   clang --target=bpf -mcpu=v4 -O2 -emit-llvm -S test.c
++
++.ifdef GEN
++;--- test.ll
++@__const.foo.jt1 = private unnamed_addr constant [2 x ptr] [ptr blockaddress(@foo, %l1), ptr blockaddress(@foo, %l2)], align 8
++
++define dso_local range(i32 3, 5) i32 @foo(i32 noundef %a) local_unnamed_addr {
++entry:
++  %rem = and i32 %a, 1
++  %idxprom = zext nneg i32 %rem to i64
++  %arrayidx = getelementptr inbounds nuw [2 x ptr], ptr @__const.foo.jt1, i64 0, i64 %idxprom
++  %0 = load ptr, ptr %arrayidx, align 8
++  indirectbr ptr %0, [label %l1, label %l2]
++
++l1:                                               ; preds = %entry
++  br label %l2
++
++l2:                                               ; preds = %l1, %entry
++  %ret.0 = phi i32 [ 4, %l1 ], [ 3, %entry ]
++  ret i32 %ret.0
++}
++
++;--- gen
++echo ""
++echo "; Generated checks follow"
++echo ";"
++llc -march=bpf -mcpu=v4 < test.ll \
++  | awk '/# -- End function/ {p=0} /@function/ {p=1} p {print "; CHECK" ": " $0}'
++
++.endif
++
++; Generated checks follow
++;
++; CHECK: 	.type	foo,@function
++; CHECK: foo:                                    # @foo
++; CHECK: .Lfoo$local:
++; CHECK: 	.type	.Lfoo$local,@function
++; CHECK: 	.cfi_startproc
++; CHECK: # %bb.0:                                # %entry
++; CHECK:                                         # kill: def $w1 killed $w1 def $r1
++; CHECK: 	w1 &= 1
++; CHECK: 	r1 <<= 3
++; CHECK: 	r2 = BPF.JT.0.0 ll
++; CHECK: 	r2 += r1
++; CHECK: 	r1 = *(u64 *)(r2 + 0)
++; CHECK: 	gotox r1
++; CHECK: .Ltmp0:                                 # Block address taken
++; CHECK: LBB0_1:                                 # %l1
++; CHECK: 	w0 = 4
++; CHECK: 	goto LBB0_3
++; CHECK: .Ltmp1:                                 # Block address taken
++; CHECK: LBB0_2:                                 # %l2
++; CHECK: 	w0 = 3
++; CHECK: LBB0_3:                                 # %.split
++; CHECK: 	exit
++; CHECK: .Lfunc_end0:
++; CHECK: 	.size	foo, .Lfunc_end0-foo
++; CHECK: 	.size	.Lfoo$local, .Lfunc_end0-foo
++; CHECK: 	.cfi_endproc
++; CHECK: 	.section	.jumptables,"",@progbits
++; CHECK: BPF.JT.0.0:
++; CHECK: 	.quad	LBB0_1
++; CHECK: 	.quad	LBB0_2
++; CHECK: 	.size	BPF.JT.0.0, 16
+diff --git a/llvm/test/CodeGen/BPF/jump_table_switch_stmt.ll b/llvm/test/CodeGen/BPF/jump_table_switch_stmt.ll
+new file mode 100644
+index 000000000000..682b025d665d
+--- /dev/null
++++ b/llvm/test/CodeGen/BPF/jump_table_switch_stmt.ll
+@@ -0,0 +1,126 @@
++; Checks generated using command:
++;    llvm/utils/update_test_body.py llvm/test/CodeGen/BPF/jump_table_switch_stmt.ll
++
++; RUN: rm -rf %t && split-file %s %t && cd %t
++; RUN: llc -march=bpf -mcpu=v4 -bpf-min-jump-table-entries=3 < test.ll | FileCheck %s
++;
++; Source code:
++;   int ret_user;
++;   int foo(int a)
++;   {
++;      switch (a) {
++;      case 1: ret_user = 18; break;
++;      case 20: ret_user = 6; break;
++;      case 30: ret_user = 2; break;
++;      default: break;
++;      }
++;      return 0;
++;   }
++;
++; Compilation Flags:
++;   clang --target=bpf -mcpu=v4 -O2 -emit-llvm -S test.c
++
++.ifdef GEN
++;--- test.ll
++@ret_user = dso_local local_unnamed_addr global i32 0, align 4
++
++define dso_local noundef i32 @foo(i32 noundef %a) local_unnamed_addr {
++entry:
++  switch i32 %a, label %sw.epilog [
++    i32 1, label %sw.epilog.sink.split
++    i32 20, label %sw.bb1
++    i32 30, label %sw.bb2
++  ]
++
++sw.bb1:                                           ; preds = %entry
++  br label %sw.epilog.sink.split
++
++sw.bb2:                                           ; preds = %entry
++  br label %sw.epilog.sink.split
++
++sw.epilog.sink.split:                             ; preds = %entry, %sw.bb1, %sw.bb2
++  %.sink = phi i32 [ 2, %sw.bb2 ], [ 6, %sw.bb1 ], [ 18, %entry ]
++  store i32 %.sink, ptr @ret_user, align 4
++  br label %sw.epilog
++
++sw.epilog:                                        ; preds = %sw.epilog.sink.split, %entry
++  ret i32 0
++}
++
++;--- gen
++echo ""
++echo "; Generated checks follow"
++echo ";"
++llc -march=bpf -mcpu=v4 -bpf-min-jump-table-entries=3 < test.ll \
++  | awk '/# -- End function/ {p=0} /@function/ {p=1} p {print "; CHECK" ": " $0}'
++
++.endif
++
++; Generated checks follow
++;
++; CHECK: 	.type	foo,@function
++; CHECK: foo:                                    # @foo
++; CHECK: .Lfoo$local:
++; CHECK: 	.type	.Lfoo$local,@function
++; CHECK: 	.cfi_startproc
++; CHECK: # %bb.0:                                # %entry
++; CHECK:                                         # kill: def $w1 killed $w1 def $r1
++; CHECK: 	w1 += -1
++; CHECK: 	if w1 > 29 goto LBB0_5
++; CHECK: # %bb.1:                                # %entry
++; CHECK: 	w2 = 18
++; CHECK: 	r1 <<= 3
++; CHECK: 	r3 = BPF.JT.0.0 ll
++; CHECK: 	r4 = BPF.JT.0.0 ll
++; CHECK: 	r4 += r1
++; CHECK: 	r1 = *(u64 *)(r4 + 0)
++; CHECK: 	r3 += r1
++; CHECK: 	gotox r3
++; CHECK: LBB0_2:                                 # %sw.bb1
++; CHECK: 	w2 = 6
++; CHECK: 	goto LBB0_4
++; CHECK: LBB0_3:                                 # %sw.bb2
++; CHECK: 	w2 = 2
++; CHECK: LBB0_4:                                 # %sw.epilog.sink.split
++; CHECK: 	r1 = ret_user ll
++; CHECK: 	*(u32 *)(r1 + 0) = w2
++; CHECK: LBB0_5:                                 # %sw.epilog
++; CHECK: 	w0 = 0
++; CHECK: 	exit
++; CHECK: .Lfunc_end0:
++; CHECK: 	.size	foo, .Lfunc_end0-foo
++; CHECK: 	.size	.Lfoo$local, .Lfunc_end0-foo
++; CHECK: 	.cfi_endproc
++; CHECK: 	.section	.jumptables,"",@progbits
++; CHECK: BPF.JT.0.0:
++; CHECK: 	.quad	LBB0_4
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_2
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_5
++; CHECK: 	.quad	LBB0_3
++; CHECK: 	.size	BPF.JT.0.0, 240
+-- 
+2.50.1
+

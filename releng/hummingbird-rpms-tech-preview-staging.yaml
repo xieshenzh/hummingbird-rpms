@@ -528,6 +528,8 @@ spec:
           contentType: rpm
         - name: llvm-main
           contentType: rpm
+        - name: llvm21-main
+          contentType: rpm
         - name: lmdb-main
           contentType: rpm
         - name: logrotate-main

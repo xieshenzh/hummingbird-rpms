@@ -1,0 +1,34 @@
+From ac5b6151976c70c8b676d3bc6ff82895fe0e1d01 Mon Sep 17 00:00:00 2001
+From: yonghong-song <yhs@fb.com>
+Date: Tue, 4 Nov 2025 15:15:33 -0800
+Subject: [PATCH] [BPF] Remove dead code related to __bpf_trap global var
+ (#166440)
+
+In [1], the symbol __bpf_trap (macro BPF_TRAP) is removed if it is not
+used in the code. In the discussion in [1], it is found that the branch
+"if (Op.isSymbol())" is actually always false. Remove it to avoid
+confusion.
+
+  [1] https://github.com/llvm/llvm-project/pull/166003
+---
+ llvm/lib/Target/BPF/BPFAsmPrinter.cpp | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/llvm/lib/Target/BPF/BPFAsmPrinter.cpp b/llvm/lib/Target/BPF/BPFAsmPrinter.cpp
+index 378a72ab27dd..abe081c0c76f 100644
+--- a/llvm/lib/Target/BPF/BPFAsmPrinter.cpp
++++ b/llvm/lib/Target/BPF/BPFAsmPrinter.cpp
+@@ -176,10 +176,6 @@ void BPFAsmPrinter::emitInstruction(const MachineInstr *MI) {
+         if (const GlobalValue *GV = Op.getGlobal())
+           if (GV->getName() == BPF_TRAP)
+             SawTrapCall = true;
+-      } else if (Op.isSymbol()) {
+-        if (const MCSymbol *Sym = Op.getMCSymbol())
+-          if (Sym->getName() == BPF_TRAP)
+-            SawTrapCall = true;
+       }
+     }
+   }
+-- 
+2.50.1
+
