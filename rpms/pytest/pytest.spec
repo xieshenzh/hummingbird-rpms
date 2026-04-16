@@ -1,6 +1,6 @@
 Name:           pytest
-Version:        8.4.2
-Release:        3.2%{?dist}
+Version:        9.0.3
+Release:        1%{?dist}
 Summary:        Simple powerful testing with Python
 # SPDX
 License:        MIT
@@ -67,6 +67,7 @@ BuildRequires:  python3-pluggy >= 1
 BuildRequires:  python3-pygments-pytest
 BuildRequires:  python3-furo
 BuildRequires:  python3-sphinx
+BuildRequires:  python3-sphinx-inline-tabs
 BuildRequires:  python3-sphinx-removed-in
 BuildRequires:  python3-sphinxcontrib-trio
 # See doc/en/conf.py -- sphinxcontrib.inkscapeconverter is only used when inkscape is available
