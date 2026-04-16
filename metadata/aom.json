@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "c334c4f8c65c1c762fb112d45f04c9575698dbbf",
+  "release": "2",
+  "sha": "2539e35b9e97bbcea7e629eb6a441cbe9f831ff6",
   "source": "https://src.fedoraproject.org/rpms/aom.git",
   "version": "3.13.3"
 }
