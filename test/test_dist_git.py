@@ -2920,3 +2920,146 @@ Test native package
     # Verify commit message
     subject, _ = get_last_commit_info(workdir)
     assert subject == 'Rebuild native-pkg: test native rebuild'
+
+
+def test_rebuild_rev_deps_direct(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test rebuild-rev-deps with direct package name (go-rpm-macros)."""
+    # Import vanilla which BuildRequires: go-rpm-macros (simulated)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Modify vanilla spec to add BuildRequires: go-rpm-macros
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    spec_content = vanilla_spec.read_text()
+    modified_content = spec_content.replace(
+        'Summary: Test package vanilla',
+        'Summary: Test package vanilla\nBuildRequires: go-rpm-macros'
+    )
+    vanilla_spec.write_text(modified_content)
+    subprocess.run(['git', 'commit', '-a', '-m', 'Add BuildRequires'], cwd=workdir, check=True)
+
+    # Rebuild reverse dependencies of go-rpm-macros
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild-rev-deps', 'go-rpm-macros',
+         '--reason', 'go-rpm-macros update'],
+        cwd=workdir, capture_output=True, text=True, check=True
+    )
+
+    # Should rebuild vanilla
+    assert 'Rebuilding vanilla: go-rpm-macros update' in result.stderr
+    assert 'Release: 1.1%{?dist}' in vanilla_spec.read_text()
+
+    # Check summary
+    assert 'Rebuild Summary for go-rpm-macros reverse dependencies:' in result.stdout
+    assert 'Total packages: 1' in result.stdout
+    assert 'Successful rebuilds: 1' in result.stdout
+
+
+def setup_golang_packages(workdir: Path, versions: list[str]) -> None:
+    """Create golang packages for testing virtual BuildRequires."""
+    for version in versions:
+        golang_dir = workdir / 'rpms' / f'golang{version}'
+        golang_dir.mkdir()
+        golang_spec = golang_dir / 'golang.spec'
+        golang_spec.write_text(f"""Name: golang{version}
+Version: {version}.0
+Release: 1%{{?dist}}
+Summary: Go compiler {version}
+License: BSD
+Provides: golang = %{{version}}-%{{release}}
+
+%description
+Go compiler version {version}
+
+%files
+""")
+        metadata_file = workdir / 'metadata' / f'golang{version}.json'
+        metadata = {
+            'source': 'https://example.com/golang.git',
+            'branch': 'rawhide',
+            'sha': '1234567890abcdef',
+            'version': f'{version}.0',
+            'release': '1',
+            'modification_status': 'clean'
+        }
+        with open(metadata_file, 'w') as f:
+            json.dump(metadata, f, indent=2)
+            f.write('\n')
+
+
+def test_rebuild_rev_deps_virtual_buildrequires_latest(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test rebuild-rev-deps with latest virtual BuildRequires (golang1.26)."""
+    setup_golang_packages(workdir, ['1.25', '1.26'])
+
+    # Import vanilla which BuildRequires: go-rpm-macros
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    spec_content = vanilla_spec.read_text()
+    modified_content = spec_content.replace(
+        'Summary: Test package vanilla',
+        'Summary: Test package vanilla\nBuildRequires: go-rpm-macros'
+    )
+    vanilla_spec.write_text(modified_content)
+
+    subprocess.run(['git', 'add', '.'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add golang packages and BR'], cwd=workdir, check=True)
+
+    # Rebuild reverse dependencies of golang1.26 (latest)
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild-rev-deps', 'golang1.26',
+         '--reason', 'golang 1.26 update'],
+        cwd=workdir, capture_output=True, text=True, check=True
+    )
+
+    # Should translate golang1.26 to go-rpm-macros and rebuild vanilla
+    assert 'Translating golang1.26 to go-rpm-macros (virtual BuildRequires pattern)' in result.stderr
+    assert 'Rebuilding vanilla: golang 1.26 update' in result.stderr
+    assert 'Release: 1.1%{?dist}' in vanilla_spec.read_text()
+
+    # Check commit message
+    subject, _ = get_last_commit_info(workdir)
+    assert subject == 'Rebuild vanilla: golang 1.26 update'
+
+
+def test_rebuild_rev_deps_virtual_buildrequires_not_latest(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test rebuild-rev-deps rejects non-latest virtual BuildRequires."""
+    setup_golang_packages(workdir, ['1.25', '1.26'])
+
+    subprocess.run(['git', 'add', '.'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add golang packages'], cwd=workdir, check=True)
+
+    # Try to rebuild reverse dependencies of golang1.25 (not latest)
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild-rev-deps', 'golang1.25',
+         '--reason', 'golang 1.25 update'],
+        cwd=workdir, capture_output=True, text=True
+    )
+
+    # Should exit with error
+    assert result.returncode != 0
+    assert 'golang1.25 is not the latest version' in result.stderr
+    assert 'Latest version is golang1.26' in result.stderr
+
+
+def test_rebuild_rev_deps_no_dependencies(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test rebuild-rev-deps with package that has no reverse dependencies."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Rebuild reverse dependencies of vanilla (which nothing depends on)
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild-rev-deps', 'vanilla',
+         '--reason', 'vanilla update'],
+        cwd=workdir, capture_output=True, text=True, check=True
+    )
+
+    # Should report no dependencies
+    assert 'No packages found with BuildRequires: vanilla' in result.stderr

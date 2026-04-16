@@ -5,21 +5,26 @@ aliases: [/l/rebuilding-packages]
 ---
 
 > **AI Agent Note:** When asked to rebuild packages, use the `rebuild` command:
-> `./ci/dist_git.py rebuild <package> --reason "<reason>"`. Always ask the user for a ticket link or
-> explanation first to use as the reason. If the command fails with "uses macros in Release field",
-> see the "Packages requiring manual rebuild" section below for instructions.
+> `./ci/dist_git.py rebuild <package> --reason "<reason>"`. For rebuilding reverse dependencies
+> (e.g., "rebuild all Go packages"), use `rebuild-rev-deps <package> --reason "<reason>"`.
+> Always ask the user for a ticket link or explanation first to use as the reason. If the command
+> fails with "uses macros in Release field", see the "Packages requiring manual rebuild" section
+> below for instructions.
 
 ## Overview
 
-This document covers two scenarios for triggering a new package build:
+This document covers three scenarios for triggering package builds:
 
 1. **No-change rebuild**: Bump the Release field to rebuild with identical sources (e.g., to fix a
    faulty published RPM or pick up toolchain changes).
 
-2. **Backporting a patch**: Add an upstream patch that hasn't yet landed in Fedora to fast-track a
+2. **Rebuilding reverse dependencies**: Rebuild all packages that depend on a changed package (e.g.,
+   rebuild all Go packages when golang updates).
+
+3. **Backporting a patch**: Add an upstream patch that hasn't yet landed in Fedora to fast-track a
    fix or feature.
 
-Both scenarios use the `.N` release suffix pattern to ensure our builds sort higher than the
+All scenarios use the `.N` release suffix pattern to ensure our builds sort higher than the
 upstream Fedora release while remaining lower than the next upstream version.
 
 ## No-Change Rebuild
@@ -328,6 +333,93 @@ manually mark the package as modified:
 ```
 
 Note: This will block automatic Fedora updates until you mark it clean again.
+
+## Rebuilding Reverse Dependencies
+
+When a compiler, runtime, or toolchain package changes, you may need to rebuild all packages that
+depend on it. The `rebuild-rev-deps` command automates finding and rebuilding reverse dependencies.
+
+### When to use
+
+Common scenarios for rebuilding reverse dependencies:
+
+- **Golang/Python runtime updates**: When updating `golang1.26`, `python3.14`, etc.,
+  rebuild all Go/Python packages
+- **Toolchain changes**: When updating `gcc`, rebuild packages that BuildRequire it
+- **Library ABI changes**: When a library's ABI changes, rebuild packages that BuildRequire it
+
+### Usage
+
+```bash
+./ci/dist_git.py rebuild-rev-deps <package> --reason "<reason>"
+```
+
+The command:
+
+1. Finds all packages that have `BuildRequires: <package>` in their spec files
+2. Rebuilds each package (bumps Release field and commits)
+3. Reports a summary of successful/failed rebuilds
+
+Examples:
+
+```bash
+# Rebuild all Go packages when golang updates
+./ci/dist_git.py rebuild-rev-deps golang1.26 --reason "golang 1.26.2 update"
+
+# Rebuild all Python packages when python updates
+./ci/dist_git.py rebuild-rev-deps python3.14 --reason "python 3.14.1 update"
+
+# Rebuild packages that depend on a specific library
+./ci/dist_git.py rebuild-rev-deps openssl --reason "openssl 3.4.0 update"
+```
+
+### Virtual BuildRequires (golang/python)
+
+For virtual BuildRequires like `golang1.25`, `golang1.26`, `python3.13`, `python3.14`, the command
+automatically handles translation to the actual BuildRequires target:
+
+```bash
+# These all work the same way:
+./ci/dist_git.py rebuild-rev-deps golang1.26 --reason "..."
+./ci/dist_git.py rebuild-rev-deps go-rpm-macros --reason "..."
+```
+
+**Important:** Only the **latest** version triggers rebuilds. This is because:
+
+1. Multiple golang versions exist: `golang1.25`, `golang1.26`
+2. They all provide the same virtual package: `Provides: golang = <version>`
+3. DNF always picks the highest version to satisfy `Requires: golang`
+
+Therefore:
+
+- ✅ `rebuild-rev-deps golang1.26` → Rebuilds all Go packages (latest version)
+- ❌ `rebuild-rev-deps golang1.25` → **Error**: Not the latest version
+
+This ensures rebuilds only happen when the active runtime actually changes.
+
+### Creating MRs for reverse dependency rebuilds
+
+After creating rebuild commits, use `rebuild_multi_mr.sh` to push each commit as its own MR:
+
+```bash
+./ci/rebuild_multi_mr.sh --base main
+```
+
+See the "Creating MRs for rebuild commits" section above for full details.
+
+### Dry-run mode
+
+Preview which packages would be rebuilt without making changes:
+
+```bash
+./ci/dist_git.py --dry-run rebuild-rev-deps golang1.26 --reason "test"
+```
+
+This shows:
+
+- Which packages have the BuildRequires dependency
+- What the new Release values would be
+- Does not commit any changes
 
 ## Backporting a Patch
 
