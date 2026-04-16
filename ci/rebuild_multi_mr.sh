@@ -1,6 +1,6 @@
 #!/bin/bash
 # Creates individual MRs for each rebuild commit ahead of a base branch.
-# Intended to be run after 'dist_git.py rebuild' has created commits locally.
+# Intended to be run after 'dist_git.py rebuild' or 'rebuild-rev-deps' has created commits locally.
 #
 # Usage:
 #   ./ci/rebuild_multi_mr.sh                              # Create MRs for all commits ahead of origin/main

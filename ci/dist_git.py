@@ -22,6 +22,7 @@ import time
 import urllib.parse
 import xmlrpc.client
 import yaml
+from packaging.version import Version
 from pathlib import Path
 from specfile import Specfile
 from typing import Literal, NotRequired, TypedDict, cast
@@ -38,6 +39,14 @@ RENAMED_PACKAGES_JSON = ROOT_DIR / 'ci' / 'renamed_packages.json'
 # it through indirect macros.  Nothing after %autorelease ever needs to be preserved,
 # so we consume everything to end of line.
 AUTORELEASE_PATTERN = r'%\{?\??autorelease.*'
+
+# When the LATEST version of a virtual BuildRequires changes, rebuild all its dependents
+# See get_virtual_buildrequires_translation() below for details
+VIRTUAL_BUILDREQUIRES_PATTERNS = {
+    r'^golang1\.(.+)$': 'go-rpm-macros',
+    r'^golang-fips1\.(.+)$': 'go-rpm-macros',
+    r'^python3\.(.+)$': 'python3-devel',
+}
 
 # Global imports dict, loaded at startup
 imports: dict[str, 'PackageMetadata'] = {}
@@ -1516,6 +1525,163 @@ def diff_package(package_name: str, output_mode: str = 'full', raw: bool = False
             sys.exit(f"Error running diff: {result.stderr}")
 
 
+def get_virtual_buildrequires_translation(package_name: str) -> str:
+    """Translate virtual BuildRequires to actual target, or return package_name unchanged.
+
+    Virtual BuildRequires packages (golang1.{25,26}, python3.{13,14}, etc.) all
+    provide a common virtual package (golang, python3-devel).
+
+    Dependency chain example for Go packages:
+        go-fdo-client
+          → BuildRequires: go-rpm-macros
+            → Requires: golang (virtual package)
+              → Provided by: golang1.25 (Provides: golang = 1.25.9-1)
+              → Provided by: golang1.26 (Provides: golang = 1.26.2-1)
+              → DNF picks the highest version match → golang1.26
+
+    Since DNF always selects the latest version to satisfy the virtual package requirement,
+    only changes to the LATEST version trigger rebuilds of reverse dependencies.
+    Updating golang1.25 when golang1.26 exists won't affect any builds, so we reject it.
+
+    Args:
+        package_name: Package name to check (e.g., 'golang1.26' or 'openssl')
+
+    Returns:
+        Target package name (e.g., 'go-rpm-macros') if virtual BuildRequires and latest version,
+        otherwise the original package_name unchanged
+
+    Raises:
+        SystemExit: If package is a virtual BuildRequires but not the latest
+    """
+    for pattern, target in VIRTUAL_BUILDREQUIRES_PATTERNS.items():
+        match = re.match(pattern, package_name)
+        if match:
+            version_suffix = match.group(1)
+
+            # Find all packages matching this pattern
+            all_matching = [
+                (pkg.name, m.group(1))
+                for pkg in RPMS_DIR.glob('*')
+                if pkg.is_dir() and (m := re.match(pattern, pkg.name))
+            ]
+
+            # Should always find at least the input package since we matched it above
+            assert all_matching, f"No packages found matching pattern {pattern} despite matching {package_name}"
+
+            # Find the latest version using proper version comparison
+            latest_pkg, latest_suffix = max(all_matching, key=lambda x: Version(x[1]))
+
+            if Version(version_suffix) < Version(latest_suffix):
+                sys.exit(f"ERROR: {package_name} is not the latest version.\n"
+                        f"       Latest version is {latest_pkg}.\n"
+                        f"       Only the latest version triggers rebuilds of reverse dependencies.")
+
+            logging.info("Translating %s to %s (virtual BuildRequires pattern)", package_name, target)
+            return target
+
+    return package_name
+
+
+def expand_spec_buildrequires(package_dir: Path) -> list[str]:
+    """Expand spec file macros and extract BuildRequires.
+
+    Args:
+        package_dir: Path to package directory containing spec file
+
+    Returns:
+        List of BuildRequires package names (without version constraints)
+    """
+    spec_files = list(package_dir.glob('*.spec'))
+    assert len(spec_files) == 1, \
+        f"Expected exactly one .spec file in {package_dir}, found {len(spec_files)}: {spec_files}"
+    spec_file = spec_files[0]
+
+    # Resolve macros and conditionals
+    result = subprocess.run(
+        ['rpmspec', '-q', '--buildrequires', f'--define=_sourcedir {package_dir}', str(spec_file)],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True
+    )
+
+    # Parse BuildRequires - each line is a requirement
+    # Format can be: "package", "package >= version", "package = version", etc.
+    # Extract just the package name (before any version constraint)
+    return [
+        line.split()[0]
+        for line in result.stdout.strip().splitlines()
+        if line.strip()
+    ]
+
+
+def print_rebuild_summary(total_packages: int, failed_packages: list[str], title: str = "Rebuild Summary") -> None:
+    """Print rebuild summary and exit if there are failures.
+
+    Args:
+        total_packages: Total number of packages attempted
+        failed_packages: List of package names that failed to rebuild
+        title: Title for the summary report
+    """
+    successful = total_packages - len(failed_packages)
+    print(f"\n{title}:")
+    print(f"  Total packages: {total_packages}")
+    print(f"  Successful rebuilds: {successful}")
+    print(f"  Failed rebuilds: {len(failed_packages)}")
+
+    if failed_packages:
+        print("\nFailed packages:")
+        for pkg in failed_packages:
+            print(f"  - {pkg}")
+        sys.exit(1)
+
+
+def rebuild_reverse_dependencies(package_name: str, reason: str, dry_run: bool = False) -> None:
+    """Rebuild all reverse dependencies of a package.
+
+    For virtual BuildRequires (golang1.X, python3.X), only rebuilds if the package
+    is the latest version. Translates to the actual BuildRequires target (e.g.,
+    golang1.26 → go-rpm-macros).
+
+    Args:
+        package_name: Package whose reverse dependencies should be rebuilt
+        reason: Reason for rebuild
+        dry_run: If True, don't commit changes
+    """
+    # Translate virtual BuildRequires to actual target (e.g., golang1.26 → go-rpm-macros)
+    actual_target = get_virtual_buildrequires_translation(package_name)
+
+    # Find all reverse dependencies
+    logging.info("Scanning packages for BuildRequires: %s", actual_target)
+    reverse_deps = []
+    for package_dir in sorted(RPMS_DIR.glob('*')):
+        if not package_dir.is_dir():
+            continue
+
+        pkg = package_dir.name
+        buildrequires = expand_spec_buildrequires(package_dir)
+
+        if actual_target in buildrequires:
+            logging.debug("Found reverse dependency: %s", pkg)
+            reverse_deps.append(pkg)
+
+    if not reverse_deps:
+        logging.info("No packages found with BuildRequires: %s", actual_target)
+        return
+
+    logging.info("Found %d reverse dependencies of %s", len(reverse_deps), actual_target)
+    logging.info("Packages to rebuild: %s", ', '.join(sorted(reverse_deps)))
+
+    # Rebuild each package
+    failed_packages = []
+    for pkg in reverse_deps:
+        try:
+            rebuild_package(pkg, reason, dry_run=dry_run)
+        except SystemExit as e:
+            logging.error("Failed to rebuild %s: %s", pkg, e.code if isinstance(e.code, str) else "error")
+            failed_packages.append(pkg)
+
+    # Report summary
+    print_rebuild_summary(len(reverse_deps), failed_packages, f"Rebuild Summary for {package_name} reverse dependencies")
+
+
 def list_packages(status_filter: str | None = None, prerelease_filter: bool = False, name_only: bool = False) -> None:
     """List packages with their modification status.
 
@@ -1675,6 +1841,14 @@ Examples:
     rebuild_parser.add_argument('--reason', required=True,
                                help='Reason for rebuild (e.g., "fix faulty build", "toolchain update")')
 
+    # rebuild-rev-deps command
+    rebuild_revdeps_parser = subparsers.add_parser('rebuild-rev-deps',
+                                                   help='Rebuild all reverse dependencies of a package')
+    rebuild_revdeps_parser.add_argument('package',
+                                       help='Package name (e.g., golang1.26, python3.14, go-rpm-macros)')
+    rebuild_revdeps_parser.add_argument('--reason', required=True,
+                                       help='Reason for rebuild (e.g., "golang 1.26 update", "python ABI change")')
+
     # update-releases command
     subparsers.add_parser('update-releases',
                           help='Update upstream-releases.json from Bodhi API (rawhide auto-resolves to highest version)')
@@ -1789,17 +1963,9 @@ Examples:
 
             # Report summary for multiple packages
             if args.all or len(args.packages) > 1:
-                successful = len(packages) - len(failed_packages)
-                print("\nRebuild Summary:")
-                print(f"  Total packages: {len(packages)}")
-                print(f"  Successful rebuilds: {successful}")
-                print(f"  Failed rebuilds: {len(failed_packages)}")
-
-                if failed_packages:
-                    print("\nFailed packages:")
-                    for pkg in failed_packages:
-                        print(f"  - {pkg}")
-                    sys.exit(1)
+                print_rebuild_summary(len(packages), failed_packages)
+        case 'rebuild-rev-deps':
+            rebuild_reverse_dependencies(args.package, args.reason, dry_run=args.dry_run)
         case 'update-releases':
             update_releases()
         case 'rename':
