@@ -1,0 +1,4 @@
+addFilter(r'spelling-error .* (dm|reencryption|situ|libcryptsetup)')
+addFilter(r'obsolete-not-provided python2-cryptsetup|cryptsetup-python3')
+addFilter(r'cryptsetup-libs\.[^:]+: (E|W): no-documentation')
+addFilter(r'non-standard-dir-perm /run/cryptsetup')
