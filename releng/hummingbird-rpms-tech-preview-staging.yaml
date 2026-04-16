@@ -532,6 +532,8 @@ spec:
           contentType: rpm
         - name: lua-rpm-macros-main
           contentType: rpm
+        - name: lvm2-main
+          contentType: rpm
         - name: lz4-main
           contentType: rpm
         - name: lzo-main
