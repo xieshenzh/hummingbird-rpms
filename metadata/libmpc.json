@@ -2,7 +2,7 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "f26e76257269fc3a31cd006201024fc7bdfe0a59",
+  "sha": "05de0cb4ebbde749c314d441077b11fd42578381",
   "source": "https://src.fedoraproject.org/rpms/libmpc.git",
-  "version": "1.4.0"
+  "version": "1.4.1"
 }
