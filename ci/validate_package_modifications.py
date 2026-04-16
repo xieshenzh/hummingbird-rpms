@@ -12,6 +12,7 @@ import logging
 import os
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 # Import from dist_git.py
@@ -457,13 +458,22 @@ def validate_packages(packages: list[str], check_actual_state: bool = True) -> i
     errors = []
     total = len(packages)
 
-    for i, package_name in enumerate(packages, 1):
-        logging.info(f"[{i}/{total}] Validating {package_name}...")
+    # Use thread pool for parallel validation (git operations release GIL)
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        # Submit all validation tasks
+        future_to_pkg = {
+            executor.submit(validate_package, pkg, check_actual_state): pkg
+            for pkg in packages
+        }
 
-        valid, error = validate_package(package_name, check_actual_state)
+        # Collect results as they complete
+        for i, future in enumerate(as_completed(future_to_pkg), 1):
+            package_name = future_to_pkg[future]
+            logging.info(f"[{i}/{total}] Validated {package_name}")
 
-        if not valid:
-            errors.append(error)
+            valid, error = future.result()
+            if not valid:
+                errors.append(error)
 
     if errors:
         print("\n" + "=" * 60, file=sys.stderr)
