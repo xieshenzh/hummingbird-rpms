@@ -1,7 +1,7 @@
 From d7d716f3270235529995e0d28b8d6c89f4171045 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Fri, 9 Nov 2018 15:12:21 -0500
-Subject: [PATCH 01/21] FIPS: Add support for PRNG, RADIUS (krad), and crypto
+Subject: [PATCH 01/22] FIPS: Add support for PRNG, RADIUS (krad), and crypto
  providers
 
 In FIPS mode:
@@ -662,7 +662,7 @@ index 1a772d450f..32baaecbb8 100644
 From 1a4d6a7393887bf5372674942eea53030de0fed9 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Thu, 5 May 2022 17:15:12 +0200
-Subject: [PATCH 02/21] FIPS: Allow krad UDP/TCP localhost connection
+Subject: [PATCH 02/22] FIPS: Allow krad UDP/TCP localhost connection
 
 libkrad allows to establish connections only to UNIX socket in FIPS
 mode, because MD5 digest is not considered safe enough to be used for
@@ -746,7 +746,7 @@ index 891404d5b7..7654bab21b 100644
 From 9b5aa1ecb9b49d684534bffbad39f08358f797e3 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Tue, 23 May 2023 12:19:54 +0200
-Subject: [PATCH 03/21] FIPS: Make PKINIT CMS SHA-1 signature verification
+Subject: [PATCH 03/22] FIPS: Make PKINIT CMS SHA-1 signature verification
  available
 
 We recommend using the SHA1 crypto-module in order to allow the
@@ -792,7 +792,7 @@ index f222dbdf92..1d99559485 100644
 From c082c835672d41b9a68d1d3195fe0c44cb689fd7 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Thu, 19 Jan 2023 19:22:27 +0100
-Subject: [PATCH 04/21] FIPS: Allow KRB5KDF, MD5, MD4 and HMAC-MD4/5
+Subject: [PATCH 04/22] FIPS: Allow KRB5KDF, MD5, MD4 and HMAC-MD4/5
 
 OpenSSL's restrictions to use KRB5KDF, MD5, and MD4 in FIPS mode are
 bypassed in case AES SHA-1 HMAC or RC4 encryption types are allowed by
@@ -1224,7 +1224,7 @@ index 7654bab21b..96da3c451d 100644
 From c64ff3431496d96f30ac1303be3a5aedf518cab1 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 26 Mar 2019 18:51:10 -0400
-Subject: [PATCH 05/21] 3DES: Remove support
+Subject: [PATCH 05/22] 3DES: Remove support
 
 Completely remove support for all DES3 enctypes (des3-cbc-raw,
 des3-hmac-sha1, des3-cbc-sha1-kd).  Update all tests and documentation
@@ -7504,7 +7504,7 @@ index 1aebdd0b4a..c38eefd2bd 100644
 From f6b425e86cec7feb91d62a9d312f2660f06ac2ac Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 23 Aug 2016 16:29:58 -0400
-Subject: [PATCH 06/21] PAM: Add integration to ksu
+Subject: [PATCH 06/22] PAM: Add integration to ksu
 
 Modify ksu so that it performs account and session management on behalf of
 the target user account, mimicking the action of regular su.  The default
@@ -8284,7 +8284,7 @@ index 9fc569f195..99268dfd78 100644
 From dac2e975d5729d53f22dc7d77428feb55263b982 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 23 Aug 2016 16:30:53 -0400
-Subject: [PATCH 07/21] SELINUX: Add integration
+Subject: [PATCH 07/22] SELINUX: Add integration
 
 SELinux bases access to files on the domain of the requesting process,
 the operation being performed, and the context applied to the file.
@@ -9326,7 +9326,7 @@ index 0000000000..b10f927b2e
 From 8523c362c7a0bc2a702ede1ec82b24555ff12ba5 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Mon, 9 Jan 2023 22:39:52 +0100
-Subject: [PATCH 08/21] INSTALL: Do not set root as ksu file owner
+Subject: [PATCH 08/22] INSTALL: Do not set root as ksu file owner
 
 Upstream Makefile uses the install command to set root as owner of the
 ksu executable file. However, this is no longer supported on latest
@@ -9358,7 +9358,7 @@ index 9f64fd190f..3724d26ae6 100644
 From 307d0b16159de59092b00a109d44f68de323f5f1 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Wed, 7 Dec 2022 13:22:42 +0100
-Subject: [PATCH 09/21] SSSD: Make tests compatible with
+Subject: [PATCH 09/22] SSSD: Make tests compatible with
  sssd_krb5_locator_plugin.so
 
 The sssd_krb5_locator_plugin.so plugin provided by sssd-client conflicts
@@ -9400,7 +9400,7 @@ index 87bac17929..26bc95a8dc 100644
 From 82ec4d257ba4f0ea5e57c56b680bc888b69ae3df Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Wed, 15 Mar 2023 15:56:34 +0100
-Subject: [PATCH 10/21] PAC: Allow to set ticket signature as optional
+Subject: [PATCH 10/22] PAC: Allow to set ticket signature as optional
 
 MS-PAC states that "The ticket signature SHOULD be included in tickets
 that are not encrypted to the krbtgt account". However, the
@@ -9680,7 +9680,7 @@ index 15ddc17dc5..96cdd52982 100644
 From f160430a84cdbc2f24e4e9dc32fafac04ddcb887 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 23 Aug 2016 16:49:25 -0400
-Subject: [PATCH 11/21] BUILD: fix debuginfo with y.tab.c
+Subject: [PATCH 11/22] BUILD: fix debuginfo with y.tab.c
 
 We want to keep these y.tab.c files around because the debuginfo points to
 them.  It would be more elegant at the end to use symbolic links, but that
@@ -9737,7 +9737,7 @@ index 8669c2436c..f243017ce9 100644
 From 621dac3f7d2989adfd746d40ba74468fa0275ab5 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Sun, 21 Sep 2025 11:14:51 +0300
-Subject: [PATCH 12/21] PKINIT: If configured, attempt Anonymous PKINIT for
+Subject: [PATCH 12/22] PKINIT: If configured, attempt Anonymous PKINIT for
  FAST
 
 If auto_fast_armor is configured for the realm or globally, optimistically
@@ -9965,7 +9965,7 @@ index 6f7890abcd..12c2ea1e5d 100644
 From 347f81103e95536b5655bee31bb9ced05d06b098 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Sun, 19 Oct 2025 18:14:29 +0300
-Subject: [PATCH 13/21] Fix OTP preauth crash with null prompter
+Subject: [PATCH 13/22] Fix OTP preauth crash with null prompter
 
 In doprompt(), check if the caller provided a prompter before
 dereferencing it.  Similar code returns either EIO or
@@ -10001,7 +10001,7 @@ index 07ffc15c22..48003da62f 100644
 From 2073be1acd51f906ac68c1a73c4f1ae8380eee35 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Wed, 10 Dec 2025 10:42:02 +0200
-Subject: [PATCH 14/21] Fix strchr() conformance to C23
+Subject: [PATCH 14/22] Fix strchr() conformance to C23
 
 C23 7.28.5.1 specifies search functions such as strchr() as generic,
 returning const char * if the first argument is of type const char *.
@@ -10191,7 +10191,7 @@ index 82f870ea5d..4221a20283 100644
 From df905ea146a4feb39275f657918373e343cda28f Mon Sep 17 00:00:00 2001
 From: Greg Hudson <ghudson@mit.edu>
 Date: Sun, 28 Sep 2025 15:39:10 -0400
-Subject: [PATCH 15/21] Add paChecksum2 to PKINIT ASN.1 tests
+Subject: [PATCH 15/22] Add paChecksum2 to PKINIT ASN.1 tests
 
 Commit 310793ba63782af5ffa3a95d20e41f8f03ca7e00 added the paChecksum2
 field to krb5_pk_authenticator.  ktest_make_sample_pk_authenticator()
@@ -10366,7 +10366,7 @@ index c47bd71f67..418be63546 100644
 From c851405051ca0af7779a6d6f40df4f28221230f3 Mon Sep 17 00:00:00 2001
 From: Dax Kelson <dakelson@redhat.com>
 Date: Tue, 13 May 2025 11:54:41 -0600
-Subject: [PATCH 16/21] Add xrealmauthz KDC policy module and tests
+Subject: [PATCH 16/22] Add xrealmauthz KDC policy module and tests
 
 This module provides fine-grained access control for cross-realm
 authentications by checking string attributes on the incoming
@@ -11127,7 +11127,7 @@ index 0000000000..3b3921f036
 From 4634ca1f8242c24632e006d7b651064a7556cc92 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Thu, 29 Jan 2026 19:05:01 +0100
-Subject: [PATCH 17/21] Install xrealmauthz like other plugins
+Subject: [PATCH 17/22] Install xrealmauthz like other plugins
 
 The xrealmauthz kdcpolicy plugin was merged upstream, but it is not
 installed my the Makefile. The commit adds additional configuration to
@@ -11191,7 +11191,7 @@ index 78346d6572..b6740210a7 100644
 From 6d066787d23c913789dcfc220b34cd3a78ada4c7 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Mon, 16 Feb 2026 16:30:14 +0100
-Subject: [PATCH 18/21] Force "fork" method for RADIUS daemon in OTP test
+Subject: [PATCH 18/22] Force "fork" method for RADIUS daemon in OTP test
 
 The RADIUS daemon used in the OTP test relies on
 multiprocessing.Process. Since Python 3.14, multiprocessing changed its
@@ -11261,7 +11261,7 @@ index dd5cdc5c26..c173b55c41 100755
 From 4d8e778bdbf6476e8aa397ef046126ae532f03d6 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Sun, 8 Mar 2026 21:50:52 +0200
-Subject: [PATCH 19/21] Fix S4U2Self ignoring time_req when acquiring
+Subject: [PATCH 19/22] Fix S4U2Self ignoring time_req when acquiring
  impersonated credentials
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -11332,7 +11332,7 @@ index fa7f980af7..9f2cbebec7 100644
 From 5b185893438f775538a8d6340e9f4f39f6383cc7 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Mon, 9 Mar 2026 09:16:56 +0200
-Subject: [PATCH 20/21] Fix S4U2Self ignoring time_req when copying
+Subject: [PATCH 20/22] Fix S4U2Self ignoring time_req when copying
  impersonator TGT
 
 gss_acquire_cred_impersonate_name() with a time_req bounded the
@@ -11412,7 +11412,7 @@ index 9f2cbebec7..10288ebe94 100644
 From 8df1c41911e7179d2e6cdb72b3bb568c1db08bd3 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Mon, 9 Mar 2026 09:17:08 +0200
-Subject: [PATCH 21/21] Add t_s4u test for time_req bounding all delegated-cred
+Subject: [PATCH 21/22] Add t_s4u test for time_req bounding all delegated-cred
  tickets
 
 Add --time-req N option to t_s4u and a check_cred_endtimes() function
@@ -11567,6 +11567,100 @@ index 4a1cdb2355..813e27fc15 100755
  # Regression test for #8139: get a user ticket directly for service1 and
  # try krb5 -> S4U2Proxy.
  realm.kinit(realm.user_princ, None, ['-f', '-k', '-c', usercache,
+-- 
+2.53.0
+
+
+From e79cc39961a0e347e2efc0455d62ea64fdff99ea Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.com>
+Date: Tue, 17 Feb 2026 16:57:40 +0100
+Subject: [PATCH 22/22] Make configure.ac work with autoconf 2.73
+
+autoreconf requires "AC_INIT" to appear in configure.ac.  Prior to
+autoconf 2.73, our indirect invocation via K5_AC_INIT() was
+sufficient, but now the regular expression match checks for word
+boundaries.  Get rid of K5_AC_INIT(), moving the version extraction
+code from aclocal.m4 to a new file version.m4.  In the moved
+versioning code, use m4_fatal() to simplify error handling.
+
+[ghudson@mit.edu: made the m4_fatal() change; rewrote commit message]
+
+ticket: 9202 (new)
+(cherry picked from commit b7290e0cab5b7e39cd4aa7c098beb18a886d4a1d)
+---
+ src/aclocal.m4   | 24 ------------------------
+ src/configure.ac |  4 +++-
+ src/version.m4   | 14 ++++++++++++++
+ 3 files changed, 17 insertions(+), 25 deletions(-)
+ create mode 100644 src/version.m4
+
+diff --git a/src/aclocal.m4 b/src/aclocal.m4
+index 1782be9788..fe22b1e045 100644
+--- a/src/aclocal.m4
++++ b/src/aclocal.m4
+@@ -16,30 +16,6 @@ ac_config_fragdir=$ac_reltopdir/config
+ AC_CONFIG_AUX_DIR(K5_TOPDIR/config)
+ ])dnl
+ dnl
+-dnl Version info.
+-dnl
+-pushdef([x],esyscmd([sed -n 's/#define \([A-Z0-9_]*\)[ \t]*\(.*\)/\1=\2/p' < ]K5_TOPDIR/patchlevel.h))
+-define([PL_KRB5_MAJOR_RELEASE],regexp(x,[KRB5_MAJOR_RELEASE=\(.*\)],[\1]))
+-ifelse(PL_KRB5_MAJOR_RELEASE,,[errprint([Can't determine KRB5_MAJOR_RELEASE value from patchlevel.h.
+-]) m4exit(1) dnl sometimes that does not work?
+-builtin(m4exit,1)])
+-define([PL_KRB5_MINOR_RELEASE],regexp(x,[KRB5_MINOR_RELEASE=\(.*\)],[\1]))
+-ifelse(PL_KRB5_MINOR_RELEASE,,[errprint([Can't determine KRB5_MINOR_RELEASE value from patchlevel.h.
+-]) m4exit(1) dnl sometimes that does not work?
+-builtin(m4exit,1)])
+-define([PL_KRB5_PATCHLEVEL],regexp(x,[KRB5_PATCHLEVEL=\(.*\)],[\1]))
+-ifelse(PL_KRB5_PATCHLEVEL,,[errprint([Can't determine KRB5_PATCHLEVEL value from patchlevel.h.
+-]) m4exit(1) dnl sometimes that does not work?
+-builtin(m4exit,1)])
+-define([PL_KRB5_RELTAIL],regexp(x,[KRB5_RELTAIL="\(.*\)"],[\1]))
+-dnl RELTAIL is allowed to not be defined.
+-popdef([x])
+-define([K5_VERSION],PL_KRB5_MAJOR_RELEASE.PL_KRB5_MINOR_RELEASE[]ifelse(PL_KRB5_PATCHLEVEL,0,,.PL_KRB5_PATCHLEVEL)ifelse(PL_KRB5_RELTAIL,,,-PL_KRB5_RELTAIL))
+-define([K5_BUGADDR],krb5-bugs@mit.edu)
+-define([K5_AC_INIT],[AC_INIT(Kerberos 5, K5_VERSION, K5_BUGADDR, krb5)
+-AC_CONFIG_SRCDIR($1)
+-build_dynobj=no])
+-dnl
+ dnl drop in standard rules for all configure files -- CONFIG_RULES
+ dnl
+ AC_DEFUN(CONFIG_RULES,[dnl
+diff --git a/src/configure.ac b/src/configure.ac
+index c0ccfb9be8..064adede3f 100644
+--- a/src/configure.ac
++++ b/src/configure.ac
+@@ -1,4 +1,6 @@
+-K5_AC_INIT([aclocal.m4])
++m4_include([version.m4])
++AC_INIT(Kerberos 5, K5_VERSION, K5_BUGADDR, krb5)
++AC_CONFIG_SRCDIR([aclocal.m4])
+ 
+ # If $runstatedir isn't set by autoconf (<2.70), set it manually.
+ if test x"$runstatedir" = x; then
+diff --git a/src/version.m4 b/src/version.m4
+new file mode 100644
+index 0000000000..4b08edde52
+--- /dev/null
++++ b/src/version.m4
+@@ -0,0 +1,14 @@
++define([K5_TOPDIR],[.])dnl
++dnl
++pushdef([x],esyscmd([sed -n 's/#define \([A-Z0-9_]*\)[ \t]*\(.*\)/\1=\2/p' < ]K5_TOPDIR/patchlevel.h))
++define([PL_KRB5_MAJOR_RELEASE],regexp(x,[KRB5_MAJOR_RELEASE=\(.*\)],[\1]))
++ifelse(PL_KRB5_MAJOR_RELEASE,,[m4_fatal([Can't determine KRB5_MAJOR_RELEASE value from patchlevel.h.])])
++define([PL_KRB5_MINOR_RELEASE],regexp(x,[KRB5_MINOR_RELEASE=\(.*\)],[\1]))
++ifelse(PL_KRB5_MINOR_RELEASE,,[m4_fatal([Can't determine KRB5_MINOR_RELEASE value from patchlevel.h.])])
++define([PL_KRB5_PATCHLEVEL],regexp(x,[KRB5_PATCHLEVEL=\(.*\)],[\1]))
++ifelse(PL_KRB5_PATCHLEVEL,,[m4_fatal([Can't determine KRB5_PATCHLEVEL value from patchlevel.h.])])
++define([PL_KRB5_RELTAIL],regexp(x,[KRB5_RELTAIL="\(.*\)"],[\1]))
++dnl RELTAIL is allowed to not be defined.
++popdef([x])
++m4_define([K5_VERSION],PL_KRB5_MAJOR_RELEASE.PL_KRB5_MINOR_RELEASE[]ifelse(PL_KRB5_PATCHLEVEL,0,,.PL_KRB5_PATCHLEVEL)ifelse(PL_KRB5_RELTAIL,,,-PL_KRB5_RELTAIL))
++m4_define([K5_BUGADDR],krb5-bugs@mit.edu)
 -- 
 2.53.0
 
