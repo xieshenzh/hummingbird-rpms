@@ -69,13 +69,14 @@ def find_last_sync_commit(package_name: str) -> str | None:
     # Note: Sync commits with --mark are empty commits, so we can't filter by path
     # We search for "Sync <package>" or "Import <package>" in the subject line
     # Multiple --grep flags are OR'd by default in git log
+    # Require version to start with digit to avoid prefix matches (e.g., "rust" matching "rust-podman-sequoia")
     result = run_git(
         'log',
         '--format=%H',
         '--grep',
         f'^Sync {package_name} ',
         '--grep',
-        f'^Import {package_name}-',
+        f'^Import {package_name}-[0-9]',
         cwd=ROOT_DIR,
         check=False
     )
