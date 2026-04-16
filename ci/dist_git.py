@@ -1286,11 +1286,12 @@ def rebuild_package(package_name: str, reason: str, dry_run: bool = False) -> No
     if not metadata:
         sys.exit(f"ERROR: Could not load metadata for {package_name}")
 
-    # Get upstream release from metadata (for non-native packages)
+    # Get upstream release from metadata (for non-native packages only)
     # This allows us to distinguish between:
     # - Fedora ships 3.1 -> first rebuild should be 3.1.1
     # - We already rebuilt Fedora's 3 to 3.1 -> next rebuild should be 3.2
-    upstream_release = metadata.get('release')
+    # For native packages, don't pass upstream_release - they have no upstream
+    upstream_release = metadata.get('release') if 'source' in metadata else None
 
     # Bump release with upstream awareness
     new_release = bump_release(current_release, upstream_release)

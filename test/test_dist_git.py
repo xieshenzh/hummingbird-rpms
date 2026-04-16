@@ -2869,3 +2869,54 @@ def test_rebuild_all_continues_on_failure(workdir: Path, upstream_repos: dict[st
 
     # vanilla should still have the broken macro
     assert 'Release: %{broken_macro}' in vanilla_spec.read_text()
+
+
+def test_rebuild_native_package(workdir: Path) -> None:
+    """Test that rebuilding a native package bumps release correctly."""
+    # Create a native package manually
+    native_dir = workdir / 'rpms' / 'native-pkg'
+    native_dir.mkdir()
+
+    # Create spec file with Release: 0.1%{?dist}
+    native_spec = native_dir / 'native-pkg.spec'
+    native_spec.write_text("""Name: native-pkg
+Version: 1.0
+Release: 0.1%{?dist}
+Summary: Test native package
+License: MIT
+
+%description
+Test native package
+
+%files
+""")
+
+    # Create metadata for native package (no 'source' field)
+    metadata_file = workdir / 'metadata' / 'native-pkg.json'
+    metadata = {
+        'version': '1.0',
+        'release': '0.1',
+        'modification_status': 'native'
+    }
+    with open(metadata_file, 'w') as f:
+        json.dump(metadata, f, indent=2)
+        f.write('\n')
+
+    # Commit the native package
+    subprocess.run(['git', 'add', 'rpms/native-pkg', 'metadata/native-pkg.json'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add native package'], cwd=workdir, check=True)
+
+    # Rebuild the native package
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'native-pkg',
+         '--reason', 'test native rebuild'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify Release was bumped to 0.2, not 0.1.1
+    spec_content = native_spec.read_text()
+    assert 'Release: 0.2%{?dist}' in spec_content, f"Expected '0.2', got spec:\n{spec_content}"
+
+    # Verify commit message
+    subject, _ = get_last_commit_info(workdir)
+    assert subject == 'Rebuild native-pkg: test native rebuild'
