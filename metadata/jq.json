@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
-  "release": "2",
-  "sha": "1597363a1cdd9a3513d2d24b84e8de545412290d",
+  "modification_status": "clean",
+  "release": "3",
+  "sha": "7013b20589fb858ffa0933e41f7d57ba0bc376df",
   "source": "https://src.fedoraproject.org/rpms/jq.git",
-  "version": "1.8.1",
-  "modification_status": "clean"
+  "version": "1.8.1"
 }
