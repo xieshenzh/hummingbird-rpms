@@ -28,7 +28,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.66
-Release: 6.1%{?dist}
+Release: 6.2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -129,7 +129,7 @@ Requires: system-logos(httpd-logo-ng)
 Provides: webserver
 Requires: httpd-core = 0:%{version}-%{release}
 Recommends: mod_http2, mod_lua
-%{?systemd_requires}
+%{?systemd_ordering}
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible

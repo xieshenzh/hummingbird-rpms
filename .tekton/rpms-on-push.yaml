@@ -8571,7 +8571,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[push]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/httpd/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/httpd/***, test/rpms/httpd.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
