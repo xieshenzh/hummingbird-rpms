@@ -192,6 +192,23 @@ paths-ruby-binary:
       TEST_FAIL "ruby4.0 does not include /usr/bin/ruby or /usr/bin/ruby4.0-mri"
     fi
 
+paths-ruby-mri-symlink:
+  command: |
+    # Verify ruby4.0 includes /usr/bin/ruby-mri symlink when in rubypick mode.
+    # rubypick hardcodes /usr/bin/ruby-mri, so ruby4.0 must provide it.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ruby4.0" ]]; then
+      echo "Skipping: This test only runs on ruby4.0 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    files=$(rpm -qlp "${TEST_RPM}")
+    if echo "${files}" | grep -q "^/usr/bin/ruby-mri$"; then
+      echo "PASS: ruby4.0 includes /usr/bin/ruby-mri symlink"
+    else
+      TEST_FAIL "ruby4.0 does not include /usr/bin/ruby-mri (required by rubypick)"
+    fi
+
 paths-pkgconfig:
   command: |
     # Verify ruby4.0-devel installs ruby.pc (not ruby4.0.pc)
