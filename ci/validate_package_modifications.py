@@ -144,12 +144,6 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     Returns:
         (is_clean, error_message) tuple
     """
-    # can't validate without full history
-    result = run_git('rev-parse', '--is-shallow-repository', cwd=ROOT_DIR, check=False)
-    if result.stdout.strip() == 'true':
-        logging.error("Cannot validate git history in shallow clone")
-        sys.exit(1)
-
     package_path = f'rpms/{package_name}'
 
     # Find commits without "Upstream:" trailer
@@ -457,6 +451,15 @@ def validate_packages(packages: list[str], check_actual_state: bool = True) -> i
     """
     errors = []
     total = len(packages)
+
+    # Fast/history mode walks git log — requires a full clone.
+    # Check once here, before spawning threads, so a misconfigured environment
+    # fails immediately rather than after all workers have already started.
+    if not check_actual_state:
+        result = run_git('rev-parse', '--is-shallow-repository', cwd=ROOT_DIR, check=False)
+        if result.stdout.strip() == 'true':
+            logging.error("Cannot validate git history in shallow clone")
+            sys.exit(1)
 
     # Use thread pool for parallel validation (git operations release GIL)
     with ThreadPoolExecutor(max_workers=8) as executor:
