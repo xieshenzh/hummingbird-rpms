@@ -9,7 +9,7 @@
 
 Name:           memcached
 Version:        1.6.41
-Release:        1.1%{?dist}
+Release:        1.2%{?dist}
 Epoch:          0
 Summary:        High Performance, Distributed Memory Object Cache
 
@@ -38,7 +38,7 @@ Requires(pre):  shadow-utils
 # This ensures that the selinux subpackage is not installed when not needed
 # (e.g. inside a container)
 Requires: (%{name}-selinux if selinux-policy-targeted)
-%{?systemd_requires}
+%{?systemd_ordering}
 
 %description
 memcached is a high-performance, distributed memory object caching
