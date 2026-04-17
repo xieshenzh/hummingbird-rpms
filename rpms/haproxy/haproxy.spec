@@ -8,7 +8,7 @@
 
 Name:           haproxy
 Version:        3.0.19
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        HAProxy reverse proxy for high availability environments
 
 License:        GPL-2.0-or-later
@@ -36,7 +36,7 @@ BuildRequires:  systemd-rpm-macros
 BuildRequires:  make
 
 Requires(pre):  shadow-utils
-%{?systemd_requires}
+%{?systemd_ordering}
 
 %description
 HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high
