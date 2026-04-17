@@ -2,7 +2,7 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "6630e1b1154af6f4365109dac3ee7483b0039107",
+  "sha": "207b2fe27ec1e10632a9d106ca884a313eb1f14f",
   "source": "https://src.fedoraproject.org/rpms/haproxy.git",
-  "version": "3.0.17"
+  "version": "3.0.19"
 }
