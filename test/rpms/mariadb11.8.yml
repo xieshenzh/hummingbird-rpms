@@ -1,0 +1,20 @@
+---
+# Tests specific to the mariadb11.8 package
+
+no-systemd-runtime-dependency:
+  command: |
+    # Verify that the mariadb11.8-server package does not have a runtime
+    # dependency on systemd.  It should use systemd_ordering (weak ordering)
+    # instead of systemd_requires (hard dependency).
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "mariadb11.8-server" ]]; then
+      echo "Skipping: This test only runs on mariadb11.8-server (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -qxF "systemd"; then
+      TEST_FAIL "mariadb11.8-server has a hard runtime dependency on systemd"
+    else
+      echo "PASS: mariadb11.8-server does not require systemd at runtime"
+    fi
