@@ -160,7 +160,7 @@
 
 Name:             %{majorname}%{majorversion}
 Version:          %{package_version}
-Release:          2%{?with_debug:.debug}.1%{?dist}
+Release:          2%{?with_debug:.debug}.2%{?dist}
 Epoch:            3
 
 Summary:          A very fast and robust SQL database server
@@ -545,10 +545,8 @@ Requires:         (mysql-selinux >= 1.0.10 if selinux-policy-%{selinuxtype})
 %endif
 
 Requires:         coreutils
-# We require this to be present for %%{_tmpfilesdir}
-Requires:         systemd
-# Make sure it's there when scriptlets run, too
-%{?systemd_requires}
+# Maintain correct service ordering without hard systemd dependency
+%{?systemd_ordering}
 # RHBZ#1496131; use 'iproute' instead of 'net-tools'
 Requires:         iproute
 # The 'wsrep_sst_common' and 'wsrep_sst_rsync_tunnel' calls 'which' utility

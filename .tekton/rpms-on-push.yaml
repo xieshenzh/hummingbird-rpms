@@ -15999,7 +15999,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[push]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/mariadb10.11/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/mariadb10.11/***, test/rpms/mariadb10.11.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
@@ -16065,7 +16065,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[push]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/mariadb11.8/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/mariadb11.8/***, test/rpms/mariadb11.8.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
