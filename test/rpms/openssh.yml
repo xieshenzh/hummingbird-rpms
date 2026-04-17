@@ -1,0 +1,38 @@
+---
+# Tests specific to the openssh package
+
+no-nologin-dependency-on-base:
+  command: |
+    # Verify that the base openssh package does not require /sbin/nologin.
+    # Only openssh-server needs it (for the sshd privsep user). Having it
+    # on the base package pulls util-linux into images that only need the
+    # SSH client.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssh" ]]; then
+      echo "Skipping: This test only runs on openssh (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -qF "/sbin/nologin"; then
+      TEST_FAIL "openssh base package requires /sbin/nologin (should be on openssh-server)"
+    else
+      echo "PASS: openssh base package does not require /sbin/nologin"
+    fi
+
+nologin-dependency-on-server:
+  command: |
+    # Verify that openssh-server does require /sbin/nologin for the sshd
+    # privsep user.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssh-server" ]]; then
+      echo "Skipping: This test only runs on openssh-server (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -qF "/sbin/nologin"; then
+      echo "PASS: openssh-server requires /sbin/nologin"
+    else
+      TEST_FAIL "openssh-server is missing /sbin/nologin dependency"
+    fi
