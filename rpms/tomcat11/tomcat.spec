@@ -61,7 +61,7 @@
 Name:          tomcat11
 Epoch:         1
 Version:       %{major_version}.%{minor_version}.%{micro_version}
-Release:       0.1.1%{?dist}
+Release:       0.1.2%{?dist}
 Summary:       Apache Servlet/JSP Engine, RI for Servlet %{servletspec}/JSP %{jspspec} API
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
@@ -110,9 +110,7 @@ Requires:      %{name}-lib = %{epoch}:%{version}-%{release}
 %if 0%{?fedora} || 0%{?rhel} > 7
 Recommends:    tomcat-native >= %{native_version}
 %endif
-Requires(post):   systemd
-Requires(preun):  systemd
-Requires(postun): systemd
+%{?systemd_ordering}
 Conflicts:        tomcat10
 
 # added after log4j sub-package was removed

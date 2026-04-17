@@ -28468,7 +28468,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/tomcat10/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/tomcat10/***, test/rpms/tomcat10.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
@@ -28537,7 +28537,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/tomcat11/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/tomcat11/***, test/rpms/tomcat11.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
