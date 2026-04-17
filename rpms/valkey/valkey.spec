@@ -11,7 +11,7 @@
 
 Name:              valkey
 Version:           9.0.3
-Release:           1.1%{?dist}
+Release:           1.2%{?dist}
 Summary:           A persistent key-value database
 # valkey: BSD-3-Clause
 # hiredis: BSD-3-Clause
@@ -52,7 +52,7 @@ BuildRequires:     python3
 BuildRequires:     python3-pyyaml
 %endif
 
-Requires:          logrotate
+Recommends:        logrotate
 # from deps/libvalkey/include/valkey/valkey.h
 Provides:          bundled(libvalkey) = 0.2.1
 # from deps/jemalloc/VERSION

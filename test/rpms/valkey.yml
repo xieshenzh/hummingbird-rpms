@@ -1,0 +1,20 @@
+---
+# Tests specific to the valkey package
+
+no-hard-logrotate-dependency:
+  command: |
+    # Verify that the valkey package does not hard-require logrotate.
+    # logrotate pulls in systemd transitively, so it should be a weak
+    # dependency (Recommends) instead of a hard Requires.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "valkey" ]]; then
+      echo "Skipping: This test only runs on valkey (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -qxF "logrotate"; then
+      TEST_FAIL "valkey has a hard runtime dependency on logrotate (which pulls in systemd)"
+    else
+      echo "PASS: valkey does not hard-require logrotate at runtime"
+    fi
