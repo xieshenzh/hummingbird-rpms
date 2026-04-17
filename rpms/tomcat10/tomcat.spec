@@ -30,7 +30,7 @@
 Name:          tomcat10
 Epoch:         1
 Version:       %{major_version}.%{minor_version}.%{micro_version}
-Release:       1%{?dist}
+Release:       1.1%{?dist}
 Summary:       Apache Tomcat - Servlet and JSP engine for system-wide deployment
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
@@ -78,7 +78,7 @@ BuildRequires: tomcat-jakartaee-migration
 BuildRequires: systemd
 
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
-Requires: systemd
+%{?systemd_ordering}
 
 Recommends: tomcat-native >= %{native_version}
 

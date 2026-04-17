@@ -1,0 +1,20 @@
+---
+# Tests specific to the tomcat10 package
+
+no-systemd-runtime-dependency:
+  command: |
+    # Verify that the tomcat10 package does not have a runtime dependency on
+    # systemd.  It should use systemd_ordering (weak ordering) instead of a
+    # hard dependency.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "tomcat10" ]]; then
+      echo "Skipping: This test only runs on tomcat10 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -qxF "systemd"; then
+      TEST_FAIL "tomcat10 has a hard runtime dependency on systemd"
+    else
+      echo "PASS: tomcat10 does not require systemd at runtime"
+    fi
