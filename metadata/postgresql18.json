@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Pre-existing modification - requires review",
+  "modification_reason": "Remove runtime dependency on systemd",
   "modification_status": "modified",
   "release": "1",
   "sha": "37e7d739b8e9a97a0eadca0a3fca2dc98eb39100",

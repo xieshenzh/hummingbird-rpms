@@ -48,7 +48,7 @@
 Summary: PostgreSQL client programs
 Name: %{majorname}%{majorversion}
 Version: 18.3
-Release: 1.1%{?dist}
+Release: 1.2%{?dist}
 
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
@@ -271,10 +271,8 @@ will interact with a PostgreSQL server.
 %package -n %{pkgname}-server
 Summary: The programs needed to create and run a PostgreSQL server
 Requires: %{pkgname}%{?_isa} = %precise_version
-# We require this to be present for %%{_prefix}/lib/tmpfiles.d
-Requires: systemd
-# Make sure it's there when scriptlets run, too
-%{?systemd_requires}
+# Ensure correct ordering with systemd without a hard runtime dependency
+%{?systemd_ordering}
 # We require this to be present for /usr/sbin/runuser when using --initdb (rhbz#2071437)
 Requires: util-linux
 # postgresql setup requires runuser from util-linux package
