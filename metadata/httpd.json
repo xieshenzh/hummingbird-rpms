@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_status": "modified",
+  "modification_reason": "Remove runtime dependency on systemd",
   "release": "6",
   "sha": "de872af94461cbc9951954c09cd5e095a7bd1ed3",
   "source": "https://src.fedoraproject.org/rpms/httpd.git",

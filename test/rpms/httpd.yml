@@ -1,0 +1,20 @@
+---
+# Tests specific to the httpd package
+
+no-systemd-runtime-dependency:
+  command: |
+    # Verify that the httpd package does not have a runtime dependency on
+    # systemd.  It should use systemd_ordering (weak ordering) instead of
+    # systemd_requires (hard dependency).
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "httpd" ]]; then
+      echo "Skipping: This test only runs on httpd (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -qxF "systemd"; then
+      TEST_FAIL "httpd has a hard runtime dependency on systemd"
+    else
+      echo "PASS: httpd does not require systemd at runtime"
+    fi
