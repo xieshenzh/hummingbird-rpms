@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2.1%{?dist}
+Release: 3%{?dist}
 License: Python-2.0.1
 
 
@@ -267,7 +267,6 @@ BuildRequires: make
 BuildRequires: mpdecimal-devel
 BuildRequires: ncurses-devel
 
-BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: python-rpm-macros
 BuildRequires: readline-devel
@@ -280,6 +279,10 @@ BuildRequires: tcl-devel < 1:9
 BuildRequires: tix-devel
 BuildRequires: tk-devel < 1:9
 BuildRequires: tzdata
+
+# Support for OpenSSL 4 only landed in Python 3.15 for now
+# https://github.com/python/cpython/issues/146207
+BuildRequires: (openssl-devel < 1:4 or openssl3-devel)
 
 # Perf support is only available on x86_64 and aarch64 right now
 %ifarch x86_64 aarch64
@@ -451,6 +454,42 @@ Patch329: 00329-fips.patch
 # Reject leading dashes in webbrowser URLs (GH-146360)
 Patch478: 00478-cve-2026-4519.patch
 
+# 00479 # 97404b2cf62e545c2d41be7ccfed4e74da9ee665
+# CVE-2026-1502
+#
+# Reject CR/LF in HTTP tunnel request headers
+Patch479: 00479-cve-2026-1502.patch
+
+# 00480 # 6f4eef3ba4d9818a53698e994550ee8db17a1e2e
+# CVE-2026-4786
+#
+# Fix webbrowser `%%action` substitution bypass of dash-prefix check
+Patch480: 00480-cve-2026-4786.patch
+
+# 00482 # 69f14bc306fc62400d45565faa980b77858b9151
+# CVE-2026-6100
+#
+# Fix a possible UAF in {LZMA,BZ2,_Zlib}Decompressor
+Patch482: 00482-cve-2026-6100.patch
+
+# 00483 # 577c595137ce6ff92158ddaf2d7b7ea86437825d
+# CVE-2026-2297
+#
+# Logging Bypass in Legacy .pyc File Handling
+Patch483: 00483-cve-2026-2297.patch
+
+# 00484 # 8b5133c1ab17a060cd134bea2a4b6e1831c47fed
+# CVE-2026-3644
+#
+# Incomplete control character validation in http.cookies
+Patch484: 00484-cve-2026-3644.patch
+
+# 00485 # 12a5b206676927bcee131ab4f2bd6783d2f5914a
+# CVE-2026-4224
+#
+# Stack overflow parsing XML with deeply nested DTD content models
+Patch485: 00485-cve-2026-4224.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -614,8 +653,12 @@ Requires: tzdata
 # We avoid this problem by requiring at least the same version of expat that
 # was used during the build time.
 # Other subpackages (like -debug) also need this, but they all depend on -libs.
+# Since expat 2.7.4, the library has versioned symbols and this is no longer needed,
+# as the generated requirement will be in the form of libexpat.so.1(LIBEXPAT_2.7.2) etc.
 %global expat_version %(LANG=C rpm -q --qf '%%{version}' expat.%{_target_cpu} | sed 's/.*not installed/0/')
+%if v"%{expat_version}" < v"2.7.4"
 Requires: expat%{?_isa} >= %{expat_version}
+%endif
 
 
 %description -n %{pkgname}-libs
@@ -1776,6 +1819,10 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Apr 16 2026 Charalampos Stratakis <cstratak@redhat.com> - 3.12.13-3
+- Security fixes for CVE-2026-1502, CVE-2026-4786, CVE-2026-6100, CVE-2026-2297, CVE-2026-3644, CVE-2026-4224
+Resolves: rhbz#2444705, rhbz#2448189, rhbz#2448205, rhbz#2457942, rhbz#2458014, rhbz#2458222
+
 * Thu Mar 26 2026 Lumír Balhar <lbalhar@redhat.com> - 3.12.13-2
 - Security fix for CVE-2026-4519 (rhbz#2449728)
 
