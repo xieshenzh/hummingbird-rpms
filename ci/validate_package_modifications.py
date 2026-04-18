@@ -12,6 +12,7 @@ import logging
 import os
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 # Import from dist_git.py
@@ -69,13 +70,14 @@ def find_last_sync_commit(package_name: str) -> str | None:
     # Note: Sync commits with --mark are empty commits, so we can't filter by path
     # We search for "Sync <package>" or "Import <package>" in the subject line
     # Multiple --grep flags are OR'd by default in git log
+    # Require version to start with digit to avoid prefix matches (e.g., "rust" matching "rust-podman-sequoia")
     result = run_git(
         'log',
         '--format=%H',
         '--grep',
         f'^Sync {package_name} ',
         '--grep',
-        f'^Import {package_name}-',
+        f'^Import {package_name}-[0-9]',
         cwd=ROOT_DIR,
         check=False
     )
@@ -142,12 +144,6 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     Returns:
         (is_clean, error_message) tuple
     """
-    # can't validate without full history
-    result = run_git('rev-parse', '--is-shallow-repository', cwd=ROOT_DIR, check=False)
-    if result.stdout.strip() == 'true':
-        logging.error("Cannot validate git history in shallow clone")
-        sys.exit(1)
-
     package_path = f'rpms/{package_name}'
 
     # Find commits without "Upstream:" trailer
@@ -456,13 +452,31 @@ def validate_packages(packages: list[str], check_actual_state: bool = True) -> i
     errors = []
     total = len(packages)
 
-    for i, package_name in enumerate(packages, 1):
-        logging.info(f"[{i}/{total}] Validating {package_name}...")
+    # Fast/history mode walks git log — requires a full clone.
+    # Check once here, before spawning threads, so a misconfigured environment
+    # fails immediately rather than after all workers have already started.
+    if not check_actual_state:
+        result = run_git('rev-parse', '--is-shallow-repository', cwd=ROOT_DIR, check=False)
+        if result.stdout.strip() == 'true':
+            logging.error("Cannot validate git history in shallow clone")
+            sys.exit(1)
 
-        valid, error = validate_package(package_name, check_actual_state)
+    # Use thread pool for parallel validation (git operations release GIL)
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        # Submit all validation tasks
+        future_to_pkg = {
+            executor.submit(validate_package, pkg, check_actual_state): pkg
+            for pkg in packages
+        }
 
-        if not valid:
-            errors.append(error)
+        # Collect results as they complete
+        for i, future in enumerate(as_completed(future_to_pkg), 1):
+            package_name = future_to_pkg[future]
+            logging.info(f"[{i}/{total}] Validated {package_name}")
+
+            valid, error = future.result()
+            if not valid:
+                errors.append(error)
 
     if errors:
         print("\n" + "=" * 60, file=sys.stderr)
