@@ -378,7 +378,6 @@ fi
 
 ##############################################
 %files systemd -f %{go_vendor_license_filelist}
-%license LICENSE vendor/modules.txt
 %doc *.md
 %{_mandir}/man1/kube-apiserver.1*
 %{_mandir}/man1/kube-controller-manager.1*

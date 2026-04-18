@@ -2,7 +2,7 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "c905734f3fb3ea5d75fe15a23d8e6d3558c2fcaf",
+  "sha": "507bee620d50f9386c05e2b613a3592c2fc24fed",
   "source": "https://src.fedoraproject.org/rpms/kubernetes1.35.git",
-  "version": "1.35.3"
+  "version": "1.35.4"
 }
