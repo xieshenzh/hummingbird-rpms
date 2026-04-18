@@ -1,7 +1,7 @@
 {
   "modification_status": "native",
-  "release": "1",
+  "release": "0.1",
   "release_monitoring_project_id": 205787,
   "track_upstream": "latest",
-  "version": "1.3.1"
+  "version": "1.3.2"
 }
