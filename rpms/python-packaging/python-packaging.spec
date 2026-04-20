@@ -21,8 +21,8 @@
 %endif
 
 Name:           python-%{pypi_name}
-Version:        26.0
-Release:        1.2%{?dist}
+Version:        26.1
+Release:        1%{?dist}
 Summary:        Core utilities for Python packages
 
 License:        BSD-2-Clause OR Apache-2.0
@@ -41,6 +41,7 @@ BuildRequires:  python%{python3_pkgversion}-flit-core
 
 # Upstream uses nox for testing, we specify the test deps manually as well.
 %if %{with tests}
+BuildRequires:  python%{python3_pkgversion}-hypothesis
 BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-pretend
 BuildRequires:  python%{python3_pkgversion}-tomli-w
