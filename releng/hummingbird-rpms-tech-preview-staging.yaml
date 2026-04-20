@@ -562,6 +562,8 @@ spec:
           contentType: rpm
         - name: memcached-main
           contentType: rpm
+        - name: meson-main
+          contentType: rpm
         - name: mkfontscale-main
           contentType: rpm
         - name: mpdecimal-main
