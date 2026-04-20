@@ -892,6 +892,8 @@ spec:
           contentType: rpm
         - name: tar-main
           contentType: rpm
+        - name: tcl-main
+          contentType: rpm
         - name: tomcat10-main
           contentType: rpm
         - name: tomcat11-main
