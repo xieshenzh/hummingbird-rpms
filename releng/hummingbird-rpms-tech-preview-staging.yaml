@@ -846,6 +846,8 @@ spec:
           contentType: rpm
         - name: rust-imagequant-sys-main
           contentType: rpm
+        - name: rust-podman-sequoia-main
+          contentType: rpm
         - name: rust-rav1e-main
           contentType: rpm
         - name: rust-rpds-main

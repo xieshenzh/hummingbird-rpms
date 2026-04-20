@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "7f0694fa51b07b8d1f2cb839f685365731306a1b",
+  "source": "https://src.fedoraproject.org/rpms/rust-podman-sequoia.git",
+  "version": "0.3.2"
+}
