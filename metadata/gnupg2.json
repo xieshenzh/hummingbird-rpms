@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
-  "release": "5",
-  "sha": "359527df1112dcf1d963818819742a8867299437",
+  "modification_status": "clean",
+  "release": "6",
+  "sha": "e891bc2f9432fde72531af58c6f4341b82b44d1e",
   "source": "https://src.fedoraproject.org/rpms/gnupg2.git",
-  "version": "2.4.9",
-  "modification_status": "clean"
+  "version": "2.4.9"
 }
