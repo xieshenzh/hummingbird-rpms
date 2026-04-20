@@ -1,8 +1,8 @@
 %bcond_without check
 
 Name:           libarchive
-Version:        3.8.6
-Release:        1.1%{?dist}
+Version:        3.8.7
+Release:        1%{?dist}
 Summary:        A library for handling streaming archive formats
 
 # Licenses:
@@ -240,6 +240,10 @@ run_testsuite
 
 
 %changelog
+* Mon Apr 13 2026 Packit <hello@packit.dev> - 3.8.7-1
+- Update to version 3.8.7
+- Resolves: rhbz#2457948
+
 * Tue Mar 10 2026 Packit <hello@packit.dev> - 3.8.6-1
 - Update to version 3.8.6
 - Resolves: rhbz#2427134
