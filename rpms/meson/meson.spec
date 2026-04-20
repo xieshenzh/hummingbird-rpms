@@ -26,8 +26,11 @@ BuildRequires:  libasan
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
 
+# Hummingbird does not build objc with gcc
+%if %{undefined rhel} && !%{defined hummingbird}
 BuildRequires:  gcc-objc
 BuildRequires:  gcc-objc++
+%endif
 BuildRequires:  java-25-devel
 BuildRequires:  libomp-devel
 %if %{undefined rhel}
