@@ -38,7 +38,7 @@ index 000000000..0adc40703
 +Requires=keyboxd.socket
 +
 +[Service]
-+ExecStart=/usr/lib/gnupg/keyboxd --supervised
++ExecStart=/usr/libexec/keyboxd --supervised
 +ExecReload=/usr/bin/gpgconf --reload keyboxd
 diff --git a/doc/examples/systemd-user/keyboxd.socket b/doc/examples/systemd-user/keyboxd.socket
 new file mode 100644
