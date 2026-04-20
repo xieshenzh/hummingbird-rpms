@@ -1,0 +1,142 @@
+%global libname mesonbuild
+
+%bcond check 1
+
+Name:           meson
+Version:        1.10.2
+Release:        1%{?dist}
+Summary:        High productivity build system
+
+License:        Apache-2.0
+URL:            https://mesonbuild.com/
+Source:         https://github.com/mesonbuild/meson/releases/download/%{version_no_tilde .}/meson-%{version_no_tilde %{quote:}}.tar.gz
+
+BuildArch:      noarch
+
+BuildRequires:  python3-devel
+Requires:       ninja-build
+
+%if %{with check}
+BuildRequires:  ninja-build
+# Some tests expect the unversioned executable
+BuildRequires:  /usr/bin/python
+# Various languages
+BuildRequires:  gcc
+BuildRequires:  libasan
+BuildRequires:  gcc-c++
+BuildRequires:  gcc-gfortran
+
+BuildRequires:  gcc-objc
+BuildRequires:  gcc-objc++
+BuildRequires:  java-25-devel
+BuildRequires:  libomp-devel
+%if %{undefined rhel}
+BuildRequires:  mono-core mono-devel
+%endif
+BuildRequires:  rust
+# Since the build is noarch, we can't use %%ifarch
+#%%ifarch %%{ldc_arches}
+#BuildRequires:  ldc
+#%%endif
+# Various libs support
+BuildRequires:  boost-devel
+BuildRequires:  /usr/bin/clang-format
+%if %{undefined rhel}
+BuildRequires:  clippy
+%endif
+BuildRequires:  gtest-devel
+BuildRequires:  gmock-devel
+%if %{undefined rhel}
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qtbase-private-devel
+BuildRequires:  qt5-linguist
+%endif
+BuildRequires:  vala
+BuildRequires:  python3-gobject-base
+%if %{undefined rhel}
+BuildRequires:  wxGTK-devel
+BuildRequires:  bindgen
+%endif
+BuildRequires:  flex
+BuildRequires:  bison
+BuildRequires:  gettext
+%if %{undefined rhel}
+BuildRequires:  gnustep-base-devel
+BuildRequires:  /usr/bin/gnustep-config
+%endif
+BuildRequires:  git-core
+BuildRequires:  pkgconfig(protobuf)
+BuildRequires:  pkgconfig(glib-2.0)
+%if %{undefined rhel}
+BuildRequires:  pkgconfig(glib-sharp-2.0)
+%endif
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
+BuildRequires:  gtk-doc
+BuildRequires:  itstool
+%if %{undefined rhel}
+BuildRequires:  mercurial
+BuildRequires:  gcovr
+%endif
+BuildRequires:  pkgconfig(zlib)
+BuildRequires:  zlib-static
+BuildRequires:  python3dist(cython)
+%if %{undefined rhel}
+BuildRequires:  python3dist(fastjsonschema)
+%else
+BuildRequires:  python3dist(jsonschema)
+%endif
+BuildRequires:  pkgconfig(sdl2)
+BuildRequires:  /usr/bin/pcap-config
+BuildRequires:  pkgconfig(vulkan)
+BuildRequires:  llvm-devel
+BuildRequires:  cups-devel
+%if %{undefined rhel}
+BuildRequires:  /usr/bin/wx-config
+%endif
+BuildRequires:  /usr/bin/sdl2-config
+%endif
+
+%generate_buildrequires
+%pyproject_buildrequires
+
+%description
+Meson is a build system designed to optimize programmer
+productivity. It aims to do this by providing simple, out-of-the-box
+support for modern software development tools and practices, such as
+unit tests, coverage reports, Valgrind, CCache and the like.
+
+%prep
+%autosetup -p1 -n meson-%{version_no_tilde %{quote:}}
+# Macro should not change when we are redefining bindir
+sed -i -e "/^%%__meson /s| .*$| %{_bindir}/%{name}|" data/macros.%{name}
+
+%build
+%pyproject_wheel
+
+%install
+%pyproject_install
+%pyproject_save_files -l mesonbuild
+
+install -Dpm0644 -t %{buildroot}%{rpmmacrodir} data/macros.%{name}
+install -Dpm0644 -t %{buildroot}%{_datadir}/bash-completion/completions/ data/shell-completions/bash/meson
+install -Dpm0644 -t %{buildroot}%{_datadir}/zsh/site-functions/ data/shell-completions/zsh/_meson
+
+%if %{with check}
+%check
+export MESON_PRINT_TEST_OUTPUT=1
+%{python3} ./run_unittests.py -v
+%endif
+
+%files -f %{pyproject_files}
+%license COPYING
+%{_bindir}/%{name}
+%{_mandir}/man1/%{name}.1*
+%{rpmmacrodir}/macros.%{name}
+%dir %{_datadir}/polkit-1
+%dir %{_datadir}/polkit-1/actions
+%{_datadir}/polkit-1/actions/com.mesonbuild.install.policy
+%{_datadir}/bash-completion/completions/meson
+%{_datadir}/zsh/site-functions/_meson
+
+%changelog
+%autochangelog

@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "155e3ab347f1269339ebc1caa4cd67d084c3366f",
+  "source": "https://src.fedoraproject.org/rpms/meson.git",
+  "version": "1.10.2"
+}

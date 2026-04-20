@@ -1,0 +1,32 @@
+# See the documentation for more information:
+# https://packit.dev/docs/configuration/
+
+upstream_project_url: https://github.com/mesonbuild/meson
+copy_upstream_release_description: false
+
+# do not sync release candidate versions
+upstream_tag_exclude: ".*rc\\d+"
+
+jobs:
+- job: pull_from_upstream
+  trigger: release
+  dist_git_branches:
+    - fedora-rawhide
+  actions:
+    commit-message:
+    - bash -c 'echo "Update to ${PACKIT_PROJECT_VERSION}"'
+    - bash -c '[ -z "$PACKIT_RESOLVED_BUGS" ] || echo ${PACKIT_RESOLVED_BUGS} | tr " " "\n" | sed "s/^/- Resolves /"'
+    - bash -c 'echo "- Upstream tag: ${PACKIT_UPSTREAM_TAG}"'
+    - bash -c 'echo "- Upstream commit: ${PACKIT_UPSTREAM_COMMIT}"'
+
+
+- job: koji_build
+  trigger: commit
+  allowed_committers: ['packit']
+  dist_git_branches:
+    - fedora-all
+
+- job: bodhi_update
+  trigger: commit
+  dist_git_branches:
+    - fedora-branched
