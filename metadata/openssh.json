@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
-  "modification_status": "modified",
   "modification_reason": "Move /sbin/nologin dependency to server subpackage",
-  "release": "10",
-  "sha": "5faa755c8e53beca27579286e83ae3747ddf6a3e",
+  "modification_status": "modified",
+  "release": "2",
+  "sha": "29a32d35ff6ce4afbcbe295f1ab30c2a3617efbd",
   "source": "https://src.fedoraproject.org/rpms/openssh.git",
-  "version": "10.2p1"
+  "version": "10.3p1"
 }

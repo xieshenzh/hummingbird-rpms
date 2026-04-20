@@ -1,8 +1,9 @@
-From aecc5861e1cf7094a32f893ae4bfd8409b77e5cd Mon Sep 17 00:00:00 2001
+From d0225bcdbc0d783df878ccfb5128bdcb787d82ed Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Fri, 12 Dec 2025 14:25:41 +0100
-Subject: [PATCH 53/53] openssh-6.7p1-coverity
+Subject: [PATCH 54/54] openssh-6.7p1-coverity
 
+https://bugzilla.mindrot.org/show_bug.cgi?id=2581
 ---
  auth-krb5.c                   | 2 ++
  gss-genr.c                    | 3 ++-
@@ -18,7 +19,7 @@ Subject: [PATCH 53/53] openssh-6.7p1-coverity
  11 files changed, 24 insertions(+), 11 deletions(-)
 
 diff --git a/auth-krb5.c b/auth-krb5.c
-index b9c261a24..a37be93c3 100644
+index 7d4fbcc3d..9cd3618b2 100644
 --- a/auth-krb5.c
 +++ b/auth-krb5.c
 @@ -427,6 +427,7 @@ ssh_krb5_cc_new_unique(krb5_context ctx, krb5_ccache *ccache, int *need_environm
@@ -38,7 +39,7 @@ index b9c261a24..a37be93c3 100644
  		}
  		/* make sure the KRB5CCNAME is set for non-standard location */
 diff --git a/gss-genr.c b/gss-genr.c
-index f2d6f59e5..91602e045 100644
+index a07dbf512..ec2c9c6dd 100644
 --- a/gss-genr.c
 +++ b/gss-genr.c
 @@ -178,8 +178,9 @@ ssh_gssapi_kex_mechs(gss_OID_set gss_supported, ssh_gssapi_check_fn *check,
@@ -53,10 +54,10 @@ index f2d6f59e5..91602e045 100644
  				(p = strsep(&cp, ","))) {
  				if (sshbuf_len(buf) != 0 &&
 diff --git a/krl.c b/krl.c
-index bea5b1b98..4dd8a24a9 100644
+index 0e2b5f155..f2d105f23 100644
 --- a/krl.c
 +++ b/krl.c
-@@ -1205,6 +1205,7 @@ is_key_revoked(struct ssh_krl *krl, const struct sshkey *key)
+@@ -1202,6 +1202,7 @@ is_key_revoked(struct ssh_krl *krl, const struct sshkey *key)
  		return r;
  	erb = RB_FIND(revoked_blob_tree, &krl->revoked_sha1s, &rb);
  	free(rb.blob);
@@ -64,7 +65,7 @@ index bea5b1b98..4dd8a24a9 100644
  	if (erb != NULL) {
  		KRL_DBG(("revoked by key SHA1"));
  		return SSH_ERR_KEY_REVOKED;
-@@ -1215,6 +1216,7 @@ is_key_revoked(struct ssh_krl *krl, const struct sshkey *key)
+@@ -1212,6 +1213,7 @@ is_key_revoked(struct ssh_krl *krl, const struct sshkey *key)
  		return r;
  	erb = RB_FIND(revoked_blob_tree, &krl->revoked_sha256s, &rb);
  	free(rb.blob);
@@ -72,7 +73,7 @@ index bea5b1b98..4dd8a24a9 100644
  	if (erb != NULL) {
  		KRL_DBG(("revoked by key SHA256"));
  		return SSH_ERR_KEY_REVOKED;
-@@ -1226,6 +1228,7 @@ is_key_revoked(struct ssh_krl *krl, const struct sshkey *key)
+@@ -1223,6 +1225,7 @@ is_key_revoked(struct ssh_krl *krl, const struct sshkey *key)
  		return r;
  	erb = RB_FIND(revoked_blob_tree, &krl->revoked_keys, &rb);
  	free(rb.blob);
@@ -81,10 +82,10 @@ index bea5b1b98..4dd8a24a9 100644
  		KRL_DBG(("revoked by explicit key"));
  		return SSH_ERR_KEY_REVOKED;
 diff --git a/loginrec.c b/loginrec.c
-index 7d1c9dd43..a017e173b 100644
+index 7499aa975..2807cad4a 100644
 --- a/loginrec.c
 +++ b/loginrec.c
-@@ -677,9 +677,11 @@ construct_utmp(struct logininfo *li,
+@@ -680,9 +680,11 @@ construct_utmp(struct logininfo *li,
  	 */
  
  	/* Use strncpy because we don't necessarily want null termination */
@@ -97,10 +98,10 @@ index 7d1c9dd43..a017e173b 100644
  	    MIN_SIZEOF(ut->ut_host, li->hostname));
  # endif
 diff --git a/misc.c b/misc.c
-index 2fd14159d..d4c4e4164 100644
+index e96fa8d61..556c112c3 100644
 --- a/misc.c
 +++ b/misc.c
-@@ -1573,6 +1573,8 @@ sanitise_stdfd(void)
+@@ -1620,6 +1620,8 @@ sanitise_stdfd(void)
  	}
  	if (nullfd > STDERR_FILENO)
  		close(nullfd);
@@ -109,7 +110,7 @@ index 2fd14159d..d4c4e4164 100644
  }
  
  char *
-@@ -2773,6 +2775,7 @@ stdfd_devnull(int do_stdin, int do_stdout, int do_stderr)
+@@ -2821,6 +2823,7 @@ stdfd_devnull(int do_stdin, int do_stdout, int do_stderr)
  	}
  	if (devnull > STDERR_FILENO)
  		close(devnull);
@@ -118,10 +119,10 @@ index 2fd14159d..d4c4e4164 100644
  }
  
 diff --git a/monitor.c b/monitor.c
-index 2f154a3d7..f959e0124 100644
+index 36db1afee..3b60059a9 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -405,7 +405,7 @@ monitor_child_preauth(struct ssh *ssh, struct monitor *pmonitor)
+@@ -410,7 +410,7 @@ monitor_child_preauth(struct ssh *ssh, struct monitor *pmonitor)
  	mm_get_keystate(ssh, pmonitor);
  
  	/* Drain any buffered messages from the child */
@@ -130,7 +131,7 @@ index 2f154a3d7..f959e0124 100644
  		;
  
  	/* Wait for the child's exit status */
-@@ -1819,7 +1819,7 @@ mm_answer_pty(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -1855,7 +1855,7 @@ mm_answer_pty(struct ssh *ssh, int sock, struct sshbuf *m)
  	s->ptymaster = s->ptyfd;
  
  	debug3_f("tty %s ptyfd %d", s->tty, s->ttyfd);
@@ -184,10 +185,10 @@ index 26bdc3e08..8e2939b95 100644
  		FD_CLR(notify_pipe[0], readset);
  	}
 diff --git a/readconf.c b/readconf.c
-index b6ad47b49..75e1c953c 100644
+index 058e53cf1..14f149cc1 100644
 --- a/readconf.c
 +++ b/readconf.c
-@@ -2170,6 +2170,7 @@ parse_pubkey_algos:
+@@ -2164,6 +2164,7 @@ parse_pubkey_algos:
  			} else if (r != 0) {
  				error("%.200s line %d: glob failed for %s.",
  				    filename, linenum, arg2);
@@ -196,10 +197,10 @@ index b6ad47b49..75e1c953c 100644
  			}
  			free(arg2);
 diff --git a/servconf.c b/servconf.c
-index 956205f6d..1093dcbac 100644
+index e05a31584..3ffa49c3a 100644
 --- a/servconf.c
 +++ b/servconf.c
-@@ -2307,8 +2307,9 @@ process_server_config_line_depth(ServerOptions *options, char *line,
+@@ -2382,8 +2382,9 @@ process_server_config_line_depth(ServerOptions *options, char *line,
  		if (*activep && *charptr == NULL) {
  			*charptr = tilde_expand_filename(arg, getuid());
  			/* increase optional counter */
@@ -212,10 +213,10 @@ index 956205f6d..1093dcbac 100644
  		break;
  
 diff --git a/serverloop.c b/serverloop.c
-index 55411a6b4..acc721cd1 100644
+index 1087a6c7d..b65c9dd66 100644
 --- a/serverloop.c
 +++ b/serverloop.c
-@@ -533,7 +533,7 @@ server_request_tun(struct ssh *ssh)
+@@ -536,7 +536,7 @@ server_request_tun(struct ssh *ssh)
  		debug_f("invalid tun");
  		goto done;
  	}
@@ -225,5 +226,5 @@ index 55411a6b4..acc721cd1 100644
  		    auth_opts->force_tun_device != (int)tun)
  			goto done;
 -- 
-2.52.0
+2.53.0
 

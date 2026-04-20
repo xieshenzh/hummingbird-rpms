@@ -1,8 +1,10 @@
-From e2c0fb233119584b04d61d243cd58433072559c2 Mon Sep 17 00:00:00 2001
+From 27e73c9d6c4a44bdfb98852ddeb30e902ff8658e Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
-Subject: [PATCH 34/53] openssh-8.7p1-ibmca
+Subject: [PATCH 34/54] openssh-8.7p1-ibmca
 
+# downstream only, IBMCA tentative fix
+# From https://bugzilla.redhat.com/show_bug.cgi?id=1976202#c14
 ---
  openbsd-compat/bsd-closefrom.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -21,5 +23,5 @@ index f61124585..417c20484 100644
  #include <sys/types.h>
  #include <unistd.h>
 -- 
-2.52.0
+2.53.0
 
