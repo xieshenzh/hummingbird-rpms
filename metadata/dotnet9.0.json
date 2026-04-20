@@ -2,7 +2,7 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "86a6e38a84260dc972908ceb83d8153a4158c5be",
+  "sha": "ba13ff35f6eaa6beb8109ef47171763c8813eb61",
   "source": "https://src.fedoraproject.org/rpms/dotnet9.0.git",
-  "version": "9.0.115"
+  "version": "9.0.116"
 }
