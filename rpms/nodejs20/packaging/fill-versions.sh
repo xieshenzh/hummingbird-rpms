@@ -95,7 +95,7 @@ parse_isu_version() {
     local -r path="${1?No ICU metadata JSON path provided!}"
 
     version_from_json "${path}" '.[0].url' \
-    | sed -E 's/.*release-([[:digit:]]+)-([[:digit:]]+).*/\1.\2/g'
+    | sed -E 's/.*release-([[:digit:]]+).([[:digit:]]+).*/\1.\2/g'
 }
 parse_punycode_version() {
     local -r path="${1?No punycode.js path provided!}"
