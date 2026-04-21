@@ -1,9 +1,9 @@
 {
   "branch": "f43",
-  "modification_reason": "Lower nss-softokn minimum version to 3.90.0 to allow FIPS-certified softokn from RHEL 9.2; backport dbtests sqlite 3.50+ fix from Fedora rawhide",
+  "modification_reason": "Lower nss-softokn minimum version to 3.90.0 to allow FIPS-certified softokn from RHEL 9.2",
   "modification_status": "modified",
   "release": "1",
-  "sha": "f97da13cbff826185fa4896bf6529cc44094056d",
+  "sha": "02bcf5612022be9693e4dd68573e8629e588c776",
   "source": "https://src.fedoraproject.org/rpms/nss.git",
-  "version": "3.121.0"
+  "version": "3.122.1"
 }
