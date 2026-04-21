@@ -1,3 +1,14 @@
+* Mon Apr 20 2026 Zdenek Pytela <zpytela@redhat.com> - 45.1-1
+- Do not backslash-escape underscores in file context specifications
+- Allow systemd_homework_t to delete systemd_homed_record_t dirs (bsc#1261359)
+- Allow sshd-auth/sshd-session get attributes of their sshd parent
+- Allow systemd-tmpfiles to adjust resource limits
+- Allow logwatch to getattr nsfs files
+- Allow xdm dbus chat with rhsmcertd
+- Allow dhcpc_hook_t unix_dgram_socket and module_request
+- Allow accountsd list accountsd_share_t dirs
+- Allow cloud init to domtrans into ssh keygen (bsc#1249964)
+
 * Wed Apr 08 2026 Vit Mojzis <vmojzis@redhat.com> - 43.6-2
 - Advertise ownership of DPS-related file paths
 - Remove trigger{in|preun} triggers for binsbin and varrun
