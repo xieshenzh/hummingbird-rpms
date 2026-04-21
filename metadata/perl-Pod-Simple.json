@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
-  "release": "4",
-  "sha": "421cac19d150985b5d45c097b0ed90c369834edd",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "d3bd500a65fd36eea2810646483b6e0b957dca54",
   "source": "https://src.fedoraproject.org/rpms/perl-Pod-Simple.git",
-  "version": "3.47",
-  "modification_status": "clean"
+  "version": "3.48"
 }
