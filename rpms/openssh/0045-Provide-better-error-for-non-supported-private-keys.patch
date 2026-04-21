@@ -1,0 +1,29 @@
+From 1d59bb1f658bab8de931d115959fcb0fe93d27fa Mon Sep 17 00:00:00 2001
+From: Zoltan Fridrich <zfridric@redhat.com>
+Date: Wed, 16 Apr 2025 15:11:59 +0200
+Subject: [PATCH 45/54] Provide better error for non-supported private keys
+
+Signed-off-by: Zoltan Fridrich <zfridric@redhat.com>
+
+# https://github.com/openssh/openssh-portable/pull/564
+---
+ sshkey.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/sshkey.c b/sshkey.c
+index 82e55509d..5225eabf2 100644
+--- a/sshkey.c
++++ b/sshkey.c
+@@ -3554,6 +3554,9 @@ translate_libcrypto_error(unsigned long pem_err)
+ 			return SSH_ERR_LIBCRYPTO_ERROR;
+ 		}
+ 	case ERR_LIB_ASN1:
++#ifdef ERR_LIB_OSSL_DECODER
++	case ERR_LIB_OSSL_DECODER:
++#endif
+ 		return SSH_ERR_INVALID_FORMAT;
+ 	}
+ 	return SSH_ERR_LIBCRYPTO_ERROR;
+-- 
+2.53.0
+

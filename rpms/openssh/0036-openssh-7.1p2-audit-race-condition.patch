@@ -1,8 +1,9 @@
-From ffa3fdb2ad2c7afc91993d9301e35d2e9a83ea47 Mon Sep 17 00:00:00 2001
+From d18c0e8c12110d7a46bcbfb67cb6e28e7ebcecf1 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
-Subject: [PATCH 36/53] openssh-7.1p2-audit-race-condition
+Subject: [PATCH 36/54] openssh-7.1p2-audit-race-condition
 
+# Audit race condition in forked child (#1310684)
 ---
  monitor_wrap.c | 46 +++++++++++++++++++++++++++++++++++++
  monitor_wrap.h |  2 ++
@@ -10,10 +11,10 @@ Subject: [PATCH 36/53] openssh-7.1p2-audit-race-condition
  3 files changed, 102 insertions(+), 7 deletions(-)
 
 diff --git a/monitor_wrap.c b/monitor_wrap.c
-index fb44ae733..17a6c9786 100644
+index ef419b743..fa3718924 100644
 --- a/monitor_wrap.c
 +++ b/monitor_wrap.c
-@@ -1426,4 +1426,50 @@ mm_audit_destroy_sensitive_data(struct ssh *ssh, const char *fp, pid_t pid, uid_
+@@ -1446,4 +1446,50 @@ mm_audit_destroy_sensitive_data(struct ssh *ssh, const char *fp, pid_t pid, uid_
  	mm_request_send(pmonitor->m_recvfd, MONITOR_REQ_AUDIT_SERVER_KEY_FREE, m);
  	sshbuf_free(m);
  }
@@ -65,10 +66,10 @@ index fb44ae733..17a6c9786 100644
 +}
  #endif /* SSH_AUDIT_EVENTS */
 diff --git a/monitor_wrap.h b/monitor_wrap.h
-index 1bcbfd305..2b814dbd1 100644
+index 9856968f9..0865f59cb 100644
 --- a/monitor_wrap.h
 +++ b/monitor_wrap.h
-@@ -97,6 +97,8 @@ void mm_audit_unsupported_body(struct ssh *, int);
+@@ -98,6 +98,8 @@ void mm_audit_unsupported_body(struct ssh *, int);
  void mm_audit_kex_body(struct ssh *, int, char *, char *, char *, char *, pid_t, uid_t);
  void mm_audit_session_key_free_body(struct ssh *, int, pid_t, uid_t);
  void mm_audit_destroy_sensitive_data(struct ssh *, const char *, pid_t, uid_t);
@@ -78,7 +79,7 @@ index 1bcbfd305..2b814dbd1 100644
  
  struct Session;
 diff --git a/session.c b/session.c
-index 107edcf91..80282dfd8 100644
+index 75ff1080e..1a7f5ca7a 100644
 --- a/session.c
 +++ b/session.c
 @@ -161,6 +161,10 @@ static Session *sessions = NULL;
@@ -92,7 +93,7 @@ index 107edcf91..80282dfd8 100644
  static int is_child = 0;
  static int in_chroot = 0;
  static int have_dev_log = 1;
-@@ -358,6 +362,8 @@ xauth_valid_string(const char *s)
+@@ -359,6 +363,8 @@ xauth_valid_string(const char *s)
  	return 1;
  }
  
@@ -101,7 +102,7 @@ index 107edcf91..80282dfd8 100644
  #define USE_PIPES 1
  /*
   * This is called to fork and execute a command when we have no tty.  This
-@@ -481,6 +487,8 @@ do_exec_no_pty(struct ssh *ssh, Session *s, const char *command)
+@@ -482,6 +488,8 @@ do_exec_no_pty(struct ssh *ssh, Session *s, const char *command)
  		close(err[0]);
  #endif
  
@@ -110,7 +111,7 @@ index 107edcf91..80282dfd8 100644
  		/* Do processing for the child (exec command etc). */
  		do_child(ssh, s, command);
  		/* NOTREACHED */
-@@ -595,6 +603,9 @@ do_exec_pty(struct ssh *ssh, Session *s, const char *command)
+@@ -596,6 +604,9 @@ do_exec_pty(struct ssh *ssh, Session *s, const char *command)
  		/* Close the extra descriptor for the pseudo tty. */
  		close(ttyfd);
  
@@ -120,7 +121,7 @@ index 107edcf91..80282dfd8 100644
  		/* record login, etc. similar to login(1) */
  #ifndef HAVE_OSF_SIA
  		do_login(ssh, s, command);
-@@ -729,6 +740,8 @@ do_exec(struct ssh *ssh, Session *s, const char *command)
+@@ -730,6 +741,8 @@ do_exec(struct ssh *ssh, Session *s, const char *command)
  	}
  	if (s->command != NULL && s->ptyfd == -1)
  		s->command_handle = mm_audit_run_command(ssh, s->command);
@@ -129,7 +130,7 @@ index 107edcf91..80282dfd8 100644
  #endif
  	if (s->ttyfd != -1)
  		ret = do_exec_pty(ssh, s, command);
-@@ -744,6 +757,20 @@ do_exec(struct ssh *ssh, Session *s, const char *command)
+@@ -745,6 +758,20 @@ do_exec(struct ssh *ssh, Session *s, const char *command)
  	 */
  	sshbuf_reset(loginmsg);
  
@@ -150,7 +151,7 @@ index 107edcf91..80282dfd8 100644
  	return ret;
  }
  
-@@ -1490,6 +1517,33 @@ child_close_fds(struct ssh *ssh)
+@@ -1497,6 +1524,33 @@ child_close_fds(struct ssh *ssh)
  	log_redirect_stderr_to(NULL);
  }
  
@@ -184,7 +185,7 @@ index 107edcf91..80282dfd8 100644
  /*
   * Performs common processing for the child, such as setting up the
   * environment, closing extra file descriptors, setting the user and group
-@@ -1507,13 +1561,6 @@ do_child(struct ssh *ssh, Session *s, const char *command)
+@@ -1514,13 +1568,6 @@ do_child(struct ssh *ssh, Session *s, const char *command)
  
  	sshpkt_fmt_connection_id(ssh, remote_id, sizeof(remote_id));
  
@@ -199,5 +200,5 @@ index 107edcf91..80282dfd8 100644
  	if (s->authctxt->force_pwchange) {
  		do_setusercontext(pw);
 -- 
-2.52.0
+2.53.0
 
