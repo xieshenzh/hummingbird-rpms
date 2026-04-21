@@ -100,11 +100,53 @@ gpg-signature-verification:
         install_repo=$(dnf info --installed procps-ng 2>/dev/null | \
           grep "^From repo" | cut -d: -f2 | tr -d " ")
         echo "procps-ng installed from repo: ${install_repo}"
-        if [[ "${install_repo}" != "hummingbird" ]]; then
-          echo "FAIL: procps-ng was not installed from the hummingbird repo (got: ${install_repo})"
+        expected_repo="public-hummingbird-$(uname -m)-rpms"
+        if [[ "${install_repo}" != "${expected_repo}" ]]; then
+          echo "FAIL: procps-ng was not installed from ${expected_repo} (got: ${install_repo})"
           exit 1
         fi
 
         echo ""
-        echo "SUCCESS: procps-ng installed from hummingbird repo with gpgcheck=1"
+        echo "SUCCESS: procps-ng installed from ${expected_repo} with gpgcheck=1"
       '
+
+repo-names-match-convention:
+  summary: Verify .repo file uses consistent repo IDs matching the Pulp repository names
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "hummingbird-repos" ]]; then
+      echo "Skipping: This test only runs on hummingbird-repos (got: ${rpm_name})"
+      exit 0
+    fi
+
+    repo_file=$(rpm -qpl "${TEST_RPM}" | grep '\.repo$')
+    if [[ -z "${repo_file}" ]]; then
+      echo "FAIL: No .repo file found in package"
+      exit 1
+    fi
+
+    # Extract repo IDs from the .repo file inside the RPM
+    repo_ids=$(rpm -qp --dump "${TEST_RPM}" 2>/dev/null | head -0; \
+      rpm2cpio "${TEST_RPM}" | cpio -i --to-stdout ".${repo_file}" 2>/dev/null | \
+      grep '^\[' | tr -d '[]')
+
+    echo "Found repo IDs: ${repo_ids}"
+
+    # Verify binary repo uses public-hummingbird-$basearch-rpms pattern
+    if ! echo "${repo_ids}" | grep -q '^public-hummingbird-\$basearch-rpms$'; then
+      echo "FAIL: Expected repo ID 'public-hummingbird-\$basearch-rpms' not found"
+      echo "Got: ${repo_ids}"
+      exit 1
+    fi
+    echo "Verified: binary repo ID matches public-hummingbird-\$basearch-rpms"
+
+    # Verify source repo uses public-hummingbird-source-rpms
+    if ! echo "${repo_ids}" | grep -q '^public-hummingbird-source-rpms$'; then
+      echo "FAIL: Expected repo ID 'public-hummingbird-source-rpms' not found"
+      echo "Got: ${repo_ids}"
+      exit 1
+    fi
+    echo "Verified: source repo ID matches public-hummingbird-source-rpms"
+
+    echo ""
+    echo "SUCCESS: All repo IDs follow the consistent naming convention"
