@@ -79,8 +79,8 @@
 %global _package_note_file  %{_builddir}/%{name}-%{real_version}/.package_note-%{name}-%{version}-%{release}.%{_arch}.ld
 
 Name:           git
-Version:        2.53.0
-Release:        1.1%{?dist}
+Version:        2.54.0
+Release:        1%{?dist}
 Summary:        Fast Version Control System
 License:        BSD-3-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT
 URL:            https://git-scm.com/
@@ -376,7 +376,7 @@ Documentation files for git-core package including man pages.
 %package credential-libsecret
 Summary:        Git helper for accessing credentials via libsecret
 BuildRequires:  libsecret-devel
-Requires:       git = %{version}-%{release}
+Requires:       git-core = %{version}-%{release}
 %description credential-libsecret
 %{summary}.
 %endif
@@ -421,7 +421,6 @@ Requires:       perl(MIME::Base64)
 Requires:       perl(MIME::QuotedPrint)
 Requires:       perl(Net::Domain)
 Requires:       perl(Net::SMTP)
-Requires:       perl(Net::SMTP::SSL)
 Requires:       perl(POSIX)
 Requires:       perl(Sys::Hostname)
 Requires:       perl(Term::ANSIColor)
@@ -1042,6 +1041,9 @@ rmdir --ignore-fail-on-non-empty "$testdir"
 %{?with_docs:%{_pkgdocdir}/git-svn.html}
 
 %changelog
+* Tue Apr 21 2026 Ondřej Pohořelský <opohorel@redhat.com> - 2.54.0-1
+- update to 2.54.0
+
 * Tue Feb 03 2026 Ondřej Pohořelský <opohorel@redhat.com> - 2.53.0-1
 - update to 2.53.0
 
