@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "10",
+  "sha": "1111a1b12a2f66c6f904bafef3e41dd57f603bbc",
+  "source": "https://src.fedoraproject.org/rpms/libXft.git",
+  "version": "2.3.8"
+}

@@ -390,6 +390,8 @@ spec:
           contentType: rpm
         - name: libxext-main
           contentType: rpm
+        - name: libxft-main
+          contentType: rpm
         - name: libxi-main
           contentType: rpm
         - name: libxpm-main
