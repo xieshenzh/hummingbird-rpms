@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
-  "modification_reason": "trigger rebuild to sign the RPMs",
+  "modification_reason": "disable some unit tests that don't work in Konflux",
   "modification_status": "modified",
-  "release": "7",
-  "sha": "391a5ac40504c3d24494b7382d497cee14eafb12",
+  "release": "3",
+  "sha": "1ef4adcb666c8e885a5127738c527bbdb344fc3f",
   "source": "https://src.fedoraproject.org/rpms/nodejs20.git",
-  "version": "20.20.0"
+  "version": "20.20.2"
 }
