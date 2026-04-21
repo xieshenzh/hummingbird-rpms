@@ -496,6 +496,8 @@ spec:
           contentType: rpm
         - name: libtirpc-main
           contentType: rpm
+        - name: libtommath-main
+          contentType: rpm
         - name: libtool-main
           contentType: rpm
         - name: libunistring-main
