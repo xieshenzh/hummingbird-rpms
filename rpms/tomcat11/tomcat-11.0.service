@@ -1,20 +1,41 @@
-# Systemd unit file for default tomcat
-# 
-# To create clones of this service:
-# DO NOTHING, use tomcat@.service instead.
+# Systemd unit file for for Apache Tomcat
 
 [Unit]
 Description=Apache Tomcat Web Application Container
+Documentation=https://tomcat.apache.org/tomcat-11.0-doc/index.html
 After=syslog.target network.target
+RequiresMountsFor=/var/log/tomcat /var/lib/tomcat
 
 [Service]
+# Configuration
+Environment="CATALINA_HOME=/usr/share/tomcat"
+Environment="CATALINA_BASE=/var/lib/tomcat"
+Environment="CATALINA_TMPDIR=/tmp"
+Environment="JAVA_OPTS=-Djava.awt.headless=true"
+
+# Lifecycle
 Type=simple
-EnvironmentFile=/etc/tomcat/tomcat.conf
-Environment="NAME="
-EnvironmentFile=-/etc/sysconfig/tomcat
-ExecStart=/usr/libexec/tomcat/server start
+ExecStart=/bin/sh /usr/libexec/tomcat/tomcat-run.sh
 SuccessExitStatus=143
+Restart=on-abort
+
+# Logging
+SyslogIdentifier=tomcat
+
+# Security
 User=tomcat
+Group=tomcat
+PrivateTmp=yes
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+CacheDirectory=tomcat
+CacheDirectoryMode=750
+ProtectSystem=strict
+ReadWritePaths=/etc/tomcat/Catalina/
+ReadWritePaths=/var/lib/tomcat/webapps/
+ReadWritePaths=/var/lib/tomcat/webapps-javaee/
+ReadWritePaths=/var/log/tomcat/
+ReadWritePaths=/tmp
 
 [Install]
 WantedBy=multi-user.target
