@@ -2,7 +2,7 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "47bfaee136da2cb2089032894175211c3e098bc6",
+  "sha": "5f206bef8c6153865787ed5b51587fa7e0455357",
   "source": "https://src.fedoraproject.org/rpms/dnf5.git",
-  "version": "5.4.1.0"
+  "version": "5.4.2.0"
 }
