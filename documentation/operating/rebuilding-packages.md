@@ -207,7 +207,7 @@ If you have a binary RPM name, the source package name may differ. Query the Hum
 get the source RPM name:
 
 ```bash
-podman run --rm quay.io/hummingbird-ci/builder:latest-hatchling \
+podman run --rm quay.io/hummingbird-ci/builder:latest \
   dnf5 repoquery --queryformat '%{SOURCERPM}' <binary-package> 2>/dev/null
 ```
 

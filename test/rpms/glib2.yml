@@ -99,7 +99,7 @@ ghmac-returns-null:
       -v "${CI_REPOS_DIR}:/tmp/repos:ro,z" \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
       -v "${build_dir}/test_hmac.c:/tmp/test_hmac.c:ro,z" \
-      quay.io/hummingbird-ci/builder:latest-hatchling \
+      quay.io/hummingbird-ci/builder:latest \
       bash -c '
         set -e
 
