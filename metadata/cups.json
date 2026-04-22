@@ -2,7 +2,7 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "5ff8c5fbbdc8f6f1e1332f59f22010cc78e9f121",
+  "sha": "72e8d503434672595ad8919eefda6720440ded53",
   "source": "https://src.fedoraproject.org/rpms/cups.git",
-  "version": "2.4.17"
+  "version": "2.4.18"
 }
