@@ -355,7 +355,7 @@ fips-not-installed-by-default:
 
         "${TEST_ENGINE}" run --rm \
           -v "${TEST_REPO_DIR}:/tmp/rpms:ro,z" \
-          quay.io/hummingbird-ci/builder:latest-hatchling \
+          quay.io/hummingbird-ci/builder:latest \
           bash -c '
             set -e
 
@@ -427,7 +427,7 @@ fips-java-crypto:
         "${TEST_ENGINE}" run --rm \
           -v "${TEST_REPO_DIR}:/tmp/rpms:ro,z" \
           -v "${TEST_FILES_DIR}:/tmp/test-files:ro,z" \
-          quay.io/hummingbird-ci/builder:latest-hatchling \
+          quay.io/hummingbird-ci/builder:latest \
           bash -c '
             set -e
 
@@ -499,7 +499,7 @@ fips-java-crypto-negative:
         "${TEST_ENGINE}" run --rm \
           -v "${TEST_REPO_DIR}:/tmp/rpms:ro,z" \
           -v "${TEST_FILES_DIR}:/tmp/test-files:ro,z" \
-          quay.io/hummingbird-ci/builder:latest-hatchling \
+          quay.io/hummingbird-ci/builder:latest \
           bash -c '
             set -e
 
@@ -587,7 +587,7 @@ fips-replaces-nss-softokn:
 
         "${TEST_ENGINE}" run --rm \
           -v "${TEST_REPO_DIR}:/tmp/rpms:ro,z" \
-          quay.io/hummingbird-ci/builder:latest-hatchling \
+          quay.io/hummingbird-ci/builder:latest \
           bash -c '
             set -e
 
