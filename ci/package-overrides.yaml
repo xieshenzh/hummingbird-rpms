@@ -145,6 +145,9 @@ rust-rpm-sequoia:
   # Tracked from CentOS Stream c10s instead of Fedora
   forked_from: "https://gitlab.com/redhat/centos-stream/rpms"
 
+scap-security-guide:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 # Required to prevent running out of storage
 rust:
   timeout_hours: 12
