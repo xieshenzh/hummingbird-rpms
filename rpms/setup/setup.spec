@@ -1,7 +1,7 @@
 Summary: A set of system configuration and setup files
 Name: setup
 Version: 2.15.0
-Release: 29.1%{?dist}
+Release: 29.2%{?dist}
 License: LicenseRef-Fedora-Public-Domain
 # This package is a downstream-only project
 URL: https://src.fedoraproject.org/rpms/setup

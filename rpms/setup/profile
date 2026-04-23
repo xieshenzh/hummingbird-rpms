@@ -61,6 +61,9 @@ fi
 
 export PATH USER LOGNAME MAIL HOSTNAME HISTSIZE HISTCONTROL
 
+# Set default umask
+umask 027
+
 for i in /etc/profile.d/*.sh /etc/profile.d/sh.local ; do
     if [ -r "$i" ]; then
         if [ "${-#*i}" != "$-" ]; then
