@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: Python-2.0.1
 
 
@@ -420,6 +420,24 @@ Patch475: 00475-cve-2025-15367.patch
 # which is modified with this patch, hence they need a
 # direct call to the check function.
 Patch477: 00477-raise-an-error-when-importing-stdlib-modules-compiled-for-a-different-python-version.patch
+
+# 00479 # 05ed7ce7ae9e17c23a04085b2539fe6d6d3cef69
+# CVE-2026-1502
+#
+# gh-146211: Reject CR/LF in HTTP tunnel request headers
+Patch479: 00479-cve-2026-1502.patch
+
+# 00480 # 858691f36890b33e713f330d24c6670329695c2e
+# CVE-2026-4786
+#
+# Fix webbrowser `%%action` substitution bypass of dash-prefix check
+Patch480: 00480-cve-2026-4786.patch
+
+# 00482 # 69f14bc306fc62400d45565faa980b77858b9151
+# CVE-2026-6100
+#
+# Fix a possible UAF in {LZMA,BZ2,_Zlib}Decompressor
+Patch482: 00482-cve-2026-6100.patch
 
 # (New patches go here ^^^)
 #
