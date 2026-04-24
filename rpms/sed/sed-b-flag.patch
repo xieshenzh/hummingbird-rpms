@@ -12,7 +12,7 @@ diff --git a/sed/sed.c b/sed/sed.c
 index af83065..bdf590b 100644
 --- a/sed/sed.c
 +++ b/sed/sed.c
-@@ -153,7 +153,12 @@ Usage: %s [OPTION]... {script-only-if-no-other-script} [input-file]...\n\
+@@ -153,6 +153,10 @@ Usage: %s [OPTION]... {script-only-if-no-other-script} [input-file]...\n\
    fprintf (out, _("  -b, --binary\n\
                   open files in binary mode (CR+LFs are not" \
                   " processed specially)\n"));
@@ -21,10 +21,5 @@ index af83065..bdf590b 100644
 +                 does nothing; for compatibility with WIN32/CYGWIN/MSDOS/EMX \n\
 +                 (open files in binary mode; CR+LF are not processed specially)\n" ));
  #endif
-+
    fprintf (out, _("  -l N, --line-length=N\n\
-                  specify the desired line-wrap length for the `l' command\n"));
-   fprintf (out, _("  --posix\n\
--- 
-2.43.0
-
+                  specify the desired line-wrap length for the 'l' command\n"));
