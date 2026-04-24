@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "2b6065d95e896dd254a8b23979108d8682155121",
+  "release": "1",
+  "sha": "00b1ed302a571a22febda213ee5829ddcc436413",
   "source": "https://src.fedoraproject.org/rpms/libsolv.git",
-  "version": "0.7.36"
+  "version": "0.7.37"
 }
