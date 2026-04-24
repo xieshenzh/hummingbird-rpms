@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Change default umask from 022 to 027 for CIS benchmark compliance",
+  "modification_status": "modified",
   "release": "29",
   "sha": "aae1771e2281440b3cd6e399c68d70d2db19d06a",
   "source": "https://src.fedoraproject.org/rpms/setup.git",

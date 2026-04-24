@@ -6,3 +6,13 @@ content:
     for expected in /etc/environment /etc/services /usr/share/licenses/setup; do
       grep -q -F -x "$expected" <<<"$files" || TEST_FAIL "Expected file $expected not found in RPM"
     done
+
+# CIS benchmark: accounts_umask_etc_bashrc, accounts_umask_etc_profile
+umask:
+  command: |
+    tmpdir=$(mktemp -d)
+    trap 'rm -rf "$tmpdir"' EXIT
+    cd "$tmpdir"
+    rpm2cpio "${TEST_RPM:?}" | cpio -id --quiet 2>/dev/null
+    grep -qE '^\s*umask 027' etc/bashrc  || TEST_FAIL "/etc/bashrc does not set umask 027"
+    grep -qE '^\s*umask 027' etc/profile || TEST_FAIL "/etc/profile does not set umask 027"

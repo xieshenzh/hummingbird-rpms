@@ -66,8 +66,8 @@ if [ -z "$BASHRCSOURCED" ]; then
         esac
     }
 
-    # Set default umask for non-login shell only if it is set to 0
-    [ `umask` -eq 0 ] && umask 022
+    # Set default umask for non-login shell
+    umask 027
 
     SHELL=/bin/bash
     # Only display echos from profile.d scripts if we are no login shell
