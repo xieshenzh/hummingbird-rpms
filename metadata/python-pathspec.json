@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "02d3d51df4c11496861b1d09820ff7c0de2d7fd7",
+  "release": "1",
+  "sha": "2f7b7d5e1c38495287cc755c4121cc9c43979165",
   "source": "https://src.fedoraproject.org/rpms/python-pathspec.git",
-  "version": "1.0.4"
+  "version": "1.1.0"
 }
