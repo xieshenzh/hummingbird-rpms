@@ -87,6 +87,7 @@ def test_data(case_name, capfd, tmp_path, monkeypatch):
             read_pyproject_dependencies=read_pyproject_dependencies,
             output=output,
             config_settings=case.get('config_settings'),
+            dependency_overrides=case.get('dependency_overrides', []),
         )
     except SystemExit as e:
         assert e.code == case['result']

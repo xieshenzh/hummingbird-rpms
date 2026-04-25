@@ -52,9 +52,13 @@ Summary:        %{summary}
 
 %if 0%{?rhel} == 9
 # The following test deps are optional and either not desired or not available in Fedora:
-sed -Ei setup.cfg -e  '/\bpytest-(checkdocs|black|cov|mypy|enabler)\b/d' \
-                  -e  '/\bflake8\b/d' \
-                  -e  '/\bpaver\b/d'
+%pyproject_patch_dependency pytest-checkdocs:ignore
+%pyproject_patch_dependency pytest-black:ignore
+%pyproject_patch_dependency pytest-cov:ignore
+%pyproject_patch_dependency pytest-mypy:ignore
+%pyproject_patch_dependency pytest-enabler:ignore
+%pyproject_patch_dependency flake8:ignore
+%pyproject_patch_dependency paver:ignore
 # Strip pytest options from the above
 sed -i pytest.ini -e 's/ --flake8//' \
                   -e 's/ --cov//'

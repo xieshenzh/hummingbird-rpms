@@ -27,12 +27,11 @@ Summary:        %{summary}
 %autosetup -p1 -n %{pypi_name}-%{version}
 # setuptools-git is needed to build the source distribution, but not
 # for packaging, which *starts* from the source distribution
-# we sed it out to save ourselves a dependency, but that is not strictly required
-sed -i -e 's., "setuptools-git"..g' pyproject.toml
+%pyproject_patch_dependency setuptools-git:ignore
 
 # the tests don't actually need mock, they use unittest.mock
 # https://github.com/os-autoinst/openQA-python-client/pull/21
-sed -i '/mock/d' tests.requires
+%pyproject_patch_dependency mock:ignore
 
 
 %generate_buildrequires

@@ -26,12 +26,13 @@ Summary:        %{summary}
 
 %prep
 %autosetup -p1 -n flit-%{version}
+# pytoml is no longer available in Fedora
+%pyproject_patch_dependency pytoml:ignore:br_only
 
 
 %generate_buildrequires
 cd flit_core
-# this runtime-requires pytoml which is no longer available in Fedora
-%pyproject_buildrequires -R
+%pyproject_buildrequires
 cd ..
 
 %build

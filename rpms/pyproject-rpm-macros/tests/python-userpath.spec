@@ -29,7 +29,7 @@ Summary:        %{summary}
 
 %prep
 %autosetup -p1 -n userpath-%{version}
-sed -Ei '/^(coverage)$/d' requirements-dev.txt
+%pyproject_patch_dependency coverage:ignore
 
 
 %generate_buildrequires

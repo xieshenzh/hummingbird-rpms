@@ -30,6 +30,7 @@
 %_pyproject_ghost_distinfo %{_builddir}/%{_pyproject_files_prefix}-pyproject-ghost-distinfo
 %_pyproject_record %{_builddir}/%{_pyproject_files_prefix}-pyproject-record
 %_pyproject_buildrequires %{_builddir}/%{_pyproject_files_prefix}-pyproject-buildrequires
+%_pyproject_dep_overrides %{_builddir}/%{_pyproject_files_prefix}-pyproject-dep-overrides
 
 # Internal macro, takes %%set_build_flags and strips all the exports
 # TODO: Make such a list an actual source of %%set_build_flags (in redhat-rpm-config)
@@ -40,6 +41,12 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=1935212
 # The value is read and used by the %%pytest and %%tox macros:
 %_set_pytest_addopts %global __pytest_addopts --ignore=%{_pyproject_builddir}
+
+%pyproject_patch_dependency() %{expand:\\\
+%{!?1:%{error:%%pyproject_patch_dependency requires an argument}}\\\
+%{?2:%{error:%%pyproject_patch_dependency accepts exactly one argument per call}}\\\
+echo '%1' >> %{_pyproject_dep_overrides}
+}
 
 %pyproject_wheel(C:d:) %{expand:\\\
 %_set_pytest_addopts
@@ -112,6 +119,11 @@ for site_dir in ${site_dirs[@]}; do
       --buildroot %{buildroot} --record ${distinfo}/RECORD --output %{_pyproject_record}
     rm -fv ${distinfo}/RECORD
     rm -fv ${distinfo}/REQUESTED
+    if [ -f %{_pyproject_dep_overrides} ]; then
+      %{__python3} -B %{_rpmconfigdir}/redhat/pyproject_patch_metadata.py \\
+        --overrides %{_pyproject_dep_overrides} \\
+        --metadata ${distinfo}/METADATA
+    fi
   done
 done
 lines=$(wc -l %{_pyproject_ghost_distinfo} | cut -f1 -d" ")
@@ -228,7 +240,7 @@ if [ -f %{__python3} ]; then
   echo -n > %{_pyproject_buildrequires}
   %{_pyproject_build_flags} \\\
   TMPDIR="%{_pyproject_builddir}" \\\
-  RPM_TOXENV="%{toxenv}" FEDORA=%{?fedora} HOSTNAME="rpmbuild" %{__python3} -Bs %{_rpmconfigdir}/redhat/pyproject_buildrequires.py %{?!_python_no_extras_requires:--generate-extras} --python3_pkgversion %{python3_pkgversion} --wheeldir %{_pyproject_wheeldir} --output %{_pyproject_buildrequires} %{?**} >&2
+  RPM_TOXENV="%{toxenv}" FEDORA=%{?fedora} HOSTNAME="rpmbuild" %{__python3} -Bs %{_rpmconfigdir}/redhat/pyproject_buildrequires.py %{?!_python_no_extras_requires:--generate-extras} --python3_pkgversion %{python3_pkgversion} --wheeldir %{_pyproject_wheeldir} --output %{_pyproject_buildrequires} --dep-overrides-file %{_pyproject_dep_overrides} %{?**} >&2
   cat %{_pyproject_buildrequires}
 fi
 # Incomplete .dist-info dir might confuse importlib.metadata
