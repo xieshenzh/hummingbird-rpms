@@ -1,6 +1,6 @@
 Name: libgpg-error
-Version: 1.59
-Release: 1.1%{?dist}
+Version: 1.60
+Release: 1%{?dist}
 Summary: Library for error values used by GnuPG components
 URL: https://www.gnupg.org/related_software/libgpg-error/
 License: LGPL-2.1-or-later AND (BSD-3-Clause OR LGPL-2.1-or-later) AND FSFULLR AND GPL-2.0-or-later
@@ -89,6 +89,9 @@ make check
 %{_mandir}/man1/gpgrt-config.*
 
 %changelog
+* Fri Apr 24 2026 Jakub Jelen <jjelen@redhat.com> - 1.60-1
+- New upstream release (#2461419)
+
 * Wed Feb 18 2026 Jakub Jelen <jjelen@redhat.com> - 1.59-1
 - New upstream release (#2440586)
 
