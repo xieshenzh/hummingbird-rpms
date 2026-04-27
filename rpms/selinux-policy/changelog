@@ -1,3 +1,13 @@
+* Mon Apr 27 2026 Zdenek Pytela <zpytela@redhat.com> - 45.2-1
+- Allow init nnp domain transition do dirsrv_t and dirsrv_snmp_t
+- Allow NetworkManager_dispatcher_nvme_t check status of systemd services
+- Allow iptables_t read state of some processes
+- Label /dev/HID-SENSOR-.* with hid_sensor_device_t
+- Allow thump_t setattr on thumb_tmp_t lnk_files
+- Allow accounts-daemon read accountsd_share_t symlinks
+- Label /usr/bin/sudo-rs and /usr/bin/su-rs
+- Allow gpsd the setcap process capability
+
 * Mon Apr 20 2026 Zdenek Pytela <zpytela@redhat.com> - 45.1-1
 - Do not backslash-escape underscores in file context specifications
 - Allow systemd_homework_t to delete systemd_homed_record_t dirs (bsc#1261359)
