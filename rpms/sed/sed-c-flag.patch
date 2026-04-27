@@ -129,12 +129,11 @@ index 4bd6587..05f7a44 100644
  
  #include "binary-io.h"
  #include "eloop-threshold.h"
-@@ -408,7 +409,78 @@ ck_rename (const char *from, const char *to)
-   panic (_("cannot rename %s: %s"), from, strerror (errno));
+@@ -408,6 +409,77 @@ ck_rename (const char *from, const char *to)
+   panic (_("cannot rename %s to %s: %s"), from, to, strerror (errno));
  }
  
 +/* Downstream -c related functions */
- 
 +/* Panic on failing unlink */
 +void
 +ck_unlink (const char *name)
@@ -207,7 +206,7 @@ index 4bd6587..05f7a44 100644
 +}
  
  
- /* Implement a variable sized buffer of `stuff'.  We don't know what it is,
+ 
 diff --git a/sed/utils.h b/sed/utils.h
 index cac8a05..93bbcf2 100644
 --- a/sed/utils.h
@@ -219,8 +218,8 @@ index cac8a05..93bbcf2 100644
 +void ck_fccopy (const char *from, const char *to);
 +void ck_fcmove (const char *from, const char *to);
  
- void *ck_malloc (size_t size);
- void *ck_realloc (void *ptr, size_t size);
+ void cancel_cleanup (void);
+ void remove_cleanup_file (void);
 -- 
 2.43.0
 
