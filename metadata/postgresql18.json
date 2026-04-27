@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Remove runtime dependency on systemd",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "37e7d739b8e9a97a0eadca0a3fca2dc98eb39100",
+  "release": "2",
+  "sha": "58f69a4ee195b0877f6960ebaaf3cb9e13c89073",
   "source": "https://src.fedoraproject.org/rpms/postgresql18.git",
   "version": "18.3"
 }
