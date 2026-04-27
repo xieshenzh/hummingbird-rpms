@@ -940,8 +940,6 @@ spec:
           contentType: rpm
         - name: xz-main
           contentType: rpm
-        - name: yarnpkg-main
-          contentType: rpm
         - name: yq-main
           contentType: rpm
         - name: zchunk-main
