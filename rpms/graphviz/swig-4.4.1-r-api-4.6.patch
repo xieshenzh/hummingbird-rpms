@@ -1,0 +1,37 @@
+From bca7d7f78fb8b75e16798bc8a5dc131d203c953b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?I=C3=B1aki=20=C3=9Acar?= <iucar@fedoraproject.org>
+Date: Sun, 26 Apr 2026 13:15:21 +0200
+Subject: [PATCH] asdf
+
+---
+ tclpkg/gv/Makefile.am | 1 +
+ tclpkg/gv/Makefile.in | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/tclpkg/gv/Makefile.am b/tclpkg/gv/Makefile.am
+index e9cdabf..4373b1c 100644
+--- a/tclpkg/gv/Makefile.am
++++ b/tclpkg/gv/Makefile.am
+@@ -146,6 +146,7 @@ libgv_R_la_CPPFLAGS = $(BASECPPFLAGS) $(R_CFLAGS)
+ libgv_R_la_CXXFLAGS = $(AM_CXXFLAGS) -Wno-cast-function-type -Wno-unused-parameter
+ gv_R.cpp: gv.i
+ 	$(SWIG) -c++ -r -o $@ $(srcdir)/gv.i
++	sed -i 's/SET_S4_OBJECT\((.*)\);/Rf_asS4\(\1, TRUE, 1\);/g' $@
+ 
+ pkgrubydir = $(pkglibdir)/ruby
+ RUBY_data =
+diff --git a/tclpkg/gv/Makefile.in b/tclpkg/gv/Makefile.in
+index a58ce8f..fab1afa 100644
+--- a/tclpkg/gv/Makefile.in
++++ b/tclpkg/gv/Makefile.in
+@@ -2898,6 +2898,7 @@ gv_python3.cpp: gv.i
+ 	$(SWIG) -c++ -python -o $@ $(srcdir)/gv.i
+ gv_R.cpp: gv.i
+ 	$(SWIG) -c++ -r -o $@ $(srcdir)/gv.i
++	sed -i 's/SET_S4_OBJECT\((.*)\);/Rf_asS4\(\1, TRUE, 1\);/g' $@
+ gv_ruby.cpp: gv.i
+ 	$(SWIG) -c++ -ruby -o $@ $(srcdir)/gv.i
+ gv_tcl.cpp: gv.i
+-- 
+2.52.0
+
