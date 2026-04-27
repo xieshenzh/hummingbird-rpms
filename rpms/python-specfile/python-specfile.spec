@@ -7,7 +7,7 @@ Main focus is on modifying existing spec files, any change should result
 in a minimal diff.}
 
 
-%global base_version 0.40.1
+%global base_version 0.40.2
 #global prerelease   rc1
 
 %global package_version %{base_version}%{?prerelease:~%{prerelease}}
@@ -16,7 +16,7 @@ in a minimal diff.}
 
 Name:           python-specfile
 Version:        %{package_version}
-Release:        1.1%{?dist}
+Release:        1%{?dist}
 
 Summary:        A library for parsing and manipulating RPM spec files
 License:        MIT
@@ -81,6 +81,10 @@ sed -i 's/setuptools_scm\[toml\]>=7/setuptools_scm[toml]/' pyproject.toml
 
 
 %changelog
+* Fri Apr 24 2026 Packit <hello@packit.dev> - 0.40.2-1
+- Trailing whitespaces at the end of specfile sections are now ignored during parsing. (#531)
+- Resolves: rhbz#2461109
+
 * Wed Mar 25 2026 Packit <hello@packit.dev> - 0.40.1-1
 - Fixed issues related to introduced sanitization (#523, #524, #525).
 - Resolves: rhbz#2446536
@@ -261,7 +265,7 @@ sed -i 's/setuptools_scm\[toml\]>=7/setuptools_scm[toml]/' pyproject.toml
 - The `Specfile.add_changelog_entry()` method now uses dates based on UTC instead of the local timezone. (#223)
 
 * Thu Apr 20 2023 Packit <hello@packit.dev> - 0.16.0-1
-- Added `Specfile.has_autorelease` property to detect if a spec file uses the `%1%{?dist}` macro. (#221)
+- Added `Specfile.has_autorelease` property to detect if a spec file uses the `%1%{?dist}
 
 * Fri Mar 10 2023 Packit <hello@packit.dev> - 0.15.0-1
 - Parsing the spec file by RPM is now performed only if really necessary, greatly improving performance in certain scenarios. (#212)
