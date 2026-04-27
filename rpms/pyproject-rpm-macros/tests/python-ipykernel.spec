@@ -33,7 +33,7 @@ Summary:        %{summary}
 
 # Remove the dependency on debugpy.
 # See https://github.com/ipython/ipykernel/pull/767
-sed -i '/"debugpy/d' pyproject.toml setup.py
+%pyproject_patch_dependency debugpy:ignore
 
 %generate_buildrequires
 %pyproject_buildrequires -r

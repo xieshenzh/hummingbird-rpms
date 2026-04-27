@@ -27,13 +27,13 @@ Summary:        %{summary}
 
 %prep
 %autosetup -p1 -n virtualenv-%{version}
-# Relax the upper bounds of some dependencies to their known available versions in EL 9
-sed -i -e 's/distlib<1,>=0.3.6/distlib<1,>=0.3.2/' \
-       -e 's/filelock<4,>=3.4.1/filelock<4,>=3.3.1/' \
-       -e 's/platformdirs<4,>=2.4/platformdirs<5,>=2.3/' \
-       -e 's/hatchling>=1.12.2/hatchling>=0.25/' \
-       -e 's/hatch-vcs>=0.3/hatch-vcs>=0.2.1/' \
-    pyproject.toml
+# Relax version bounds of some dependencies for EL 9
+%pyproject_patch_dependency distlib:set_lower:0.3.2
+%pyproject_patch_dependency filelock:set_lower:3.3.1
+%pyproject_patch_dependency platformdirs:set_upper:5
+%pyproject_patch_dependency platformdirs:set_lower:2.3
+%pyproject_patch_dependency hatchling:set_lower:0.25
+%pyproject_patch_dependency hatch-vcs:set_lower:0.2.1
 # Drop the option for flaky
 sed -i 's/--no-success-flaky-report//' pyproject.toml
 # Hacky backport of https://src.fedoraproject.org/rpms/python-virtualenv/c/87b1f95664

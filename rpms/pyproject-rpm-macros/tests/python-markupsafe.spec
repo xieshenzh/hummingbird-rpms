@@ -33,7 +33,7 @@ Summary:        %{summary}
 %autosetup -n markupsafe-%{version}
 
 # we don't have pip-tools packaged in Fedora yet
-sed -i /pip-tools/d requirements/dev.in
+%pyproject_patch_dependency pip-tools:ignore
 
 # help the macros understand the URL in requirements/docs.in
 sed -Ei 's/sphinx\.git@([0-9a-f]+)/sphinx.git@\1#egg=sphinx/' requirements/docs.in

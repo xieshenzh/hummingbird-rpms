@@ -46,6 +46,7 @@ def print_err(*args, **kwargs):
 try:
     from packaging.markers import Marker
     from packaging.requirements import Requirement, InvalidRequirement
+    from packaging.specifiers import SpecifierSet
     from packaging.utils import canonicalize_name
 except ImportError as e:
     print_err('Import error:', e)
@@ -54,6 +55,9 @@ except ImportError as e:
 
 # uses packaging, needs to be imported after packaging is verified to be present
 from pyproject_convert import convert
+from pyproject_dependency_overrides import (
+    parse_override_string, apply_overrides_to_specifiers,
+)
 
 
 def guess_reason_for_invalid_requirement(requirement_str):
@@ -79,7 +83,8 @@ def guess_reason_for_invalid_requirement(requirement_str):
 class Requirements:
     """Requirement gatherer. The macro will eventually print out output_lines."""
     def __init__(self, get_installed_version, extras=None,
-                 generate_extras=False, python3_pkgversion='3', config_settings=None):
+                 generate_extras=False, python3_pkgversion='3', config_settings=None,
+                 dependency_overrides=None):
         self.get_installed_version = get_installed_version
         self.output_lines = []
         self.extras = set()
@@ -94,11 +99,55 @@ class Requirements:
         self.generate_extras = generate_extras
         self.python3_pkgversion = python3_pkgversion
         self.config_settings = config_settings
+        self.dependency_overrides = self._parse_dependency_overrides(dependency_overrides or [])
 
         self.package_name = None
 
     def add_extras(self, *extras):
         self.extras |= set(e.strip() for e in extras)
+
+    def _parse_dependency_overrides(self, overrides):
+        """Parse dependency override specifications into a structured format.
+
+        Each override is a string of the form: package:action[:value][:br_only]
+        """
+        parsed_overrides = {}
+        for override in overrides:
+            # Strip br_only scope suffix (irrelevant for BuildRequires)
+            parts = override.split(':')
+            if parts and parts[-1].strip() == 'br_only':
+                override = ':'.join(parts[:-1])
+
+            package, action, value = parse_override_string(override)
+            parsed_overrides.setdefault(package, []).append(
+                {'action': action, 'value': value})
+
+        return parsed_overrides
+
+    @staticmethod
+    def _base_package_name(package_name):
+        """Extract base package name, stripping any extras like [extra1]."""
+        bracket = package_name.find('[')
+        if bracket != -1:
+            package_name = package_name[:bracket]
+        return canonicalize_name(package_name)
+
+    def _should_ignore_dependency(self, package_name):
+        """Check if a dependency should be completely ignored."""
+        package_name = self._base_package_name(package_name)
+        if package_name not in self.dependency_overrides:
+            return False
+        return any(o['action'] == 'ignore' for o in self.dependency_overrides[package_name])
+
+    def _apply_dependency_overrides(self, package_name, specifiers):
+        """Apply dependency overrides to a list of specifiers for a given package."""
+        package_name = self._base_package_name(package_name)
+        if package_name not in self.dependency_overrides:
+            return specifiers
+
+        return apply_overrides_to_specifiers(
+            specifiers, self.dependency_overrides[package_name],
+            package_name=package_name, log_fn=print_err)
 
     @property
     def marker_envs(self):
@@ -146,6 +195,10 @@ class Requirements:
 
         name = canonicalize_name(requirement.name)
 
+        if self._should_ignore_dependency(name):
+            print_err(f'Ignoring dependency {name} per dependency override')
+            return
+
         if extra is not None:
             extra_str = f'extra == "{extra}"'
             if requirement.marker is not None:
@@ -171,6 +224,14 @@ class Requirements:
             else:
                 print_err(f'Ignoring self-referential requirement without extras:', requirement_str)
             return
+
+        # Apply dependency overrides before the installed-version check,
+        # so the check reflects the constraints we will actually output.
+        if self._base_package_name(name) in self.dependency_overrides:
+            overridden = self._apply_dependency_overrides(
+                name, list(requirement.specifier))
+            requirement.specifier = SpecifierSet(
+                ','.join(str(s) for s in overridden))
 
         # We need to always accept pre-releases as satisfying the requirement
         # Otherwise e.g. installed cffi version 1.15.0rc2 won't even satisfy the requirement for "cffi"
@@ -595,7 +656,7 @@ def generate_requires(
     get_installed_version=importlib.metadata.version,  # for dep injection
     generate_extras=False, python3_pkgversion="3", requirement_files=None, use_build_system=True,
     read_pyproject_dependencies=False,
-    output, config_settings=None,
+    output, config_settings=None, dependency_overrides=None,
 ):
     """Generate the BuildRequires for the project in the current directory
 
@@ -608,6 +669,7 @@ def generate_requires(
         generate_extras=generate_extras,
         python3_pkgversion=python3_pkgversion,
         config_settings=config_settings,
+        dependency_overrides=dependency_overrides or [],
     )
 
     dependency_groups = dependency_groups or []
@@ -718,6 +780,10 @@ def main(argv):
         help='Configuration settings to pass to the PEP 517 backend',
     )
     parser.add_argument('-d', help=argparse.SUPPRESS)  # processed by RPM macro
+    parser.add_argument(
+        '--dep-overrides-file', type=pathlib.Path, default=None,
+        help=argparse.SUPPRESS,
+    )
 
     args = parser.parse_args(argv)
 
@@ -740,6 +806,10 @@ def main(argv):
     if args.extras:
         args.runtime = True
 
+    dependency_overrides = []
+    if args.dep_overrides_file and args.dep_overrides_file.is_file():
+        dependency_overrides = args.dep_overrides_file.read_text().split()
+
     try:
         generate_requires(
             include_runtime=args.runtime,
@@ -755,6 +825,7 @@ def main(argv):
             read_pyproject_dependencies=args.read_pyproject_dependencies,
             output=args.output,
             config_settings=parse_config_settings_args(args.config_settings),
+            dependency_overrides=dependency_overrides,
         )
     except Exception:
         # Log the traceback explicitly (it's useful debug info)

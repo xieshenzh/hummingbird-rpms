@@ -36,7 +36,8 @@ Summary:        %{summary}
 %prep
 %autosetup -p1 -n %{pypi_name}-%{version}
 # remove optional test dependencies we don't like to pull in
-sed -E -i '/mock|nose/d' setup.cfg
+%pyproject_patch_dependency mock:ignore
+%pyproject_patch_dependency nose:ignore
 
 
 %generate_buildrequires

@@ -236,6 +236,68 @@ is not supported there and will result to an error like:
 [config_settings]: https://peps.python.org/pep-0517/#config-settings
 
 
+Provisional: Overriding dependency constraints
+-----------------------------------------------
+
+Upstream Python projects sometimes pin or constrain dependency versions in ways
+that are incompatible with the versions available in the distribution.
+The `%pyproject_patch_dependency` macro allows you to override these constraints
+for both build-time (BuildRequires) and run-time (Requires) dependencies.
+The feature is **provisional** and the behavior might change.
+Please subscribe to Fedora's [python-devel list] if you use the feature.
+
+Declare overrides in `%prep`, after `%autosetup`:
+
+    %prep
+    %autosetup -p1
+    %pyproject_patch_dependency cython:drop_upper
+    %pyproject_patch_dependency numpy:set_upper:2.0
+
+The overrides are written to a file that is automatically consumed by
+`%pyproject_buildrequires` (for BuildRequires) and `%pyproject_install`
+(for patching installed `.dist-info/METADATA`, which controls Requires).
+
+The syntax is:
+
+    %pyproject_patch_dependency PACKAGE:ACTION[:VALUE][:br_only]
+
+where `PACKAGE` is the Python package name (normalized per [PEP 503]),
+`ACTION` is one of the following, `VALUE` is required for `set_upper`
+and `set_lower`, and the optional `br_only` suffix restricts the override
+to BuildRequires only (the installed METADATA is left untouched).
+
+Available actions:
+
+* `drop_upper` -- remove upper-bound constraints (`<`, `<=`);
+  decompose `==V` to `>=V` and `~=V` to `>=V` (keeping the lower half)
+* `drop_lower` -- remove lower-bound constraints (`>`, `>=`);
+  decompose `==V` to `<=V` (keeping the upper half); remove `~=` entirely
+* `drop_constraints` -- remove all version constraints
+* `set_upper` -- replace the upper bound with `< VALUE`
+  (same decomposition as `drop_upper`, then adds `< VALUE`)
+* `set_lower` -- replace the lower bound with `>= VALUE`
+  (same decomposition as `drop_lower`, then adds `>= VALUE`)
+* `ignore` -- remove the dependency entirely
+
+The `==` decomposition follows from the mathematical equivalence
+`==V` = `>=V AND <=V`. The `~=` decomposition follows PEP 440 which
+defines `~= V.N` as `>= V.N, == V.*`. Exclusions (`!=`) are always
+preserved by `drop_upper`/`drop_lower` (but removed by `drop_constraints`).
+
+The `br_only` suffix is useful in multi-wheel spec files where a sibling
+package should be ignored in BuildRequires but kept as a runtime dependency:
+
+    %pyproject_patch_dependency sibling-package:ignore:br_only
+
+Note that the macro operates on the **output** of the build backend's PEP 517
+hooks, not on the source files themselves. If a dependency is enforced
+internally by the build backend (e.g. a `setup_requires` entry that is imported
+at the top level of `setup.py`), the hook may fail before the macro can
+intercept. In such cases, use traditional `sed`/`patch` in `%prep`, or
+combine a static `BuildRequires` with `%pyproject_patch_dependency` to ensure
+the dependency is installed while still being filtered from dynamic output.
+
+
 Running tox based tests
 -----------------------
 
@@ -545,6 +607,7 @@ The requirements will be converted to package names without versions, e.g.:
 However upstreams usually only use direct URLs for their requirements as workarounds,
 so be prepared for problems.
 
+[PEP 503]: https://www.python.org/dev/peps/pep-0503/
 [PEP 508]: https://www.python.org/dev/peps/pep-0508/
 [PEP 517]: https://www.python.org/dev/peps/pep-0517/
 [PEP 518]: https://www.python.org/dev/peps/pep-0518/
