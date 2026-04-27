@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "1",
+  "modification_reason": "Update to 2.8.0 ahead of Fedora",
+  "modification_status": "modified",
+  "release": "0.1",
   "sha": "76216637648fa5f518ad93f7a0791706e14871fa",
   "source": "https://src.fedoraproject.org/rpms/expat.git",
-  "version": "2.7.5"
+  "version": "2.8.0"
 }
