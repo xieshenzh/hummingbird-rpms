@@ -7836,7 +7836,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/golang1.25/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/golang1.25/***, test/rpms/golang1.25.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
@@ -7905,7 +7905,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/golang1.26/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/golang1.26/***, test/rpms/golang1.26.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
