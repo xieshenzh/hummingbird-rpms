@@ -7,16 +7,21 @@
 - We choose the domain prefix of `public-` to ensure that the repositories are publicly available
 
 ## Setup
-* Obtain the value of the field `cli.toml` from the secret located in the vault at `rhel-primitives/PULP_PUBLIC_RHEL_PRIMITIVES_CONFIG_FILE`
-* Save the contents to a file, e.g., `cli.toml`
-* You can either copy this file to the default location `~/.config/pulp/cli.toml` or pass its path using the `--config` argument to the creation script.
+
+- Obtain the value of the field `cli.toml` from the secret located
+  in the vault at
+  `rhel-primitives/PULP_PUBLIC_RHEL_PRIMITIVES_CONFIG_FILE`
+- Save the contents to a file, e.g., `cli.toml`
+- You can either copy this file to the default location
+  `~/.config/pulp/cli.toml` or pass its path using the `--config`
+  argument to the creation script.
 
 ## Create
 
 Usage:
 
-```
-$ ./create-pulp-resources.sh --domain <domain_name> [OPTIONS]
+```bash
+./create-pulp-resources.sh --domain <domain_name> [OPTIONS]
 ```
 
 ### Options
@@ -29,7 +34,13 @@ $ ./create-pulp-resources.sh --domain <domain_name> [OPTIONS]
 | `--config <path>` | Path to the Pulp CLI config (e.g. `cli.toml`). If omitted, the CLI default (e.g. `~/.config/pulp/cli.toml`) is used. |
 | `--retain-repo-versions <n>` | **File repositories only.** Sets Pulp `retain_repo_versions` to a non-negative integer. If `--type file` and this flag is omitted, the default is **1**. For **existing** repositories, the script calls `repository update` **only when** the current value differs from `<n>` (reads the live repo with `repository show --format json`). Newly created file repositories get `retain_repo_versions` set directly after creation. |
 
-> **Note:** If you re-run with `--type file` and omit `--retain-repo-versions`, the script applies the default **1** and will change existing file repositories whose current `retain_repo_versions` is not already `1`. Pass `--retain-repo-versions <n>` explicitly (including to match a custom value already on the server) to avoid an unintended reset.
+> **Note:** If you re-run with `--type file` and omit
+> `--retain-repo-versions`, the script applies the default **1**
+> and will change existing file repositories whose current
+> `retain_repo_versions` is not already `1`. Pass
+> `--retain-repo-versions <n>` explicitly (including to match a
+> custom value already on the server) to avoid an unintended
+> reset.
 
 Run `./create-pulp-resources.sh --help` for the full usage text from the script.
 
@@ -37,30 +48,35 @@ Run `./create-pulp-resources.sh --help` for the full usage text from the script.
 
 Using default config `~/.config/pulp/cli.toml`, default type `rpm`, and default RPM repositories:
 
-```
-$ ./create-pulp-resources.sh --domain public-hummingbird
+```bash
+./create-pulp-resources.sh --domain public-hummingbird
 ```
 
 Overriding the repositories to be created, still using default `rpm` type:
 
-```
-$ ./create-pulp-resources.sh --domain public-hummingbird --repos "source,x86_64,s390x,ppc64le,aarch64"
+```bash
+./create-pulp-resources.sh --domain public-hummingbird \
+  --repos "source,x86_64,s390x,ppc64le,aarch64"
 ```
 
-Creating `file` type repositories with default repos `metadata` and `rpm-catalog`. Retention defaults to **1** repo version per file repository (updated only if the server value is different):
+Creating `file` type repositories with default repos `metadata`
+and `rpm-catalog`. Retention defaults to **1** repo version per
+file repository (updated only if the server value is different):
 
-```
-$ ./create-pulp-resources.sh --domain public-hummingbird --type file
+```bash
+./create-pulp-resources.sh --domain public-hummingbird --type file
 ```
 
 Explicit retention (file type only), for example keeping **10** repository versions:
 
-```
-$ ./create-pulp-resources.sh --domain public-hummingbird --type file --retain-repo-versions 10
+```bash
+./create-pulp-resources.sh --domain public-hummingbird \
+  --type file --retain-repo-versions 10
 ```
 
 Using a specific config file:
 
-```
-$ ./create-pulp-resources.sh --domain public-hummingbird --config ./cli.toml
+```bash
+./create-pulp-resources.sh --domain public-hummingbird \
+  --config ./cli.toml
 ```
