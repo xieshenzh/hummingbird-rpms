@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
-  "release": "8",
+  "modification_reason": "update to 0.9rc4",
+  "modification_status": "modified",
+  "release": "0.1",
   "sha": "195919c9f9a8dff0e996921afd8736df8f12715b",
   "source": "https://src.fedoraproject.org/rpms/avahi.git",
-  "version": "0.9~rc2",
-  "modification_status": "clean"
+  "version": "0.9~rc4"
 }
