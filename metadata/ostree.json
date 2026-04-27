@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "f4d0913262e2362a52b4f93082b36b1bbcfc0c64",
   "source": "https://src.fedoraproject.org/rpms/ostree.git",
+  "upstream_repo": "https://github.com/ostreedev/ostree",
   "version": "2026.1"
 }

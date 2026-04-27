@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "2",
   "sha": "ddee082ca708435f1abbe4d40ed027b0d2ee1a82",
   "source": "https://src.fedoraproject.org/rpms/python-iniconfig.git",
-  "version": "2.3.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/pytest-dev/iniconfig",
+  "version": "2.3.0"
 }

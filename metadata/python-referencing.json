@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "04de3cd28b72e365558e37932d230b45c8d36449",
   "source": "https://src.fedoraproject.org/rpms/python-referencing.git",
+  "upstream_repo": "https://github.com/python-jsonschema/referencing",
   "version": "0.37.0"
 }

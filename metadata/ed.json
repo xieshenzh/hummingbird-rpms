@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "7772de949f84c7e43c6aae7894d825734b599dc0",
   "source": "https://src.fedoraproject.org/rpms/ed.git",
+  "upstream_repo": "https://git.savannah.gnu.org/git/ed.git",
   "version": "1.22.5"
 }

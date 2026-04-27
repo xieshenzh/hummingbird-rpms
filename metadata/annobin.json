@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "9f59fe00d41693107d6590bf80e4ab9d471c272c",
   "source": "https://src.fedoraproject.org/rpms/annobin.git",
+  "upstream_repo": "https://sourceware.org/git/annobin.git",
   "version": "13.12"
 }

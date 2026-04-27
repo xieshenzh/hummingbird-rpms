@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "1e6dfa5a1e2fae97bf46b772c01b1fa16b92f6be",
   "source": "https://src.fedoraproject.org/rpms/cmake.git",
+  "upstream_repo": "https://github.com/Kitware/CMake",
   "version": "4.3.0"
 }

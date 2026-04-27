@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "522",
   "sha": "af378359e0bd8936d70b4a011e81879bf49660f3",
   "source": "https://src.fedoraproject.org/rpms/perl-constant.git",
-  "version": "1.33",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/Perl/perl5",
+  "version": "1.33"
 }

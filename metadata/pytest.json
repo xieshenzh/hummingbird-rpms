@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "eb78bf4ba2ea2f19cf58a0ad66e5aae72b37a3fc",
   "source": "https://src.fedoraproject.org/rpms/pytest.git",
+  "upstream_repo": "https://github.com/pytest-dev/pytest",
   "version": "9.0.3"
 }

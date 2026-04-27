@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "1a042bd8d9008c4651cac4544ca30995502d433e",
   "source": "https://src.fedoraproject.org/rpms/libsodium.git",
+  "upstream_repo": "https://github.com/jedisct1/libsodium",
   "version": "1.0.22"
 }

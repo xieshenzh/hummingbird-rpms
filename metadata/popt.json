@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "10",
   "sha": "6d4bd3f2b3195974a1fa4a2490579f4f47f58cb9",
   "source": "https://src.fedoraproject.org/rpms/popt.git",
-  "version": "1.19",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/rpm-software-management/popt",
+  "version": "1.19"
 }

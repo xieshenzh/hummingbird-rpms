@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "e78d480e1cdccc96da9241c302c2393f85312bb2",
   "source": "https://src.fedoraproject.org/rpms/erlang-rpm-macros.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/erlang-rpm-macros",
   "version": "0.3.11"
 }

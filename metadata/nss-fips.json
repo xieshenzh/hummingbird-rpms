@@ -1,5 +1,6 @@
 {
-  "version": "3.90.0",
+  "modification_status": "native",
   "release": "1.hum1",
-  "modification_status": "native"
+  "upstream_repo": "https://github.com/nss-dev/nss",
+  "version": "3.90.0"
 }

@@ -4,5 +4,6 @@
   "release": "7",
   "sha": "8d8e886ff2f7d4edddec77a49b3290ce709bd7a2",
   "source": "https://src.fedoraproject.org/rpms/ca-certificates.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/ca-certificates",
   "version": "2025.2.80_v9.0.304"
 }

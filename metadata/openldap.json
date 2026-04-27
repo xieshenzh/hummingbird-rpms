@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "28101bc22f637ead60cc272752958dad7d4f6e5f",
   "source": "https://src.fedoraproject.org/rpms/openldap.git",
+  "upstream_repo": "https://git.openldap.org/openldap/openldap",
   "version": "2.6.13"
 }

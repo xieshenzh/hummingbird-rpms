@@ -4,5 +4,6 @@
   "release": "5",
   "sha": "f2b5db3bfd714bf1a564aa0903ae6c2ff080ba68",
   "source": "https://src.fedoraproject.org/rpms/composefs.git",
+  "upstream_repo": "https://github.com/composefs/composefs",
   "version": "1.0.8"
 }

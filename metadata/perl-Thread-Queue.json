@@ -4,5 +4,6 @@
   "release": "521",
   "sha": "7ec2219e3c19dccedab2367c5287afca084b0a71",
   "source": "https://src.fedoraproject.org/rpms/perl-Thread-Queue.git",
+  "upstream_repo": "https://github.com/Perl/perl5",
   "version": "3.14"
 }

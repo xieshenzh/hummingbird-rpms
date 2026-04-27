@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "36a234147fcabb698bebe627b09a6e684de9b23d",
   "source": "https://src.fedoraproject.org/rpms/systemd.git",
+  "upstream_repo": "https://github.com/systemd/systemd",
   "version": "260.1"
 }

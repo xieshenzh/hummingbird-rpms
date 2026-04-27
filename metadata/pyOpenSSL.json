@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "30f88b69132ef174d91870ccdfa2868cfb94e348",
   "source": "https://src.fedoraproject.org/rpms/pyOpenSSL.git",
+  "upstream_repo": "https://github.com/pyca/pyopenssl",
   "version": "26.0.0"
 }

@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "9",
   "sha": "ec6d8ff62e3cb207ddde0fb3817a9e71c64f827b",
   "source": "https://src.fedoraproject.org/rpms/libmnl.git",
-  "version": "1.0.5",
-  "modification_status": "clean"
+  "upstream_repo": "https://git.netfilter.org/libmnl",
+  "version": "1.0.5"
 }

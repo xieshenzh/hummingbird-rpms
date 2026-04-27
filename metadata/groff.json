@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "9ae173cb757726a0884a068392114470ac534e62",
   "source": "https://src.fedoraproject.org/rpms/groff.git",
+  "upstream_repo": "https://git.savannah.gnu.org/git/groff.git",
   "version": "1.24.0"
 }

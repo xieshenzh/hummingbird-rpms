@@ -5,5 +5,6 @@
   "release": "1",
   "sha": "5d9a208cf2fcebe2115772239a74743064730d32",
   "source": "https://src.fedoraproject.org/rpms/glib2.git",
+  "upstream_repo": "https://gitlab.gnome.org/GNOME/glib",
   "version": "2.88.0"
 }

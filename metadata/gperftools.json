@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "c518a0eb265410f2a730b614cdd4304d0b6fa038",
   "source": "https://src.fedoraproject.org/rpms/gperftools.git",
+  "upstream_repo": "https://github.com/gperftools/gperftools",
   "version": "2.18.1"
 }

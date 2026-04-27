@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "9e4cdebe483f1c57e5f876c26881e4189071061a",
   "source": "https://src.fedoraproject.org/rpms/python-certifi.git",
+  "upstream_repo": "https://github.com/certifi/python-certifi",
   "version": "2026.01.04"
 }

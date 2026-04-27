@@ -3,5 +3,6 @@
   "release": "1.hum1",
   "release_monitoring_project_id": 376781,
   "track_upstream": "latest",
+  "upstream_repo": "https://github.com/caddyserver/xcaddy",
   "version": "0.4.5"
 }

@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "2",
   "sha": "a5dd528d906bc9be4c86a560a43c23119b2a23b8",
   "source": "https://src.fedoraproject.org/rpms/sdbus-cpp.git",
-  "version": "2.2.1",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/Kistler-Group/sdbus-cpp",
+  "version": "2.2.1"
 }

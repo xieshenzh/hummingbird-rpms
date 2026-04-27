@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "d3bd500a65fd36eea2810646483b6e0b957dca54",
   "source": "https://src.fedoraproject.org/rpms/perl-Pod-Simple.git",
+  "upstream_repo": "https://github.com/perl-pod/pod-simple",
   "version": "3.48"
 }

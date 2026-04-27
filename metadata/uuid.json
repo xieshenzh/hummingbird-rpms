@@ -5,5 +5,6 @@
   "release": "68",
   "sha": "c055df887dfefc07807fffca23cf361ead47b64b",
   "source": "https://src.fedoraproject.org/rpms/uuid.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/uuid",
   "version": "1.6.2"
 }

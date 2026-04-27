@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "746562b04f27404f1ec2de3e59b15b0a369752c9",
   "source": "https://src.fedoraproject.org/rpms/php.git",
+  "upstream_repo": "https://github.com/php/php-src",
   "version": "8.5.5"
 }

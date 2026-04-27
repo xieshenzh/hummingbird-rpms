@@ -4,5 +4,7 @@
   "release": "1",
   "sha": "507bee620d50f9386c05e2b613a3592c2fc24fed",
   "source": "https://src.fedoraproject.org/rpms/kubernetes1.35.git",
+  "upstream_branch": "release-1.35",
+  "upstream_repo": "https://github.com/kubernetes/kubernetes",
   "version": "1.35.4"
 }

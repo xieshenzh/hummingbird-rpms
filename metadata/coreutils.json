@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "4dd9637f3d78b82f07376d06f758103d9deb1d89",
   "source": "https://src.fedoraproject.org/rpms/coreutils.git",
+  "upstream_repo": "https://git.savannah.gnu.org/git/coreutils.git",
   "version": "9.11"
 }

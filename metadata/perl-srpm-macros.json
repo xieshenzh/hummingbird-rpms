@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "61",
   "sha": "4595c2e44eeae40d53f1bcaf32ee3e14c7de6827",
   "source": "https://src.fedoraproject.org/rpms/perl-srpm-macros.git",
-  "version": "1",
-  "modification_status": "clean"
+  "upstream_repo": "https://src.fedoraproject.org/rpms/perl-srpm-macros",
+  "version": "1"
 }

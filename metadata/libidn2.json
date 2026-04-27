@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "3",
   "sha": "a07b15270234413d8b5538eed098eebdcda29737",
   "source": "https://src.fedoraproject.org/rpms/libidn2.git",
-  "version": "2.3.8",
-  "modification_status": "clean"
+  "upstream_repo": "https://gitlab.com/libidn/libidn2",
+  "version": "2.3.8"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "f52f7da265db1c302c562e452393af382a85efcd",
   "source": "https://src.fedoraproject.org/rpms/gettext.git",
+  "upstream_repo": "https://git.savannah.gnu.org/git/gettext.git",
   "version": "1.0"
 }

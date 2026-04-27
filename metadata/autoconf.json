@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "8d7d5667e3dff51a23a343028d8f27395ee03f0c",
   "source": "https://src.fedoraproject.org/rpms/autoconf.git",
+  "upstream_repo": "https://git.savannah.gnu.org/git/autoconf.git",
   "version": "2.73"
 }

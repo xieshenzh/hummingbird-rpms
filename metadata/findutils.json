@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "7",
   "sha": "57b29de58ebf0aabdcef3f40dddca0e60b119e4b",
   "source": "https://src.fedoraproject.org/rpms/findutils.git",
-  "version": "4.10.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://git.savannah.gnu.org/git/findutils.git",
+  "version": "4.10.0"
 }

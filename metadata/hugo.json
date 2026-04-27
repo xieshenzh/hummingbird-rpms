@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "b49d07c790a6de6b16a8168cedf111a340a78354",
   "source": "https://src.fedoraproject.org/rpms/hugo.git",
+  "upstream_repo": "https://github.com/gohugoio/hugo",
   "version": "0.160.1"
 }

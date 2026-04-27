@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "20.1",
   "sha": "888473271d1159f60f9ba1c39856bf522fbdd120",
   "source": "https://src.fedoraproject.org/rpms/ansible-packaging.git",
-  "version": "1",
-  "modification_status": "clean"
+  "upstream_repo": "https://src.fedoraproject.org/rpms/ansible-packaging",
+  "version": "1"
 }

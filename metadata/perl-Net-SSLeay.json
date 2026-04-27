@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "d6569d085cee864056be477731cd8e13af8d6bb8",
   "source": "https://src.fedoraproject.org/rpms/perl-Net-SSLeay.git",
+  "upstream_repo": "https://github.com/radiator-software/p5-net-ssleay",
   "version": "1.96"
 }

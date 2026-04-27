@@ -4,5 +4,6 @@
   "release": "521",
   "sha": "43840895f54050874a85f60da2110aeb4835ee8a",
   "source": "https://src.fedoraproject.org/rpms/perl-threads-shared.git",
+  "upstream_repo": "https://github.com/Perl/perl5",
   "version": "1.70"
 }

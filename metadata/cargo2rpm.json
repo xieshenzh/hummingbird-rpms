@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "b0fbfb94fabfb6006c0218ac8364d6c34943764e",
   "source": "https://src.fedoraproject.org/rpms/cargo2rpm.git",
+  "upstream_repo": "https://codeberg.org/rust2rpm/cargo2rpm",
   "version": "0.3.3"
 }

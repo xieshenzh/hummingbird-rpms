@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "ed37883c954167578cf8a605f8d43719ed5633c7",
   "source": "https://src.fedoraproject.org/rpms/llhttp.git",
+  "upstream_repo": "https://github.com/nodejs/llhttp",
   "version": "9.3.1"
 }

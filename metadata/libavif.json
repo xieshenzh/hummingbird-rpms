@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "4",
   "sha": "f993e77b3e11aa3096aef8092ebdf7d869d7d22a",
   "source": "https://src.fedoraproject.org/rpms/libavif.git",
-  "version": "1.3.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/AOMediaCodec/libavif",
+  "version": "1.3.0"
 }

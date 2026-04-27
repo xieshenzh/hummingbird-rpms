@@ -1,9 +1,10 @@
 {
   "branch": "f43",
+  "modification_reason": "Pre-existing modification - requires review",
+  "modification_status": "modified",
   "release": "1",
   "sha": "659c0740e5c29098632207467aa89ce0083d5892",
   "source": "https://src.fedoraproject.org/rpms/llvm.git",
-  "version": "21.1.8",
-  "modification_status": "modified",
-  "modification_reason": "Pre-existing modification - requires review"
+  "upstream_repo": "https://github.com/llvm/llvm-project",
+  "version": "21.1.8"
 }

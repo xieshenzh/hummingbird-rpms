@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "e936af43f1fc37677015d8db81ebec68d0374303",
   "source": "https://src.fedoraproject.org/rpms/qt6.git",
+  "upstream_repo": "https://code.qt.io/qt/qtbase.git",
   "version": "6.11.0"
 }

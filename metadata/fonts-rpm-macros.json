@@ -4,5 +4,6 @@
   "release": "3",
   "sha": "98223712887d290b1d558d2493aa4a5999e40ac4",
   "source": "https://src.fedoraproject.org/rpms/fonts-rpm-macros.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/fonts-rpm-macros",
   "version": "5.0.0"
 }

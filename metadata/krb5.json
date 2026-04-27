@@ -4,5 +4,6 @@
   "release": "6",
   "sha": "d3aa2b06ebfa960ba4e53b016833d11cab80a999",
   "source": "https://src.fedoraproject.org/rpms/krb5.git",
+  "upstream_repo": "https://github.com/krb5/krb5",
   "version": "1.22.2"
 }

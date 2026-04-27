@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "05de0cb4ebbde749c314d441077b11fd42578381",
   "source": "https://src.fedoraproject.org/rpms/libmpc.git",
+  "upstream_repo": "https://gitlab.inria.fr/mpc/mpc",
   "version": "1.4.1"
 }

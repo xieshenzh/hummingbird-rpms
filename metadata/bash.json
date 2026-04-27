@@ -4,5 +4,6 @@
   "release": "3",
   "sha": "a6bcc6767229199f4f02b781d1d39df0835d894b",
   "source": "https://src.fedoraproject.org/rpms/bash.git",
+  "upstream_repo": "https://git.savannah.gnu.org/git/bash.git",
   "version": "5.3.9"
 }

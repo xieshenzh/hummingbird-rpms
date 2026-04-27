@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "8",
   "sha": "05f0d35551ad48d4039025b3796a8668853846af",
   "source": "https://src.fedoraproject.org/rpms/json-c.git",
-  "version": "0.18",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/json-c/json-c",
+  "version": "0.18"
 }

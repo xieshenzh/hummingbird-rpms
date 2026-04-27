@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "20",
   "sha": "c3bc1cc8fc64e9669d2cda787c7cfd12ea9fb63a",
   "source": "https://src.fedoraproject.org/rpms/python-jinja2-cli.git",
-  "version": "0.8.2",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/mattrobenolt/jinja2-cli",
+  "version": "0.8.2"
 }

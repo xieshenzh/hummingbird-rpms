@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "4d517cd65f57989c9f8fe67a16b37fd9ed5e53fb",
   "source": "https://src.fedoraproject.org/rpms/R-rpm-macros.git",
+  "upstream_repo": "https://github.com/rpm-software-management/R-rpm-macros",
   "version": "1.3.7"
 }

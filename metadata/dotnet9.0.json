@@ -1,8 +1,12 @@
 {
   "branch": "rawhide",
+  "cve_product": "Microsoft / .NET 9.0",
   "modification_status": "clean",
   "release": "1",
   "sha": "ba13ff35f6eaa6beb8109ef47171763c8813eb61",
   "source": "https://src.fedoraproject.org/rpms/dotnet9.0.git",
-  "version": "9.0.116"
+  "upstream_branch": "release/9.0",
+  "upstream_repo": "https://github.com/dotnet/runtime",
+  "version": "9.0.116",
+  "version_transform": "dotnet_sdk_to_runtime"
 }

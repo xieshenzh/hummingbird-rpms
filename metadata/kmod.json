@@ -4,5 +4,6 @@
   "release": "4",
   "sha": "61b64d20ad254652f8fe185df50cd86befa0af35",
   "source": "https://src.fedoraproject.org/rpms/kmod.git",
+  "upstream_repo": "https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git",
   "version": "34.2"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "1f70305ee1d3e02834330912eb74fac15bb1933f",
   "source": "https://src.fedoraproject.org/rpms/redhat-rpm-config.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/redhat-rpm-config",
   "version": "344"
 }

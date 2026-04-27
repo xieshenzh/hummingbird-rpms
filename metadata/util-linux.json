@@ -5,5 +5,6 @@
   "release": "7",
   "sha": "da7125e4bb4140112a50af0a7ff4b03d3b3d1d1b",
   "source": "https://src.fedoraproject.org/rpms/util-linux.git",
+  "upstream_repo": "https://github.com/util-linux/util-linux",
   "version": "2.42"
 }

@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "5",
   "sha": "30afc8668865e293f0f7f1b1e71da357c274ee21",
   "source": "https://src.fedoraproject.org/rpms/libXext.git",
-  "version": "1.3.6",
-  "modification_status": "clean"
+  "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libxext",
+  "version": "1.3.6"
 }

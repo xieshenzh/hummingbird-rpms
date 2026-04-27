@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "24af6053b3be544abf74095cbde7d9e118d6f8ba",
   "source": "https://src.fedoraproject.org/rpms/btrfs-progs.git",
+  "upstream_repo": "https://github.com/kdave/btrfs-progs",
   "version": "6.19.1"
 }

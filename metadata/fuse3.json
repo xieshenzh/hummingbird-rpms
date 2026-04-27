@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "a4a1ab351abddcd0579d225f676d331cce3da7bc",
   "source": "https://src.fedoraproject.org/rpms/fuse3.git",
+  "upstream_repo": "https://github.com/libfuse/libfuse",
   "version": "3.18.2"
 }

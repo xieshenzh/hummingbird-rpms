@@ -1,7 +1,10 @@
 {
+  "cve_product": "Apache Software Foundation / Apache Tomcat",
   "modification_status": "native",
   "release": "1",
   "release_monitoring_project_id": 148939,
   "track_upstream": "11",
+  "upstream_branch": "main",
+  "upstream_repo": "https://github.com/apache/tomcat",
   "version": "11.0.21"
 }

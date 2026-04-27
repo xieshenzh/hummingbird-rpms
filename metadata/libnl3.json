@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "3",
   "sha": "2a91a717fa578eab985af797771b0cbe40e1a988",
   "source": "https://src.fedoraproject.org/rpms/libnl3.git",
-  "version": "3.12.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/thom311/libnl",
+  "version": "3.12.0"
 }

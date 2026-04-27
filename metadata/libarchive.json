@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "61c9d60e4855650bf65265062d1d3916259da569",
   "source": "https://src.fedoraproject.org/rpms/libarchive.git",
+  "upstream_repo": "https://github.com/libarchive/libarchive",
   "version": "3.8.7"
 }

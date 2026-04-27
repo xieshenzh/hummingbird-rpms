@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "6777b603e5f25a0d2e383724724ecc26b537a6af",
   "source": "https://src.fedoraproject.org/rpms/gnutls.git",
+  "upstream_repo": "https://gitlab.com/gnutls/gnutls",
   "version": "3.8.12"
 }

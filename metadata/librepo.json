@@ -4,5 +4,6 @@
   "release": "5",
   "sha": "b3b98f6b0181780a22e6ba8ede3ed6d822d16ecc",
   "source": "https://src.fedoraproject.org/rpms/librepo.git",
+  "upstream_repo": "https://github.com/rpm-software-management/librepo",
   "version": "1.20.0"
 }

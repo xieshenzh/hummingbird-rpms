@@ -1,9 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_status": "modified",
   "modification_reason": "Remove runtime dependency on systemd",
+  "modification_status": "modified",
   "release": "1",
   "sha": "207b2fe27ec1e10632a9d106ca884a313eb1f14f",
   "source": "https://src.fedoraproject.org/rpms/haproxy.git",
+  "upstream_repo": "https://git.haproxy.org/git/haproxy.git",
   "version": "3.0.19"
 }

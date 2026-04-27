@@ -4,5 +4,7 @@
   "release": "3",
   "sha": "da2851ca475557e7401c04d175a375c21ca8dd44",
   "source": "https://src.fedoraproject.org/rpms/llvm21.git",
+  "upstream_branch": "release/21.x",
+  "upstream_repo": "https://github.com/llvm/llvm-project",
   "version": "21.1.8"
 }

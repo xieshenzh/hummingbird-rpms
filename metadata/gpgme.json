@@ -5,5 +5,6 @@
   "release": "3",
   "sha": "e8a88aca9a6495a67593a0f4cdec7b440c698015",
   "source": "https://src.fedoraproject.org/rpms/gpgme.git",
+  "upstream_repo": "https://dev.gnupg.org/source/gpgme.git",
   "version": "2.0.1"
 }

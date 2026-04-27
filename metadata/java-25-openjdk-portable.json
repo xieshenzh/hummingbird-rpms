@@ -1,9 +1,12 @@
 {
   "branch": "rawhide",
-  "modification_status": "modified",
+  "cve_product": "Oracle Corporation / Oracle Java SE",
   "modification_reason": "Add changelog separator to spec file",
+  "modification_status": "modified",
   "release": "2",
   "sha": "13d4a131f5e449a181971aea308b49f7b114b031",
   "source": "https://src.fedoraproject.org/rpms/java-25-openjdk-portable.git",
-  "version": "25.0.2.0.10"
+  "upstream_repo": "https://github.com/openjdk/jdk25u",
+  "version": "25.0.2.0.10",
+  "version_transform": "openjdk_to_oracle"
 }

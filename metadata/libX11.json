@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "01b7542be6e51f3f04503978c00cca4b3e237aae",
   "source": "https://src.fedoraproject.org/rpms/libX11.git",
+  "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libx11",
   "version": "1.8.13"
 }

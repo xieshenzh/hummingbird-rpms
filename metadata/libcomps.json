@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "397a6c66c3037b5a3fb07fee774f5ec2f9c3e39c",
   "source": "https://src.fedoraproject.org/rpms/libcomps.git",
+  "upstream_repo": "https://github.com/rpm-software-management/libcomps",
   "version": "0.1.24"
 }

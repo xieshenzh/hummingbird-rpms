@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "2",
   "sha": "30c6d6c5067ecce70c8b930c1853e18234e710e7",
   "source": "https://src.fedoraproject.org/rpms/drpm.git",
-  "version": "0.5.3",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/rpm-software-management/drpm",
+  "version": "0.5.3"
 }

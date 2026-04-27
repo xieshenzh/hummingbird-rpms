@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "7",
   "sha": "b63ae155311951745673dd25c6d9afc8d3d95db9",
   "source": "https://src.fedoraproject.org/rpms/python-jinja2.git",
-  "version": "3.1.6",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/pallets/jinja",
+  "version": "3.1.6"
 }

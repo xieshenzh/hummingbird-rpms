@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "2",
   "sha": "fa42d0e2dd3a7a5a1d35e58d0daaa9e703a3f691",
   "source": "https://src.fedoraproject.org/rpms/go-rpm-macros.git",
-  "version": "3.8.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://src.fedoraproject.org/rpms/go-rpm-macros",
+  "version": "3.8.0"
 }

@@ -4,5 +4,6 @@
   "release": "5",
   "sha": "c317cb2db7117bbca97f5dfeee1f61e78df9552b",
   "source": "https://src.fedoraproject.org/rpms/zlib-ng.git",
+  "upstream_repo": "https://github.com/zlib-ng/zlib-ng",
   "version": "2.3.3"
 }

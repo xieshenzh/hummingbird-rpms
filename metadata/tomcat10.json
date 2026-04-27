@@ -1,9 +1,12 @@
 {
   "branch": "rawhide",
+  "cve_product": "Apache Software Foundation / Apache Tomcat",
   "modification_reason": "Local changes in commit 2273cfe5; remove runtime dependency on systemd",
   "modification_status": "modified",
   "release": "1",
   "sha": "3b9f5a883bb250d182b8274f590bf7a5486e95af",
   "source": "https://src.fedoraproject.org/rpms/tomcat.git",
+  "upstream_branch": "10.1.x",
+  "upstream_repo": "https://github.com/apache/tomcat",
   "version": "10.1.54"
 }

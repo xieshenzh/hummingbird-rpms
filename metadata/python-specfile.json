@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "f51d1bc1bda16932e511348a23391a91dd023dd1",
   "source": "https://src.fedoraproject.org/rpms/python-specfile.git",
+  "upstream_repo": "https://github.com/packit/specfile",
   "version": "0.40.2"
 }

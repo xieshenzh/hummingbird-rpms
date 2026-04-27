@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "ea86fc4eff9ecd5a54a20860c794c6227ab3be6c",
   "source": "https://src.fedoraproject.org/rpms/openscap.git",
+  "upstream_repo": "https://github.com/OpenSCAP/openscap",
   "version": "1.4.4"
 }

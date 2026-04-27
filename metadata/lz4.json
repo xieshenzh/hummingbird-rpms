@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "4",
   "sha": "96913980bb0b518d3588b719ce3bc0659d7cfed5",
   "source": "https://src.fedoraproject.org/rpms/lz4.git",
-  "version": "1.10.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/lz4/lz4",
+  "version": "1.10.0"
 }

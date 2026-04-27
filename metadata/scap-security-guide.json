@@ -5,5 +5,6 @@
   "release": "0.1",
   "sha": "81369569ea551f7a3efd221fbf6cb6b5ea0d503f",
   "source": "https://src.fedoraproject.org/rpms/scap-security-guide.git",
+  "upstream_repo": "https://github.com/ComplianceAsCode/content",
   "version": "0.1.80^20260423git07c4c5a"
 }

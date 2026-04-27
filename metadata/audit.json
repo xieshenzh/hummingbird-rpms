@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "7c28cec1b892f6ce8745412f1add1028386b7174",
   "source": "https://src.fedoraproject.org/rpms/audit.git",
+  "upstream_repo": "https://github.com/linux-audit/audit-userspace",
   "version": "4.1.4"
 }

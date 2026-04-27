@@ -5,5 +5,7 @@
   "release": "2",
   "sha": "9025dc97608c7a6896a947ddc94384e133090360",
   "source": "https://src.fedoraproject.org/rpms/python3.14.git",
+  "upstream_branch": "3.14",
+  "upstream_repo": "https://github.com/python/cpython",
   "version": "3.14.4"
 }

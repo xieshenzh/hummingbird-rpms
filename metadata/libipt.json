@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "b6555fe72d034e46b14ab6acd9b0907e5ab949ba",
   "source": "https://src.fedoraproject.org/rpms/libipt.git",
+  "upstream_repo": "https://github.com/intel/libipt",
   "version": "2.2"
 }

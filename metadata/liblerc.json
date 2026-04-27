@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "dfb04359917e44b52109b30baa86ce647deab53c",
   "source": "https://src.fedoraproject.org/rpms/liblerc.git",
+  "upstream_repo": "https://github.com/Esri/lerc",
   "version": "4.1.0"
 }

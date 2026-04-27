@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "522",
   "sha": "a02814792b27d28998442e0dcdc571776d8fc18c",
   "source": "https://src.fedoraproject.org/rpms/perl-Term-ANSIColor.git",
-  "version": "5.01",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/rra/ansicolor",
+  "version": "5.01"
 }

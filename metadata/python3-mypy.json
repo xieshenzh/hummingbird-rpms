@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "4",
   "sha": "63376b6dbb33f598b35aa00ed62cb77a88f5c642",
   "source": "https://src.fedoraproject.org/rpms/python3-mypy.git",
-  "version": "1.18.2",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/python/mypy",
+  "version": "1.18.2"
 }

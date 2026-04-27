@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "83ed285f9b4bcd90668cd1ca1ee0f3b337419ec0",
   "source": "https://src.fedoraproject.org/rpms/fsverity-utils.git",
+  "upstream_repo": "https://github.com/ebiggers/fsverity-utils",
   "version": "1.7"
 }

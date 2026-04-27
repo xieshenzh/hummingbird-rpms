@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "273c56147181771490b7e14a03cff09ff1ec0622",
   "source": "https://src.fedoraproject.org/rpms/libuv.git",
+  "upstream_repo": "https://github.com/libuv/libuv",
   "version": "1.52.1"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "545b6dde4c2dca95c5c22f6eb8fdf8ae23f621f6",
   "source": "https://src.fedoraproject.org/rpms/libjpeg-turbo.git",
+  "upstream_repo": "https://github.com/libjpeg-turbo/libjpeg-turbo",
   "version": "3.1.4.1"
 }

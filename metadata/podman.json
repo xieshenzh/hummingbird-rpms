@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "dd66aee8d65f552db5e4323b802e3f96e3209dea",
   "source": "https://src.fedoraproject.org/rpms/podman.git",
+  "upstream_repo": "https://github.com/containers/podman",
   "version": "5.8.2"
 }

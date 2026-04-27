@@ -4,5 +4,6 @@
   "release": "7",
   "sha": "cdd3b9a95f9e7153b4667a85666718f6cbf65687",
   "source": "https://src.fedoraproject.org/rpms/libtommath.git",
+  "upstream_repo": "https://github.com/libtom/libtommath",
   "version": "1.3.0"
 }

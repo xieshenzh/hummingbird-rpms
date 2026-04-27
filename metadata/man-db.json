@@ -4,5 +4,6 @@
   "release": "3",
   "sha": "000ef4d2090cfd61db5320f4eaf04401a0163d6c",
   "source": "https://src.fedoraproject.org/rpms/man-db.git",
+  "upstream_repo": "https://gitlab.com/man-db/man-db",
   "version": "2.13.1"
 }

@@ -4,5 +4,6 @@
   "release": "3",
   "sha": "e9955031f28334b8de91604b1ca8778fb04b3072",
   "source": "https://src.fedoraproject.org/rpms/php-pecl-zip.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/php-pecl-zip",
   "version": "1.22.8"
 }

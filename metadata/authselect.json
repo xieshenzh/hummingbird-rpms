@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "1",
   "sha": "9f6d0c3ac2381b21cda31eaedc465030a6491286",
   "source": "https://src.fedoraproject.org/rpms/authselect.git",
-  "version": "1.7.1",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/authselect/authselect",
+  "version": "1.7.1"
 }

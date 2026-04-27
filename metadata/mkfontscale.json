@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "4",
   "sha": "6c3309f5ed8e5802383994353688cc4f96a92e65",
   "source": "https://src.fedoraproject.org/rpms/mkfontscale.git",
-  "version": "1.2.3",
-  "modification_status": "clean"
+  "upstream_repo": "https://gitlab.freedesktop.org/xorg/app/mkfontscale",
+  "version": "1.2.3"
 }

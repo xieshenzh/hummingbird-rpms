@@ -1,9 +1,10 @@
 {
   "branch": "f43",
+  "modification_reason": "Pre-existing modification - requires review",
+  "modification_status": "modified",
   "release": "1",
   "sha": "11f1d312274235a3d4f44d426b7fdcd2c39fce24",
   "source": "https://src.fedoraproject.org/rpms/fedora-repos.git",
-  "version": "43",
-  "modification_status": "modified",
-  "modification_reason": "Pre-existing modification - requires review"
+  "upstream_repo": "https://src.fedoraproject.org/rpms/fedora-repos",
+  "version": "43"
 }
