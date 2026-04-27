@@ -23,7 +23,7 @@ Optional fields you may also set:
 
     "upstream_branch": "<branch>"          # for versioned packages sharing a repo
     "cve_product": "<Vendor / Product>"    # CVE vendor/product override
-    "version_transform": "<rule>"          # version transform rule
+    "version_transform": "<rule>"          # version transform rule (defined and declared in tools repo)
 
 If no upstream git repository exists, use the Fedora DistGit URL as a fallback:
 
