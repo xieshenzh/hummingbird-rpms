@@ -1,4 +1,4 @@
-From 7726f5fb4e833b23f95120ff7f29d10b4f36185d Mon Sep 17 00:00:00 2001
+From b94d9843a82dc187df0720636cbfcc6b6163cba8 Mon Sep 17 00:00:00 2001
 From: Kamil Dudka <kdudka@redhat.com>
 Date: Mon, 29 Mar 2010 17:20:34 +0000
 Subject: [PATCH] coreutils-df-direct.patch
@@ -12,10 +12,10 @@ Subject: [PATCH] coreutils-df-direct.patch
  create mode 100755 tests/df/direct.sh
 
 diff --git a/doc/coreutils.texi b/doc/coreutils.texi
-index a02e8d7..12756ab 100644
+index 0f9d3e27..dd77f03d 100644
 --- a/doc/coreutils.texi
 +++ b/doc/coreutils.texi
-@@ -11976,6 +11976,12 @@ some systems (notably Solaris), doing this yields more up to date results,
+@@ -12007,6 +12007,12 @@ some systems (notably Solaris), doing this yields more up to date results,
  but in general this option makes @command{df} much slower, especially when
  there are many or very busy file systems.
  
@@ -29,10 +29,10 @@ index a02e8d7..12756ab 100644
  @cindex grand total of file system size, usage and available space
  Print a grand total of all arguments after all arguments have
 diff --git a/src/df.c b/src/df.c
-index 25235a2..7f8faac 100644
+index f41ba3a8..6b23df75 100644
 --- a/src/df.c
 +++ b/src/df.c
-@@ -121,6 +121,9 @@ static bool print_type;
+@@ -122,6 +122,9 @@ static bool print_type;
  /* If true, print a grand total at the end.  */
  static bool print_grand_total;
  
@@ -40,9 +40,9 @@ index 25235a2..7f8faac 100644
 +static bool direct_statfs;
 +
  /* Grand total data.  */
- static struct fs_usage grand_fsu;
+ static struct fs_usage grand_fsu = { .fsu_blocksize = 1 };
  
-@@ -248,13 +251,15 @@ enum
+@@ -249,13 +252,15 @@ enum
    NO_SYNC_OPTION = CHAR_MAX + 1,
    SYNC_OPTION,
    TOTAL_OPTION,
@@ -59,7 +59,7 @@ index 25235a2..7f8faac 100644
    {"inodes", no_argument, NULL, 'i'},
    {"human-readable", no_argument, NULL, 'h'},
    {"si", no_argument, NULL, 'H'},
-@@ -571,7 +576,10 @@ get_header (void)
+@@ -572,7 +577,10 @@ get_header (void)
    for (idx_t col = 0; col < ncolumns; col++)
      {
        char *cell;
@@ -71,7 +71,7 @@ index 25235a2..7f8faac 100644
  
        if (columns[col]->field == SIZE_FIELD
            && (header_mode == DEFAULT_MODE
-@@ -1439,6 +1447,17 @@ get_point (char const *point, const struct stat *statp)
+@@ -1442,6 +1450,17 @@ get_point (char const *point, const struct stat *statp)
  static void
  get_entry (char const *name, struct stat const *statp)
  {
@@ -89,7 +89,7 @@ index 25235a2..7f8faac 100644
    if ((S_ISBLK (statp->st_mode) || S_ISCHR (statp->st_mode))
        && get_device (name))
      return;
-@@ -1510,6 +1529,10 @@ or all file systems by default.\n\
+@@ -1513,6 +1532,10 @@ or all file systems by default.\n\
    -B, --block-size=SIZE\n\
           scale sizes by SIZE before printing them; see SIZE format below;\n\
           E.g., '-BM' prints sizes in units of 1,048,576 bytes\n\
@@ -100,7 +100,7 @@ index 25235a2..7f8faac 100644
  "));
        oputs (_("\
    -h, --human-readable\n\
-@@ -1633,6 +1656,9 @@ main (int argc, char **argv)
+@@ -1625,6 +1648,9 @@ main (int argc, char **argv)
                xstrtol_fatal (e, oi, c, long_options, optarg);
            }
            break;
@@ -110,7 +110,7 @@ index 25235a2..7f8faac 100644
          case 'i':
            if (header_mode == OUTPUT_MODE)
              {
-@@ -1729,6 +1755,13 @@ main (int argc, char **argv)
+@@ -1721,6 +1747,13 @@ main (int argc, char **argv)
          }
      }
  
@@ -126,7 +126,7 @@ index 25235a2..7f8faac 100644
        if (posix_format)
 diff --git a/tests/df/direct.sh b/tests/df/direct.sh
 new file mode 100755
-index 0000000..1428779
+index 00000000..8373705a
 --- /dev/null
 +++ b/tests/df/direct.sh
 @@ -0,0 +1,55 @@
@@ -186,11 +186,11 @@ index 0000000..1428779
 +
 +Exit $fail
 diff --git a/tests/local.mk b/tests/local.mk
-index e337235..1682d1b 100644
+index 628e5443..e2c07a89 100644
 --- a/tests/local.mk
 +++ b/tests/local.mk
-@@ -590,6 +590,7 @@ all_tests =					\
-   tests/df/no-mtab-status-masked-proc.sh			\
+@@ -610,6 +610,7 @@ all_tests =					\
+   tests/df/no-mtab-status-masked-proc.sh	\
    tests/df/skip-duplicates.sh			\
    tests/df/skip-rootfs.sh			\
 +  tests/df/direct.sh				\
@@ -198,5 +198,5 @@ index e337235..1682d1b 100644
    tests/dd/conv-case.sh				\
    tests/dd/direct.sh				\
 -- 
-2.53.0
+2.54.0
 
