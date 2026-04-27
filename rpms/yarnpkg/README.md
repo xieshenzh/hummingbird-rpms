@@ -1,3 +1,0 @@
-# yarnpkg
-
-The yarnpkg package

@@ -575,7 +575,6 @@ packages:
   - xorg-x11-fonts
   - xxhash
   - xz
-  - yarnpkg
   - yq
   - zchunk
   - zig-srpm-macros
