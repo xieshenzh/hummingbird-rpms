@@ -95,6 +95,9 @@ java-25-openjdk-portable:
 libxml2:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+libxslt:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 llvm:
   timeout_hours: 12
   build_platforms:
