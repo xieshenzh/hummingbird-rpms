@@ -48,7 +48,7 @@ PULP_FILE_RETAIN_REPO_VERSIONS=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --domain)
-      if [[ -z "$2" || "$2" == --* ]]; then
+      if [[ $# -lt 2 || -z "$2" ]]; then
         echo "🔴 error: --domain requires a value"
         usage 1
       fi
@@ -56,7 +56,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --repos)
-      if [[ -z "$2" || "$2" == --* ]]; then
+      if [[ $# -lt 2 || -z "$2" ]]; then
         echo "🔴 error: --repos requires a value"
         usage 1
       fi
@@ -64,7 +64,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --type)
-      if [[ -z "$2" || "$2" == --* ]]; then
+      if [[ $# -lt 2 || -z "$2" ]]; then
         echo "🔴 error: --type requires a value"
         usage 1
       fi
@@ -72,7 +72,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --config)
-      if [[ -z "$2" || "$2" == --* ]]; then
+      if [[ $# -lt 2 || -z "$2" ]]; then
         echo "🔴 error: --config requires a value"
         usage 1
       fi
@@ -80,7 +80,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --retain-repo-versions)
-      if [[ -z "$2" || "$2" == --* ]]; then
+      if [[ $# -lt 2 || -z "$2" ]]; then
         echo "🔴 error: --retain-repo-versions requires a value"
         usage 1
       fi
@@ -117,7 +117,7 @@ else
 fi
 
 if [[ -n "${PULP_FILE_RETAIN_REPO_VERSIONS}" && "${PULP_TYPE}" != "file" ]]; then
-  echo "🔴 error: --retain-repo-versions is only valid with --type file"
+  echo "🔴 error: --retain-repo-versions is only valid with --type file (default type is rpm)"
   exit 1
 fi
 
@@ -208,7 +208,10 @@ if cur is None:
     sys.stdout.write('yes')
 else:
     sys.stdout.write('yes' if int(cur) != want else 'no')
-" "${PULP_FILE_RETAIN_REPO_VERSIONS}")
+" "${PULP_FILE_RETAIN_REPO_VERSIONS}") || {
+          echo "🔴 error: failed to parse JSON for repository '${PULP_REPOSITORY}'"
+          exit 1
+        }
         if [[ "${need_update}" == "yes" ]]; then
           echo "📝 Setting retain_repo_versions to ${PULP_FILE_RETAIN_REPO_VERSIONS} for '${PULP_REPOSITORY}'..."
           pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update \
