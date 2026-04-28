@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "b9b71a7af9315905b2c728e5fc4fc455685da0a4",
   "source": "https://src.fedoraproject.org/rpms/libcap.git",
+  "upstream_repo": "https://git.kernel.org/pub/scm/libs/libcap/libcap.git",
   "version": "2.78"
 }

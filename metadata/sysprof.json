@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "047a50a2142776b90b8aa239522e1b351671d21d",
   "source": "https://src.fedoraproject.org/rpms/sysprof.git",
+  "upstream_repo": "https://gitlab.gnome.org/GNOME/sysprof",
   "version": "50~rc"
 }

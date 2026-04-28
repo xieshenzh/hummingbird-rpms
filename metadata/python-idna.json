@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "1fb1538c28005f5b626ea0870445e8146b70511c",
   "source": "https://src.fedoraproject.org/rpms/python-idna.git",
+  "upstream_repo": "https://github.com/kjd/idna",
   "version": "3.13"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "916695f6d8a2122769a67bd860c6096bd3e7b3f4",
   "source": "https://src.fedoraproject.org/rpms/container-selinux.git",
+  "upstream_repo": "https://github.com/containers/container-selinux",
   "version": "2.247.0"
 }

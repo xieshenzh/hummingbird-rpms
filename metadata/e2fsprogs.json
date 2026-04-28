@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "ba45e6d43c077f4f0dc50da74b77edd8e4c0a72b",
   "source": "https://src.fedoraproject.org/rpms/e2fsprogs.git",
+  "upstream_repo": "https://github.com/tytso/e2fsprogs",
   "version": "1.47.4"
 }

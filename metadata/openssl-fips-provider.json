@@ -1,5 +1,6 @@
 {
-  "version": "3.0.7",
+  "modification_status": "native",
   "release": "1.hum1",
-  "modification_status": "native"
+  "upstream_repo": "https://github.com/openssl/openssl",
+  "version": "3.0.7"
 }

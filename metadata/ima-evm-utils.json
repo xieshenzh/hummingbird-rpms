@@ -4,5 +4,6 @@
   "release": "10",
   "sha": "aef2613ab9d8311683e71a2c02fd88bc7de8d001",
   "source": "https://src.fedoraproject.org/rpms/ima-evm-utils.git",
+  "upstream_repo": "https://github.com/linux-integrity/ima-evm-utils",
   "version": "1.6.2"
 }

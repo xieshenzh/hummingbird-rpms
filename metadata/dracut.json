@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "7b7989cb700232b4691e3581c8a796376f084f01",
   "source": "https://src.fedoraproject.org/rpms/dracut.git",
+  "upstream_repo": "https://github.com/dracut-ng/dracut-ng",
   "version": "109"
 }

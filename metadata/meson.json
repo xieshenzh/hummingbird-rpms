@@ -5,5 +5,6 @@
   "release": "1",
   "sha": "e96077fb2fc3480f0a9f72bea7f102b6e53b2706",
   "source": "https://src.fedoraproject.org/rpms/meson.git",
+  "upstream_repo": "https://github.com/mesonbuild/meson",
   "version": "1.11.1"
 }

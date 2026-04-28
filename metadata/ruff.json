@@ -5,5 +5,6 @@
   "release": "1",
   "sha": "b0d46a1397c88238df0a7cd035c21429d8b583a9",
   "source": "https://src.fedoraproject.org/rpms/ruff.git",
+  "upstream_repo": "https://github.com/astral-sh/ruff",
   "version": "0.15.11"
 }

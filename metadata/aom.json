@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "2539e35b9e97bbcea7e629eb6a441cbe9f831ff6",
   "source": "https://src.fedoraproject.org/rpms/aom.git",
+  "upstream_repo": "https://aomedia.googlesource.com/aom",
   "version": "3.13.3"
 }

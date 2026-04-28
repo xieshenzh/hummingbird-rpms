@@ -4,5 +4,6 @@
   "release": "6",
   "sha": "9df12f89c56333bbf4dd54d9d12c35fab9a0f97d",
   "source": "https://src.fedoraproject.org/rpms/less.git",
+  "upstream_repo": "https://github.com/gwsw/less",
   "version": "692"
 }

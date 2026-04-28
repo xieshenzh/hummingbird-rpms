@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "522",
   "sha": "2822d9a130a493299462bf16c90e5763b13a28ee",
   "source": "https://src.fedoraproject.org/rpms/perl-Pod-Perldoc.git",
-  "version": "3.28.01",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/mrallen1/Pod-Perldoc",
+  "version": "3.28.01"
 }

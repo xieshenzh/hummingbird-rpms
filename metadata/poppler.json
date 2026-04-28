@@ -4,5 +4,6 @@
   "release": "7",
   "sha": "f3ee2cebf8754a08a89000a651640a38c1f71add",
   "source": "https://src.fedoraproject.org/rpms/poppler.git",
+  "upstream_repo": "https://gitlab.freedesktop.org/poppler/poppler",
   "version": "26.01.0"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "1c747d9ea95ec18d72bf01015e3efb27ef199ece",
   "source": "https://src.fedoraproject.org/rpms/python-rpds-py.git",
+  "upstream_repo": "https://github.com/crate-py/rpds",
   "version": "0.30.0"
 }

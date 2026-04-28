@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "5",
   "sha": "d5f86878081f7139a3dee9f57e0eb5c26ad11390",
   "source": "https://src.fedoraproject.org/rpms/diffutils.git",
-  "version": "3.12",
-  "modification_status": "clean"
+  "upstream_repo": "https://git.savannah.gnu.org/git/diffutils.git",
+  "version": "3.12"
 }

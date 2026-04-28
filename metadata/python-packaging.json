@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "45b2f837ef79df65ec1a09d4db9d80ea1e5547bd",
   "source": "https://src.fedoraproject.org/rpms/python-packaging.git",
+  "upstream_repo": "https://github.com/pypa/packaging",
   "version": "26.1"
 }

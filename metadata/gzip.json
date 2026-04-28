@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "2",
   "sha": "39b40a601737d169d98c361deabf84c6c744054b",
   "source": "https://src.fedoraproject.org/rpms/gzip.git",
-  "version": "1.14",
-  "modification_status": "clean"
+  "upstream_repo": "https://git.savannah.gnu.org/git/gzip.git",
+  "version": "1.14"
 }

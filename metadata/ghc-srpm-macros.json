@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "1",
   "sha": "a8f43cbc4b0d3b60470bc6b702888182a7a0a6c1",
   "source": "https://src.fedoraproject.org/rpms/ghc-srpm-macros.git",
-  "version": "1.10",
-  "modification_status": "clean"
+  "upstream_repo": "https://src.fedoraproject.org/rpms/ghc-srpm-macros",
+  "version": "1.10"
 }

@@ -1,8 +1,10 @@
 {
   "branch": "rawhide",
+  "cve_product": "perl / perl",
   "modification_status": "clean",
   "release": "524",
   "sha": "a6fb59f96e92d928431d9892e22dfc22bd006809",
   "source": "https://src.fedoraproject.org/rpms/perl.git",
+  "upstream_repo": "https://github.com/Perl/perl5",
   "version": "5.42.2"
 }

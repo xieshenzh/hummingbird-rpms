@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "c7f24529e8ffd1ce5ccd30d0270d0665b9d7a3bd",
   "source": "https://src.fedoraproject.org/rpms/libsemanage.git",
+  "upstream_repo": "https://github.com/SELinuxProject/selinux",
   "version": "3.10"
 }

@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "14",
   "sha": "7128f3e14edfc86d51d06382ba64500f09d62812",
   "source": "https://src.fedoraproject.org/rpms/jemalloc.git",
-  "version": "5.3.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/jemalloc/jemalloc",
+  "version": "5.3.0"
 }

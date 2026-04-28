@@ -5,5 +5,6 @@
   "release": "3",
   "sha": "a0cd4e498c44f2c75ee30568facc05d5c308be7b",
   "source": "https://src.fedoraproject.org/rpms/javapackages-tools.git",
+  "upstream_repo": "https://github.com/fedora-java/javapackages",
   "version": "6.5.1"
 }

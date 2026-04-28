@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "42",
   "sha": "48b6e17dd3b7304b53cd08de7d6c55de9f565741",
   "source": "https://src.fedoraproject.org/rpms/xorg-x11-fonts.git",
-  "version": "7.5",
-  "modification_status": "clean"
+  "upstream_repo": "https://gitlab.freedesktop.org/xorg/font",
+  "version": "7.5"
 }

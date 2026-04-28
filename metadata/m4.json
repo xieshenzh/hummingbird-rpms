@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "07df3f02c652d1863958354f495ee231502a85a6",
   "source": "https://src.fedoraproject.org/rpms/m4.git",
+  "upstream_repo": "https://git.savannah.gnu.org/git/m4.git",
   "version": "1.4.21"
 }

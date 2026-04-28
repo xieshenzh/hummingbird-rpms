@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "d354d6d65ef32f952b08f7764779f7fffca9739b",
   "source": "https://src.fedoraproject.org/rpms/sed.git",
+  "upstream_repo": "https://git.savannah.gnu.org/git/sed.git",
   "version": "4.10"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "b5e46c9c4043de59f55c98c23bc3faa47a076521",
   "source": "https://src.fedoraproject.org/rpms/freetype.git",
+  "upstream_repo": "https://gitlab.freedesktop.org/freetype/freetype",
   "version": "2.14.3"
 }

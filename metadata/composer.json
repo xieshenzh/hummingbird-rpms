@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "17db6b706fca0379b88c0a7c3b42b77c464cc0c8",
   "source": "https://src.fedoraproject.org/rpms/composer.git",
+  "upstream_repo": "https://github.com/composer/composer",
   "version": "2.9.7"
 }

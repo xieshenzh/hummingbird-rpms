@@ -5,5 +5,6 @@
   "release": "3",
   "sha": "9821ffef8df4d04216000f7fa65777a9e3fb6677",
   "source": "https://src.fedoraproject.org/rpms/curl.git",
+  "upstream_repo": "https://github.com/curl/curl",
   "version": "8.19.0"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "eb6f7b86c738e6b99f64de6d3012e087ca7ceabd",
   "source": "https://src.fedoraproject.org/rpms/chunkah.git",
+  "upstream_repo": "https://github.com/coreos/chunkah",
   "version": "0.4.0"
 }

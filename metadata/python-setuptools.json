@@ -4,5 +4,6 @@
   "release": "3",
   "sha": "ea61f055948b7735a0a0c6473f2382b239f5d20b",
   "source": "https://src.fedoraproject.org/rpms/python-setuptools.git",
+  "upstream_repo": "https://github.com/pypa/setuptools",
   "version": "80.10.2"
 }

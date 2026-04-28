@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "4",
   "sha": "6d2250b65a3a2ab8022db08c32a65af6363b1e35",
   "source": "https://src.fedoraproject.org/rpms/patch.git",
-  "version": "2.8",
-  "modification_status": "clean"
+  "upstream_repo": "https://git.savannah.gnu.org/git/patch.git",
+  "version": "2.8"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "42e49258f8887389f2e0ae21c42f16af8e0845f7",
   "source": "https://src.fedoraproject.org/rpms/rdma-core.git",
+  "upstream_repo": "https://github.com/linux-rdma/rdma-core",
   "version": "62.0"
 }

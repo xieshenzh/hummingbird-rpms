@@ -5,5 +5,6 @@
   "release": "2",
   "sha": "b5d8755891c954e7ce42815b0e04a3009591ada8",
   "source": "https://src.fedoraproject.org/rpms/rust.git",
+  "upstream_repo": "https://github.com/rust-lang/rust",
   "version": "1.95.0"
 }

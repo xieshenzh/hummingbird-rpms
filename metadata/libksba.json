@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "8c0110918e4860247cb32659d7c262ec50bd6765",
   "source": "https://src.fedoraproject.org/rpms/libksba.git",
+  "upstream_repo": "https://dev.gnupg.org/source/libksba.git",
   "version": "1.6.8"
 }

@@ -5,5 +5,6 @@
   "release": "0.1",
   "sha": "d84703ae70817d9fd735f91ee178ba1f5dcc84d1",
   "source": "https://src.fedoraproject.org/rpms/bootc.git",
+  "upstream_repo": "https://github.com/containers/bootc",
   "version": "1.14.0"
 }

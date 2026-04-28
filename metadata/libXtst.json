@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "4",
   "sha": "272dc738064cded9455991bfd16e648148636b0b",
   "source": "https://src.fedoraproject.org/rpms/libXtst.git",
-  "version": "1.2.5",
-  "modification_status": "clean"
+  "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libxtst",
+  "version": "1.2.5"
 }

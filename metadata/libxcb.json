@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "7",
   "sha": "6118e6f5ed4a5c85cececbd2f0f3de88e16a17c2",
   "source": "https://src.fedoraproject.org/rpms/libxcb.git",
-  "version": "1.17.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libxcb",
+  "version": "1.17.0"
 }

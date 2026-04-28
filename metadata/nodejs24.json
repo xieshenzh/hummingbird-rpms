@@ -5,5 +5,7 @@
   "release": "4",
   "sha": "e3ad89485ac1cbd6c1350c0a80f422b50f35be1d",
   "source": "https://src.fedoraproject.org/rpms/nodejs24.git",
+  "upstream_branch": "v24.x",
+  "upstream_repo": "https://github.com/nodejs/node",
   "version": "24.14.1"
 }

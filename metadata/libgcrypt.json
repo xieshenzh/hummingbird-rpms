@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "e668758aaf600e9c5dc65f588c111046d7661fba",
   "source": "https://src.fedoraproject.org/rpms/libgcrypt.git",
+  "upstream_repo": "https://dev.gnupg.org/source/libgcrypt.git",
   "version": "1.12.2"
 }

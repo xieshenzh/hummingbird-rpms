@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "a3ffc69d2cdb8f147c426bc9ee29bcde838c65e9",
   "source": "https://src.fedoraproject.org/rpms/libfido2.git",
+  "upstream_repo": "https://github.com/Yubico/libfido2",
   "version": "1.17.0"
 }

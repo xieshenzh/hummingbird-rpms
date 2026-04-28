@@ -4,5 +4,6 @@
   "release": "11",
   "sha": "c400bb086a2b2fbd79fe63060713aa5d449f77fd",
   "source": "https://src.fedoraproject.org/rpms/unbound.git",
+  "upstream_repo": "https://github.com/NLnetLabs/unbound",
   "version": "1.24.2"
 }

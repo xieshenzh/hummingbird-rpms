@@ -4,5 +4,6 @@
   "release": "10",
   "sha": "1111a1b12a2f66c6f904bafef3e41dd57f603bbc",
   "source": "https://src.fedoraproject.org/rpms/libXft.git",
+  "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libxft",
   "version": "2.3.8"
 }

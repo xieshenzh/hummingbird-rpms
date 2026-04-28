@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "8bae68f4c7297e8502d6dd2f32a3e62056c54bb8",
   "source": "https://src.fedoraproject.org/rpms/python-attrs.git",
+  "upstream_repo": "https://github.com/python-attrs/attrs",
   "version": "26.1.0"
 }

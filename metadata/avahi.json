@@ -5,5 +5,6 @@
   "release": "0.1",
   "sha": "195919c9f9a8dff0e996921afd8736df8f12715b",
   "source": "https://src.fedoraproject.org/rpms/avahi.git",
+  "upstream_repo": "https://github.com/avahi/avahi",
   "version": "0.9~rc4"
 }

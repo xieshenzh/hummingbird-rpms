@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "521",
   "sha": "646a7e0c5f87cc3feabda4bce904cfc4f759202d",
   "source": "https://src.fedoraproject.org/rpms/perl-Getopt-Long.git",
-  "version": "2.58",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/sciurius/perl-Getopt-Long",
+  "version": "2.58"
 }

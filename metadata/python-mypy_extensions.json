@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "6",
   "sha": "33fcbc4ddce86b710ae1c777eed4325c15e6cd3f",
   "source": "https://src.fedoraproject.org/rpms/python-mypy_extensions.git",
-  "version": "1.1.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/python/mypy_extensions",
+  "version": "1.1.0"
 }

@@ -1,9 +1,13 @@
 {
   "branch": "rawhide",
+  "cve_product": "Microsoft / .NET 8.0",
   "modification_reason": "Pre-existing modification - requires review",
   "modification_status": "modified",
   "release": "1",
   "sha": "4d8569ed030ec7f99894fbfc0ee086454db448e1",
   "source": "https://src.fedoraproject.org/rpms/dotnet8.0.git",
-  "version": "8.0.126"
+  "upstream_branch": "release/8.0",
+  "upstream_repo": "https://github.com/dotnet/runtime",
+  "version": "8.0.126",
+  "version_transform": "dotnet_sdk_to_runtime"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "24a42e69fcfa4f8fa4a67717a7b6a6ed27d2e7d0",
   "source": "https://src.fedoraproject.org/rpms/libpng.git",
+  "upstream_repo": "https://github.com/pnggroup/libpng",
   "version": "1.6.56"
 }

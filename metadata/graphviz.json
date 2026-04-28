@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "5132ca8c6f8b1263ee4666774de619b24fc638f6",
   "source": "https://src.fedoraproject.org/rpms/graphviz.git",
+  "upstream_repo": "https://gitlab.com/graphviz/graphviz",
   "version": "14.1.4"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "b22cfa76cecc051ad37041abaef2c569804a9a1e",
   "source": "https://src.fedoraproject.org/rpms/elfutils.git",
+  "upstream_repo": "https://sourceware.org/git/elfutils.git",
   "version": "0.195"
 }

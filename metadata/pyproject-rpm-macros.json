@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "5d9798f289ea8cbeb5189604013e865e7e7d2870",
   "source": "https://src.fedoraproject.org/rpms/pyproject-rpm-macros.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/pyproject-rpm-macros",
   "version": "1.20.0"
 }

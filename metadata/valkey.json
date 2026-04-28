@@ -1,9 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_status": "modified",
   "modification_reason": "Weaken logrotate dependency to remove transitive systemd requirement",
+  "modification_status": "modified",
   "release": "1",
   "sha": "9c1a4e3d19e753c942a611dabc517fb38d702204",
   "source": "https://src.fedoraproject.org/rpms/valkey.git",
+  "upstream_repo": "https://github.com/valkey-io/valkey",
   "version": "9.0.3"
 }

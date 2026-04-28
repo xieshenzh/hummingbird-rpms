@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "5",
   "sha": "de3ebcec0a38f38e69a431a523897833b7ed8263",
   "source": "https://src.fedoraproject.org/rpms/python-pluggy.git",
-  "version": "1.6.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/pytest-dev/pluggy",
+  "version": "1.6.0"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "4b2fb92358c462fc3d5f6d4110762724934369ce",
   "source": "https://src.fedoraproject.org/rpms/vmaf.git",
+  "upstream_repo": "https://github.com/Netflix/vmaf",
   "version": "3.1.0"
 }

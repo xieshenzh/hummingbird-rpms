@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "00fb1d71ea03b42cd4b447054ae57ded0d0b0622",
   "source": "https://src.fedoraproject.org/rpms/tcl.git",
+  "upstream_repo": "https://github.com/tcltk/tcl",
   "version": "9.0.2"
 }

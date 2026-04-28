@@ -1,9 +1,12 @@
 {
   "branch": "rawhide",
+  "cve_product": "Oracle Corporation / Oracle Java SE",
   "modification_reason": "Weaken cups-libs to Recommends to exclude gnutls from FIPS container images",
   "modification_status": "modified",
   "release": "5",
   "sha": "4fde3402099f14e3734be5673ec28fda10e69882",
   "source": "https://src.fedoraproject.org/rpms/java-25-openjdk.git",
-  "version": "25.0.2.0.10"
+  "upstream_repo": "https://github.com/openjdk/jdk25u",
+  "version": "25.0.2.0.10",
+  "version_transform": "openjdk_to_oracle"
 }

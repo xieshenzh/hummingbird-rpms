@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "492a790266c2fe44062f31221f5e4ac9a37a443d",
   "source": "https://src.fedoraproject.org/rpms/bind.git",
+  "upstream_repo": "https://gitlab.isc.org/isc-projects/bind9",
   "version": "9.18.48"
 }

@@ -5,5 +5,6 @@
   "release": "1",
   "sha": "02bcf5612022be9693e4dd68573e8629e588c776",
   "source": "https://src.fedoraproject.org/rpms/nss.git",
+  "upstream_repo": "https://github.com/nss-dev/nss",
   "version": "3.122.1"
 }

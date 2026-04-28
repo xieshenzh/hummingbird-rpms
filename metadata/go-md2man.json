@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "aafe453044a4f42560b99ded799efb7a8727dd0f",
   "source": "https://src.fedoraproject.org/rpms/go-md2man.git",
+  "upstream_repo": "https://github.com/cpuguy83/go-md2man",
   "version": "2.0.7"
 }

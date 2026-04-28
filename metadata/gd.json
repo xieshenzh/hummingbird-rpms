@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "21",
   "sha": "12290fd21ef7578e1be7c49dc997d8c6838e10a6",
   "source": "https://src.fedoraproject.org/rpms/gd.git",
-  "version": "2.3.3",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/libgd/libgd",
+  "version": "2.3.3"
 }

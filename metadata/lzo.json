@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "16",
   "sha": "699cafd20e4d9f53350c0a13d2ca3077ac8393de",
   "source": "https://src.fedoraproject.org/rpms/lzo.git",
-  "version": "2.10",
-  "modification_status": "clean"
+  "upstream_repo": "https://src.fedoraproject.org/rpms/lzo",
+  "version": "2.10"
 }

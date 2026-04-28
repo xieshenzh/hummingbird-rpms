@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "24",
   "sha": "8eec4ea87df0ead1447d0af27214bc26669278f9",
   "source": "https://src.fedoraproject.org/rpms/rubypick.git",
-  "version": "1.1.1",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/fedora-ruby/rubypick",
+  "version": "1.1.1"
 }

@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "3",
   "sha": "d9a574d39b3cebea0d1b05d64d30d51a0d9eb92a",
   "source": "https://src.fedoraproject.org/rpms/rust-rav1e.git",
-  "version": "0.8.1",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/xiph/rav1e",
+  "version": "0.8.1"
 }

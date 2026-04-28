@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "5",
   "sha": "1291733fff41aa1265429eaeed46cfa068b0bd15",
   "source": "https://src.fedoraproject.org/rpms/libassuan.git",
-  "version": "2.5.7",
-  "modification_status": "clean"
+  "upstream_repo": "https://dev.gnupg.org/source/libassuan.git",
+  "version": "2.5.7"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "067f8d105c85d5a8204df47d30c0a5a8ed25acad",
   "source": "https://src.fedoraproject.org/rpms/tzdata.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/tzdata",
   "version": "2026a"
 }

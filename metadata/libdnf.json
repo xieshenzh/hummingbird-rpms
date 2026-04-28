@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "2",
   "sha": "7907f1087d31d318a3457e40801a6e814d462eb7",
   "source": "https://src.fedoraproject.org/rpms/libdnf.git",
-  "version": "0.75.0",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/rpm-software-management/libdnf",
+  "version": "0.75.0"
 }

@@ -1,8 +1,10 @@
 {
   "branch": "rawhide",
+  "cve_product": "oniguruma project / oniguruma",
+  "modification_status": "clean",
   "release": "4",
   "sha": "6e4e54be4ccb5e526d008e5087105ec3e54976cd",
   "source": "https://src.fedoraproject.org/rpms/oniguruma.git",
-  "version": "6.9.10",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/kkos/oniguruma",
+  "version": "6.9.10"
 }

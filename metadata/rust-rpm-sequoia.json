@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "e1f836e33d61d1e1acadde64963d7ca18c4b29b5",
   "source": "https://gitlab.com/redhat/centos-stream/rpms/rust-rpm-sequoia.git",
+  "upstream_repo": "https://github.com/rpm-software-management/rpm-sequoia",
   "version": "1.10.1.1"
 }

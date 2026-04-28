@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "10",
   "sha": "8f8c0edc37918377bfe35f0bc87d4dfcc0e6c6a9",
   "source": "https://src.fedoraproject.org/rpms/mailcap.git",
-  "version": "2.1.54",
-  "modification_status": "clean"
+  "upstream_repo": "https://src.fedoraproject.org/rpms/mailcap",
+  "version": "2.1.54"
 }

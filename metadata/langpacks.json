@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "6d56f0a0aa3c31f20b536fb97dbb0ff63b3229dc",
   "source": "https://src.fedoraproject.org/rpms/langpacks.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/langpacks",
   "version": "4.3"
 }

@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "42d95d56458002a7d5cccaba988a07a3af6a3b38",
   "source": "https://src.fedoraproject.org/rpms/sqlite.git",
+  "upstream_repo": "https://github.com/sqlite/sqlite",
   "version": "3.52.0"
 }

@@ -5,5 +5,6 @@
   "release": "1",
   "sha": "a6896de188416e93bb9e559af02f82437b9ebc06",
   "source": "https://src.fedoraproject.org/rpms/git.git",
+  "upstream_repo": "https://github.com/git/git",
   "version": "2.54.0"
 }

@@ -5,5 +5,6 @@
   "release": "3.git19878fe",
   "sha": "0da1c8d7a7ed49c46c39f65f760febb699643a55",
   "source": "https://src.fedoraproject.org/rpms/crypto-policies.git",
+  "upstream_repo": "https://gitlab.com/redhat-crypto/fedora-crypto-policies",
   "version": "20251128"
 }

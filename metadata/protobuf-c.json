@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "0b6d4e9189f315474bd43e8775cf902df8028321",
   "source": "https://src.fedoraproject.org/rpms/protobuf-c.git",
+  "upstream_repo": "https://github.com/protobuf-c/protobuf-c",
   "version": "1.5.2"
 }

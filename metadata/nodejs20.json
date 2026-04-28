@@ -5,5 +5,7 @@
   "release": "3",
   "sha": "1ef4adcb666c8e885a5127738c527bbdb344fc3f",
   "source": "https://src.fedoraproject.org/rpms/nodejs20.git",
+  "upstream_branch": "v20.x",
+  "upstream_repo": "https://github.com/nodejs/node",
   "version": "20.20.2"
 }

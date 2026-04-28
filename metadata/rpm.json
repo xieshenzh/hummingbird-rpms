@@ -4,5 +4,6 @@
   "release": "5",
   "sha": "75bb7d91ab2f73d1fc6592521df7c97d69d9225b",
   "source": "https://src.fedoraproject.org/rpms/rpm.git",
+  "upstream_repo": "https://github.com/rpm-software-management/rpm",
   "version": "6.0.1"
 }

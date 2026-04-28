@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "d5e59e908162daccdfac161407e80bdae75248f5",
   "source": "https://src.fedoraproject.org/rpms/pkgconf.git",
+  "upstream_repo": "https://github.com/pkgconf/pkgconf",
   "version": "2.5.1"
 }

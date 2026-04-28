@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "410fb14cb0eaf6584384803ba94687bfcbaaafbb",
   "source": "https://src.fedoraproject.org/rpms/go-fdo-client.git",
+  "upstream_repo": "https://github.com/fido-device-onboard/go-fdo-client",
   "version": "1.0.0"
 }

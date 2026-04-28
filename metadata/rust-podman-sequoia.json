@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "7f0694fa51b07b8d1f2cb839f685365731306a1b",
   "source": "https://src.fedoraproject.org/rpms/rust-podman-sequoia.git",
+  "upstream_repo": "https://github.com/ueno/podman-sequoia",
   "version": "0.3.2"
 }

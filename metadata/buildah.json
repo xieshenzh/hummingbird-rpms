@@ -5,5 +5,6 @@
   "release": "1",
   "sha": "c85bd0303826695c3112884c001bddc825bf992d",
   "source": "https://src.fedoraproject.org/rpms/buildah.git",
+  "upstream_repo": "https://github.com/containers/buildah",
   "version": "1.43.1"
 }

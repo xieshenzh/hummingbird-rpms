@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "45d4c786332ca28e34e836f8e0041de2461c5f90",
   "source": "https://src.fedoraproject.org/rpms/libgpg-error.git",
+  "upstream_repo": "https://dev.gnupg.org/source/libgpg-error.git",
   "version": "1.60"
 }

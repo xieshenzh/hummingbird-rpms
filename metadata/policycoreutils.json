@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "73db4fa86c62a91488a1172a7b30d5e731b9c31a",
   "source": "https://src.fedoraproject.org/rpms/policycoreutils.git",
+  "upstream_repo": "https://github.com/SELinuxProject/selinux",
   "version": "3.10"
 }

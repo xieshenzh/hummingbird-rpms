@@ -4,5 +4,6 @@
   "release": "3",
   "sha": "47436eb34ac89702a9f3a40c0138d881dc549881",
   "source": "https://src.fedoraproject.org/rpms/package-notes.git",
+  "upstream_repo": "https://github.com/systemd/package-notes",
   "version": "0.17"
 }

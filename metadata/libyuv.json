@@ -4,5 +4,6 @@
   "release": "0.62.20260213git6067afd",
   "sha": "10ae99a60fa82e911d04df30760d4b9be52797c4",
   "source": "https://src.fedoraproject.org/rpms/libyuv.git",
+  "upstream_repo": "https://chromium.googlesource.com/libyuv/libyuv",
   "version": "0"
 }

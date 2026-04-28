@@ -4,5 +4,6 @@
   "release": "6.20260302",
   "sha": "fc7c270570179d9d6338b3443e8c9c721271782d",
   "source": "https://src.fedoraproject.org/rpms/mawk.git",
+  "upstream_repo": "https://github.com/ThomasDickey/mawk-snapshots",
   "version": "1.3.4"
 }

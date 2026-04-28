@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "3",
   "sha": "11f7ff37b847c772211382a9f3b1fd773df134eb",
   "source": "https://src.fedoraproject.org/rpms/libeconf.git",
-  "version": "0.7.9",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/openSUSE/libeconf",
+  "version": "0.7.9"
 }

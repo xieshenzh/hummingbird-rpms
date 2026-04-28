@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "5f206bef8c6153865787ed5b51587fa7e0455357",
   "source": "https://src.fedoraproject.org/rpms/dnf5.git",
+  "upstream_repo": "https://github.com/rpm-software-management/dnf5",
   "version": "5.4.2.0"
 }

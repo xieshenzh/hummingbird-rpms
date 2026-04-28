@@ -4,5 +4,6 @@
   "release": "1.1",
   "sha": "c005224357d85b601791d5201162d382c7c8e006",
   "source": "https://src.fedoraproject.org/rpms/python-gitlab.git",
+  "upstream_repo": "https://github.com/python-gitlab/python-gitlab",
   "version": "7.1.0"
 }

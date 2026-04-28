@@ -4,5 +4,7 @@
   "release": "1",
   "release_monitoring_project_id": 8251,
   "track_upstream": "25",
+  "upstream_branch": "v25.x",
+  "upstream_repo": "https://github.com/nodejs/node",
   "version": "25.9.0"
 }

@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "4",
   "sha": "901c1b18607c9662c95239d7bfb49a6262fda85b",
   "source": "https://src.fedoraproject.org/rpms/libXi.git",
-  "version": "1.8.2",
-  "modification_status": "clean"
+  "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libxi",
+  "version": "1.8.2"
 }

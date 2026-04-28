@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "a564faa88cb1f0ebc7f1bcfcbf1f14504739f025",
   "source": "https://src.fedoraproject.org/rpms/google-noto-fonts.git",
+  "upstream_repo": "https://github.com/notofonts/notofonts.github.io",
   "version": "20260401"
 }

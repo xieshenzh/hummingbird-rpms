@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "05f7439bf543f0d4bad829b092b93f8af63d884c",
   "source": "https://src.fedoraproject.org/rpms/libtasn1.git",
+  "upstream_repo": "https://gitlab.com/gnutls/libtasn1",
   "version": "4.21.0"
 }

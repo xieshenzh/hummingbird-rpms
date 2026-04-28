@@ -4,5 +4,6 @@
   "release": "8",
   "sha": "425ee3a8e8beeb9feeeda5070dde4f72b048d469",
   "source": "https://src.fedoraproject.org/rpms/dbus-broker.git",
+  "upstream_repo": "https://github.com/bus1/dbus-broker",
   "version": "37"
 }

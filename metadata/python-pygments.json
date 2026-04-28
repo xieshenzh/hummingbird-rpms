@@ -4,5 +4,6 @@
   "release": "1",
   "sha": "6f781816d1ee44f625f4fd1a0b3036330835a102",
   "source": "https://src.fedoraproject.org/rpms/python-pygments.git",
+  "upstream_repo": "https://github.com/pygments/pygments",
   "version": "2.19.2"
 }

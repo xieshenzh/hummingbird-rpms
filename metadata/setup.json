@@ -5,5 +5,6 @@
   "release": "29",
   "sha": "aae1771e2281440b3cd6e399c68d70d2db19d06a",
   "source": "https://src.fedoraproject.org/rpms/setup.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/setup",
   "version": "2.15.0"
 }

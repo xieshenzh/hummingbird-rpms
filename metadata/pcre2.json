@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "1",
   "sha": "7564d9d768d993dc417a65d0c9c66d9a857d527d",
   "source": "https://src.fedoraproject.org/rpms/pcre2.git",
-  "version": "10.47",
-  "modification_status": "clean"
+  "upstream_repo": "https://github.com/PCRE2Project/pcre2",
+  "version": "10.47"
 }

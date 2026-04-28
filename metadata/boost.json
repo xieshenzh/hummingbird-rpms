@@ -5,5 +5,6 @@
   "release": "7",
   "sha": "7d6a68d9597c2fed2632dc1d9c4b7c03b8fe3937",
   "source": "https://src.fedoraproject.org/rpms/boost.git",
+  "upstream_repo": "https://github.com/boostorg/boost",
   "version": "1.90.0"
 }

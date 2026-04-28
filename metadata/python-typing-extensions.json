@@ -4,5 +4,6 @@
   "release": "4",
   "sha": "9682b60f0139750eab9c773969157fc82fadebd3",
   "source": "https://src.fedoraproject.org/rpms/python-typing-extensions.git",
+  "upstream_repo": "https://github.com/python/typing_extensions",
   "version": "4.15.0"
 }

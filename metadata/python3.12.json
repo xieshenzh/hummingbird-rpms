@@ -5,5 +5,7 @@
   "release": "3",
   "sha": "5b0b65def8430636bedc2ed3912240cef307e244",
   "source": "https://src.fedoraproject.org/rpms/python3.12.git",
+  "upstream_branch": "3.12",
+  "upstream_repo": "https://github.com/python/cpython",
   "version": "3.12.13"
 }

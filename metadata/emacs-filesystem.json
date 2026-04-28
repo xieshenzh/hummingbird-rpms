@@ -1,8 +1,9 @@
 {
   "branch": "rawhide",
+  "modification_status": "clean",
   "release": "2",
   "sha": "1dd5dffaf2b5eca21e8e4ebde4ef056799838111",
   "source": "https://src.fedoraproject.org/rpms/emacs-filesystem.git",
-  "version": "30.2",
-  "modification_status": "clean"
+  "upstream_repo": "https://git.savannah.gnu.org/git/emacs.git",
+  "version": "30.2"
 }
