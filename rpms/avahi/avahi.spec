@@ -56,11 +56,11 @@
 # trim changelog included in binary rpms
 %global _changelog_trimtime %(date +%s -d "1 year ago")
 
-%define rc rc2
+%define rc rc4
 
 Name:             avahi
 Version:          0.9%{?rc:~%{rc}}
-Release:          8.1%{?dist}
+Release:          0.1%{?dist}
 Summary:          Local network service discovery
 License:          LGPL-2.1-or-later AND LGPL-2.0-or-later AND BSD-2-Clause-Views AND MIT
 URL:              http://avahi.org
@@ -138,10 +138,6 @@ Source0:          https://github.com/avahi/avahi/releases/download/v%{version_no
 %endif
 
 ## upstream patches
-# https://github.com/avahi/avahi/pull/662
-Patch1: avahi-0.9-CVE-2024-52615.patch
-# https://github.com/avahi/avahi/pull/707
-Patch2: avahi-0.9-address-data-size.patch
 
 ## downstream patches
 Patch100: avahi-0.6.30-mono-libdir.patch
@@ -635,8 +631,8 @@ fi
 %{_sbindir}/avahi-daemon
 %dir %{_datadir}/avahi
 %{_datadir}/avahi/*.dtd
-%dir %{_libdir}/avahi
 %if %{WITH_PYTHON}
+%dir %{_libdir}/avahi
 %{_libdir}/avahi/service-types.db
 %endif
 %{_mandir}/man5/*
