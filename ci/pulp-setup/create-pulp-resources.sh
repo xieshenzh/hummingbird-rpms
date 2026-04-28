@@ -2,21 +2,144 @@
 
 set -e
 
-PULP_DOMAIN=$1
+DEFAULT_RPM_REPOSITORIES="source,x86_64,s390x,ppc64le,aarch64"
+DEFAULT_FILE_REPOSITORIES="metadata,rpm-catalog"
+DEFAULT_TYPE="rpm"
+DEFAULT_FILE_RETAIN_REPO_VERSIONS="1"
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") --domain <domain> [OPTIONS]
+
+Create Pulp domain, repositories, and distributions.
+
+Required:
+  --domain <name>      Pulp domain name to create/use
+
+Optional:
+  --repos <list>       Comma-separated repository names
+                       Default for rpm: ${DEFAULT_RPM_REPOSITORIES}
+                       Default for file: ${DEFAULT_FILE_REPOSITORIES}
+  --type <type>        Repository type (e.g., rpm, file)
+                       Default: ${DEFAULT_TYPE}
+  --config <path>      Path to pulp CLI config file (e.g., cli.toml)
+  --retain-repo-versions <n>
+                       For --type file only: set retain_repo_versions to <n> on each
+                       file repository when the current value differs (non-negative integer).
+                       Default for file: ${DEFAULT_FILE_RETAIN_REPO_VERSIONS} if omitted.
+  --help               Show this help message
+
+Examples:
+  $(basename "$0") --domain my-domain
+  $(basename "$0") --domain my-domain --repos "repo1,repo2"
+  $(basename "$0") --domain my-domain --type file
+  $(basename "$0") --domain my-domain --type file --retain-repo-versions 1
+  $(basename "$0") --domain my-domain --config /path/to/config.toml
+EOF
+  exit "${1:-0}"
+}
+
+PULP_DOMAIN=""
+PULP_REPOSITORIES_STRING=""
+PULP_TYPE=""
+PULP_CONFIG_FILE=""
+PULP_FILE_RETAIN_REPO_VERSIONS=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --domain)
+      if [[ $# -lt 2 || -z "$2" ]]; then
+        echo "🔴 error: --domain requires a value"
+        usage 1
+      fi
+      PULP_DOMAIN="$2"
+      shift 2
+      ;;
+    --repos)
+      if [[ $# -lt 2 || -z "$2" ]]; then
+        echo "🔴 error: --repos requires a value"
+        usage 1
+      fi
+      PULP_REPOSITORIES_STRING="$2"
+      shift 2
+      ;;
+    --type)
+      if [[ $# -lt 2 || -z "$2" ]]; then
+        echo "🔴 error: --type requires a value"
+        usage 1
+      fi
+      PULP_TYPE="$2"
+      shift 2
+      ;;
+    --config)
+      if [[ $# -lt 2 || -z "$2" ]]; then
+        echo "🔴 error: --config requires a value"
+        usage 1
+      fi
+      PULP_CONFIG_FILE="$2"
+      shift 2
+      ;;
+    --retain-repo-versions)
+      if [[ $# -lt 2 || -z "$2" ]]; then
+        echo "🔴 error: --retain-repo-versions requires a value"
+        usage 1
+      fi
+      PULP_FILE_RETAIN_REPO_VERSIONS="$2"
+      shift 2
+      ;;
+    --help)
+      usage 0
+      ;;
+    *)
+      echo "🔴 Unknown option: $1"
+      usage 1
+      ;;
+  esac
+done
 
 if [[ -z "${PULP_DOMAIN}" ]]; then
-  echo "🔴 error: missing parameter PULP_DOMAIN"
+  echo "🔴 error: --domain is required"
+  usage 1
+fi
+
+if [[ -n "${PULP_FILE_RETAIN_REPO_VERSIONS}" ]]; then
+  if ! [[ "${PULP_FILE_RETAIN_REPO_VERSIONS}" =~ ^[0-9]+$ ]]; then
+    echo "🔴 error: --retain-repo-versions must be a non-negative integer"
+    exit 1
+  fi
+fi
+
+if [[ -z "${PULP_TYPE}" ]]; then
+  PULP_TYPE="${DEFAULT_TYPE}"
+  echo "ℹ️ Using default repository type: ${PULP_TYPE}"
+else
+  echo "ℹ️ Using provided repository type: ${PULP_TYPE}"
+fi
+
+if [[ -n "${PULP_FILE_RETAIN_REPO_VERSIONS}" && "${PULP_TYPE}" != "file" ]]; then
+  echo "🔴 error: --retain-repo-versions is only valid with --type file (default type is rpm)"
   exit 1
 fi
 
-PULP_REPOSITORIES_STRING=$2
+if [[ "${PULP_TYPE}" == "file" && -z "${PULP_FILE_RETAIN_REPO_VERSIONS}" ]]; then
+  PULP_FILE_RETAIN_REPO_VERSIONS="${DEFAULT_FILE_RETAIN_REPO_VERSIONS}"
+  echo "ℹ️ Using default retain_repo_versions for file repositories: ${PULP_FILE_RETAIN_REPO_VERSIONS}"
+fi
+
 if [[ -z "${PULP_REPOSITORIES_STRING}" ]]; then
-  echo "🔴 error: missing parameter PULP_REPOSITORIES (provide comma-delimited repository names)"
-  exit 1
+  if [[ "${PULP_TYPE}" == "rpm" ]]; then
+    PULP_REPOSITORIES_STRING="${DEFAULT_RPM_REPOSITORIES}"
+  elif [[ "${PULP_TYPE}" == "file" ]]; then
+    PULP_REPOSITORIES_STRING="${DEFAULT_FILE_REPOSITORIES}"
+  else
+    echo "🔴 error: no default repositories for type ${PULP_TYPE}. Please provide --repos."
+    exit 1
+  fi
+  echo "ℹ️ Using default repositories for type ${PULP_TYPE}: ${PULP_REPOSITORIES_STRING}"
+else
+  echo "ℹ️ Using provided repositories: ${PULP_REPOSITORIES_STRING}"
 fi
 
-# Optional third argument: path to pulp CLI config (e.g., ci.toml)
-PULP_CONFIG_FILE=$3
 PULP_CONFIG_OPT=()
 if [[ -n "${PULP_CONFIG_FILE}" ]]; then
   PULP_CONFIG_OPT=(--config "${PULP_CONFIG_FILE}")
@@ -31,7 +154,7 @@ for i in "${!PULP_REPOSITORIES[@]}"; do
   PULP_REPOSITORIES[i]=$(echo "${PULP_REPOSITORIES[i]}" | xargs)
 done
 
-echo "ℹ️ Will create repositories: ${PULP_REPOSITORIES[*]}"
+echo "ℹ️ Will create ${PULP_TYPE} repositories: ${PULP_REPOSITORIES[*]}"
 
 # Check domain existence robustly (avoids pagination/truncation)
 if pulp "${PULP_CONFIG_OPT[@]}" domain show --name "${PULP_DOMAIN}" >/dev/null 2>&1; then
@@ -53,19 +176,58 @@ fi
 for PULP_REPOSITORY in "${PULP_REPOSITORIES[@]}"; do
     echo "🔄 Processing repository: ${PULP_REPOSITORY}"
 
-    if pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" rpm repository show --name "${PULP_REPOSITORY}" >/dev/null 2>&1; then
+    repo_created=false
+    if pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository show --name "${PULP_REPOSITORY}" >/dev/null 2>&1; then
       echo "ℹ️ Repository '${PULP_REPOSITORY}' already exists. Skipping creation."
     else
       echo "🆕 Repository '${PULP_REPOSITORY}' not found. Creating..."
-      pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" rpm repository create --name "${PULP_REPOSITORY}"
-      pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" rpm repository update --name "${PULP_REPOSITORY}" --autopublish
+      pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository create --name "${PULP_REPOSITORY}"
+      repo_created=true
+      if [[ "${PULP_TYPE}" == "rpm" ]]; then
+        pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update --name "${PULP_REPOSITORY}" --autopublish
+      fi
+    fi
+    if [[ "${PULP_TYPE}" == "file" && -n "${PULP_FILE_RETAIN_REPO_VERSIONS}" ]]; then
+      if [[ "${repo_created}" == true ]]; then
+        echo "📝 Setting retain_repo_versions to ${PULP_FILE_RETAIN_REPO_VERSIONS} for new repository '${PULP_REPOSITORY}'..."
+        pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update \
+          --name "${PULP_REPOSITORY}" \
+          --retain-repo-versions "${PULP_FILE_RETAIN_REPO_VERSIONS}"
+      else
+        repo_json=$(pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository show \
+          --name "${PULP_REPOSITORY}" --format json) || {
+          echo "🔴 error: failed to read repository '${PULP_REPOSITORY}'"
+          exit 1
+        }
+        need_update=$(echo "${repo_json}" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+cur = data.get('retain_repo_versions')
+want = int(sys.argv[1])
+if cur is None:
+    sys.stdout.write('yes')
+else:
+    sys.stdout.write('yes' if int(cur) != want else 'no')
+" "${PULP_FILE_RETAIN_REPO_VERSIONS}") || {
+          echo "🔴 error: failed to parse JSON for repository '${PULP_REPOSITORY}'"
+          exit 1
+        }
+        if [[ "${need_update}" == "yes" ]]; then
+          echo "📝 Setting retain_repo_versions to ${PULP_FILE_RETAIN_REPO_VERSIONS} for '${PULP_REPOSITORY}'..."
+          pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update \
+            --name "${PULP_REPOSITORY}" \
+            --retain-repo-versions "${PULP_FILE_RETAIN_REPO_VERSIONS}"
+        else
+          echo "ℹ️ Repository '${PULP_REPOSITORY}' retain_repo_versions already ${PULP_FILE_RETAIN_REPO_VERSIONS}, skipping update."
+        fi
+      fi
     fi
     # Ensure distribution exists (recreate if it was deleted)
-    if pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" rpm distribution show --name "${PULP_REPOSITORY}" >/dev/null 2>&1; then
+    if pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" distribution show --name "${PULP_REPOSITORY}" >/dev/null 2>&1; then
       echo "ℹ️ Distribution '${PULP_REPOSITORY}' already exists. Skipping creation."
     else
       echo "🆕 Distribution '${PULP_REPOSITORY}' not found. Creating..."
-      pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" rpm distribution create \
+      pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" distribution create \
         --name "${PULP_REPOSITORY}" \
         --repository "${PULP_REPOSITORY}" \
         --base-path "${PULP_REPOSITORY}"
