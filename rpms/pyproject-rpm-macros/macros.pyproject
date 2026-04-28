@@ -1,6 +1,4 @@
-# This is a backward-compatible suffix used in all pyproject-rpm-macros directories
-# For the main Python it's empty, for all others it's "-3.X"
-%_pyproject_files_pkgversion %{expr:"%{python3_pkgversion}" != "3" ? "-%{python3_pkgversion}" : ""}
+# %%_pyproject_files_pkgversion defined in srpm macros
 
 # In RPM < 4.20 (4.19.9x is 4.20 alpha), there is no guaranteed, RPM-controlled per-build directory (%%mkbuilddir step).
 # Hence we use %%{buildsubdir} if available.
@@ -20,17 +18,14 @@
 #     https://docs.pytest.org/en/latest/reference.html#confval-norecursedirs
 %_pyproject_builddir %{_builddir}%{_pyproject_buildsubdir_compat}/.pyproject-builddir%{_pyproject_files_pkgversion}
 
-# We prefix all created files with this value to make them unique
-# Ideally, we would put them into %%{buildsubdir}, but that value changes during the spec
-# The used value is similar to the one used to define the default %%buildroot
-%_pyproject_files_prefix %{name}-%{version}-%{release}.%{_arch}%{_pyproject_files_pkgversion}
+# %%_pyproject_files_prefix defined in srpm macros
 
 %pyproject_files %{_builddir}/%{_pyproject_files_prefix}-pyproject-files
 %_pyproject_modules %{_builddir}/%{_pyproject_files_prefix}-pyproject-modules
 %_pyproject_ghost_distinfo %{_builddir}/%{_pyproject_files_prefix}-pyproject-ghost-distinfo
 %_pyproject_record %{_builddir}/%{_pyproject_files_prefix}-pyproject-record
 %_pyproject_buildrequires %{_builddir}/%{_pyproject_files_prefix}-pyproject-buildrequires
-%_pyproject_dep_overrides %{_builddir}/%{_pyproject_files_prefix}-pyproject-dep-overrides
+# %%_pyproject_dep_overrides defined in srpm macros
 
 # Internal macro, takes %%set_build_flags and strips all the exports
 # TODO: Make such a list an actual source of %%set_build_flags (in redhat-rpm-config)
@@ -42,11 +37,7 @@
 # The value is read and used by the %%pytest and %%tox macros:
 %_set_pytest_addopts %global __pytest_addopts --ignore=%{_pyproject_builddir}
 
-%pyproject_patch_dependency() %{expand:\\\
-%{!?1:%{error:%%pyproject_patch_dependency requires an argument}}\\\
-%{?2:%{error:%%pyproject_patch_dependency accepts exactly one argument per call}}\\\
-echo '%1' >> %{_pyproject_dep_overrides}
-}
+# %%pyproject_patch_dependency defined in srpm macros
 
 %pyproject_wheel(C:d:) %{expand:\\\
 %_set_pytest_addopts

@@ -195,8 +195,10 @@ Support for `%pyproject_save_files` with multiple wheels is not implemented.
 If you use `%pyproject_buildrequires -d ...` for multiple co-dependent packages
 in one spec file, it will create one or more build time dependencies
 on the packages you are currently building.
-The only currently supported way to avoid some of such unnecessary BuildRequires
+The only fully supported way to avoid some of such unnecessary BuildRequires
 is to use the `-R` flag to avoid generating BuildRequires based on runtime dependencies.
+Alternatively, use the **provisional** `%pyproject_patch_dependency` macro
+with the `:br_only` suffix to mitigate this problem.
 
 
 Passing config settings to build backends
