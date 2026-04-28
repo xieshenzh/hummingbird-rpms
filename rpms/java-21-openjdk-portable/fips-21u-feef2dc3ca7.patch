@@ -208,7 +208,7 @@ index 1e0f66726d0..59fe923f2c5 100644
  # Create the symbols file for static builds.
  
 diff --git a/src/java.base/share/classes/com/sun/crypto/provider/SunJCE.java b/src/java.base/share/classes/com/sun/crypto/provider/SunJCE.java
-index 10093137151..b023c63ae58 100644
+index 6a4e28372e5..6d06f69c50f 100644
 --- a/src/java.base/share/classes/com/sun/crypto/provider/SunJCE.java
 +++ b/src/java.base/share/classes/com/sun/crypto/provider/SunJCE.java
 @@ -31,6 +31,7 @@ import java.security.SecureRandom;
@@ -230,10 +230,16 @@ index 10093137151..b023c63ae58 100644
      @java.io.Serial
      private static final long serialVersionUID = 6812507587804302833L;
  
-@@ -147,298 +152,299 @@ public final class SunJCE extends Provider {
+@@ -147,301 +152,302 @@ public final class SunJCE extends Provider {
      void putEntries() {
          // reuse attribute map and reset before each reuse
          HashMap<String, String> attrs = new HashMap<>(3);
+-        attrs.put("SupportedKeyClasses",
+-                "java.security.interfaces.RSAPublicKey" +
+-                "|java.security.interfaces.RSAPrivateKey");
+-        ps("Signature", "NONEwithRSA",
+-                "com.sun.crypto.provider.RSACipherAdaptor", null, attrs);
+-        // continue adding cipher specific attributes
 -        attrs.put("SupportedModes", "ECB");
 -        attrs.put("SupportedPaddings", "NOPADDING|PKCS1PADDING|OAEPPADDING"
 -                + "|OAEPWITHMD5ANDMGF1PADDING"
@@ -245,9 +251,6 @@ index 10093137151..b023c63ae58 100644
 -                + "|OAEPWITHSHA-512ANDMGF1PADDING"
 -                + "|OAEPWITHSHA-512/224ANDMGF1PADDING"
 -                + "|OAEPWITHSHA-512/256ANDMGF1PADDING");
--        attrs.put("SupportedKeyClasses",
--                "java.security.interfaces.RSAPublicKey" +
--                "|java.security.interfaces.RSAPrivateKey");
 -        ps("Cipher", "RSA",
 -                "com.sun.crypto.provider.RSACipher", null, attrs);
 -
@@ -527,6 +530,12 @@ index 10093137151..b023c63ae58 100644
 -                "com.sun.crypto.provider.DHKeyPairGenerator",
 -                null);
 +        if (!systemFipsEnabled) {
++            attrs.put("SupportedKeyClasses",
++                    "java.security.interfaces.RSAPublicKey" +
++                    "|java.security.interfaces.RSAPrivateKey");
++            ps("Signature", "NONEwithRSA",
++               "com.sun.crypto.provider.RSACipherAdaptor", null, attrs);
++            // continue adding cipher specific attributes
 +            attrs.put("SupportedModes", "ECB");
 +            attrs.put("SupportedPaddings", "NOPADDING|PKCS1PADDING|OAEPPADDING"
 +                    + "|OAEPWITHMD5ANDMGF1PADDING"
@@ -538,9 +547,6 @@ index 10093137151..b023c63ae58 100644
 +                    + "|OAEPWITHSHA-512ANDMGF1PADDING"
 +                    + "|OAEPWITHSHA-512/224ANDMGF1PADDING"
 +                    + "|OAEPWITHSHA-512/256ANDMGF1PADDING");
-+            attrs.put("SupportedKeyClasses",
-+                    "java.security.interfaces.RSAPublicKey" +
-+                    "|java.security.interfaces.RSAPrivateKey");
 +            ps("Cipher", "RSA",
 +                    "com.sun.crypto.provider.RSACipher", null, attrs);
 +
@@ -822,7 +828,7 @@ index 10093137151..b023c63ae58 100644
  
          /*
           * Algorithm parameter generation engines
-@@ -447,15 +453,17 @@ public final class SunJCE extends Provider {
+@@ -450,15 +456,17 @@ public final class SunJCE extends Provider {
                  "DiffieHellman", "com.sun.crypto.provider.DHParameterGenerator",
                  null);
  
@@ -849,7 +855,7 @@ index 10093137151..b023c63ae58 100644
  
          /*
           * Algorithm Parameter engines
-@@ -625,10 +633,10 @@ public final class SunJCE extends Provider {
+@@ -628,10 +636,10 @@ public final class SunJCE extends Provider {
                  "com.sun.crypto.provider.PBEKeyFactory$PBEWithHmacSHA512AndAES_128");
  
          ps("SecretKeyFactory", "PBEWithHmacSHA512/224AndAES_128",
@@ -862,7 +868,7 @@ index 10093137151..b023c63ae58 100644
  
          ps("SecretKeyFactory", "PBEWithHmacSHA1AndAES_256",
                  "com.sun.crypto.provider.PBEKeyFactory$PBEWithHmacSHA1AndAES_256");
-@@ -651,136 +659,137 @@ public final class SunJCE extends Provider {
+@@ -654,136 +662,137 @@ public final class SunJCE extends Provider {
          ps("SecretKeyFactory", "PBEWithHmacSHA512/256AndAES_256",
                  "com.sun.crypto.provider.PBEKeyFactory$PBEWithHmacSHA512_256AndAES_256");
  
@@ -1979,7 +1985,7 @@ index 539ef1e8ee8..435f57e3ff2 100644
                  "sun.security.rsa.PSSParameters", null);
      }
 diff --git a/src/java.base/share/conf/security/java.security b/src/java.base/share/conf/security/java.security
-index 6b0fd201b9b..2af4e3a3e21 100644
+index be473e3f895..1d5cb17e492 100644
 --- a/src/java.base/share/conf/security/java.security
 +++ b/src/java.base/share/conf/security/java.security
 @@ -85,6 +85,17 @@ security.provider.tbd=Apple
@@ -3011,7 +3017,7 @@ index f8dd5a71c2c..6423805d164 100644
  }
 -
 diff --git a/src/jdk.crypto.cryptoki/share/classes/sun/security/pkcs11/SunPKCS11.java b/src/jdk.crypto.cryptoki/share/classes/sun/security/pkcs11/SunPKCS11.java
-index 0a62021633f..0723b69c2bc 100644
+index aaafc373f80..6466581f4ae 100644
 --- a/src/jdk.crypto.cryptoki/share/classes/sun/security/pkcs11/SunPKCS11.java
 +++ b/src/jdk.crypto.cryptoki/share/classes/sun/security/pkcs11/SunPKCS11.java
 @@ -26,6 +26,9 @@
@@ -3141,7 +3147,7 @@ index 0a62021633f..0723b69c2bc 100644
              }
              p11 = tmpPKCS11;
  
-@@ -1388,11 +1460,52 @@ public final class SunPKCS11 extends AuthProvider {
+@@ -1390,11 +1462,52 @@ public final class SunPKCS11 extends AuthProvider {
          }
  
          @Override
@@ -3194,7 +3200,7 @@ index 0a62021633f..0723b69c2bc 100644
              try {
                  return newInstance0(param);
              } catch (PKCS11Exception e) {
-@@ -1749,6 +1862,9 @@ public final class SunPKCS11 extends AuthProvider {
+@@ -1753,6 +1866,9 @@ public final class SunPKCS11 extends AuthProvider {
          try {
              session = token.getOpSession();
              p11.C_Logout(session.id());
