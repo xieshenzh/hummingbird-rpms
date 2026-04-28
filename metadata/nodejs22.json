@@ -2,10 +2,10 @@
   "branch": "rawhide",
   "modification_reason": "Disabled tests that fail in Konflux due to no network access",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "c3714057a72964ed51e7063a52846f9a0eec02d7",
+  "release": "3",
+  "sha": "8ea384d7de32df7b12b7039aba02200964a5c9e5",
   "source": "https://src.fedoraproject.org/rpms/nodejs22.git",
   "upstream_branch": "v22.x",
   "upstream_repo": "https://github.com/nodejs/node",
-  "version": "22.22.0"
+  "version": "22.22.2"
 }
