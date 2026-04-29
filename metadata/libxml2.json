@@ -5,6 +5,8 @@
   "release": "0.1",
   "sha": "93d41c31ba576bf339d17ba20537fffd45c0af46",
   "source": "https://src.fedoraproject.org/rpms/libxml2.git",
+  "release_monitoring_project_id": 1783,
+  "track_upstream": "latest",
   "upstream_repo": "https://gitlab.gnome.org/GNOME/libxml2",
   "version": "2.15.3"
 }
