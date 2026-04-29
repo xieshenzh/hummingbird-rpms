@@ -3,10 +3,10 @@
   "cve_product": "Oracle Corporation / Oracle Java SE",
   "modification_reason": "Weaken cups-libs to Recommends to exclude gnutls from FIPS container images",
   "modification_status": "modified",
-  "release": "2",
-  "sha": "2f1770af45eab9c28d8913be50756a82ef56b711",
+  "release": "1",
+  "sha": "e2f66f7f20fe66d99774aaf0dc57d1be088b47ba",
   "source": "https://src.fedoraproject.org/rpms/java-21-openjdk.git",
   "upstream_repo": "https://github.com/openjdk/jdk21u",
-  "version": "21.0.10.0.7",
+  "version": "21.0.11.0.10",
   "version_transform": "openjdk_to_oracle"
 }
