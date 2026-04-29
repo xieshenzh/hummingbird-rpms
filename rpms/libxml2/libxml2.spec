@@ -1,4 +1,5 @@
 %global soversion 16
+%global majorminor %(echo %{version} | cut -d. -f1-2)
 
 Name:           libxml2
 Version:        2.15.3
@@ -9,7 +10,7 @@ Summary:        Library providing XML and HTML support
 # the conformance test suite data in Source1 is covered by W3C
 License:        MIT AND ISC-Veillard AND W3C
 URL:            https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
-Source0:        https://download.gnome.org/sources/%{name}/2.15/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/%{majorminor}/%{name}-%{version}.tar.xz
 # https://www.w3.org/XML/Test/xmlconf-20080827.html
 Source1:        https://www.w3.org/XML/Test/xmlts20080827.tar.gz
 Patch0:         libxml2-multilib.patch
