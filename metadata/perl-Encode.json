@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "522",
-  "sha": "364038a94d47fd34e3a96b44df69a78e22f8c2e4",
+  "release": "523",
+  "sha": "8048accc7e87d27955e51fb77b0df5c975ed8c08",
   "source": "https://src.fedoraproject.org/rpms/perl-Encode.git",
   "upstream_repo": "https://github.com/dankogai/p5-encode",
-  "version": "3.22"
+  "version": "3.23"
 }
