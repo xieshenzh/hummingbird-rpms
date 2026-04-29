@@ -405,6 +405,179 @@ Run dependencies with multiple extras:
       python3dist(dep1)
   result: 0
 
+Run dependencies with extra missing in metadata:
+  installed:
+    setuptools: 50
+    wheel: 1
+    pyyaml: 1
+  include_runtime: true
+  generate_extras: true
+  extras:
+    - testing,more-testing,missing-extra
+    - even-more-testing , cool-feature
+  setup.py: |
+    from setuptools import setup
+    setup(
+        extras_require={
+            'testing': ['dep1'],
+            'more-testing': ['dep2'],
+            'even-more-testing': ['dep3'],
+            'cool-feature': ['dep4[FOO,BAR]'],
+        },
+    )
+  environ:
+    FEDORA: "45"
+  except: ValueError
+  result: 1
+
+Run dependencies with extra missing in metadata (older releases):
+  installed:
+    setuptools: 50
+    wheel: 1
+    pyyaml: 1
+  include_runtime: true
+  generate_extras: true
+  extras:
+    - testing,more-testing,missing-extra
+    - even-more-testing , cool-feature
+  setup.py: |
+    from setuptools import setup
+    setup(
+        extras_require={
+            'testing': ['dep1'],
+            'more-testing': ['dep2'],
+            'even-more-testing': ['dep3'],
+            'cool-feature': ['dep4[FOO,BAR]'],
+        },
+    )
+  environ:
+    FEDORA: "44"
+  result: 0
+  expected:
+    - |  # setuptools 70+
+      python3dist(dep1)
+      python3dist(dep2)
+      python3dist(dep3)
+      python3dist(dep4)
+      python3dist(dep4[bar])
+      python3dist(dep4[foo])
+      python3dist(setuptools) >= 40.8
+    - |  # setuptools < 70
+      python3dist(dep1)
+      python3dist(dep2)
+      python3dist(dep3)
+      python3dist(dep4)
+      python3dist(dep4[bar])
+      python3dist(dep4[foo])
+      python3dist(setuptools) >= 40.8
+      python3dist(wheel)
+  stderr_contains: "WARNING: Extra 'missing-extra' not found in project metadata."
+
+Self-referencing missing extra:
+  installed:
+    setuptools: 50
+    wheel: 1
+    tomli: 1
+  extras:
+    - dev  # this is deliberately sooner in the alphabet than the referenced ones
+  pyproject.toml: |
+    [build-system]
+    requires = ["setuptools"]
+    build-backend = "setuptools.build_meta"
+  setup.cfg: |
+    [metadata]
+    name = my_package
+    version = 0.1
+    [options]
+    install_requires =
+        foo
+        importlib-metadata; python_version<"3.8"
+    [options.extras_require]
+    tests = pytest>=5; pytest-mock
+    docs = sphinx; python-docs-theme
+    dev = my_package[docs,tests,xxx]
+  environ:
+    FEDORA: "45"
+  except: ValueError
+  result: 1
+
+Self-referencing missing extra (older releases):
+  installed:
+    setuptools: 50
+    wheel: 1
+    tomli: 1
+  extras:
+    - dev  # this is deliberately sooner in the alphabet than the referenced ones
+  pyproject.toml: |
+    [build-system]
+    requires = ["setuptools"]
+    build-backend = "setuptools.build_meta"
+  setup.cfg: |
+    [metadata]
+    name = my_package
+    version = 0.1
+    [options]
+    install_requires =
+        foo
+        importlib-metadata; python_version<"3.8"
+    [options.extras_require]
+    tests = pytest>=5; pytest-mock
+    docs = sphinx; python-docs-theme
+    dev = my_package[docs,tests,xxx]
+  environ:
+    FEDORA: "44"
+  result: 0
+  expected:
+    - |  # setuptools 70+
+      python3dist(foo)
+      python3dist(pytest) >= 5
+      python3dist(pytest-mock)
+      python3dist(setuptools)
+      python3dist(sphinx)
+      python3dist(python-docs-theme)
+    - |  # setuptools < 70
+      python3dist(foo)
+      python3dist(pytest) >= 5
+      python3dist(pytest-mock)
+      python3dist(setuptools)
+      python3dist(sphinx)
+      python3dist(python-docs-theme)
+      python3dist(wheel)
+  stderr_contains: "WARNING: Extra 'xxx' not found in project metadata."
+
+Extras normalization:
+  installed:
+    setuptools: 50
+    wheel: 1
+    pyyaml: 1
+  include_runtime: true
+  generate_extras: true
+  extras:
+    - Test_Feature,DOCS_Build
+    - More_Testing
+  setup.py: |
+    from setuptools import setup
+    setup(
+        extras_require={
+            'test-feature': ['dep1'],
+            'docs-build': ['dep2'],
+            'more-testing': ['dep3'],
+        },
+    )
+  expected:
+    - |  # setuptools 70+
+      python3dist(setuptools) >= 40.8
+      python3dist(dep3)
+      python3dist(dep2)
+      python3dist(dep1)
+    - |  # setuptools < 70
+      python3dist(setuptools) >= 40.8
+      python3dist(wheel)
+      python3dist(dep3)
+      python3dist(dep2)
+      python3dist(dep1)
+  result: 0
+
 Run dependencies with extras and build wheel option:
   installed:
     setuptools: 50

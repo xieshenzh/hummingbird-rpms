@@ -61,6 +61,11 @@ def test_data(case_name, capfd, tmp_path, monkeypatch):
     for name, value in case.get('environ', {}).items():
         monkeypatch.setenv(name, value)
 
+    fedora = int(case.get('environ', {}).get('FEDORA', 0))
+    rhel = int(case.get('environ', {}).get('RHEL', 0))
+    monkeypatch.setattr('pyproject_buildrequires.REJECT_INVALID_EXTRAS',
+                        fedora >= 45 or rhel >= 11)
+
     def get_installed_version(dist_name):
         try:
             return str(case['installed'][dist_name])
