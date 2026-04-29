@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "45b2f837ef79df65ec1a09d4db9d80ea1e5547bd",
+  "sha": "cdea5852127c2c697ef5cce5abab6e717fb95fc8",
   "source": "https://src.fedoraproject.org/rpms/python-packaging.git",
   "upstream_repo": "https://github.com/pypa/packaging",
-  "version": "26.1"
+  "version": "26.2"
 }
