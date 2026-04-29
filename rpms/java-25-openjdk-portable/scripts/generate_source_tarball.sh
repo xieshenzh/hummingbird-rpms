@@ -48,8 +48,8 @@
 # This will check out the same version as example 1, but from the
 # upstream repository:
 #
-# $ VERSION=jdk-25.0.2+10 PROJECT_NAME=openjdk REPO_NAME=jdk25u \
-#   BOOT_JDK=/usr/lib/jvm/java-17-openjdk sh scripts/generate_source_tarball.sh
+# $ VERSION=jdk-25.0.3+9 PROJECT_NAME=openjdk REPO_NAME=jdk25u \
+#   BOOT_JDK=/usr/lib/jvm/java-25-openjdk sh scripts/generate_source_tarball.sh
 #
 # Example 3:
 # This will read the OpenJDK feature version from the spec file, then create a

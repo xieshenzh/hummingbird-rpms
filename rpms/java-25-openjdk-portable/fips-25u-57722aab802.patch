@@ -1,8 +1,8 @@
 diff --git a/src/java.base/share/classes/java/security/Provider.java b/src/java.base/share/classes/java/security/Provider.java
-index de2845fb550..b1e416b90f4 100644
+index de2845fb550..60eeab678ca 100644
 --- a/src/java.base/share/classes/java/security/Provider.java
 +++ b/src/java.base/share/classes/java/security/Provider.java
-@@ -1203,6 +1203,39 @@ public Set<Service> getServices() {
+@@ -1203,6 +1203,34 @@ public Set<Service> getServices() {
          return serviceSet;
      }
  
@@ -10,9 +10,7 @@ index de2845fb550..b1e416b90f4 100644
 +    private static final class RedHatFIPSFilter {
 +        static final boolean IS_ON = Boolean.parseBoolean(
 +                Security.getProperty("__redhat_fips_filter__"));
-+        private static final Set<String> ANY_SERVICE_TYPE = Set.of();
 +        private static final Map<String, Set<String>> ALLOW_LIST = Map.of(
-+                "SunPKCS11-FIPS", ANY_SERVICE_TYPE,
 +                "SUN", Set.of(
 +                        "AlgorithmParameterGenerator",
 +                        "AlgorithmParameters", "CertificateFactory",
@@ -20,21 +18,18 @@ index de2845fb550..b1e416b90f4 100644
 +                        "Configuration", "KeyStore"),
 +                "SunEC", Set.of(
 +                        "AlgorithmParameters", "KeyFactory"),
-+                "SunJSSE", ANY_SERVICE_TYPE,
 +                "SunJCE", Set.of(
 +                        "AlgorithmParameters",
 +                        "AlgorithmParameterGenerator", "KeyFactory",
 +                        "SecretKeyFactory"),
 +                "SunRsaSign", Set.of(
-+                        "KeyFactory", "AlgorithmParameters"),
-+                "XMLDSig", ANY_SERVICE_TYPE
++                        "KeyFactory", "AlgorithmParameters")
 +        );
 +
 +        static boolean isAllowed(String provName, String serviceType) {
 +            Set<String> allowedServiceTypes = ALLOW_LIST.get(provName);
-+            return allowedServiceTypes != null &&
-+                    (allowedServiceTypes == ANY_SERVICE_TYPE ||
-+                            allowedServiceTypes.contains(serviceType));
++            return allowedServiceTypes == null ||
++                    allowedServiceTypes.contains(serviceType);
 +        }
 +    }
 +    /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ FIPS PATCH ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
@@ -42,7 +37,7 @@ index de2845fb550..b1e416b90f4 100644
      /**
       * Add a service. If a service of the same type with the same algorithm
       * name exists, and it was added using {@link #putService putService()},
-@@ -1231,6 +1264,15 @@ protected void putService(Service s) {
+@@ -1231,6 +1259,15 @@ protected void putService(Service s) {
                      ("service.getProvider() must match this Provider object");
          }
          String type = s.getType();

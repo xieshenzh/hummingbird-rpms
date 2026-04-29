@@ -1,0 +1,63 @@
+From dbbdc1dffd10608195487fa139e77c4a90c80658 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ji=C5=99=C3=AD=20Van=C4=9Bk?= <jvanek@openjdk.org>
+Date: Wed, 15 Apr 2026 12:54:49 +0000
+Subject: [PATCH] 8375294: (fs) Files.copy can fail with EOPNOTSUPP when
+ copy_file_range not supported
+
+Reviewed-by: andrew
+Backport-of: 30cda00010888b6e9a2bf8cdeaedbb3eb4b6a222
+---
+ src/java.base/linux/native/libnio/ch/FileDispatcherImpl.c    | 5 +++--
+ src/java.base/linux/native/libnio/fs/LinuxNativeDispatcher.c | 3 ++-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/java.base/linux/native/libnio/ch/FileDispatcherImpl.c b/src/java.base/linux/native/libnio/ch/FileDispatcherImpl.c
+index efbd0ca5684..54d640b03a4 100644
+--- a/src/java.base/linux/native/libnio/ch/FileDispatcherImpl.c
++++ b/src/java.base/linux/native/libnio/ch/FileDispatcherImpl.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2000, 2024, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2000, 2026, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -63,7 +63,7 @@ Java_sun_nio_ch_FileDispatcherImpl_transferFrom0(JNIEnv *env, jobject this,
+     if (n < 0) {
+         if (errno == EAGAIN)
+             return IOS_UNAVAILABLE;
+-        if (errno == ENOSYS)
++        if (errno == ENOSYS || errno == EOPNOTSUPP)
+             return IOS_UNSUPPORTED_CASE;
+         if ((errno == EBADF || errno == EINVAL || errno == EXDEV) &&
+             ((ssize_t)count >= 0))
+@@ -103,6 +103,7 @@ Java_sun_nio_ch_FileDispatcherImpl_transferTo0(JNIEnv *env, jobject this,
+                 case EINVAL:
+                 case ENOSYS:
+                 case EXDEV:
++                case EOPNOTSUPP:
+                     // ignore and try sendfile()
+                     break;
+                 default:
+diff --git a/src/java.base/linux/native/libnio/fs/LinuxNativeDispatcher.c b/src/java.base/linux/native/libnio/fs/LinuxNativeDispatcher.c
+index c90e99dda07..4677411b0ba 100644
+--- a/src/java.base/linux/native/libnio/fs/LinuxNativeDispatcher.c
++++ b/src/java.base/linux/native/libnio/fs/LinuxNativeDispatcher.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2008, 2024, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2008, 2026, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -193,6 +193,7 @@ Java_sun_nio_fs_LinuxNativeDispatcher_directCopy0
+                     case EINVAL:
+                     case ENOSYS:
+                     case EXDEV:
++                    case EOPNOTSUPP:
+                         // ignore and try sendfile()
+                         break;
+                     default:
+-- 
+2.52.0
+
