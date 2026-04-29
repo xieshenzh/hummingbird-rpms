@@ -29,7 +29,14 @@ VERSION_RE = re.compile(r'[a-zA-Z0-9.-]+(\.\*)?')
 # because %tox without config is dangerous (false sense of tests).
 # Running %pyproject_buildrequires -t/-e without tox config is wrong, but not dangerous.
 FEDORA = int(os.getenv('FEDORA') or 0)
+RHEL = int(os.getenv('RHEL') or 0)
 TOX_ASSERT_CONFIG_OPTS = () if 40 <= FEDORA < 43 else ('--assert-config',)
+
+# To avoid breakage on Fedora < 45 and RHEL < 11
+# we don't compare extras listed in %pyproject_buildrequires -x
+# with upstream metadata.
+# Instead we issue warning on old releases.
+REJECT_INVALID_EXTRAS = FEDORA >= 45 or RHEL >= 11
 
 
 class EndPass(Exception):
@@ -88,6 +95,7 @@ class Requirements:
         self.get_installed_version = get_installed_version
         self.output_lines = []
         self.extras = set()
+        self.extras_ok_nonexisting = set()
 
         if extras:
             for extra in extras:
@@ -100,11 +108,18 @@ class Requirements:
         self.python3_pkgversion = python3_pkgversion
         self.config_settings = config_settings
         self.dependency_overrides = self._parse_dependency_overrides(dependency_overrides or [])
+        self.metadata_extras = []
 
         self.package_name = None
 
-    def add_extras(self, *extras):
-        self.extras |= set(e.strip() for e in extras)
+    def add_extras(self, *extras, error_nonexisting=None):
+        if error_nonexisting is None:
+            error_nonexisting = REJECT_INVALID_EXTRAS
+        new_extras = set(canonicalize_name(e.strip()) for e in extras if e.strip())
+        self.extras |= new_extras
+        if not error_nonexisting:
+            self.extras_ok_nonexisting |= new_extras
+        return new_extras
 
     def _parse_dependency_overrides(self, overrides):
         """Parse dependency override specifications into a structured format.
@@ -388,11 +403,17 @@ def package_name_from_parsed_metadata_file(message):
     return message.get('name')
 
 
-def package_name_and_requires_from_metadata_file(metadata_file):
+def extras_from_parsed_metadata_file(message):
+    raw_extras = message.get_all('provides-extra') or []
+    return [canonicalize_name(extra) for extra in raw_extras if extra]
+
+
+def extract_data_from_metadata_file(metadata_file):
     message = parse_metadata_file(metadata_file)
     package_name = package_name_from_parsed_metadata_file(message)
+    extras_names = extras_from_parsed_metadata_file(message)
     requires = requires_from_parsed_metadata_file(message)
-    return package_name, requires
+    return package_name, requires, extras_names
 
 
 def generate_run_requirements_hook(backend, requirements):
@@ -408,8 +429,9 @@ def generate_run_requirements_hook(backend, requirements):
         )
     dir_basename = prepare_metadata('.', requirements.config_settings)
     with open(dir_basename + '/METADATA') as metadata_file:
-        name, requires = package_name_and_requires_from_metadata_file(metadata_file)
+        name, requires, metadata_extras = extract_data_from_metadata_file(metadata_file)
         requirements.set_package_name(name)
+        requirements.metadata_extras.extend(metadata_extras)
         for key, req in requires.items():
             requirements.extend(req,
                                 source=f'hook generated metadata: {key} ({requirements.package_name})')
@@ -451,8 +473,9 @@ def generate_run_requirements_wheel(backend, requirements, wheeldir):
         for name in wheelfile.namelist():
             if name.count('/') == 1 and name.endswith('.dist-info/METADATA'):
                 with io.TextIOWrapper(wheelfile.open(name), encoding='utf-8') as metadata_file:
-                    name, requires = package_name_and_requires_from_metadata_file(metadata_file)
+                    name, requires, metadata_extras = extract_data_from_metadata_file(metadata_file)
                     requirements.set_package_name(name)
+                    requirements.metadata_extras.extend(metadata_extras)
                     for key, req in requires.items():
                         requirements.extend(req,
                                             source=f'built wheel metadata: {key} ({name})')
@@ -483,6 +506,7 @@ def generate_run_requirements_pyproject(requirements):
         requirements.extend(dependencies,
                             source=f'pyproject.toml generated metadata: [optional-dependencies] {extra} ({name})',
                             extra=extra)
+        requirements.metadata_extras.append(canonicalize_name(extra))
 
 
 def generate_run_requirements(backend, requirements, *, build_wheel, read_pyproject_dependencies, wheeldir):
@@ -534,7 +558,7 @@ def generate_tox_requirements(toxenv, requirements):
 
         tox_extras = {e for e in extras.read().splitlines() if e}
         if not (tox_extras <= requirements.extras):
-            requirements.add_extras(*tox_extras)
+            requirements.add_extras(*tox_extras, error_nonexisting=False)
             requirements.readd_ignored_alien_requirements(source=f'tox added extras: {toxenv}')
 
         deplines = deps.read().splitlines()
@@ -694,6 +718,19 @@ def generate_requires(
             dependency_groups.extend(tox_dependency_groups(toxenv))
         if dependency_groups:
             generate_dependency_groups(dependency_groups, requirements)
+        if include_runtime:
+            for extra in requirements.extras:
+                if extra not in requirements.metadata_extras:
+                    if extra in requirements.extras_ok_nonexisting:
+                        print_err(
+                            f'WARNING: Extra {extra!r} not found in project metadata. '
+                            f'Available extras: {requirements.metadata_extras}. '
+                        )
+                    else:
+                        raise ValueError(
+                            f'Extra {extra} does not exist in upstream metadata. '
+                            f'Available extras: {requirements.metadata_extras}.'
+                        )
     except EndPass:
         return
     finally:

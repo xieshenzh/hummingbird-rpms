@@ -102,6 +102,10 @@ For example, if upstream suggests installing test dependencies with
     %generate_buildrequires
     %pyproject_buildrequires -x testing
 
+The macros verify that requested extras exist in the project's metadata.
+If a requested extra is not found after PEP 685 validation, the build fails with a `ValueError`
+on Fedora >=45 and RHEL >=11. It will emit a warning instead on older releases.
+
 For projects that specify test requirements using [PEP 735] dependency groups,
 these can be added using the `-g` flag.
 Multiple groups can be supplied by repeating the flag or as a comma separated list.

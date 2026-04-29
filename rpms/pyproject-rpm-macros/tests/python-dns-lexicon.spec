@@ -45,8 +45,8 @@ sed -i \
 
 %generate_buildrequires
 # We use the "light" toxenv because the default one installs the [full] extra and we don't have all the deps.
-# Note that [full] contains [plesk] and [route53] but we specify them manually instead:
-%pyproject_buildrequires -e light -x plesk -x route53
+# Note that [full] contains [route53] but we specify them manually instead:
+%pyproject_buildrequires -e light -x route53
 
 
 %build
