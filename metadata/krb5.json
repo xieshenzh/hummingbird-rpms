@@ -1,5 +1,6 @@
 {
   "branch": "rawhide",
+  "cve_product": "MIT / Kerberos 5",
   "modification_status": "clean",
   "release": "6",
   "sha": "d3aa2b06ebfa960ba4e53b016833d11cab80a999",
