@@ -1,7 +1,7 @@
-From 2b8be958db6fab9af8be80c9d5315e1b94a463b2 Mon Sep 17 00:00:00 2001
+From d7d716f3270235529995e0d28b8d6c89f4171045 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Fri, 9 Nov 2018 15:12:21 -0500
-Subject: [PATCH 01/24] FIPS: Add support for PRNG, RADIUS (krad), and crypto
+Subject: [PATCH 01/25] FIPS: Add support for PRNG, RADIUS (krad), and crypto
  providers
 
 In FIPS mode:
@@ -45,7 +45,7 @@ Forward-ported-by: Andreas Schneider <asn@redhat.com>
  15 files changed, 164 insertions(+), 39 deletions(-)
 
 diff --git a/doc/admin/conf_files/krb5_conf.rst b/doc/admin/conf_files/krb5_conf.rst
-index e0c7a63..603b902 100644
+index e0c7a63309..603b902def 100644
 --- a/doc/admin/conf_files/krb5_conf.rst
 +++ b/doc/admin/conf_files/krb5_conf.rst
 @@ -352,6 +352,12 @@ The libdefaults section may contain any of the following relations:
@@ -62,7 +62,7 @@ index e0c7a63..603b902 100644
      If this flag is true, reverse name lookup will be used in addition
      to forward name lookup to canonicalizing hostnames for use in
 diff --git a/src/lib/crypto/krb/prng.c b/src/lib/crypto/krb/prng.c
-index 4a64645..b058b75 100644
+index 4a6464558c..b058b75132 100644
 --- a/src/lib/crypto/krb/prng.c
 +++ b/src/lib/crypto/krb/prng.c
 @@ -26,6 +26,9 @@
@@ -109,7 +109,7 @@ index 4a64645..b058b75 100644
          /*
           * Pull from the /dev/urandom pool, but require it to have been seeded.
 diff --git a/src/lib/crypto/openssl/enc_provider/camellia.c b/src/lib/crypto/openssl/enc_provider/camellia.c
-index 01920e6..20e45de 100644
+index 01920e6ce1..20e45def61 100644
 --- a/src/lib/crypto/openssl/enc_provider/camellia.c
 +++ b/src/lib/crypto/openssl/enc_provider/camellia.c
 @@ -387,6 +387,9 @@ krb5int_camellia_cbc_mac(krb5_key key, const krb5_crypto_iov *data,
@@ -133,7 +133,7 @@ index 01920e6..20e45de 100644
      state->data = (void *) malloc(16);
      if (state->data == NULL)
 diff --git a/src/lib/crypto/openssl/enc_provider/rc4.c b/src/lib/crypto/openssl/enc_provider/rc4.c
-index 448d563..028cd09 100644
+index 448d563348..028cd09ff0 100644
 --- a/src/lib/crypto/openssl/enc_provider/rc4.c
 +++ b/src/lib/crypto/openssl/enc_provider/rc4.c
 @@ -69,6 +69,9 @@ k5_arcfour_docrypt(krb5_key key, const krb5_data *state, krb5_crypto_iov *data,
@@ -171,7 +171,7 @@ index 448d563..028cd09 100644
       * The cipher state here is a saved pointer to a struct arcfour_state
       * object, rather than a flat byte array as in most enc providers.  The
 diff --git a/src/lib/crypto/openssl/hash_provider/hash_evp.c b/src/lib/crypto/openssl/hash_provider/hash_evp.c
-index f2fbffd..1165990 100644
+index f2fbffdb29..11659908bb 100644
 --- a/src/lib/crypto/openssl/hash_provider/hash_evp.c
 +++ b/src/lib/crypto/openssl/hash_provider/hash_evp.c
 @@ -60,6 +60,11 @@ hash_evp(const EVP_MD *type, const krb5_crypto_iov *data, size_t num_data,
@@ -208,7 +208,7 @@ index f2fbffd..1165990 100644
  }
  
 diff --git a/src/lib/crypto/openssl/hmac.c b/src/lib/crypto/openssl/hmac.c
-index 799d700..bfbbc53 100644
+index 799d7005ba..bfbbc53fd2 100644
 --- a/src/lib/crypto/openssl/hmac.c
 +++ b/src/lib/crypto/openssl/hmac.c
 @@ -111,7 +111,11 @@ map_digest(const struct krb5_hash_provider *hash)
@@ -225,7 +225,7 @@ index 799d700..bfbbc53 100644
      else if (hash == &krb5int_hash_md4)
          return EVP_md4();
 diff --git a/src/lib/krad/attr.c b/src/lib/krad/attr.c
-index 4ad3212..65ed1d3 100644
+index 4ad32122a8..65ed1d35e7 100644
 --- a/src/lib/krad/attr.c
 +++ b/src/lib/krad/attr.c
 @@ -38,7 +38,8 @@
@@ -349,7 +349,7 @@ index 4ad3212..65ed1d3 100644
  
  krad_attr
 diff --git a/src/lib/krad/attrset.c b/src/lib/krad/attrset.c
-index d52622f..6bccd52 100644
+index d52622ff94..6bccd52ac7 100644
 --- a/src/lib/krad/attrset.c
 +++ b/src/lib/krad/attrset.c
 @@ -169,13 +169,14 @@ krad_attrset_copy(const krad_attrset *set, krad_attrset **copy)
@@ -397,7 +397,7 @@ index d52622f..6bccd52 100644
              return retval;
      }
 diff --git a/src/lib/krad/internal.h b/src/lib/krad/internal.h
-index e2a16c7..5c5418b 100644
+index e2a16c77a6..5c5418b209 100644
 --- a/src/lib/krad/internal.h
 +++ b/src/lib/krad/internal.h
 @@ -39,6 +39,8 @@
@@ -468,7 +468,7 @@ index e2a16c7..5c5418b 100644
 +
  #endif /* INTERNAL_H_ */
 diff --git a/src/lib/krad/packet.c b/src/lib/krad/packet.c
-index ae1f6df..7e4fd72 100644
+index ae1f6df7df..7e4fd72203 100644
 --- a/src/lib/krad/packet.c
 +++ b/src/lib/krad/packet.c
 @@ -54,12 +54,6 @@ typedef unsigned char uchar;
@@ -530,7 +530,7 @@ index ae1f6df..7e4fd72 100644
  }
  
 diff --git a/src/lib/krad/remote.c b/src/lib/krad/remote.c
-index 28f2e83..891404d 100644
+index 28f2e83d0d..891404d5b7 100644
 --- a/src/lib/krad/remote.c
 +++ b/src/lib/krad/remote.c
 @@ -263,7 +263,7 @@ on_io_write(krad_remote *rr)
@@ -565,7 +565,7 @@ index 28f2e83..891404d 100644
      K5_TAILQ_FOREACH(r, &rr->list, list) {
          if (r->request == tmp) {
 diff --git a/src/lib/krad/t_attr.c b/src/lib/krad/t_attr.c
-index f894086..a302f2a 100644
+index f8940862d6..a302f2a208 100644
 --- a/src/lib/krad/t_attr.c
 +++ b/src/lib/krad/t_attr.c
 @@ -50,6 +50,7 @@ main(void)
@@ -586,7 +586,7 @@ index f894086..a302f2a 100644
      insist(len == sizeof(encoded));
      insist(memcmp(outbuf, encoded, len) == 0);
 diff --git a/src/lib/krad/t_attrset.c b/src/lib/krad/t_attrset.c
-index 17a281f..7e43078 100644
+index 17a281f15f..7e43078660 100644
 --- a/src/lib/krad/t_attrset.c
 +++ b/src/lib/krad/t_attrset.c
 @@ -49,6 +49,7 @@ main(void)
@@ -608,7 +608,7 @@ index 17a281f..7e43078 100644
  
      /* Manually encode User-Name. */
 diff --git a/src/plugins/preauth/spake/spake_client.c b/src/plugins/preauth/spake/spake_client.c
-index 00734a1..196e711 100644
+index 00734a13b5..196e7112c9 100644
 --- a/src/plugins/preauth/spake/spake_client.c
 +++ b/src/plugins/preauth/spake/spake_client.c
 @@ -38,6 +38,8 @@
@@ -632,7 +632,7 @@ index 00734a1..196e711 100644
      vt->name = "spake";
      vt->pa_type_list = pa_types;
 diff --git a/src/plugins/preauth/spake/spake_kdc.c b/src/plugins/preauth/spake/spake_kdc.c
-index 1a772d4..32baaec 100644
+index 1a772d450f..32baaecbb8 100644
 --- a/src/plugins/preauth/spake/spake_kdc.c
 +++ b/src/plugins/preauth/spake/spake_kdc.c
 @@ -41,6 +41,8 @@
@@ -659,10 +659,10 @@ index 1a772d4..32baaec 100644
 2.53.0
 
 
-From 5990688e659135f239f6b5f9ba31d42b98aa63d4 Mon Sep 17 00:00:00 2001
+From 1a4d6a7393887bf5372674942eea53030de0fed9 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Thu, 5 May 2022 17:15:12 +0200
-Subject: [PATCH 02/24] FIPS: Allow krad UDP/TCP localhost connection
+Subject: [PATCH 02/25] FIPS: Allow krad UDP/TCP localhost connection
 
 libkrad allows to establish connections only to UNIX socket in FIPS
 mode, because MD5 digest is not considered safe enough to be used for
@@ -680,7 +680,7 @@ Forward-ported-by: Andreas Schneider <asn@redhat.com>
  1 file changed, 33 insertions(+), 2 deletions(-)
 
 diff --git a/src/lib/krad/remote.c b/src/lib/krad/remote.c
-index 891404d..7654bab 100644
+index 891404d5b7..7654bab21b 100644
 --- a/src/lib/krad/remote.c
 +++ b/src/lib/krad/remote.c
 @@ -33,6 +33,7 @@
@@ -743,10 +743,10 @@ index 891404d..7654bab 100644
 2.53.0
 
 
-From 080cbe2fc625d705886a5ec96c99a549b2b20b0d Mon Sep 17 00:00:00 2001
+From 9b5aa1ecb9b49d684534bffbad39f08358f797e3 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Tue, 23 May 2023 12:19:54 +0200
-Subject: [PATCH 03/24] FIPS: Make PKINIT CMS SHA-1 signature verification
+Subject: [PATCH 03/25] FIPS: Make PKINIT CMS SHA-1 signature verification
  available
 
 We recommend using the SHA1 crypto-module in order to allow the
@@ -765,7 +765,7 @@ curve cryptography is implemented for PKINIT in MIT krb5.
  1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c b/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
-index f222dbd..1d99559 100644
+index f222dbdf92..1d99559485 100644
 --- a/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
 +++ b/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
 @@ -1985,8 +1985,15 @@ cms_signeddata_verify(krb5_context context,
@@ -789,10 +789,10 @@ index f222dbd..1d99559 100644
 2.53.0
 
 
-From 123beda081a7fbb2ce09208e4a13a82ea195becf Mon Sep 17 00:00:00 2001
+From c082c835672d41b9a68d1d3195fe0c44cb689fd7 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Thu, 19 Jan 2023 19:22:27 +0100
-Subject: [PATCH 04/24] FIPS: Allow KRB5KDF, MD5, MD4 and HMAC-MD4/5
+Subject: [PATCH 04/25] FIPS: Allow KRB5KDF, MD5, MD4 and HMAC-MD4/5
 
 OpenSSL's restrictions to use KRB5KDF, MD5, and MD4 in FIPS mode are
 bypassed in case AES SHA-1 HMAC or RC4 encryption types are allowed by
@@ -825,7 +825,7 @@ Forward-ported-by: Andreas Schneider <asn@redhat.com>
  create mode 100644 src/lib/crypto/openssl/common.c
 
 diff --git a/src/lib/crypto/krb/crypto_int.h b/src/lib/crypto/krb/crypto_int.h
-index 3629616..0e6263b 100644
+index 3629616d96..0e6263bf15 100644
 --- a/src/lib/crypto/krb/crypto_int.h
 +++ b/src/lib/crypto/krb/crypto_int.h
 @@ -36,6 +36,9 @@
@@ -850,7 +850,7 @@ index 3629616..0e6263b 100644
 +
  #endif /* CRYPTO_INT_H */
 diff --git a/src/lib/crypto/openssl/Makefile.in b/src/lib/crypto/openssl/Makefile.in
-index cf11f68..fe9ad86 100644
+index cf11f6847b..fe9ad8619a 100644
 --- a/src/lib/crypto/openssl/Makefile.in
 +++ b/src/lib/crypto/openssl/Makefile.in
 @@ -8,21 +8,24 @@ STLIBOBJS=\
@@ -883,7 +883,7 @@ index cf11f68..fe9ad86 100644
  		md5/OBJS.ST sha1/OBJS.ST sha2/OBJS.ST 	\
 diff --git a/src/lib/crypto/openssl/common.c b/src/lib/crypto/openssl/common.c
 new file mode 100644
-index 0000000..144346c
+index 0000000000..144346c231
 --- /dev/null
 +++ b/src/lib/crypto/openssl/common.c
 @@ -0,0 +1,105 @@
@@ -993,7 +993,7 @@ index 0000000..144346c
 +    return err;
 +}
 diff --git a/src/lib/crypto/openssl/hash_provider/hash_evp.c b/src/lib/crypto/openssl/hash_provider/hash_evp.c
-index 1165990..498967d 100644
+index 11659908bb..498967d07c 100644
 --- a/src/lib/crypto/openssl/hash_provider/hash_evp.c
 +++ b/src/lib/crypto/openssl/hash_provider/hash_evp.c
 @@ -60,11 +60,6 @@ hash_evp(const EVP_MD *type, const krb5_crypto_iov *data, size_t num_data,
@@ -1070,7 +1070,7 @@ index 1165990..498967d 100644
  
  const struct krb5_hash_provider krb5int_hash_md5 = {
 diff --git a/src/lib/crypto/openssl/hmac.c b/src/lib/crypto/openssl/hmac.c
-index bfbbc53..945586a 100644
+index bfbbc53fd2..945586a525 100644
 --- a/src/lib/crypto/openssl/hmac.c
 +++ b/src/lib/crypto/openssl/hmac.c
 @@ -111,11 +111,7 @@ map_digest(const struct krb5_hash_provider *hash)
@@ -1108,7 +1108,7 @@ index bfbbc53..945586a 100644
          return KRB5_CRYPTO_INTERNAL;
  
 diff --git a/src/lib/crypto/openssl/kdf.c b/src/lib/crypto/openssl/kdf.c
-index 41e845e..2713850 100644
+index 41e845eae0..2713850997 100644
 --- a/src/lib/crypto/openssl/kdf.c
 +++ b/src/lib/crypto/openssl/kdf.c
 @@ -200,7 +200,7 @@ k5_derive_random_rfc3961(const struct krb5_enc_provider *enc, krb5_key key,
@@ -1121,7 +1121,7 @@ index 41e845e..2713850 100644
          ret = KRB5_CRYPTO_INTERNAL;
          goto done;
 diff --git a/src/lib/krad/packet.c b/src/lib/krad/packet.c
-index 7e4fd72..a04b6b5 100644
+index 7e4fd72203..a04b6b57f9 100644
 --- a/src/lib/krad/packet.c
 +++ b/src/lib/krad/packet.c
 @@ -275,7 +275,7 @@ lookup_msgauth_addr(const krad_packet *pkt)
@@ -1200,7 +1200,7 @@ index 7e4fd72..a04b6b5 100644
              }
  
 diff --git a/src/lib/krad/remote.c b/src/lib/krad/remote.c
-index 7654bab..96da3c4 100644
+index 7654bab21b..96da3c451d 100644
 --- a/src/lib/krad/remote.c
 +++ b/src/lib/krad/remote.c
 @@ -76,10 +76,10 @@ static void
@@ -1221,10 +1221,10 @@ index 7654bab..96da3c4 100644
 2.53.0
 
 
-From c05330817b1e550bc7fe301d55ef93f2e2c699db Mon Sep 17 00:00:00 2001
+From c64ff3431496d96f30ac1303be3a5aedf518cab1 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 26 Mar 2019 18:51:10 -0400
-Subject: [PATCH 05/24] 3DES: Remove support
+Subject: [PATCH 05/25] 3DES: Remove support
 
 Completely remove support for all DES3 enctypes (des3-cbc-raw,
 des3-hmac-sha1, des3-cbc-sha1-kd).  Update all tests and documentation
@@ -1367,7 +1367,7 @@ Forward-ported-by: Andreas Schneider <asn@redhat.com>
  delete mode 100644 src/lib/crypto/openssl/enc_provider/des3.c
 
 diff --git a/README b/README
-index 73eafa5..6dc3769 100644
+index 73eafa585d..6dc3769373 100644
 --- a/README
 +++ b/README
 @@ -81,11 +81,11 @@ Triple-DES and RC4 transitions
@@ -1398,7 +1398,7 @@ index 73eafa5..6dc3769 100644
    recent draft standard and to support realm discovery.
  
 diff --git a/doc/admin/advanced/retiring-des.rst b/doc/admin/advanced/retiring-des.rst
-index 38f76d3..d5e3c30 100644
+index 38f76d3f45..d5e3c30c04 100644
 --- a/doc/admin/advanced/retiring-des.rst
 +++ b/doc/admin/advanced/retiring-des.rst
 @@ -10,6 +10,13 @@ ability have rendered DES vulnerable to brute force attacks on its 56-bit
@@ -1427,7 +1427,7 @@ index 38f76d3..d5e3c30 100644
  -------------
  
 diff --git a/doc/admin/conf_files/kdc_conf.rst b/doc/admin/conf_files/kdc_conf.rst
-index 63bdb8d..2e62e2a 100644
+index 63bdb8d48c..2e62e2acdd 100644
 --- a/doc/admin/conf_files/kdc_conf.rst
 +++ b/doc/admin/conf_files/kdc_conf.rst
 @@ -859,8 +859,6 @@ Encryption types marked as "weak" and "deprecated" are available for
@@ -1459,7 +1459,7 @@ index 63bdb8d..2e62e2a 100644
  
  While **aes128-cts** and **aes256-cts** are supported for all Kerberos
 diff --git a/doc/admin/conf_files/krb5_conf.rst b/doc/admin/conf_files/krb5_conf.rst
-index 603b902..160a8f1 100644
+index 603b902def..160a8f1fd4 100644
 --- a/doc/admin/conf_files/krb5_conf.rst
 +++ b/doc/admin/conf_files/krb5_conf.rst
 @@ -99,12 +99,6 @@ Additionally, krb5.conf may include any of the relations described in
@@ -1476,7 +1476,7 @@ index 603b902..160a8f1 100644
      Permit the KDC to issue tickets with arcfour-hmac session keys.
      In future releases, this flag will allow arcfour-hmac to be used
 diff --git a/doc/admin/enctypes.rst b/doc/admin/enctypes.rst
-index dce19ad..6ce4638 100644
+index dce19ad43e..6ce4638d5e 100644
 --- a/doc/admin/enctypes.rst
 +++ b/doc/admin/enctypes.rst
 @@ -49,8 +49,8 @@ The KDC chooses the session key enctype by taking the intersection of
@@ -1529,7 +1529,7 @@ index dce19ad..6ce4638 100644
  
  Migrating away from older encryption types
 diff --git a/doc/admin/troubleshoot.rst b/doc/admin/troubleshoot.rst
-index ade5e1f..e4dc54f 100644
+index ade5e1f87a..e4dc54f7e5 100644
 --- a/doc/admin/troubleshoot.rst
 +++ b/doc/admin/troubleshoot.rst
 @@ -73,11 +73,10 @@ credential verification failed: KDC has no support for encryption type
@@ -1549,7 +1549,7 @@ index ade5e1f..e4dc54f 100644
  
  .. _err_cert_chain_cert_expired:
 diff --git a/doc/appdev/refs/macros/index.rst b/doc/appdev/refs/macros/index.rst
-index c1bda5c..9f9b7e5 100644
+index c1bda5c6c4..9f9b7e5233 100644
 --- a/doc/appdev/refs/macros/index.rst
 +++ b/doc/appdev/refs/macros/index.rst
 @@ -39,7 +39,6 @@ Public
@@ -1568,7 +1568,7 @@ index c1bda5c..9f9b7e5 100644
     krb524_convert_creds_kdc.rst
     krb524_init_ets.rst
 diff --git a/doc/conf.py b/doc/conf.py
-index 2fa3d8b..16e0adb 100644
+index 2fa3d8b358..16e0adb5e3 100644
 --- a/doc/conf.py
 +++ b/doc/conf.py
 @@ -281,7 +281,7 @@ else:
@@ -1581,7 +1581,7 @@ index 2fa3d8b..16e0adb 100644
  .. |copy| unicode:: U+000A9
  '''
 diff --git a/doc/mitK5features.rst b/doc/mitK5features.rst
-index e260e8e..6f7ded7 100644
+index e260e8e083..6f7ded76ff 100644
 --- a/doc/mitK5features.rst
 +++ b/doc/mitK5features.rst
 @@ -37,7 +37,7 @@ Database backends: LDAP, DB2, LMDB
@@ -1606,7 +1606,7 @@ index e260e8e..6f7ded7 100644
    - The KDC will assume that all services can handle aes256-sha1
      session keys unless the service principal has a session_enctypes
 diff --git a/src/Makefile.in b/src/Makefile.in
-index 01fb060..f1ebde3 100644
+index 01fb060f73..f1ebde39b1 100644
 --- a/src/Makefile.in
 +++ b/src/Makefile.in
 @@ -142,7 +142,7 @@ WINMAKEFILES=Makefile \
@@ -1628,7 +1628,7 @@ index 01fb060..f1ebde3 100644
  ##DOS##	$(WCONFIG) config < $@.in > $@
  ##DOS##lib\crypto\builtin\camellia\Makefile: lib\crypto\builtin\camellia\Makefile.in $(MKFDEP)
 diff --git a/src/configure.ac b/src/configure.ac
-index 4325fae..9fc569f 100644
+index 4325fae992..9fc569f195 100644
 --- a/src/configure.ac
 +++ b/src/configure.ac
 @@ -1517,12 +1517,12 @@ V5_AC_OUTPUT_MAKEFILE(.
@@ -1647,7 +1647,7 @@ index 4325fae..9fc569f 100644
  
  	lib/krb5 lib/krb5/error_tables lib/krb5/asn.1 lib/krb5/ccache
 diff --git a/src/include/k5-int.h b/src/include/k5-int.h
-index cfd2cc9..a430e4e 100644
+index cfd2cc9393..a430e4eec9 100644
 --- a/src/include/k5-int.h
 +++ b/src/include/k5-int.h
 @@ -180,7 +180,6 @@ typedef unsigned char   u_char;
@@ -1667,7 +1667,7 @@ index cfd2cc9..a430e4e 100644
      krb5_boolean ignore_acceptor_hostname;
      krb5_boolean enforce_ok_as_delegate;
 diff --git a/src/include/krb5/krb5.hin b/src/include/krb5/krb5.hin
-index b5d295f..81c3844 100644
+index b5d295f331..81c3844605 100644
 --- a/src/include/krb5/krb5.hin
 +++ b/src/include/krb5/krb5.hin
 @@ -425,8 +425,8 @@ typedef struct _krb5_crypto_iov {
@@ -1703,7 +1703,7 @@ index b5d295f..81c3844 100644
  #define CKSUMTYPE_HMAC_SHA1_96_AES128 0x000f /**< RFC 3962. Used with
                                                  ENCTYPE_AES128_CTS_HMAC_SHA1_96 */
 diff --git a/src/kdc/kdc_util.c b/src/kdc/kdc_util.c
-index 6f88afa..89f34ca 100644
+index 6f88afa2d7..89f34ca06e 100644
 --- a/src/kdc/kdc_util.c
 +++ b/src/kdc/kdc_util.c
 @@ -1099,8 +1099,6 @@ select_session_keytype(krb5_context context, krb5_db_entry *server,
@@ -1734,7 +1734,7 @@ index 6f88afa..89f34ca 100644
      case ENCTYPE_ARCFOUR_HMAC_EXP :
          return 0;
 diff --git a/src/lib/crypto/Makefile.in b/src/lib/crypto/Makefile.in
-index 10e8c74..25c4f40 100644
+index 10e8c74cf8..25c4f40cc3 100644
 --- a/src/lib/crypto/Makefile.in
 +++ b/src/lib/crypto/Makefile.in
 @@ -10,12 +10,12 @@ LIBMINOR=1
@@ -1764,7 +1764,7 @@ index 10e8c74..25c4f40 100644
  all-unix: all-liblinks
  install-unix: install-libs
 diff --git a/src/lib/crypto/builtin/Makefile.in b/src/lib/crypto/builtin/Makefile.in
-index 243bb17..30bfcd3 100644
+index 243bb17ba3..30bfcd30c0 100644
 --- a/src/lib/crypto/builtin/Makefile.in
 +++ b/src/lib/crypto/builtin/Makefile.in
 @@ -1,6 +1,6 @@
@@ -1786,7 +1786,7 @@ index 243bb17..30bfcd3 100644
  		hash_provider/OBJS.ST 		\
 diff --git a/src/lib/crypto/builtin/des/Makefile.in b/src/lib/crypto/builtin/des/Makefile.in
 deleted file mode 100644
-index 397ac87..0000000
+index 397ac87ed4..0000000000
 --- a/src/lib/crypto/builtin/des/Makefile.in
 +++ /dev/null
 @@ -1,82 +0,0 @@
@@ -1874,7 +1874,7 @@ index 397ac87..0000000
 -
 diff --git a/src/lib/crypto/builtin/des/d3_aead.c b/src/lib/crypto/builtin/des/d3_aead.c
 deleted file mode 100644
-index fb83f73..0000000
+index fb83f73b43..0000000000
 --- a/src/lib/crypto/builtin/des/d3_aead.c
 +++ /dev/null
 @@ -1,137 +0,0 @@
@@ -2017,7 +2017,7 @@ index fb83f73..0000000
 -#endif /* K5_BUILTIN_DES */
 diff --git a/src/lib/crypto/builtin/des/d3_kysched.c b/src/lib/crypto/builtin/des/d3_kysched.c
 deleted file mode 100644
-index 55fb944..0000000
+index 55fb9449b5..0000000000
 --- a/src/lib/crypto/builtin/des/d3_kysched.c
 +++ /dev/null
 @@ -1,55 +0,0 @@
@@ -2078,7 +2078,7 @@ index 55fb944..0000000
 -#endif /* K5_BUILTIN_DES */
 diff --git a/src/lib/crypto/builtin/des/deps b/src/lib/crypto/builtin/des/deps
 deleted file mode 100644
-index 1c1239d..0000000
+index 1c1239d696..0000000000
 --- a/src/lib/crypto/builtin/des/deps
 +++ /dev/null
 @@ -1,146 +0,0 @@
@@ -2230,7 +2230,7 @@ index 1c1239d..0000000
 -  des_int.h t_verify.c
 diff --git a/src/lib/crypto/builtin/des/des_int.h b/src/lib/crypto/builtin/des/des_int.h
 deleted file mode 100644
-index 46fed7d..0000000
+index 46fed7dbd6..0000000000
 --- a/src/lib/crypto/builtin/des/des_int.h
 +++ /dev/null
 @@ -1,282 +0,0 @@
@@ -2518,7 +2518,7 @@ index 46fed7d..0000000
 -#endif  /*DES_INTERNAL_DEFS*/
 diff --git a/src/lib/crypto/builtin/des/des_keys.c b/src/lib/crypto/builtin/des/des_keys.c
 deleted file mode 100644
-index 027b09d..0000000
+index 027b09d728..0000000000
 --- a/src/lib/crypto/builtin/des/des_keys.c
 +++ /dev/null
 @@ -1,38 +0,0 @@
@@ -2562,7 +2562,7 @@ index 027b09d..0000000
 -#endif /* K5_BUILTIN_DES_KEY_PARITY */
 diff --git a/src/lib/crypto/builtin/des/destest.c b/src/lib/crypto/builtin/des/destest.c
 deleted file mode 100644
-index 0a1a5be..0000000
+index 0a1a5be81b..0000000000
 --- a/src/lib/crypto/builtin/des/destest.c
 +++ /dev/null
 @@ -1,231 +0,0 @@
@@ -2799,7 +2799,7 @@ index 0a1a5be..0000000
 -}
 diff --git a/src/lib/crypto/builtin/des/doc/libdes.doc b/src/lib/crypto/builtin/des/doc/libdes.doc
 deleted file mode 100644
-index 6e9431e..0000000
+index 6e9431ed2e..0000000000
 --- a/src/lib/crypto/builtin/des/doc/libdes.doc
 +++ /dev/null
 @@ -1,208 +0,0 @@
@@ -3013,7 +3013,7 @@ index 6e9431e..0000000
 -string length desired.
 diff --git a/src/lib/crypto/builtin/des/f_aead.c b/src/lib/crypto/builtin/des/f_aead.c
 deleted file mode 100644
-index f887735..0000000
+index f887735820..0000000000
 --- a/src/lib/crypto/builtin/des/f_aead.c
 +++ /dev/null
 @@ -1,177 +0,0 @@
@@ -3196,7 +3196,7 @@ index f887735..0000000
 -#endif /* K5_BUILTIN_DES */
 diff --git a/src/lib/crypto/builtin/des/f_cbc.c b/src/lib/crypto/builtin/des/f_cbc.c
 deleted file mode 100644
-index 84d5382..0000000
+index 84d5382f22..0000000000
 --- a/src/lib/crypto/builtin/des/f_cbc.c
 +++ /dev/null
 @@ -1,256 +0,0 @@
@@ -3458,7 +3458,7 @@ index 84d5382..0000000
 -}
 diff --git a/src/lib/crypto/builtin/des/f_cksum.c b/src/lib/crypto/builtin/des/f_cksum.c
 deleted file mode 100644
-index 615a947..0000000
+index 615a947f4a..0000000000
 --- a/src/lib/crypto/builtin/des/f_cksum.c
 +++ /dev/null
 @@ -1,141 +0,0 @@
@@ -3605,7 +3605,7 @@ index 615a947..0000000
 -#endif /* K5_BUILTIN_DES */
 diff --git a/src/lib/crypto/builtin/des/f_parity.c b/src/lib/crypto/builtin/des/f_parity.c
 deleted file mode 100644
-index a658878..0000000
+index a658878f6f..0000000000
 --- a/src/lib/crypto/builtin/des/f_parity.c
 +++ /dev/null
 @@ -1,64 +0,0 @@
@@ -3675,7 +3675,7 @@ index a658878..0000000
 -#endif /* K5_BUILTIN_DES */
 diff --git a/src/lib/crypto/builtin/des/f_sched.c b/src/lib/crypto/builtin/des/f_sched.c
 deleted file mode 100644
-index bbc88a1..0000000
+index bbc88a1c8d..0000000000
 --- a/src/lib/crypto/builtin/des/f_sched.c
 +++ /dev/null
 @@ -1,363 +0,0 @@
@@ -4044,7 +4044,7 @@ index bbc88a1..0000000
 -#endif /* K5_BUILTIN_DES */
 diff --git a/src/lib/crypto/builtin/des/f_tables.c b/src/lib/crypto/builtin/des/f_tables.c
 deleted file mode 100644
-index e50ab1f..0000000
+index e50ab1fc60..0000000000
 --- a/src/lib/crypto/builtin/des/f_tables.c
 +++ /dev/null
 @@ -1,375 +0,0 @@
@@ -4425,7 +4425,7 @@ index e50ab1f..0000000
 -#endif /* K5_BUILTIN_DES */
 diff --git a/src/lib/crypto/builtin/des/f_tables.h b/src/lib/crypto/builtin/des/f_tables.h
 deleted file mode 100644
-index fc91b56..0000000
+index fc91b566cf..0000000000
 --- a/src/lib/crypto/builtin/des/f_tables.h
 +++ /dev/null
 @@ -1,285 +0,0 @@
@@ -4716,7 +4716,7 @@ index fc91b56..0000000
 -#endif  /* __DES_TABLES_H__ */
 diff --git a/src/lib/crypto/builtin/des/key_sched.c b/src/lib/crypto/builtin/des/key_sched.c
 deleted file mode 100644
-index d6dedd9..0000000
+index d6dedd93c6..0000000000
 --- a/src/lib/crypto/builtin/des/key_sched.c
 +++ /dev/null
 @@ -1,66 +0,0 @@
@@ -4788,7 +4788,7 @@ index d6dedd9..0000000
 -#endif /* K5_BUILTIN_DES */
 diff --git a/src/lib/crypto/builtin/des/keytest.data b/src/lib/crypto/builtin/des/keytest.data
 deleted file mode 100644
-index 7ff34ee..0000000
+index 7ff34eedcf..0000000000
 --- a/src/lib/crypto/builtin/des/keytest.data
 +++ /dev/null
 @@ -1,171 +0,0 @@
@@ -4965,7 +4965,7 @@ index 7ff34ee..0000000
 -1C587F1C13924FEF 305532286D6F295A 63FAC0D034D9F793
 diff --git a/src/lib/crypto/builtin/des/t_verify.c b/src/lib/crypto/builtin/des/t_verify.c
 deleted file mode 100644
-index 11f1a40..0000000
+index 11f1a404dd..0000000000
 --- a/src/lib/crypto/builtin/des/t_verify.c
 +++ /dev/null
 @@ -1,388 +0,0 @@
@@ -5359,7 +5359,7 @@ index 11f1a40..0000000
 -}
 diff --git a/src/lib/crypto/builtin/des/weak_key.c b/src/lib/crypto/builtin/des/weak_key.c
 deleted file mode 100644
-index f8304a3..0000000
+index f8304a3638..0000000000
 --- a/src/lib/crypto/builtin/des/weak_key.c
 +++ /dev/null
 @@ -1,90 +0,0 @@
@@ -5454,7 +5454,7 @@ index f8304a3..0000000
 -
 -#endif /* K5_BUILTIN_DES */
 diff --git a/src/lib/crypto/builtin/enc_provider/Makefile.in b/src/lib/crypto/builtin/enc_provider/Makefile.in
-index 6ad7cbd..655966b 100644
+index 6ad7cbd4e0..655966b255 100644
 --- a/src/lib/crypto/builtin/enc_provider/Makefile.in
 +++ b/src/lib/crypto/builtin/enc_provider/Makefile.in
 @@ -1,6 +1,6 @@
@@ -5486,7 +5486,7 @@ index 6ad7cbd..655966b 100644
  	$(srcdir)/camellia.c	\
  	$(srcdir)/rc4.c
 diff --git a/src/lib/crypto/builtin/enc_provider/deps b/src/lib/crypto/builtin/enc_provider/deps
-index a3414a3..dc29d9f 100644
+index a3414a38ec..dc29d9fce8 100644
 --- a/src/lib/crypto/builtin/enc_provider/deps
 +++ b/src/lib/crypto/builtin/enc_provider/deps
 @@ -1,17 +1,6 @@
@@ -5509,7 +5509,7 @@ index a3414a3..dc29d9f 100644
    $(BUILDTOP)/include/profile.h $(COM_ERR_DEPS) $(srcdir)/../../krb/crypto_int.h \
 diff --git a/src/lib/crypto/builtin/enc_provider/des3.c b/src/lib/crypto/builtin/enc_provider/des3.c
 deleted file mode 100644
-index c2634d5..0000000
+index c2634d5e10..0000000000
 --- a/src/lib/crypto/builtin/enc_provider/des3.c
 +++ /dev/null
 @@ -1,109 +0,0 @@
@@ -5623,7 +5623,7 @@ index c2634d5..0000000
 -
 -#endif /* K5_BUILTIN_DES */
 diff --git a/src/lib/crypto/crypto_tests/t_cf2.expected b/src/lib/crypto/crypto_tests/t_cf2.expected
-index f8251a1..bc6aa50 100644
+index f8251a16cb..bc6aa50c84 100644
 --- a/src/lib/crypto/crypto_tests/t_cf2.expected
 +++ b/src/lib/crypto/crypto_tests/t_cf2.expected
 @@ -1,6 +1,5 @@
@@ -5634,7 +5634,7 @@ index f8251a1..bc6aa50 100644
  edd02a39d2dbde31611c16e610be062c
  67f6ea530aea85a37dcbb23349ea52dcc61ca8493ff557252327fd8304341584
 diff --git a/src/lib/crypto/crypto_tests/t_cf2.in b/src/lib/crypto/crypto_tests/t_cf2.in
-index 73e2f8f..c4d23b5 100644
+index 73e2f8fbc9..c4d23b506b 100644
 --- a/src/lib/crypto/crypto_tests/t_cf2.in
 +++ b/src/lib/crypto/crypto_tests/t_cf2.in
 @@ -8,11 +8,6 @@ key1
@@ -5650,7 +5650,7 @@ index 73e2f8f..c4d23b5 100644
  key1
  key2
 diff --git a/src/lib/crypto/crypto_tests/t_cksums.c b/src/lib/crypto/crypto_tests/t_cksums.c
-index 557340e..9f9a177 100644
+index 557340ec5e..9f9a177ef0 100644
 --- a/src/lib/crypto/crypto_tests/t_cksums.c
 +++ b/src/lib/crypto/crypto_tests/t_cksums.c
 @@ -59,16 +59,6 @@ struct test {
@@ -5671,7 +5671,7 @@ index 557340e..9f9a177 100644
          { KV5M_DATA, 37, "eight nine ten eleven twelve thirteen" },
          CKSUMTYPE_HMAC_SHA1_96_AES128, ENCTYPE_AES128_CTS_HMAC_SHA1_96, 3,
 diff --git a/src/lib/crypto/crypto_tests/t_decrypt.c b/src/lib/crypto/crypto_tests/t_decrypt.c
-index a40a855..716f2c3 100644
+index a40a855007..716f2c337a 100644
 --- a/src/lib/crypto/crypto_tests/t_decrypt.c
 +++ b/src/lib/crypto/crypto_tests/t_decrypt.c
 @@ -39,62 +39,6 @@ struct test {
@@ -5746,7 +5746,7 @@ index a40a855..716f2c3 100644
      ENCTYPE_ARCFOUR_HMAC_EXP,
      ENCTYPE_AES128_CTS_HMAC_SHA1_96,
 diff --git a/src/lib/crypto/crypto_tests/t_derive.c b/src/lib/crypto/crypto_tests/t_derive.c
-index afbf747..93ce30d 100644
+index afbf7477f6..93ce30da20 100644
 --- a/src/lib/crypto/crypto_tests/t_derive.c
 +++ b/src/lib/crypto/crypto_tests/t_derive.c
 @@ -38,41 +38,6 @@ struct test {
@@ -5800,7 +5800,7 @@ index afbf747..93ce30d 100644
      case ENCTYPE_AES256_CTS_HMAC_SHA1_96:    return &krb5int_enc_aes256;
      case ENCTYPE_CAMELLIA128_CTS_CMAC:       return &krb5int_enc_camellia128;
 diff --git a/src/lib/crypto/crypto_tests/t_encrypt.c b/src/lib/crypto/crypto_tests/t_encrypt.c
-index 64092ef..83bc98a 100644
+index 64092ef5c2..83bc98a2f1 100644
 --- a/src/lib/crypto/crypto_tests/t_encrypt.c
 +++ b/src/lib/crypto/crypto_tests/t_encrypt.c
 @@ -37,7 +37,6 @@
@@ -5812,7 +5812,7 @@ index 64092ef..83bc98a 100644
      ENCTYPE_ARCFOUR_HMAC_EXP,
      ENCTYPE_AES256_CTS_HMAC_SHA1_96,
 diff --git a/src/lib/crypto/crypto_tests/t_short.c b/src/lib/crypto/crypto_tests/t_short.c
-index d4c2b97..4466b71 100644
+index d4c2b97dfd..4466b71158 100644
 --- a/src/lib/crypto/crypto_tests/t_short.c
 +++ b/src/lib/crypto/crypto_tests/t_short.c
 @@ -34,7 +34,6 @@
@@ -5824,7 +5824,7 @@ index d4c2b97..4466b71 100644
      ENCTYPE_ARCFOUR_HMAC_EXP,
      ENCTYPE_AES256_CTS_HMAC_SHA1_96,
 diff --git a/src/lib/crypto/crypto_tests/t_str2key.c b/src/lib/crypto/crypto_tests/t_str2key.c
-index cdb1acc..ef4c4a7 100644
+index cdb1acc6d0..ef4c4a7d3b 100644
 --- a/src/lib/crypto/crypto_tests/t_str2key.c
 +++ b/src/lib/crypto/crypto_tests/t_str2key.c
 @@ -35,58 +35,6 @@ struct test {
@@ -5887,7 +5887,7 @@ index cdb1acc..ef4c4a7 100644
      {
          ENCTYPE_AES128_CTS_HMAC_SHA1_96,
 diff --git a/src/lib/crypto/crypto_tests/vectors.c b/src/lib/crypto/crypto_tests/vectors.c
-index 314d5c7..b40551d 100644
+index 314d5c728a..b40551d998 100644
 --- a/src/lib/crypto/crypto_tests/vectors.c
 +++ b/src/lib/crypto/crypto_tests/vectors.c
 @@ -190,8 +190,6 @@ test_s2k (krb5_enctype enctype)
@@ -5909,7 +5909,7 @@ index 314d5c7..b40551d 100644
  
  void DK (krb5_keyblock *out, krb5_keyblock *in, const krb5_data *usage) {
 diff --git a/src/lib/crypto/krb/Makefile.in b/src/lib/crypto/krb/Makefile.in
-index cb2e40a..f66698b 100644
+index cb2e40a3a5..f66698bd53 100644
 --- a/src/lib/crypto/krb/Makefile.in
 +++ b/src/lib/crypto/krb/Makefile.in
 @@ -47,7 +47,6 @@ STLIBOBJS=\
@@ -5937,7 +5937,7 @@ index cb2e40a..f66698b 100644
  	$(srcdir)/prf_rc4.c		\
  	$(srcdir)/prng.c 		\
 diff --git a/src/lib/crypto/krb/cksumtypes.c b/src/lib/crypto/krb/cksumtypes.c
-index f7ba322..25a3ffd 100644
+index f7ba322f24..25a3ffd2d2 100644
 --- a/src/lib/crypto/krb/cksumtypes.c
 +++ b/src/lib/crypto/krb/cksumtypes.c
 @@ -52,12 +52,6 @@ const struct krb5_cksumtypes krb5int_cksumtypes_list[] = {
@@ -5954,7 +5954,7 @@ index f7ba322..25a3ffd 100644
        "hmac-md5-rc4", { "hmac-md5-enc", "hmac-md5-earcfour" },
        "Microsoft HMAC MD5",
 diff --git a/src/lib/crypto/krb/crypto_int.h b/src/lib/crypto/krb/crypto_int.h
-index 0e6263b..ff67b6b 100644
+index 0e6263bf15..ff67b6bd35 100644
 --- a/src/lib/crypto/krb/crypto_int.h
 +++ b/src/lib/crypto/krb/crypto_int.h
 @@ -335,8 +335,6 @@ krb5_error_code krb5int_aes2_string_to_key(const struct krb5_keytypes *enc,
@@ -5997,7 +5997,7 @@ index 0e6263b..ff67b6b 100644
   * result into output (caller-allocated). */
  krb5_error_code krb5int_hmac(const struct krb5_hash_provider *hash,
 diff --git a/src/lib/crypto/krb/default_state.c b/src/lib/crypto/krb/default_state.c
-index 0757c8b..f89dc79 100644
+index 0757c8b02c..f89dc79023 100644
 --- a/src/lib/crypto/krb/default_state.c
 +++ b/src/lib/crypto/krb/default_state.c
 @@ -32,16 +32,6 @@
@@ -6018,7 +6018,7 @@ index 0757c8b..f89dc79 100644
  krb5int_default_free_state(krb5_data *state)
  {
 diff --git a/src/lib/crypto/krb/enctype_util.c b/src/lib/crypto/krb/enctype_util.c
-index 1542d40..a003791 100644
+index 1542d40629..a0037912a7 100644
 --- a/src/lib/crypto/krb/enctype_util.c
 +++ b/src/lib/crypto/krb/enctype_util.c
 @@ -45,6 +45,9 @@ struct {
@@ -6032,7 +6032,7 @@ index 1542d40..a003791 100644
  };
  
 diff --git a/src/lib/crypto/krb/etypes.c b/src/lib/crypto/krb/etypes.c
-index fc27878..7635393 100644
+index fc278783b9..7635393a41 100644
 --- a/src/lib/crypto/krb/etypes.c
 +++ b/src/lib/crypto/krb/etypes.c
 @@ -35,27 +35,6 @@
@@ -6065,7 +6065,7 @@ index fc27878..7635393 100644
      { ENCTYPE_ARCFOUR_HMAC,
 diff --git a/src/lib/crypto/krb/prf_des.c b/src/lib/crypto/krb/prf_des.c
 deleted file mode 100644
-index 7a2d719..0000000
+index 7a2d719c5f..0000000000
 --- a/src/lib/crypto/krb/prf_des.c
 +++ /dev/null
 @@ -1,47 +0,0 @@
@@ -6117,7 +6117,7 @@ index 7a2d719..0000000
 -    return ktp->enc->encrypt(key, NULL, &iov, 1);
 -}
 diff --git a/src/lib/crypto/krb/random_to_key.c b/src/lib/crypto/krb/random_to_key.c
-index 9394385..863090b 100644
+index 9394385aa0..863090beb2 100644
 --- a/src/lib/crypto/krb/random_to_key.c
 +++ b/src/lib/crypto/krb/random_to_key.c
 @@ -71,31 +71,3 @@ k5_rand2key_direct(const krb5_data *randombits, krb5_keyblock *keyblock)
@@ -6153,7 +6153,7 @@ index 9394385..863090b 100644
 -    return 0;
 -}
 diff --git a/src/lib/crypto/libk5crypto.exports b/src/lib/crypto/libk5crypto.exports
-index 2b27028..00e0ce1 100644
+index 2b27028a0f..00e0ce1812 100644
 --- a/src/lib/crypto/libk5crypto.exports
 +++ b/src/lib/crypto/libk5crypto.exports
 @@ -86,7 +86,6 @@ krb5_k_verify_checksum
@@ -6165,7 +6165,7 @@ index 2b27028..00e0ce1 100644
  krb5int_camellia_encrypt
  krb5int_cmac_checksum
 diff --git a/src/lib/crypto/openssl/Makefile.in b/src/lib/crypto/openssl/Makefile.in
-index fe9ad86..cc13100 100644
+index fe9ad8619a..cc131000bd 100644
 --- a/src/lib/crypto/openssl/Makefile.in
 +++ b/src/lib/crypto/openssl/Makefile.in
 @@ -1,6 +1,6 @@
@@ -6187,7 +6187,7 @@ index fe9ad86..cc13100 100644
  		hash_provider/OBJS.ST 		\
 diff --git a/src/lib/crypto/openssl/des/Makefile.in b/src/lib/crypto/openssl/des/Makefile.in
 deleted file mode 100644
-index a6cece1..0000000
+index a6cece1dd1..0000000000
 --- a/src/lib/crypto/openssl/des/Makefile.in
 +++ /dev/null
 @@ -1,20 +0,0 @@
@@ -6213,7 +6213,7 @@ index a6cece1..0000000
 -
 diff --git a/src/lib/crypto/openssl/des/deps b/src/lib/crypto/openssl/des/deps
 deleted file mode 100644
-index 723c268..0000000
+index 723c268082..0000000000
 --- a/src/lib/crypto/openssl/des/deps
 +++ /dev/null
 @@ -1,14 +0,0 @@
@@ -6233,7 +6233,7 @@ index 723c268..0000000
 -  $(top_srcdir)/include/socket-utils.h des_keys.c
 diff --git a/src/lib/crypto/openssl/des/des_keys.c b/src/lib/crypto/openssl/des/des_keys.c
 deleted file mode 100644
-index 83f1cbf..0000000
+index 83f1cbf22a..0000000000
 --- a/src/lib/crypto/openssl/des/des_keys.c
 +++ /dev/null
 @@ -1,39 +0,0 @@
@@ -6277,7 +6277,7 @@ index 83f1cbf..0000000
 -
 -#endif
 diff --git a/src/lib/crypto/openssl/enc_provider/Makefile.in b/src/lib/crypto/openssl/enc_provider/Makefile.in
-index 26827cf..f0d37c1 100644
+index 26827cfed5..f0d37c1213 100644
 --- a/src/lib/crypto/openssl/enc_provider/Makefile.in
 +++ b/src/lib/crypto/openssl/enc_provider/Makefile.in
 @@ -3,19 +3,16 @@ BUILDTOP=$(REL)..$(S)..$(S)..$(S)..
@@ -6301,7 +6301,7 @@ index 26827cf..f0d37c1 100644
  	$(srcdir)/camellia.c 	\
  	$(srcdir)/rc4.c
 diff --git a/src/lib/crypto/openssl/enc_provider/deps b/src/lib/crypto/openssl/enc_provider/deps
-index 1c87a52..a502990 100644
+index 1c87a526d0..a502990a0c 100644
 --- a/src/lib/crypto/openssl/enc_provider/deps
 +++ b/src/lib/crypto/openssl/enc_provider/deps
 @@ -1,17 +1,6 @@
@@ -6324,7 +6324,7 @@ index 1c87a52..a502990 100644
    $(BUILDTOP)/include/profile.h $(COM_ERR_DEPS) $(srcdir)/../../krb/crypto_int.h \
 diff --git a/src/lib/crypto/openssl/enc_provider/des3.c b/src/lib/crypto/openssl/enc_provider/des3.c
 deleted file mode 100644
-index 90fcf9a..0000000
+index 90fcf9acb5..0000000000
 --- a/src/lib/crypto/openssl/enc_provider/des3.c
 +++ /dev/null
 @@ -1,188 +0,0 @@
@@ -6517,7 +6517,7 @@ index 90fcf9a..0000000
 -
 -#endif /* K5_OPENSSL_DES */
 diff --git a/src/lib/crypto/openssl/kdf.c b/src/lib/crypto/openssl/kdf.c
-index 2713850..8528ddc 100644
+index 2713850997..8528ddc4a9 100644
 --- a/src/lib/crypto/openssl/kdf.c
 +++ b/src/lib/crypto/openssl/kdf.c
 @@ -60,8 +60,6 @@ enc_name(const struct krb5_enc_provider *enc)
@@ -6530,7 +6530,7 @@ index 2713850..8528ddc 100644
  }
  
 diff --git a/src/lib/gssapi/krb5/accept_sec_context.c b/src/lib/gssapi/krb5/accept_sec_context.c
-index c9987b7..edde90f 100644
+index c9987b757b..edde90ff18 100644
 --- a/src/lib/gssapi/krb5/accept_sec_context.c
 +++ b/src/lib/gssapi/krb5/accept_sec_context.c
 @@ -1007,7 +1007,6 @@ kg_accept_krb5(OM_uint32 *minor_status, gss_ctx_id_t *context_handle,
@@ -6542,7 +6542,7 @@ index c9987b7..edde90f 100644
              case ENCTYPE_ARCFOUR_HMAC_EXP:
                  /* RFC 4121 accidentally omits RC4-HMAC-EXP as a "not-newer"
 diff --git a/src/lib/gssapi/krb5/gssapiP_krb5.h b/src/lib/gssapi/krb5/gssapiP_krb5.h
-index 1ed71fc..b01fecf 100644
+index 1ed71fc81f..b01fecf1b6 100644
 --- a/src/lib/gssapi/krb5/gssapiP_krb5.h
 +++ b/src/lib/gssapi/krb5/gssapiP_krb5.h
 @@ -125,14 +125,14 @@ enum sgn_alg {
@@ -6572,7 +6572,7 @@ index 1ed71fc..b01fecf 100644
  };
  
 diff --git a/src/lib/gssapi/krb5/k5seal.c b/src/lib/gssapi/krb5/k5seal.c
-index 71df11e..1148f69 100644
+index 71df11e1bc..1148f6929b 100644
 --- a/src/lib/gssapi/krb5/k5seal.c
 +++ b/src/lib/gssapi/krb5/k5seal.c
 @@ -142,19 +142,12 @@ make_seal_token_v1 (krb5_context context,
@@ -6625,7 +6625,7 @@ index 71df11e..1148f69 100644
      krb5_free_checksum_contents(context, &md5cksum);
  
 diff --git a/src/lib/gssapi/krb5/k5sealiov.c b/src/lib/gssapi/krb5/k5sealiov.c
-index 7bf7609..d5e12cb 100644
+index 7bf7609a48..d5e12cb436 100644
 --- a/src/lib/gssapi/krb5/k5sealiov.c
 +++ b/src/lib/gssapi/krb5/k5sealiov.c
 @@ -147,18 +147,11 @@ make_seal_token_v1_iov(krb5_context context,
@@ -6670,7 +6670,7 @@ index 7bf7609..d5e12cb 100644
      /* create the seq_num */
      code = kg_make_seq_num(context, ctx->seq, ctx->initiate ? 0 : 0xFF,
 diff --git a/src/lib/gssapi/krb5/k5unsealiov.c b/src/lib/gssapi/krb5/k5unsealiov.c
-index de79f30..897d3a4 100644
+index de79f3016e..897d3a4962 100644
 --- a/src/lib/gssapi/krb5/k5unsealiov.c
 +++ b/src/lib/gssapi/krb5/k5unsealiov.c
 @@ -103,28 +103,21 @@ kg_unseal_v1_iov(krb5_context context,
@@ -6749,7 +6749,7 @@ index de79f30..897d3a4 100644
          code = 0;
          retval = GSS_S_BAD_SIG;
 diff --git a/src/lib/gssapi/krb5/unwrap.c b/src/lib/gssapi/krb5/unwrap.c
-index 3e962a6..f403f27 100644
+index 3e962a611d..f403f277f3 100644
 --- a/src/lib/gssapi/krb5/unwrap.c
 +++ b/src/lib/gssapi/krb5/unwrap.c
 @@ -32,8 +32,8 @@
@@ -6773,7 +6773,7 @@ index 3e962a6..f403f27 100644
  
      /* Validate the header fields, and ensure that there are enough bytes
 diff --git a/src/lib/gssapi/krb5/util_crypt.c b/src/lib/gssapi/krb5/util_crypt.c
-index 386842e..e1b73b2 100644
+index 386842e8a6..e1b73b2720 100644
 --- a/src/lib/gssapi/krb5/util_crypt.c
 +++ b/src/lib/gssapi/krb5/util_crypt.c
 @@ -97,17 +97,6 @@ kg_setup_keys(krb5_context context, krb5_gss_ctx_id_rec *ctx, krb5_key subkey,
@@ -6810,7 +6810,7 @@ index 386842e..e1b73b2 100644
      iov[0].flags = iov[1].flags = KRB5_CRYPTO_TYPE_SIGN_ONLY;
      iov[0].data = make_data((uint8_t *)header, 8);
 diff --git a/src/lib/gssapi/krb5/verify_mic.c b/src/lib/gssapi/krb5/verify_mic.c
-index 1c11d20..9687fa9 100644
+index 1c11d2016f..9687fa9d6a 100644
 --- a/src/lib/gssapi/krb5/verify_mic.c
 +++ b/src/lib/gssapi/krb5/verify_mic.c
 @@ -56,7 +56,7 @@ kg_verify_mic_v1(krb5_context context, OM_uint32 *minor_status,
@@ -6823,7 +6823,7 @@ index 1c11d20..9687fa9 100644
  
      if (in->status || in->len != 0 || toktype != exp_toktype ||
 diff --git a/src/lib/krb5/krb/init_ctx.c b/src/lib/krb5/krb/init_ctx.c
-index 1d63f32..e0a92d3 100644
+index 1d63f32ace..e0a92d3b36 100644
 --- a/src/lib/krb5/krb/init_ctx.c
 +++ b/src/lib/krb5/krb/init_ctx.c
 @@ -59,7 +59,6 @@
@@ -6856,7 +6856,7 @@ index 1d63f32..e0a92d3 100644
              mod_list(ENCTYPE_AES256_CTS_HMAC_SHA1_96, sel, weak, &list);
              mod_list(ENCTYPE_AES128_CTS_HMAC_SHA1_96, sel, weak, &list);
 diff --git a/src/lib/krb5/krb/s4u_creds.c b/src/lib/krb5/krb/s4u_creds.c
-index 45fd103..20c8064 100644
+index 45fd103229..20c8064e56 100644
 --- a/src/lib/krb5/krb/s4u_creds.c
 +++ b/src/lib/krb5/krb/s4u_creds.c
 @@ -288,8 +288,6 @@ verify_s4u2self_reply(krb5_context context,
@@ -6869,7 +6869,7 @@ index 45fd103..20c8064 100644
      case ENCTYPE_ARCFOUR_HMAC_EXP :
          not_newer = TRUE;
 diff --git a/src/lib/krb5/krb/t_etypes.c b/src/lib/krb5/krb/t_etypes.c
-index 90c9f62..935aca1 100644
+index 90c9f626c6..935aca12f5 100644
 --- a/src/lib/krb5/krb/t_etypes.c
 +++ b/src/lib/krb5/krb/t_etypes.c
 @@ -50,17 +50,6 @@ static struct {
@@ -6941,7 +6941,7 @@ index 90c9f62..935aca1 100644
      { NULL,
        { ENCTYPE_AES256_CTS_HMAC_SHA1_96, 0 },
 diff --git a/src/lib/krb5/os/t_trace.c b/src/lib/krb5/os/t_trace.c
-index 10ba8d0..24064ff 100644
+index 10ba8d0ac7..24064ffcfd 100644
 --- a/src/lib/krb5/os/t_trace.c
 +++ b/src/lib/krb5/os/t_trace.c
 @@ -65,8 +65,8 @@ main (int argc, char *argv[])
@@ -6956,7 +6956,7 @@ index 10ba8d0..24064ff 100644
      krb5_keytab keytab;
      krb5_creds creds;
 diff --git a/src/lib/krb5/os/t_trace.ref b/src/lib/krb5/os/t_trace.ref
-index 79d3b7a..8a34012 100644
+index 79d3b7a99e..8a340123ab 100644
 --- a/src/lib/krb5/os/t_trace.ref
 +++ b/src/lib/krb5/os/t_trace.ref
 @@ -41,7 +41,7 @@ int, krb5_principal type: ?
@@ -6969,7 +6969,7 @@ index 79d3b7a..8a34012 100644
  krb5_ccache, display type:name: FILE:/path/to/ccache
  krb5_keytab, display name: FILE:/etc/krb5.keytab
 diff --git a/src/man/krb5.conf.man b/src/man/krb5.conf.man
-index eaba2b4..6f7890a 100644
+index eaba2b4cda..6f7890abcd 100644
 --- a/src/man/krb5.conf.man
 +++ b/src/man/krb5.conf.man
 @@ -175,12 +175,6 @@ Additionally, krb5.conf may include any of the relations described in
@@ -6986,7 +6986,7 @@ index eaba2b4..6f7890a 100644
  Permit the KDC to issue tickets with arcfour\-hmac session keys.
  In future releases, this flag will allow arcfour\-hmac to be used
 diff --git a/src/plugins/preauth/pkinit/pkcs11.h b/src/plugins/preauth/pkinit/pkcs11.h
-index e3d2846..586661b 100644
+index e3d2846315..586661bb7e 100644
 --- a/src/plugins/preauth/pkinit/pkcs11.h
 +++ b/src/plugins/preauth/pkinit/pkcs11.h
 @@ -339,9 +339,9 @@ typedef unsigned long ck_key_type_t;
@@ -7003,7 +7003,7 @@ index e3d2846..586661b 100644
  #define CKK_CAST3		(0x17)
  #define CKK_CAST128		(0x18)
 diff --git a/src/plugins/preauth/pkinit/pkinit_crypto.h b/src/plugins/preauth/pkinit/pkinit_crypto.h
-index 57bb3cb..92ccafd 100644
+index 57bb3cb840..92ccafdfe5 100644
 --- a/src/plugins/preauth/pkinit/pkinit_crypto.h
 +++ b/src/plugins/preauth/pkinit/pkinit_crypto.h
 @@ -316,11 +316,11 @@ krb5_error_code server_process_dh
@@ -7024,7 +7024,7 @@ index 57bb3cb..92ccafd 100644
  /*
   * this functions takes in crypto specific representation of
 diff --git a/src/plugins/preauth/pkinit/pkinit_kdf_test.c b/src/plugins/preauth/pkinit/pkinit_kdf_test.c
-index 3d0f719..122ea54 100644
+index 3d0f7198e9..122ea54853 100644
 --- a/src/plugins/preauth/pkinit/pkinit_kdf_test.c
 +++ b/src/plugins/preauth/pkinit/pkinit_kdf_test.c
 @@ -45,7 +45,6 @@ char eighteen_bs[9];
@@ -7069,7 +7069,7 @@ index 3d0f719..122ea54 100644
      /* release all allocated resources, whether good or bad return */
      free(secret.data);
 diff --git a/src/plugins/preauth/spake/t_vectors.c b/src/plugins/preauth/spake/t_vectors.c
-index 983b305..ecffd3d 100644
+index 983b30597b..ecffd3d7ee 100644
 --- a/src/plugins/preauth/spake/t_vectors.c
 +++ b/src/plugins/preauth/spake/t_vectors.c
 @@ -56,31 +56,6 @@ struct test {
@@ -7105,7 +7105,7 @@ index 983b305..ecffd3d 100644
        /* initial key, w, x, y, T, S, K */
        "8846F7EAEE8FB117AD06BDD830B7586C",
 diff --git a/src/tests/gssapi/t_enctypes.py b/src/tests/gssapi/t_enctypes.py
-index f5f1184..1bb8c40 100755
+index f5f11842e2..1bb8c40b6b 100755
 --- a/src/tests/gssapi/t_enctypes.py
 +++ b/src/tests/gssapi/t_enctypes.py
 @@ -1,25 +1,17 @@
@@ -7175,7 +7175,7 @@ index f5f1184..1bb8c40 100755
  # because the ticket session key and initiator subkey are
  # non-permitted.  (This is unfortunate if the acceptor's restriction
 diff --git a/src/tests/gssapi/t_invalid.c b/src/tests/gssapi/t_invalid.c
-index a558a68..0a38ea2 100644
+index a558a68132..0a38ea2b18 100644
 --- a/src/tests/gssapi/t_invalid.c
 +++ b/src/tests/gssapi/t_invalid.c
 @@ -104,32 +104,6 @@ struct test {
@@ -7212,7 +7212,7 @@ index a558a68..0a38ea2 100644
          ENCTYPE_ARCFOUR_HMAC, ENCTYPE_ARCFOUR_HMAC,
          SEAL_ALG_MICROSOFT_RC4, SGN_ALG_HMAC_MD5, 8,
 diff --git a/src/tests/gssapi/t_pcontok.c b/src/tests/gssapi/t_pcontok.c
-index 7368f75..bf22bd3 100644
+index 7368f752f0..bf22bd3da1 100644
 --- a/src/tests/gssapi/t_pcontok.c
 +++ b/src/tests/gssapi/t_pcontok.c
 @@ -43,7 +43,6 @@
@@ -7247,7 +7247,7 @@ index 7368f75..bf22bd3 100644
      tlen = 20 + mech_krb5.length + cksize;
      token = malloc(tlen);
 diff --git a/src/tests/gssapi/t_prf.c b/src/tests/gssapi/t_prf.c
-index f71774c..d1857c4 100644
+index f71774cdc9..d1857c433f 100644
 --- a/src/tests/gssapi/t_prf.c
 +++ b/src/tests/gssapi/t_prf.c
 @@ -41,13 +41,6 @@ static struct {
@@ -7265,7 +7265,7 @@ index f71774c..d1857c4 100644
        "3BB3AE288C12B3B9D06B208A4151B3B6",
        "9AEA11A3BCF3C53F1F91F5A0BA2132E2501ADF5F3C28"
 diff --git a/src/tests/t_authdata.py b/src/tests/t_authdata.py
-index bde1c36..8fcd30d 100644
+index bde1c36844..8fcd30db51 100644
 --- a/src/tests/t_authdata.py
 +++ b/src/tests/t_authdata.py
 @@ -179,7 +179,7 @@ realm.run([kvno, 'restricted'])
@@ -7278,7 +7278,7 @@ index bde1c36..8fcd30d 100644
  realm.run(['./forward'])
  realm.run([kvno, realm.host_princ])
 diff --git a/src/tests/t_etype_info.py b/src/tests/t_etype_info.py
-index 38cf96c..e82ff7f 100644
+index 38cf96ca8f..e82ff7ff07 100644
 --- a/src/tests/t_etype_info.py
 +++ b/src/tests/t_etype_info.py
 @@ -1,7 +1,7 @@
@@ -7329,7 +7329,7 @@ index 38cf96c..e82ff7f 100644
  # Verify that etype-info2 is included in a MORE_PREAUTH_DATA_REQUIRED
  # error if the client does optimistic preauth.
 diff --git a/src/tests/t_keyrollover.py b/src/tests/t_keyrollover.py
-index 036c0c3..7748133 100755
+index 036c0c3c6f..77481336ca 100755
 --- a/src/tests/t_keyrollover.py
 +++ b/src/tests/t_keyrollover.py
 @@ -38,9 +38,9 @@ realm.run([klist, '-e'], expected_msg=msg)
@@ -7357,7 +7357,7 @@ index 036c0c3..7748133 100755
  
  # Test -keepold limit for self-service requests through kadmind.
 diff --git a/src/tests/t_mkey.py b/src/tests/t_mkey.py
-index 32f4070..da0ed18 100755
+index 32f4070bcb..da0ed1831e 100755
 --- a/src/tests/t_mkey.py
 +++ b/src/tests/t_mkey.py
 @@ -7,7 +7,6 @@ import struct
@@ -7410,7 +7410,7 @@ index 32f4070..da0ed18 100755
  # master key fetch does not segfault.
  mark('#8395 regression test')
 diff --git a/src/tests/t_salt.py b/src/tests/t_salt.py
-index 65084bb..55ca897 100755
+index 65084bbf35..55ca897459 100755
 --- a/src/tests/t_salt.py
 +++ b/src/tests/t_salt.py
 @@ -16,13 +16,12 @@ def test_salt(realm, e1, salt, e2):
@@ -7430,7 +7430,7 @@ index 65084bb..55ca897 100755
  # Test using different salt types in a principal's key list.
  # Parameters from one key in the list must not leak over to later ones.
 diff --git a/src/tests/t_sesskeynego.py b/src/tests/t_sesskeynego.py
-index 5a21361..c7dba0f 100755
+index 5a213617b5..c7dba0ff5b 100755
 --- a/src/tests/t_sesskeynego.py
 +++ b/src/tests/t_sesskeynego.py
 @@ -26,7 +26,6 @@ conf3 = {'libdefaults': {
@@ -7456,7 +7456,7 @@ index 5a21361..c7dba0f 100755
  realm = K5Realm(create_host=False, get_creds=False)
  realm.run([kadminl, 'addprinc', '-randkey', '-e', 'rc4-hmac', 'server'])
 diff --git a/src/util/k5test.py b/src/util/k5test.py
-index d22cb5c..cba6ca0 100644
+index d22cb5c804..cba6ca0a61 100644
 --- a/src/util/k5test.py
 +++ b/src/util/k5test.py
 @@ -1388,13 +1388,6 @@ _passes = [
@@ -7474,7 +7474,7 @@ index d22cb5c..cba6ca0 100644
      ('arcfour', None,
       {'libdefaults': {'permitted_enctypes': 'rc4', 'allow_rc4': 'true'}},
 diff --git a/src/windows/leash/htmlhelp/html/Encryption_Types.htm b/src/windows/leash/htmlhelp/html/Encryption_Types.htm
-index 1aebdd0..c38eefd 100644
+index 1aebdd0b4a..c38eefd2bd 100644
 --- a/src/windows/leash/htmlhelp/html/Encryption_Types.htm
 +++ b/src/windows/leash/htmlhelp/html/Encryption_Types.htm
 @@ -79,19 +79,6 @@ will have an entry in the Encryption type column. <br>
@@ -7501,10 +7501,10 @@ index 1aebdd0..c38eefd 100644
 2.53.0
 
 
-From cbda7da472940a4176b195c3a04a5a463a51423a Mon Sep 17 00:00:00 2001
+From f6b425e86cec7feb91d62a9d312f2660f06ac2ac Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 23 Aug 2016 16:29:58 -0400
-Subject: [PATCH 06/24] PAM: Add integration to ksu
+Subject: [PATCH 06/25] PAM: Add integration to ksu
 
 Modify ksu so that it performs account and session management on behalf of
 the target user account, mimicking the action of regular su.  The default
@@ -7534,7 +7534,7 @@ Forward-ported-by: Andreas Schneider <asn@redhat.com>
  create mode 100644 src/clients/ksu/pam.h
 
 diff --git a/src/aclocal.m4 b/src/aclocal.m4
-index 7397bdc..3d9b02c 100644
+index 7397bdcc2b..3d9b02c21a 100644
 --- a/src/aclocal.m4
 +++ b/src/aclocal.m4
 @@ -1413,3 +1413,72 @@ if test "$with_ldap" = yes; then
@@ -7611,7 +7611,7 @@ index 7397bdc..3d9b02c 100644
 +AC_SUBST(NON_PAM_MAN)
 +])dnl
 diff --git a/src/clients/ksu/Makefile.in b/src/clients/ksu/Makefile.in
-index 9a892e6..5c9845c 100644
+index 9a892e6656..5c9845c1f7 100644
 --- a/src/clients/ksu/Makefile.in
 +++ b/src/clients/ksu/Makefile.in
 @@ -3,12 +3,14 @@ BUILDTOP=$(REL)..$(S)..
@@ -7649,7 +7649,7 @@ index 9a892e6..5c9845c 100644
  clean:
  	$(RM) ksu
 diff --git a/src/clients/ksu/main.c b/src/clients/ksu/main.c
-index ca3981e..443bace 100644
+index ca3981ea75..443bacea16 100644
 --- a/src/clients/ksu/main.c
 +++ b/src/clients/ksu/main.c
 @@ -26,6 +26,7 @@
@@ -7808,7 +7808,7 @@ index ca3981e..443bace 100644
      }
 diff --git a/src/clients/ksu/pam.c b/src/clients/ksu/pam.c
 new file mode 100644
-index 0000000..eb5d03b
+index 0000000000..eb5d03bbf2
 --- /dev/null
 +++ b/src/clients/ksu/pam.c
 @@ -0,0 +1,389 @@
@@ -8203,7 +8203,7 @@ index 0000000..eb5d03b
 +#endif
 diff --git a/src/clients/ksu/pam.h b/src/clients/ksu/pam.h
 new file mode 100644
-index 0000000..d45b9fd
+index 0000000000..d45b9fd84b
 --- /dev/null
 +++ b/src/clients/ksu/pam.h
 @@ -0,0 +1,57 @@
@@ -8265,7 +8265,7 @@ index 0000000..d45b9fd
 +void appl_pam_cleanup(void);
 +#endif
 diff --git a/src/configure.ac b/src/configure.ac
-index 9fc569f..99268df 100644
+index 9fc569f195..99268dfd78 100644
 --- a/src/configure.ac
 +++ b/src/configure.ac
 @@ -1407,6 +1407,8 @@ AC_SUBST([VERTO_VERSION])
@@ -8281,10 +8281,10 @@ index 9fc569f..99268df 100644
 2.53.0
 
 
-From 3b8df028cdeeef1110b11510ea5e682dd4b1f39f Mon Sep 17 00:00:00 2001
+From dac2e975d5729d53f22dc7d77428feb55263b982 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 23 Aug 2016 16:30:53 -0400
-Subject: [PATCH 07/24] SELINUX: Add integration
+Subject: [PATCH 07/25] SELINUX: Add integration
 
 SELinux bases access to files on the domain of the requesting process,
 the operation being performed, and the context applied to the file.
@@ -8356,7 +8356,7 @@ Forward-ported-by: Andreas Schneider <asn@redhat.com>
  create mode 100644 src/util/support/selinux.c
 
 diff --git a/src/aclocal.m4 b/src/aclocal.m4
-index 3d9b02c..1782be9 100644
+index 3d9b02c21a..1782be9788 100644
 --- a/src/aclocal.m4
 +++ b/src/aclocal.m4
 @@ -85,6 +85,7 @@ AC_SUBST_FILE(libnodeps_frag)
@@ -8420,7 +8420,7 @@ index 3d9b02c..1782be9 100644
 +AC_SUBST(SELINUX_LIBS)
 +])dnl
 diff --git a/src/build-tools/krb5-config.in b/src/build-tools/krb5-config.in
-index 2cb4398..12a6988 100755
+index 2cb439887d..12a698833e 100755
 --- a/src/build-tools/krb5-config.in
 +++ b/src/build-tools/krb5-config.in
 @@ -40,6 +40,7 @@ DL_LIB='@DL_LIB@'
@@ -8441,7 +8441,7 @@ index 2cb4398..12a6988 100755
      echo $lib_flags
  fi
 diff --git a/src/config/pre.in b/src/config/pre.in
-index 1197c1f..9f64fd1 100644
+index 1197c1ffd6..9f64fd190f 100644
 --- a/src/config/pre.in
 +++ b/src/config/pre.in
 @@ -178,6 +178,7 @@ KRB_INCLUDES = -I$(BUILDTOP)/include -I$(top_srcdir)/include
@@ -8462,7 +8462,7 @@ index 1197c1f..9f64fd1 100644
  GSS_LIBS	= $(GSS_KRB5_LIB)
  # needs fixing if ever used on macOS!
 diff --git a/src/configure.ac b/src/configure.ac
-index 99268df..33a1160 100644
+index 99268dfd78..33a1160657 100644
 --- a/src/configure.ac
 +++ b/src/configure.ac
 @@ -1409,6 +1409,8 @@ AC_PATH_PROG(GROFF, groff)
@@ -8475,7 +8475,7 @@ index 99268df..33a1160 100644
  if test "${localedir+set}" != set; then
      localedir='$(datadir)/locale'
 diff --git a/src/include/k5-int.h b/src/include/k5-int.h
-index a430e4e..252c8d9 100644
+index a430e4eec9..252c8d9b00 100644
 --- a/src/include/k5-int.h
 +++ b/src/include/k5-int.h
 @@ -128,6 +128,7 @@ typedef unsigned char   u_char;
@@ -8488,7 +8488,7 @@ index a430e4e..252c8d9 100644
  #define KRB5_KDB_MAX_RLIFE      (60*60*24*7) /* one week */
 diff --git a/src/include/k5-label.h b/src/include/k5-label.h
 new file mode 100644
-index 0000000..dfaaa84
+index 0000000000..dfaaa847cb
 --- /dev/null
 +++ b/src/include/k5-label.h
 @@ -0,0 +1,32 @@
@@ -8525,7 +8525,7 @@ index 0000000..dfaaa84
 +#endif
 +#endif
 diff --git a/src/include/krb5/krb5.hin b/src/include/krb5/krb5.hin
-index 81c3844..3d5bdf6 100644
+index 81c3844605..3d5bdf6935 100644
 --- a/src/include/krb5/krb5.hin
 +++ b/src/include/krb5/krb5.hin
 @@ -83,6 +83,12 @@
@@ -8542,7 +8542,7 @@ index 81c3844..3d5bdf6 100644
  
  #include <stdlib.h>
 diff --git a/src/kadmin/dbutil/dump.c b/src/kadmin/dbutil/dump.c
-index e45551a..cd32ebd 100644
+index e45551a200..cd32ebdaf2 100644
 --- a/src/kadmin/dbutil/dump.c
 +++ b/src/kadmin/dbutil/dump.c
 @@ -134,12 +134,21 @@ create_ofile(char *ofile, char **tmpname)
@@ -8577,7 +8577,7 @@ index e45551a..cd32ebd 100644
          com_err(progname, errno, _("while creating 'ok' file, '%s'"), file_ok);
          goto cleanup;
 diff --git a/src/kdc/main.c b/src/kdc/main.c
-index 1052766..f48d60a 100644
+index 105276601e..f48d60a774 100644
 --- a/src/kdc/main.c
 +++ b/src/kdc/main.c
 @@ -837,7 +837,7 @@ write_pid_file(const char *path)
@@ -8590,7 +8590,7 @@ index 1052766..f48d60a 100644
          return errno;
      pid = (unsigned long)getpid();
 diff --git a/src/kprop/kpropd.c b/src/kprop/kpropd.c
-index 4b36752..296ca2b 100644
+index 4b36752646..296ca2bb71 100644
 --- a/src/kprop/kpropd.c
 +++ b/src/kprop/kpropd.c
 @@ -489,6 +489,9 @@ doit(int fd)
@@ -8620,7 +8620,7 @@ index 4b36752..296ca2b 100644
                              KRB5_LOCKMODE_EXCLUSIVE | KRB5_LOCKMODE_DONTBLOCK);
      if (retval) {
 diff --git a/src/lib/kadm5/logger.c b/src/lib/kadm5/logger.c
-index e14da53..b879a40 100644
+index e14da53790..b879a4049b 100644
 --- a/src/lib/kadm5/logger.c
 +++ b/src/lib/kadm5/logger.c
 @@ -310,7 +310,7 @@ krb5_klog_init(krb5_context kcontext, char *ename, char *whoami, krb5_boolean do
@@ -8642,7 +8642,7 @@ index e14da53..b879a40 100644
                  set_cloexec_file(f);
                  log_control.log_entries[lindex].lfu_filep = f;
 diff --git a/src/lib/kdb/kdb_log.c b/src/lib/kdb/kdb_log.c
-index b840eec..419beab 100644
+index b840eec9a2..419beab9e4 100644
 --- a/src/lib/kdb/kdb_log.c
 +++ b/src/lib/kdb/kdb_log.c
 @@ -512,7 +512,7 @@ ulog_map(krb5_context context, const char *logname, uint32_t ulogentries)
@@ -8655,7 +8655,7 @@ index b840eec..419beab 100644
              retval = errno;
              goto cleanup;
 diff --git a/src/lib/krb5/ccache/cc_dir.c b/src/lib/krb5/ccache/cc_dir.c
-index 1da40b5..f3ab734 100644
+index 1da40b51d0..f3ab7340a6 100644
 --- a/src/lib/krb5/ccache/cc_dir.c
 +++ b/src/lib/krb5/ccache/cc_dir.c
 @@ -183,10 +183,19 @@ write_primary_file(const char *primary_path, const char *contents)
@@ -8705,7 +8705,7 @@ index 1da40b5..f3ab734 100644
                    _("Credential cache directory %s does not exist"),
                    dirname);
 diff --git a/src/lib/krb5/keytab/kt_file.c b/src/lib/krb5/keytab/kt_file.c
-index 993f902..8fd1505 100644
+index 993f902c7c..8fd1505115 100644
 --- a/src/lib/krb5/keytab/kt_file.c
 +++ b/src/lib/krb5/keytab/kt_file.c
 @@ -736,14 +736,14 @@ krb5_ktfileint_open(krb5_context context, krb5_keytab id, int mode)
@@ -8726,7 +8726,7 @@ index 993f902..8fd1505 100644
                  goto report_errno;
              writevno = 1;
 diff --git a/src/lib/krb5/os/trace.c b/src/lib/krb5/os/trace.c
-index 89699f7..9c7d7da 100644
+index 89699f7df5..9c7d7dad6f 100644
 --- a/src/lib/krb5/os/trace.c
 +++ b/src/lib/krb5/os/trace.c
 @@ -455,7 +455,7 @@ krb5_set_trace_filename(krb5_context context, const char *filename)
@@ -8739,7 +8739,7 @@ index 89699f7..9c7d7da 100644
          free(fd);
          return errno;
 diff --git a/src/plugins/kdb/db2/adb_openclose.c b/src/plugins/kdb/db2/adb_openclose.c
-index 9a506e9..f92ab47 100644
+index 9a506e9d44..f92ab47143 100644
 --- a/src/plugins/kdb/db2/adb_openclose.c
 +++ b/src/plugins/kdb/db2/adb_openclose.c
 @@ -152,7 +152,7 @@ osa_adb_init_db(osa_adb_db_t *dbp, char *filename, char *lockfilename,
@@ -8752,7 +8752,7 @@ index 9a506e9..f92ab47 100644
               * maybe someone took away write permission so we could only
               * get shared locks?
 diff --git a/src/plugins/kdb/db2/kdb_db2.c b/src/plugins/kdb/db2/kdb_db2.c
-index 381228e..eb8610b 100644
+index 381228e6da..eb8610b2ae 100644
 --- a/src/plugins/kdb/db2/kdb_db2.c
 +++ b/src/plugins/kdb/db2/kdb_db2.c
 @@ -694,8 +694,8 @@ ctx_create_db(krb5_context context, krb5_db2_context *dbc)
@@ -8767,7 +8767,7 @@ index 381228e..eb8610b 100644
          retval = errno;
          goto cleanup;
 diff --git a/src/plugins/kdb/db2/libdb2/btree/bt_open.c b/src/plugins/kdb/db2/libdb2/btree/bt_open.c
-index 56bab19..ef7515c 100644
+index 56bab19412..ef7515c3d4 100644
 --- a/src/plugins/kdb/db2/libdb2/btree/bt_open.c
 +++ b/src/plugins/kdb/db2/libdb2/btree/bt_open.c
 @@ -60,6 +60,7 @@ static char sccsid[] = "@(#)bt_open.c	8.11 (Berkeley) 11/2/95";
@@ -8788,7 +8788,7 @@ index 56bab19..ef7515c 100644
  
  	} else {
 diff --git a/src/plugins/kdb/db2/libdb2/hash/hash.c b/src/plugins/kdb/db2/libdb2/hash/hash.c
-index 7c3e951..9528b62 100644
+index 7c3e951aa2..9528b62538 100644
 --- a/src/plugins/kdb/db2/libdb2/hash/hash.c
 +++ b/src/plugins/kdb/db2/libdb2/hash/hash.c
 @@ -51,6 +51,7 @@ static char sccsid[] = "@(#)hash.c	8.12 (Berkeley) 11/7/95";
@@ -8809,7 +8809,7 @@ index 7c3e951..9528b62 100644
  		(void)fcntl(hashp->fp, F_SETFD, 1);
  	}
 diff --git a/src/plugins/kdb/db2/libdb2/recno/rec_open.c b/src/plugins/kdb/db2/libdb2/recno/rec_open.c
-index acbf03d..de3fc3f 100644
+index acbf03d9dd..de3fc3f4d0 100644
 --- a/src/plugins/kdb/db2/libdb2/recno/rec_open.c
 +++ b/src/plugins/kdb/db2/libdb2/recno/rec_open.c
 @@ -51,6 +51,7 @@ static char sccsid[] = "@(#)rec_open.c	8.12 (Berkeley) 11/18/94";
@@ -8831,7 +8831,7 @@ index acbf03d..de3fc3f 100644
  
  	if (fname != NULL && fcntl(rfd, F_SETFD, 1) == -1) {
 diff --git a/src/plugins/kdb/ldap/ldap_util/kdb5_ldap_services.c b/src/plugins/kdb/ldap/ldap_util/kdb5_ldap_services.c
-index e87688d..30f7c00 100644
+index e87688d666..30f7c00ab5 100644
 --- a/src/plugins/kdb/ldap/ldap_util/kdb5_ldap_services.c
 +++ b/src/plugins/kdb/ldap/ldap_util/kdb5_ldap_services.c
 @@ -190,7 +190,7 @@ kdb5_ldap_stash_service_password(int argc, char **argv)
@@ -8868,7 +8868,7 @@ index e87688d..30f7c00 100644
          if (newfile == NULL) {
              com_err(me, errno, _("Error creating file %s"), tmp_file);
 diff --git a/src/util/profile/prof_file.c b/src/util/profile/prof_file.c
-index 8b0b2bb..9468e31 100644
+index 8b0b2bb441..9468e317bf 100644
 --- a/src/util/profile/prof_file.c
 +++ b/src/util/profile/prof_file.c
 @@ -33,6 +33,7 @@
@@ -8889,7 +8889,7 @@ index 8b0b2bb..9468e31 100644
          retval = errno;
          if (retval == 0)
 diff --git a/src/util/support/Makefile.in b/src/util/support/Makefile.in
-index b9cd70d..6705681 100644
+index b9cd70dac4..6705681df5 100644
 --- a/src/util/support/Makefile.in
 +++ b/src/util/support/Makefile.in
 @@ -79,6 +79,7 @@ IPC_SYMS= \
@@ -8911,7 +8911,7 @@ index b9cd70d..6705681 100644
  
 diff --git a/src/util/support/selinux.c b/src/util/support/selinux.c
 new file mode 100644
-index 0000000..b10f927
+index 0000000000..b10f927b2e
 --- /dev/null
 +++ b/src/util/support/selinux.c
 @@ -0,0 +1,404 @@
@@ -9323,10 +9323,10 @@ index 0000000..b10f927
 2.53.0
 
 
-From fef0ab37debe54022c94cc987321ceec514500c3 Mon Sep 17 00:00:00 2001
+From 8523c362c7a0bc2a702ede1ec82b24555ff12ba5 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Mon, 9 Jan 2023 22:39:52 +0100
-Subject: [PATCH 08/24] INSTALL: Do not set root as ksu file owner
+Subject: [PATCH 08/25] INSTALL: Do not set root as ksu file owner
 
 Upstream Makefile uses the install command to set root as owner of the
 ksu executable file. However, this is no longer supported on latest
@@ -9339,7 +9339,7 @@ in the specfile.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/config/pre.in b/src/config/pre.in
-index 9f64fd1..3724d26 100644
+index 9f64fd190f..3724d26ae6 100644
 --- a/src/config/pre.in
 +++ b/src/config/pre.in
 @@ -186,7 +186,7 @@ INSTALL_PROGRAM=@INSTALL_PROGRAM@ $(INSTALL_STRIP)
@@ -9355,10 +9355,10 @@ index 9f64fd1..3724d26 100644
 2.53.0
 
 
-From 7a6c0b0c357407ad190630778f8f5634577d1071 Mon Sep 17 00:00:00 2001
+From 307d0b16159de59092b00a109d44f68de323f5f1 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Wed, 7 Dec 2022 13:22:42 +0100
-Subject: [PATCH 09/24] SSSD: Make tests compatible with
+Subject: [PATCH 09/25] SSSD: Make tests compatible with
  sssd_krb5_locator_plugin.so
 
 The sssd_krb5_locator_plugin.so plugin provided by sssd-client conflicts
@@ -9369,7 +9369,7 @@ order to avoid false positive.
  1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/src/lib/krb5/os/t_discover_uri.py b/src/lib/krb5/os/t_discover_uri.py
-index 87bac17..26bc95a 100644
+index 87bac17929..26bc95a8dc 100644
 --- a/src/lib/krb5/os/t_discover_uri.py
 +++ b/src/lib/krb5/os/t_discover_uri.py
 @@ -1,3 +1,4 @@
@@ -9397,10 +9397,10 @@ index 87bac17..26bc95a 100644
 2.53.0
 
 
-From c5c1bc353d7745532b797864e7971ea1775b9471 Mon Sep 17 00:00:00 2001
+From 82ec4d257ba4f0ea5e57c56b680bc888b69ae3df Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Wed, 15 Mar 2023 15:56:34 +0100
-Subject: [PATCH 10/24] PAC: Allow to set ticket signature as optional
+Subject: [PATCH 10/25] PAC: Allow to set ticket signature as optional
 
 MS-PAC states that "The ticket signature SHOULD be included in tickets
 that are not encrypted to the krbtgt account". However, the
@@ -9431,7 +9431,7 @@ attribute of the TGT KDB entry.
  8 files changed, 108 insertions(+), 10 deletions(-)
 
 diff --git a/doc/admin/admin_commands/kadmin_local.rst b/doc/admin/admin_commands/kadmin_local.rst
-index b4edc79..a2fbaf4 100644
+index b4edc79243..a2fbaf45c2 100644
 --- a/doc/admin/admin_commands/kadmin_local.rst
 +++ b/doc/admin/admin_commands/kadmin_local.rst
 @@ -676,6 +676,12 @@ KDC:
@@ -9448,7 +9448,7 @@ index b4edc79..a2fbaf4 100644
  
  Alias: **setstr**
 diff --git a/doc/appdev/refs/api/index.rst b/doc/appdev/refs/api/index.rst
-index 648dc2e..abc6806 100644
+index 648dc2ed99..abc6806ca1 100644
 --- a/doc/appdev/refs/api/index.rst
 +++ b/doc/appdev/refs/api/index.rst
 @@ -227,6 +227,7 @@ Rarely used public interfaces
@@ -9460,7 +9460,7 @@ index 648dc2e..abc6806 100644
     krb5_kt_end_seq_get.rst
     krb5_kt_get_entry.rst
 diff --git a/src/include/kdb.h b/src/include/kdb.h
-index 17a3456..83e22f4 100644
+index 17a3456822..83e22f4462 100644
 --- a/src/include/kdb.h
 +++ b/src/include/kdb.h
 @@ -136,6 +136,7 @@
@@ -9472,7 +9472,7 @@ index 17a3456..83e22f4 100644
  #if !defined(_WIN32)
  
 diff --git a/src/include/krb5/krb5.hin b/src/include/krb5/krb5.hin
-index 3d5bdf6..6e2d000 100644
+index 3d5bdf6935..6e2d0001a0 100644
 --- a/src/include/krb5/krb5.hin
 +++ b/src/include/krb5/krb5.hin
 @@ -8366,6 +8366,46 @@ krb5_kdc_verify_ticket(krb5_context context, const krb5_enc_tkt_part *enc_tkt,
@@ -9523,7 +9523,7 @@ index 3d5bdf6..6e2d000 100644
  krb5_error_code KRB5_CALLCONV
  krb5_pac_sign(krb5_context context, krb5_pac pac, krb5_timestamp authtime,
 diff --git a/src/kdc/kdc_util.c b/src/kdc/kdc_util.c
-index 89f34ca..c6f1563 100644
+index 89f34ca06e..c6f15639f7 100644
 --- a/src/kdc/kdc_util.c
 +++ b/src/kdc/kdc_util.c
 @@ -566,16 +566,36 @@ cleanup:
@@ -9587,7 +9587,7 @@ index 89f34ca..c6f1563 100644
          if (!ret)
              return 0;
 diff --git a/src/lib/krb5/krb/pac.c b/src/lib/krb5/krb/pac.c
-index 7e33387..8b3d896 100644
+index 7e33387454..8b3d89631c 100644
 --- a/src/lib/krb5/krb/pac.c
 +++ b/src/lib/krb5/krb/pac.c
 @@ -596,6 +596,19 @@ krb5_kdc_verify_ticket(krb5_context context, const krb5_enc_tkt_part *enc_tkt,
@@ -9645,7 +9645,7 @@ index 7e33387..8b3d896 100644
          goto cleanup;
  
 diff --git a/src/lib/krb5/libkrb5.exports b/src/lib/krb5/libkrb5.exports
-index 1e7076d..d48985f 100644
+index 1e7076d3ce..d48985f9fc 100644
 --- a/src/lib/krb5/libkrb5.exports
 +++ b/src/lib/krb5/libkrb5.exports
 @@ -468,6 +468,7 @@ krb5_is_thread_safe
@@ -9657,7 +9657,7 @@ index 1e7076d..d48985f 100644
  krb5_kt_client_default
  krb5_kt_close
 diff --git a/src/man/kadmin.man b/src/man/kadmin.man
-index 15ddc17..96cdd52 100644
+index 15ddc17dc5..96cdd52982 100644
 --- a/src/man/kadmin.man
 +++ b/src/man/kadmin.man
 @@ -733,6 +733,12 @@ encryption type.  It may be necessary to set this value to
@@ -9677,10 +9677,10 @@ index 15ddc17..96cdd52 100644
 2.53.0
 
 
-From 093e71ee210630227cc44f36eb24d95eb015f959 Mon Sep 17 00:00:00 2001
+From f160430a84cdbc2f24e4e9dc32fafac04ddcb887 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 23 Aug 2016 16:49:25 -0400
-Subject: [PATCH 11/24] BUILD: fix debuginfo with y.tab.c
+Subject: [PATCH 11/25] BUILD: fix debuginfo with y.tab.c
 
 We want to keep these y.tab.c files around because the debuginfo points to
 them.  It would be more elegant at the end to use symbolic links, but that
@@ -9694,7 +9694,7 @@ Forward-ported-by: Andreas Schneider <asn@redhat.com>
  2 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/src/kadmin/cli/Makefile.in b/src/kadmin/cli/Makefile.in
-index adfea6e..47f3338 100644
+index adfea6e2b5..47f3338fd2 100644
 --- a/src/kadmin/cli/Makefile.in
 +++ b/src/kadmin/cli/Makefile.in
 @@ -31,9 +31,14 @@ generate-files-mac: kadmin_ct.c getdate.c
@@ -9714,7 +9714,7 @@ index adfea6e..47f3338 100644
 +	$(YACC.y) $<
 +	$(CP) y.tab.c $@
 diff --git a/src/plugins/kdb/ldap/ldap_util/Makefile.in b/src/plugins/kdb/ldap/ldap_util/Makefile.in
-index 8669c24..f243017 100644
+index 8669c2436c..f243017ce9 100644
 --- a/src/plugins/kdb/ldap/ldap_util/Makefile.in
 +++ b/src/plugins/kdb/ldap/ldap_util/Makefile.in
 @@ -20,10 +20,10 @@ $(PROG): $(OBJS) $(KADMSRV_DEPLIBS) $(KRB5_BASE_DEPLIB) $(GETDATE)
@@ -9734,10 +9734,10 @@ index 8669c24..f243017 100644
 2.53.0
 
 
-From 246a6bc03b2ef3312cb07b72fcf9f362fb04c4b2 Mon Sep 17 00:00:00 2001
+From 621dac3f7d2989adfd746d40ba74468fa0275ab5 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Sun, 21 Sep 2025 11:14:51 +0300
-Subject: [PATCH 12/24] PKINIT: If configured, attempt Anonymous PKINIT for
+Subject: [PATCH 12/25] PKINIT: If configured, attempt Anonymous PKINIT for
  FAST
 
 If auto_fast_armor is configured for the realm or globally, optimistically
@@ -9761,7 +9761,7 @@ PR: https://github.com/krb5/krb5/pull/1447
  3 files changed, 133 insertions(+)
 
 diff --git a/src/lib/krb5/krb/fast.c b/src/lib/krb5/krb/fast.c
-index 62c9f08..ee2e081 100644
+index 62c9f0841f..ee2e081892 100644
 --- a/src/lib/krb5/krb/fast.c
 +++ b/src/lib/krb5/krb/fast.c
 @@ -168,6 +168,109 @@ krb5int_fast_prep_req_body(krb5_context context,
@@ -9915,7 +9915,7 @@ index 62c9f08..ee2e081 100644
  }
  
 diff --git a/src/lib/krb5/krb/fast.h b/src/lib/krb5/krb/fast.h
-index 7156ea2..e5fe8bd 100644
+index 7156ea203f..e5fe8bd544 100644
 --- a/src/lib/krb5/krb/fast.h
 +++ b/src/lib/krb5/krb/fast.h
 @@ -34,6 +34,7 @@ struct krb5int_fast_request_state {
@@ -9935,7 +9935,7 @@ index 7156ea2..e5fe8bd 100644
  krb5_error_code
  krb5int_fast_prep_req_body(krb5_context context,
 diff --git a/src/man/krb5.conf.man b/src/man/krb5.conf.man
-index 6f7890a..12c2ea1 100644
+index 6f7890abcd..12c2ea1e5d 100644
 --- a/src/man/krb5.conf.man
 +++ b/src/man/krb5.conf.man
 @@ -655,6 +655,19 @@ primary KDC, in case the user\(aqs password has just been changed, and
@@ -9962,10 +9962,10 @@ index 6f7890a..12c2ea1 100644
 2.53.0
 
 
-From be9185b4c3b289ad6a4e9629ec45a0190b943701 Mon Sep 17 00:00:00 2001
+From 347f81103e95536b5655bee31bb9ced05d06b098 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Sun, 19 Oct 2025 18:14:29 +0300
-Subject: [PATCH 13/24] Fix OTP preauth crash with null prompter
+Subject: [PATCH 13/25] Fix OTP preauth crash with null prompter
 
 In doprompt(), check if the caller provided a prompter before
 dereferencing it.  Similar code returns either EIO or
@@ -9981,7 +9981,7 @@ ticket: 9186 (new)
  1 file changed, 3 insertions(+)
 
 diff --git a/src/lib/krb5/krb/preauth_otp.c b/src/lib/krb5/krb/preauth_otp.c
-index 07ffc15..48003da 100644
+index 07ffc15c22..48003da62f 100644
 --- a/src/lib/krb5/krb/preauth_otp.c
 +++ b/src/lib/krb5/krb/preauth_otp.c
 @@ -479,6 +479,9 @@ doprompt(krb5_context context, krb5_prompter_fct prompter, void *prompter_data,
@@ -9998,10 +9998,10 @@ index 07ffc15..48003da 100644
 2.53.0
 
 
-From 75080a83c04759836b5dc2073fc5214d11477815 Mon Sep 17 00:00:00 2001
+From 2073be1acd51f906ac68c1a73c4f1ae8380eee35 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Wed, 10 Dec 2025 10:42:02 +0200
-Subject: [PATCH 14/24] Fix strchr() conformance to C23
+Subject: [PATCH 14/25] Fix strchr() conformance to C23
 
 C23 7.28.5.1 specifies search functions such as strchr() as generic,
 returning const char * if the first argument is of type const char *.
@@ -10025,7 +10025,7 @@ ticket: 9191 (new)
  8 files changed, 18 insertions(+), 19 deletions(-)
 
 diff --git a/src/lib/krb5/ccache/ccbase.c b/src/lib/krb5/ccache/ccbase.c
-index 696b681..30a0a41 100644
+index 696b681812..30a0a410c5 100644
 --- a/src/lib/krb5/ccache/ccbase.c
 +++ b/src/lib/krb5/ccache/ccbase.c
 @@ -201,8 +201,8 @@ krb5_cc_register(krb5_context context, const krb5_cc_ops *ops,
@@ -10040,7 +10040,7 @@ index 696b681..30a0a41 100644
      krb5_error_code err;
      const krb5_cc_ops *ops;
 diff --git a/src/lib/krb5/os/expand_path.c b/src/lib/krb5/os/expand_path.c
-index 5cbccf0..6569b88 100644
+index 5cbccf08c8..6569b8820b 100644
 --- a/src/lib/krb5/os/expand_path.c
 +++ b/src/lib/krb5/os/expand_path.c
 @@ -454,7 +454,8 @@ k5_expand_path_tokens_extra(krb5_context context, const char *path_in,
@@ -10054,7 +10054,7 @@ index 5cbccf0..6569b88 100644
      size_t nargs = 0, i;
      va_list ap;
 diff --git a/src/lib/krb5/os/locate_kdc.c b/src/lib/krb5/os/locate_kdc.c
-index d1df04a..6559465 100644
+index d1df04a635..655946505e 100644
 --- a/src/lib/krb5/os/locate_kdc.c
 +++ b/src/lib/krb5/os/locate_kdc.c
 @@ -214,8 +214,8 @@ oom:
@@ -10101,7 +10101,7 @@ index d1df04a..6559465 100644
  
      ret = get_sitename(context, realm, &sitename);
 diff --git a/src/plugins/preauth/pkinit/pkinit_crypto.h b/src/plugins/preauth/pkinit/pkinit_crypto.h
-index 92ccafd..09c5751 100644
+index 92ccafdfe5..09c5751765 100644
 --- a/src/plugins/preauth/pkinit/pkinit_crypto.h
 +++ b/src/plugins/preauth/pkinit/pkinit_crypto.h
 @@ -440,7 +440,7 @@ krb5_error_code crypto_load_cas_and_crls
@@ -10114,7 +10114,7 @@ index 92ccafd..09c5751 100644
  
  /*
 diff --git a/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c b/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
-index 1d99559..7779141 100644
+index 1d99559485..7779141943 100644
 --- a/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
 +++ b/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
 @@ -5006,7 +5006,7 @@ load_cas_and_crls(krb5_context context,
@@ -10145,7 +10145,7 @@ index 1d99559..7779141 100644
      switch (idtype) {
      case IDTYPE_FILE:
 diff --git a/src/plugins/preauth/pkinit/pkinit_identity.c b/src/plugins/preauth/pkinit/pkinit_identity.c
-index 0dcfcfc..ad65f23 100644
+index 0dcfcfc46a..ad65f237b0 100644
 --- a/src/plugins/preauth/pkinit/pkinit_identity.c
 +++ b/src/plugins/preauth/pkinit/pkinit_identity.c
 @@ -473,7 +473,7 @@ process_option_ca_crl(krb5_context context,
@@ -10158,7 +10158,7 @@ index 0dcfcfc..ad65f23 100644
      int idtype;
  
 diff --git a/src/plugins/preauth/pkinit/pkinit_matching.c b/src/plugins/preauth/pkinit/pkinit_matching.c
-index 0ea072c..b3c8df1 100644
+index 0ea072c887..b3c8df1610 100644
 --- a/src/plugins/preauth/pkinit/pkinit_matching.c
 +++ b/src/plugins/preauth/pkinit/pkinit_matching.c
 @@ -262,7 +262,7 @@ parse_rule_component(krb5_context context,
@@ -10171,7 +10171,7 @@ index 0ea072c..b3c8df1 100644
      char *value = NULL;
      size_t len;
 diff --git a/src/tests/responder.c b/src/tests/responder.c
-index 82f870e..4221a20 100644
+index 82f870ea5d..4221a20283 100644
 --- a/src/tests/responder.c
 +++ b/src/tests/responder.c
 @@ -282,8 +282,7 @@ responder(krb5_context ctx, void *rawdata, krb5_responder_context rctx)
@@ -10188,10 +10188,10 @@ index 82f870e..4221a20 100644
 2.53.0
 
 
-From a33e4fa217a2709c3c3eb5155d2f85a90c423486 Mon Sep 17 00:00:00 2001
+From df905ea146a4feb39275f657918373e343cda28f Mon Sep 17 00:00:00 2001
 From: Greg Hudson <ghudson@mit.edu>
 Date: Sun, 28 Sep 2025 15:39:10 -0400
-Subject: [PATCH 15/24] Add paChecksum2 to PKINIT ASN.1 tests
+Subject: [PATCH 15/25] Add paChecksum2 to PKINIT ASN.1 tests
 
 Commit 310793ba63782af5ffa3a95d20e41f8f03ca7e00 added the paChecksum2
 field to krb5_pk_authenticator.  ktest_make_sample_pk_authenticator()
@@ -10211,7 +10211,7 @@ Reported by Michael Osipov.
  5 files changed, 53 insertions(+), 14 deletions(-)
 
 diff --git a/src/tests/asn.1/krb5_decode_test.c b/src/tests/asn.1/krb5_decode_test.c
-index 25ed30e..daeab87 100644
+index 25ed30e422..daeab87c3d 100644
 --- a/src/tests/asn.1/krb5_decode_test.c
 +++ b/src/tests/asn.1/krb5_decode_test.c
 @@ -1178,7 +1178,7 @@ main(int argc, char **argv)
@@ -10224,7 +10224,7 @@ index 25ed30e..daeab87 100644
                     ktest_equal_auth_pack,ktest_free_auth_pack);
          ktest_empty_auth_pack(&ref);
 diff --git a/src/tests/asn.1/ktest.c b/src/tests/asn.1/ktest.c
-index 20360c8..d607891 100644
+index 20360c8ffc..d607891d3a 100644
 --- a/src/tests/asn.1/ktest.c
 +++ b/src/tests/asn.1/ktest.c
 @@ -694,17 +694,6 @@ ktest_make_maximal_pa_otp_req(krb5_pa_otp_req *p)
@@ -10297,7 +10297,7 @@ index 20360c8..d607891 100644
  
  static void
 diff --git a/src/tests/asn.1/ktest_equal.c b/src/tests/asn.1/ktest_equal.c
-index 13786dd..72aa1ff 100644
+index 13786dd1e5..72aa1ff6c6 100644
 --- a/src/tests/asn.1/ktest_equal.c
 +++ b/src/tests/asn.1/ktest_equal.c
 @@ -834,6 +834,18 @@ ktest_equal_sequence_of_spake_factor(krb5_spake_factor **ref,
@@ -10330,7 +10330,7 @@ index 13786dd..72aa1ff 100644
  }
  
 diff --git a/src/tests/asn.1/pkinit_encode.out b/src/tests/asn.1/pkinit_encode.out
-index a764182..9ab0aee 100644
+index a764182e15..9ab0aee772 100644
 --- a/src/tests/asn.1/pkinit_encode.out
 +++ b/src/tests/asn.1/pkinit_encode.out
 @@ -1,7 +1,7 @@
@@ -10343,7 +10343,7 @@ index a764182..9ab0aee 100644
  encode_krb5_reply_key_pack: 30 26 A0 13 30 11 A0 03 02 01 01 A1 0A 04 08 31 32 33 34 35 36 37 38 A1 0F 30 0D A0 03 02 01 01 A1 06 04 04 31 32 33 34
  encode_krb5_sp80056a_other_info: 30 81 81 30 0B 06 09 2A 86 48 86 F7 12 01 02 02 A0 32 04 30 30 2E A0 10 1B 0E 41 54 48 45 4E 41 2E 4D 49 54 2E 45 44 55 A1 1A 30 18 A0 03 02 01 01 A1 11 30 0F 1B 06 68 66 74 73 61 69 1B 05 65 78 74 72 61 A1 32 04 30 30 2E A0 10 1B 0E 41 54 48 45 4E 41 2E 4D 49 54 2E 45 44 55 A1 1A 30 18 A0 03 02 01 01 A1 11 30 0F 1B 06 68 66 74 73 61 69 1B 05 65 78 74 72 61 A2 0A 04 08 6B 72 62 35 64 61 74 61
 diff --git a/src/tests/asn.1/pkinit_trval.out b/src/tests/asn.1/pkinit_trval.out
-index c47bd71..418be63 100644
+index c47bd71f67..418be63546 100644
 --- a/src/tests/asn.1/pkinit_trval.out
 +++ b/src/tests/asn.1/pkinit_trval.out
 @@ -40,6 +40,12 @@ encode_krb5_auth_pack:
@@ -10363,10 +10363,10 @@ index c47bd71..418be63 100644
 2.53.0
 
 
-From 1d63b5d60ac8bdeafef84b2a33def17015398546 Mon Sep 17 00:00:00 2001
+From c851405051ca0af7779a6d6f40df4f28221230f3 Mon Sep 17 00:00:00 2001
 From: Dax Kelson <dakelson@redhat.com>
 Date: Tue, 13 May 2025 11:54:41 -0600
-Subject: [PATCH 16/24] Add xrealmauthz KDC policy module and tests
+Subject: [PATCH 16/25] Add xrealmauthz KDC policy module and tests
 
 This module provides fine-grained access control for cross-realm
 authentications by checking string attributes on the incoming
@@ -10396,7 +10396,7 @@ and is documented only in the module source code.
  create mode 100644 src/tests/t_xrealmauthz.py
 
 diff --git a/src/Makefile.in b/src/Makefile.in
-index f1ebde3..7fa3da9 100644
+index f1ebde39b1..7fa3da923a 100644
 --- a/src/Makefile.in
 +++ b/src/Makefile.in
 @@ -25,6 +25,7 @@ SUBDIRS=util include lib \
@@ -10408,7 +10408,7 @@ index f1ebde3..7fa3da9 100644
  	plugins/preauth/pkinit \
  	plugins/preauth/spake \
 diff --git a/src/configure.ac b/src/configure.ac
-index 33a1160..c0ccfb9 100644
+index 33a1160657..c0ccfb9be8 100644
 --- a/src/configure.ac
 +++ b/src/configure.ac
 @@ -1563,6 +1563,7 @@ V5_AC_OUTPUT_MAKEFILE(.
@@ -10421,7 +10421,7 @@ index 33a1160..c0ccfb9 100644
  	plugins/preauth/test
 diff --git a/src/plugins/kdcpolicy/xrealmauthz/Makefile.in b/src/plugins/kdcpolicy/xrealmauthz/Makefile.in
 new file mode 100644
-index 0000000..78346d6
+index 0000000000..78346d6572
 --- /dev/null
 +++ b/src/plugins/kdcpolicy/xrealmauthz/Makefile.in
 @@ -0,0 +1,18 @@
@@ -10445,7 +10445,7 @@ index 0000000..78346d6
 +@libobj_frag@
 diff --git a/src/plugins/kdcpolicy/xrealmauthz/deps b/src/plugins/kdcpolicy/xrealmauthz/deps
 new file mode 100644
-index 0000000..4ecf533
+index 0000000000..4ecf533f3f
 --- /dev/null
 +++ b/src/plugins/kdcpolicy/xrealmauthz/deps
 @@ -0,0 +1,14 @@
@@ -10465,7 +10465,7 @@ index 0000000..4ecf533
 +  $(top_srcdir)/include/socket-utils.h main.c
 diff --git a/src/plugins/kdcpolicy/xrealmauthz/main.c b/src/plugins/kdcpolicy/xrealmauthz/main.c
 new file mode 100644
-index 0000000..72f077d
+index 0000000000..72f077d434
 --- /dev/null
 +++ b/src/plugins/kdcpolicy/xrealmauthz/main.c
 @@ -0,0 +1,380 @@
@@ -10851,13 +10851,13 @@ index 0000000..72f077d
 +}
 diff --git a/src/plugins/kdcpolicy/xrealmauthz/xrealmauthz.exports b/src/plugins/kdcpolicy/xrealmauthz/xrealmauthz.exports
 new file mode 100644
-index 0000000..a5794af
+index 0000000000..a5794afdbd
 --- /dev/null
 +++ b/src/plugins/kdcpolicy/xrealmauthz/xrealmauthz.exports
 @@ -0,0 +1 @@
 +kdcpolicy_xrealmauthz_initvt
 diff --git a/src/tests/Makefile.in b/src/tests/Makefile.in
-index 41ac0d3..80ac35a 100644
+index 41ac0d3b2a..80ac35aacc 100644
 --- a/src/tests/Makefile.in
 +++ b/src/tests/Makefile.in
 @@ -193,6 +193,7 @@ check-pytests: responder s2p s4u2proxy unlockiter s4u2self
@@ -10870,7 +10870,7 @@ index 41ac0d3..80ac35a 100644
  	$(RM) adata conccache etinfo forward gcred hist hooks hrealm
 diff --git a/src/tests/t_xrealmauthz.py b/src/tests/t_xrealmauthz.py
 new file mode 100644
-index 0000000..3b3921f
+index 0000000000..3b3921f036
 --- /dev/null
 +++ b/src/tests/t_xrealmauthz.py
 @@ -0,0 +1,246 @@
@@ -11124,10 +11124,10 @@ index 0000000..3b3921f
 2.53.0
 
 
-From efd91ec97f5a7cfaa2bdab679199ec3706c6e287 Mon Sep 17 00:00:00 2001
+From 4634ca1f8242c24632e006d7b651064a7556cc92 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Thu, 29 Jan 2026 19:05:01 +0100
-Subject: [PATCH 17/24] Install xrealmauthz like other plugins
+Subject: [PATCH 17/25] Install xrealmauthz like other plugins
 
 The xrealmauthz kdcpolicy plugin was merged upstream, but it is not
 installed my the Makefile. The commit adds additional configuration to
@@ -11139,7 +11139,7 @@ install it in the krb5 modules directory when running "make install".
  3 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/src/Makefile.in b/src/Makefile.in
-index 7fa3da9..05c4b01 100644
+index 7fa3da923a..05c4b01761 100644
 --- a/src/Makefile.in
 +++ b/src/Makefile.in
 @@ -71,7 +71,7 @@ INSTALLMKDIRS = $(KRB5ROOT) $(KRB5MANROOT) $(KRB5OTHERMKDIRS) \
@@ -11152,7 +11152,7 @@ index 7fa3da9..05c4b01 100644
  		$(localstatedir) $(localstatedir)/krb5kdc \
  		$(runstatedir) $(runstatedir)/krb5kdc \
 diff --git a/src/config/pre.in b/src/config/pre.in
-index 3724d26..dbe692b 100644
+index 3724d26ae6..dbe692b251 100644
 --- a/src/config/pre.in
 +++ b/src/config/pre.in
 @@ -220,6 +220,7 @@ MODULE_DIR = @libdir@/krb5/plugins
@@ -11164,7 +11164,7 @@ index 3724d26..dbe692b 100644
  KRB5_TLS_MODULE_DIR = $(MODULE_DIR)/tls
  KRB5_LOCALEDIR = @localedir@
 diff --git a/src/plugins/kdcpolicy/xrealmauthz/Makefile.in b/src/plugins/kdcpolicy/xrealmauthz/Makefile.in
-index 78346d6..b674021 100644
+index 78346d6572..b6740210a7 100644
 --- a/src/plugins/kdcpolicy/xrealmauthz/Makefile.in
 +++ b/src/plugins/kdcpolicy/xrealmauthz/Makefile.in
 @@ -1,5 +1,7 @@
@@ -11188,10 +11188,10 @@ index 78346d6..b674021 100644
 2.53.0
 
 
-From 25714b27b6d3f67bac010f67dbb526958c26716f Mon Sep 17 00:00:00 2001
+From 6d066787d23c913789dcfc220b34cd3a78ada4c7 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Mon, 16 Feb 2026 16:30:14 +0100
-Subject: [PATCH 18/24] Force "fork" method for RADIUS daemon in OTP test
+Subject: [PATCH 18/25] Force "fork" method for RADIUS daemon in OTP test
 
 The RADIUS daemon used in the OTP test relies on
 multiprocessing.Process. Since Python 3.14, multiprocessing changed its
@@ -11208,7 +11208,7 @@ Pull-request: https://github.com/krb5/krb5/pull/1483
  1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/src/tests/t_otp.py b/src/tests/t_otp.py
-index dd5cdc5..c173b55 100755
+index dd5cdc5c26..c173b55c41 100755
 --- a/src/tests/t_otp.py
 +++ b/src/tests/t_otp.py
 @@ -38,10 +38,14 @@ try:
@@ -11258,10 +11258,10 @@ index dd5cdc5..c173b55 100755
 2.53.0
 
 
-From 326a1ce0ba392423a4b75c5d3398377586844dd2 Mon Sep 17 00:00:00 2001
+From 4d8e778bdbf6476e8aa397ef046126ae532f03d6 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Sun, 8 Mar 2026 21:50:52 +0200
-Subject: [PATCH 19/24] Fix S4U2Self ignoring time_req when acquiring
+Subject: [PATCH 19/25] Fix S4U2Self ignoring time_req when acquiring
  impersonated credentials
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -11304,7 +11304,7 @@ Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
  1 file changed, 11 insertions(+)
 
 diff --git a/src/lib/gssapi/krb5/s4u_gss_glue.c b/src/lib/gssapi/krb5/s4u_gss_glue.c
-index fa7f980..9f2cbeb 100644
+index fa7f980af7..9f2cbebec7 100644
 --- a/src/lib/gssapi/krb5/s4u_gss_glue.c
 +++ b/src/lib/gssapi/krb5/s4u_gss_glue.c
 @@ -53,6 +53,17 @@ kg_impersonate_name(OM_uint32 *minor_status,
@@ -11329,10 +11329,10 @@ index fa7f980..9f2cbeb 100644
 2.53.0
 
 
-From c909154f95b8eba8b05d0ddcfac888f06952a663 Mon Sep 17 00:00:00 2001
+From 5b185893438f775538a8d6340e9f4f39f6383cc7 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Mon, 9 Mar 2026 09:16:56 +0200
-Subject: [PATCH 20/24] Fix S4U2Self ignoring time_req when copying
+Subject: [PATCH 20/25] Fix S4U2Self ignoring time_req when copying
  impersonator TGT
 
 gss_acquire_cred_impersonate_name() with a time_req bounded the
@@ -11350,7 +11350,7 @@ Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
  1 file changed, 29 insertions(+), 4 deletions(-)
 
 diff --git a/src/lib/gssapi/krb5/s4u_gss_glue.c b/src/lib/gssapi/krb5/s4u_gss_glue.c
-index 9f2cbeb..10288eb 100644
+index 9f2cbebec7..10288ebe94 100644
 --- a/src/lib/gssapi/krb5/s4u_gss_glue.c
 +++ b/src/lib/gssapi/krb5/s4u_gss_glue.c
 @@ -192,14 +192,35 @@ krb5_gss_acquire_cred_impersonate_name(OM_uint32 *minor_status,
@@ -11409,10 +11409,10 @@ index 9f2cbeb..10288eb 100644
 2.53.0
 
 
-From ec938cdd54ba90a06ccbac881f9e1a360e2b38f3 Mon Sep 17 00:00:00 2001
+From 8df1c41911e7179d2e6cdb72b3bb568c1db08bd3 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Mon, 9 Mar 2026 09:17:08 +0200
-Subject: [PATCH 21/24] Add t_s4u test for time_req bounding all delegated-cred
+Subject: [PATCH 21/25] Add t_s4u test for time_req bounding all delegated-cred
  tickets
 
 Add --time-req N option to t_s4u and a check_cred_endtimes() function
@@ -11431,7 +11431,7 @@ Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
  2 files changed, 80 insertions(+), 3 deletions(-)
 
 diff --git a/src/tests/gssapi/t_s4u.c b/src/tests/gssapi/t_s4u.c
-index 0400f8f..c73f187 100644
+index 0400f8f61f..c73f187b25 100644
 --- a/src/tests/gssapi/t_s4u.c
 +++ b/src/tests/gssapi/t_s4u.c
 @@ -57,6 +57,7 @@
@@ -11552,7 +11552,7 @@ index 0400f8f..c73f187 100644
                              &delegated_cred_handle);
      printf("\n");
 diff --git a/src/tests/gssapi/t_s4u.py b/src/tests/gssapi/t_s4u.py
-index 4a1cdb2..813e27f 100755
+index 4a1cdb2355..813e27fc15 100755
 --- a/src/tests/gssapi/t_s4u.py
 +++ b/src/tests/gssapi/t_s4u.py
 @@ -113,6 +113,11 @@ if 'auth1: user@' not in out or 'auth2: user@' not in out:
@@ -11571,10 +11571,10 @@ index 4a1cdb2..813e27f 100755
 2.53.0
 
 
-From 41b4933383a0fe51b52881a0d4257aaa260e1341 Mon Sep 17 00:00:00 2001
+From e79cc39961a0e347e2efc0455d62ea64fdff99ea Mon Sep 17 00:00:00 2001
 From: Samuel Cabrero <scabrero@suse.com>
 Date: Tue, 17 Feb 2026 16:57:40 +0100
-Subject: [PATCH 22/24] Make configure.ac work with autoconf 2.73
+Subject: [PATCH 22/25] Make configure.ac work with autoconf 2.73
 
 autoreconf requires "AC_INIT" to appear in configure.ac.  Prior to
 autoconf 2.73, our indirect invocation via K5_AC_INIT() was
@@ -11595,7 +11595,7 @@ ticket: 9202 (new)
  create mode 100644 src/version.m4
 
 diff --git a/src/aclocal.m4 b/src/aclocal.m4
-index 1782be9..fe22b1e 100644
+index 1782be9788..fe22b1e045 100644
 --- a/src/aclocal.m4
 +++ b/src/aclocal.m4
 @@ -16,30 +16,6 @@ ac_config_fragdir=$ac_reltopdir/config
@@ -11630,7 +11630,7 @@ index 1782be9..fe22b1e 100644
  dnl
  AC_DEFUN(CONFIG_RULES,[dnl
 diff --git a/src/configure.ac b/src/configure.ac
-index c0ccfb9..064aded 100644
+index c0ccfb9be8..064adede3f 100644
 --- a/src/configure.ac
 +++ b/src/configure.ac
 @@ -1,4 +1,6 @@
@@ -11643,7 +11643,7 @@ index c0ccfb9..064aded 100644
  if test x"$runstatedir" = x; then
 diff --git a/src/version.m4 b/src/version.m4
 new file mode 100644
-index 0000000..4b08edd
+index 0000000000..4b08edde52
 --- /dev/null
 +++ b/src/version.m4
 @@ -0,0 +1,14 @@
@@ -11665,10 +11665,10 @@ index 0000000..4b08edd
 2.53.0
 
 
-From b87535795bd164a7d0075835e6d8326d4a171c41 Mon Sep 17 00:00:00 2001
+From a79620c4f0080f436ecae3504c2e0ee3fedb5360 Mon Sep 17 00:00:00 2001
 From: Greg Hudson <ghudson@mit.edu>
 Date: Wed, 25 Feb 2026 19:05:40 -0500
-Subject: [PATCH 23/24] Use X509_check_host() to verify KKDCP server cert
+Subject: [PATCH 23/25] Use X509_check_host() to verify KKDCP server cert
 
 In the k5tls module, rely on X509_check_host() and
 X509_check_ip_asc(), which were added in OpenSSL 1.0.2, instead of
@@ -11680,12 +11680,13 @@ like "kdc*.mydomain.com".  The old code only allows a wildcard to
 match a complete label.
 
 ticket: 9198 (new)
+(cherry picked from commit f5bbfa4821cf590a4748f96d0e016bc0485e95c4)
 ---
  src/plugins/tls/k5tls/openssl.c | 211 +-------------------------------
  1 file changed, 6 insertions(+), 205 deletions(-)
 
 diff --git a/src/plugins/tls/k5tls/openssl.c b/src/plugins/tls/k5tls/openssl.c
-index aab67c0..42d72dc 100644
+index aab67c01cb..42d72dc9ec 100644
 --- a/src/plugins/tls/k5tls/openssl.c
 +++ b/src/plugins/tls/k5tls/openssl.c
 @@ -71,218 +71,19 @@ flush_errors(krb5_context context)
@@ -11917,10 +11918,10 @@ index aab67c0..42d72dc 100644
 2.53.0
 
 
-From a29c2ce5aa19d5baed9496a76033fd64eea2f6ae Mon Sep 17 00:00:00 2001
+From c75afd347838de097522095016690e851f055fa1 Mon Sep 17 00:00:00 2001
 From: Bob Beck <beck@openssl.org>
 Date: Mon, 16 Feb 2026 15:15:55 -0700
-Subject: [PATCH 24/24] Improve future OpenSSL compatibility
+Subject: [PATCH 24/25] Improve future OpenSSL compatibility
 
 Avoid calling deprecated OpenSSL functions when compiling against
 versions of OpenSSL where they are deprecated.  Add
@@ -11949,57 +11950,15 @@ Contains work by Frederik Wedel-Heinen
 
 [ghudson@mit.edu: combined numerous commits; added compatibility
 macros; rewrote commit message; fixed 1.0.2 compatibility issue]
+
+(cherry picked from commit 5e4e8452328804948d042235bbf58ca457795857)
 ---
- .github/workflows/build.yml                   | 10 ++--
  .../preauth/pkinit/pkinit_crypto_openssl.c    | 54 ++++++++++++++-----
  src/plugins/tls/k5tls/openssl.c               | 26 +++++++--
- 3 files changed, 68 insertions(+), 22 deletions(-)
+ 2 files changed, 63 insertions(+), 17 deletions(-)
 
-diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
-index c16e77c..af07cf0 100644
---- a/.github/workflows/build.yml
-+++ b/.github/workflows/build.yml
-@@ -16,17 +16,17 @@ jobs:
-                     - name: linux-clang
-                       os: ubuntu-latest
-                       compiler: clang
--                      makevars: CPPFLAGS=-Werror
-+                      flags: -Werror
-                       configureopts: --enable-asan
-                     - name: linux-clang-openssl
-                       os: ubuntu-latest
-                       compiler: clang
--                      makevars: CPPFLAGS=-Werror
-+                      flags: -Werror -DOPENSSL_NO_DEPRECATED
-                       configureopts: --with-crypto-impl=openssl
-                     - name: linux-gcc
-                       os: ubuntu-latest
-                       compiler: gcc
--                      makevars: CPPFLAGS=-D_FORTIFY_SOURCE=3
-+                      flags: -D_FORTIFY_SOURCE=3
-         steps:
-             - name: Checkout repository
-               uses: actions/checkout@v1
-@@ -39,7 +39,7 @@ jobs:
-             - name: Build
-               env:
-                 CC: ${{ matrix.compiler }}
--                MAKEVARS: ${{ matrix.makevars }}
-+                FLAGS: ${{ matrix.flags }}
-                 CONFIGURE_OPTS:  ${{ matrix.configureopts }}
-               run: |
-                 # For the ksu tests, allow homedir access from other users.
-@@ -49,7 +49,7 @@ jobs:
-                 cd src
-                 autoreconf
-                 ./configure --enable-maintainer-mode --with-ldap $CONFIGURE_OPTS --prefix=$HOME/inst
--                make $MAKEVARS
-+                make CPPFLAGS="$FLAGS"
-                 make check
-                 make install
-                 (cd clients/ksu && make check-ksu)
 diff --git a/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c b/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
-index 7779141..f085323 100644
+index 7779141943..f085323d90 100644
 --- a/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
 +++ b/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
 @@ -209,13 +209,20 @@ create_identifiers_from_stack(STACK_OF(X509) *sk,
@@ -12173,7 +12132,7 @@ index 7779141..f085323 100644
      int len = 0;
      PKCS7_ISSUER_AND_SERIAL *is = NULL;
 diff --git a/src/plugins/tls/k5tls/openssl.c b/src/plugins/tls/k5tls/openssl.c
-index 42d72dc..7763327 100644
+index 42d72dc9ec..7763327b7a 100644
 --- a/src/plugins/tls/k5tls/openssl.c
 +++ b/src/plugins/tls/k5tls/openssl.c
 @@ -38,6 +38,24 @@
@@ -12240,6 +12199,72 @@ index 42d72dc..7763327 100644
      if (ctx == NULL)
          goto error;
  
+-- 
+2.53.0
+
+
+From 3cf396189876ac661063dc2483ea721d8a8c7441 Mon Sep 17 00:00:00 2001
+From: Greg Hudson <ghudson@mit.edu>
+Date: Wed, 8 Apr 2026 17:57:59 -0400
+Subject: [PATCH 25/25] Fix two NegoEx parsing vulnerabilities
+
+In parse_nego_message(), check the result of the second call to
+vector_base() before dereferencing it.  In parse_message(), check for
+a short header_len to prevent an integer underflow when calculating
+the remaining message length.
+
+Reported by Cem Onat Karagun.
+
+CVE-2026-40355:
+
+In MIT krb5 release 1.18 and later, if an application calls
+gss_accept_sec_context() on a system with a NegoEx mechanism
+registered in /etc/gss/mech, an unauthenticated remote attacker can
+trigger a null pointer dereference, causing the process to terminate.
+
+CVE-2026-40356:
+
+In MIT krb5 release 1.18 and later, if an application calls
+gss_accept_sec_context() on a system with a NegoEx mechanism
+registered in /etc/gss/mech, an unauthenticated remote attacker can
+trigger a read overrun of up to 52 bytes, possibly causing the process
+to terminate.  Exfiltration of the bytes read does not appear
+possible.
+
+ticket: 9205 (new)
+tags: pullup
+target_version: 1.22-next
+
+(cherry picked from commit 2e75f0d9362fb979f5fc92829431a590a130929f)
+---
+ src/lib/gssapi/spnego/negoex_util.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/lib/gssapi/spnego/negoex_util.c b/src/lib/gssapi/spnego/negoex_util.c
+index edc5462e84..a65238e573 100644
+--- a/src/lib/gssapi/spnego/negoex_util.c
++++ b/src/lib/gssapi/spnego/negoex_util.c
+@@ -253,6 +253,10 @@ parse_nego_message(OM_uint32 *minor, struct k5input *in,
+     offset = k5_input_get_uint32_le(in);
+     count = k5_input_get_uint16_le(in);
+     p = vector_base(offset, count, EXTENSION_LENGTH, msg_base, msg_len);
++    if (p == NULL) {
++        *minor = ERR_NEGOEX_INVALID_MESSAGE_SIZE;
++        return GSS_S_DEFECTIVE_TOKEN;
++    }
+     for (i = 0; i < count; i++) {
+         extension_type = load_32_le(p + i * EXTENSION_LENGTH);
+         if (extension_type & EXTENSION_FLAG_CRITICAL) {
+@@ -391,7 +395,8 @@ parse_message(OM_uint32 *minor, spnego_gss_ctx_id_t ctx, struct k5input *in,
+     msg_len = k5_input_get_uint32_le(in);
+     conv_id = k5_input_get_bytes(in, GUID_LENGTH);
+ 
+-    if (in->status || msg_len > token_remaining || header_len > msg_len) {
++    if (in->status || msg_len > token_remaining ||
++        header_len < (size_t)(in->ptr - msg_base) || header_len > msg_len) {
+         *minor = ERR_NEGOEX_INVALID_MESSAGE_SIZE;
+         return GSS_S_DEFECTIVE_TOKEN;
+     }
 -- 
 2.53.0
 
