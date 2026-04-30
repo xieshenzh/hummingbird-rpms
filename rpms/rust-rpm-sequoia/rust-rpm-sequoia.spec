@@ -5,7 +5,7 @@
 
 Name:           rust-rpm-sequoia
 Version:        1.10.1.1
-Release:        1.1%{?dist}
+Release:        1.2%{?dist}
 Summary:        Implementation of the RPM PGP interface using Sequoia
 
 License:        LGPL-2.0-or-later
@@ -24,6 +24,10 @@ Source:         %{crate}-%{version}.tar.gz
 #   tar -czf ../rpm-sequoia-vendor-1.10.1.1.tar.gz vendor
 Source1:        %{crate}-vendor-%{version}.tar.gz
 Source2:        vendor.toml
+
+# CVE-2026-2625: reject signatures with invalid issuer subpackets
+# https://github.com/rpm-software-management/rpm-sequoia/pull/112
+Patch0:         CVE-2026-2625.patch
 
 %if 0%{?rhel}
 BuildRequires:  rust-toolset
@@ -76,6 +80,7 @@ Requires:       %{crate}%{?_isa} = %{version}-%{release}
 
 %prep
 %autosetup -n %{crate}-%{version} -N -a1
+%patch 0 -p1
 %cargo_prep -N
 # include full configuration for vendored dependencies
 cat %{SOURCE2} >> .cargo/config.toml
