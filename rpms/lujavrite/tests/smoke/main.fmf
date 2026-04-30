@@ -1,0 +1,5 @@
+summary: Lujavrite smoke test
+description: Test basic functionality of Lujavrite.
+require:
+  - java-25-openjdk-headless
+  - lua
