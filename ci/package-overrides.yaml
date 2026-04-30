@@ -177,6 +177,9 @@ syft:
 tomcat11:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+caddy:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 oras:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
