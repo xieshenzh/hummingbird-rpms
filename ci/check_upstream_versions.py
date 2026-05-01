@@ -708,7 +708,6 @@ def update_spec_version(package: str, new_version: str) -> list[str]:
       is used).  ``0.1`` is chosen so that when the same version is
       later imported from Fedora (with ``Release >= 1``), it sorts
       higher and replaces this locally-built version.
-    - Adds a ``%changelog`` entry (unless ``%autochangelog`` is used)
     - Downloads new source archives and updates the ``sources`` file
     - Marks the package metadata as modified
 
@@ -716,7 +715,7 @@ def update_spec_version(package: str, new_version: str) -> list[str]:
     defined there replace (or extend) the default phases:
 
     - **update_spec** — replaces the Version/Release update described
-      above (a changelog entry is still added via the Specfile object).
+      above.
     - **download_sources** — replaces the default URL-based source
       download; stdout lines are treated as filenames to upload to the
       lookaside cache.
@@ -769,14 +768,6 @@ def update_spec_version(package: str, new_version: str) -> list[str]:
             spec.update_tag("Release", "0.1%{?dist}")
         spec.save()
 
-    # Add changelog entry (common to both paths)
-    spec = Specfile(str(spec_file), sourcedir=str(package_dir))
-    spec.add_changelog_entry(
-        f"- Update to {new_version}",
-        author="Hummingbird",
-        email="hummingbird@redhat.com",
-    )
-    spec.save()
     logger.info(f"{package}: updated spec {old_version} -> {new_version}")
 
     # --- Phase 2: source download --------------------------------------------
