@@ -4,5 +4,6 @@ download_sources: |
   curl -fSL -o "caddy-${UPDATE_NEW_VERSION}.tar.gz" \
     "https://github.com/caddyserver/caddy/archive/v${UPDATE_NEW_VERSION}/caddy-${UPDATE_NEW_VERSION}.tar.gz" >&2
   ./create-vendor-tarball.sh "v${UPDATE_NEW_VERSION}" >&2
+  rm -rf "caddy-${UPDATE_NEW_VERSION}"
   echo "caddy-${UPDATE_NEW_VERSION}.tar.gz"
   echo "caddy-${UPDATE_NEW_VERSION}-vendor.tar.gz"
