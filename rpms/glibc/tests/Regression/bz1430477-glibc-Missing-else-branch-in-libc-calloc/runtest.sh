@@ -50,7 +50,7 @@ rlJournalStart
         rlRun "rpm -Uhv $PACKAGE*.src.rpm"
         rlAssertExists $SPECDIR/$PACKAGE.spec
 
-        rlRun "yum-builddep -y $PACKAGE-*.src.rpm" 0 "Installing dependences"
+        rlRun "dnf builddep -y $PACKAGE-*.src.rpm" 0 "Installing dependences"
     rlPhaseEnd
 
     rlPhaseStartTest "Building glibc"

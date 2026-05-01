@@ -36,7 +36,7 @@ rlJournalStart
         rlRun "pushd $tmpdir"
         # make sure glibc-debuginfo is not installed
         if rlCheckRpm glibc-debuginfo; then
-            rlRun "yum -y remove glibc-debuginfo"
+            rlRun "dnf -y remove glibc-debuginfo"
         fi
 
     rlPhaseEnd
