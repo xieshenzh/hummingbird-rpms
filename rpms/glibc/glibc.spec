@@ -346,6 +346,7 @@ Patch27: glibc-RHEL-172425-2.patch
 Patch28: glibc-RHEL-172425-3.patch
 Patch29: glibc-RHEL-172425-4.patch
 Patch30: glibc-RHEL-172420.patch
+Patch31: glibc-bz33921-open-tree-ifndef-guards.patch
 # https://bugs.winehq.org/show_bug.cgi?id=58523
 # revert 3d3572f59059e2b19b8541ea648a6172136ec42e to fix wine build
 # applied with PP powers as we really need to build wine to fix scriptlet problems
