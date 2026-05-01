@@ -4,3 +4,5 @@
 /curl-[0-9.]*.tar.xz.asc
 /curl-[0-9]*.[0-9]*.[0-9]*/
 /*.src.rpm
+curl-8.20.0.tar.xz
+curl-8.20.0.tar.xz.asc

@@ -1,12 +1,12 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Lower parallel test multiplier to avoid valgrind contention on small builders",
+  "modification_reason": "Update to upstream version 8.20.0",
   "modification_status": "modified",
-  "release": "3",
+  "release": "0.1",
   "release_monitoring_project_id": 381,
   "sha": "9821ffef8df4d04216000f7fa65777a9e3fb6677",
   "source": "https://src.fedoraproject.org/rpms/curl.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/curl/curl",
-  "version": "8.19.0"
+  "version": "8.20.0"
 }

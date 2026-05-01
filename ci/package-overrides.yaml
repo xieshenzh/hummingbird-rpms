@@ -36,6 +36,7 @@ cloud-init:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 curl:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
   # Larger builders needed for parallel test suite under valgrind
   build_platforms:
     - "linux-c2xlarge/amd64"
