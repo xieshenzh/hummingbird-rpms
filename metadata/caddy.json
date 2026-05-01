@@ -3,8 +3,10 @@
   "modification_reason": "Remove runtime dependency on systemd",
   "modification_status": "modified",
   "release": "5",
+  "release_monitoring_project_id": 15601,
   "sha": "27556fc66f904b7fddb7cd3f244e44042ed662ca",
   "source": "https://src.fedoraproject.org/rpms/caddy.git",
+  "track_upstream": "latest",
   "upstream_repo": "https://github.com/caddyserver/caddy",
   "version": "2.10.2"
 }
