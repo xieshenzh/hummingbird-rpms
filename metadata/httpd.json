@@ -3,8 +3,8 @@
   "cve_product": "Apache Software Foundation / Apache HTTP Server",
   "modification_reason": "Remove runtime dependency on systemd",
   "modification_status": "modified",
-  "release": "6",
-  "sha": "de872af94461cbc9951954c09cd5e095a7bd1ed3",
+  "release": "7",
+  "sha": "ecfe55be836e19b6758f829913ebe73599214aae",
   "source": "https://src.fedoraproject.org/rpms/httpd.git",
   "upstream_repo": "https://github.com/apache/httpd",
   "version": "2.4.66"
