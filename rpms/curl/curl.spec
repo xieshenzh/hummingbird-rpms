@@ -11,8 +11,8 @@
 
 Summary: A utility for getting files from remote servers (FTP, HTTP, and others)
 Name: curl
-Version: 8.19.0
-Release: 3.1%{?dist}
+Version: 8.20.0
+Release: 0.1%{?dist}
 License: curl
 Source0: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz
 Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
@@ -20,11 +20,6 @@ Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
 # to Daniel's address page https://daniel.haxx.se/address.html for the GPG Key,
 # which points to the GPG key as of April 7th 2016 of https://daniel.haxx.se/mykey.asc
 Source2: mykey.asc
-
-# Fix test459 to pass when running tests in parallel
-Patch001: 001-curl-8.19.0-test459-switch-to-mode-warn-for-stderr-check.patch
-# Don't fail channel binding for ML-DSA certificates
-Patch002: 002-curl-8.19.0-mldsa-channel-binding.patch
 
 # patch making libcurl multilib ready
 Patch101: 0101-curl-7.32.0-multilib.patch
