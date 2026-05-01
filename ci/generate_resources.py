@@ -22,7 +22,7 @@ DEFAULT_BUILD_PLATFORMS = ["linux/x86_64", "linux/arm64"]
 BUILD_TRIGGER_RPM_NAME = "setup"
 
 # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
-PIPELINE_BUNDLE = "quay.io/hummingbird-ci/rpmbuild-pipeline@sha256:61cee35da40ca89d4400d9e95898a48bdaf0264bbcaabc0a6e6ea64ac7e2b4d1"
+PIPELINE_BUNDLE = "quay.io/hummingbird-ci/rpmbuild-pipeline@sha256:b9ce8a02047f0d27361c0172fe6c1eb4f2c7a196be133d19d6d67edd20b13de7"
 
 def load_yaml_file(path: Path) -> dict | None:
     """Load a YAML file, returning None if it doesn't exist."""

@@ -1,8 +1,9 @@
 {
   "branch": "f43",
-  "modification_status": "clean",
-  "release": "11",
-  "sha": "a79fc6cc782260ab21a9e4dba02ce8a4371f9474",
+  "modification_reason": "Sync OPEN_TREE_CLONE definition with kernel headers to fix -Werror build failure on x86-64 and aarch64",
+  "modification_status": "modified",
+  "release": "12",
+  "sha": "dc92cb50fb32d11d14029f6d3232dd48b8f9b80d",
   "source": "https://src.fedoraproject.org/rpms/glibc.git",
   "upstream_repo": "https://sourceware.org/git/glibc.git",
   "version": "2.42"

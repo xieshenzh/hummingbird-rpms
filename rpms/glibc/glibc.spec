@@ -1,4 +1,4 @@
-%global glibcsrcdir glibc-2.42-61-ga56a2943d2
+%global glibcsrcdir glibc-2.42-62-gf13c1bb0f9
 %global glibcversion 2.42
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
@@ -152,8 +152,8 @@ Version: %{glibcversion}
 # - It allows using the Release number without the %%dist tag in the dependency
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
-%global baserelease 11
-Release: %{baserelease}.1%{?dist}
+%global baserelease 12
+Release: %{baserelease}%{?dist}
 
 # Licenses:
 #
@@ -340,6 +340,13 @@ Patch13: glibc-fedora-localedata-rh61908.patch
 Patch17: glibc-cs-path.patch
 Patch23: glibc-python3.patch
 Patch24: glibc-rh2432405.patch
+Patch25: glibc-RHEL-172421.patch
+Patch26: glibc-RHEL-172425-1.patch
+Patch27: glibc-RHEL-172425-2.patch
+Patch28: glibc-RHEL-172425-3.patch
+Patch29: glibc-RHEL-172425-4.patch
+Patch30: glibc-RHEL-172420.patch
+Patch31: glibc-bz33921-open-tree-ifndef-guards.patch
 # https://bugs.winehq.org/show_bug.cgi?id=58523
 # revert 3d3572f59059e2b19b8541ea648a6172136ec42e to fix wine build
 # applied with PP powers as we really need to build wine to fix scriptlet problems
@@ -2388,6 +2395,17 @@ update_gconv_modules_cache ()
 %endif
 
 %changelog
+* Thu Apr 30 2026 Florian Weimer <fweimer@redhat.com> - 2.42-12
+- Add downstream patches with fixes for vulnerabilities.
+- Fix buffer overflow in scanf %%mc (CVE-2026-5450)
+- Fix ns_sprintrrf buffer overreads (CVE-2026-6238)
+- Fix ns_sprintrrf buffer overflow in TSIG record processing (CVE-2026-5435)
+- Fix memory corruption in ungetwc (CVE-2026-5928)
+- Auto-sync with upstream branch release/2.42/master,
+  commit f13c1bb0f97fbc12a6ba1ab5669ce561ea32b80a:
+- iconv: Use pending character state in IBM1390, IBM1399 character sets
+  (CVE-2026-4046)
+
 * Tue Apr 07 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-11
 - Auto-sync with upstream branch release/2.42/master,
   commit a56a2943d2ce541102c630142c2eae0fbfc5886b:
