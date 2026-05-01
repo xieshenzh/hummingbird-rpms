@@ -29,6 +29,9 @@
 bootc:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+capstone:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 cloud-init:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
