@@ -110,7 +110,47 @@ CVE Jira tickets, see the [manual CVE triage process][cve-manual]. For
 details on the automated `cve_analysis.py` tool, CLI flags, managed labels,
 and bot-vs-human interaction, see the [CVE analysis documentation][cve-docs].
 
+### How vulnerability scanners identify CVEs in container images
+
+The following describes the general approach used by vulnerability
+scanners; specific scanner implementations may vary in detail.
+
+1. **SBOM generation** -- The Konflux build pipeline produces an SPDX 2.3
+   SBOM for each container image, assembled from two scans merged by
+   [Mobster][mobster]: [Syft][syft] (which scans the built image for
+   installed RPMs and non-RPM packages, including CPE references) and
+   [Hermeto][hermeto] (which records build-time dependencies from
+   lockfiles). The merged SBOM is attached to the image as an OCI
+   artifact. Published SBOMs are also available at the
+   [Hummingbird SBOM repository][sbom-repo], where each package has a
+   subdirectory (e.g., `nodejs22-main/`) containing the SBOM files.
+
+2. **RPM matching** -- Vulnerability scanners use the SBOM to enumerate
+   packages, then typically perform two kinds of matching for RPMs:
+   - **Direct match** -- looks up the binary RPM package name and version
+     against distro-specific vulnerability feeds (e.g., Red Hat/Fedora
+     security advisories). Epochs are explicitly handled.
+   - **Source/upstream match** -- derives the source RPM name and matches
+     against vulnerability data for the source package (e.g.,
+     `perl-Errno` maps back to the `perl` source package).
+
+3. **Data sources** -- For RPM packages, scanners typically use
+   distro-specific security feeds (Red Hat/Fedora advisories) rather than
+   the NVD. CPE-based NVD matching is generally used as a fallback for
+   EOL distros or package types without dedicated feeds.
+
+4. **VEX suppression** -- Scanners that support VEX (Vulnerability
+   Exploitability eXchange) can filter false positives using OpenVEX or
+   CSAF documents. Red Hat's [VEX feed][vex-feed] is the authoritative
+   source for consumer-facing CVE disposition, recording whether a
+   product is affected, not affected, or fixed.
+
 [cve-script]: https://gitlab.com/redhat/hummingbird/tools/-/blob/main/hummingbird-tools/hummingbird_tools/cve_analysis.py
 [cve-docs]: https://gitlab.com/redhat/hummingbird/tools/-/blob/main/documentation/hummingbird-tools-cve-analysis.md
 [cve-manual]: https://gitlab.com/redhat/hummingbird/tools/-/blob/main/hummingbird-tools/hummingbird_tools/cve-manual-process.md
 [prodsec-vuln-mgmt]: https://redhat.atlassian.net/wiki/x/VSM9EQ
+[syft]: https://github.com/anchore/syft
+[hermeto]: https://github.com/hermetoproject/hermeto
+[mobster]: https://github.com/konflux-ci/mobster
+[sbom-repo]: https://packages.redhat.com/api/pulp-content/public-hummingbird/metadata/sboms
+[vex-feed]: https://security.access.redhat.com/data/csaf/v2/vex-feed
