@@ -1,0 +1,14 @@
+testrunner.tcl exits with code 0 even if tests fail
+reported upstream https://sqlite.org/forum/info/cfa5101805883158
+diff --git a/test/testrunner.tcl b/test/testrunner.tcl
+index 62dce8e..035e137 100755
+--- a/test/testrunner.tcl
++++ b/test/testrunner.tcl
+@@ -1877,6 +1877,7 @@ proc run_testset {} {
+   trdb eval {
+      SELECT DISTINCT substr(svers,1,79) as v1 FROM jobs WHERE svers IS NOT NULL
+   } {puts $v1}
++  if {$totalerr>0} {exit 1}
+ 
+ }
+ 

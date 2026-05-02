@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "42d95d56458002a7d5cccaba988a07a3af6a3b38",
+  "sha": "f8a9253ae622f1a33054d407ec20b6e6022c2645",
   "source": "https://src.fedoraproject.org/rpms/sqlite.git",
   "upstream_repo": "https://github.com/sqlite/sqlite",
-  "version": "3.52.0"
+  "version": "3.53.0"
 }

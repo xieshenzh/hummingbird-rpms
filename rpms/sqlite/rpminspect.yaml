@@ -9,5 +9,5 @@ annocheck:
     # These have to be ignored due to TCL library being partly compiled without lto.
     # Ref: https://issues.redhat.com/browse/RHEL-45991
     ignore:
-        - '/usr/lib*/tcl*/sqlite*/libtclsqlite*.so*'
+        - '/usr/lib*/tcl*/sqlite*/libtcl*sqlite*.so*'
         - '/usr/lib*/tcl*/sqlite*/libsqlite*.so*'
