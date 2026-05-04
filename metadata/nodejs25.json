@@ -1,6 +1,5 @@
 {
-  "modification_reason": "trigger rebuild to sign the RPMs",
-  "modification_status": "modified",
+  "modification_status": "native",
   "release": "1",
   "release_monitoring_project_id": 8251,
   "track_upstream": "25",
