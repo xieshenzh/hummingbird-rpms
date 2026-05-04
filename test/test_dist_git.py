@@ -12,6 +12,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+project_root = Path(__file__).parent.parent
+
 #
 # Fixtures
 #
@@ -40,8 +42,6 @@ def workdir(tmp_path: Path) -> Path:
     subprocess.run(['git', 'init'], cwd=rpms_dir, check=True)
     subprocess.run(['git', 'config', 'user.name', 'Test'], cwd=rpms_dir, check=True)
     subprocess.run(['git', 'config', 'user.email', 'test@example.com'], cwd=rpms_dir, check=True)
-
-    project_root = Path(__file__).parent.parent
 
     # Copy ci/, config, and templates
     shutil.copytree(project_root / 'ci', rpms_dir / 'ci')
@@ -3063,3 +3063,30 @@ def test_rebuild_rev_deps_no_dependencies(workdir: Path, upstream_repos: dict[st
 
     # Should report no dependencies
     assert 'No packages found with BuildRequires: vanilla' in result.stderr
+
+
+def test_ls_sources() -> None:
+    """Integration test: ls-sources on tar"""
+
+    # This calls the actual dist-git-client and thus downloads the archives
+    # (in the first run). This is a bit awkward for a unit test, but otherwise
+    # we can't meaningfully test this.
+    tar_dir = project_root / 'rpms' / 'tar'
+
+    result = subprocess.run(
+        [str(project_root / 'ci' / 'dist_git.py'), 'ls-sources', 'tar'],
+        cwd=project_root, capture_output=True, text=True, check=True)
+
+    assert result.stderr == ''
+
+    # Verify output contains archive headers
+    assert re.search(r'==== tar-[\d.]+\.tar\.xz ====', result.stdout)
+    assert re.search(r'==== tar-[\d.]+\.tar\.xz\.sig ====', result.stdout)
+
+    # Verify output contains some tar contents
+    assert re.search(r'tar-[\d.]+/', result.stdout)
+    assert 'configure' in result.stdout
+
+    # Verify files were actually downloaded
+    assert len(list(tar_dir.glob('tar-*.tar.xz'))) == 1
+    assert len(list(tar_dir.glob('tar-*.tar.xz.sig'))) == 1

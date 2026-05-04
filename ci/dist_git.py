@@ -25,7 +25,7 @@ import yaml
 from packaging.version import Version
 from pathlib import Path
 from specfile import Specfile
-from typing import Literal, NotRequired, TypedDict, cast
+from typing import Iterator, Literal, NotRequired, TypedDict, cast
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 RPMS_DIR = ROOT_DIR / 'rpms'
@@ -39,6 +39,9 @@ RENAMED_PACKAGES_JSON = ROOT_DIR / 'ci' / 'renamed_packages.json'
 # it through indirect macros.  Nothing after %autorelease ever needs to be preserved,
 # so we consume everything to end of line.
 AUTORELEASE_PATTERN = r'%\{?\??autorelease.*'
+
+# Match dist-git sources file format: ALGO (filename) = hash
+SOURCES_LINE_PATTERN = re.compile(r'^(\w+)\s+\((.+?)\)\s+=\s+(\w+)$')
 
 # When the LATEST version of a virtual BuildRequires changes, rebuild all its dependents
 # See get_virtual_buildrequires_translation() below for details
@@ -276,6 +279,72 @@ def get_all_imported_packages() -> dict[str, PackageMetadata]:
             all_imports[package_name] = metadata
 
     return all_imports
+
+
+def _parse_sources_file(sources_path: Path) -> Iterator[str]:
+    """
+    Parse a dist-git 'sources' file.
+
+    Each line has format: ALGO (filename) = hash
+
+    Yields filenames.
+    """
+    for line in sources_path.read_text().splitlines():
+        match = SOURCES_LINE_PATTERN.match(line.strip())
+        if match:
+            yield match.group(2)  # filename
+
+
+def list_archive_contents(filepath: Path) -> None:
+    """List contents of a tar or zip archive."""
+    name_lower = filepath.name.lower()
+
+    # Skip signature files and other non-archives
+    if name_lower.endswith(('.sig', '.asc', '.sign')):
+        return
+
+    # Determine archive type and command
+    if name_lower.endswith(('.tar.gz', '.tar.bz2', '.tar.xz', '.tar.zst', '.tgz', '.tar')):
+        cmd = ['tar', 'tf', str(filepath)]
+    elif name_lower.endswith('.zip'):
+        cmd = ['unzip', '-l', str(filepath)]
+    else:
+        raise RuntimeError(f"Unknown archive type: {filepath.name}")
+
+    subprocess.run(cmd, check=True)
+
+
+def ls_sources(package: str) -> None:
+    """List 'sources' archive contents for a package."""
+    # Determine source URL from metadata
+    metadata = imports[package]
+
+    package_dir = RPMS_DIR / package
+    sources_path = package_dir / 'sources'
+    if not sources_path.exists():
+        logging.info(f"No {sources_path} file")
+        sys.exit(0)
+
+    try:
+        source_url = metadata['source']
+    except KeyError:
+        # Native packages don't have a source URL - use Hummingbird lookaside
+        if metadata.get('modification_status') != 'native':
+            logging.error(f"Package {package} has no source URL and is not marked as native")
+            sys.exit(1)
+        source_url = f'https://gitlab.com/redhat/hummingbird/rpms/{package}.git'
+
+    # Download source archives
+    subprocess.run(
+        ['dist-git-client', '--configdir', str(ROOT_DIR / 'mock'),
+         '--loglevel', 'warning',
+         '--forked-from', source_url, 'sources'],
+        cwd=str(package_dir), check=True)
+
+    # List contents of each source file
+    for filename in _parse_sources_file(sources_path):
+        print(f"==== {filename} ====")
+        list_archive_contents(package_dir / filename)
 
 
 def run_git(*args: str, cwd: Path | str | None = None, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -1913,6 +1982,9 @@ Examples:
     diff_parser.add_argument('--raw', action='store_true',
                             help='Show raw diff without filters (includes Release:, whitespace)')
 
+    ls_sources_parser = subparsers.add_parser('ls-sources', help='List contents of sources archives')
+    ls_sources_parser.add_argument('package', help='Package name to inspect')
+
     args = parser.parse_args()
 
     # Set global sign-off flag
@@ -1924,7 +1996,7 @@ Examples:
         sys.exit("ERROR: --dry-run is not supported with the rename command")
 
     # Check git config for commands that will commit
-    if args.command not in ['list', 'diff', 'set-upstream'] and (not args.dry_run or args.command == 'rename'):
+    if args.command not in ['list', 'diff', 'set-upstream', 'ls-sources'] and (not args.dry_run or args.command == 'rename'):
         check_git_config()
 
     match args.command:
@@ -2039,6 +2111,8 @@ Examples:
 
             # Exit with code 1 if any diffs found
             sys.exit(1 if has_diffs else 0)
+        case 'ls-sources':
+            ls_sources(args.package)
 
 
 if __name__ == '__main__':
