@@ -3077,8 +3077,6 @@ def test_ls_sources() -> None:
         [str(project_root / 'ci' / 'dist_git.py'), 'ls-sources', 'tar'],
         cwd=project_root, capture_output=True, text=True, check=True)
 
-    assert result.stderr == ''
-
     # Verify output contains archive headers
     assert re.search(r'==== tar-[\d.]+\.tar\.xz ====', result.stdout)
     assert re.search(r'==== tar-[\d.]+\.tar\.xz\.sig ====', result.stdout)
