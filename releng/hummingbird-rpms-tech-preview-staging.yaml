@@ -41,7 +41,7 @@ spec:
       #
     singleComponentMode: true
     sign:
-      configMapName: hacbs-signing-pipeline-config-staging-redhatrelease2
+      configMapName: hacbs-signing-pipeline-config-staging-e2e
       cosignSecretName: konflux-cosign-signing-stage
     pyxis:
       secret: pyxis-staging-secret
