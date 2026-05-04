@@ -4,7 +4,7 @@ import json
 import subprocess
 import types
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import pytest
 
@@ -480,7 +480,6 @@ def test_check_package_version_uses_project_id_string(cuv_module, workdir: Path)
     }
 
     queried_names = []
-    original_query = cuv_module.query_anitya
 
     def tracking_query(name, distro='Fedora'):
         queried_names.append(name)
@@ -824,7 +823,7 @@ def test_download_new_sources_regenerates_vendor_archive(
             return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
         return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
 
-    with patch.object(cuv_module, '_download_file') as mock_dl, \
+    with patch.object(cuv_module, '_download_file'), \
          patch.object(cuv_module, '_upload_to_lookaside') as mock_ul, \
          patch.object(cuv_module, '_compute_file_hash',
                       return_value='newhash'), \
@@ -1197,9 +1196,9 @@ def test_update_spec_version_hook_failure_propagates(
     cuv_module, workdir: Path,
 ) -> None:
     """Hook failure propagates RuntimeError to caller."""
-    pkg_dir = _create_package(workdir, 'pkg', '1.0',
-                              sources={'pkg-1.0.tar.gz': 'oldhash'},
-                              metadata={'version': '1.0', 'release': '1'})
+    _create_package(workdir, 'pkg', '1.0',
+                    sources={'pkg-1.0.tar.gz': 'oldhash'},
+                    metadata={'version': '1.0', 'release': '1'})
 
     import yaml
     hooks_data = {
@@ -1274,7 +1273,7 @@ def test_commit_excludes_lookaside_files(cuv_module, workdir: Path) -> None:
     # Replicate the logic from main(): update .gitignore, then git add
     cuv_module._update_gitignore(pkg_dir, downloaded)
 
-    cuv_module.run_git('add', f'rpms/pkg', f'metadata/pkg.json', cwd=workdir)
+    cuv_module.run_git('add', 'rpms/pkg', 'metadata/pkg.json', cwd=workdir)
 
     result = subprocess.run(
         ['git', 'diff', '--cached', '--name-only'],

@@ -5,7 +5,6 @@ import subprocess
 import sys
 import types
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -44,9 +43,9 @@ def validator(tmp_path: Path):
     sys.modules['dist_git'] = dg
 
     # Patch dist_git paths so validate_package_modifications picks them up
-    dg.ROOT_DIR = tmp_path
-    dg.RPMS_DIR = tmp_path / 'rpms'
-    dg.METADATA_DIR = tmp_path / 'metadata'
+    dg.ROOT_DIR = tmp_path  # type: ignore[attr-defined]
+    dg.RPMS_DIR = tmp_path / 'rpms'  # type: ignore[attr-defined]
+    dg.METADATA_DIR = tmp_path / 'metadata'  # type: ignore[attr-defined]
 
     module = types.ModuleType('validate_package_modifications')
     module.__file__ = str(script_path)
@@ -54,11 +53,11 @@ def validator(tmp_path: Path):
     exec(code, module.__dict__)
 
     # Also patch the module's own references
-    module.METADATA_DIR = tmp_path / 'metadata'
-    module.RPMS_DIR = tmp_path / 'rpms'
-    module.ROOT_DIR = tmp_path
+    module.METADATA_DIR = tmp_path / 'metadata'  # type: ignore[attr-defined]
+    module.RPMS_DIR = tmp_path / 'rpms'  # type: ignore[attr-defined]
+    module.ROOT_DIR = tmp_path  # type: ignore[attr-defined]
 
-    module._tmp_path = tmp_path
+    module._tmp_path = tmp_path  # type: ignore[attr-defined]
     return module
 
 

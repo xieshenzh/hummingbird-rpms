@@ -538,10 +538,6 @@ def test_update_built(workdir: Path, upstream_repos: dict[str, Path], dist_git_m
         [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
         cwd=workdir, check=True,
     )
-    chocolate_import_json = workdir / 'metadata' / 'chocolate.json'
-    with open(chocolate_import_json) as f:
-        initial_data = json.load(f)
-    initial_sha = initial_data['sha']
 
     # Update upstream chocolate
     new_sha = add_upstream_commit(upstream_repos["chocolate"], 'chocolate', '10', '11')
@@ -560,7 +556,7 @@ def test_update_built(workdir: Path, upstream_repos: dict[str, Path], dist_git_m
         # Run update in-process
         run_dist_git(dist_git_module, workdir, 'update', 'chocolate')
         mock_server.getBuild.assert_called_once_with('chocolate-11-1.fc99')
-        with open(chocolate_import_json) as f:
+        with open(workdir / 'metadata' / 'chocolate.json') as f:
             import_data = json.load(f)
         assert import_data['version'] == '11'
         assert import_data['sha'] == new_sha
@@ -729,8 +725,6 @@ def test_koji_no_retry_on_auth_error(dist_git_module) -> None:
 
 def test_koji_retry_on_connection_error(dist_git_module) -> None:
     """Verify network connection errors are retried with exponential backoff."""
-    import time
-
     with patch('xmlrpc.client.ServerProxy') as mock_server_class:
         mock_server = MagicMock()
 
@@ -867,7 +861,7 @@ def test_sync_mark(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     original_sha = upstream_match.group(1)
 
     # Sync --mark when already at upstream should succeed
-    result = subprocess.run(
+    subprocess.run(
         [str(workdir / 'ci' / 'dist_git.py'), 'sync', '--mark', 'chocolate'],
         cwd=workdir, capture_output=True, text=True, check=True
     )
@@ -1088,7 +1082,7 @@ def test_mark_modified_with_reason(workdir: Path, upstream_repos: dict[str, Path
     assert 'modification_reason' not in metadata
 
     # Mark as modified with a reason
-    result = subprocess.run(
+    subprocess.run(
         [str(workdir / 'ci' / 'dist_git.py'), 'mark-modified', 'vanilla', '--modified',
          '--reason', 'Backport CVE fix from upstream'],
         cwd=workdir, capture_output=True, text=True, check=True,
@@ -1123,7 +1117,7 @@ def test_mark_clean(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     assert 'modification_reason' in metadata
 
     # Mark back to clean
-    result = subprocess.run(
+    subprocess.run(
         [str(workdir / 'ci' / 'dist_git.py'), 'mark-modified', 'vanilla', '--clean'],
         cwd=workdir, capture_output=True, text=True, check=True,
     )
@@ -1950,13 +1944,12 @@ def test_update_with_ref(workdir: Path, upstream_repos: dict[str, Path]) -> None
     import_json_file = workdir / 'metadata' / 'chocolate.json'
     with open(import_json_file) as f:
         import_data = json.load(f)
-    old_sha = import_data['sha']
     assert import_data['version'] == '10'
 
     # Add new commits upstream
     add_upstream_commit(upstream_repos["chocolate"], 'chocolate', '10', '11')
     intermediate_sha = add_upstream_commit(upstream_repos["chocolate"], 'chocolate', '11', '12')
-    final_sha = add_upstream_commit(upstream_repos["chocolate"], 'chocolate', '12', '13')
+    add_upstream_commit(upstream_repos["chocolate"], 'chocolate', '12', '13')
 
     # Update with --ref to get the intermediate version (not latest)
     subprocess.run(
