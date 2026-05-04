@@ -1424,22 +1424,23 @@ def set_upstream(
     imports[package_name] = metadata
 
 
-def diff_package(package_name: str, output_mode: str = 'full', raw: bool = False) -> bool | None:
+def diff_package(package_name: str, output_mode: str = 'full', raw: bool = False,
+                 capture: bool = False) -> bool | str | None:
     """Show diff between local package and upstream Fedora.
 
     Args:
         package_name: Name of package to diff
         output_mode: 'full' (default), 'stat', or 'name-only'
         raw: If True, show raw diff with no filters
+        capture: If True and output_mode='full', return diff text instead of printing
 
     Returns:
-        True if differences exist, False if clean, None if native package
-
-    Behavior:
-        - Native packages: Print message and return None
-        - Clean packages: Print nothing, return False
-        - Modified packages: Print diff, return True
+        When capture=False: True if differences exist, False if clean, None if native
+        When capture=True: diff string if differences exist, '' if clean, None if native
     """
+    if capture and output_mode != 'full':
+        raise ValueError(f"capture=True is only supported with output_mode='full', got {output_mode!r}")
+
     metadata = load_package_metadata(package_name)
     if not metadata:
         sys.exit(f"ERROR: Package {package_name} not found")
@@ -1489,9 +1490,11 @@ def diff_package(package_name: str, output_mode: str = 'full', raw: bool = False
 
         if result.returncode == 0:
             # No differences
-            return False
+            return '' if capture else False
         elif result.returncode == 1:
             # Differences found
+            if capture and output_mode == 'full':
+                return result.stdout
             if output_mode == 'name-only':
                 # Parse --brief output to show only filenames
                 for line in result.stdout.splitlines():
