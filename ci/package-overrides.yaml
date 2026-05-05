@@ -42,6 +42,9 @@ curl:
     - "linux-c2xlarge/amd64"
     - "linux-c2xlarge/arm64"
 
+fontconfig:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 dotnet8.0:
   timeout_hours: 12
 
