@@ -107,7 +107,7 @@ GitLab CI runs validation jobs on every merge request:
 - **`tree_status`** - Repository consistency checks (metadata integrity, spec
   file presence)
 - **Testing Farm** - Integration tests run via an IntegrationTestScenario that
-  exercises built RPMs on a real RHEL compose
+  exercises built RPMs on a real RHEL compose (see [Testing](#testing) below)
 
 ### Auto-approval for chore MRs
 
@@ -180,6 +180,73 @@ See [Konflux Resource Deployment][konflux-deploy] for details on how these
 resources are managed and deployed.
 
 [konflux-deploy]: konflux-resource-deployment.md
+
+### Testing
+
+RPM packages are validated through integration tests that run on Testing Farm
+infrastructure.
+
+Tests run via [Testing Farm][testing-farm] on RHEL-9-Nightly systems for both
+`x86_64` and `aarch64` architectures. Test results appear as external jobs in
+GitLab CI pipelines, providing pass/fail status and links to the Konflux
+PipelineRun.
+
+[testing-farm]: https://docs.testing-farm.io/
+
+#### Test triggering
+
+Tests are only triggered on merge requests, not on main branch builds. For a
+package at `rpms/<package>/`, tests are triggered for all changes below that
+directory.
+
+#### Integration Test Scenario
+
+Tests are triggered via an `IntegrationTestScenario` resource defined in the
+[infrastructure repository][infrastructure]:
+
+**Configuration**: `infrastructure/kubernetes/rpms-main/10-integration-test-scenarios-testing-farm.yml.j2`
+
+The scenario uses the upstream [Testing Farm pipeline for Konflux
+CI][integrations-konflux] and is parameterized as follows:
+
+[infrastructure]: https://gitlab.com/redhat/hummingbird/infrastructure
+[integrations-konflux]: https://gitlab.com/testing-farm/integrations-konflux
+
+**Scenario parameters**:
+
+- `COMPOSE: RHEL-9-Nightly` - Test environment OS/compose
+- `PIPELINE_MODE: rpm` - Configures RPM testing mode (vs. container)
+- `ARCH: x86_64,aarch64` - Architectures to test (creates separate test runs per arch)
+- `PASS_SNAPSHOT_TO_TF: false` - Don't pass full snapshot JSON (package info comes via
+  `IMAGE_NAME`/`IMAGE_URL` instead)
+- `IMAGE_TAG:` - Version of the tmt-via-testing-farm pipeline bundle
+
+**Key characteristics**:
+
+- **Single scenario for all packages** - Not per-package, runs for every package build
+- **Context-based triggering** - Runs on `pull_request` snapshots only
+- **Package identification** - Konflux automatically provides `IMAGE_NAME` (e.g., `openssl-main`)
+  and `IMAGE_URL` (OCI image with built RPMs) as environment variables
+
+#### FMF test plan
+
+The root folder of the `rpms` repository is marked with a `.fmf` directory to
+identify it as an FMF metadata tree for tmt. The test plan in
+`ci/run_tests_rpm.fmf` sets up the test instance and runs default and
+package-specific tests via `ci/run_tests_rpm.sh`.
+
+#### Test environment
+
+These environment variables are available to the tmt test execution:
+
+| Variable      | Description                                                              |
+| ------------- | ------------------------------------------------------------------------ |
+| `IMAGE_NAME`  | Component name (e.g., `openssl-main`)                                    |
+| `IMAGE_URL`   | OCI image URL with built RPMs (e.g., `quay.io/.../openssl-main@sha...`)  |
+| `SNAPSHOT`    | Snapshot metadata (if `PASS_SNAPSHOT_TO_TF` is true)                     |
+| `COMPOSE`     | OS/compose being tested (`RHEL-9-Nightly`)                               |
+| `ARCH`        | Architectures being tested (`x86_64,aarch64`)                            |
+| `TMT_VERSION` | tmt version running the tests                                            |
 
 ## Stage 4: Signing
 
