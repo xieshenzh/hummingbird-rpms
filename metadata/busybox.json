@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "backport upstream security fixes",
+  "modification_status": "modified",
   "release": "7",
   "sha": "513901a550025eb1a6cb831123a37ddc10b6612c",
   "source": "https://src.fedoraproject.org/rpms/busybox.git",
