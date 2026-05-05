@@ -99,6 +99,9 @@ java-25-openjdk-portable:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+libpng:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 libxml2:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
