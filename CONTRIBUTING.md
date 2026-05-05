@@ -250,6 +250,14 @@ configuration.
 - Body (optional): context, rationale, and user/ops impact
 - Reference issues using standard notation (e.g. "Fixes: #123")
 
+## Spec guidelines
+
+- Don't use `%changelog` for Hummingbird specific changes. It's just a point of
+  conflict with Fedora imports, commit messages are good enough.
+- Hummingbird specific changes increase `Release:` number in steps of 0.1 (e.g.
+  2 → 2.1 → 2.2). This avoids colliding with Fedora's Release number namespace
+  and allows us to sync again to a future -3.
+
 ## Packaging and testing guidelines
 
 - Spec files should be reproducible and minimal.
