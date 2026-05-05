@@ -27,7 +27,7 @@ PACKAGING := Makefile packaging/make-nodejs-tarball.sh packaging/fill-versions.s
 
 # Update the package to TARGET_VERSION
 update: ${SPECFILE} packaging/fill-versions.sh
-	sed -Ei '/^%nodejs_define_version\s+node\>/s|:[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+-|:${TARGET_VERSION}-|' '${SPECFILE}'
+	awk -i inplace '/^Version:/ && !done {sub(/[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+/, "${TARGET_VERSION}"); done=1} {print}' '${SPECFILE}'
 	${MAKE} node-v${TARGET_VERSION}-stripped.tar.gz
 	packaging/fill-versions.sh '${SPECFILE}' node-v${TARGET_VERSION}-stripped.tar.gz
 	${GIT} add '${SPECFILE}'

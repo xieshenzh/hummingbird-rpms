@@ -162,10 +162,11 @@ find_version histogram deps/histogram/include/hdr/hdr_histogram_version.h '' ver
 find_version icu tools/icu/current_ver.dep -p parse_isu_version
 find_version libuv deps/uv/include/uv/version.h '' version_from_c_define UV_VERSION_{MAJOR,MINOR,PATCH}
 find_version llhttp deps/llhttp/include/llhttp.h '' version_from_c_define LLHTTP_VERSION_{MAJOR,MINOR,PATCH}
+find_version merve deps/merve/merve.h '' version_from_c_define MERVE_VERSION
 find_version nghttp2 deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h '' version_from_c_define NGHTTP2_VERSION
 find_version nghttp3 deps/ngtcp2/nghttp3/lib/includes/nghttp3/version.h '' version_from_c_define NGHTTP3_VERSION
 find_version ngtcp2 deps/ngtcp2/ngtcp2/lib/includes/ngtcp2/version.h '' version_from_c_define NGTCP2_VERSION
-find_version merve deps/merve/merve.h '' version_from_c_define MERVE_VERSION
+find_version nodejs-minimatch deps/minimatch/package.json '' version_from_json
 find_version nodejs-punycode lib/punycode.js '' parse_punycode_version
 find_version nodejs-undici deps/undici/src/package.json '' version_from_json
 find_version npm deps/npm/package.json '' parse_npm_version
