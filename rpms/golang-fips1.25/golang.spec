@@ -115,11 +115,11 @@
 %global go_api 1.25
 # Use only for prerelease versions
 #global go_prerelease rc3
-%global go_patch 8
+%global go_patch 9
 %global go_version %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease:~%{go_prerelease}}
 %global go_source %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease}
 # Go FIPS package release
-%global pkg_release 1
+%global pkg_release 2
 
 # For rpmdev-bumpspec and releng automation.
 %global baserelease 1

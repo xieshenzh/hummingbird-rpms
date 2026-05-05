@@ -8,5 +8,5 @@
   "source": "https://gitlab.com/redhat/centos-stream/rpms/golang.git",
   "upstream_branch": "release-branch.go1.25",
   "upstream_repo": "https://github.com/golang/go",
-  "version": "1.25.8"
+  "version": "1.25.9"
 }
