@@ -1,0 +1,8 @@
+# Skip the branch-protection annocheck test. Rust does not yet support
+# -mbranch-protection=standard on aarch64, so the BTI check fails for
+# all Rust binaries built with Rust 1.95+.
+# https://github.com/rust-lang/rust/issues/131592
+---
+annocheck:
+    extra_opts:
+        - hardened: --skip-branch-protection
