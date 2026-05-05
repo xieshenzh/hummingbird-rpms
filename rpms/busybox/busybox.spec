@@ -54,7 +54,7 @@
 
 Name:		busybox
 Version:	1.37.0
-Release:	7.1%{?dist}
+Release:	7.2%{?dist}
 Epoch:		1
 Summary:	Statically linked binary providing simplified versions of system commands
 License:	GPL-2.0-only
@@ -79,6 +79,9 @@ Patch1:		busybox-1.36.1-no-cbq.patch
 # sha1_process_block64_shaNI is only valid on x86
 # most of the calls are wrapped in an arch conditional, but they missed one.
 Patch2:		busybox-1.37.0-fix-conditional-for-sha1_process_block64_shaNI.patch
+# Backport from upstream master (commit 3fb6b31c716669e12f75a2accd31bb7685b1a1cb)
+# CVE-2026-26157, CVE-2026-26158: Strip unsafe hardlink components to prevent tar extraction attacks
+Patch3:		busybox-1.37.0-CVE-2026-26157-CVE-2026-26158.patch
 BuildRequires:	gcc
 BuildRequires:	libselinux-devel >= 1.27.7-2
 BuildRequires:	libsepol-devel
@@ -135,6 +138,7 @@ package is build against shared libraries, most notably glibc.
 %patch -P0 -p1 -b .stime
 %patch -P1 -p1 -b .cbq
 %patch -P2 -p1 -b .shani-fix
+%patch -P3 -p1 -b .tar-hardlink-fix
 
 %build
 # Fix architecture name maps
