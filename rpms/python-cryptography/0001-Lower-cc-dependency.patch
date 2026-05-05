@@ -1,0 +1,29 @@
+From 90ddb902ed292b3da77cbcbe9bbd699a702bf523 Mon Sep 17 00:00:00 2001
+From: Jeremy Cline <jeremycline@microsoft.com>
+Date: Tue, 5 May 2026 07:43:30 -0400
+Subject: [PATCH] Lower cc dependency
+
+It's a docblock-only fix release compared to .60 and I can't be bothered
+to rebuild it.
+
+Signed-off-by: Jeremy Cline <jeremycline@microsoft.com>
+---
+ Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index d045bb077..680344f95 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -23,7 +23,7 @@ license = "Apache-2.0 OR BSD-3-Clause"
+ [workspace.dependencies]
+ asn1 = { version = "0.24.1", default-features = false }
+ base64 = "0.22"
+-cc = "1.2.61"
++cc = "1.2.60"
+ cfg-if = "1"
+ foreign-types = "0.3"
+ foreign-types-shared = "0.1"
+-- 
+2.54.0
+
