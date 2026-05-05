@@ -7,8 +7,8 @@
 %global _hardened_build 1
 
 Name:           haproxy
-Version:        3.0.19
-Release:        1.1%{?dist}
+Version:        3.0.21
+Release:        0.1%{?dist}
 Summary:        HAProxy reverse proxy for high availability environments
 
 License:        GPL-2.0-or-later
