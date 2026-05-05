@@ -48,7 +48,7 @@
 Summary: PostgreSQL client programs
 Name: %{majorname}%{majorversion}
 Version: 18.3
-Release: 2%{?dist}
+Release: 2.1%{?dist}
 
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
@@ -1192,20 +1192,16 @@ make -C postgresql-setup-%{setup_version} check
 %{_datadir}/pgsql/extension/earthdistance*
 %{_datadir}/pgsql/extension/file_fdw*
 %{_datadir}/pgsql/extension/fuzzystrmatch*
-%{_datadir}/pgsql/extension/hstore*
+%{_datadir}/pgsql/extension/hstore--*
+%{_datadir}/pgsql/extension/hstore.control
 %{_datadir}/pgsql/extension/insert_username*
 %{_datadir}/pgsql/extension/intagg*
 %{_datadir}/pgsql/extension/intarray*
 %{_datadir}/pgsql/extension/isn*
-%if %{plperl}
-%{_datadir}/pgsql/extension/jsonb_plperl*
-%endif
-%if %{plpython3}
-%{_datadir}/pgsql/extension/jsonb_plpython3u*
-%endif
 %{_datadir}/pgsql/extension/lo*
 %{_datadir}/pgsql/extension/pg_logicalinspect*
-%{_datadir}/pgsql/extension/ltree*
+%{_datadir}/pgsql/extension/ltree--*
+%{_datadir}/pgsql/extension/ltree.control
 %{_datadir}/pgsql/extension/moddatetime*
 %{_datadir}/pgsql/extension/pageinspect*
 %{_datadir}/pgsql/extension/pg_buffercache*
@@ -1244,25 +1240,10 @@ make -C postgresql-setup-%{setup_version} check
 %{_libdir}/pgsql/file_fdw.so
 %{_libdir}/pgsql/fuzzystrmatch.so
 %{_libdir}/pgsql/hstore.so
-%if %plperl
-%{_libdir}/pgsql/hstore_plperl.so
-%endif
-%if %plpython3
-%{_libdir}/pgsql/hstore_plpython3.so
-%endif
 %{_libdir}/pgsql/insert_username.so
 %{_libdir}/pgsql/isn.so
-%if %plperl
-%{_libdir}/pgsql/jsonb_plperl.so
-%endif
-%if %plpython3
-%{_libdir}/pgsql/jsonb_plpython3.so
-%endif
 %{_libdir}/pgsql/lo.so
 %{_libdir}/pgsql/ltree.so
-%if %plpython3
-%{_libdir}/pgsql/ltree_plpython3.so
-%endif
 %{_libdir}/pgsql/pg_logicalinspect.so
 %{_libdir}/pgsql/pg_overexplain.so
 %{_libdir}/pgsql/moddatetime.so
@@ -1477,8 +1458,12 @@ make -C postgresql-setup-%{setup_version} check
 %if %plperl
 %files -n %{pkgname}-plperl -f plperl.lst
 %{_datadir}/pgsql/extension/bool_plperl*
+%{_datadir}/pgsql/extension/hstore_plperl*
+%{_datadir}/pgsql/extension/jsonb_plperl*
 %{_datadir}/pgsql/extension/plperl*
 %{_libdir}/pgsql/bool_plperl.so
+%{_libdir}/pgsql/hstore_plperl.so
+%{_libdir}/pgsql/jsonb_plperl.so
 %{_libdir}/pgsql/plperl.so
 %endif
 
@@ -1493,7 +1478,13 @@ make -C postgresql-setup-%{setup_version} check
 %if %plpython3
 %files -n %{pkgname}-plpython3 -f plpython3.lst
 %{_datadir}/pgsql/extension/plpython3*
+%{_datadir}/pgsql/extension/hstore_plpython3u*
+%{_datadir}/pgsql/extension/jsonb_plpython3u*
+%{_datadir}/pgsql/extension/ltree_plpython3u*
 %{_libdir}/pgsql/plpython3.so
+%{_libdir}/pgsql/hstore_plpython3.so
+%{_libdir}/pgsql/jsonb_plpython3.so
+%{_libdir}/pgsql/ltree_plpython3.so
 %endif
 
 

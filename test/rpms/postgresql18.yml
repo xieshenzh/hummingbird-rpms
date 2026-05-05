@@ -18,3 +18,172 @@ no-systemd-runtime-dependency:
     else
       echo "PASS: postgresql18-server does not require systemd at runtime"
     fi
+
+contrib-no-python-dependency:
+  command: |
+    # Verify that postgresql18-contrib does not depend on libpython.
+    # The plpython3 bridge extensions (hstore_plpython3, jsonb_plpython3,
+    # ltree_plpython3) should live in the plpython3 subpackage instead.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "postgresql18-contrib" ]]; then
+      echo "Skipping: This test only runs on postgresql18-contrib (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -q "libpython"; then
+      TEST_FAIL "postgresql18-contrib has a runtime dependency on libpython"
+    else
+      echo "PASS: postgresql18-contrib does not depend on libpython"
+    fi
+
+contrib-no-perl-dependency:
+  command: |
+    # Verify that postgresql18-contrib does not depend on libperl.
+    # The plperl bridge extensions (hstore_plperl, jsonb_plperl) should
+    # live in the plperl subpackage instead.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "postgresql18-contrib" ]]; then
+      echo "Skipping: This test only runs on postgresql18-contrib (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -q "libperl"; then
+      TEST_FAIL "postgresql18-contrib has a runtime dependency on libperl"
+    else
+      echo "PASS: postgresql18-contrib does not depend on libperl"
+    fi
+
+plpython3-extensions:
+  command: |
+    # Verify that PL/Python3 and its bridge extensions work when installed.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "postgresql18-plpython3" ]]; then
+      echo "Skipping: This test only runs on postgresql18-plpython3 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y postgresql18-server postgresql18-plpython3 postgresql18-contrib
+
+        runuser -u postgres -- initdb -D /var/lib/pgsql/data
+        runuser -u postgres -- pg_ctl -D /var/lib/pgsql/data -l /var/lib/pgsql/log start
+        sleep 2
+
+        runuser -u postgres -- psql -c "CREATE EXTENSION plpython3u;"
+        echo "PASS: plpython3u extension created"
+
+        runuser -u postgres -- psql -c "CREATE EXTENSION hstore;"
+        runuser -u postgres -- psql -c "CREATE EXTENSION hstore_plpython3u;"
+        echo "PASS: hstore_plpython3u extension created"
+
+        runuser -u postgres -- psql -c "CREATE EXTENSION jsonb_plpython3u;"
+        echo "PASS: jsonb_plpython3u extension created"
+
+        runuser -u postgres -- psql -c "CREATE EXTENSION ltree;"
+        runuser -u postgres -- psql -c "CREATE EXTENSION ltree_plpython3u;"
+        echo "PASS: ltree_plpython3u extension created"
+
+        result=$(runuser -u postgres -- psql -t -c "
+          CREATE FUNCTION py_hello() RETURNS text AS \$\$
+            return \"hello from plpython3\"
+          \$\$ LANGUAGE plpython3u;
+          SELECT py_hello();
+        ")
+        echo "PL/Python3 result: ${result}"
+        if echo "${result}" | grep -q "hello from plpython3"; then
+          echo "PASS: PL/Python3 function executed successfully"
+        else
+          echo "FAIL: PL/Python3 function returned unexpected result"
+          exit 1
+        fi
+
+        runuser -u postgres -- pg_ctl -D /var/lib/pgsql/data stop
+      '
+
+plperl-extensions:
+  command: |
+    # Verify that PL/Perl and its bridge extensions work when installed.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "postgresql18-plperl" ]]; then
+      echo "Skipping: This test only runs on postgresql18-plperl (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y postgresql18-server postgresql18-plperl postgresql18-contrib
+
+        runuser -u postgres -- initdb -D /var/lib/pgsql/data
+        runuser -u postgres -- pg_ctl -D /var/lib/pgsql/data -l /var/lib/pgsql/log start
+        sleep 2
+
+        runuser -u postgres -- psql -c "CREATE EXTENSION plperl;"
+        echo "PASS: plperl extension created"
+
+        runuser -u postgres -- psql -c "CREATE EXTENSION plperlu;"
+        echo "PASS: plperlu extension created"
+
+        runuser -u postgres -- psql -c "CREATE EXTENSION hstore;"
+        runuser -u postgres -- psql -c "CREATE EXTENSION hstore_plperl;"
+        echo "PASS: hstore_plperl extension created"
+
+        runuser -u postgres -- psql -c "CREATE EXTENSION jsonb_plperl;"
+        echo "PASS: jsonb_plperl extension created"
+
+        result=$(runuser -u postgres -- psql -t -c "
+          CREATE FUNCTION perl_hello() RETURNS text AS \$\$
+            return \"hello from plperl\";
+          \$\$ LANGUAGE plperlu;
+          SELECT perl_hello();
+        ")
+        echo "PL/Perl result: ${result}"
+        if echo "${result}" | grep -q "hello from plperl"; then
+          echo "PASS: PL/Perl function executed successfully"
+        else
+          echo "FAIL: PL/Perl function returned unexpected result"
+          exit 1
+        fi
+
+        runuser -u postgres -- pg_ctl -D /var/lib/pgsql/data stop
+      '
