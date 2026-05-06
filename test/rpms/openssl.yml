@@ -83,6 +83,38 @@ config-fips-requires-validated-provider:
       TEST_FAIL "openssl-config-fips missing openssl-fips-provider dependency"
     fi
 
+libs-recommends-fips-provider-upstream:
+  command: |
+    # Verify that openssl-libs recommends openssl-fips-provider-upstream
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl-libs" ]]; then
+      echo "Skipping: only runs on openssl-libs (got: ${rpm_name})"
+      exit 0
+    fi
+
+    recommends=$(rpm -qp --recommends "${TEST_RPM}")
+    if echo "${recommends}" | grep -q 'openssl-fips-provider-upstream'; then
+      echo "PASS: openssl-libs recommends openssl-fips-provider-upstream"
+    else
+      TEST_FAIL "openssl-libs missing openssl-fips-provider-upstream in Recommends"
+    fi
+
+fips-provider-upstream-conflicts-with-validated:
+  command: |
+    # Verify that openssl-fips-provider-upstream conflicts with openssl-fips-provider-so
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl-fips-provider-upstream" ]]; then
+      echo "Skipping: only runs on openssl-fips-provider-upstream (got: ${rpm_name})"
+      exit 0
+    fi
+
+    conflicts=$(rpm -qp --conflicts "${TEST_RPM}")
+    if echo "${conflicts}" | grep -q 'openssl-fips-provider-so'; then
+      echo "PASS: openssl-fips-provider-upstream conflicts with openssl-fips-provider-so"
+    else
+      TEST_FAIL "openssl-fips-provider-upstream missing Conflicts: openssl-fips-provider-so"
+    fi
+
 fips-provider-upstream-provides-fips-module:
   command: |
     # Verify that openssl-fips-provider-upstream provides fips-provider-so
@@ -135,7 +167,7 @@ dnf-default-install-gets-upstream:
         NEWROOT=/new-root-fs
 
         cp /tmp/repos/*.repo /etc/yum.repos.d/
-        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=10\n" \
           > /etc/yum.repos.d/local.repo
 
         DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs"
@@ -164,6 +196,66 @@ dnf-default-install-gets-upstream:
         echo "PASS: fips.so present"
 
         echo "SUCCESS: Default install uses upstream FIPS provider"
+      '
+
+dnf-no-weak-deps-install-gets-upstream:
+  command: |
+    # Verify that installing openssl with install_weak_deps=False still pulls
+    # in the upstream FIPS provider (Recommends should act as tiebreaker for
+    # the virtual fips-provider-so Requires)
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl" ]]; then
+      echo "Skipping: only runs on openssl (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    trap 'rm -rf "${build_dir}"' EXIT
+    mkdir -p "${build_dir}/local-repo"
+
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    repo_root=$(git rev-parse --show-toplevel)
+
+    "${TEST_ENGINE}" run --rm --cap-add=ALL \
+      -v "${repo_root}/ci/repos:/tmp/repos:ro,z" \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        NEWROOT=/new-root-fs
+
+        cp /tmp/repos/*.repo /etc/yum.repos.d/
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=10\n" \
+          > /etc/yum.repos.d/local.repo
+
+        DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs --setopt=install_weak_deps=False"
+
+        mkdir -p "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+
+        ${DNF} install filesystem
+        ${DNF} install openssl
+
+        echo "=== Verify upstream provider installed ==="
+        rpm --root="${NEWROOT}" -q openssl-fips-provider-upstream || \
+          { echo "FAIL: openssl-fips-provider-upstream not installed with install_weak_deps=False"; exit 1; }
+        echo "PASS: openssl-fips-provider-upstream installed (even with install_weak_deps=False)"
+
+        echo "=== Verify fips.so exists ==="
+        test -f "${NEWROOT}/usr/lib64/ossl-modules/fips.so" || \
+          { echo "FAIL: fips.so not found on disk"; exit 1; }
+        echo "PASS: fips.so present"
+
+        echo "SUCCESS: install_weak_deps=False still gets upstream FIPS provider"
       '
 
 dnf-config-fips-gets-validated:
@@ -201,7 +293,7 @@ dnf-config-fips-gets-validated:
         NEWROOT=/new-root-fs
 
         cp /tmp/repos/*.repo /etc/yum.repos.d/
-        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=10\n" \
           > /etc/yum.repos.d/local.repo
 
         DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs"
