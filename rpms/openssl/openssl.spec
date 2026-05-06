@@ -34,7 +34,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.5.6
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -138,6 +138,7 @@ Requires: openssl-fips-provider
 %endif
 %if %{defined hummingbird}
 Requires: fips-provider-so
+Recommends: %{name}-fips-provider-upstream%{?_isa} = %{epoch}:%{version}-%{release}
 %endif
 
 %description libs
@@ -199,6 +200,7 @@ for container images that need FIPS-compliant cryptography by default.
 Summary: OpenSSL FIPS provider (unvalidated, upstream build)
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Provides: fips-provider-so
+Conflicts: openssl-fips-provider-so
 
 %description fips-provider-upstream
 This package provides the OpenSSL FIPS provider module built from the upstream
