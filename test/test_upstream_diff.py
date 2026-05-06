@@ -1,7 +1,6 @@
 """Tests for upstream_diff analysis tool."""
 
 import json
-import sys
 import types
 from datetime import datetime, timezone
 from pathlib import Path
