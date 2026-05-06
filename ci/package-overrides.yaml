@@ -29,6 +29,9 @@
 bootc:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+caddy:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 capstone:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
@@ -42,9 +45,6 @@ curl:
     - "linux-c2xlarge/amd64"
     - "linux-c2xlarge/arm64"
 
-fontconfig:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
 dotnet8.0:
   timeout_hours: 12
 
@@ -57,10 +57,7 @@ dotnet10.0:
 expat:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
-haproxy:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-httpd:
+fontconfig:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 gcc:
@@ -86,15 +83,17 @@ golang-fips1.25:
   # Use hummingbird lookaside cache
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+haproxy:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+httpd:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 java-21-openjdk-portable:
   timeout_hours: 8
   build_platforms:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
-
-nss-fips:
-  # Use hummingbird lookaside cache instead of Fedora
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 java-25-openjdk:
   timeout_hours: 8
@@ -135,11 +134,18 @@ nodejs25:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+nss-fips:
+  # Use hummingbird lookaside cache instead of Fedora
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 openssl:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 openssl-fips-provider:
   # Use hummingbird lookaside cache instead of Fedora
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+oras:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 python3.13:
@@ -163,13 +169,6 @@ ruff:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
-rust-rpm-sequoia:
-  # Tracked from CentOS Stream c10s instead of Fedora
-  forked_from: "https://gitlab.com/redhat/centos-stream/rpms"
-
-scap-security-guide:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
 # Required to prevent running out of storage
 rust:
   timeout_hours: 12
@@ -187,16 +186,20 @@ rust:
             limits:
               memory: 10Gi
 
+rust-rpm-sequoia:
+  # Tracked from CentOS Stream c10s instead of Fedora
+  forked_from: "https://gitlab.com/redhat/centos-stream/rpms"
+
+scap-security-guide:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 tomcat11:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
-caddy:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-oras:
+valkey:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 xcaddy:
