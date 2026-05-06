@@ -1,0 +1,259 @@
+---
+# Tests for the openssl package and its subpackages
+
+fips-provider-upstream-ships-fips-so:
+  command: |
+    # Verify that openssl-fips-provider-upstream contains fips.so
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl-fips-provider-upstream" ]]; then
+      echo "Skipping: only runs on openssl-fips-provider-upstream (got: ${rpm_name})"
+      exit 0
+    fi
+
+    files=$(rpm -qlp "${TEST_RPM}")
+    if echo "${files}" | grep -q 'ossl-modules/fips.so$'; then
+      echo "PASS: openssl-fips-provider-upstream ships fips.so"
+    else
+      TEST_FAIL "openssl-fips-provider-upstream does not contain fips.so"
+    fi
+
+fips-provider-upstream-requires-libs:
+  command: |
+    # Verify that openssl-fips-provider-upstream requires openssl-libs
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl-fips-provider-upstream" ]]; then
+      echo "Skipping: only runs on openssl-fips-provider-upstream (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -q 'openssl-libs'; then
+      echo "PASS: openssl-fips-provider-upstream requires openssl-libs"
+    else
+      TEST_FAIL "openssl-fips-provider-upstream missing openssl-libs dependency"
+    fi
+
+libs-requires-fips-module:
+  command: |
+    # Verify that openssl-libs requires fips-provider-so (virtual).
+    # Satisfied by either openssl-fips-provider-upstream (Provides) or
+    # the validated openssl-fips-provider-so package (Provides).
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl-libs" ]]; then
+      echo "Skipping: only runs on openssl-libs (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -q 'fips-provider-so'; then
+      echo "PASS: openssl-libs requires fips-provider-so"
+    else
+      TEST_FAIL "openssl-libs missing fips-provider-so dependency"
+    fi
+
+libs-does-not-ship-fips-so:
+  command: |
+    # Verify that openssl-libs does not contain fips.so (it belongs in the subpackage)
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl-libs" ]]; then
+      echo "Skipping: only runs on openssl-libs (got: ${rpm_name})"
+      exit 0
+    fi
+
+    files=$(rpm -qlp "${TEST_RPM}")
+    if echo "${files}" | grep -q 'fips.so$'; then
+      TEST_FAIL "openssl-libs should not contain fips.so (belongs in openssl-fips-provider-upstream)"
+    else
+      echo "PASS: openssl-libs does not ship fips.so"
+    fi
+
+config-fips-requires-validated-provider:
+  command: |
+    # Verify that openssl-config-fips requires the validated openssl-fips-provider
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl-config-fips" ]]; then
+      echo "Skipping: only runs on openssl-config-fips (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -qw 'openssl-fips-provider'; then
+      echo "PASS: openssl-config-fips requires openssl-fips-provider"
+    else
+      TEST_FAIL "openssl-config-fips missing openssl-fips-provider dependency"
+    fi
+
+fips-provider-upstream-provides-fips-module:
+  command: |
+    # Verify that openssl-fips-provider-upstream provides fips-provider-so
+    # so it satisfies the Requires on openssl-libs
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl-fips-provider-upstream" ]]; then
+      echo "Skipping: only runs on openssl-fips-provider-upstream (got: ${rpm_name})"
+      exit 0
+    fi
+
+    provides=$(rpm -qp --provides "${TEST_RPM}")
+    if echo "${provides}" | grep -q 'fips-provider-so'; then
+      echo "PASS: openssl-fips-provider-upstream provides fips-provider-so"
+    else
+      TEST_FAIL "openssl-fips-provider-upstream missing Provides: fips-provider-so"
+    fi
+
+dnf-default-install-gets-upstream:
+  command: |
+    # Verify that installing openssl without config-fips pulls in the upstream
+    # FIPS provider (not the validated one)
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl" ]]; then
+      echo "Skipping: only runs on openssl (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    trap 'rm -rf "${build_dir}"' EXIT
+    mkdir -p "${build_dir}/local-repo"
+
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    repo_root=$(git rev-parse --show-toplevel)
+
+    "${TEST_ENGINE}" run --rm --cap-add=ALL \
+      -v "${repo_root}/ci/repos:/tmp/repos:ro,z" \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        NEWROOT=/new-root-fs
+
+        cp /tmp/repos/*.repo /etc/yum.repos.d/
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+
+        DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs"
+
+        mkdir -p "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+
+        ${DNF} install filesystem
+        ${DNF} install openssl
+
+        echo "=== Verify upstream provider installed ==="
+        rpm --root="${NEWROOT}" -q openssl-fips-provider-upstream || \
+          { echo "FAIL: openssl-fips-provider-upstream not installed"; exit 1; }
+        echo "PASS: openssl-fips-provider-upstream installed"
+
+        echo "=== Verify validated provider NOT installed ==="
+        if rpm --root="${NEWROOT}" -q openssl-fips-provider 2>/dev/null; then
+          echo "FAIL: openssl-fips-provider should not be installed in default install"
+          exit 1
+        fi
+        echo "PASS: openssl-fips-provider not installed"
+
+        echo "=== Verify fips.so exists ==="
+        test -f "${NEWROOT}/usr/lib64/ossl-modules/fips.so" || \
+          { echo "FAIL: fips.so not found on disk"; exit 1; }
+        echo "PASS: fips.so present"
+
+        echo "SUCCESS: Default install uses upstream FIPS provider"
+      '
+
+dnf-config-fips-gets-validated:
+  command: |
+    # Verify that installing openssl + openssl-config-fips pulls in the validated
+    # FIPS provider and does NOT install the upstream one
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl" ]]; then
+      echo "Skipping: only runs on openssl (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    trap 'rm -rf "${build_dir}"' EXIT
+    mkdir -p "${build_dir}/local-repo"
+
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    repo_root=$(git rev-parse --show-toplevel)
+
+    "${TEST_ENGINE}" run --rm --cap-add=ALL \
+      -v "${repo_root}/ci/repos:/tmp/repos:ro,z" \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        NEWROOT=/new-root-fs
+
+        cp /tmp/repos/*.repo /etc/yum.repos.d/
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+
+        DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs"
+
+        mkdir -p "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+
+        ${DNF} install filesystem
+        ${DNF} install openssl openssl-config-fips
+
+        echo "=== Verify validated provider installed ==="
+        rpm --root="${NEWROOT}" -q openssl-fips-provider || \
+          { echo "FAIL: openssl-fips-provider not installed"; exit 1; }
+        echo "PASS: openssl-fips-provider installed"
+
+        echo "=== Verify upstream provider NOT installed ==="
+        if rpm --root="${NEWROOT}" -q openssl-fips-provider-upstream 2>/dev/null; then
+          echo "FAIL: openssl-fips-provider-upstream should not be installed alongside validated"
+          exit 1
+        fi
+        echo "PASS: openssl-fips-provider-upstream not installed"
+
+        echo "=== Verify fips.so exists ==="
+        test -f "${NEWROOT}/usr/lib64/ossl-modules/fips.so" || \
+          { echo "FAIL: fips.so not found on disk"; exit 1; }
+        echo "PASS: fips.so present"
+
+        echo "SUCCESS: FIPS config install uses validated provider"
+      '
+
+fips-provider-upstream-fips-so-has-hmac:
+  command: |
+    # Verify that fips.so in openssl-fips-provider-upstream has an embedded HMAC
+    # (the .rodata1 section should be present and non-zero)
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl-fips-provider-upstream" ]]; then
+      echo "Skipping: only runs on openssl-fips-provider-upstream (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    trap 'rm -rf "${build_dir}"' EXIT
+
+    rpm2cpio "${TEST_RPM}" | (cd "${build_dir}" && cpio -idm 2>/dev/null)
+
+    fips_so=$(find "${build_dir}" -name 'fips.so' -type f)
+    if [[ -z ${fips_so} ]]; then
+      TEST_FAIL "fips.so not found in RPM"
+    fi
+
+    if objdump -h "${fips_so}" | grep -q '\.rodata1'; then
+      echo "PASS: fips.so contains .rodata1 section (embedded HMAC)"
+    else
+      TEST_FAIL "fips.so missing .rodata1 section — HMAC not embedded"
+    fi
