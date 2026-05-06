@@ -459,20 +459,7 @@ Follow the same `.N` suffix pattern as no-change rebuilds:
 + Release: 3.1%{?dist}
 ```
 
-### 4. Add a changelog entry
-
-Add a new changelog entry at the top of the `%changelog` section:
-
-```spec
-%changelog
-* Wed Jan 08 2026 Your Name <email@example.com> - 1.2.3-3.1
-- Backport upstream PR#1234: short description of the fix
-
-* Mon Jan 06 2026 Previous Maintainer <prev@example.com> - 1.2.3-3
-- Previous changelog entry
-```
-
-### 5. Commit the patch
+### 4. Commit the patch
 
 Use this commit message format:
 
@@ -491,7 +478,7 @@ dnf5: backport reproducible build sorting fix
 Upstream: https://github.com/rpm-software-management/dnf5/pull/2522
 ```
 
-### 6. Mark package as modified
+### 5. Mark package as modified
 
 Mark the package as modified to prevent automatic Fedora updates from overwriting your backport:
 
@@ -510,7 +497,7 @@ Example:
 This ensures the package won't be automatically updated from Fedora until the backported patch lands
 upstream and you explicitly mark it clean again.
 
-### 7. Test the build locally (optional)
+### 6. Test the build locally (optional)
 
 Build the package locally to verify the patch applies cleanly:
 
