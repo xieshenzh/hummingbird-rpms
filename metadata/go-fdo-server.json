@@ -1,9 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "1",
+  "modification_reason": "Bump to 1.0.1 ahead of Fedora rawhide",
+  "modification_status": "modified",
+  "release": "0.1",
   "sha": "a5c50650b6b371a7d76e53994f9b3b093394f151",
   "source": "https://src.fedoraproject.org/rpms/go-fdo-server.git",
   "upstream_repo": "https://github.com/fido-device-onboard/go-fdo-server",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
