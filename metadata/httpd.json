@@ -1,11 +1,13 @@
 {
   "branch": "rawhide",
   "cve_product": "Apache Software Foundation / Apache HTTP Server",
-  "modification_reason": "Remove runtime dependency on systemd",
+  "modification_reason": "Update to 2.4.67 for security fixes; remove runtime dependency on systemd",
   "modification_status": "modified",
   "release": "7",
+  "release_monitoring_project_id": 387502,
   "sha": "ecfe55be836e19b6758f829913ebe73599214aae",
   "source": "https://src.fedoraproject.org/rpms/httpd.git",
+  "track_upstream": "2.4",
   "upstream_repo": "https://github.com/apache/httpd",
-  "version": "2.4.66"
+  "version": "2.4.67"
 }
