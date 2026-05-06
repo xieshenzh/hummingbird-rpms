@@ -27,8 +27,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.66
-Release: 7%{?dist}
+Version: 2.4.67
+Release: 0.1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
