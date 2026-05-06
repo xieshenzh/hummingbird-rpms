@@ -1,5 +1,6 @@
 builds/
 __pycache__
+.cache/
 
 # Source tarballs (stored in lookaside cache, referenced via sources file)
 # Generate checksums with: sha512sum --tag <file>
