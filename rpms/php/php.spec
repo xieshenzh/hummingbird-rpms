@@ -66,7 +66,8 @@
 %bcond_without   lmdb
 
 # liburiparser version 1.0.0 required
-%global liburiparser_ver 1.0.0
+%global liburiparser_minver 1.0.0
+%global liburiparser_bunver 1.0.1
 %if 0%{?fedora}
 # use system liburiparser when available
 %bcond_without       liburiparser
@@ -75,8 +76,8 @@
 %bcond_with          liburiparser
 %endif
 
-%global upver        8.5.5
-#global rcver        RC1
+%global upver        8.5.6
+#global rcver        RC3
 
 Summary: PHP scripting language for creating dynamic web sites
 %if %{with rename}
@@ -85,7 +86,7 @@ Name: php%{major_version}
 Name: php
 %endif
 Version: %{upver}%{?rcver:~%{rcver}}
-Release: 1.1%{?dist}
+Release: 1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -142,6 +143,7 @@ Patch47: php-8.4.0-phpinfo.patch
 Patch48: php-8.5.0-openssl-ec-param.patch
 
 # Upstream fixes (100+)
+Patch100: php-openssl4.patch
 
 # Security fixes (200+)
 
@@ -185,9 +187,9 @@ BuildRequires: systemtap-sdt-devel
 BuildRequires: systemtap-sdt-dtrace
 %endif
 %if %{with liburiparser}
-BuildRequires: pkgconfig(liburiparser) >= %{liburiparser_ver}
+BuildRequires: pkgconfig(liburiparser) >= %{liburiparser_minver}
 %else
-Provides:      bundled(liburiparser) = %{liburiparser_ver}
+Provides:      bundled(liburiparser) = %{liburiparser_bunver}
 %endif
 # used for tests
 BuildRequires: %{_bindir}/ps
@@ -333,7 +335,8 @@ Provides: php-gettext, php-gettext%{?_isa}
 Provides: php-hash, php-hash%{?_isa}
 Provides: php-lexbor, php-lexbor%{?_isa}
 # See ext/lexbor/patches/README.md
-Provides: bundled(lexbor) = 2.5.0
+%global lexborver 2.7.0
+Provides: bundled(lexbor) = %{lexborver}
 Provides: php-mhash = %{version}, php-mhash%{?_isa} = %{version}
 Provides: php-iconv, php-iconv%{?_isa}
 Obsoletes: php-json < 8
@@ -861,6 +864,7 @@ in pure PHP.
 %patch -P48 -p1 -b .ec-param
 
 # upstream patches
+%patch -P100 -p1 -b .v4
 
 # security patches
 
@@ -931,6 +935,13 @@ vpdo=`sed -n '/#define PDO_DRIVER_API/{s/.*[ 	]//;p}' ext/pdo/php_pdo_driver.h`
 if test "x${vpdo}" != "x%{pdover}"; then
    : Error: Upstream PDO ABI version is now ${vpdo}, expecting %{pdover}.
    : Update the pdover macro and rebuild.
+   exit 1
+fi
+
+vlexbor=`sed -n '/Lexbor version/{s/.* is //;s/\.$//;p}' ext/lexbor/patches/README.md`
+if test "x${vlexbor}" != "x%{lexborver}"; then
+   : Error: Upstream Lexbor version is now ${vlexbor}, expecting %{lexborver}.
+   : Update the lexborver macro and rebuild.
    exit 1
 fi
 
@@ -1655,6 +1666,21 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 
 %changelog
+* Wed May  6 2026 Remi Collet <remi@remirepo.net> - 8.5.6-1
+- Update to 8.5.6 - http://www.php.net/releases/8_5_6.php
+
+* Thu Apr 30 2026 Remi Collet <remi@remirepo.net> - 8.5.6~RC3-2
+- more upstream patch for OpenSSL 4.0
+
+* Thu Apr 30 2026 Remi Collet <remi@remirepo.net> - 8.5.6~RC3-1
+- update to 8.5.6RC3
+
+* Wed Apr 29 2026 Remi Collet <remi@remirepo.net> - 8.5.6~RC2-1
+- update to 8.5.6RC2
+
+* Wed Apr 22 2026 Remi Collet <remi@remirepo.net> - 8.5.6~RC1-1
+- update to 8.5.6RC1
+
 * Wed Apr  8 2026 Remi Collet <remi@remirepo.net> - 8.5.5-1
 - Update to 8.5.5 - http://www.php.net/releases/8_5_5.php
 
