@@ -64,3 +64,21 @@ fips-checksum-match:
       file "${build_dir}/ubi9-fips.so"
       TEST_FAIL "fips.so checksum mismatch - our module differs from UBI9"
     fi
+
+validated-provider-provides-fips-module:
+  command: |
+    # Verify that openssl-fips-provider-so provides fips-provider-so
+    # so it satisfies the Requires on openssl-libs as an alternative to
+    # openssl-fips-provider-upstream
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openssl-fips-provider-so" ]]; then
+      echo "Skipping: only runs on openssl-fips-provider-so (got: ${rpm_name})"
+      exit 0
+    fi
+
+    provides=$(rpm -qp --provides "${TEST_RPM}")
+    if echo "${provides}" | grep -q 'fips-provider-so'; then
+      echo "PASS: openssl-fips-provider-so provides fips-provider-so"
+    else
+      TEST_FAIL "openssl-fips-provider-so missing Provides: fips-provider-so"
+    fi

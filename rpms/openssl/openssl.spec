@@ -34,7 +34,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.5.6
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -133,8 +133,11 @@ Summary: A general purpose cryptography library with TLS implementation
 Requires: ca-certificates >= 2008-5
 Requires: crypto-policies >= 20180730
 Recommends: pkcs11-provider%{?_isa}
-%if ( ( %{defined rhel} || %{defined hummingbird} ) && (! %{defined centos}) && (! %{defined eln}) )
+%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) )
 Requires: openssl-fips-provider
+%endif
+%if %{defined hummingbird}
+Requires: fips-provider-so
 %endif
 
 %description libs
@@ -190,6 +193,22 @@ Requires: openssl-fips-provider
 This package configures OpenSSL to load and activate the FIPS provider by
 default, without requiring kernel FIPS mode to be enabled. This is useful
 for container images that need FIPS-compliant cryptography by default.
+
+%if %{defined hummingbird}
+%package fips-provider-upstream
+Summary: OpenSSL FIPS provider (unvalidated, upstream build)
+Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Provides: fips-provider-so
+
+%description fips-provider-upstream
+This package provides the OpenSSL FIPS provider module built from the upstream
+OpenSSL source. This module has NOT been through FIPS 140 validation. It is
+intended for users who need the FIPS provider interface but do not require a
+validated module.
+
+For a FIPS 140 validated module, install the openssl-fips-provider package
+and the openssl-config-fips package instead.
+%endif
 
 %prep
 %autosetup -S git -n %{name}-%{version}
@@ -330,7 +349,7 @@ make test HARNESS_JOBS=8
 # Add generation of HMAC checksum of the final stripped library
 # We manually copy standard definition of __spec_install_post
 # and add hmac calculation/embedding to fips.so
-%if ( ( %{defined rhel} || %{defined hummingbird} ) && (! %{defined centos}) && (! %{defined eln}) )
+%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) )
 %define __spec_install_post \
     rm -rf $RPM_BUILD_ROOT/%{_libdir}/ossl-modules/fips.so \
     %{?__debug_package:%{__debug_install_post}} \
@@ -457,6 +476,9 @@ install -m 644 %{SOURCE11} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.d/fips-
 %{_libdir}/libssl.so.%{soversion}
 %attr(0755,root,root) %{_libdir}/engines-%{soversion}
 %attr(0755,root,root) %{_libdir}/ossl-modules
+%if %{defined hummingbird}
+%exclude %{_libdir}/ossl-modules/fips.so
+%endif
 
 %files devel
 %doc CHANGES.md doc/dir-locals.example.el doc/openssl-c-indent.el
@@ -493,6 +515,12 @@ install -m 644 %{SOURCE11} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.d/fips-
 %files config-fips
 # Drop-in config - automatically included via .include /etc/pki/tls/openssl.d
 %{_sysconfdir}/pki/tls/openssl.d/fips-provider-enable.cnf
+
+%if %{defined hummingbird}
+%files fips-provider-upstream
+%license LICENSE.txt
+%{_libdir}/ossl-modules/fips.so
+%endif
 
 %changelog
 * Wed Jan 28 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.5.5-1
