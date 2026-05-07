@@ -134,6 +134,12 @@ nodejs25:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+nodejs26:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+  build_platforms:
+    - "linux-d160-c8xlarge/arm64"
+    - "linux-d160-c8xlarge/amd64"
+
 nss-fips:
   # Use hummingbird lookaside cache instead of Fedora
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"

@@ -598,6 +598,8 @@ spec:
           contentType: rpm
         - name: nodejs25-main
           contentType: rpm
+        - name: nodejs26-main
+          contentType: rpm
         - name: npth-main
           contentType: rpm
         - name: nss-main
