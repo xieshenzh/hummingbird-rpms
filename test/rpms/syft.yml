@@ -13,7 +13,7 @@ syft-version:
     # Test that syft binary runs and reports its version
     "${TEST_ENGINE}" run --rm \
       -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         dnf install -y /tmp/test.rpm
@@ -32,7 +32,7 @@ syft-scan-rpm:
     # Test that syft can scan an RPM file and produce SBOM output
     "${TEST_ENGINE}" run --rm \
       -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         dnf install -y /tmp/test.rpm
@@ -61,7 +61,7 @@ syft-scan-directory:
     # Test that syft can scan a directory
     "${TEST_ENGINE}" run --rm \
       -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         dnf install -y /tmp/test.rpm
@@ -84,7 +84,7 @@ syft-output-formats:
     # Test that syft can produce output in various formats
     "${TEST_ENGINE}" run --rm \
       -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         dnf install -y /tmp/test.rpm

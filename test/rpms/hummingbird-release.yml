@@ -24,7 +24,7 @@ gpg-signature-verification:
 
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     "${TEST_ENGINE}" run --rm --user 0 \
       -v "${CI_REPOS_DIR}:/tmp/repos:ro,z" \
