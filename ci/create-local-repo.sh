@@ -6,7 +6,7 @@ set -euo pipefail
 
 # Parse arguments
 ENGINE=""
-IMAGE="quay.io/hummingbird-ci/builder:latest"
+IMAGE="quay.io/hummingbird-ci/hummingbird-builder:latest"
 RPM_FILES=()
 
 while [[ $# -gt 0 ]]; do

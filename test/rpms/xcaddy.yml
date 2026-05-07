@@ -13,7 +13,7 @@ xcaddy-smoke:
     # Smoke test: install xcaddy and verify it runs
     "${TEST_ENGINE}" run --rm \
       -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         dnf install -y /tmp/test.rpm
@@ -41,7 +41,7 @@ xcaddy-build-caddy:
     # Build a custom caddy binary with a plugin to verify xcaddy works end-to-end
     "${TEST_ENGINE}" run --rm \
       -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         dnf install -y /tmp/test.rpm

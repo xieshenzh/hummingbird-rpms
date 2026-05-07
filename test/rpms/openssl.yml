@@ -154,14 +154,14 @@ dnf-default-install-gets-upstream:
 
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     repo_root=$(git rev-parse --show-toplevel)
 
     "${TEST_ENGINE}" run --rm --cap-add=ALL \
       -v "${repo_root}/ci/repos:/tmp/repos:ro,z" \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         NEWROOT=/new-root-fs
@@ -221,14 +221,14 @@ dnf-no-weak-deps-install-gets-upstream:
 
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     repo_root=$(git rev-parse --show-toplevel)
 
     "${TEST_ENGINE}" run --rm --cap-add=ALL \
       -v "${repo_root}/ci/repos:/tmp/repos:ro,z" \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         NEWROOT=/new-root-fs
@@ -280,14 +280,14 @@ dnf-config-fips-gets-validated:
 
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     repo_root=$(git rev-parse --show-toplevel)
 
     "${TEST_ENGINE}" run --rm --cap-add=ALL \
       -v "${repo_root}/ci/repos:/tmp/repos:ro,z" \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         NEWROOT=/new-root-fs

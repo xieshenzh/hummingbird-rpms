@@ -22,11 +22,11 @@ node-version-check:
     fi
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     "${TEST_ENGINE}" run --rm \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
@@ -64,11 +64,11 @@ npm-version-check:
     fi
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     "${TEST_ENGINE}" run --rm \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
@@ -108,11 +108,11 @@ fips-disable-options:
     fi
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     "${TEST_ENGINE}" run --rm \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
@@ -159,11 +159,11 @@ fips-setfips-js-api:
     fi
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     "${TEST_ENGINE}" run --rm \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
@@ -212,11 +212,11 @@ openssl-system-linked:
     fi
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     "${TEST_ENGINE}" run --rm \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
@@ -270,11 +270,11 @@ crypto-basic-operations:
     fi
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     "${TEST_ENGINE}" run --rm \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
         printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \

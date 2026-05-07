@@ -62,7 +62,7 @@ rpm-install:
       # Fall back to container
       "${TEST_ENGINE}" run --rm --user 0 -e HOME=/root \
         -v "${build_dir}/local-repo:/repo:z" \
-        quay.io/hummingbird-ci/builder:latest \
+        quay.io/hummingbird-ci/hummingbird-builder:latest \
         createrepo_c /repo
     fi
 
@@ -74,7 +74,7 @@ rpm-install:
       --cap-add=ALL \
       -v "${CI_REPOS_DIR}:/tmp/repos:ro,z" \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
-      quay.io/hummingbird-ci/builder:latest \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e  # Exit immediately on any error
 
