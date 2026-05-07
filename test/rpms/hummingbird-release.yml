@@ -47,30 +47,43 @@ gpg-signature-verification:
 
         DNF_FLAGS="-y --nodocs --setopt=install_weak_deps=False"
 
-        # Remove any pre-existing hummingbird packages and GPG keys from
-        # the container image so we test a clean install of our packages
-        dnf ${DNF_FLAGS} remove hummingbird-release hummingbird-repos hummingbird-gpg-keys 2>/dev/null || true
+        # Remove GPG keys and repo files from disk so we start from a
+        # clean state. The dnf remove of hummingbird packages will fail
+        # in container images where they are essential OS dependencies
+        # (everything depends on system-release), so we do not rely on it.
         rm -f /etc/pki/rpm-gpg/RPM-GPG-KEY-*
-        rm -f /etc/yum.repos.d/hummingbird.repo
+        rm -f /etc/yum.repos.d/*hummingbird*.repo
         for key in $(rpm -qa gpg-pubkey*); do
           rpm -e "${key}"
         done
 
-        # Install our hummingbird-release packages from local repo
-        # This provides the repo config with gpgcheck=1 and the GPG keys
+        # Force-(re)install our packages from the local repo. Use reinstall
+        # to handle the common case where the container image already has
+        # the same NEVRA installed (dnf install would be a no-op). Fall back
+        # to install for clean environments where they are not yet present.
+        dnf ${DNF_FLAGS} reinstall \
+          hummingbird-release \
+          hummingbird-repos \
+          hummingbird-gpg-keys 2>/dev/null || \
         dnf ${DNF_FLAGS} install \
           hummingbird-release \
           hummingbird-repos \
           hummingbird-gpg-keys
 
-        # Verify gpgcheck=1 is active in the installed repo config
-        installed_repo="/etc/yum.repos.d/hummingbird.repo"
-        if ! grep -q "^gpgcheck=1" "${installed_repo}"; then
-          echo "FAIL: gpgcheck=1 not found in installed ${installed_repo}"
-          cat "${installed_repo}"
+        # Verify gpgcheck=1 is active in all installed repo configs
+        readarray -t repo_files < <(rpm -ql hummingbird-repos | grep '/etc/yum\.repos\.d/.*\.repo$')
+        if [[ ${#repo_files[@]} -eq 0 ]]; then
+          echo "FAIL: no .repo file found in installed hummingbird-repos package"
           exit 1
         fi
-        echo "Verified: gpgcheck=1 is set in installed hummingbird.repo"
+        for installed_repo in "${repo_files[@]}"; do
+          if ! grep -q "^gpgcheck=1" "${installed_repo}"; then
+            echo "FAIL: gpgcheck=1 not found in installed ${installed_repo}"
+            cat "${installed_repo}"
+            exit 1
+          fi
+          echo "Verified: gpgcheck=1 is set in ${installed_repo}"
+        done
 
         # Verify GPG key was installed
         gpg_key="/etc/pki/rpm-gpg/RPM-GPG-KEY-hummingbird-release"
