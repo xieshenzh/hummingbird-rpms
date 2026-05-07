@@ -1,0 +1,335 @@
+---
+# Integration tests for the nodejs26 package
+
+node-version-check:
+  command: |
+    # Verify the node binary reports the expected version
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "nodejs26" ]]; then
+      echo "Skipping: This test only runs on nodejs26 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y nodejs26 nodejs26-libs
+
+        node_version=$(node-26 --version)
+        echo "Node.js version: ${node_version}"
+        if [[ "${node_version}" == v26.* ]]; then
+          echo "PASS: Node.js 26 version is correct"
+        else
+          echo "FAIL: Expected v26.x, got ${node_version}"
+          exit 1
+        fi
+      '
+
+npm-version-check:
+  command: |
+    # Verify npm is installed and functional
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "nodejs26-npm" ]]; then
+      echo "Skipping: This test only runs on nodejs26-npm (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y nodejs26 nodejs26-npm nodejs26-libs
+
+        npm_version=$(npm-26 --version)
+        echo "npm version: ${npm_version}"
+        if [[ -n "${npm_version}" ]]; then
+          echo "PASS: npm is functional"
+        else
+          echo "FAIL: npm did not return a version"
+          exit 1
+        fi
+      '
+
+fips-disable-options:
+  command: |
+    # Verify FIPS options are disabled at the Node.js level.
+    # On RHEL/Hummingbird, FIPS should be controlled at the system level,
+    # not per-application. The --enable-fips flag should cause an error.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "nodejs26" ]]; then
+      echo "Skipping: This test only runs on nodejs26 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y nodejs26 nodejs26-libs
+
+        # --enable-fips should fail with our FIPS patch
+        if node-26 --enable-fips -e "console.log(\"ok\")" 2>&1; then
+          echo "FAIL: --enable-fips should have been rejected"
+          exit 1
+        else
+          echo "PASS: --enable-fips is correctly rejected"
+        fi
+
+        # --force-fips should also fail
+        if node-26 --force-fips -e "console.log(\"ok\")" 2>&1; then
+          echo "FAIL: --force-fips should have been rejected"
+          exit 1
+        else
+          echo "PASS: --force-fips is correctly rejected"
+        fi
+      '
+
+fips-setfips-js-api:
+  command: |
+    # Verify that the JavaScript crypto.setFips() API is blocked.
+    # On non-FIPS systems, calling setFips(1) should throw
+    # ERR_CRYPTO_FIPS_SYSTEM_CONTROLLED.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "nodejs26" ]]; then
+      echo "Skipping: This test only runs on nodejs26 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y nodejs26 nodejs26-libs
+
+        # Try to toggle FIPS via JS API - should throw ERR_CRYPTO_FIPS_SYSTEM_CONTROLLED
+        output=$(node-26 -e "
+          try {
+            const crypto = require(\"crypto\");
+            const currentFips = crypto.getFips();
+            crypto.setFips(currentFips ? 0 : 1);
+            process.exit(1);  // should not reach here
+          } catch (e) {
+            if (e.code === \"ERR_CRYPTO_FIPS_SYSTEM_CONTROLLED\") {
+              console.log(\"PASS: setFips correctly throws ERR_CRYPTO_FIPS_SYSTEM_CONTROLLED\");
+              process.exit(0);
+            } else {
+              console.log(\"FAIL: unexpected error: \" + e.code + \" - \" + e.message);
+              process.exit(1);
+            }
+          }
+        " 2>&1)
+        echo "${output}"
+        echo "${output}" | grep -q "PASS"
+      '
+
+openssl-system-linked:
+  command: |
+    # Verify that Node.js is linked against system OpenSSL (not bundled)
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "nodejs26-libs" ]]; then
+      echo "Skipping: This test only runs on nodejs26-libs (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y nodejs26-libs
+
+        # The shared library should link against system libssl/libcrypto
+        libnode=$(find /usr/lib64 /usr/lib -name "libnode.so.*" 2>/dev/null | head -1)
+        if [[ -z "${libnode}" ]]; then
+          echo "FAIL: libnode.so not found"
+          exit 1
+        fi
+
+        ldd_output=$(ldd "${libnode}")
+        echo "ldd output:"
+        echo "${ldd_output}"
+
+        if echo "${ldd_output}" | grep -q "libssl.so"; then
+          echo "PASS: libnode.so is linked against system libssl"
+        else
+          echo "FAIL: libnode.so is not linked against system libssl"
+          exit 1
+        fi
+
+        if echo "${ldd_output}" | grep -q "libcrypto.so"; then
+          echo "PASS: libnode.so is linked against system libcrypto"
+        else
+          echo "FAIL: libnode.so is not linked against system libcrypto"
+          exit 1
+        fi
+      '
+
+crypto-basic-operations:
+  command: |
+    # Verify basic crypto operations work (SHA-256, TLS)
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "nodejs26" ]]; then
+      echo "Skipping: This test only runs on nodejs26 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y nodejs26 nodejs26-libs
+
+        node-26 -e "
+          const crypto = require(\"crypto\");
+          const assert = require(\"assert\");
+
+          // SHA-256 hash test
+          const hash = crypto.createHash(\"sha256\").update(\"hello\").digest(\"hex\");
+          assert.strictEqual(hash, \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\");
+          console.log(\"PASS: SHA-256 hash works correctly\");
+
+          // HMAC test
+          const hmac = crypto.createHmac(\"sha256\", \"secret\").update(\"hello\").digest(\"hex\");
+          assert.ok(hmac.length === 64);
+          console.log(\"PASS: HMAC-SHA256 works correctly\");
+
+          // Random bytes test
+          const randomBytes = crypto.randomBytes(32);
+          assert.strictEqual(randomBytes.length, 32);
+          console.log(\"PASS: crypto.randomBytes works correctly\");
+
+          // Verify OpenSSL version is reported
+          console.log(\"OpenSSL version: \" + process.versions.openssl);
+          assert.ok(process.versions.openssl.startsWith(\"3.\"));
+          console.log(\"PASS: Using OpenSSL 3.x\");
+        "
+      '
+
+shared-library-provides:
+  command: |
+    # Verify the libs subpackage provides the expected shared libraries
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "nodejs26-libs" ]]; then
+      echo "Skipping: This test only runs on nodejs26-libs (got: ${rpm_name})"
+      exit 0
+    fi
+
+    provides=$(rpm -qp --provides "${TEST_RPM}")
+    echo "Package provides:"
+    echo "${provides}"
+
+    if echo "${provides}" | grep -q "libnode.so"; then
+      echo "PASS: nodejs26-libs provides libnode.so"
+    else
+      echo "FAIL: nodejs26-libs does not provide libnode.so"
+      exit 1
+    fi
+
+    if echo "${provides}" | grep -q "libv8.so"; then
+      echo "PASS: nodejs26-libs provides libv8.so"
+    else
+      echo "FAIL: nodejs26-libs does not provide libv8.so"
+      exit 1
+    fi

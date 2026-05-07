@@ -1,0 +1,27 @@
+# This check is disabled because rpminspect has issues with 
+# macro nesting and autorelease macro
+# which led to continuous need to waive or ignore the failure of the test
+# e.g:https://artifacts.dev.testing-farm.io/07049d23-04ed-451c-99f6-eed73e369d28/
+inspections:
+  disttag: off
+# Multiple annochecks are disabled because they are creating Verify type failures
+annocheck:
+  extra_opts:
+    # Issue: https://github.com/nodejs/node/issues/40368
+    # skip test for link time optimalization 
+    # test fails because nodejs is compiled without LTO. 
+    # This is on purpose as it creates issues.
+    hardened: --skip-lto
+    #  Temporarily disabled
+    #  skip test for GNU Property notes formatting
+    #  test fails because it's missing CET notes
+    #  feature is unsopported by upstream
+    #  See RHEL-85793 for details
+    hardened: --skip-property-note
+    hardened: --skip-cf-protection
+    #  Temporarily disabled
+    # skip test for dynamic tags
+    # BTI_PLT protection feature is missing from dynamic tags
+    # libnode.so.127 lacks this feature
+    # See RHEL-85837 for details
+    hardened: --skip-dynamic-tags
