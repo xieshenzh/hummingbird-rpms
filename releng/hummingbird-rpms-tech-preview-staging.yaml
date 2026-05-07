@@ -798,6 +798,8 @@ spec:
           contentType: rpm
         - name: python-rpds-py-main
           contentType: rpm
+        - name: python-rpm-lockfile-prototype-main
+          contentType: rpm
         - name: python-rpm-macros-main
           contentType: rpm
         - name: python-sentry-sdk-main

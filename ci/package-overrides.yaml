@@ -169,6 +169,9 @@ python-sentry-sdk:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+python-rpm-lockfile-prototype:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 ruff:
   timeout_hours: 8
   build_platforms:
