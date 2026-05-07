@@ -26,14 +26,14 @@ Summary:        %{summary}
 %autosetup -p1 -n markdown-it-py-%{version}
 
 %generate_buildrequires
-%pyproject_buildrequires -x testing,linkify -p
+%pyproject_buildrequires --extras testing,linkify --pyproject-dependencies
 
 %build
 %pyproject_wheel
 
 %install
 %pyproject_install
-%pyproject_save_files markdown_it -L
+%pyproject_save_files markdown_it --no-assert-license
 
 %check
 # sphinx-copybutton is in [rtd] extra, should not appear

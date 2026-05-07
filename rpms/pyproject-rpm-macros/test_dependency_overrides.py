@@ -1,5 +1,8 @@
 """Unit tests for dependency override functionality."""
 
+import subprocess
+import sys
+
 import pytest
 
 from packaging.requirements import Requirement
@@ -45,6 +48,56 @@ class TestParseOverrideString:
     def test_invalid_version(self):
         with pytest.raises(ValueError, match='Invalid version'):
             parse_override_string('pkg:set_upper:not_a_version!!!')
+
+
+# ---- CLI validation (pyproject_dependency_overrides.py __main__) ----
+
+SCRIPT = 'pyproject_dependency_overrides.py'
+
+
+class TestCLIValidation:
+    def _run(self, arg):
+        return subprocess.run(
+            [sys.executable, '-Bs', SCRIPT, arg],
+            capture_output=True, text=True,
+        )
+
+    def test_valid_drop_upper(self):
+        assert self._run('numpy:drop_upper').returncode == 0
+
+    def test_valid_set_upper(self):
+        assert self._run('numpy:set_upper:2.0').returncode == 0
+
+    def test_valid_ignore_br_only(self):
+        assert self._run('pkg:ignore:br_only').returncode == 0
+
+    def test_valid_set_lower_br_only(self):
+        assert self._run('pkg:set_lower:1.0:br_only').returncode == 0
+
+    def test_invalid_no_colon(self):
+        r = self._run('justpackage')
+        assert r.returncode == 1
+        assert 'Invalid dependency override format' in r.stderr
+
+    def test_invalid_action(self):
+        r = self._run('pkg:bogus')
+        assert r.returncode == 1
+        assert 'Invalid dependency override action' in r.stderr
+
+    def test_set_upper_missing_value(self):
+        r = self._run('pkg:set_upper')
+        assert r.returncode == 1
+        assert 'requires a value' in r.stderr
+
+    def test_drop_upper_rejects_value(self):
+        r = self._run('pkg:drop_upper:2.0')
+        assert r.returncode == 1
+        assert 'does not accept a value' in r.stderr
+
+    def test_invalid_version(self):
+        r = self._run('pkg:set_upper:not_a_version!!!')
+        assert r.returncode == 1
+        assert 'Invalid version' in r.stderr
 
 
 # ---- apply_overrides_to_specifiers (shared module) ----

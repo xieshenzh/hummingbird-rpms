@@ -36,17 +36,17 @@ Summary:        %{summary}
 %pyproject_patch_dependency debugpy:ignore
 
 %generate_buildrequires
-%pyproject_buildrequires -r
+%pyproject_buildrequires --runtime
 
 %build
 %pyproject_wheel
 
 %install
 %pyproject_install
-%pyproject_save_files -l 'ipykernel*' +auto
+%pyproject_save_files --assert-license 'ipykernel*' --auto
 
 %check
-%pyproject_check_import  -e '*.test*' -e 'ipykernel.gui*' -e 'ipykernel.pylab.*' -e 'ipykernel.trio*' -e 'ipykernel.datapub' -e 'ipykernel.pickleutil' -e 'ipykernel.serialize'
+%pyproject_check_import  --exclude '*.test*' --exclude 'ipykernel.gui*' --exclude 'ipykernel.pylab.*' --exclude 'ipykernel.trio*' --exclude 'ipykernel.datapub' --exclude 'ipykernel.pickleutil' --exclude 'ipykernel.serialize'
 
 %files -n python3-ipykernel -f %{pyproject_files}
 %doc README.md

@@ -135,3 +135,13 @@ def apply_overrides_to_specifiers(specifiers, overrides, package_name=None,
             new_specifiers.append(Specifier(f'>={value}'))
 
     return new_specifiers
+
+
+if __name__ == '__main__':
+    import sys
+    override_str = sys.argv[1].removesuffix(':br_only')
+    try:
+        parse_override_string(override_str)
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)

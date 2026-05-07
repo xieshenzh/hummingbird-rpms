@@ -1384,7 +1384,7 @@ config_settings:
 
 pyproject.toml with runtime dependencies read from it:
   skipif: not SETUPTOOLS_60
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1
@@ -1412,7 +1412,7 @@ pyproject.toml with runtime dependencies read from it:
 
 pyproject.toml with extras - only runtime dependencies read from it:
   skipif: not SETUPTOOLS_60
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1
@@ -1430,7 +1430,7 @@ pyproject.toml with extras - only runtime dependencies read from it:
 
 pyproject.toml with runtime dependencies and partially selected extras read from it:
   skipif: not SETUPTOOLS_60
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1
@@ -1454,7 +1454,7 @@ pyproject.toml with runtime dependencies and partially selected extras read from
 
 pyproject.toml with runtime dependencies and all extras read from it:
   skipif: not SETUPTOOLS_60
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1
@@ -1483,7 +1483,7 @@ pyproject.toml with runtime dependencies and all extras read from it:
 
 pyproject.toml without dependencies:
   skipif: not SETUPTOOLS_60
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1
@@ -1505,7 +1505,7 @@ pyproject.toml without dependencies:
 
 pyproject.toml without project table:
   skipif: not SETUPTOOLS_60
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1
@@ -1516,7 +1516,7 @@ pyproject.toml without project table:
   except: ValueError
 
 no pyproject.toml:
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1
@@ -1524,7 +1524,7 @@ no pyproject.toml:
 
 pyproject.toml with dynamic dependencies:
   skipif: not SETUPTOOLS_60
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1
@@ -1546,7 +1546,7 @@ pyproject.toml with dynamic dependencies:
 
 pyproject.toml with dynamic optional dependencies:
   skipif: not SETUPTOOLS_60
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1
@@ -1569,7 +1569,7 @@ pyproject.toml with dynamic optional dependencies:
 
 pyproject.toml with dynamic table and no deps:
   skipif: not SETUPTOOLS_60
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1
@@ -1596,7 +1596,7 @@ pyproject.toml with dynamic table and no deps:
 
 pyproject.toml with self-referencing extras:
   skipif: not SETUPTOOLS_60
-  read_pyproject_dependencies: true
+  pyproject_dependencies: true
   installed:
     setuptools: 50
     wheel: 1

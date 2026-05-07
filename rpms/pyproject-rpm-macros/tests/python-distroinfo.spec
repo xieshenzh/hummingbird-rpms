@@ -47,7 +47,7 @@ Summary:          %{summary}
 
 %check
 %pytest
-%pyproject_check_import -t
+%pyproject_check_import --top-level-only
 
 
 %files -n python3-distroinfo -f %{pyproject_files}

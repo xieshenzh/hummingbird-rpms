@@ -40,10 +40,10 @@ sed -i 's/d)/d+)/' setup.py
 
 # internal check for our macros:
 # this should not work without -M
-%pyproject_save_files -L && exit 1 || true
+%pyproject_save_files --no-assert-license && exit 1 || true
 
 # but this should:
-%pyproject_save_files -LM
+%pyproject_save_files --no-assert-license --allow-no-modules
 
 
 %files -n python3-coverage-pth -f %{pyproject_files}

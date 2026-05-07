@@ -9,7 +9,7 @@ BuildRequires:  pyproject-rpm-macros
 
 
 %description
-Fake spec file to test %%pyproject_buildrequires -N works as expected
+Fake spec file to test %%pyproject_buildrequires --no-use-build-system works as expected
 
 %prep
 cat > requirements.txt <<EOF
@@ -18,7 +18,7 @@ tomli>=0.10.0
 EOF
 
 %generate_buildrequires
-%pyproject_buildrequires requirements.txt -N
+%pyproject_buildrequires requirements.txt --no-use-build-system
 
 
 %check

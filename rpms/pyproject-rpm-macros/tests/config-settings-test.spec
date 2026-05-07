@@ -37,12 +37,12 @@ EOF
 
 
 %generate_buildrequires
-%pyproject_buildrequires -C abc=123 -C xyz=456 -C--option-with-dashes=1 -C--option-with-dashes=2
-%{!?el9:%pyproject_buildrequires -C abc=123 -C xyz=456 -C--option-with-dashes=1 -C--option-with-dashes=2 -w}
+%pyproject_buildrequires --config-settings abc=123 -C xyz=456 --config-settings=--option-with-dashes=1 -C--option-with-dashes=2
+%{!?el9:%pyproject_buildrequires --config-settings abc=123 -C xyz=456 --config-settings=--option-with-dashes=1 -C--option-with-dashes=2 --wheel}
 
 
 %build
-%{!?el9:%pyproject_wheel -C abc=123 -C xyz=456 -C--option-with-dashes=1 -C--option-with-dashes=2}
+%{!?el9:%pyproject_wheel --config-settings abc=123 --config-settings xyz=456 --config-settings=--option-with-dashes=1 --config-settings=--option-with-dashes=2}
 
 
 %changelog

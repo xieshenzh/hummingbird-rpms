@@ -509,8 +509,8 @@ def generate_run_requirements_pyproject(requirements):
         requirements.metadata_extras.append(canonicalize_name(extra))
 
 
-def generate_run_requirements(backend, requirements, *, build_wheel, read_pyproject_dependencies, wheeldir):
-    if read_pyproject_dependencies:
+def generate_run_requirements(backend, requirements, *, build_wheel, pyproject_dependencies, wheeldir):
+    if pyproject_dependencies:
         generate_run_requirements_pyproject(requirements)
     elif build_wheel:
         generate_run_requirements_wheel(backend, requirements, wheeldir)
@@ -679,7 +679,7 @@ def generate_requires(
     *, include_runtime=False, build_wheel=False, wheeldir=None, toxenv=None, extras=None, dependency_groups=None,
     get_installed_version=importlib.metadata.version,  # for dep injection
     generate_extras=False, python3_pkgversion="3", requirement_files=None, use_build_system=True,
-    read_pyproject_dependencies=False,
+    pyproject_dependencies=False,
     output, config_settings=None, dependency_overrides=None,
 ):
     """Generate the BuildRequires for the project in the current directory
@@ -698,7 +698,7 @@ def generate_requires(
 
     dependency_groups = dependency_groups or []
     try:
-        if (include_runtime or toxenv or read_pyproject_dependencies) and not use_build_system:
+        if (include_runtime or toxenv or pyproject_dependencies) and not use_build_system:
             raise ValueError('-N option cannot be used in combination with -r, -e, -t, -x, -p options')
         if requirement_files:
             for req_file in requirement_files:
@@ -712,7 +712,7 @@ def generate_requires(
             generate_build_requirements(backend, requirements)
         if include_runtime or toxenv:
             generate_run_requirements(backend, requirements, build_wheel=build_wheel,
-                read_pyproject_dependencies=read_pyproject_dependencies, wheeldir=wheeldir)
+                pyproject_dependencies=pyproject_dependencies, wheeldir=wheeldir)
         if toxenv:
             generate_tox_requirements(toxenv, requirements)
             dependency_groups.extend(tox_dependency_groups(toxenv))
@@ -737,7 +737,7 @@ def generate_requires(
         output.write_text(os.linesep.join(requirements.output_lines) + os.linesep)
 
 
-def main(argv):
+def argparser():
     parser = argparse.ArgumentParser(
         description='Generate BuildRequires for a Python project.',
         prog='%pyproject_buildrequires',
@@ -793,7 +793,7 @@ def main(argv):
               '(useful for build backends without the prepare_metadata_for_build_wheel hook, deprecated)'),
     )
     parser.add_argument(
-        '-p', '--read-pyproject-dependencies', action='store_true', default=False,
+        '-p', '--pyproject-dependencies', action='store_true', default=False,
         help=('Generate dependencies from [project] table of pyproject.toml '
               'instead of calling prepare_metadata_for_build_wheel hook)'),
     )
@@ -811,17 +811,21 @@ def main(argv):
         help=('Add buildrequires from file'),
     )
     parser.add_argument(
-        '-C',
+        '-C', '--config-settings',
         dest='config_settings',
         action='append',
         help='Configuration settings to pass to the PEP 517 backend',
     )
-    parser.add_argument('-d', help=argparse.SUPPRESS)  # processed by RPM macro
     parser.add_argument(
         '--dep-overrides-file', type=pathlib.Path, default=None,
         help=argparse.SUPPRESS,
     )
+    parser.add_argument('-d', '--directory', help=argparse.SUPPRESS)  # processed by RPM macro
+    return parser
 
+
+def main(argv):
+    parser = argparser()
     args = parser.parse_args(argv)
 
     if not args.use_build_system:
@@ -859,7 +863,7 @@ def main(argv):
             python3_pkgversion=args.python3_pkgversion,
             requirement_files=args.requirement_files,
             use_build_system=args.use_build_system,
-            read_pyproject_dependencies=args.read_pyproject_dependencies,
+            pyproject_dependencies=args.pyproject_dependencies,
             output=args.output,
             config_settings=parse_config_settings_args(args.config_settings),
             dependency_overrides=dependency_overrides,

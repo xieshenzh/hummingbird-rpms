@@ -24,13 +24,13 @@ tar xf %{SOURCE2}
 
 
 %generate_buildrequires
-%pyproject_buildrequires -R -d markupsafe-%{markupsafe_version}
-%pyproject_buildrequires -R -d tldr-%{tldr_version}
+%pyproject_buildrequires --no-runtime --directory markupsafe-%{markupsafe_version}
+%pyproject_buildrequires --no-runtime --directory tldr-%{tldr_version}
 
 
 %build
-%pyproject_wheel -d markupsafe-%{markupsafe_version}
-%pyproject_wheel -d tldr-%{tldr_version}
+%pyproject_wheel --directory markupsafe-%{markupsafe_version}
+%pyproject_wheel --directory tldr-%{tldr_version}
 
 
 %install
