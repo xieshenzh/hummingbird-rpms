@@ -105,7 +105,7 @@
 # Comment out go_prerelease and go_patch as needed
 %global go_api 1.26
 #global go_prerelease rc3
-%global go_patch 2
+%global go_patch 3
 
 %global go_version %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease:~%{go_prerelease}}
 %global go_source %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease}
@@ -117,7 +117,7 @@
 
 Name:           %{basepackagename}1.26
 Version:        %{go_version}
-Release:        1.1%{?dist}
+Release:        0.1%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
@@ -147,14 +147,14 @@ Provides: bundled(golang(golang.org/x/arch)) = 0.23.0
 Provides: bundled(golang(golang.org/x/build)) = 0.0.0.20251128064159.b9bfd88b30e8
 Provides: bundled(golang(golang.org/x/crypto)) = 0.46.1.0.20251210140736.7dacc380ba00
 Provides: bundled(golang(golang.org/x/mod)) = 0.30.1.0.20251115032019.269c237cf350
-Provides: bundled(golang(golang.org/x/net)) = 0.47.1.0.20251128220604.7c360367ab7e
+Provides: bundled(golang(golang.org/x/net)) = 0.47.1.0.20260417193450.705de46f8788
 Provides: bundled(golang(golang.org/x/sync)) = 0.19.0
 Provides: bundled(golang(golang.org/x/sys)) = 0.39.0
 Provides: bundled(golang(golang.org/x/telemetry)) = 0.0.0.20251128220624.abf20d0e57ec
 Provides: bundled(golang(golang.org/x/term)) = 0.38.0
 Provides: bundled(golang(golang.org/x/text)) = 0.32.0
 Provides: bundled(golang(golang.org/x/tools)) = 0.27.0
-Provides: bundled(golang(golang.org/x/tools)) = 0.39.1.0.20251230210517.d44be789a05c
+Provides: bundled(golang(golang.org/x/tools)) = 0.39.1.0.20260323181443.4f499ecaa91d
 Provides: bundled(golang(rsc.io/markdown)) = 0.0.0.20240306144322.0bf8f97ee8ef
 
 Requires:       %{name}-bin = %{version}-%{release}
@@ -163,11 +163,8 @@ Requires:       go-filesystem
 
 Patch1:         0001-Modify-go.env.patch
 Patch5:         0005-Skip-TestCrashDumpsAllThreads.patch
-Patch6:         0006-Default-to-ld.bfd-on-ARM64.patch
 # Related to https://gcc.gnu.org/PR118497
 Patch8:         fix_cgo_panic-with-gcc15-in-368.patch
-# Related to https://github.com/golang/go/issues/74476
-Patch9:         skip_lsan_tests.patch
 # TestTerminalSignal hangs in mock (podman --init)
 Patch10:        0010-Skip-TestTerminalSignal.patch
 
