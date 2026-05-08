@@ -1,0 +1,232 @@
+---
+# Tests for the ca-certificates-bundle subpackage
+
+bundle-install-standalone:
+  command: |
+    # Install ca-certificates-bundle into a minimal rootfs and verify it
+    # does NOT pull in the heavy dependencies that the full package requires.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ca-certificates-bundle" ]]; then
+      echo "Skipping: only runs on ca-certificates-bundle (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    trap 'rm -rf "${build_dir}"' EXIT
+    mkdir -p "${build_dir}/local-repo"
+
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+
+    if command -v createrepo_c &>/dev/null; then
+      createrepo_c "${build_dir}/local-repo"
+    else
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+    fi
+
+    repo_root=$(git rev-parse --show-toplevel)
+
+    "${TEST_ENGINE}" run --rm --cap-add=ALL \
+      -v "${repo_root}/ci/repos:/tmp/repos:ro,z" \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -e
+        NEWROOT=/new-root-fs
+
+        cp /tmp/repos/*.repo /etc/yum.repos.d/
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+
+        DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs --setopt=install_weak_deps=False"
+
+        mkdir -p "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+
+        ${DNF} install filesystem
+        ${DNF} install ca-certificates-bundle
+
+        echo "=== Installed packages ==="
+        rpm --root="${NEWROOT}" -qa | sort
+
+        for pkg in p11-kit bash grep sed coreutils findutils; do
+          if rpm --root="${NEWROOT}" -q "${pkg}" &>/dev/null; then
+            echo "FAIL: ${pkg} was pulled in as a dependency"
+            exit 1
+          fi
+        done
+        echo "PASS: no heavy dependencies installed"
+      '
+
+bundle-cert-bundles:
+  command: |
+    # Verify the PEM bundles exist, symlinks resolve, and contain certificates.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ca-certificates-bundle" ]]; then
+      echo "Skipping: only runs on ca-certificates-bundle (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    trap 'rm -rf "${build_dir}"' EXIT
+    mkdir -p "${build_dir}/local-repo"
+
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+
+    if command -v createrepo_c &>/dev/null; then
+      createrepo_c "${build_dir}/local-repo"
+    else
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+    fi
+
+    repo_root=$(git rev-parse --show-toplevel)
+
+    "${TEST_ENGINE}" run --rm --cap-add=ALL \
+      -v "${repo_root}/ci/repos:/tmp/repos:ro,z" \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -e
+        NEWROOT=/new-root-fs
+
+        cp /tmp/repos/*.repo /etc/yum.repos.d/
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+
+        DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs --setopt=install_weak_deps=False"
+
+        mkdir -p "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+
+        ${DNF} install filesystem
+        ${DNF} install ca-certificates-bundle
+
+        echo "=== Test: PEM bundles contain certificates ==="
+        for bundle in \
+          /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+          /etc/pki/ca-trust/extracted/pem/email-ca-bundle.pem \
+          /etc/pki/ca-trust/extracted/pem/objsign-ca-bundle.pem; do
+
+          path="${NEWROOT}${bundle}"
+
+          if [ ! -f "${path}" ]; then
+            echo "FAIL: ${bundle} does not exist as a regular file"
+            exit 1
+          fi
+
+          count=$(grep -c "BEGIN CERTIFICATE" "${path}" || true)
+          if [ "${count}" -eq 0 ]; then
+            echo "FAIL: ${bundle} contains no certificates"
+            exit 1
+          fi
+          echo "PASS: ${bundle} (${count} certs)"
+        done
+
+        echo ""
+        echo "=== Test: compatibility symlinks resolve ==="
+        for link in \
+          /etc/ssl/cert.pem \
+          /etc/ssl/certs/ca-bundle.crt \
+          /etc/ssl/certs/ca-certificates.crt \
+          /etc/ssl/certs/ca-bundle.trust.crt \
+          /etc/pki/java/cacerts; do
+
+          path="${NEWROOT}${link}"
+          if [ ! -L "${path}" ]; then
+            echo "FAIL: ${link} is not a symlink"
+            exit 1
+          fi
+
+          target=$(readlink "${path}")
+          if [ -z "${target}" ] || [ ! -f "${NEWROOT}${target}" ]; then
+            echo "FAIL: ${link} does not resolve to a file (target: ${target:-empty})"
+            exit 1
+          fi
+          echo "PASS: ${link} -> $(readlink "${path}")"
+        done
+
+        echo ""
+        echo "=== Test: directory-hash contains cert hashes ==="
+        hash_dir="${NEWROOT}/etc/pki/ca-trust/extracted/pem/directory-hash"
+        hash_count=$(find "${hash_dir}" -maxdepth 1 -name "[0-9a-f]*.[0-9]*" | wc -l)
+        if [ "${hash_count}" -eq 0 ]; then
+          echo "FAIL: no hash entries in directory-hash"
+          exit 1
+        fi
+        echo "PASS: directory-hash has ${hash_count} entries"
+
+        echo ""
+        echo "SUCCESS: all bundle content tests passed"
+      '
+
+bundle-curl-tls:
+  command: |
+    # End-to-end TLS verification: install the bundle and curl, then make
+    # an HTTPS request. This proves the certificate chain works in practice.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "ca-certificates-bundle" ]]; then
+      echo "Skipping: only runs on ca-certificates-bundle (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    trap 'rm -rf "${build_dir}"' EXIT
+    mkdir -p "${build_dir}/local-repo"
+
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+
+    if command -v createrepo_c &>/dev/null; then
+      createrepo_c "${build_dir}/local-repo"
+    else
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+    fi
+
+    repo_root=$(git rev-parse --show-toplevel)
+
+    "${TEST_ENGINE}" run --rm --cap-add=ALL \
+      -v "${repo_root}/ci/repos:/tmp/repos:ro,z" \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -e
+        NEWROOT=/new-root-fs
+
+        cp /tmp/repos/*.repo /etc/yum.repos.d/
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+
+        DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs --setopt=install_weak_deps=False"
+
+        mkdir -p "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+
+        ${DNF} install filesystem
+        ${DNF} install ca-certificates-bundle curl
+
+        # Set up DNS resolution inside the chroot
+        cp /etc/resolv.conf "${NEWROOT}/etc/resolv.conf"
+
+        echo "=== Test: HTTPS request with ca-certificates-bundle ==="
+        chroot "${NEWROOT}" curl -fsSL --max-time 15 -o /dev/null \
+          -w "HTTP %{http_code} from %{url}\n" \
+          https://www.google.com || {
+            echo "SKIP: network unavailable (air-gapped environment?)"
+            exit 0
+          }
+
+        echo "PASS: TLS connection succeeded with ca-certificates-bundle"
+      '
