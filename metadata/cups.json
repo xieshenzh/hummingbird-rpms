@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "72e8d503434672595ad8919eefda6720440ded53",
+  "sha": "be6d28b6e12d1582856c2f79a1bd6cb77d728fcc",
   "source": "https://src.fedoraproject.org/rpms/cups.git",
   "upstream_repo": "https://github.com/OpenPrinting/cups",
-  "version": "2.4.18"
+  "version": "2.4.19"
 }
