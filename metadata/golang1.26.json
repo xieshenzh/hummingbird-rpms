@@ -4,8 +4,10 @@
   "modification_reason": "Carry hummingbird path along",
   "modification_status": "modified",
   "release": "1",
+  "release_monitoring_project_id": 1227,
   "sha": "e702d43b259623aab7f92db8b26626f80cc6f046",
   "source": "https://src.fedoraproject.org/rpms/golang.git",
+  "track_upstream": "1.26",
   "upstream_branch": "release-branch.go1.26",
   "upstream_repo": "https://github.com/golang/go",
   "version": "1.26.2"
