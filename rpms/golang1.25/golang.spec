@@ -101,7 +101,7 @@
 # Comment out go_prerelease and go_patch as needed
 %global go_api 1.25
 #global go_prerelease rc2
-%global go_patch 9
+%global go_patch 10
 
 %global go_version %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease:~%{go_prerelease}}
 %global go_source %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease}
@@ -113,7 +113,7 @@
 
 Name:           %{basepackagename}1.25
 Version:        %{go_version}
-Release:        1%{?dist}
+Release:        0.1%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
@@ -147,9 +147,9 @@ Provides: bundled(golang(golang.org/x/arch)) = 0.18.1.0.20250605182141.b2f4e2807
 Provides: bundled(golang(golang.org/x/build)) = 0.0.0.20250606033421.8c8ff6f34a83
 Provides: bundled(golang(golang.org/x/crypto)) = 0.39.0
 Provides: bundled(golang(golang.org/x/mod)) = 0.25.0
-Provides: bundled(golang(golang.org/x/net)) = 0.41.0
+Provides: bundled(golang(golang.org/x/net)) = 0.41.1.0.20260417201234.a9171bc8c6f1
 Provides: bundled(golang(golang.org/x/sync)) = 0.15.0
-Provides: bundled(golang(golang.org/x/sys)) = 0.33.0
+Provides: bundled(golang(golang.org/x/sys)) = 0.33.1.0.20260225210015.e0c9f78de999
 Provides: bundled(golang(golang.org/x/telemetry)) = 0.0.0.20250606142133.60998feb31a8
 Provides: bundled(golang(golang.org/x/term)) = 0.32.0
 Provides: bundled(golang(golang.org/x/text)) = 0.26.0
@@ -163,11 +163,8 @@ Requires:       go-filesystem
 
 Patch1:         0001-Modify-go.env.patch
 Patch5:         0005-Skip-TestCrashDumpsAllThreads.patch
-Patch6:         0006-Default-to-ld.bfd-on-ARM64.patch
 # Related to https://gcc.gnu.org/PR118497
 Patch8:         fix_cgo_panic-with-gcc15-in-368.patch
-# Related to https://github.com/golang/go/issues/74476
-Patch9:         skip_lsan_tests.patch
 # TestTerminalSignal hangs in mock (podman --init)
 Patch10:        0010-Skip-TestTerminalSignal.patch
 
