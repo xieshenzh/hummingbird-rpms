@@ -12,12 +12,28 @@ fips-module-source-present:
       exit 0
     fi
 
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
     "${TEST_ENGINE}" run --rm \
-      -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
       quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -e
-        dnf install -y /tmp/test.rpm
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y golang1.25
 
         goroot=$(go env GOROOT)
         fips_zip=$(ls "${goroot}"/lib/fips140/v1.0.0-*.zip 2>/dev/null || true)
