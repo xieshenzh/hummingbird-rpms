@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "8ea4fb962477869f28d0f5ee51d0c4e6ba4204da",
+  "sha": "310da217f6e47584d2054826e239ac3a94b0edbb",
   "source": "https://src.fedoraproject.org/rpms/annobin.git",
   "upstream_repo": "https://sourceware.org/git/annobin.git",
-  "version": "13.14"
+  "version": "13.15"
 }
