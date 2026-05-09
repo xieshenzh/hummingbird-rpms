@@ -27,7 +27,7 @@ GVTOML=go-vendor-tools.toml
 ###    1. Checks for configuration file and creates if missing. Optionally,
 ###       create a draft configuration file.
 ###    2. Use data from configuration file to generate kubernetes.spec
-###       from the ./template/kubernetes-template.spec template file.
+###       from the ./template/kubernetes-template.spec.in template file.
 ###    3. Download source, if needed, based on configuration.
 ###
 ###    Configuration file is named 'newrelease.conf'.
@@ -72,7 +72,7 @@ if [[ ($1 =~ (-c|-C)) || ($1 == "-y" && ! -f "$CFG_NAME") ]]; then
   echo " Edit ${CFG_NAME} with release information and rerun script"
   {
     printf "# spec file name\nexport SPEC_NAME=kubernetes\n\n"
-    printf "# spec template name and path\nTEMPLATE=./template/kubernetes-template.spec\n\n"
+    printf "# spec template name and path\nTEMPLATE=./template/kubernetes-template.spec.in\n\n"
     printf "# release tag from git repository\n# e.g. export GIT_TAG=v1.24.3\nexport GIT_TAG=vxx.xx.xx\n\n"
     printf "# the 'built-with' golang version - expressed as SEMVER\n# e.g. export GOLANG_VERSION=1.18.3\nexport GOLANG_VERSION=xx.xx.xx\n"
     printf "# optional configuration variables:\n"
