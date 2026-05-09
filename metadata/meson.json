@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Exclude gcc-objc/gcc-objc++ BuildRequires (disabled in Hummingbird gcc build)",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "e96077fb2fc3480f0a9f72bea7f102b6e53b2706",
+  "release": "2",
+  "sha": "045fbb68f3847e6ec0665993f6952aa99d690c11",
   "source": "https://src.fedoraproject.org/rpms/meson.git",
   "upstream_repo": "https://github.com/mesonbuild/meson",
   "version": "1.11.1"
