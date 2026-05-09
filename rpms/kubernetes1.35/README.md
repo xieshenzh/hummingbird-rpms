@@ -30,7 +30,7 @@ The workflow to revise the spec file uses the ```newrelease``` script. This scri
 
 ### Other modifications to the spec file to fix errors or add features
 
-1. Edit the template (initially ```./template/kubernetes-template.spec``` but set in configuration file)
+1. Edit the template (initially ```./template/kubernetes-template.spec.in``` but set in configuration file)
 
 2. Run
 

@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Rename template spec to .spec.in to avoid CI multi-specfile detection",
+  "modification_status": "modified",
   "release": "1",
   "sha": "507bee620d50f9386c05e2b613a3592c2fc24fed",
   "source": "https://src.fedoraproject.org/rpms/kubernetes1.35.git",
