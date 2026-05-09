@@ -152,7 +152,7 @@ which use the "default" feature of the "%{name}" crate.
 %files -n lib%{name} \
 %%license LICENSE* \
 %doc README* \
-%{_datadir}/tree-sitter/queries/%{tree_sitter_shortname}/ \
+%{_datadir}/tree-sitter/queries/*/ \
 %{_libdir}/libtree-sitter-*.so.* \
 \
 %files -n lib%{name}-devel \
