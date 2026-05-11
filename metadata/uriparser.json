@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "6a39b1071e4cd1dfdb4594e78ff6ae10e4ea0a55",
+  "sha": "c45f69cfb1e810f302a107b79a59a583a54341c0",
   "source": "https://src.fedoraproject.org/rpms/uriparser.git",
   "upstream_repo": "https://github.com/uriparser/uriparser",
-  "version": "1.0.1"
+  "version": "1.0.2"
 }
