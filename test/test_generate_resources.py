@@ -74,6 +74,48 @@ def mock_repo(tmp_path):
     return tmp_path
 
 
+class TestExpandTaskRunSpecs:
+    """Tests for expand_task_run_specs (rpmbuild shorthand for both arches)."""
+
+    def test_rpmbuild_expands_to_both_arches(self, gen_module):
+        specs = [
+            {
+                "pipelineTaskName": "rpmbuild",
+                "stepSpecs": [
+                    {
+                        "name": "run-syft",
+                        "computeResources": {
+                            "requests": {"memory": "10Gi"},
+                            "limits": {"memory": "10Gi"},
+                        },
+                    }
+                ],
+            }
+        ]
+        out = gen_module.expand_task_run_specs(specs)
+        assert len(out) == 2
+        assert out[0]["pipelineTaskName"] == "rpmbuild-x86-64"
+        assert out[1]["pipelineTaskName"] == "rpmbuild-aarch64"
+        assert out[0]["stepSpecs"] == out[1]["stepSpecs"] == specs[0]["stepSpecs"]
+
+    def test_other_task_names_unchanged(self, gen_module):
+        specs = [{"pipelineTaskName": "upload-to-quay", "stepSpecs": [{"name": "foo"}]}]
+        assert gen_module.expand_task_run_specs(specs) == specs
+
+    def test_mixed_list(self, gen_module):
+        specs = [
+            {"pipelineTaskName": "rpmbuild", "stepSpecs": [{"name": "run-syft"}]},
+            {"pipelineTaskName": "custom-task", "computeResources": {"limits": {"memory": "2Gi"}}},
+        ]
+        out = gen_module.expand_task_run_specs(specs)
+        assert len(out) == 3
+        assert [s["pipelineTaskName"] for s in out] == [
+            "rpmbuild-x86-64",
+            "rpmbuild-aarch64",
+            "custom-task",
+        ]
+
+
 class TestBuildRelengVariables:
     def test_basic_structure(self, gen_module, mock_repo):
         with patch.object(gen_module, "ROOT_DIR", mock_repo):
