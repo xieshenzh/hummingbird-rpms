@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "58.20251016cvs",
-  "sha": "bbb0f53588dd609569cd331867b17193f4a2098b",
+  "release": "59.20260508cvs",
+  "sha": "20de0947e2a9ac68a00b08e87d8ef4438f56dd1a",
   "source": "https://src.fedoraproject.org/rpms/libedit.git",
   "upstream_repo": "https://github.com/NetBSD/src",
   "version": "3.1"
