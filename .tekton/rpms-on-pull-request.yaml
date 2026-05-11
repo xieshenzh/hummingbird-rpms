@@ -27215,7 +27215,15 @@ spec:
         # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline@sha256:b9ce8a02047f0d27361c0172fe6c1eb4f2c7a196be133d19d6d67edd20b13de7"
   taskRunSpecs:
-    - pipelineTaskName: upload-to-quay
+    - pipelineTaskName: rpmbuild-x86-64
+      stepSpecs:
+        - name: run-syft
+          computeResources:
+            requests:
+              memory: 10Gi
+            limits:
+              memory: 10Gi
+    - pipelineTaskName: rpmbuild-aarch64
       stepSpecs:
         - name: run-syft
           computeResources:

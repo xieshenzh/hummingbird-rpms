@@ -21,6 +21,25 @@ DEFAULT_TIMEOUT_HOURS = 4
 DEFAULT_BUILD_PLATFORMS = ["linux/x86_64", "linux/arm64"]
 BUILD_TRIGGER_RPM_NAME = "setup"
 
+# Konflux rpmbuild-pipeline uses one pipeline task per arch (not a single "rpmbuild" task).
+# package-overrides may use pipelineTaskName: rpmbuild as shorthand for both.
+RPMBUILD_PIPELINE_TASK_NAMES = ("rpmbuild-x86-64", "rpmbuild-aarch64")
+
+
+def expand_task_run_specs(specs: list) -> list:
+    """Expand shorthand task names in task_run_specs for generated PipelineRuns."""
+    expanded: list = []
+    for spec in specs:
+        name = spec.get("pipelineTaskName")
+        if name == "rpmbuild":
+            for task_name in RPMBUILD_PIPELINE_TASK_NAMES:
+                dup = dict(spec)
+                dup["pipelineTaskName"] = task_name
+                expanded.append(dup)
+        else:
+            expanded.append(spec)
+    return expanded
+
 # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
 PIPELINE_BUNDLE = "quay.io/hummingbird-ci/rpmbuild-pipeline@sha256:b9ce8a02047f0d27361c0172fe6c1eb4f2c7a196be133d19d6d67edd20b13de7"
 
@@ -137,7 +156,9 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
             )
 
             if "task_run_specs" in pkg_config:
-                rpm_data["task_run_specs"] = pkg_config["task_run_specs"]
+                rpm_data["task_run_specs"] = expand_task_run_specs(
+                    pkg_config["task_run_specs"]
+                )
 
             if "forked_from" in pkg_config:
                 rpm_data["forked_from"] = pkg_config["forked_from"]

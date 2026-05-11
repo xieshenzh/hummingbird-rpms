@@ -1,10 +1,12 @@
 ---
 debuginfo:
     ignore:
-        # i686 has limited debuginfo. From rust.spec
-        # full debuginfo is exhausting memory; just do libstd for now
+        # i686 has debuginfo only for libstd. We build the rest with reduced
+        # debuginfo and these will likely fail the inspection.
+        # Ignore all i686 debuginfo from bin and libexec paths.
         # https://github.com/rust-lang/rust/issues/45854
-        - /usr/lib/debug/usr/bin/rustc-*.i386.debug
+        - /usr/lib/debug/usr/bin/*.i386.debug
+        - /usr/lib/debug/usr/libexec/*.i386.debug
 
 unicode:
     ignore:
