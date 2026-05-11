@@ -71,7 +71,7 @@
     if [[ -f tree-sitter.json ]]; then \
         sed -i -E 's#"node_modules/tree-sitter-([^/])/queries/#"%{_datadir}/tree-sitter/queries/\\1/#g' tree-sitter.json \
     fi \
-    %{__make} test %* \
+    %make_build test %* \
     %{?with_python:%pyproject_check_import} \
     %{?with_rust:%cargo_test}
 
