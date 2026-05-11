@@ -7,7 +7,7 @@
 
 Name:           libgit2
 Version:        1.9.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        C implementation of the Git core methods as a library with a solid API
 # The main code is GPL-2.0-only WITH GCC-exception-2.0
 # The bundled PCRE implementation is BSD-3-Clause - but not used
