@@ -1,4 +1,4 @@
-%global glibcsrcdir glibc-2.42-62-gf13c1bb0f9
+%global glibcsrcdir glibc-2.42-67-g4ebd33dd77
 %global glibcversion 2.42
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
@@ -152,7 +152,7 @@ Version: %{glibcversion}
 # - It allows using the Release number without the %%dist tag in the dependency
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
-%global baserelease 12
+%global baserelease 13
 Release: %{baserelease}%{?dist}
 
 # Licenses:
@@ -340,13 +340,10 @@ Patch13: glibc-fedora-localedata-rh61908.patch
 Patch17: glibc-cs-path.patch
 Patch23: glibc-python3.patch
 Patch24: glibc-rh2432405.patch
-Patch25: glibc-RHEL-172421.patch
 Patch26: glibc-RHEL-172425-1.patch
 Patch27: glibc-RHEL-172425-2.patch
 Patch28: glibc-RHEL-172425-3.patch
 Patch29: glibc-RHEL-172425-4.patch
-Patch30: glibc-RHEL-172420.patch
-Patch31: glibc-bz33921-open-tree-ifndef-guards.patch
 # https://bugs.winehq.org/show_bug.cgi?id=58523
 # revert 3d3572f59059e2b19b8541ea648a6172136ec42e to fix wine build
 # applied with PP powers as we really need to build wine to fix scriptlet problems
@@ -2395,6 +2392,18 @@ update_gconv_modules_cache ()
 %endif
 
 %changelog
+* Tue May 12 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-13
+- Auto-sync with upstream branch release/2.42/master,
+  commit 4ebd33dd77eabe8d4c45232bed4b42a31d2f9edc:
+- stdio-common: Fix buffer overflow in scanf %mc [BZ #34008] (Rocket Ma)
+- libio: Fix ungetwc operating on byte stream [BZ #33998] (Rocket Ma)
+- abilist.awk: Handle weak unversioned defined symbols (H.J. Lu)
+- Linux: Only define OPEN_TREE_* macros in <sys/mount.h> if undefined (bug 33921) (Florian Weimer)
+- include: isolate __O_CLOEXEC flag for sys/mount.h and fcntl.h (DJ Delorie)
+- Remove applied or redundant patches:
+  - glibc-RHEL-172420.patch
+  - glibc-RHEL-172421.patch
+
 * Thu Apr 30 2026 Florian Weimer <fweimer@redhat.com> - 2.42-12
 - Add downstream patches with fixes for vulnerabilities.
 - Fix buffer overflow in scanf %%mc (CVE-2026-5450)
