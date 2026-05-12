@@ -1,17 +1,18 @@
 %global project_version_prime 5
 %global project_version_major 4
 %global project_version_minor 2
-%global project_version_micro 0
+%global project_version_micro 1
 
 %bcond dnf5_obsoletes_dnf %[0%{?fedora} > 40 || 0%{?rhel} > 10]
 
 Name:           dnf5
 Version:        %{project_version_prime}.%{project_version_major}.%{project_version_minor}.%{project_version_micro}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Command-line package manager
 License:        GPL-2.0-or-later
 URL:            https://github.com/rpm-software-management/dnf5
 Source0:        %{url}/archive/%{version}/dnf5-%{version}.tar.gz
+Patch0:         0001-copr-update-detection-of-ELN.patch
 
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
@@ -488,10 +489,10 @@ Package management library.
 %verify(not md5 size mtime) %attr(0644, root, root) %ghost %{_prefix}/lib/sysimage/libdnf5/packages.toml
 %verify(not md5 size mtime) %attr(0644, root, root) %ghost %{_prefix}/lib/sysimage/libdnf5/system.toml
 %verify(not md5 size mtime) %attr(0644, root, root) %ghost %{_prefix}/lib/sysimage/libdnf5/transaction_history.sqlite{,-shm,-wal}
-%verify(not md5 size mtime) %attr(0664, root, root) %ghost %{_prefix}/lib/sysimage/libdnf5/system-repo.lock
 %license lgpl-2.1.txt
 %ghost %attr(0755, root, root) %dir %{_var}/cache/libdnf5
-%ghost %attr(0755, root, root) %dir %{_sharedstatedir}/dnf
+%attr(0755, root, root) %dir %{_sharedstatedir}/dnf
+%verify(not md5 size mtime) %attr(0644, root, root) %{_sharedstatedir}/dnf/system-repo.lock
 
 # ========== libdnf5-cli ==========
 
@@ -1087,14 +1088,15 @@ for file in \
     environments.toml groups.toml modules.toml nevras.toml packages.toml \
     system.toml \
     transaction_history.sqlite transaction_history.sqlite-shm \
-    transaction_history.sqlite-wal \
-    system-repo.lock
+    transaction_history.sqlite-wal
 do
     touch %{buildroot}%{_prefix}/lib/sysimage/libdnf5/$file
 done
 mkdir -p %{buildroot}%{_prefix}/lib/sysimage/libdnf5/comps_groups
 mkdir -p %{buildroot}%{_prefix}/lib/sysimage/libdnf5/offline
 touch %{buildroot}%{_sysconfdir}/dnf/versionlock.toml
+mkdir -p %{buildroot}%{_sharedstatedir}/dnf
+touch %{buildroot}%{_sharedstatedir}/dnf/system-repo.lock
 
 %if 0%{?fedora} || 0%{?rhel} > 10
 ln -sr %{buildroot}%{_bindir}/dnf5 %{buildroot}%{_bindir}/microdnf
@@ -1143,6 +1145,12 @@ mkdir -p %{buildroot}%{_libdir}/libdnf5/plugins
 %ldconfig_scriptlets
 
 %changelog
+* Tue May 12 2026 Petr Pisar <ppisar@redhat.com> - 5.4.2.1-2
+- Adapt copr plugin for new ELN os-release identification (upstream GH#2729)
+
+* Wed May 06 2026 Evan Goode <mail@evangoo.de> - 5.4.2.1-1
+- Update to version 5.4.2.1
+
 * Wed Apr 22 2026 Packit <hello@packit.dev> - 5.4.2.0-1
 - Update to version 5.4.2.0
 
