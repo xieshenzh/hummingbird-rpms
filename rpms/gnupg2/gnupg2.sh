@@ -1,3 +1,3 @@
-if [[ $- == *i* ]]; then
-    export GPG_TTY=$(tty)
-fi
+case "$-" in *i*)
+    export GPG_TTY=$(tty) ;;
+esac
