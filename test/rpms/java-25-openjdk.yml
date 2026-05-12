@@ -1,0 +1,32 @@
+---
+# Tests for the java-25-openjdk package
+
+headless-does-not-require-alsa-lib:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "java-25-openjdk-headless" ]]; then
+      echo "Skipping: only runs on java-25-openjdk-headless (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -q 'libasound\.so'; then
+      TEST_FAIL "java-25-openjdk-headless has hard Requires on libasound.so (should be Recommends: alsa-lib)"
+    else
+      echo "PASS: java-25-openjdk-headless does not hard-require libasound.so"
+    fi
+
+headless-recommends-alsa-lib:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "java-25-openjdk-headless" ]]; then
+      echo "Skipping: only runs on java-25-openjdk-headless (got: ${rpm_name})"
+      exit 0
+    fi
+
+    recommends=$(rpm -qp --recommends "${TEST_RPM}")
+    if echo "${recommends}" | grep -q 'alsa-lib'; then
+      echo "PASS: java-25-openjdk-headless recommends alsa-lib"
+    else
+      TEST_FAIL "java-25-openjdk-headless missing Recommends: alsa-lib"
+    fi
