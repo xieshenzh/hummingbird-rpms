@@ -1,7 +1,7 @@
 %global jspspec 3.1
 %global major_version 10
 %global minor_version 1
-%global micro_version 54
+%global micro_version 55
 %global packdname apache-tomcat-%{version}-src
 %global servletspec 6.0
 %global elspec 5.0
@@ -30,7 +30,7 @@
 Name:          tomcat10
 Epoch:         1
 Version:       %{major_version}.%{minor_version}.%{micro_version}
-Release:       1.1%{?dist}
+Release:       1%{?dist}
 Summary:       Apache Tomcat - Servlet and JSP engine for system-wide deployment
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
