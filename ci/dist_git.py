@@ -1106,7 +1106,24 @@ def merge_local_modifications(package_name: str, package_dir: Path, tmpdir: Path
     run_git('commit', '-m', 'Local Hummingbird modifications', cwd=upstream_dir)
 
     # Drop the previous "Normalize Release" commit, to leave only our actual modifications, with Release: untouched
-    run_git('rebase', '--onto', old_sha, 'HEAD~1', cwd=upstream_dir)
+    rebase_result = run_git('rebase', '--onto', old_sha, 'HEAD~1', cwd=upstream_dir, check=False)
+    if rebase_result.returncode != 0:
+        # Rebase can fail when Version and Release are close enough to share a diff hunk context,
+        # causing the normalized Release context to not match old_sha. Fall back to applying local
+        # modifications without Release normalization — Release may then conflict during the merge
+        # step, but that is handled by the caller's conflict-resolution flow.
+        logging.warning("Release normalization rebase failed for %s, falling back to direct diff", package_name)
+        run_git('rebase', '--abort', cwd=upstream_dir, check=False)
+        run_git('checkout', '--quiet', '-B', 'hummingbird-local', old_sha, cwd=upstream_dir)
+        for item in upstream_dir.iterdir():
+            if item.name != '.git':
+                if item.is_dir():
+                    shutil.rmtree(item)
+                else:
+                    item.unlink()
+        shutil.copytree(package_dir, upstream_dir, dirs_exist_ok=True)
+        run_git('add', '-A', cwd=upstream_dir)
+        run_git('commit', '--allow-empty', '-m', 'Local Hummingbird modifications', cwd=upstream_dir)
 
     # Checkout new upstream (don't normalize - we want to keep its Release)
     run_git('checkout', '--quiet', '-b', 'new-upstream', new_sha, cwd=upstream_dir)
