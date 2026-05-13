@@ -337,7 +337,6 @@ fi
 
 ##############################################
 %files -f %{go_vendor_license_filelist}
-%license LICENSE vendor/modules.txt
 %doc *.md
 
 # kubelet
@@ -357,7 +356,6 @@ fi
 
 ##############################################
 %files kubeadm -f %{go_vendor_license_filelist}
-%license LICENSE vendor/modules.txt
 %doc *.md
 %{_mandir}/man1/kubeadm.1*
 %{_mandir}/man1/kubeadm-*
@@ -367,7 +365,6 @@ fi
 
 ##############################################
 %files client -f %{go_vendor_license_filelist}
-%license LICENSE vendor/modules.txt
 %doc *.md
 %{_mandir}/man1/kubectl.1*
 %{_mandir}/man1/kubectl-*
