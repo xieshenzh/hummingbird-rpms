@@ -1216,7 +1216,7 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
         if not dry_run:
             save_package_metadata(package_name, metadata)
             run_git('add', str(METADATA_DIR / f'{package_name}.json'), cwd=ROOT_DIR)
-            commit_msg = f"Sync {upstream_package_name} to {version}-{release} (mark)\n\nUpstream: {latest_sha}"
+            commit_msg = f"Sync {package_name} to {version}-{release} (mark)\n\nUpstream: {latest_sha}"
             run_git_commit('--allow-empty', '-m', commit_msg, cwd=ROOT_DIR)
 
         logging.info("Marked %s as synced (no changes, empty commit)", package_name)
@@ -1319,7 +1319,7 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
         if not dry_run:
             run_git('add', '-f', f'rpms/{package_name}', f'metadata/{package_name}.json', cwd=ROOT_DIR)
             verb = "Sync" if sync else "Update"
-            commit_msg = f"{verb} {upstream_package_name} from {old_version}-{old_release} to {version}-{release}\n\nUpstream: {latest_sha}"
+            commit_msg = f"{verb} {package_name} from {old_version}-{old_release} to {version}-{release}\n\nUpstream: {latest_sha}"
             run_git_commit('-m', commit_msg, cwd=ROOT_DIR)
 
             # Exit with code 2 for conflicts (success but needs manual resolution)

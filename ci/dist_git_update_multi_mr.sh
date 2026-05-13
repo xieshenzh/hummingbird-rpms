@@ -343,15 +343,13 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
     # Get commit message and extract package name
     COMMIT_MSG=$(git log -1 --format=%s "${COMMIT_SHA}")
 
-    # Extract package name from commit message
-    # Examples: "Update bash from 5.2.0-1 to 5.3.9-1" -> extract "bash"
-    #           "Sync chocolate from 10-1 to 11-1" -> extract "chocolate"
-    # The pattern handles both "Update" and "Sync" verbs with "from X to Y" format
-    if [[ ${COMMIT_MSG} =~ ^(Update|Sync)\ ([^\ ]+)\ from\ [^\ ]+\ to\ .* ]]; then
-        PACKAGE="${BASH_REMATCH[2]}"
-    else
+    # Extract package name from changed metadata file (authoritative — works even when
+    # the upstream repo name differs from the local directory, e.g. golang vs golang1.26)
+    PACKAGE=$(git diff-tree --no-commit-id --name-only -r "${COMMIT_SHA}" -- metadata/ \
+        | head -1 | sed 's|^metadata/||; s|\.json$||')
+    if [[ -z "${PACKAGE}" ]]; then
         echo "----------------------------------------"
-        echo "⚠ Skipping commit ${COMMIT_SHA:0:8}: cannot parse package name from: ${COMMIT_MSG}"
+        echo "⚠ Skipping commit ${COMMIT_SHA:0:8}: no metadata file changed in: ${COMMIT_MSG}"
         PACKAGES_SKIPPED=$((PACKAGES_SKIPPED + 1))
         continue
     fi

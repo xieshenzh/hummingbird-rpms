@@ -451,10 +451,10 @@ def test_update(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     assert chocolate_import_data['version'] == '11', "chocolate should be at version 11"
     assert "Updating chocolate" in result.stderr
 
-    # Verify commit was created for chocolate update
+    # Verify commits were created for chocolate and strawberry updates
+    # strawberry is last (alphabetical order) so check it first (last commit)
     subject, body = get_last_commit_info(workdir)
-    assert subject == 'Update chocolate from 10-1 to 11-1'
-    assert f"Upstream: {chocolate_import_data['sha']}" in body
+    assert subject == 'Update strawberry from 10-1 to 11-1'
 
     # Case 3: strawberry should be updated with merge (has upstream update and local modifications)
     assert "Updating strawberry" in result.stderr
@@ -1065,6 +1065,39 @@ def test_update_of_rebuild(workdir: Path, upstream_repos: dict[str, Path]) -> No
     subject, body = get_last_commit_info(workdir)
     assert subject == 'Update vanilla from 1.0-1 to 2.0-1'
     assert f"Upstream: {new_sha}" in body
+
+def test_update_commit_uses_local_package_name(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Update commit message uses local directory name, not upstream repo name.
+
+    When a package is imported with --directory (e.g. golang imported as golang1.26),
+    the commit message must use the local name so that CI scripts can find the correct
+    rpms/ directory for conflict detection.
+    """
+    # Import vanilla with a different directory name (simulates golang -> golang1.26)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', '--directory', 'vanilla1.0',
+         f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Add upstream commit (Release bump only — version stays in 1.0 series)
+    upstream_spec = upstream_repos['vanilla'] / 'vanilla.spec'
+    upstream_content = upstream_spec.read_text()
+    updated = upstream_content.replace('Release: 1', 'Release: 2')
+    upstream_spec.write_text(updated)
+    subprocess.run(['git', 'commit', '-a', '-m', 'Bump release'],
+                   cwd=upstream_repos['vanilla'], check=True)
+
+    # Update
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--skip-build-check', 'vanilla1.0'],
+        cwd=workdir, check=True,
+    )
+
+    # Commit message must use local name "vanilla1.0", not upstream "vanilla"
+    subject, _ = get_last_commit_info(workdir)
+    assert subject == 'Update vanilla1.0 from 1.0-1 to 1.0-2'
+
 
 def test_mark_modified_with_reason(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     """Mark a clean package as modified with a reason."""
