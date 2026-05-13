@@ -1,10 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to 2.8.0 ahead of Fedora",
+  "modification_reason": "Historical commit missing Upstream trailer",
   "modification_status": "modified",
-  "release": "0.1",
-  "sha": "76216637648fa5f518ad93f7a0791706e14871fa",
+  "release": "1",
+  "sha": "e7c4e277fa46ee92ce5bdb1e8c78a573f7304176",
   "source": "https://src.fedoraproject.org/rpms/expat.git",
   "upstream_repo": "https://github.com/libexpat/libexpat",
-  "version": "2.8.0"
+  "version": "2.8.1"
 }
