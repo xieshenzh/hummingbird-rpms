@@ -1,9 +1,9 @@
 Summary: An XML parser library
 Name: expat
-Version: 2.8.0
-Release: 0.1%{?dist}
-Source0: https://github.com/libexpat/libexpat/releases/download/R_2_8_0/expat-%{version}.tar.gz
-Source1: https://github.com/libexpat/libexpat/releases/download/R_2_8_0/expat-%{version}.tar.gz.asc
+Version: 2.8.1
+Release: 1%{?dist}
+Source0: https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-%{version}.tar.gz
+Source1: https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-%{version}.tar.gz.asc
 # Sebastian Pipping's PGP public key
 Source2: https://keys.openpgp.org/vks/v1/by-fingerprint/3176EF7DB2367F1FCA4F306B1F9B0E909AF37285
 
