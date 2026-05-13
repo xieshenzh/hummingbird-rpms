@@ -3,8 +3,8 @@
   "modification_reason": "Lower nss-softokn minimum version to 3.90.0 to allow FIPS-certified softokn from RHEL 9.2",
   "modification_status": "modified",
   "release": "1",
-  "sha": "a14a2e4858856333684d7e230fc3af38844c99b9",
+  "sha": "a2e1a543d0c2cb811e939c90d9ebdbf9579468d6",
   "source": "https://src.fedoraproject.org/rpms/nss.git",
   "upstream_repo": "https://github.com/nss-dev/nss",
-  "version": "3.122.2"
+  "version": "3.123.1"
 }
