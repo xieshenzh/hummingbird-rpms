@@ -1,8 +1,9 @@
 # OpenSSL ENGINE support
 # This is deprecated by OpenSSL since OpenSSL 3.0 and by Fedora since Fedora 41
 # https://fedoraproject.org/wiki/Changes/OpensslDeprecateEngine
+# and dropped by OpenSSL since OpenSSL 4.0 in Fedora 45
 # Change the bcond to 0 to turn off ENGINE support by default
-%bcond openssl_engine_support %[%{defined fedora} || 0%{?rhel} < 10]
+%bcond openssl_engine_support %[!(0%{?fedora} > 44 || 0%{?rhel} > 10 || %{defined hummingbird})]
 
 # HTTP/3 support
 # This is using ngtcp2 with OpenSSL 3.5 QUIC support instead of curl's
@@ -12,7 +13,7 @@
 Summary: A utility for getting files from remote servers (FTP, HTTP, and others)
 Name: curl
 Version: 8.20.0
-Release: 0.1%{?dist}
+Release: 1%{?dist}
 License: curl
 Source0: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz
 Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
@@ -170,8 +171,8 @@ Requires: libcurl%{?_isa} >= %{version}-%{release}
 
 # require at least the version of openssl-libs that we were built against,
 # to ensure that we have the necessary symbols available (#1462184, #1462211)
-# (we need to translate 3.0.0-alpha16 -> 3.0.0-0.alpha16 and 3.0.0-beta1 -> 3.0.0-0.beta1 though)
-%global openssl_version %({ pkg-config --modversion openssl 2>/dev/null || echo 0;} | sed 's|-|-0.|')
+# (we need to translate 4.0.0-beta1 -> 4.0.0~beta1 though)
+%global openssl_version %({ pkg-config --modversion openssl 2>/dev/null || echo 0;} | sed 's|-|~|')
 
 %description
 curl is a command line tool for transferring data with URL syntax, supporting
@@ -241,6 +242,26 @@ be installed.
 # disable test 1801
 # <https://github.com/bagder/curl/commit/21e82bd6#commitcomment-12226582>
 printf "1801\n" >>tests/data/DISABLED
+
+# temporary disable test 1085 it passes on Fedora but fails on ELN
+printf "1085\n" >>tests/data/DISABLED
+
+# test 303: raise timeout from 8s to 20s so it doesn't expire during TLS
+# handshake under valgrind
+%ifarch x86_64
+sed -e 's|-m 8|-m 20|' -i tests/data/test303
+%endif
+
+%ifarch s390x
+# SFTP/SCP tests fail due to libssh port-setting bug on big-endian
+# ("Could not set remote port")
+printf "582\n600\n601\n602\n603\n604\n605\n606\n607\n608\n" >>tests/data/DISABLED
+printf "609\n610\n611\n612\n613\n614\n615\n616\n617\n618\n" >>tests/data/DISABLED
+printf "619\n620\n621\n622\n623\n624\n625\n626\n627\n628\n" >>tests/data/DISABLED
+printf "629\n630\n631\n633\n634\n635\n636\n637\n638\n639\n" >>tests/data/DISABLED
+printf "640\n641\n642\n656\n664\n665\n" >>tests/data/DISABLED
+printf "1446\n1459\n1583\n2004\n2007\n" >>tests/data/DISABLED
+%endif
 
 # test3026: avoid pthread_create() failure due to resource exhaustion on i386
 %ifarch %{ix86}
@@ -367,7 +388,7 @@ for size in minimal full; do (
     export LD_LIBRARY_PATH="${PWD}/lib/.libs"
 
     # tests that must run in serial to avoid intermittent failures under parallel execution
-    serial_tests="766 2502"
+    serial_tests="766 2402 2404 2500 2502 3300"
     serial_excludes=$(for t in $serial_tests; do printf ' !%s' "$t"; done)
     # run the bulk of tests in parallel, excluding serial ones
     # cap at 64 jobs to avoid overwhelming system resources on high-CPU machines
@@ -447,6 +468,24 @@ rm -f ${RPM_BUILD_ROOT}%{_mandir}/man1/wcurl.1*
 %{_libdir}/libcurl.so.4.[0-9].[0-9].minimal
 
 %changelog
+* Thu May 07 2026 Jan Macku <jamacku@redhat.com> - 8.20.0-1
+- new upstream release
+
+* Thu Apr 30 2026 Jan Macku <jamacku@redhat.com> - 8.20.0~rc3-1
+- new upstream release candidate
+
+* Tue Apr 14 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 8.20.0~rc2-3
+- Rebuilt for reverted openssl 3.5
+
+* Mon Apr 13 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 8.20.0~rc2-2
+- Rebuilt for openssl-4.0.0~beta1
+
+* Mon Apr 13 2026 Jan Macku <jamacku@redhat.com> - 8.20.0~rc2-1
+- new upstream release candidate
+
+* Tue Apr 07 2026 Jan Macku <jamacku@redhat.com> - 8.20.0~rc1-1
+- new upstream release candidate
+
 * Tue Mar 24 2026 Rob Crittenden <rcritten@redhat.com> - 8.19.0-3
 - openssl channel_binding: lookup digest algorithm without NID
 

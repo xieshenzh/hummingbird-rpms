@@ -1,10 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 8.20.0",
+  "modification_reason": "Disable deprecated OpenSSL ENGINE support",
   "modification_status": "modified",
-  "release": "0.1",
+  "release": "1",
   "release_monitoring_project_id": 381,
-  "sha": "9821ffef8df4d04216000f7fa65777a9e3fb6677",
+  "sha": "2507a0c150f4182a6abffffe6e3d11bb80a8642c",
   "source": "https://src.fedoraproject.org/rpms/curl.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/curl/curl",
