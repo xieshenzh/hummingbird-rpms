@@ -3,7 +3,7 @@
 # https://fedoraproject.org/wiki/Changes/OpensslDeprecateEngine
 # and dropped by OpenSSL since OpenSSL 4.0 in Fedora 45
 # Change the bcond to 0 to turn off ENGINE support by default
-%bcond openssl_engine_support %[!(0%{?fedora} > 44 || 0%{?rhel} > 10)]
+%bcond openssl_engine_support %[!(0%{?fedora} > 44 || 0%{?rhel} > 10 || %{defined hummingbird})]
 
 # HTTP/3 support
 # This is using ngtcp2 with OpenSSL 3.5 QUIC support instead of curl's
