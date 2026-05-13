@@ -6,6 +6,26 @@ PULL ?= newer
 PODMAN_RUN = podman run --pull=$(PULL) --label io.hummingbird-project.makefile-container=true $(shell [ -t 0 ] && echo "-it" || echo "-i") --rm -u 0 -v $(PWD_REALPATH):$(PWD_REALPATH):z $(WORKTREE_MOUNT) -w $(PWD_REALPATH) -e XARGS_PARALLEL_JOBS -e GITLAB_TOKEN
 PODMAN_IMAGE = quay.io/hummingbird-ci/gitlab-ci:latest
 
+.DEFAULT_GOAL := container
+
+.PHONY: help
+help:
+	@echo "Makefile targets:"
+	@echo "  container               - Start interactive container shell (default)"
+	@echo "  help                    - Show this help message"
+	@echo "  check                   - Run linters, type checks, and tests"
+	@echo "  generate                - Generate Konflux/Tekton resources"
+	@echo "  dist-git                - Run dist-git operations (pass ARGS='...')"
+	@echo "  find-missing-rpms       - List RPMs missing in Pulp that need publishing"
+	@echo "  analyze-rpms            - List RPMs in containers repo not present here"
+	@echo "  markdownlint            - Run markdown linter"
+	@echo "  delete-konflux-comments - Delete Konflux bot comments (pass ARGS='...')"
+	@echo ""
+	@echo "Most targets run inside a container. Targets suffixed with -host"
+	@echo "run directly on the host (used by CI and the container wrapper)."
+	@echo ""
+	@echo "Options:"
+	@echo "  ARGS='...'              - Pass arguments to dist-git, generate, find-missing-rpms, etc."
 
 .PHONY: container
 container:
