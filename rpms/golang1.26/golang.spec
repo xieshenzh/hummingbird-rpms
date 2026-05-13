@@ -117,7 +117,7 @@
 
 Name:           %{basepackagename}1.26
 Version:        %{go_version}
-Release:        0.1%{?dist}
+Release:        2%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
