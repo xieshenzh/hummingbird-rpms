@@ -15,10 +15,26 @@ discover:
   - name: same_repo
     how: shell
     dist-git-source: true
-    dist-git-download-only: true
     tests:
     - name: import_test
       test: python3 -c "import setuptools"
+    - name: upstream_tests
+      environment:
+        PIP_NO_BUILD_ISOLATION: 0
+      test: |
+        cd $(dirname $TMT_SOURCE_DIR/*/pyproject.toml)
+        python3 -m pip install --uploaded-prior-to='2026-03-10T00:00:00Z' '.[test]'
+        python3 -m pip uninstall --yes setuptools
+        PYTHONPATH=$(pwd) \
+          PRE_BUILT_SETUPTOOLS_WHEEL=$(rpm -ql python-setuptools-wheel | grep whl$) \
+          pytest \
+          --ignore=setuptools/tests/integration/ \
+          --ignore=setuptools/tests/test_editable_install.py \
+          --ignore=setuptools/tests/config/test_apply_pyprojecttoml.py \
+          --ignore=tools \
+          -k "not test_wheel_includes_cli_scripts" \
+          -n auto
+        rm -rf /usr/local/bin/* /usr/local/lib*/python*
     - name: mock_bootstrap_build
       # Needs cwd to contain downloaded sources, path to mocktest.sh depends on tmt tree structure
       test: |
@@ -27,6 +43,14 @@ discover:
   - name: tests_python
     how: shell
     url: https://src.fedoraproject.org/tests/python.git
+    tests:
+    - name: smoke314_virtualenv
+      path: /smoke
+      test:  VERSION=3.14 METHOD=virtualenv VIRTUALENV_SETUPTOOLS=bundle ./venv.sh
+  - name: tests_python_fedora_only
+    how: shell
+    url: https://src.fedoraproject.org/tests/python.git
+    when: distro != fedora-eln and distro == fedora
     tests:
     - name: smoke36
       path: /smoke
@@ -55,22 +79,20 @@ discover:
     - name: smoke313_virtualenv
       path: /smoke
       test:  VERSION=3.13 METHOD=virtualenv VIRTUALENV_SETUPTOOLS=bundle ./venv.sh
-    - name: smoke314_virtualenv
+    - name: smoke315_virtualenv
       path: /smoke
-      test:  VERSION=3.14 METHOD=virtualenv VIRTUALENV_SETUPTOOLS=bundle ./venv.sh
+      test:  VERSION=3.15 METHOD=virtualenv VIRTUALENV_SETUPTOOLS=bundle ./venv.sh
 
 prepare:
   - name: Install dependencies
     how: install
     package:
+    - python3-setuptools
+    - python-setuptools-wheel
+    - python3-pip
+    - python3-test
     - gcc
     - virtualenv
-    - python3.6-devel
-    - python3.9-devel
-    - python3.10-devel
-    - python3.11-devel
-    - python3.12-devel
-    - python3.13-devel
     - python3.14-devel
     - python3-devel
     - python3-tox
@@ -78,6 +100,17 @@ prepare:
     - rpmdevtools
     - rpm-build
     - dnf
+  - name: Install dependencies (Fedora not ELN)
+    how: install
+    when: distro != fedora-eln and distro == fedora
+    package:
+    - python3.6-devel
+    - python3.9-devel
+    - python3.10-devel
+    - python3.11-devel
+    - python3.12-devel
+    - python3.13-devel
+    - python3.15-devel
   - name: Update packages
     how: shell
     script: dnf upgrade -y
