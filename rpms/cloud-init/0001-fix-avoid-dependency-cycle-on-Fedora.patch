@@ -1,4 +1,4 @@
-From d7e47f0ea7cfff876807240421bae6122a9ffeca Mon Sep 17 00:00:00 2001
+From e2381f6e5e9699fb5fb4f1eb79ea1c3bffe85759 Mon Sep 17 00:00:00 2001
 From: Jeremy Cline <jeremycline@linux.microsoft.com>
 Date: Mon, 25 Aug 2025 17:06:02 -0400
 Subject: [PATCH] fix: avoid dependency cycle on Fedora
@@ -27,7 +27,7 @@ Signed-off-by: Jeremy Cline <jeremycline@linux.microsoft.com>
  3 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
-index e88b15c..fc83232 100644
+index e88b15ca2..fc8323287 100644
 --- a/systemd/cloud-init-local.service.tmpl
 +++ b/systemd/cloud-init-local.service.tmpl
 @@ -2,7 +2,7 @@
@@ -40,7 +40,7 @@ index e88b15c..fc83232 100644
  {% endif %}
  Wants=network-pre.target
 @@ -22,7 +22,7 @@ ConditionEnvironment=!KERNEL_CMDLINE=cloud-init=disabled
- 
+
  [Service]
  Type=oneshot
 -{% if variant in ["almalinux", "cloudlinux", "rhel"] %}
@@ -69,9 +69,9 @@ index 2ca6220..a1f0177 100644
 +{% if variant in ["almalinux", "cloudlinux", "rhel", "fedora"] %}
  ExecStartPre=/sbin/restorecon /run/cloud-init
  {% endif %}
- 
+
 diff --git a/systemd/cloud-init-network.service.tmpl b/systemd/cloud-init-network.service.tmpl
-index c284024..dec4fc7 100644
+index c284024be..dec4fc7c5 100644
 --- a/systemd/cloud-init-network.service.tmpl
 +++ b/systemd/cloud-init-network.service.tmpl
 @@ -2,7 +2,7 @@
@@ -83,5 +83,5 @@ index c284024..dec4fc7 100644
  DefaultDependencies=no
  {% endif %}
  Wants=cloud-init-local.service
--- 
+--
 2.53.0
