@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "57921177274f6668dfc82fb6c518154bf8200880",
+  "sha": "eb5e26dd8cef645e716b3316129e8755e6e652a1",
   "source": "https://src.fedoraproject.org/rpms/tk.git",
   "upstream_repo": "https://github.com/tcltk/tk",
-  "version": "9.0.2"
+  "version": "9.0.3"
 }
