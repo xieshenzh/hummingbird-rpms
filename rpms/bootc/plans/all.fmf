@@ -22,6 +22,8 @@ prepare:
     script:
       - pwd && ls -al && ls -al /var/share/test-artifacts && mkdir -p bootc && cp /var/share/test-artifacts/*.src.rpm bootc
       - cd bootc && ls -al && rpm2cpio *.src.rpm | cpio -idmv && rm -f *-vendor.tar.zstd && zstd -d *.tar.zstd && tar -xvf *.tar -C . --strip-components=1 && ls -al
+      # Remove the "cp" line in next release, the fix already added in bootc upstream
+      - cp os-image-map.json bootc/hack
       - cd bootc/hack && ./provision-packit.sh
   # tmt-reboot and reboot do not work in this case
   # reboot in ansible is the only way to reboot in tmt prepare

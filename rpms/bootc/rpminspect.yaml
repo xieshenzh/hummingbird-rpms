@@ -1,0 +1,4 @@
+# Disable the symlink check for the problematic path
+symlinks:
+  ignore:
+    - /usr/lib/bootc/storage

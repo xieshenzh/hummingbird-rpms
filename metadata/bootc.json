@@ -1,10 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Version bump to 1.14.0",
+  "modification_reason": "Historical commit missing Upstream trailer",
   "modification_status": "modified",
-  "release": "0.1",
-  "sha": "d84703ae70817d9fd735f91ee178ba1f5dcc84d1",
+  "release": "1",
+  "sha": "a402f0269f0c6c527598fa0ffe50243f77290708",
   "source": "https://src.fedoraproject.org/rpms/bootc.git",
   "upstream_repo": "https://github.com/containers/bootc",
-  "version": "1.14.0"
+  "version": "1.15.2"
 }
