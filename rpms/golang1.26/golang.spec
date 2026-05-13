@@ -60,12 +60,9 @@
 %global fail_on_tests 1
 %endif
 
-# Build golang shared objects for stdlib
-%ifarch %{ix86} x86_64 ppc64le %{arm} aarch64
-%global shared 1
-%else
+# Shared mode is incompatible with GOFIPS140 certified module (different roots)
+# and was already disabled in CentOS Stream c10s.
 %global shared 0
-%endif
 
 # Pre build std lib with -race enabled
 # Disabled due to 1.20 new cache usage, see 1.20 upstream release notes
