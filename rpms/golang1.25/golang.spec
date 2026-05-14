@@ -59,12 +59,9 @@
 %global fail_on_tests 1
 %endif
 
-# Build golang shared objects for stdlib
-%ifarch %{ix86} x86_64 ppc64le %{arm} aarch64
-%global shared 1
-%else
+# Shared mode is incompatible with GOFIPS140 certified module (different roots)
+# and was already disabled in CentOS Stream c10s.
 %global shared 0
-%endif
 
 # Pre build std lib with -race enabled
 # Disabled due to 1.20 new cache usage, see 1.20 upstream release notes
@@ -113,7 +110,7 @@
 
 Name:           %{basepackagename}1.25
 Version:        %{go_version}
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
@@ -167,6 +164,10 @@ Patch5:         0005-Skip-TestCrashDumpsAllThreads.patch
 Patch8:         fix_cgo_panic-with-gcc15-in-368.patch
 # TestTerminalSignal hangs in mock (podman --init)
 Patch10:        0010-Skip-TestTerminalSignal.patch
+# Embed CMVP #5247 certified FIPS module by default with host-auto detection.
+# FIPS activates automatically on FIPS-enabled hosts, stays off otherwise.
+# Users can override with GODEBUG=fips140=on or godebug fips140=auto in go.mod.
+Patch15:        0015-Default-GOFIPS140-certified-fips-auto.patch
 
 # Having documentation separate was broken
 Obsoletes:      %{name}-docs < 1.1-4
