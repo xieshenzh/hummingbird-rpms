@@ -17,7 +17,15 @@ syft-version:
       bash -c '
         set -e
         dnf install -y /tmp/test.rpm
-        syft version
+
+        # Verify version is embedded via ldflags (not "[not provided]")
+        version=$(syft version | grep "^Version:" | tr -s " " | cut -d" " -f2)
+        rpm_version=$(rpm -q --queryformat "%{VERSION}" syft)
+        if [[ "${version}" != "${rpm_version}" ]]; then
+          echo "Error: syft reports version \"${version}\", expected \"${rpm_version}\""
+          exit 1
+        fi
+        echo "syft version correctly reports ${version}"
       '
 
 syft-scan-rpm:

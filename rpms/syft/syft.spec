@@ -34,6 +34,7 @@ images and filesystems.
 
 %build
 %global gomodulesmode GO111MODULE=on
+export GO_LDFLAGS="-X main.version=%{version}"
 for cmd in cmd/* ; do
   %gobuild -o %{gobuilddir}/bin/$(basename $cmd) %{goipath}/$cmd
 done
