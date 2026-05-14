@@ -3,10 +3,10 @@
   "cve_product": "Microsoft / .NET 10.0",
   "modification_status": "clean",
   "release": "1",
-  "sha": "0594180c6fafcdb77571349a798f7bb1d0bb5d85",
+  "sha": "52bf510336f6e0a0e426b2703b68b38c6d68b1e2",
   "source": "https://src.fedoraproject.org/rpms/dotnet10.0.git",
   "upstream_branch": "release/10.0",
   "upstream_repo": "https://github.com/dotnet/runtime",
-  "version": "10.0.107",
+  "version": "10.0.108",
   "version_transform": "dotnet_sdk_to_runtime"
 }
