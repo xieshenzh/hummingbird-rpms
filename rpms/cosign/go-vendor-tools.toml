@@ -1,0 +1,22 @@
+[archive]
+# cr-20160607 is missing a LICENSE file upstream; copy from sibling module
+post_commands = [
+    [
+        "cp", "-p",
+        "vendor/github.com/alibabacloud-go/cr-20181201/LICENSE",
+        "vendor/github.com/alibabacloud-go/cr-20160607/LICENSE",
+    ],
+]
+
+[licensing]
+detector = "askalono"
+
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "Apache-2.0 AND MIT"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "Apache-2.0 AND MIT"
