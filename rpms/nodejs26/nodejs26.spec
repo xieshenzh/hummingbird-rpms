@@ -3,7 +3,7 @@
 %{load:%{_sourcedir}/nodejs.srpm.macros}
 
 # === Versions of any software shipped in the main nodejs tarball
-%nodejs_define_version node 1:26.1.0-1.1%{?dist} -p
+%nodejs_define_version node 1:26.1.0-1.2%{?dist} -p
 
 # Special release for sub-packages with their own version string.
 # The complex release string ensures that the subpackage release is always increasing,
@@ -99,6 +99,7 @@ BuildRequires:  jq
 BuildRequires:  nodejs-packaging
 # Build system and supporting tools
 BuildRequires:  gcc >= 10.0, gcc-c++ >= 10.0, pkgconf, ninja-build
+BuildRequires:  cargo >= 1.82
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  %{py3_dist setuptools jinja2}
 # Additional libraries, either system or vendored ones
@@ -334,6 +335,8 @@ readonly -a configure_flags=(
 %endif
     # Enable LTO where possible
     --enable-lto
+    # Enable Temporal API (TC39 Stage 4 / ES2026); requires Rust toolchain
+    --v8-enable-temporal-support
     # Compile with small icu, extendable via full-i18n subpackage
     --with-intl=small-icu --with-icu-default-data-dir=%{nodejs_datadir}/icudata
     # Use local headers for native addons when available
@@ -574,6 +577,8 @@ npm version --json | jq --exit-status '.npm == "%{npm_version}"'
 node '%{SOURCE20}'
 # - npm update notifier is disabled
 npm config list --json | jq --exit-status '.["update-notifier"] == false'
+# - Temporal API is available
+node -e 'require("assert").equal(typeof Temporal, "object")'
 
 # === Upstream test suite
 bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test/ '%{SOURCE11}'
