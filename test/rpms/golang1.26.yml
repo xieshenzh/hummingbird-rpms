@@ -249,3 +249,74 @@ fips-strict-mode:
           fi
         done
       '
+
+fips-go-get-resolves-std:
+  command: |
+    # Regression test for https://github.com/golang/go/issues/73649
+    # go get must resolve crypto/internal/fips140 snapshot packages when
+    # GOFIPS140 defaults to certified. This broke xcaddy and any workflow
+    # that uses "go get" to add modules importing crypto/tls.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "golang1.26-bin" ]]; then
+      echo "Skipping: only runs on golang1.26-bin (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y golang1.26-bin golang1.26 golang1.26-src gcc
+
+        export HOME=/tmp GOPATH=/tmp/gopath GOCACHE=/tmp/gocache
+
+        # Verify GOFIPS140 defaults to certified (precondition)
+        gofips=$(go env GOFIPS140)
+        if [[ "${gofips}" != "certified" ]]; then
+          echo "FAIL: GOFIPS140 should default to certified, got: ${gofips}"
+          exit 1
+        fi
+
+        # Test: go get a module that imports crypto/tls (triggers fips140 resolution)
+        mkdir -p /tmp/goget-test && cd /tmp/goget-test
+        go mod init goget-test
+
+        # go get must not emit "is not in std" errors for fips140 packages
+        if ! go get golang.org/x/crypto/ssh 2>stderr.log; then
+          if grep -q "is not in std" stderr.log; then
+            echo "FAIL: go get cannot resolve fips140 snapshot packages:"
+            cat stderr.log
+            exit 1
+          fi
+          echo "FAIL: go get failed (non-fips error):"
+          cat stderr.log
+          exit 1
+        fi
+        echo "PASS: go get resolves fips140 packages with GOFIPS140=certified"
+
+        # Test: go build after go get must also succeed
+        cat > main.go <<GOEOF
+        package main
+        import _ "golang.org/x/crypto/ssh"
+        func main() {}
+        GOEOF
+        go build -o /dev/null .
+        echo "PASS: go build succeeds after go get with GOFIPS140=certified"
+      '
