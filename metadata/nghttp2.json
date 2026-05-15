@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "fda7ebf9e6c49d6dae2ca31aab62cd12cf71dd92",
+  "release": "2",
+  "sha": "2b543a67e505d4694830338d45c6ef2bdc76b0af",
   "source": "https://src.fedoraproject.org/rpms/nghttp2.git",
   "upstream_repo": "https://github.com/nghttp2/nghttp2",
   "version": "1.69.0"
