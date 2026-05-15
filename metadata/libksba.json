@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "dd7f23a821e7d688174266cc86a1f0b12074791a",
+  "sha": "3bf6beafb45141c34ed2be0abaafcce22019c2bd",
   "source": "https://src.fedoraproject.org/rpms/libksba.git",
   "upstream_repo": "https://dev.gnupg.org/source/libksba.git",
-  "version": "1.7.0"
+  "version": "1.8.0"
 }
