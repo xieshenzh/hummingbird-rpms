@@ -1,5 +1,5 @@
 [package]
 cargo-toml-patch-comments = [
-    "remove criterion dependency",
+    "drop unused, benchmark-only criterion dev-dependency",
 ]
 
