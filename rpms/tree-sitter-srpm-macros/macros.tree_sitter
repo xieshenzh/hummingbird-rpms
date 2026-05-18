@@ -118,7 +118,6 @@ Enhances:       libtree-sitter \
 %package -n lib%{name}-devel \
 Summary:        Development files for lib%{name} \
 Requires:       lib%{name}%{?_isa} = %{version}-%{release} \
-Requires:       libtree-sitter-devel \
 \
 %description -n lib%{name}-devel \
 Libraries and header files for developing applications that use \
@@ -170,6 +169,7 @@ which use the "default" feature of the "%{name}" crate.
 %{_libdir}/libtree-sitter-*.so.* \
 \
 %files -n lib%{name}-devel \
+%%dir %{_includedir}/tree_sitter \
 %{_includedir}/tree_sitter/tree-sitter-*.h \
 %{_libdir}/libtree-sitter-*.so \
 %{_libdir}/pkgconfig/tree-sitter-*.pc
