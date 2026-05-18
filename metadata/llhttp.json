@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "6fff41fabdbfa379fe173ab3644998b1b43e6500",
+  "release": "2",
+  "sha": "b48ac2fd9db2e78db6b3cbc6d7dcc846fe646997",
   "source": "https://src.fedoraproject.org/rpms/llhttp.git",
   "upstream_repo": "https://github.com/nodejs/llhttp",
   "version": "9.4.1"
