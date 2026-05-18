@@ -1,0 +1,13 @@
+- hosts: localhost
+  roles:
+  - role: standard-test-basic
+    tags:
+    - classic
+    tests:
+    - simple:
+        dir: .
+        run: ./run_tests.sh
+    required_packages:
+     - curl
+     - gettext
+     - httpd

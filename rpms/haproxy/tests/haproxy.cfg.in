@@ -1,0 +1,16 @@
+global
+    daemon
+    maxconn 1024
+    user haproxy
+    group haproxy
+
+defaults
+    mode http
+    timeout connect 2s
+    timeout client 10s
+    timeout server 10s
+
+listen test
+    bind *:81
+    server $VHOST1_NAME $VHOST1_ADDR:$VHOST1_PORT check
+    server $VHOST2_NAME $VHOST2_ADDR:$VHOST2_PORT check
