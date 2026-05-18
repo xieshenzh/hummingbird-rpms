@@ -1,3 +1,17 @@
+* Mon May 18 2026 Zdenek Pytela <zpytela@redhat.com> - 45.3-1
+- Allow sys_resource on execution of generic executables conditionally
+- Label bootloader-migrate-generator with coreos_bootloader_migrate_generator_exec_t
+- Label /run/coreos with coreos_installer_var_run_t
+- Add systemd_create_generator_unit_file() and systemd_write_generator_unit_file()
+- Allow virtnwfilterd_t r/w on packet_socket (bsc#1264273)
+- Update fstools swap interfaces with dir search
+- Allow go-fdo-server to read system information
+- Add missing fc rule for org.gnome.DisplayManager (bsc#1264182)
+- config: make /etc/systemd/user same as /usr/lib/systemd/user
+- Do not audit iptables attempts to read other process state
+- Policy for go-fdo-server
+- Allow setroubleshoot_fixit_t to touch /.autorelabel and reboot
+
 * Mon Apr 27 2026 Zdenek Pytela <zpytela@redhat.com> - 45.2-1
 - Allow init nnp domain transition do dirsrv_t and dirsrv_snmp_t
 - Allow NetworkManager_dispatcher_nvme_t check status of systemd services
