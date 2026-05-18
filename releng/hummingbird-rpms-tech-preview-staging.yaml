@@ -166,6 +166,8 @@ spec:
           contentType: rpm
         - name: coreutils-main
           contentType: rpm
+        - name: cosign-main
+          contentType: rpm
         - name: cpio-main
           contentType: rpm
         - name: cracklib-main
