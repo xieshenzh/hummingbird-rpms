@@ -414,7 +414,7 @@ Version:	%{maj_ver}.%{min_ver}.%{patch_ver}%{?rc_ver:~%{rc_ver}}%{?llvm_snapshot
 %if 0%{?rhel} == 8
 Release:	1%{?dist}
 %else
-Release:	3%{?dist}
+Release:	5%{?dist}
 %endif
 Summary:	The Low Level Virtual Machine
 
@@ -541,6 +541,9 @@ Patch2105: 43cb4631c1f42dbfce78288b8ae30b5840ed59b3.patch
 
 # Fix for s390x vector miscompilation (rhbz#2430017)
 Patch2106: 0001-SystemZ-Fix-code-in-widening-vector-multiplication-1.patch
+
+# Fix for missing linux/scc.h
+Patch2107: 194121.patch
 
 %if 0%{?rhel} == 8
 %global python3_pkgversion 3.12
@@ -939,7 +942,9 @@ clang-format integration for git.
 %package -n python%{python3_pkgversion}-%{pkg_name_clang}
 Summary:       Python3 bindings for clang
 Requires:      %{pkg_name_clang}-devel%{?_isa} = %{version}-%{release}
+%if "%{?python3_version}" != ""
 Requires:      python(abi) = %{python3_version}
+%endif
 Provides:      python%{python3_pkgversion}-clang(major) = %{maj_ver}
 %if 0%{?rhel} == 8
 # Became python3.12-clang in LLVM 19
