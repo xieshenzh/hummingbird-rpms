@@ -2565,6 +2565,75 @@ spec:
     - name: git-auth
       secret:
         secretName: '{{git_auth_secret}}'
+# --- checkpolicy ---
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/redhat/hummingbird/rpms/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/checkpolicy/***]"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: rpms-main
+    appstudio.openshift.io/component: checkpolicy-main
+    pipelines.appstudio.openshift.io/type: build
+  name: checkpolicy-main-on-pull-request
+  namespace: hummingbird-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: image-expires-after
+      value: 5d
+    - name: ociStorage
+      value: quay.io/redhat-user-workloads/hummingbird-tenant/checkpolicy-main:on-mr-{{pull_request_number}}-{{revision}}
+    - name: package-name
+      value: checkpolicy
+    - name: target-branch
+      value: '{{target_branch}}'
+    - name: build-architectures
+      value:
+        - aarch64
+        - x86_64
+    - name: build-platforms
+      value:
+        - "linux/x86_64"
+        - "linux/arm64"
+    - name: specfile
+      value: "checkpolicy.spec"
+    - name: monorepo-subdir
+      value: "rpms/checkpolicy"
+    - name: mock-config-template-filename-in-sources
+      value: "mock/mock.cfg"
+  pipelineRef:
+    resolver: bundles
+    params:
+      - name: name
+        value: build-rpm-package
+      - name: kind
+        value: pipeline
+      - name: bundle
+        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline@sha256:b9ce8a02047f0d27361c0172fe6c1eb4f2c7a196be133d19d6d67edd20b13de7"
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-checkpolicy-main
+  timeouts:
+    pipeline: 4h
+    tasks: 4h
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{git_auth_secret}}'
 # --- chkconfig ---
 ---
 apiVersion: tekton.dev/v1

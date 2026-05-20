@@ -148,6 +148,8 @@ spec:
           contentType: rpm
         - name: catatonit-main
           contentType: rpm
+        - name: checkpolicy-main
+          contentType: rpm
         - name: chkconfig-main
           contentType: rpm
         - name: chunkah-main

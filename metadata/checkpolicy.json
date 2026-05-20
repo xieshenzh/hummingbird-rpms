@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "fad37678a0b5bf8aa772fc7a66c9b9dc166ec218",
+  "source": "https://src.fedoraproject.org/rpms/checkpolicy.git",
+  "upstream_repo": "https://github.com/SELinuxProject/selinux",
+  "version": "3.10"
+}
