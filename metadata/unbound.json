@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 1.25.0",
+  "modification_reason": "Update to upstream version 1.25.1",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 5042,
@@ -8,5 +8,5 @@
   "source": "https://src.fedoraproject.org/rpms/unbound.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/NLnetLabs/unbound",
-  "version": "1.25.0"
+  "version": "1.25.1"
 }
