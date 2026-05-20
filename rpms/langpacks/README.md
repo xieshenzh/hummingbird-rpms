@@ -6,15 +6,21 @@ and other packages, as well has default language support
 
 ## Meta-package structure
 
+```
 langpacks-* -> langpacks-{core,fonts}-* -> default-fonts-*
+```
 
 ### Default fonts
 
+```
 default-fonts -> default-fonts-{core,cjk,other}-* -> default-fonts-*
+```
 
+```
 default-fonts-core-* = default-core-{sans,mono,serif,emoji,math}
 default-fonts-cjk-* = default-fonts-cjk-{sans,mono,serif}
 default-fonts-other-* = default-fonts-other-{sans,mono,serif}
+```
 
 ## FAQ
 
