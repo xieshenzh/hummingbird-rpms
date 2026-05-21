@@ -7,6 +7,7 @@
     cancel_in_progress='false',
     output_image_tag='{{revision}}',
     build_platforms=rpm.build_platforms,
+    extra_params=rpm.extra_params if rpm.extra_params is defined else {},
     extra_path_changes=rpm.extra_path_changes if rpm.extra_path_changes is defined else [],
     timeout_hours=rpm.timeout_hours,
     task_run_specs=rpm.task_run_specs if rpm.task_run_specs is defined else None,

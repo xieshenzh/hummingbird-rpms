@@ -163,6 +163,13 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
             if "forked_from" in pkg_config:
                 rpm_data["forked_from"] = pkg_config["forked_from"]
 
+            extra_params = {}
+            if "extra_params" in pkg_config:
+                extra_params.update(pkg_config["extra_params"])
+            if resource_type == "pull-request":
+                extra_params["image-expires-after"] = "5d"
+            rpm_data["extra_params"] = extra_params
+
             # Extra path changes
             extra_paths = []
 

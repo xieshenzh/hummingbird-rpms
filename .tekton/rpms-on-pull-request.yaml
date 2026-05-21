@@ -27,7 +27,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pyyaml-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -96,7 +96,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/r-rpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -165,7 +165,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/shellcheck-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -234,7 +234,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/abattis-cantarell-fonts-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -303,7 +303,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/acl-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -372,7 +372,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/alsa-lib-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -441,7 +441,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/annobin-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -510,7 +510,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ansible-packaging-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -579,7 +579,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/aom-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -648,7 +648,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/apr-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -717,7 +717,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/apr-util-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -786,7 +786,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/apt-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -857,7 +857,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/attr-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -926,7 +926,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/audit-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -995,7 +995,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/authselect-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1064,7 +1064,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/autoconf-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1133,7 +1133,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/automake-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1202,7 +1202,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/avahi-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1271,7 +1271,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/babeltrace-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1340,7 +1340,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/bash-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1409,7 +1409,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/bash-completion-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1478,7 +1478,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/bind-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1547,7 +1547,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/binutils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1616,7 +1616,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/boost-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1685,7 +1685,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/bootc-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1758,7 +1758,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/brotli-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1827,7 +1827,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/btrfs-progs-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1896,7 +1896,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/buildah-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -1965,7 +1965,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/busybox-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2034,7 +2034,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/bzip2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2103,7 +2103,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/c-ares-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2172,7 +2172,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ca-certificates-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2241,7 +2241,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/caddy-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2314,7 +2314,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/capstone-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2387,7 +2387,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cargo-rpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2456,7 +2456,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cargo2rpm-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2525,7 +2525,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/catatonit-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2594,7 +2594,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/checkpolicy-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2663,7 +2663,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/chkconfig-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2732,7 +2732,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/chunkah-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2801,7 +2801,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cloud-init-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2874,7 +2874,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cmake-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -2943,7 +2943,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/composefs-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3012,7 +3012,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/composer-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3081,7 +3081,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/container-selinux-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3150,7 +3150,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/containers-common-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3219,7 +3219,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/coreutils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3288,7 +3288,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cosign-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3361,7 +3361,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cpio-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3430,7 +3430,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cracklib-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3499,7 +3499,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/createrepo-c-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3568,7 +3568,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/crypto-policies-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3637,7 +3637,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cryptsetup-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3706,7 +3706,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ctags-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3775,7 +3775,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cups-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3844,7 +3844,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/curl-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3921,7 +3921,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cyrus-sasl-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -3990,7 +3990,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dav1d-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4059,7 +4059,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dbus-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4128,7 +4128,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dbus-broker-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4199,7 +4199,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/debugedit-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4272,7 +4272,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/diffutils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4341,7 +4341,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dnf-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4410,7 +4410,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dnf5-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4479,7 +4479,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dns-root-data-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4558,7 +4558,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dotnet10-0-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4627,7 +4627,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dotnet8-0-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4696,7 +4696,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dotnet9-0-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4767,7 +4767,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dracut-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4836,7 +4836,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/drpm-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4905,7 +4905,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dwz-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -4974,7 +4974,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/e2fsprogs-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5043,7 +5043,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ecj-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5112,7 +5112,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ed-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5181,7 +5181,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/efi-rpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5250,7 +5250,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/elfutils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5323,7 +5323,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/emacs-filesystem-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5392,7 +5392,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/erlang-rpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5463,7 +5463,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/expat-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5536,7 +5536,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fedora-logos-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5607,7 +5607,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fedora-repos-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5676,7 +5676,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/file-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5745,7 +5745,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/filesystem-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5814,7 +5814,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/findutils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5891,7 +5891,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fmt-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -5960,7 +5960,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fontconfig-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6033,7 +6033,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fonts-rpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6104,7 +6104,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/forge-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6173,7 +6173,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fpc-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6244,7 +6244,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/freetype-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6313,7 +6313,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fstrm-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6382,7 +6382,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fsverity-utils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6453,7 +6453,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fuse3-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6524,7 +6524,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gap-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6593,7 +6593,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gawk-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6662,7 +6662,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gcc-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6733,7 +6733,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gd-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6802,7 +6802,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gdb-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6871,7 +6871,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gdbm-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -6940,7 +6940,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gettext-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7025,7 +7025,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ghc-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7096,7 +7096,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/git-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7165,7 +7165,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/glib2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7234,7 +7234,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/glibc-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7307,7 +7307,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gmp-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7376,7 +7376,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gnat-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7445,7 +7445,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gnulib-l10n-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7516,7 +7516,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gnupg2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7585,7 +7585,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gnutls-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7654,7 +7654,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/go-fdo-client-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7723,7 +7723,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/go-fdo-server-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7792,7 +7792,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/go-md2man-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7861,7 +7861,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/go-rpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -7936,7 +7936,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/golang-fips1-25-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8009,7 +8009,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/golang1-25-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8078,7 +8078,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/golang1-26-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8147,7 +8147,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/golist-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8216,7 +8216,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/google-noto-fonts-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8287,7 +8287,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gperftools-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8356,7 +8356,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gpgme-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8425,7 +8425,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gpgverify-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8496,7 +8496,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/graphite2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8565,7 +8565,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/graphviz-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8634,7 +8634,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/grep-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8703,7 +8703,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/groff-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8782,7 +8782,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gzip-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8851,7 +8851,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/haproxy-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8926,7 +8926,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/harfbuzz-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -8999,7 +8999,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/hiredis-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9068,7 +9068,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/hostname-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9137,7 +9137,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/httpd-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9210,7 +9210,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/hugo-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9279,7 +9279,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/hummingbird-release-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9348,7 +9348,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/icu-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9417,7 +9417,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ima-evm-utils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9488,7 +9488,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/iproute-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9563,7 +9563,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/jansson-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9632,7 +9632,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/java-21-openjdk-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9701,7 +9701,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/java-21-openjdk-portable-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9770,7 +9770,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/java-25-openjdk-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9839,7 +9839,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/java-25-openjdk-portable-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9908,7 +9908,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/java-rpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -9977,7 +9977,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/javapackages-tools-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10046,7 +10046,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/jbigkit-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10115,7 +10115,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/jemalloc-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10186,7 +10186,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/jq-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10255,7 +10255,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/json-c-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10326,7 +10326,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/kbd-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10399,7 +10399,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/kernel-headers-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10468,7 +10468,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/kernel-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10537,7 +10537,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/keyutils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10606,7 +10606,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/kmod-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10675,7 +10675,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/krb5-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10744,7 +10744,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/kubernetes1-35-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10815,7 +10815,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/langpacks-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10884,7 +10884,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/less-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -10953,7 +10953,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libx11-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11022,7 +11022,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxau-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11091,7 +11091,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxcomposite-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11160,7 +11160,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxext-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11229,7 +11229,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxft-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11298,7 +11298,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxi-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11367,7 +11367,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxpm-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11436,7 +11436,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxrender-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11505,7 +11505,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxtst-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11574,7 +11574,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libaio-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11643,7 +11643,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libarchive-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11712,7 +11712,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libassuan-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11781,7 +11781,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libavif-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11850,7 +11850,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libb2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11919,7 +11919,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libbpf-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -11988,7 +11988,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libcap-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12057,7 +12057,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libcap-ng-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12126,7 +12126,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libcbor-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12195,7 +12195,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libcomps-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12264,7 +12264,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libdnf-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12333,7 +12333,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libeconf-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12402,7 +12402,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libedit-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12471,7 +12471,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libevent-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12540,7 +12540,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libffi-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12609,7 +12609,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libfido2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12678,7 +12678,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libfontenc-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12747,7 +12747,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libgcrypt-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12816,7 +12816,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libgit2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12885,7 +12885,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libgpg-error-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -12954,7 +12954,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libidn2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13023,7 +13023,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libipt-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13092,7 +13092,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libjpeg-turbo-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13161,7 +13161,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libkcapi-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13230,7 +13230,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libksba-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13299,7 +13299,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/liblerc-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13368,7 +13368,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libmaxminddb-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13437,7 +13437,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libmnl-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13506,7 +13506,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libmodulemd-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13575,7 +13575,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libmpc-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13644,7 +13644,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libnl3-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13713,7 +13713,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libnsl2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13782,7 +13782,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libpipeline-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13851,7 +13851,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libpng-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13924,7 +13924,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libpsl-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -13993,7 +13993,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libpwquality-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14062,7 +14062,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/librepo-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14131,7 +14131,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libseccomp-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14200,7 +14200,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libselinux-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14269,7 +14269,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libsemanage-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14338,7 +14338,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libsepol-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14407,7 +14407,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libsodium-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14476,7 +14476,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libsolv-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14545,7 +14545,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libssh-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14614,7 +14614,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libssh2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14685,7 +14685,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libtasn1-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14754,7 +14754,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libtiff-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14823,7 +14823,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libtirpc-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14892,7 +14892,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libtommath-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -14961,7 +14961,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libtool-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15030,7 +15030,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libunistring-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15099,7 +15099,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libunwind-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15168,7 +15168,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libusb1-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15237,7 +15237,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libuv-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15306,7 +15306,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libverto-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15377,7 +15377,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libwebp-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15446,7 +15446,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxcb-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15515,7 +15515,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxcrypt-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15584,7 +15584,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxml2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15657,7 +15657,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxslt-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15730,7 +15730,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libyaml-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15799,7 +15799,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libyuv-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15868,7 +15868,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libzip-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -15943,7 +15943,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lksctp-tools-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16012,7 +16012,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/llhttp-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16081,7 +16081,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/llvm-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16152,7 +16152,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/llvm21-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16221,7 +16221,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lmdb-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16290,7 +16290,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/logrotate-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16359,7 +16359,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lua-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16428,7 +16428,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lua-rpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16497,7 +16497,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lujavrite-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16566,7 +16566,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lvm2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16635,7 +16635,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lz4-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16706,7 +16706,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lzo-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16775,7 +16775,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/m4-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16844,7 +16844,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mailcap-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16913,7 +16913,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/make-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -16982,7 +16982,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/man-db-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17051,7 +17051,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mariadb-connector-c-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17120,7 +17120,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mariadb10-11-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17189,7 +17189,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mariadb11-8-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17258,7 +17258,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mawk-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17327,7 +17327,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/memcached-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17396,7 +17396,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/meson-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17493,7 +17493,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mkfontscale-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17566,7 +17566,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mpdecimal-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17635,7 +17635,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mpfr-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17710,7 +17710,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ncurses-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17785,7 +17785,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nettle-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17856,7 +17856,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nghttp2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17925,7 +17925,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nghttp3-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -17994,7 +17994,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nginx-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18063,7 +18063,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ngtcp2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18132,7 +18132,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ninja-build-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18205,7 +18205,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs20-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18274,7 +18274,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs22-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18343,7 +18343,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs24-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18412,7 +18412,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs25-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18485,7 +18485,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs26-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18558,7 +18558,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/npth-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18627,7 +18627,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nss-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18696,7 +18696,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nss-fips-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18773,7 +18773,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ocaml-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18842,7 +18842,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/oniguruma-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18911,7 +18911,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openblas-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -18980,7 +18980,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/opendbx-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19049,7 +19049,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openldap-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19122,7 +19122,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openscap-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19191,7 +19191,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openssh-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19260,7 +19260,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openssl-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19333,7 +19333,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openssl-fips-provider-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19406,7 +19406,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/oras-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19479,7 +19479,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ostree-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19548,7 +19548,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/p11-kit-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19617,7 +19617,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/package-notes-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19686,7 +19686,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pam-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19759,7 +19759,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/patch-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19828,7 +19828,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pcre2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19899,7 +19899,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -19970,7 +19970,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-carp-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20039,7 +20039,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-data-dumper-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20108,7 +20108,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-digest-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20177,7 +20177,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-digest-md5-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20246,7 +20246,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-encode-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20315,7 +20315,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-error-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20384,7 +20384,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-exporter-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20453,7 +20453,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-file-path-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20522,7 +20522,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-file-temp-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20591,7 +20591,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-getopt-long-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20660,7 +20660,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-http-tiny-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20729,7 +20729,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-io-socket-ip-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20798,7 +20798,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-io-socket-ssl-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20867,7 +20867,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-mime-base32-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -20936,7 +20936,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-mime-base64-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21005,7 +21005,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-net-ssleay-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21074,7 +21074,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-pathtools-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21143,7 +21143,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-pod-escapes-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21212,7 +21212,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-pod-perldoc-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21281,7 +21281,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-pod-simple-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21350,7 +21350,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-pod-usage-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21419,7 +21419,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-scalar-list-utils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21488,7 +21488,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-socket-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21557,7 +21557,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-storable-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21626,7 +21626,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-term-ansicolor-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21695,7 +21695,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-term-cap-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21764,7 +21764,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-termreadkey-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21833,7 +21833,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-text-parsewords-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21902,7 +21902,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-text-tabs-wrap-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -21971,7 +21971,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-thread-queue-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22040,7 +22040,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-time-hires-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22109,7 +22109,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-time-local-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22178,7 +22178,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-uri-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22249,7 +22249,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-constant-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22320,7 +22320,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-libnet-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22389,7 +22389,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-parent-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22458,7 +22458,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-podlators-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22527,7 +22527,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22596,7 +22596,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-threads-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22665,7 +22665,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-threads-shared-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22734,7 +22734,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/php-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22805,7 +22805,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/php-patchwork-jsqueeze-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22876,7 +22876,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/php-pecl-zip-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -22947,7 +22947,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pkgconf-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23020,7 +23020,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/podman-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23089,7 +23089,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/policycoreutils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23158,7 +23158,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/poppler-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23227,7 +23227,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/popt-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23296,7 +23296,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/postgresql18-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23369,7 +23369,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/procps-ng-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23440,7 +23440,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/protobuf-c-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23509,7 +23509,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/psmisc-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23580,7 +23580,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/publicsuffix-list-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23649,7 +23649,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pyopenssl-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23720,7 +23720,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pyproject-rpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23789,7 +23789,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pytest-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23862,7 +23862,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-attrs-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -23935,7 +23935,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-certifi-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24004,7 +24004,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-charset-normalizer-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24073,7 +24073,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-cryptography-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24154,7 +24154,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-gitlab-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24225,7 +24225,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-idna-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24296,7 +24296,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-iniconfig-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24367,7 +24367,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-jinja2-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24436,7 +24436,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-jinja2-cli-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24505,7 +24505,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-jsonschema-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24574,7 +24574,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-jsonschema-specifications-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24645,7 +24645,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-markupsafe-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24716,7 +24716,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-mypy-extensions-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24785,7 +24785,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-packaging-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24854,7 +24854,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-pathspec-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24925,7 +24925,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-pip-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24994,7 +24994,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-pluggy-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25065,7 +25065,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-productmd-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25134,7 +25134,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-pygments-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25211,7 +25211,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-referencing-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25280,7 +25280,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-requests-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25349,7 +25349,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-requests-toolbelt-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25418,7 +25418,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-rpds-py-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25489,7 +25489,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-rpm-lockfile-prototype-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25562,7 +25562,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-rpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25631,7 +25631,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-sentry-sdk-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25700,7 +25700,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-setuptools-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25769,7 +25769,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-specfile-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25852,7 +25852,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-trustme-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25923,7 +25923,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-types-pyyaml-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -25992,7 +25992,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-types-requests-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26061,7 +26061,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-typing-extensions-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26130,7 +26130,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-urllib3-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26205,7 +26205,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python3-mypy-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26274,7 +26274,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python3-11-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26343,7 +26343,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python3-12-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26412,7 +26412,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python3-13-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26481,7 +26481,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python3-14-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26554,7 +26554,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/qt5-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26625,7 +26625,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/qt6-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26696,7 +26696,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rdma-core-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26765,7 +26765,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/readline-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26834,7 +26834,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/redhat-rpm-config-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26907,7 +26907,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rootfiles-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -26976,7 +26976,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rpm-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27047,7 +27047,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ruby3-3-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27116,7 +27116,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ruby3-4-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27185,7 +27185,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ruby4-0-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27256,7 +27256,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rubypick-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27325,7 +27325,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ruff-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27394,7 +27394,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27480,7 +27480,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-add-determinism-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27549,7 +27549,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-archery-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27618,7 +27618,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-imagequant-sys-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27687,7 +27687,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-podman-sequoia-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27756,7 +27756,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-rav1e-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27825,7 +27825,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-rpds-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27894,7 +27894,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-rpm-sequoia-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -27967,7 +27967,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/scap-security-guide-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28040,7 +28040,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/sdbus-cpp-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28109,7 +28109,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/sed-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28178,7 +28178,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/selinux-policy-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28247,7 +28247,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/setup-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28316,7 +28316,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/sgml-common-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28385,7 +28385,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/shadow-utils-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28454,7 +28454,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/skopeo-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28525,7 +28525,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/snappy-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28596,7 +28596,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/source-highlight-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28665,7 +28665,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/sqlite-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28736,7 +28736,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/subversion-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28805,7 +28805,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/svt-av1-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28873,8 +28873,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder"
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/syft-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -28947,7 +28949,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/sysprof-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29016,7 +29018,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/systemd-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29085,7 +29087,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/systemd-stub-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29156,7 +29158,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tar-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29225,7 +29227,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tcl-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29296,7 +29298,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tk-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29367,7 +29369,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tomcat10-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29436,7 +29438,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tomcat11-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29509,7 +29511,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tpm2-tss-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29578,7 +29580,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tree-sitter-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29647,7 +29649,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/trivy-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29716,7 +29718,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ttmkfdir-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29785,7 +29787,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tzdata-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29854,7 +29856,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/unbound-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29923,7 +29925,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/unzip-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -29992,7 +29994,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/uriparser-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30061,7 +30063,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/util-linux-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30130,7 +30132,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/uuid-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30199,7 +30201,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/valkey-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30272,7 +30274,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/vmaf-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30341,7 +30343,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/which-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30412,7 +30414,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/xcaddy-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30485,7 +30487,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/xmlsec1-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30558,7 +30560,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/xorg-x11-fonts-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30627,7 +30629,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/xxhash-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30696,7 +30698,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/xz-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30765,7 +30767,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/yq-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30834,7 +30836,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/zchunk-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30903,7 +30905,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/zig-srpm-macros-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -30972,7 +30974,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/zip-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -31041,7 +31043,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/zlib-ng-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -31110,7 +31112,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/zstd-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name

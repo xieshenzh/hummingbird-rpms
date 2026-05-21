@@ -208,6 +208,8 @@ scap-security-guide:
 
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+  extra_params:
+    syft-image: "quay.io/hummingbird-community/syft:latest-builder"
 
 tomcat11:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
