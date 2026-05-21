@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "4a3bd6f9ecaa4e74bda93b1ad449fd51f00adf7b",
+  "sha": "6cf081f55532ac57d795d7266e3b99145c1d160d",
   "source": "https://src.fedoraproject.org/rpms/libusb1.git",
   "upstream_repo": "https://github.com/libusb/libusb",
-  "version": "1.0.29"
+  "version": "1.0.30"
 }
