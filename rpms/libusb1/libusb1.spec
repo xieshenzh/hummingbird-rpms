@@ -2,8 +2,8 @@
 
 Summary:        Library for accessing USB devices
 Name:           libusb1
-Version:        1.0.29
-Release:        5.1%{?dist}
+Version:        1.0.30
+Release:        1%{?dist}
 Source0:        https://github.com/libusb/libusb/releases/download/v%{version}/libusb-%{version}.tar.bz2
 Source1:        https://github.com/libusb/libusb/releases/download/v%{version}/libusb-%{version}.tar.bz2.asc
 Source2:        https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xc68187379b23de9efc46651e2c80ff56c6830a0e#/%{name}.keyring
@@ -61,8 +61,8 @@ This package contains API documentation for %{name}.
 
 %package        tests-examples
 Summary:        Tests and examples for %{name}
-# The fxload example is GPLv2+, the rest is LGPLv2+, like libusb itself.
-License:        LGPLv2+ and GPLv2+
+# The fxload example is GPL-2.0-or-later, the rest is LGPL-2.1-or-later, like libusb itself.
+License:        LGPL-2.1-or-later AND GPL-2.0-or-later
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:       libusbx-tests-examples = %{version}-%{release}
 Obsoletes:      libusbx-tests-examples < %{version}-%{release}
@@ -91,20 +91,14 @@ MinGW Windows %{name} library.
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -p1 -n libusb-%{version}
-chmod -x examples/*.c
-mkdir -p m4
-sed -i '/AM_LDFLAGS = -static/d' tests/Makefile.am
-autoscan
-aclocal
-autoconf
-automake --add-missing
-
 
 %build
 mkdir %{_target_os}
 pushd %{_target_os}
 %define _configure ../configure
 %configure --disable-static --enable-examples-build
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 %{make_build}
 pushd doc
 make docs
@@ -125,10 +119,10 @@ popd
 pushd %{_target_os}
 %{make_install}
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
-install -m 755 tests/.libs/init_context $RPM_BUILD_ROOT%{_bindir}/libusb-test-init_context
-install -m 755 tests/.libs/set_option $RPM_BUILD_ROOT%{_bindir}/libusb-test-set_option
-install -m 755 tests/.libs/stress $RPM_BUILD_ROOT%{_bindir}/libusb-test-stress
-install -m 755 tests/.libs/stress_mt $RPM_BUILD_ROOT%{_bindir}/libusb-test-stress_mt
+install -m 755 tests/init_context $RPM_BUILD_ROOT%{_bindir}/libusb-test-init_context
+install -m 755 tests/set_option $RPM_BUILD_ROOT%{_bindir}/libusb-test-set_option
+install -m 755 tests/stress $RPM_BUILD_ROOT%{_bindir}/libusb-test-stress
+install -m 755 tests/stress_mt $RPM_BUILD_ROOT%{_bindir}/libusb-test-stress_mt
 install -m 755 tests/.libs/umockdev $RPM_BUILD_ROOT%{_bindir}/libusb-test-umockdev
 install -m 755 examples/.libs/testlibusb \
     $RPM_BUILD_ROOT%{_bindir}/libusb-test-libusb
