@@ -810,6 +810,8 @@ spec:
           contentType: rpm
         - name: python-specfile-main
           contentType: rpm
+        - name: python-trustme-main
+          contentType: rpm
         - name: python-types-pyyaml-main
           contentType: rpm
         - name: python-types-requests-main
