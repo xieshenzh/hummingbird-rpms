@@ -1,7 +1,7 @@
 {
   "branch": "rawhide",
   "cve_product": "Apache Software Foundation / Apache HTTP Server",
-  "modification_reason": "Update to 2.4.67 for security fixes; remove runtime dependency on systemd",
+  "modification_reason": "Move sscg and hostname from Requires to Recommends in mod_ssl",
   "modification_status": "modified",
   "release": "1",
   "release_monitoring_project_id": 387502,
