@@ -1,4 +1,4 @@
-From d5cb806a14bb50a96484bca6536e81f2ac316b9d Mon Sep 17 00:00:00 2001
+From a12217cf8f9bf3ab8e39d9bcc6b42e7043e79b08 Mon Sep 17 00:00:00 2001
 From: Karolina Surma <ksurma@redhat.com>
 Date: Wed, 16 Feb 2022 08:36:21 +0100
 Subject: [PATCH] Prevent removing of the system packages installed under
@@ -53,10 +53,10 @@ index 230e114..8bd5d31 100644
  class BaseEnvironment:
      """An environment containing distributions to introspect."""
 diff --git a/src/pip/_internal/req/req_install.py b/src/pip/_internal/req/req_install.py
-index c9f6bff..c101826 100644
+index aad2f0e..7b385b1 100644
 --- a/src/pip/_internal/req/req_install.py
 +++ b/src/pip/_internal/req/req_install.py
-@@ -453,7 +453,7 @@ class InstallRequirement:
+@@ -439,7 +439,7 @@ class InstallRequirement:
                          f"lack sys.path precedence to {existing_dist.raw_name} "
                          f"in {existing_dist.location}"
                      )
@@ -66,7 +66,7 @@ index c9f6bff..c101826 100644
          else:
              if self.editable:
 diff --git a/src/pip/_internal/resolution/legacy/resolver.py b/src/pip/_internal/resolution/legacy/resolver.py
-index 33a4fdc..1fe886e 100644
+index 6cc6311..4188ef1 100644
 --- a/src/pip/_internal/resolution/legacy/resolver.py
 +++ b/src/pip/_internal/resolution/legacy/resolver.py
 @@ -322,7 +322,9 @@ class Resolver(BaseResolver):
@@ -81,11 +81,11 @@ index 33a4fdc..1fe886e 100644
          req.satisfied_by = None
  
 diff --git a/src/pip/_internal/resolution/resolvelib/factory.py b/src/pip/_internal/resolution/resolvelib/factory.py
-index f23e4cd..1bada79 100644
+index a74200a..99738cc 100644
 --- a/src/pip/_internal/resolution/resolvelib/factory.py
 +++ b/src/pip/_internal/resolution/resolvelib/factory.py
-@@ -3,6 +3,8 @@ from __future__ import annotations
- import contextlib
+@@ -4,6 +4,8 @@ import contextlib
+ import copy
  import functools
  import logging
 +import sys
@@ -93,7 +93,7 @@ index f23e4cd..1bada79 100644
  from collections.abc import Iterable, Iterator, Mapping, Sequence
  from typing import (
      TYPE_CHECKING,
-@@ -615,6 +617,16 @@ class Factory:
+@@ -674,6 +676,16 @@ class Factory:
          if dist is None:  # Not installed, no uninstallation required.
              return None
  
@@ -111,5 +111,5 @@ index f23e4cd..1bada79 100644
          # be uninstalled, no matter it's in global or user site, because the
          # user site installation has precedence over global.
 -- 
-2.50.1
+2.54.0
 

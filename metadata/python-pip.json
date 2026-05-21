@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "38d7489b6efed7f1a4919ba903612c0fb808422e",
+  "release": "3",
+  "sha": "5fd8a26f31437569c50e05afc5a4e668bab9ffac",
   "source": "https://src.fedoraproject.org/rpms/python-pip.git",
   "upstream_repo": "https://github.com/pypa/pip",
-  "version": "26.0.1"
+  "version": "26.1.1"
 }
