@@ -6,12 +6,6 @@ discover:
     how: shell
     url: https://src.fedoraproject.org/tests/python.git
     tests:
-    - name: smoke36
-      path: /smoke
-      test: VERSION=3.6 TOX=false ./venv.sh
-    - name: smoke39
-      path: /smoke
-      test: VERSION=3.9 ./venv.sh
     - name: smoke310
       path: /smoke
       test: VERSION=3.10 ./venv.sh
@@ -30,9 +24,6 @@ discover:
     - name: smoke315
       path: /smoke
       test: VERSION=3.15 ./venv.sh
-    - name: smoke39_virtualenv
-      path: /smoke
-      test: VERSION=3.9 METHOD=virtualenv ./venv.sh
     - name: smoke310_virtualenv
       path: /smoke
       test: VERSION=3.10 METHOD=virtualenv ./venv.sh
@@ -88,8 +79,6 @@ prepare:
     package:
     - gcc
     - virtualenv
-    - python3.6-devel
-    - python3.9-devel
     - python3.10-devel
     - python3.11-devel
     - python3.12-devel
