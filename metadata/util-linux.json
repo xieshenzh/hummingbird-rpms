@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "drop asciidoctor BuildRequires",
   "modification_status": "modified",
-  "release": "2",
-  "sha": "ad160404f25800844ad14e6afad574c237c75942",
+  "release": "4",
+  "sha": "62e94b8fcbad1c982cb623aee26d7e00838bf4d9",
   "source": "https://src.fedoraproject.org/rpms/util-linux.git",
   "upstream_repo": "https://github.com/util-linux/util-linux",
   "version": "2.42.1"
