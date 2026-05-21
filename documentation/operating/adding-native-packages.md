@@ -51,6 +51,7 @@ Create `metadata/<package-name>.json`:
 {
   "modification_status": "native",
   "release": "1.hum1",
+  "upstream_repo": "https://github.com/example/project",
   "version": "1.3.0"
 }
 ```
@@ -58,6 +59,8 @@ Create `metadata/<package-name>.json`:
 Fields:
 
 - **`modification_status`**: Must be `"native"` for packages not imported from Fedora
+- **`upstream_repo`**: Canonical upstream git repository URL (required — CI enforces this). If no
+  upstream repo exists, use `https://src.fedoraproject.org/rpms/<name>` as a fallback.
 - **`version`**: Package version (must match spec file)
 - **`release`**: Base release number (typically `1.hum1` for new packages)
 
@@ -110,6 +113,7 @@ cat > ../../metadata/oras.json << 'EOF'
 {
   "modification_status": "native",
   "release": "1.hum1",
+  "upstream_repo": "https://github.com/oras-project/oras",
   "version": "1.3.0"
 }
 EOF
