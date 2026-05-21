@@ -55,6 +55,24 @@ Common operational tasks that users or AI agents may need to perform:
 | Analyze upstream diffs       | `diff --all --stat`                             | [Upstream Diff Analysis](documentation/operating/upstream-diff-analysis.md)               | Classify modified packages for upstreaming                   |
 | Konflux resource deployment  | _(background info)_                             | [Konflux Resource Deployment](documentation/background/konflux-resource-deployment.md)    | Understand how Konflux resources are deployed                |
 
+## Post-Import / Post-Add Requirements
+
+After importing a new SRPM (`dist_git.py import`) or adding a native package, the `upstream_repo`
+field **must** be populated in `metadata/<package>.json` before CI will pass. The `dist_git.py
+import` command does not set this field automatically.
+
+To populate it:
+
+1. Use the `/generate-package-map` Cursor skill (`.cursor/skills/generate-package-map/SKILL.md`),
+   which searches for the canonical upstream git repository and handles mirror canonicalization,
+   known overrides, and versioned-package branches.
+2. Or manually add the field to `metadata/<package>.json`:
+   `"upstream_repo": "https://github.com/example/project"`
+3. If no upstream git repository exists, use the Fedora DistGit URL as a fallback:
+   `"upstream_repo": "https://src.fedoraproject.org/rpms/<package>"`
+
+CI enforces this via `test/test_package_map.py::test_upstream_repo_exists`.
+
 ## Development Guidelines
 
 ### Testing Requirements

@@ -911,6 +911,13 @@ def import_(url: str, branch: str, ref: str | None = None, directory: str | None
     subprocess.run([sys.executable, ROOT_DIR / 'ci/generate_resources.py', 'all'], check=True)
 
     logging.info("Successfully imported %s to rpms/%s/", package_name, dir_name)
+    logging.warning(
+        "upstream_repo must be added to metadata/%s.json before CI will pass.\n"
+        "       Find the canonical upstream git repository and add it, or use the\n"
+        "       /generate-package-map Cursor skill to populate it automatically.\n"
+        "       If no upstream repo exists, use: https://src.fedoraproject.org/rpms/%s",
+        dir_name, dir_name,
+    )
 
     # Commit the changes
     if not dry_run:
