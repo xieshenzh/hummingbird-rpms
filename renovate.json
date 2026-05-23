@@ -9,8 +9,9 @@
       "description": "Update PIPELINE_BUNDLE digest in generate_resources.py",
       "managerFilePatterns": ["/ci/generate_resources\\.py$/"],
       "matchStrings": [
-        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\n\\s*PIPELINE_BUNDLE\\s*=\\s*\"[^:]+:(?<currentValue>[^@]+)@(?<currentDigest>sha256:[a-f0-9]+)\""
+        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\n\\s*PIPELINE_BUNDLE\\s*=\\s*\"[^\"@:]+(?::(?<currentValue>[^\"@]+))?@(?<currentDigest>sha256:[a-f0-9]+)\""
       ],
+      "currentValueTemplate": "latest",
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker"
     },
@@ -19,8 +20,9 @@
       "description": "Update pipeline bundle references in rendered Tekton YAML files",
       "managerFilePatterns": ["/\\.tekton/.+\\.ya?ml$/"],
       "matchStrings": [
-        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\n\\s*value:\\s*\"[^:]+:(?<currentValue>[^@]+)@(?<currentDigest>sha256:[a-f0-9]+)\""
+        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\n\\s*value:\\s*\"[^\"@:]+(?::(?<currentValue>[^\"@]+))?@(?<currentDigest>sha256:[a-f0-9]+)\""
       ],
+      "currentValueTemplate": "latest",
       "versioningTemplate": "docker"
     },
     {
