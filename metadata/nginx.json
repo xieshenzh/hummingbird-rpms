@@ -3,8 +3,8 @@
   "cve_product": "F5 / NGINX Open Source",
   "modification_status": "clean",
   "release": "1",
-  "sha": "c423f5f55d0aa431b7c7feb35a5a76f73088e1cc",
+  "sha": "ef93a3e854eecb5d6ed99fd4a6eaf9d4ad0b58d5",
   "source": "https://src.fedoraproject.org/rpms/nginx.git",
   "upstream_repo": "https://github.com/nginx/nginx",
-  "version": "1.30.1"
+  "version": "1.30.2"
 }
