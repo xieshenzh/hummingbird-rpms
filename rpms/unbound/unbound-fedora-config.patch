@@ -1,4 +1,4 @@
-From 8c02a6d0cf154d0ab4e65478afd1194fb96f6842 Mon Sep 17 00:00:00 2001
+From d4716e5940a6565f3ada3ea886af0ededf4d61f3 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
 Date: Tue, 19 May 2026 13:57:40 +0100
 Subject: [PATCH] Customize unbound.conf for Fedora defaults
