@@ -1,0 +1,33 @@
+From 9c5320c6d4a1eb91b57e4e12737882ef131c2faa Mon Sep 17 00:00:00 2001
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Tue, 12 May 2026 15:35:53 -0400
+Subject: [PATCH] sandbox/seunshare: fix error checking for setfsuid()
+Content-type: text/plain
+
+setfsuid() doesn't reliably set errno or return anything indicating
+an error.
+
+Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+Acked-by: Petr Lautrbach <lautrbach@redhat.com>
+---
+ sandbox/seunshare.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sandbox/seunshare.c b/sandbox/seunshare.c
+index 17a727e78b5f..b9c85bf20f85 100644
+--- a/sandbox/seunshare.c
++++ b/sandbox/seunshare.c
+@@ -858,8 +858,8 @@ int main(int argc, char **argv) {
+ 	/* Changing fsuid is usually required when user-specified directory is
+ 	 * on an NFS mount.  It's also desired to avoid leaking info about
+ 	 * existence of the files not accessible to the user. */
+-	if (((uid_t)setfsuid(uid) != 0)   && (errno != 0)) {
+-		fprintf(stderr, _("Error: unable to setfsuid %m\n"));
++	if ((uid_t)setfsuid(uid) != 0) {
++		fprintf(stderr, _("Error: unable to setfsuid\n"));
+ 
+ 		return -1;
+ 	}
+-- 
+2.54.0
+

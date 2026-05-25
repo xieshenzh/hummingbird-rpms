@@ -1,0 +1,30 @@
+From 8d2c7360f5749b3ccacd348c495399f24318d7b4 Mon Sep 17 00:00:00 2001
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Tue, 12 May 2026 14:34:02 -0400
+Subject: [PATCH] sandbox/seunshare: pass O_NOFOLLOW to openat()
+Content-type: text/plain
+
+We do not want to follow symlinks here.
+
+Acked-by: James Carter <jwcart2@gmail.com>
+Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+---
+ sandbox/seunshare.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sandbox/seunshare.c b/sandbox/seunshare.c
+index e89a9fecf9f6..a1900eaa7600 100644
+--- a/sandbox/seunshare.c
++++ b/sandbox/seunshare.c
+@@ -428,7 +428,7 @@ static bool rm_rf(int targetfd, const char *path) {
+ 	}
+ 
+ 	if (S_ISDIR(statbuf.st_mode)) {
+-		const int newfd = openat(targetfd, path, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
++		const int newfd = openat(targetfd, path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+ 		if (newfd < 0) {
+ 			perror("openat");
+ 			return false;
+-- 
+2.54.0
+

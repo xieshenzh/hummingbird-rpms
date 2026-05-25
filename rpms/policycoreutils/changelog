@@ -1,3 +1,9 @@
+* Mon May 25 2026 Petr Lautrbach <lautrbach@redhat.com> - 3.10-4
+- Several sandbox and seunshare security improvements
+
+* Mon Apr 06 2026 Petr Lautrbach <lautrbach@redhat.com> - 3.10-3
+- restorecond.service: Use Type=simple
+
 * Wed Feb 18 2026 Yaakov Selkowitz <yselkowi@redhat.com> 3.10-2
 - Use python3-libdnf5 where dnf5 is the package manager
 

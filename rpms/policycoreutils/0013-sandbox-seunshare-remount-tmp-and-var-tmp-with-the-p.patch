@@ -1,0 +1,86 @@
+From f78708ea5d6d3d6da4fa20527b459fa55075d8a6 Mon Sep 17 00:00:00 2001
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Tue, 12 May 2026 16:06:05 -0400
+Subject: [PATCH] sandbox/seunshare: remount /tmp and /var/tmp with the proper
+ flags
+Content-type: text/plain
+
+mount(2) with MS_BIND ignores any nosuid/nodev/noexec flags, so
+seunshare_mount() was never setting those on the /tmp and
+/var/tmp mounts. Fix seunshare_mount() to remount them
+with those flags after the bind mount, which does
+set them properly.
+
+Test:
+mkdir tmp
+seunshare -t tmp /bin/bash
+cp /bin/bash /tmp
+/tmp/bash
+
+Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+Acked-by: Petr Lautrbach <lautrbach@redhat.com>
+---
+ sandbox/seunshare.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/sandbox/seunshare.c b/sandbox/seunshare.c
+index b9c85bf20f85..985e0cfba199 100644
+--- a/sandbox/seunshare.c
++++ b/sandbox/seunshare.c
+@@ -260,26 +260,32 @@ static int verify_shell(const char *shell_name)
+  */
+ static int seunshare_mount(const char *src, const char *dst, struct stat *src_st)
+ {
+-	int flags = 0;
++	int bind_flags = MS_BIND;
++	int sec_flags = 0;
+ 	int is_tmp = 0;
+ 
+ 	if (verbose)
+ 		printf(_("Mounting %s on %s\n"), src, dst);
+ 
+ 	if (strcmp("/tmp", dst) == 0) {
+-		flags = flags | MS_NODEV | MS_NOSUID | MS_NOEXEC;
++		sec_flags = MS_NODEV | MS_NOSUID | MS_NOEXEC;
+ 		is_tmp = 1;
+ 	}
+ 
+ 	if (strncmp("/run/user", dst, 9) == 0) {
+-		flags = flags | MS_REC;
++		bind_flags |= MS_REC;
+ 	}
+ 
+ 	/* mount directory */
+-	if (mount(src, dst, NULL, MS_BIND | flags, NULL) < 0) {
++	if (mount(src, dst, NULL, bind_flags, NULL) < 0) {
+ 		fprintf(stderr, _("Failed to mount %s on %s: %s\n"), src, dst, strerror(errno));
+ 		return -1;
+ 	}
++	/* remount with security flags, ignored on original bind mount */
++	if (sec_flags && mount(NULL, dst, NULL, MS_BIND | MS_REMOUNT | sec_flags, NULL) < 0) {
++		fprintf(stderr, _("Failed to remount %s: %m\n"), dst);
++		return -1;
++	}
+ 
+ 	/* verify whether we mounted what we expected to mount */
+ 	if (verify_directory(dst, src_st, NULL) < 0) return -1;
+@@ -289,10 +295,15 @@ static int seunshare_mount(const char *src, const char *dst, struct stat *src_st
+ 		if (verbose)
+ 			printf(_("Mounting /tmp on /var/tmp\n"));
+ 
+-		if (mount("/tmp", "/var/tmp",  NULL, MS_BIND | flags, NULL) < 0) {
++		if (mount("/tmp", "/var/tmp",  NULL, MS_BIND, NULL) < 0) {
+ 			fprintf(stderr, _("Failed to mount /tmp on /var/tmp: %s\n"), strerror(errno));
+ 			return -1;
+ 		}
++		/* remount with security flags, ignored on original bind mount */
++		if (mount(NULL, "/var/tmp", NULL, MS_BIND | MS_REMOUNT | sec_flags, NULL) < 0) {
++			fprintf(stderr, _("Failed to remount /var/tmp: %m\n"));
++			return -1;
++		}
+ 	}
+ 
+ 	return 0;
+-- 
+2.54.0
+

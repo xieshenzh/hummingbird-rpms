@@ -2,6 +2,6 @@ summary: selinux tests - Tier 1 | policycoreutils
 discover:
     how: fmf
     url: https://src.fedoraproject.org/tests/selinux
-    filter: "tier: 1 | component: policycoreutils & tags: generic, fedora"
+    filter: "tier: 1 | component: policycoreutils"
 execute:
     how: tmt

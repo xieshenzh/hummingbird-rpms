@@ -1,0 +1,48 @@
+From c2f54aff134bcba8ae9701d26d7711530d72be76 Mon Sep 17 00:00:00 2001
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Wed, 13 May 2026 10:37:56 -0400
+Subject: [PATCH] sandbox/seunshare: drop unused runuserdir_r
+Content-type: text/plain
+
+runuserdir_r is created but never used nor deleted. Get rid of it.
+
+Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+---
+ sandbox/seunshare.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/sandbox/seunshare.c b/sandbox/seunshare.c
+index 89180d0aa1ed..2eef0e2f800e 100644
+--- a/sandbox/seunshare.c
++++ b/sandbox/seunshare.c
+@@ -763,14 +763,12 @@ int main(int argc, char **argv) {
+ 	char *tmpdir_s = NULL;	/* tmpdir spec'd by user in argv[] */
+ 	char *tmpdir_r = NULL;	/* tmpdir created by seunshare */
+ 	char *runuserdir_s = NULL;	/* /var/run/user/UID spec'd by user in argv[] */
+-	char *runuserdir_r = NULL;	/* /var/run/user/UID created by seunshare */
+ 
+ 	struct stat st_curhomedir;
+ 	struct stat st_homedir;
+ 	struct stat st_tmpdir_s;
+ 	struct stat st_tmpdir_r;
+ 	struct stat st_runuserdir_s;
+-	struct stat st_runuserdir_r;
+ 
+ 	const struct option long_options[] = {
+ 		{"homedir", 1, 0, 'h'},
+@@ -902,12 +900,6 @@ int main(int argc, char **argv) {
+ 		fprintf(stderr, _("Failed to create runtime temporary directory\n"));
+ 		return -1;
+ 	}
+-	/* create runtime runuserdir */
+-	if (runuserdir_s && (runuserdir_r = create_tmpdir(runuserdir_s, &st_runuserdir_s,
+-						  &st_runuserdir_r, pwd, execcon)) == NULL) {
+-		fprintf(stderr, _("Failed to create runtime $XDG_RUNTIME_DIR directory\n"));
+-		return -1;
+-	}
+ 
+ 	/* spawn child process */
+ 	child = fork();
+-- 
+2.54.0
+

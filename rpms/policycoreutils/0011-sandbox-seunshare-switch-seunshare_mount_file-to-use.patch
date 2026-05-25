@@ -1,0 +1,52 @@
+From e964a574c2ca8ec1bcd3172dc185ada8044dceee Mon Sep 17 00:00:00 2001
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Tue, 12 May 2026 15:26:31 -0400
+Subject: [PATCH] sandbox/seunshare: switch seunshare_mount_file() to use
+ open()
+Content-type: text/plain
+
+seunshare_mount_file() currently uses fopen() to create the dst
+if it doesn't already exist. Switch to using open() with
+explicitly specified flags including O_NOFOLLOW and an explicitly
+specified mode for the new file.
+
+Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+Acked-by: Petr Lautrbach <lautrbach@redhat.com>
+---
+ sandbox/seunshare.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/sandbox/seunshare.c b/sandbox/seunshare.c
+index a1900eaa7600..17a727e78b5f 100644
+--- a/sandbox/seunshare.c
++++ b/sandbox/seunshare.c
+@@ -304,18 +304,20 @@ static int seunshare_mount(const char *src, const char *dst, struct stat *src_st
+  */
+ static int seunshare_mount_file(const char *src, const char *dst)
+ {
+-	int flags = 0;
+-
+ 	if (verbose)
+ 		printf(_("Mounting %s on %s\n"), src, dst);
+ 
+ 	if (access(dst, F_OK) == -1) {
+-		 FILE *fptr;
+-         fptr = fopen(dst, "w");
+-		 fclose(fptr);
++		int fd = open(dst, O_WRONLY | O_CREAT | O_NOFOLLOW | O_CLOEXEC, 0600);
++		if (fd < 0) {
++			fprintf(stderr, _("Failed to create mount point %s: %m\n"), dst);
++			return -1;
++		}
++		close(fd);
+ 	}
++
+ 	/* mount file */
+-	if (mount(src, dst, NULL, MS_BIND | flags, NULL) < 0) {
++	if (mount(src, dst, NULL, MS_BIND, NULL) < 0) {
+ 		fprintf(stderr, _("Failed to mount %s on %s: %s\n"), src, dst, strerror(errno));
+ 		return -1;
+ 	}
+-- 
+2.54.0
+

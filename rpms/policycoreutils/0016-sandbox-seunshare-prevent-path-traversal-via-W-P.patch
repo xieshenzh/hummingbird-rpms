@@ -1,0 +1,47 @@
+From 5da4d90480164c13a5bc8f8c820e701790499ecc Mon Sep 17 00:00:00 2001
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Wed, 13 May 2026 10:13:17 -0400
+Subject: [PATCH] sandbox/seunshare: prevent path traversal via -W/-P
+Content-type: text/plain
+
+The -W/-P options specify the wayland or pipewire socket name respectively.
+The option argument is then concatenated with the runuserdir to create
+a pathname. We don't want to allow it to be used to construct arbitrary
+paths outside of the runuserdir. Also, check and handle
+errors when bind mounting the pipewire socket file.
+
+Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+---
+ sandbox/seunshare.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/sandbox/seunshare.c b/sandbox/seunshare.c
+index 0dfc5cb2b820..945a3b21c1cc 100644
+--- a/sandbox/seunshare.c
++++ b/sandbox/seunshare.c
+@@ -849,6 +849,12 @@ int main(int argc, char **argv) {
+ 		}
+ 	}
+ 
++	if ((wayland_display && (strchr(wayland_display, '/') || strstr(wayland_display, ".."))) ||
++		(pipewire_socket && (strchr(pipewire_socket, '/') || strstr(pipewire_socket, "..")))) {
++		fprintf(stderr, _("Error: -W/-P must be a socket name, not a path\n"));
++		return -1;
++	}
++
+ 	if (! homedir_s && ! tmpdir_s) {
+ 		fprintf(stderr, _("Error: tmpdir and/or homedir required\n %s\n"), USAGE_STRING);
+ 		return -1;
+@@ -990,7 +996,8 @@ int main(int argc, char **argv) {
+ 					perror(_("Out of memory"));
+ 					goto childerr;
+ 				}
+-				seunshare_mount_file(pipewire_path, pipewire_path_s);
++				if (seunshare_mount_file(pipewire_path, pipewire_path_s) == -1)
++					goto childerr;
+ 			}
+ 		}
+ 
+-- 
+2.54.0
+
