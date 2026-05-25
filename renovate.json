@@ -6,10 +6,10 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Update PIPELINE_BUNDLE digest in generate_resources.py",
+      "description": "Update pinned image digests in generate_resources.py",
       "managerFilePatterns": ["/ci/generate_resources\\.py$/"],
       "matchStrings": [
-        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\n\\s*PIPELINE_BUNDLE\\s*=\\s*\"[^\"@:]+(?::(?<currentValue>[^\"@]+))?@(?<currentDigest>sha256:[a-f0-9]+)\""
+        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\n\\s*[A-Z_]+\\s*=\\s*\"[^\"@:]+(?::(?<currentValue>[^\"@]+))?@(?<currentDigest>sha256:[a-f0-9]+)\""
       ],
       "currentValueTemplate": "latest",
       "datasourceTemplate": "docker",
@@ -51,6 +51,11 @@
       "description": "Group all rpmbuild-pipeline updates together",
       "matchPackageNames": ["/rpmbuild-pipeline/"],
       "groupName": "rpmbuild-pipeline"
+    },
+    {
+      "description": "Group all syft image updates together",
+      "matchPackageNames": ["/hummingbird-community\\/syft/"],
+      "groupName": "syft-image"
     }
   ]
 }

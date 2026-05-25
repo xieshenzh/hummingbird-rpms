@@ -26,6 +26,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -95,6 +99,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -164,6 +172,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -233,6 +245,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -302,6 +318,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -371,6 +391,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -440,6 +464,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -509,6 +537,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -578,6 +610,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -647,6 +683,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -716,6 +756,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -785,6 +829,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -856,6 +904,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -925,6 +977,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -994,6 +1050,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1063,6 +1123,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1132,6 +1196,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1201,6 +1269,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1270,6 +1342,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1339,6 +1415,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1408,6 +1488,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1477,6 +1561,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1546,6 +1634,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1615,6 +1707,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1684,6 +1780,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1757,6 +1857,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1826,6 +1930,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1895,6 +2003,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1964,6 +2076,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2033,6 +2149,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2102,6 +2222,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2171,6 +2295,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2240,6 +2368,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2313,6 +2445,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2386,6 +2522,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2455,6 +2595,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2524,6 +2668,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2593,6 +2741,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2662,6 +2814,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2731,6 +2887,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2800,6 +2960,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2873,6 +3037,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2942,6 +3110,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3011,6 +3183,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3080,6 +3256,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3149,6 +3329,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3218,6 +3402,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3287,6 +3475,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3360,6 +3552,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3429,6 +3625,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3498,6 +3698,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3567,6 +3771,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3636,6 +3844,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3705,6 +3917,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3774,6 +3990,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3843,6 +4063,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3920,6 +4144,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3989,6 +4217,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4058,6 +4290,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4127,6 +4363,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4198,6 +4438,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4271,6 +4515,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4340,6 +4588,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4409,6 +4661,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4478,6 +4734,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4557,6 +4817,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4626,6 +4890,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4695,6 +4963,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4766,6 +5038,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4835,6 +5111,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4904,6 +5184,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4973,6 +5257,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5042,6 +5330,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5111,6 +5403,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5180,6 +5476,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5249,6 +5549,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5322,6 +5626,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5391,6 +5699,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5462,6 +5774,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5535,6 +5851,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5606,6 +5926,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5675,6 +5999,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5744,6 +6072,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5813,6 +6145,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5890,6 +6226,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5959,6 +6299,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6032,6 +6376,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6103,6 +6451,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6172,6 +6524,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6243,6 +6599,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6312,6 +6672,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6381,6 +6745,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6452,6 +6820,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6523,6 +6895,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6592,6 +6968,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6661,6 +7041,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6732,6 +7116,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6801,6 +7189,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6870,6 +7262,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6939,6 +7335,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7024,6 +7424,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7095,6 +7499,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7164,6 +7572,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7233,6 +7645,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7306,6 +7722,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7375,6 +7795,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7444,6 +7868,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7515,6 +7943,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7584,6 +8016,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7653,6 +8089,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7722,6 +8162,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7791,6 +8235,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7860,6 +8308,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7935,6 +8387,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8008,6 +8464,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8077,6 +8537,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8146,6 +8610,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8215,6 +8683,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8286,6 +8758,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8355,6 +8831,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8424,6 +8904,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8495,6 +8979,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8564,6 +9052,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8633,6 +9125,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8702,6 +9198,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8781,6 +9281,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8850,6 +9354,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8925,6 +9433,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8998,6 +9510,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9067,6 +9583,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9136,6 +9656,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9209,6 +9733,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9278,6 +9806,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9347,6 +9879,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9416,6 +9952,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9487,6 +10027,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9562,6 +10106,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9631,6 +10179,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9700,6 +10252,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9769,6 +10325,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9838,6 +10398,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9907,6 +10471,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9976,6 +10544,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10045,6 +10617,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10114,6 +10690,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10185,6 +10765,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10254,6 +10838,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10325,6 +10913,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10398,6 +10990,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10467,6 +11063,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10536,6 +11136,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10605,6 +11209,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10674,6 +11282,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10743,6 +11355,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10814,6 +11430,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10883,6 +11503,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10952,6 +11576,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11021,6 +11649,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11090,6 +11722,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11159,6 +11795,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11228,6 +11868,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11297,6 +11941,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11366,6 +12014,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11435,6 +12087,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11504,6 +12160,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11573,6 +12233,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11642,6 +12306,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11711,6 +12379,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11780,6 +12452,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11849,6 +12525,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11918,6 +12598,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11987,6 +12671,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12056,6 +12744,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12125,6 +12817,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12194,6 +12890,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12263,6 +12963,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12332,6 +13036,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12401,6 +13109,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12470,6 +13182,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12539,6 +13255,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12608,6 +13328,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12677,6 +13401,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12746,6 +13474,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12815,6 +13547,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12884,6 +13620,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12953,6 +13693,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13022,6 +13766,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13091,6 +13839,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13160,6 +13912,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13229,6 +13985,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13298,6 +14058,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13367,6 +14131,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13436,6 +14204,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13505,6 +14277,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13574,6 +14350,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13643,6 +14423,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13712,6 +14496,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13781,6 +14569,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13850,6 +14642,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13923,6 +14719,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13992,6 +14792,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14061,6 +14865,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14130,6 +14938,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14199,6 +15011,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14268,6 +15084,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14337,6 +15157,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14406,6 +15230,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14475,6 +15303,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14544,6 +15376,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14613,6 +15449,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14684,6 +15524,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14753,6 +15597,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14822,6 +15670,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14891,6 +15743,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14960,6 +15816,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15029,6 +15889,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15098,6 +15962,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15167,6 +16035,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15236,6 +16108,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15305,6 +16181,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15376,6 +16256,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15445,6 +16329,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15514,6 +16402,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15583,6 +16475,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15656,6 +16552,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15729,6 +16629,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15798,6 +16702,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15867,6 +16775,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15942,6 +16854,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16011,6 +16927,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16080,6 +17000,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16151,6 +17075,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16220,6 +17148,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16289,6 +17221,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16358,6 +17294,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16427,6 +17367,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16496,6 +17440,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16565,6 +17513,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16634,6 +17586,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16705,6 +17661,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16774,6 +17734,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16843,6 +17807,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16912,6 +17880,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16981,6 +17953,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17050,6 +18026,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17119,6 +18099,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17188,6 +18172,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17257,6 +18245,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17326,6 +18318,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17395,6 +18391,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17492,6 +18492,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17565,6 +18569,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17634,6 +18642,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17709,6 +18721,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17784,6 +18800,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17855,6 +18875,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17924,6 +18948,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17993,6 +19021,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18062,6 +19094,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18131,6 +19167,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18204,6 +19244,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18273,6 +19317,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18342,6 +19390,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18411,6 +19463,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18484,6 +19540,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18557,6 +19617,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18626,6 +19690,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18695,6 +19763,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18772,6 +19844,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18841,6 +19917,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18910,6 +19990,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18979,6 +20063,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19048,6 +20136,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19121,6 +20213,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19190,6 +20286,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19259,6 +20359,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19332,6 +20436,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19405,6 +20513,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19478,6 +20590,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19547,6 +20663,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19616,6 +20736,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19685,6 +20809,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19758,6 +20886,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19827,6 +20959,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19898,6 +21034,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19969,6 +21109,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20038,6 +21182,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20107,6 +21255,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20176,6 +21328,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20245,6 +21401,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20314,6 +21474,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20383,6 +21547,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20452,6 +21620,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20521,6 +21693,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20590,6 +21766,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20659,6 +21839,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20728,6 +21912,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20797,6 +21985,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20866,6 +22058,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20935,6 +22131,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21004,6 +22204,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21073,6 +22277,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21142,6 +22350,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21211,6 +22423,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21280,6 +22496,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21349,6 +22569,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21418,6 +22642,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21487,6 +22715,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21556,6 +22788,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21625,6 +22861,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21694,6 +22934,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21763,6 +23007,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21832,6 +23080,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21901,6 +23153,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21970,6 +23226,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22039,6 +23299,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22108,6 +23372,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22177,6 +23445,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22248,6 +23520,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22319,6 +23595,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22388,6 +23668,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22457,6 +23741,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22526,6 +23814,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22595,6 +23887,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22664,6 +23960,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22733,6 +24033,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22804,6 +24108,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22875,6 +24183,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22946,6 +24258,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23019,6 +24335,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23088,6 +24408,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23157,6 +24481,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23226,6 +24554,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23295,6 +24627,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23368,6 +24704,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23439,6 +24779,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23508,6 +24852,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23579,6 +24927,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23648,6 +25000,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23719,6 +25075,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23788,6 +25148,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23861,6 +25225,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23934,6 +25302,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24003,6 +25375,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24072,6 +25448,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24153,6 +25533,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24224,6 +25608,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24295,6 +25683,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24366,6 +25758,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24435,6 +25831,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24504,6 +25904,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24573,6 +25977,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24644,6 +26052,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24715,6 +26127,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24784,6 +26200,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24853,6 +26273,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24924,6 +26348,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24993,6 +26421,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25064,6 +26496,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25133,6 +26569,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25210,6 +26650,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25279,6 +26723,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25348,6 +26796,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25417,6 +26869,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25488,6 +26944,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25561,6 +27021,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25630,6 +27094,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25699,6 +27167,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25768,6 +27240,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25851,6 +27327,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25922,6 +27402,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25991,6 +27475,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26060,6 +27548,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26129,6 +27621,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26204,6 +27700,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26273,6 +27773,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26342,6 +27846,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26411,6 +27919,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26480,6 +27992,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26553,6 +28069,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26624,6 +28144,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26695,6 +28219,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26764,6 +28292,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26833,6 +28365,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26906,6 +28442,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26975,6 +28515,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27046,6 +28590,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27115,6 +28663,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27184,6 +28736,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27255,6 +28811,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27324,6 +28884,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27393,6 +28957,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27479,6 +29047,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27548,6 +29120,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27617,6 +29193,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27686,6 +29266,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27755,6 +29339,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27824,6 +29412,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27893,6 +29485,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27966,6 +29562,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28039,6 +29639,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28108,6 +29712,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28177,6 +29785,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28247,7 +29859,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: syft-image
-      value: "quay.io/hummingbird-community/syft:latest-builder"
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
     - name: purl-rpm-namespace
       value: "redhat"
     - name: image-expires-after
@@ -28319,6 +29931,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28388,6 +30004,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28457,6 +30077,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28528,6 +30152,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28599,6 +30227,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28668,6 +30300,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28739,6 +30375,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28808,6 +30448,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28878,7 +30522,9 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: syft-image
-      value: "quay.io/hummingbird-community/syft:latest-builder"
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28952,6 +30598,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29021,6 +30671,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29090,6 +30744,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29161,6 +30819,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29230,6 +30892,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29301,6 +30967,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29372,6 +31042,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29441,6 +31115,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29514,6 +31192,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29583,6 +31265,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29652,6 +31338,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29721,6 +31411,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29790,6 +31484,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29859,6 +31557,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29928,6 +31630,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29997,6 +31703,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30066,6 +31776,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30135,6 +31849,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30204,6 +31922,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30277,6 +31999,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30346,6 +32072,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30417,6 +32147,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30490,6 +32224,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30563,6 +32301,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30632,6 +32374,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30701,6 +32447,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30770,6 +32520,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30839,6 +32593,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30908,6 +32666,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30977,6 +32739,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -31046,6 +32812,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -31115,6 +32885,10 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage

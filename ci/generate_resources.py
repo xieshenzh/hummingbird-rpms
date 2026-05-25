@@ -43,6 +43,9 @@ def expand_task_run_specs(specs: list) -> list:
 # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
 PIPELINE_BUNDLE = "quay.io/hummingbird-ci/rpmbuild-pipeline@sha256:2df4e7a45b4a80e7477f5aa7ee7ee9451564a159e7ff441d80685a2875be0d53"
 
+# renovate: datasource=docker depName=quay.io/hummingbird-community/syft
+SYFT_IMAGE = "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+
 def load_yaml_file(path: Path) -> dict | None:
     """Load a YAML file, returning None if it doesn't exist."""
     if not path.exists():
@@ -163,7 +166,7 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
             if "forked_from" in pkg_config:
                 rpm_data["forked_from"] = pkg_config["forked_from"]
 
-            extra_params = {}
+            extra_params = {"syft-image": SYFT_IMAGE, "purl-rpm-namespace": "redhat"}
             if "extra_params" in pkg_config:
                 extra_params.update(pkg_config["extra_params"])
             if resource_type == "pull-request":
