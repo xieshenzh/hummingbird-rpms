@@ -206,6 +206,10 @@ rust-rpm-sequoia:
 scap-security-guide:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+setup:
+  extra_params:
+    syft-image: "quay.io/hummingbird-community/syft:latest-builder"
+
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
   extra_params:

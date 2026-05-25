@@ -27036,6 +27036,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/setup-main:{{revision}}
     - name: package-name
