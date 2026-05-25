@@ -1,0 +1,95 @@
+From 47a8bd5d29455f1b8496a2bc7ba95f3f535c2ba7 Mon Sep 17 00:00:00 2001
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Wed, 13 May 2026 12:21:47 -0400
+Subject: [PATCH] sandbox/seunshare: fix killall() realloc and missing type
+ comparison
+Content-type: text/plain
+
+The killall() realloc() can produce an integer overflow.
+Check and handle this correctly.
+
+The killall() logic also only compares the MCS category set when
+deciding whether to kill the process. We should at least also compare
+the type to avoid incorrectly killing an unrelated process with
+the same category set (e.g. if multiple applications are independently
+assigning category sets on the same system). Check the type as well.
+
+killall() still seems error prone and I couldn't find any actual users
+of the -k/--kill option for seunshare. Can we just drop this?
+
+Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+---
+ sandbox/seunshare.c | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
+
+diff --git a/sandbox/seunshare.c b/sandbox/seunshare.c
+index 2eef0e2f800e..e20c0f8723aa 100644
+--- a/sandbox/seunshare.c
++++ b/sandbox/seunshare.c
+@@ -680,8 +680,8 @@ killall (const char *execcon)
+ 	char *scon;
+ 	struct dirent *de;
+ 	pid_t *pid_table, pid, self;
+-	int i;
+-	int pids, max_pids;
++	unsigned int i;
++	unsigned int pids, max_pids;
+ 	int running = 0;
+ 	self = getpid();
+ 	if (!(dir = opendir(PROC_BASE))) {
+@@ -701,26 +701,34 @@ killall (const char *execcon)
+ 		return -1;
+ 	}
+ 	const char *const mcs = context_range_get(con);
+-	if (!mcs) {
++	const char *const type = context_type_get(con);
++	if (!mcs || !type) {
+ 		context_free(con);
+ 		free(pid_table);
+ 		(void)closedir(dir);
+ 		return -1;
+ 	}
+-	printf("mcs=%s\n", mcs);
++	if (verbose)
++		printf("mcs=%s type=%s\n", mcs, type);
+ 	while ((de = readdir (dir)) != NULL) {
+ 		if (!(pid = (pid_t)atoi(de->d_name)) || pid == self)
+ 			continue;
+ 
+ 		if (pids == max_pids) {
+-			pid_t *new_pid_table = realloc(pid_table, 2*pids*sizeof(pid_t));
++			max_pids *= 2;
++			if (max_pids <= pids)
++			{
++				free(pid_table);
++				(void)closedir(dir);
++				return -1;
++			}
++			pid_t *new_pid_table = reallocarray(pid_table, max_pids, sizeof(pid_t));
+ 			if (!new_pid_table) {
+ 				free(pid_table);
+ 				(void)closedir(dir);
+ 				return -1;
+ 			}
+ 			pid_table = new_pid_table;
+-			max_pids *= 2;
+ 		}
+ 		pid_table[pids++] = pid;
+ 	}
+@@ -734,8 +742,12 @@ killall (const char *execcon)
+ 
+ 			context_t pidcon = context_new(scon);
+ 			if (pidcon) {
++				const char *const pmcs = context_range_get(pidcon);
++				const char *const ptype = context_type_get(pidcon);
++
+ 				/* Attempt to kill remaining processes */
+-				if (strcmp(context_range_get(pidcon), mcs) == 0)
++				if (pmcs && ptype && !strcmp(pmcs, mcs) &&
++					!strcmp(ptype, type))
+ 					kill(id, SIGKILL);
+ 
+ 				context_free(pidcon);
+-- 
+2.54.0
+

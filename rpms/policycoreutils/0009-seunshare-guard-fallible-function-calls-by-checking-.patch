@@ -1,0 +1,63 @@
+From 0edfc7cd42fdded9c697370d6932eecad2aa7449 Mon Sep 17 00:00:00 2001
+From: Rahul Sandhu <nvraxn@posteo.uk>
+Date: Tue, 14 Apr 2026 18:40:00 +0000
+Subject: [PATCH] seunshare: guard fallible function calls by checking retval
+Content-type: text/plain
+
+seunshare currently segfaults is passed --kill and an invalid context
+via -Z.
+
+Signed-off-by: Rahul Sandhu <nvraxn@posteo.uk>
+Acked-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+---
+ sandbox/seunshare.c | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
+
+diff --git a/sandbox/seunshare.c b/sandbox/seunshare.c
+index 2512a18c7b52..e89a9fecf9f6 100644
+--- a/sandbox/seunshare.c
++++ b/sandbox/seunshare.c
+@@ -679,9 +679,19 @@ killall (const char *execcon)
+ 		return -1;
+ 	}
+ 	pids = 0;
+-	context_t con;
+-	con = context_new(execcon);
+-	const char *mcs = context_range_get(con);
++	context_t con = context_new(execcon);
++	if (!con) {
++		free(pid_table);
++		(void)closedir(dir);
++		return -1;
++	}
++	const char *const mcs = context_range_get(con);
++	if (!mcs) {
++		context_free(con);
++		free(pid_table);
++		(void)closedir(dir);
++		return -1;
++	}
+ 	printf("mcs=%s\n", mcs);
+ 	while ((de = readdir (dir)) != NULL) {
+ 		if (!(pid = (pid_t)atoi(de->d_name)) || pid == self)
+@@ -708,11 +718,13 @@ killall (const char *execcon)
+ 		if (getpidcon(id, &scon) == 0) {
+ 
+ 			context_t pidcon = context_new(scon);
+-			/* Attempt to kill remaining processes */
+-			if (strcmp(context_range_get(pidcon), mcs) == 0)
+-				kill(id, SIGKILL);
++			if (pidcon) {
++				/* Attempt to kill remaining processes */
++				if (strcmp(context_range_get(pidcon), mcs) == 0)
++					kill(id, SIGKILL);
+ 
+-			context_free(pidcon);
++				context_free(pidcon);
++			}
+ 			freecon(scon);
+ 		}
+ 		running++;
+-- 
+2.54.0
+
