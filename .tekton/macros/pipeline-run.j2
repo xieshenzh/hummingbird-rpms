@@ -30,7 +30,7 @@ spec:
       value: '{{ "{{revision}}" }}'
 {%- for name, value in extra_params.items() %}
     - name: {{ name }}
-      value: {{ value }}
+      value: "{{ value }}"
 {%- endfor %}
     - name: ociStorage
       value: quay.io/redhat-user-workloads/{{ tenant }}/{{ rpm.name }}:{{ output_image_tag }}
