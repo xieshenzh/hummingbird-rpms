@@ -209,6 +209,7 @@ scap-security-guide:
 setup:
   extra_params:
     syft-image: "quay.io/hummingbird-community/syft:latest-builder"
+    purl-rpm-namespace: "redhat"
 
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
