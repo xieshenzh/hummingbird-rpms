@@ -46,6 +46,16 @@
       "description": "Group all syft image updates together",
       "matchPackageNames": ["/hummingbird-community\\/syft/"],
       "groupName": "syft-image"
+    },
+    {
+      "description": "Regenerate rendered Tekton YAML after image digest updates",
+      "matchManagers": ["custom.regex"],
+      "matchFileNames": ["ci/generate_resources.py"],
+      "postUpgradeTasks": {
+        "commands": ["ci/renovate.sh"],
+        "fileFilters": [".tekton/**"],
+        "executionMode": "branch"
+      }
     }
   ]
 }
