@@ -67,7 +67,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "{{ pipeline_bundle }}"
 {{- task_run_specs_block(task_run_specs) }}
   taskRunTemplate:

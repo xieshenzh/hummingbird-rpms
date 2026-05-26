@@ -17,16 +17,6 @@
     },
     {
       "customType": "regex",
-      "description": "Update pipeline bundle references in rendered Tekton YAML files",
-      "managerFilePatterns": ["/\\.tekton/.+\\.ya?ml$/"],
-      "matchStrings": [
-        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\n\\s*value:\\s*\"[^\"@:]+(?::(?<currentValue>[^\"@]+))?@(?<currentDigest>sha256:[a-f0-9]+)\""
-      ],
-      "currentValueTemplate": "latest",
-      "versioningTemplate": "docker"
-    },
-    {
-      "customType": "regex",
       "description": "Update release-service-catalog git reference in Konflux template",
       "managerFilePatterns": ["/konflux-templates/konflux-resources\\.yml\\.j2$/"],
       "matchStrings": [

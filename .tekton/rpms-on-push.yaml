@@ -57,7 +57,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-pyyaml-main
@@ -127,7 +126,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-r-rpm-macros-main
@@ -197,7 +195,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-shellcheck-main
@@ -267,7 +264,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-abattis-cantarell-fonts-main
@@ -337,7 +333,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-acl-main
@@ -407,7 +402,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-alsa-lib-main
@@ -477,7 +471,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-annobin-main
@@ -547,7 +540,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ansible-packaging-main
@@ -617,7 +609,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-aom-main
@@ -687,7 +678,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-apr-main
@@ -757,7 +747,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-apr-util-main
@@ -827,7 +816,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-apt-main
@@ -899,7 +887,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-attr-main
@@ -969,7 +956,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-audit-main
@@ -1039,7 +1025,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-authselect-main
@@ -1109,7 +1094,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-autoconf-main
@@ -1179,7 +1163,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-automake-main
@@ -1249,7 +1232,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-avahi-main
@@ -1319,7 +1301,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-babeltrace-main
@@ -1389,7 +1370,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-bash-main
@@ -1459,7 +1439,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-bash-completion-main
@@ -1529,7 +1508,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-bind-main
@@ -1599,7 +1577,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-binutils-main
@@ -1669,7 +1646,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-boost-main
@@ -1743,7 +1719,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-bootc-main
@@ -1813,7 +1788,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-brotli-main
@@ -1883,7 +1857,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-btrfs-progs-main
@@ -1953,7 +1926,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-buildah-main
@@ -2023,7 +1995,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-busybox-main
@@ -2093,7 +2064,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-bzip2-main
@@ -2163,7 +2133,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-c-ares-main
@@ -2233,7 +2202,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ca-certificates-main
@@ -2307,7 +2275,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-caddy-main
@@ -2381,7 +2348,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-capstone-main
@@ -2451,7 +2417,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-cargo-rpm-macros-main
@@ -2521,7 +2486,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-cargo2rpm-main
@@ -2591,7 +2555,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-catatonit-main
@@ -2661,7 +2624,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-checkpolicy-main
@@ -2731,7 +2693,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-chkconfig-main
@@ -2801,7 +2762,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-chunkah-main
@@ -2875,7 +2835,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-cloud-init-main
@@ -2945,7 +2904,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-cmake-main
@@ -3015,7 +2973,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-composefs-main
@@ -3085,7 +3042,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-composer-main
@@ -3155,7 +3111,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-container-selinux-main
@@ -3225,7 +3180,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-containers-common-main
@@ -3295,7 +3249,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-coreutils-main
@@ -3369,7 +3322,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-cosign-main
@@ -3439,7 +3391,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-cpio-main
@@ -3509,7 +3460,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-cracklib-main
@@ -3579,7 +3529,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-createrepo-c-main
@@ -3649,7 +3598,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-crypto-policies-main
@@ -3719,7 +3667,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-cryptsetup-main
@@ -3789,7 +3736,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ctags-main
@@ -3859,7 +3805,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-cups-main
@@ -3933,7 +3878,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-curl-main
@@ -4007,7 +3951,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-cyrus-sasl-main
@@ -4077,7 +4020,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dav1d-main
@@ -4147,7 +4089,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dbus-main
@@ -4217,7 +4158,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dbus-broker-main
@@ -4289,7 +4229,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-debugedit-main
@@ -4363,7 +4302,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-diffutils-main
@@ -4433,7 +4371,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dnf-main
@@ -4503,7 +4440,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dnf5-main
@@ -4573,7 +4509,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dns-root-data-main
@@ -4653,7 +4588,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dotnet10-0-main
@@ -4723,7 +4657,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dotnet8-0-main
@@ -4793,7 +4726,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dotnet9-0-main
@@ -4865,7 +4797,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dracut-main
@@ -4935,7 +4866,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-drpm-main
@@ -5005,7 +4935,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-dwz-main
@@ -5075,7 +5004,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-e2fsprogs-main
@@ -5145,7 +5073,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ecj-main
@@ -5215,7 +5142,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ed-main
@@ -5285,7 +5211,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-efi-rpm-macros-main
@@ -5355,7 +5280,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-elfutils-main
@@ -5429,7 +5353,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-emacs-filesystem-main
@@ -5499,7 +5422,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-erlang-rpm-macros-main
@@ -5575,7 +5497,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-expat-main
@@ -5645,7 +5566,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fedora-logos-main
@@ -5717,7 +5637,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fedora-repos-main
@@ -5787,7 +5706,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-file-main
@@ -5857,7 +5775,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-filesystem-main
@@ -5927,7 +5844,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-findutils-main
@@ -6005,7 +5921,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fmt-main
@@ -6079,7 +5994,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fontconfig-main
@@ -6149,7 +6063,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fonts-rpm-macros-main
@@ -6221,7 +6134,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-forge-srpm-macros-main
@@ -6291,7 +6203,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fpc-srpm-macros-main
@@ -6363,7 +6274,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-freetype-main
@@ -6433,7 +6343,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fstrm-main
@@ -6503,7 +6412,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fsverity-utils-main
@@ -6575,7 +6483,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fuse3-main
@@ -6647,7 +6554,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gap-srpm-macros-main
@@ -6717,7 +6623,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gawk-main
@@ -6787,7 +6692,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gcc-main
@@ -6859,7 +6763,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gd-main
@@ -6929,7 +6832,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gdb-main
@@ -6999,7 +6901,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gdbm-main
@@ -7069,7 +6970,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gettext-main
@@ -7155,7 +7055,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ghc-srpm-macros-main
@@ -7227,7 +7126,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-git-main
@@ -7297,7 +7195,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-glib2-main
@@ -7367,7 +7264,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-glibc-main
@@ -7441,7 +7337,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gmp-main
@@ -7511,7 +7406,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gnat-srpm-macros-main
@@ -7581,7 +7475,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gnulib-l10n-main
@@ -7653,7 +7546,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gnupg2-main
@@ -7723,7 +7615,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gnutls-main
@@ -7793,7 +7684,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-go-fdo-client-main
@@ -7863,7 +7753,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-go-fdo-server-main
@@ -7933,7 +7822,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-go-md2man-main
@@ -8003,7 +7891,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-go-rpm-macros-main
@@ -8083,7 +7970,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-golang-fips1-25-main
@@ -8153,7 +8039,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-golang1-25-main
@@ -8223,7 +8108,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-golang1-26-main
@@ -8293,7 +8177,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-golist-main
@@ -8363,7 +8246,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-google-noto-fonts-main
@@ -8435,7 +8317,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gperftools-main
@@ -8505,7 +8386,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gpgme-main
@@ -8575,7 +8455,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gpgverify-main
@@ -8647,7 +8526,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-graphite2-main
@@ -8717,7 +8595,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-graphviz-main
@@ -8787,7 +8664,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-grep-main
@@ -8857,7 +8733,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-groff-main
@@ -8937,7 +8812,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-gzip-main
@@ -9011,7 +8885,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-haproxy-main
@@ -9083,7 +8956,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-harfbuzz-main
@@ -9157,7 +9029,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-hiredis-main
@@ -9227,7 +9098,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-hostname-main
@@ -9301,7 +9171,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-httpd-main
@@ -9371,7 +9240,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-hugo-main
@@ -9441,7 +9309,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-hummingbird-release-main
@@ -9511,7 +9378,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-icu-main
@@ -9581,7 +9447,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ima-evm-utils-main
@@ -9653,7 +9518,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-iproute-main
@@ -9729,7 +9593,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-jansson-main
@@ -9799,7 +9662,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-java-21-openjdk-main
@@ -9869,7 +9731,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-java-21-openjdk-portable-main
@@ -9939,7 +9800,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-java-25-openjdk-main
@@ -10009,7 +9869,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-java-25-openjdk-portable-main
@@ -10079,7 +9938,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-java-rpm-macros-main
@@ -10149,7 +10007,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-javapackages-tools-main
@@ -10219,7 +10076,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-jbigkit-main
@@ -10289,7 +10145,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-jemalloc-main
@@ -10361,7 +10216,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-jq-main
@@ -10431,7 +10285,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-json-c-main
@@ -10503,7 +10356,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-kbd-main
@@ -10577,7 +10429,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-kernel-headers-main
@@ -10647,7 +10498,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-kernel-srpm-macros-main
@@ -10717,7 +10567,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-keyutils-main
@@ -10787,7 +10636,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-kmod-main
@@ -10857,7 +10705,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-krb5-main
@@ -10927,7 +10774,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-kubernetes1-35-main
@@ -10999,7 +10845,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-langpacks-main
@@ -11069,7 +10914,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-less-main
@@ -11139,7 +10983,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libx11-main
@@ -11209,7 +11052,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxau-main
@@ -11279,7 +11121,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxcomposite-main
@@ -11349,7 +11190,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxext-main
@@ -11419,7 +11259,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxft-main
@@ -11489,7 +11328,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxi-main
@@ -11559,7 +11397,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxpm-main
@@ -11629,7 +11466,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxrender-main
@@ -11699,7 +11535,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxtst-main
@@ -11769,7 +11604,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libaio-main
@@ -11839,7 +11673,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libarchive-main
@@ -11909,7 +11742,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libassuan-main
@@ -11979,7 +11811,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libavif-main
@@ -12049,7 +11880,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libb2-main
@@ -12119,7 +11949,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libbpf-main
@@ -12189,7 +12018,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libcap-main
@@ -12259,7 +12087,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libcap-ng-main
@@ -12329,7 +12156,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libcbor-main
@@ -12399,7 +12225,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libcomps-main
@@ -12469,7 +12294,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libdnf-main
@@ -12539,7 +12363,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libeconf-main
@@ -12609,7 +12432,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libedit-main
@@ -12679,7 +12501,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libevent-main
@@ -12749,7 +12570,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libffi-main
@@ -12819,7 +12639,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libfido2-main
@@ -12889,7 +12708,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libfontenc-main
@@ -12959,7 +12777,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libgcrypt-main
@@ -13029,7 +12846,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libgit2-main
@@ -13099,7 +12915,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libgpg-error-main
@@ -13169,7 +12984,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libidn2-main
@@ -13239,7 +13053,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libipt-main
@@ -13309,7 +13122,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libjpeg-turbo-main
@@ -13379,7 +13191,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libkcapi-main
@@ -13449,7 +13260,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libksba-main
@@ -13519,7 +13329,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-liblerc-main
@@ -13589,7 +13398,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libmaxminddb-main
@@ -13659,7 +13467,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libmnl-main
@@ -13729,7 +13536,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libmodulemd-main
@@ -13799,7 +13605,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libmpc-main
@@ -13869,7 +13674,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libnl3-main
@@ -13939,7 +13743,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libnsl2-main
@@ -14009,7 +13812,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libpipeline-main
@@ -14083,7 +13885,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libpng-main
@@ -14153,7 +13954,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libpsl-main
@@ -14223,7 +14023,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libpwquality-main
@@ -14293,7 +14092,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-librepo-main
@@ -14363,7 +14161,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libseccomp-main
@@ -14433,7 +14230,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libselinux-main
@@ -14503,7 +14299,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libsemanage-main
@@ -14573,7 +14368,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libsepol-main
@@ -14643,7 +14437,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libsodium-main
@@ -14713,7 +14506,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libsolv-main
@@ -14783,7 +14575,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libssh-main
@@ -14853,7 +14644,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libssh2-main
@@ -14925,7 +14715,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libtasn1-main
@@ -14995,7 +14784,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libtiff-main
@@ -15065,7 +14853,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libtirpc-main
@@ -15135,7 +14922,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libtommath-main
@@ -15205,7 +14991,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libtool-main
@@ -15275,7 +15060,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libunistring-main
@@ -15345,7 +15129,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libunwind-main
@@ -15415,7 +15198,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libusb1-main
@@ -15485,7 +15267,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libuv-main
@@ -15555,7 +15336,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libverto-main
@@ -15627,7 +15407,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libwebp-main
@@ -15697,7 +15476,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxcb-main
@@ -15767,7 +15545,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxcrypt-main
@@ -15841,7 +15618,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxml2-main
@@ -15915,7 +15691,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libxslt-main
@@ -15985,7 +15760,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libyaml-main
@@ -16055,7 +15829,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libyuv-main
@@ -16125,7 +15898,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libzip-main
@@ -16201,7 +15973,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-lksctp-tools-main
@@ -16271,7 +16042,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-llhttp-main
@@ -16341,7 +16111,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-llvm-main
@@ -16413,7 +16182,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-llvm21-main
@@ -16483,7 +16251,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-lmdb-main
@@ -16553,7 +16320,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-logrotate-main
@@ -16623,7 +16389,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-lua-main
@@ -16693,7 +16458,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-lua-rpm-macros-main
@@ -16763,7 +16527,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-lujavrite-main
@@ -16833,7 +16596,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-lvm2-main
@@ -16903,7 +16665,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-lz4-main
@@ -16975,7 +16736,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-lzo-main
@@ -17045,7 +16805,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-m4-main
@@ -17115,7 +16874,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-mailcap-main
@@ -17185,7 +16943,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-make-main
@@ -17255,7 +17012,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-man-db-main
@@ -17325,7 +17081,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-mariadb-connector-c-main
@@ -17395,7 +17150,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-mariadb10-11-main
@@ -17465,7 +17219,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-mariadb11-8-main
@@ -17535,7 +17288,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-mawk-main
@@ -17605,7 +17357,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-memcached-main
@@ -17675,7 +17426,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-meson-main
@@ -17773,7 +17523,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-mkfontscale-main
@@ -17847,7 +17596,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-mpdecimal-main
@@ -17917,7 +17665,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-mpfr-main
@@ -17993,7 +17740,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ncurses-main
@@ -18069,7 +17815,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nettle-main
@@ -18141,7 +17886,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nghttp2-main
@@ -18211,7 +17955,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nghttp3-main
@@ -18281,7 +18024,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nginx-main
@@ -18351,7 +18093,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ngtcp2-main
@@ -18421,7 +18162,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ninja-build-main
@@ -18495,7 +18235,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nodejs20-main
@@ -18565,7 +18304,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nodejs22-main
@@ -18635,7 +18373,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nodejs24-main
@@ -18709,7 +18446,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nodejs25-main
@@ -18783,7 +18519,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nodejs26-main
@@ -18853,7 +18588,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-npth-main
@@ -18923,7 +18657,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nss-main
@@ -18997,7 +18730,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-nss-fips-main
@@ -19071,7 +18803,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ocaml-srpm-macros-main
@@ -19141,7 +18872,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-oniguruma-main
@@ -19211,7 +18941,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-openblas-srpm-macros-main
@@ -19281,7 +19010,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-opendbx-main
@@ -19351,7 +19079,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-openldap-main
@@ -19425,7 +19152,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-openscap-main
@@ -19495,7 +19221,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-openssh-main
@@ -19569,7 +19294,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-openssl-main
@@ -19643,7 +19367,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-openssl-fips-provider-main
@@ -19717,7 +19440,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-oras-main
@@ -19787,7 +19509,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ostree-main
@@ -19857,7 +19578,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-p11-kit-main
@@ -19927,7 +19647,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-package-notes-main
@@ -19997,7 +19716,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-pam-main
@@ -20071,7 +19789,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-patch-main
@@ -20141,7 +19858,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-pcre2-main
@@ -20213,7 +19929,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-main
@@ -20285,7 +20000,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-carp-main
@@ -20355,7 +20069,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-data-dumper-main
@@ -20425,7 +20138,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-digest-main
@@ -20495,7 +20207,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-digest-md5-main
@@ -20565,7 +20276,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-encode-main
@@ -20635,7 +20345,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-error-main
@@ -20705,7 +20414,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-exporter-main
@@ -20775,7 +20483,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-file-path-main
@@ -20845,7 +20552,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-file-temp-main
@@ -20915,7 +20621,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-getopt-long-main
@@ -20985,7 +20690,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-http-tiny-main
@@ -21055,7 +20759,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-io-socket-ip-main
@@ -21125,7 +20828,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-io-socket-ssl-main
@@ -21195,7 +20897,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-mime-base32-main
@@ -21265,7 +20966,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-mime-base64-main
@@ -21335,7 +21035,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-net-ssleay-main
@@ -21405,7 +21104,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-pathtools-main
@@ -21475,7 +21173,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-pod-escapes-main
@@ -21545,7 +21242,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-pod-perldoc-main
@@ -21615,7 +21311,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-pod-simple-main
@@ -21685,7 +21380,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-pod-usage-main
@@ -21755,7 +21449,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-scalar-list-utils-main
@@ -21825,7 +21518,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-socket-main
@@ -21895,7 +21587,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-storable-main
@@ -21965,7 +21656,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-term-ansicolor-main
@@ -22035,7 +21725,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-term-cap-main
@@ -22105,7 +21794,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-termreadkey-main
@@ -22175,7 +21863,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-text-parsewords-main
@@ -22245,7 +21932,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-text-tabs-wrap-main
@@ -22315,7 +22001,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-thread-queue-main
@@ -22385,7 +22070,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-time-hires-main
@@ -22455,7 +22139,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-time-local-main
@@ -22525,7 +22208,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-uri-main
@@ -22597,7 +22279,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-constant-main
@@ -22669,7 +22350,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-libnet-main
@@ -22739,7 +22419,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-parent-main
@@ -22809,7 +22488,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-podlators-main
@@ -22879,7 +22557,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-srpm-macros-main
@@ -22949,7 +22626,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-threads-main
@@ -23019,7 +22695,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-perl-threads-shared-main
@@ -23089,7 +22764,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-php-main
@@ -23161,7 +22835,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-php-patchwork-jsqueeze-main
@@ -23233,7 +22906,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-php-pecl-zip-main
@@ -23305,7 +22977,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-pkgconf-main
@@ -23379,7 +23050,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-podman-main
@@ -23449,7 +23119,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-policycoreutils-main
@@ -23519,7 +23188,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-poppler-main
@@ -23589,7 +23257,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-popt-main
@@ -23659,7 +23326,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-postgresql18-main
@@ -23733,7 +23399,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-procps-ng-main
@@ -23805,7 +23470,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-protobuf-c-main
@@ -23875,7 +23539,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-psmisc-main
@@ -23947,7 +23610,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-publicsuffix-list-main
@@ -24017,7 +23679,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-pyopenssl-main
@@ -24089,7 +23750,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-pyproject-rpm-macros-main
@@ -24159,7 +23819,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-pytest-main
@@ -24233,7 +23892,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-attrs-main
@@ -24307,7 +23965,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-certifi-main
@@ -24377,7 +24034,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-charset-normalizer-main
@@ -24447,7 +24103,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-cryptography-main
@@ -24529,7 +24184,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-gitlab-main
@@ -24601,7 +24255,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-idna-main
@@ -24673,7 +24326,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-iniconfig-main
@@ -24745,7 +24397,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-jinja2-main
@@ -24815,7 +24466,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-jinja2-cli-main
@@ -24885,7 +24535,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-jsonschema-main
@@ -24955,7 +24604,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-jsonschema-specifications-main
@@ -25027,7 +24675,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-markupsafe-main
@@ -25099,7 +24746,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-mypy-extensions-main
@@ -25169,7 +24815,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-packaging-main
@@ -25239,7 +24884,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-pathspec-main
@@ -25311,7 +24955,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-pip-main
@@ -25381,7 +25024,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-pluggy-main
@@ -25453,7 +25095,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-productmd-main
@@ -25523,7 +25164,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-pygments-main
@@ -25601,7 +25241,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-referencing-main
@@ -25671,7 +25310,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-requests-main
@@ -25741,7 +25379,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-requests-toolbelt-main
@@ -25811,7 +25448,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-rpds-py-main
@@ -25887,7 +25523,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-rpm-lockfile-prototype-main
@@ -25957,7 +25592,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-rpm-macros-main
@@ -26027,7 +25661,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-sentry-sdk-main
@@ -26097,7 +25730,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-setuptools-main
@@ -26167,7 +25799,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-specfile-main
@@ -26251,7 +25882,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-trustme-main
@@ -26323,7 +25953,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-types-pyyaml-main
@@ -26393,7 +26022,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-types-requests-main
@@ -26463,7 +26091,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-typing-extensions-main
@@ -26533,7 +26160,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python-urllib3-main
@@ -26609,7 +26235,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python3-mypy-main
@@ -26679,7 +26304,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python3-11-main
@@ -26749,7 +26373,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python3-12-main
@@ -26819,7 +26442,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python3-13-main
@@ -26889,7 +26511,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-python3-14-main
@@ -26963,7 +26584,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-qt5-main
@@ -27035,7 +26655,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-qt6-main
@@ -27107,7 +26726,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rdma-core-main
@@ -27177,7 +26795,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-readline-main
@@ -27247,7 +26864,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-redhat-rpm-config-main
@@ -27321,7 +26937,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rootfiles-main
@@ -27391,7 +27006,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rpm-main
@@ -27463,7 +27077,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ruby3-3-main
@@ -27533,7 +27146,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ruby3-4-main
@@ -27603,7 +27215,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ruby4-0-main
@@ -27675,7 +27286,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rubypick-main
@@ -27745,7 +27355,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ruff-main
@@ -27815,7 +27424,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunSpecs:
     - pipelineTaskName: rpmbuild-x86-64
@@ -27902,7 +27510,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rust-add-determinism-main
@@ -27972,7 +27579,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rust-archery-main
@@ -28042,7 +27648,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rust-imagequant-sys-main
@@ -28112,7 +27717,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rust-podman-sequoia-main
@@ -28182,7 +27786,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rust-rav1e-main
@@ -28252,7 +27855,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rust-rpds-main
@@ -28326,7 +27928,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-rust-rpm-sequoia-main
@@ -28400,7 +28001,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-scap-security-guide-main
@@ -28470,7 +28070,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-sdbus-cpp-main
@@ -28540,7 +28139,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-sed-main
@@ -28610,7 +28208,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-selinux-policy-main
@@ -28680,7 +28277,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-setup-main
@@ -28750,7 +28346,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-sgml-common-main
@@ -28820,7 +28415,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-shadow-utils-main
@@ -28890,7 +28484,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-skopeo-main
@@ -28962,7 +28555,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-snappy-main
@@ -29034,7 +28626,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-source-highlight-main
@@ -29104,7 +28695,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-sqlite-main
@@ -29176,7 +28766,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-subversion-main
@@ -29246,7 +28835,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-svt-av1-main
@@ -29320,7 +28908,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-syft-main
@@ -29390,7 +28977,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-sysprof-main
@@ -29460,7 +29046,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-systemd-main
@@ -29530,7 +29115,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-systemd-stub-main
@@ -29602,7 +29186,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-tar-main
@@ -29672,7 +29255,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-tcl-main
@@ -29744,7 +29326,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-tk-main
@@ -29816,7 +29397,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-tomcat10-main
@@ -29890,7 +29470,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-tomcat11-main
@@ -29960,7 +29539,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-tpm2-tss-main
@@ -30030,7 +29608,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-tree-sitter-srpm-macros-main
@@ -30100,7 +29677,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-trivy-main
@@ -30170,7 +29746,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ttmkfdir-main
@@ -30240,7 +29815,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-tzdata-main
@@ -30310,7 +29884,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-unbound-main
@@ -30380,7 +29953,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-unzip-main
@@ -30450,7 +30022,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-uriparser-main
@@ -30520,7 +30091,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-util-linux-main
@@ -30590,7 +30160,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-uuid-main
@@ -30664,7 +30233,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-valkey-main
@@ -30734,7 +30302,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-vmaf-main
@@ -30804,7 +30371,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-which-main
@@ -30880,7 +30446,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-xcaddy-main
@@ -30954,7 +30519,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-xmlsec1-main
@@ -31024,7 +30588,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-xorg-x11-fonts-main
@@ -31094,7 +30657,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-xxhash-main
@@ -31164,7 +30726,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-xz-main
@@ -31234,7 +30795,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-yq-main
@@ -31304,7 +30864,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-zchunk-main
@@ -31374,7 +30933,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-zig-srpm-macros-main
@@ -31444,7 +31002,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-zip-main
@@ -31514,7 +31071,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-zlib-ng-main
@@ -31584,7 +31140,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-zstd-main
