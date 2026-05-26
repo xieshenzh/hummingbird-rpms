@@ -24627,8 +24627,12 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: syft-image
+      value: "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
-      value: 5d
+      value: "5d"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/postgresql17-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
@@ -24658,7 +24662,7 @@ spec:
         value: pipeline
       - name: bundle
         # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline@sha256:b9ce8a02047f0d27361c0172fe6c1eb4f2c7a196be133d19d6d67edd20b13de7"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-postgresql17-main
   timeouts:
