@@ -1,0 +1,21 @@
+---
+# Forbidden function symbols found:
+#   inet_net_ntop
+#   inet_net_pton
+# This is not a problem because the older version is only used for upgrade
+# purposes and communicates through unix socket only
+badfuncs:
+    ignore:
+        - /usr/lib*/pgsql/postgresql-*/bin/postgres
+
+# Invalid XML for HTML doc is ok
+xml:
+    ignore:
+        - /usr/share/doc/postgresql-docs/html/*.html
+
+# Wacky guess on file type that we do not need to care
+# Message: MIME type on <file> was text/plain and became text/x-c
+types:
+    ignore:
+        - /usr/lib64/pgsql/postgresql-*/include/server/port/freebsd.h
+        - /usr/include/pgsql/server/port/freebsd.h

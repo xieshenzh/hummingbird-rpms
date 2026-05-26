@@ -1,0 +1,19 @@
+# See the documentation for more information:
+# https://packit.dev/docs/configuration/
+actions:
+  pre-sync:
+    - bash -c "$PACKIT_DOWNSTREAM_REPO/packit-update-sources.sh"
+
+jobs:
+  - job: pull_from_upstream
+    trigger: release
+    dist_git_branches:
+      - fedora-all
+  - job: koji_build
+    trigger: commit
+    dist_git_branches:
+      - fedora-all
+  - job: bodhi_update
+    trigger: commit
+    dist_git_branches:
+       fedora-all
