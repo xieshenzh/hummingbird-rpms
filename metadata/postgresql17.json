@@ -1,12 +1,12 @@
 {
   "branch": "f44",
-  "modification_reason": "Remove runtime dependency on systemd",
+  "modification_reason": "Update to upstream version 17.10",
   "modification_status": "modified",
-  "release": "2",
+  "release": "0.1",
   "sha": "fd5a04f8eda9c7b5e089468d1d31531baa9b7270",
   "source": "https://src.fedoraproject.org/rpms/postgresql17.git",
   "track_upstream": "17",
   "upstream_branch": "REL_17_STABLE",
   "upstream_repo": "https://github.com/postgres/postgres",
-  "version": "17.9"
+  "version": "17.10"
 }
