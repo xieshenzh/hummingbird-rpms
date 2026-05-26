@@ -18,3 +18,20 @@ no-systemd-runtime-dependency:
     else
       echo "PASS: httpd does not require systemd at runtime"
     fi
+
+mod-ssl-no-hard-sscg-dependency:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "mod_ssl" ]]; then
+      echo "Skipping: This test only runs on mod_ssl (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -q "sscg"; then
+      TEST_FAIL "mod_ssl has a hard dependency on sscg (should be Recommends)"
+    fi
+    if echo "${requires}" | grep -q "hostname"; then
+      TEST_FAIL "mod_ssl has a hard dependency on hostname (should be Recommends)"
+    fi
+    echo "PASS: mod_ssl does not hard-require sscg or hostname"

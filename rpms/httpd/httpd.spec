@@ -28,7 +28,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.67
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -210,7 +210,7 @@ Epoch: 1
 BuildRequires: openssl-devel
 Requires(pre): httpd-filesystem
 Requires: httpd-core = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-Requires: sscg >= 3.0.3, /usr/bin/hostname
+Recommends: sscg >= 3.0.3, /usr/bin/hostname
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts: openssl-libs < 1:1.0.1h-4
 # mod_ssl/mod_nss cannot both be loaded simultaneously
