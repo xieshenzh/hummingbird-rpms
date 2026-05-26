@@ -1,0 +1,13 @@
+/test:
+    summary:
+        Basic set of quick tests for postgresql.
+    discover:
+      - name: fedora
+        how: fmf
+        url: "https://src.fedoraproject.org/tests/postgresql.git"
+        ref: main
+        filter: "tag:-libecpg"
+        exclude:
+          - /testsuite
+    execute:
+        how: tmt

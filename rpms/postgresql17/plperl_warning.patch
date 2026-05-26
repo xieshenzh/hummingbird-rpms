@@ -1,0 +1,23 @@
+diff -ur postgresql-15.4/src/pl/plperl/expected/plperl_call.out postgresql-patched/src/pl/plperl/expected/plperl_call.out
+--- postgresql-15.4/src/pl/plperl/expected/plperl_call.out	2023-08-07 22:08:18.000000000 +0200
++++ postgresql-patched/src/pl/plperl/expected/plperl_call.out	2023-09-18 10:23:42.499078442 +0200
+@@ -64,6 +64,7 @@
+   RAISE NOTICE '_a: %, _b: %', _a, _b;
+ END
+ $$;
++WARNING:  could not determine encoding for locale "C.UTF-8": codeset is "ANSI_X3.4-1968"
+ NOTICE:  a: 10, b: 
+ NOTICE:  _a: 10, _b: 20
+ DROP PROCEDURE test_proc1;
+diff -ur postgresql-15.4/src/pl/plperl/expected/plperl_elog_1.out postgresql-patched/src/pl/plperl/expected/plperl_elog_1.out
+--- postgresql-15.4/src/pl/plperl/expected/plperl_elog_1.out	2023-08-07 22:08:18.000000000 +0200
++++ postgresql-patched/src/pl/plperl/expected/plperl_elog_1.out	2023-09-18 10:24:39.233451395 +0200
+@@ -76,6 +76,7 @@
+   RETURN 1;
+ END;
+ $$;
++WARNING:  could not determine encoding for locale "C.UTF-8": codeset is "ANSI_X3.4-1968"
+ select die_caller();
+ NOTICE:  caught die
+  die_caller 
+Only in postgresql-patched/src/pl/plperl/expected: plperl_warning.patch

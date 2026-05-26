@@ -740,6 +740,8 @@ spec:
           contentType: rpm
         - name: popt-main
           contentType: rpm
+        - name: postgresql17-main
+          contentType: rpm
         - name: postgresql18-main
           contentType: rpm
         - name: procps-ng-main
