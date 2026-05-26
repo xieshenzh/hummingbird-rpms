@@ -24328,7 +24328,6 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
   taskRunTemplate:
     serviceAccountName: build-pipeline-postgresql17-main
