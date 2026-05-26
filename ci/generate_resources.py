@@ -41,7 +41,7 @@ def expand_task_run_specs(specs: list) -> list:
     return expanded
 
 # renovate: datasource=docker depName=quay.io/hummingbird-ci/rpmbuild-pipeline
-PIPELINE_BUNDLE = "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:2df4e7a45b4a80e7477f5aa7ee7ee9451564a159e7ff441d80685a2875be0d53"
+PIPELINE_BUNDLE = "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:c2a5cff5145786d931222644c3baa9814c57f8e3e249af750bfc0352fe4c8d31"
 
 # renovate: datasource=docker depName=quay.io/hummingbird-community/syft
 SYFT_IMAGE = "quay.io/hummingbird-community/syft:latest-builder@sha256:c4048cb63f65444cbbabef58076dafb954342ee02739c051c37ead38389e08ec"
