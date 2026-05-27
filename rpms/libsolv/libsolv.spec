@@ -27,7 +27,7 @@
 %define __cmake_switch(b:) %[%{expand:%%{?with_%{-b*}}} ? "ON" : "OFF"]
 
 Name:           lib%{libname}
-Version:        0.7.37
+Version:        0.7.38
 Release:        2%{?dist}
 Summary:        Package dependency solver
 
@@ -59,9 +59,9 @@ Patch:          0001-Python-Provide-dist-info-metadata.patch
 # Replaces <https://src.fedoraproject.org/rpms/libsolv/pull-request/14>.
 # Requires Python-Provide-dist-info-metadata.patch.
 Patch:          0002-Add-INSTALLER-to-Python-metadata.patch
-# Cope with integer overflow in data size arithmetics in repo_add_solv(),
-# in upstream after 0.7.37, <https://github.com/openSUSE/libsolv/pull/617>
-Patch:          0003-Cope-with-integer-overflow-in-data-size-arithmetics-.patch
+# Fix a buffer overflow when decompressing solv pages (CVE-2026-48864),
+# rejected by upstream, <https://github.com/openSUSE/libsolv/pull/622>.
+Patch:          0003-Fix-a-buffer-overflow-when-decompressing-solv-pages.patch
 
 BuildRequires:  cmake >= 3.5
 BuildRequires:  gcc-c++
@@ -220,7 +220,7 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 
 %files
 %license LICENSE*
-%doc NEWS README
+%doc NEWS README TODO
 %{_libdir}/%{name}.so.*
 %{_libdir}/%{name}ext.so.*
 
