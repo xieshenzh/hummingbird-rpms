@@ -42,7 +42,19 @@ EOF
 
 
 %build
-%{!?el9:%pyproject_wheel --config-settings abc=123 --config-settings xyz=456 --config-settings=--option-with-dashes=1 --config-settings=--option-with-dashes=2}
+# The way the macro is invoked serves as as a regression test
+# for option parsing bug fixed in 2acda15.
+# Use case extracted from python-nanobind-2.12.0-1.fc45.
+# Note that the : makes everything one giant argument for RPM
+# and this only works becasue:
+#  1. Each -C/--config-settings is on separate line.
+#  2. There are no spaces other than those separating each -C/--config-settings.
+%{!?el9:%{pyproject_wheel: \
+--config-settings="abc=123" \
+-C"xyz=456" \
+--config-settings=--option-with-dashes=1 \
+-C=--option-with-dashes=2 \
+}}
 
 
 %changelog

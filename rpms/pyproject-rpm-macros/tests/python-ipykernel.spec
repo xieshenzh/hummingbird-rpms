@@ -10,6 +10,7 @@ BuildArch:      noarch
 
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
+BuildRequires:  python3-pkg-resources
 
 %description
 This package contains data files.
@@ -46,7 +47,17 @@ Summary:        %{summary}
 %pyproject_save_files --assert-license 'ipykernel*' --auto
 
 %check
-%pyproject_check_import  --exclude '*.test*' --exclude 'ipykernel.gui*' --exclude 'ipykernel.pylab.*' --exclude 'ipykernel.trio*' --exclude 'ipykernel.datapub' --exclude 'ipykernel.pickleutil' --exclude 'ipykernel.serialize'
+# The global definition here serves as as a regression test
+# for option parsing bug fixed in 2acda15.
+# Use case extracted from python-pylero-0.1.1-6.fc44,
+# enhanced with combining short and long options.
+%global _check_import_excludes %{expand:
+-e '*.test*' --exclude 'ipykernel.gui*'
+--exclude 'ipykernel.pylab.*' -e 'ipykernel.trio*'
+-e 'ipykernel.datapub' --exclude 'ipykernel.pickleutil'
+-e 'ipykernel.serialize'
+}
+%pyproject_check_import %_check_import_excludes
 
 %files -n python3-ipykernel -f %{pyproject_files}
 %doc README.md

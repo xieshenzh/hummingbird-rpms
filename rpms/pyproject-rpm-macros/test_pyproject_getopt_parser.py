@@ -30,13 +30,13 @@ def rpmlua(script):
 
 
 def _get_lua_test_names():
-    stdout, _, rc = rpmlua("""\
+    stdout, stderr, rc = rpmlua("""\
         local t = require("test_pyproject_getopt")
         for _, name in ipairs(t.list()) do
             io.write(name .. "\\n")
         end
     """)
-    assert rc == 0, "Failed to list Lua tests"
+    assert rc == 0, f"Failed to list Lua tests:\n{stderr}"
     names = stdout.strip().splitlines()
     assert names, "No Lua tests found"
     return names

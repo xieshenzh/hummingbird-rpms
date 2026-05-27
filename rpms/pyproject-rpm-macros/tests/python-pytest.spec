@@ -41,7 +41,12 @@ Summary:        %{summary}
 
 
 %generate_buildrequires
-%pyproject_buildrequires %{?with_tests:-x testing -t}
+# The way the macro is invoked serves as a regression test
+# for option parsing bug fixed in 2acda15.
+# Use case extracted from fontmake-3.11.1-2.fc44.
+%{pyproject_buildrequires \
+    %{?with_tests:-x testing} \
+    %{?with_tests:-t}}
 
 
 %build

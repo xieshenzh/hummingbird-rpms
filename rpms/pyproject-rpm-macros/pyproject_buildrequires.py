@@ -139,30 +139,24 @@ class Requirements:
 
         return parsed_overrides
 
-    @staticmethod
-    def _base_package_name(package_name):
-        """Extract base package name, stripping any extras like [extra1]."""
-        bracket = package_name.find('[')
-        if bracket != -1:
-            package_name = package_name[:bracket]
-        return canonicalize_name(package_name)
-
     def _should_ignore_dependency(self, package_name):
         """Check if a dependency should be completely ignored."""
-        package_name = self._base_package_name(package_name)
         if package_name not in self.dependency_overrides:
             return False
         return any(o['action'] == 'ignore' for o in self.dependency_overrides[package_name])
 
-    def _apply_dependency_overrides(self, package_name, specifiers):
+    def _apply_dependency_overrides(self, requirement):
         """Apply dependency overrides to a list of specifiers for a given package."""
-        package_name = self._base_package_name(package_name)
+        package_name = canonicalize_name(requirement.name)
         if package_name not in self.dependency_overrides:
-            return specifiers
+            return requirement
 
-        return apply_overrides_to_specifiers(
-            specifiers, self.dependency_overrides[package_name],
+        overridden = apply_overrides_to_specifiers(
+            requirement.specifier, self.dependency_overrides[package_name],
             package_name=package_name, log_fn=print_err)
+
+        requirement.specifier = SpecifierSet(','.join(str(s) for s in overridden))
+        return requirement
 
     @property
     def marker_envs(self):
@@ -242,11 +236,8 @@ class Requirements:
 
         # Apply dependency overrides before the installed-version check,
         # so the check reflects the constraints we will actually output.
-        if self._base_package_name(name) in self.dependency_overrides:
-            overridden = self._apply_dependency_overrides(
-                name, list(requirement.specifier))
-            requirement.specifier = SpecifierSet(
-                ','.join(str(s) for s in overridden))
+        requirement = self._apply_dependency_overrides(requirement)
+        requirement_str = str(requirement)
 
         # We need to always accept pre-releases as satisfying the requirement
         # Otherwise e.g. installed cffi version 1.15.0rc2 won't even satisfy the requirement for "cffi"
@@ -703,8 +694,8 @@ def generate_requires(
         if requirement_files:
             for req_file in requirement_files:
                 requirements.extend(
-                    convert_requirements_txt(req_file, pathlib.Path(req_file.name)),
-                    source=f'requirements file {req_file.name}'
+                    convert_requirements_txt(req_file.read_text().splitlines(), req_file),
+                    source=f'requirements file {req_file}'
                 )
             requirements.check(source='all requirements files')
         if use_build_system:
@@ -806,7 +797,7 @@ def argparser():
         action='store_false', help='Use -N to indicate that project does not use any build system',
     )
     parser.add_argument(
-        'requirement_files', nargs='*', type=argparse.FileType('r'),
+        'requirement_files', nargs='*', type=pathlib.Path,
         metavar='REQUIREMENTS.TXT',
         help=('Add buildrequires from file'),
     )
@@ -827,6 +818,10 @@ def argparser():
 def main(argv):
     parser = argparser()
     args = parser.parse_args(argv)
+
+    for req_file in args.requirement_files:
+        if not req_file.exists():
+            parser.error(f"can't open '{req_file}': No such file or directory")
 
     if not args.use_build_system:
         args.runtime = False

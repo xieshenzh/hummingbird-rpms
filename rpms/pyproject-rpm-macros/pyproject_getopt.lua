@@ -46,6 +46,29 @@ function M.rpm_args()
 end
 
 
+-- RPM may embed newlines within tokens (from %{expand:} or line continuations).
+-- Split such tokens on newlines, strip trailing backslashes and whitespace
+-- (from \-newline continuations inside %{macro:} syntax), and discard
+-- whitespace/backslash-only fragments.
+-- Intentional empty strings (e.g. from -d "") are preserved.
+local function normalize_tokens(tokens)
+    local filtered = {}
+    for _, t in ipairs(tokens) do
+        if t:find("\n") then
+            for part in (t .. "\n"):gmatch("([^\n]*)\n") do
+                local stripped = part:gsub("[%s\\]+$", "")
+                if stripped ~= "" then
+                    filtered[#filtered + 1] = stripped
+                end
+            end
+        elseif not t:find("^[%s\\]+$") then
+            filtered[#filtered + 1] = t
+        end
+    end
+    return filtered
+end
+
+
 local function build_lookup(opt_spec)
     local by_short = {}
     local by_long = {}
@@ -196,25 +219,37 @@ end
 -- On older RPM, %{quote:} leaks \x1f into shell commands, so we skip quoting there.
 M._use_quote = rpm.vercmp(rpm.expand("0%{?rpmversion}"), "4.19.90") >= 0
 
+-- Quote a single value for safe embedding in an rpm.define() call.
+-- On RPM 4.20+, empty values or values with spaces are wrapped in %{quote:}.
+-- On older RPM, empty values are represented as %{nil}, values with spaces are verbatim.
+local function quote_value(v)
+    if M._use_quote and (v == "" or v:find("%s")) then
+        return "%{quote:" .. v .. "}"
+    elseif v == "" then
+        return "%{nil}"
+    else
+        return v
+    end
+end
+
+-- Apply quote_value to each element, return a new table.
+local function quote_values(values)
+    local parts = {}
+    for _, v in ipairs(values) do
+        parts[#parts + 1] = quote_value(v)
+    end
+    return parts
+end
+
 -- Define %__pyproject_opt_{short} for each found option.
 -- Flags get %{nil} (defined but empty), value options get each individual
 -- value joined by separator.
--- On RPM 4.20+ empty values or values with spaces are wrapped in %{quote:} before joining.
--- On older RPM, empty values are represented as %{nil}, values with spaces are verbatim.
+-- See the quote_value function about how values are quoted.
 local function define_macros(found, opt_spec)
     for _, spec in ipairs(opt_spec) do
         if found[spec.short] then
             if spec.value then
-                local parts = {}
-                for i, v in ipairs(found[spec.short]) do
-                    if M._use_quote and (v == "" or v:find("%s")) then
-                        parts[i] = "%{quote:" .. v .. "}"
-                    elseif v == "" then
-                        parts[i] = "%{nil}"
-                    else
-                        parts[i] = v
-                    end
-                end
+                local parts = quote_values(found[spec.short])
                 rpm.define("__pyproject_opt_" .. spec.short .. " " .. table.concat(parts, spec.separator))
             else
                 rpm.define("__pyproject_opt_" .. spec.short .. " %{nil}")
@@ -231,7 +266,7 @@ end
 -- exclusion_rules: optional list of {short_char, {conflicting_short_chars...}} pairs.
 -- tokens and macro_name default to the current RPM macro's arguments and name.
 function M.getopt(opt_spec, exclusion_rules, tokens, macro_name)
-    tokens = tokens or M.rpm_args()
+    tokens = normalize_tokens(tokens or M.rpm_args())
     macro_name = macro_name or rpm.expand("%0")
     local by_short, by_long = build_lookup(opt_spec)
     cleanup_macros(opt_spec)
@@ -249,7 +284,8 @@ function M.getopt(opt_spec, exclusion_rules, tokens, macro_name)
     define_macros(result.found, opt_spec)
 
     if #result.positional > 0 then
-        rpm.define("__pyproject_positional_args " .. table.concat(result.positional, " "))
+        local parts = quote_values(result.positional)
+        rpm.define("__pyproject_positional_args " .. table.concat(parts, " "))
     end
 end
 

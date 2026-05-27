@@ -8,9 +8,12 @@ arch=$(rpm --eval '%{_arch}')
 
 case $ID in
   "fedora")
-  if [ "${VARIANT_ID-}" == "eln" ]; then
-      version="eln"
-    fi
+    mock="fedora-${version}-${arch}"
+    repos="local"
+    ;;
+
+  "eln")
+    version="eln"
     mock="fedora-${version}-${arch}"
     repos="local"
     ;;
