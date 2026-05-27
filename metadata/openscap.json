@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_status": "modified",
+  "modification_reason": "Patch signature.c to not call OPENSSL_cleanup() after validation (https://github.com/OpenSCAP/openscap/issues/2358)",
   "release": "1",
   "sha": "ea86fc4eff9ecd5a54a20860c794c6227ab3be6c",
   "source": "https://src.fedoraproject.org/rpms/openscap.git",
