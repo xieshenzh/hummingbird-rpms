@@ -25,6 +25,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pyyaml-main:{{revision}}
     - name: package-name
@@ -90,6 +92,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/r-rpm-macros-main:{{revision}}
     - name: package-name
@@ -155,6 +159,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/shellcheck-main:{{revision}}
     - name: package-name
@@ -220,6 +226,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/abattis-cantarell-fonts-main:{{revision}}
     - name: package-name
@@ -285,6 +293,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/acl-main:{{revision}}
     - name: package-name
@@ -350,6 +360,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/alsa-lib-main:{{revision}}
     - name: package-name
@@ -415,6 +427,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/annobin-main:{{revision}}
     - name: package-name
@@ -480,6 +494,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ansible-packaging-main:{{revision}}
     - name: package-name
@@ -545,6 +561,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/aom-main:{{revision}}
     - name: package-name
@@ -610,6 +628,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/apr-main:{{revision}}
     - name: package-name
@@ -675,6 +695,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/apr-util-main:{{revision}}
     - name: package-name
@@ -740,6 +762,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/apt-main:{{revision}}
     - name: package-name
@@ -807,6 +831,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/attr-main:{{revision}}
     - name: package-name
@@ -872,6 +898,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/audit-main:{{revision}}
     - name: package-name
@@ -937,6 +965,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/authselect-main:{{revision}}
     - name: package-name
@@ -1002,6 +1032,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/autoconf-main:{{revision}}
     - name: package-name
@@ -1067,6 +1099,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/automake-main:{{revision}}
     - name: package-name
@@ -1132,6 +1166,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/avahi-main:{{revision}}
     - name: package-name
@@ -1197,6 +1233,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/babeltrace-main:{{revision}}
     - name: package-name
@@ -1262,6 +1300,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/bash-main:{{revision}}
     - name: package-name
@@ -1327,6 +1367,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/bash-completion-main:{{revision}}
     - name: package-name
@@ -1392,6 +1434,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/bind-main:{{revision}}
     - name: package-name
@@ -1457,6 +1501,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/binutils-main:{{revision}}
     - name: package-name
@@ -1522,6 +1568,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/boost-main:{{revision}}
     - name: package-name
@@ -1587,6 +1635,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/bootc-main:{{revision}}
     - name: package-name
@@ -1656,6 +1706,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/brotli-main:{{revision}}
     - name: package-name
@@ -1721,6 +1773,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/btrfs-progs-main:{{revision}}
     - name: package-name
@@ -1786,6 +1840,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/buildah-main:{{revision}}
     - name: package-name
@@ -1851,6 +1907,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/busybox-main:{{revision}}
     - name: package-name
@@ -1916,6 +1974,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/bzip2-main:{{revision}}
     - name: package-name
@@ -1981,6 +2041,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/c-ares-main:{{revision}}
     - name: package-name
@@ -2046,6 +2108,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ca-certificates-main:{{revision}}
     - name: package-name
@@ -2111,6 +2175,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/caddy-main:{{revision}}
     - name: package-name
@@ -2180,6 +2246,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/capstone-main:{{revision}}
     - name: package-name
@@ -2249,6 +2317,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cargo-rpm-macros-main:{{revision}}
     - name: package-name
@@ -2314,6 +2384,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cargo2rpm-main:{{revision}}
     - name: package-name
@@ -2379,6 +2451,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/catatonit-main:{{revision}}
     - name: package-name
@@ -2444,6 +2518,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/checkpolicy-main:{{revision}}
     - name: package-name
@@ -2509,6 +2585,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/chkconfig-main:{{revision}}
     - name: package-name
@@ -2574,6 +2652,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/chunkah-main:{{revision}}
     - name: package-name
@@ -2639,6 +2719,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cloud-init-main:{{revision}}
     - name: package-name
@@ -2708,6 +2790,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cmake-main:{{revision}}
     - name: package-name
@@ -2773,6 +2857,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/composefs-main:{{revision}}
     - name: package-name
@@ -2838,6 +2924,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/composer-main:{{revision}}
     - name: package-name
@@ -2903,6 +2991,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/container-selinux-main:{{revision}}
     - name: package-name
@@ -2968,6 +3058,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/containers-common-main:{{revision}}
     - name: package-name
@@ -3033,6 +3125,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/coreutils-main:{{revision}}
     - name: package-name
@@ -3098,6 +3192,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cosign-main:{{revision}}
     - name: package-name
@@ -3167,6 +3263,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cpio-main:{{revision}}
     - name: package-name
@@ -3232,6 +3330,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cracklib-main:{{revision}}
     - name: package-name
@@ -3297,6 +3397,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/createrepo-c-main:{{revision}}
     - name: package-name
@@ -3362,6 +3464,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/crypto-policies-main:{{revision}}
     - name: package-name
@@ -3427,6 +3531,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cryptsetup-main:{{revision}}
     - name: package-name
@@ -3492,6 +3598,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ctags-main:{{revision}}
     - name: package-name
@@ -3557,6 +3665,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cups-main:{{revision}}
     - name: package-name
@@ -3622,6 +3732,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/curl-main:{{revision}}
     - name: package-name
@@ -3695,6 +3807,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/cyrus-sasl-main:{{revision}}
     - name: package-name
@@ -3760,6 +3874,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dav1d-main:{{revision}}
     - name: package-name
@@ -3825,6 +3941,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dbus-main:{{revision}}
     - name: package-name
@@ -3890,6 +4008,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dbus-broker-main:{{revision}}
     - name: package-name
@@ -3957,6 +4077,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/debugedit-main:{{revision}}
     - name: package-name
@@ -4026,6 +4148,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/diffutils-main:{{revision}}
     - name: package-name
@@ -4091,6 +4215,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dnf-main:{{revision}}
     - name: package-name
@@ -4156,6 +4282,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dnf5-main:{{revision}}
     - name: package-name
@@ -4221,6 +4349,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dns-root-data-main:{{revision}}
     - name: package-name
@@ -4296,6 +4426,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dotnet10-0-main:{{revision}}
     - name: package-name
@@ -4361,6 +4493,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dotnet8-0-main:{{revision}}
     - name: package-name
@@ -4426,6 +4560,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dotnet9-0-main:{{revision}}
     - name: package-name
@@ -4493,6 +4629,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dracut-main:{{revision}}
     - name: package-name
@@ -4558,6 +4696,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/drpm-main:{{revision}}
     - name: package-name
@@ -4623,6 +4763,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/dwz-main:{{revision}}
     - name: package-name
@@ -4688,6 +4830,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/e2fsprogs-main:{{revision}}
     - name: package-name
@@ -4753,6 +4897,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ecj-main:{{revision}}
     - name: package-name
@@ -4818,6 +4964,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ed-main:{{revision}}
     - name: package-name
@@ -4883,6 +5031,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/efi-rpm-macros-main:{{revision}}
     - name: package-name
@@ -4948,6 +5098,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/elfutils-main:{{revision}}
     - name: package-name
@@ -5017,6 +5169,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/emacs-filesystem-main:{{revision}}
     - name: package-name
@@ -5082,6 +5236,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/erlang-rpm-macros-main:{{revision}}
     - name: package-name
@@ -5149,6 +5305,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/expat-main:{{revision}}
     - name: package-name
@@ -5218,6 +5376,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fedora-logos-main:{{revision}}
     - name: package-name
@@ -5285,6 +5445,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fedora-repos-main:{{revision}}
     - name: package-name
@@ -5350,6 +5512,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/file-main:{{revision}}
     - name: package-name
@@ -5415,6 +5579,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/filesystem-main:{{revision}}
     - name: package-name
@@ -5480,6 +5646,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/findutils-main:{{revision}}
     - name: package-name
@@ -5553,6 +5721,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fmt-main:{{revision}}
     - name: package-name
@@ -5618,6 +5788,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fontconfig-main:{{revision}}
     - name: package-name
@@ -5687,6 +5859,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fonts-rpm-macros-main:{{revision}}
     - name: package-name
@@ -5754,6 +5928,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/forge-srpm-macros-main:{{revision}}
     - name: package-name
@@ -5819,6 +5995,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fpc-srpm-macros-main:{{revision}}
     - name: package-name
@@ -5886,6 +6064,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/freetype-main:{{revision}}
     - name: package-name
@@ -5951,6 +6131,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fstrm-main:{{revision}}
     - name: package-name
@@ -6016,6 +6198,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fsverity-utils-main:{{revision}}
     - name: package-name
@@ -6083,6 +6267,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/fuse3-main:{{revision}}
     - name: package-name
@@ -6150,6 +6336,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gap-srpm-macros-main:{{revision}}
     - name: package-name
@@ -6215,6 +6403,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gawk-main:{{revision}}
     - name: package-name
@@ -6280,6 +6470,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gcc-main:{{revision}}
     - name: package-name
@@ -6347,6 +6539,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gd-main:{{revision}}
     - name: package-name
@@ -6412,6 +6606,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gdb-main:{{revision}}
     - name: package-name
@@ -6477,6 +6673,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gdbm-main:{{revision}}
     - name: package-name
@@ -6542,6 +6740,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gettext-main:{{revision}}
     - name: package-name
@@ -6623,6 +6823,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ghc-srpm-macros-main:{{revision}}
     - name: package-name
@@ -6690,6 +6892,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/git-main:{{revision}}
     - name: package-name
@@ -6755,6 +6959,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/glib2-main:{{revision}}
     - name: package-name
@@ -6820,6 +7026,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/glibc-main:{{revision}}
     - name: package-name
@@ -6889,6 +7097,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gmp-main:{{revision}}
     - name: package-name
@@ -6954,6 +7164,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gnat-srpm-macros-main:{{revision}}
     - name: package-name
@@ -7019,6 +7231,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gnulib-l10n-main:{{revision}}
     - name: package-name
@@ -7086,6 +7300,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gnupg2-main:{{revision}}
     - name: package-name
@@ -7151,6 +7367,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gnutls-main:{{revision}}
     - name: package-name
@@ -7216,6 +7434,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/go-fdo-client-main:{{revision}}
     - name: package-name
@@ -7281,6 +7501,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/go-fdo-server-main:{{revision}}
     - name: package-name
@@ -7346,6 +7568,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/go-md2man-main:{{revision}}
     - name: package-name
@@ -7411,6 +7635,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/go-rpm-macros-main:{{revision}}
     - name: package-name
@@ -7482,6 +7708,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/golang-fips1-25-main:{{revision}}
     - name: package-name
@@ -7551,6 +7779,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/golang1-25-main:{{revision}}
     - name: package-name
@@ -7616,6 +7846,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/golang1-26-main:{{revision}}
     - name: package-name
@@ -7681,6 +7913,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/golist-main:{{revision}}
     - name: package-name
@@ -7746,6 +7980,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/google-noto-fonts-main:{{revision}}
     - name: package-name
@@ -7813,6 +8049,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gperftools-main:{{revision}}
     - name: package-name
@@ -7878,6 +8116,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gpgme-main:{{revision}}
     - name: package-name
@@ -7943,6 +8183,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gpgverify-main:{{revision}}
     - name: package-name
@@ -8010,6 +8252,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/graphite2-main:{{revision}}
     - name: package-name
@@ -8075,6 +8319,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/graphviz-main:{{revision}}
     - name: package-name
@@ -8140,6 +8386,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/grep-main:{{revision}}
     - name: package-name
@@ -8205,6 +8453,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/groff-main:{{revision}}
     - name: package-name
@@ -8280,6 +8530,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/gzip-main:{{revision}}
     - name: package-name
@@ -8345,6 +8597,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/haproxy-main:{{revision}}
     - name: package-name
@@ -8416,6 +8670,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/harfbuzz-main:{{revision}}
     - name: package-name
@@ -8485,6 +8741,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/hiredis-main:{{revision}}
     - name: package-name
@@ -8550,6 +8808,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/hostname-main:{{revision}}
     - name: package-name
@@ -8615,6 +8875,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/httpd-main:{{revision}}
     - name: package-name
@@ -8684,6 +8946,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/hugo-main:{{revision}}
     - name: package-name
@@ -8749,6 +9013,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/hummingbird-release-main:{{revision}}
     - name: package-name
@@ -8814,6 +9080,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/icu-main:{{revision}}
     - name: package-name
@@ -8879,6 +9147,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ima-evm-utils-main:{{revision}}
     - name: package-name
@@ -8946,6 +9216,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/iproute-main:{{revision}}
     - name: package-name
@@ -9017,6 +9289,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/jansson-main:{{revision}}
     - name: package-name
@@ -9082,6 +9356,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/java-21-openjdk-main:{{revision}}
     - name: package-name
@@ -9147,6 +9423,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/java-21-openjdk-portable-main:{{revision}}
     - name: package-name
@@ -9212,6 +9490,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/java-25-openjdk-main:{{revision}}
     - name: package-name
@@ -9277,6 +9557,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/java-25-openjdk-portable-main:{{revision}}
     - name: package-name
@@ -9342,6 +9624,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/java-rpm-macros-main:{{revision}}
     - name: package-name
@@ -9407,6 +9691,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/javapackages-tools-main:{{revision}}
     - name: package-name
@@ -9472,6 +9758,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/jbigkit-main:{{revision}}
     - name: package-name
@@ -9537,6 +9825,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/jemalloc-main:{{revision}}
     - name: package-name
@@ -9604,6 +9894,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/jq-main:{{revision}}
     - name: package-name
@@ -9669,6 +9961,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/json-c-main:{{revision}}
     - name: package-name
@@ -9736,6 +10030,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/kbd-main:{{revision}}
     - name: package-name
@@ -9805,6 +10101,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/kernel-headers-main:{{revision}}
     - name: package-name
@@ -9870,6 +10168,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/kernel-srpm-macros-main:{{revision}}
     - name: package-name
@@ -9935,6 +10235,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/keyutils-main:{{revision}}
     - name: package-name
@@ -10000,6 +10302,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/kmod-main:{{revision}}
     - name: package-name
@@ -10065,6 +10369,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/krb5-main:{{revision}}
     - name: package-name
@@ -10130,6 +10436,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/kubernetes1-35-main:{{revision}}
     - name: package-name
@@ -10197,6 +10505,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/langpacks-main:{{revision}}
     - name: package-name
@@ -10262,6 +10572,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/less-main:{{revision}}
     - name: package-name
@@ -10327,6 +10639,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libx11-main:{{revision}}
     - name: package-name
@@ -10392,6 +10706,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxau-main:{{revision}}
     - name: package-name
@@ -10457,6 +10773,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxcomposite-main:{{revision}}
     - name: package-name
@@ -10522,6 +10840,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxext-main:{{revision}}
     - name: package-name
@@ -10587,6 +10907,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxft-main:{{revision}}
     - name: package-name
@@ -10652,6 +10974,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxi-main:{{revision}}
     - name: package-name
@@ -10717,6 +11041,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxpm-main:{{revision}}
     - name: package-name
@@ -10782,6 +11108,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxrender-main:{{revision}}
     - name: package-name
@@ -10847,6 +11175,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxtst-main:{{revision}}
     - name: package-name
@@ -10912,6 +11242,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libaio-main:{{revision}}
     - name: package-name
@@ -10977,6 +11309,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libarchive-main:{{revision}}
     - name: package-name
@@ -11042,6 +11376,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libassuan-main:{{revision}}
     - name: package-name
@@ -11107,6 +11443,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libavif-main:{{revision}}
     - name: package-name
@@ -11172,6 +11510,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libb2-main:{{revision}}
     - name: package-name
@@ -11237,6 +11577,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libbpf-main:{{revision}}
     - name: package-name
@@ -11302,6 +11644,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libcap-main:{{revision}}
     - name: package-name
@@ -11367,6 +11711,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libcap-ng-main:{{revision}}
     - name: package-name
@@ -11432,6 +11778,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libcbor-main:{{revision}}
     - name: package-name
@@ -11497,6 +11845,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libcomps-main:{{revision}}
     - name: package-name
@@ -11562,6 +11912,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libdnf-main:{{revision}}
     - name: package-name
@@ -11627,6 +11979,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libeconf-main:{{revision}}
     - name: package-name
@@ -11692,6 +12046,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libedit-main:{{revision}}
     - name: package-name
@@ -11757,6 +12113,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libevent-main:{{revision}}
     - name: package-name
@@ -11822,6 +12180,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libffi-main:{{revision}}
     - name: package-name
@@ -11887,6 +12247,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libfido2-main:{{revision}}
     - name: package-name
@@ -11952,6 +12314,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libfontenc-main:{{revision}}
     - name: package-name
@@ -12017,6 +12381,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libgcrypt-main:{{revision}}
     - name: package-name
@@ -12082,6 +12448,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libgit2-main:{{revision}}
     - name: package-name
@@ -12147,6 +12515,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libgpg-error-main:{{revision}}
     - name: package-name
@@ -12212,6 +12582,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libidn2-main:{{revision}}
     - name: package-name
@@ -12277,6 +12649,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libipt-main:{{revision}}
     - name: package-name
@@ -12342,6 +12716,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libjpeg-turbo-main:{{revision}}
     - name: package-name
@@ -12407,6 +12783,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libkcapi-main:{{revision}}
     - name: package-name
@@ -12472,6 +12850,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libksba-main:{{revision}}
     - name: package-name
@@ -12537,6 +12917,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/liblerc-main:{{revision}}
     - name: package-name
@@ -12602,6 +12984,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libmaxminddb-main:{{revision}}
     - name: package-name
@@ -12667,6 +13051,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libmnl-main:{{revision}}
     - name: package-name
@@ -12732,6 +13118,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libmodulemd-main:{{revision}}
     - name: package-name
@@ -12797,6 +13185,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libmpc-main:{{revision}}
     - name: package-name
@@ -12862,6 +13252,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libnl3-main:{{revision}}
     - name: package-name
@@ -12927,6 +13319,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libnsl2-main:{{revision}}
     - name: package-name
@@ -12992,6 +13386,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libpipeline-main:{{revision}}
     - name: package-name
@@ -13057,6 +13453,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libpng-main:{{revision}}
     - name: package-name
@@ -13126,6 +13524,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libpsl-main:{{revision}}
     - name: package-name
@@ -13191,6 +13591,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libpwquality-main:{{revision}}
     - name: package-name
@@ -13256,6 +13658,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/librepo-main:{{revision}}
     - name: package-name
@@ -13321,6 +13725,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libseccomp-main:{{revision}}
     - name: package-name
@@ -13386,6 +13792,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libselinux-main:{{revision}}
     - name: package-name
@@ -13451,6 +13859,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libsemanage-main:{{revision}}
     - name: package-name
@@ -13516,6 +13926,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libsepol-main:{{revision}}
     - name: package-name
@@ -13581,6 +13993,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libsodium-main:{{revision}}
     - name: package-name
@@ -13646,6 +14060,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libsolv-main:{{revision}}
     - name: package-name
@@ -13711,6 +14127,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libssh-main:{{revision}}
     - name: package-name
@@ -13776,6 +14194,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libssh2-main:{{revision}}
     - name: package-name
@@ -13843,6 +14263,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libtasn1-main:{{revision}}
     - name: package-name
@@ -13908,6 +14330,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libtiff-main:{{revision}}
     - name: package-name
@@ -13973,6 +14397,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libtirpc-main:{{revision}}
     - name: package-name
@@ -14038,6 +14464,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libtommath-main:{{revision}}
     - name: package-name
@@ -14103,6 +14531,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libtool-main:{{revision}}
     - name: package-name
@@ -14168,6 +14598,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libunistring-main:{{revision}}
     - name: package-name
@@ -14233,6 +14665,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libunwind-main:{{revision}}
     - name: package-name
@@ -14298,6 +14732,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libusb1-main:{{revision}}
     - name: package-name
@@ -14363,6 +14799,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libuv-main:{{revision}}
     - name: package-name
@@ -14428,6 +14866,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libverto-main:{{revision}}
     - name: package-name
@@ -14495,6 +14935,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libwebp-main:{{revision}}
     - name: package-name
@@ -14560,6 +15002,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxcb-main:{{revision}}
     - name: package-name
@@ -14625,6 +15069,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxcrypt-main:{{revision}}
     - name: package-name
@@ -14690,6 +15136,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxml2-main:{{revision}}
     - name: package-name
@@ -14759,6 +15207,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libxslt-main:{{revision}}
     - name: package-name
@@ -14828,6 +15278,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libyaml-main:{{revision}}
     - name: package-name
@@ -14893,6 +15345,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libyuv-main:{{revision}}
     - name: package-name
@@ -14958,6 +15412,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/libzip-main:{{revision}}
     - name: package-name
@@ -15029,6 +15485,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lksctp-tools-main:{{revision}}
     - name: package-name
@@ -15094,6 +15552,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/llhttp-main:{{revision}}
     - name: package-name
@@ -15159,6 +15619,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/llvm-main:{{revision}}
     - name: package-name
@@ -15226,6 +15688,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/llvm21-main:{{revision}}
     - name: package-name
@@ -15291,6 +15755,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lmdb-main:{{revision}}
     - name: package-name
@@ -15356,6 +15822,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/logrotate-main:{{revision}}
     - name: package-name
@@ -15421,6 +15889,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lua-main:{{revision}}
     - name: package-name
@@ -15486,6 +15956,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lua-rpm-macros-main:{{revision}}
     - name: package-name
@@ -15551,6 +16023,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lujavrite-main:{{revision}}
     - name: package-name
@@ -15616,6 +16090,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lvm2-main:{{revision}}
     - name: package-name
@@ -15681,6 +16157,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lz4-main:{{revision}}
     - name: package-name
@@ -15748,6 +16226,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/lzo-main:{{revision}}
     - name: package-name
@@ -15813,6 +16293,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/m4-main:{{revision}}
     - name: package-name
@@ -15878,6 +16360,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mailcap-main:{{revision}}
     - name: package-name
@@ -15943,6 +16427,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/make-main:{{revision}}
     - name: package-name
@@ -16008,6 +16494,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/man-db-main:{{revision}}
     - name: package-name
@@ -16073,6 +16561,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mariadb-connector-c-main:{{revision}}
     - name: package-name
@@ -16138,6 +16628,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mariadb10-11-main:{{revision}}
     - name: package-name
@@ -16203,6 +16695,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mariadb11-8-main:{{revision}}
     - name: package-name
@@ -16268,6 +16762,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mawk-main:{{revision}}
     - name: package-name
@@ -16333,6 +16829,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/memcached-main:{{revision}}
     - name: package-name
@@ -16398,6 +16896,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/meson-main:{{revision}}
     - name: package-name
@@ -16491,6 +16991,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mkfontscale-main:{{revision}}
     - name: package-name
@@ -16560,6 +17062,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mpdecimal-main:{{revision}}
     - name: package-name
@@ -16625,6 +17129,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/mpfr-main:{{revision}}
     - name: package-name
@@ -16696,6 +17202,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ncurses-main:{{revision}}
     - name: package-name
@@ -16767,6 +17275,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nettle-main:{{revision}}
     - name: package-name
@@ -16834,6 +17344,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nghttp2-main:{{revision}}
     - name: package-name
@@ -16899,6 +17411,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nghttp3-main:{{revision}}
     - name: package-name
@@ -16964,6 +17478,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nginx-main:{{revision}}
     - name: package-name
@@ -17029,6 +17545,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ngtcp2-main:{{revision}}
     - name: package-name
@@ -17094,6 +17612,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ninja-build-main:{{revision}}
     - name: package-name
@@ -17163,6 +17683,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs20-main:{{revision}}
     - name: package-name
@@ -17228,6 +17750,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs22-main:{{revision}}
     - name: package-name
@@ -17293,6 +17817,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs24-main:{{revision}}
     - name: package-name
@@ -17358,6 +17884,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs25-main:{{revision}}
     - name: package-name
@@ -17427,6 +17955,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs26-main:{{revision}}
     - name: package-name
@@ -17496,6 +18026,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/npth-main:{{revision}}
     - name: package-name
@@ -17561,6 +18093,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nss-main:{{revision}}
     - name: package-name
@@ -17626,6 +18160,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/nss-fips-main:{{revision}}
     - name: package-name
@@ -17699,6 +18235,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ocaml-srpm-macros-main:{{revision}}
     - name: package-name
@@ -17764,6 +18302,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/oniguruma-main:{{revision}}
     - name: package-name
@@ -17829,6 +18369,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openblas-srpm-macros-main:{{revision}}
     - name: package-name
@@ -17894,6 +18436,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/opendbx-main:{{revision}}
     - name: package-name
@@ -17959,6 +18503,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openldap-main:{{revision}}
     - name: package-name
@@ -18028,6 +18574,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openscap-main:{{revision}}
     - name: package-name
@@ -18093,6 +18641,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openssh-main:{{revision}}
     - name: package-name
@@ -18158,6 +18708,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openssl-main:{{revision}}
     - name: package-name
@@ -18227,6 +18779,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/openssl-fips-provider-main:{{revision}}
     - name: package-name
@@ -18296,6 +18850,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/oras-main:{{revision}}
     - name: package-name
@@ -18365,6 +18921,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ostree-main:{{revision}}
     - name: package-name
@@ -18430,6 +18988,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/p11-kit-main:{{revision}}
     - name: package-name
@@ -18495,6 +19055,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/package-notes-main:{{revision}}
     - name: package-name
@@ -18560,6 +19122,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pam-main:{{revision}}
     - name: package-name
@@ -18629,6 +19193,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/patch-main:{{revision}}
     - name: package-name
@@ -18694,6 +19260,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pcre2-main:{{revision}}
     - name: package-name
@@ -18761,6 +19329,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-main:{{revision}}
     - name: package-name
@@ -18828,6 +19398,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-carp-main:{{revision}}
     - name: package-name
@@ -18893,6 +19465,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-data-dumper-main:{{revision}}
     - name: package-name
@@ -18958,6 +19532,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-digest-main:{{revision}}
     - name: package-name
@@ -19023,6 +19599,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-digest-md5-main:{{revision}}
     - name: package-name
@@ -19088,6 +19666,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-encode-main:{{revision}}
     - name: package-name
@@ -19153,6 +19733,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-error-main:{{revision}}
     - name: package-name
@@ -19218,6 +19800,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-exporter-main:{{revision}}
     - name: package-name
@@ -19283,6 +19867,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-file-path-main:{{revision}}
     - name: package-name
@@ -19348,6 +19934,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-file-temp-main:{{revision}}
     - name: package-name
@@ -19413,6 +20001,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-getopt-long-main:{{revision}}
     - name: package-name
@@ -19478,6 +20068,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-http-tiny-main:{{revision}}
     - name: package-name
@@ -19543,6 +20135,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-io-socket-ip-main:{{revision}}
     - name: package-name
@@ -19608,6 +20202,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-io-socket-ssl-main:{{revision}}
     - name: package-name
@@ -19673,6 +20269,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-mime-base32-main:{{revision}}
     - name: package-name
@@ -19738,6 +20336,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-mime-base64-main:{{revision}}
     - name: package-name
@@ -19803,6 +20403,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-net-ssleay-main:{{revision}}
     - name: package-name
@@ -19868,6 +20470,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-pathtools-main:{{revision}}
     - name: package-name
@@ -19933,6 +20537,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-pod-escapes-main:{{revision}}
     - name: package-name
@@ -19998,6 +20604,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-pod-perldoc-main:{{revision}}
     - name: package-name
@@ -20063,6 +20671,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-pod-simple-main:{{revision}}
     - name: package-name
@@ -20128,6 +20738,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-pod-usage-main:{{revision}}
     - name: package-name
@@ -20193,6 +20805,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-scalar-list-utils-main:{{revision}}
     - name: package-name
@@ -20258,6 +20872,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-socket-main:{{revision}}
     - name: package-name
@@ -20323,6 +20939,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-storable-main:{{revision}}
     - name: package-name
@@ -20388,6 +21006,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-term-ansicolor-main:{{revision}}
     - name: package-name
@@ -20453,6 +21073,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-term-cap-main:{{revision}}
     - name: package-name
@@ -20518,6 +21140,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-termreadkey-main:{{revision}}
     - name: package-name
@@ -20583,6 +21207,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-text-parsewords-main:{{revision}}
     - name: package-name
@@ -20648,6 +21274,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-text-tabs-wrap-main:{{revision}}
     - name: package-name
@@ -20713,6 +21341,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-thread-queue-main:{{revision}}
     - name: package-name
@@ -20778,6 +21408,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-time-hires-main:{{revision}}
     - name: package-name
@@ -20843,6 +21475,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-time-local-main:{{revision}}
     - name: package-name
@@ -20908,6 +21542,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-uri-main:{{revision}}
     - name: package-name
@@ -20975,6 +21611,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-constant-main:{{revision}}
     - name: package-name
@@ -21042,6 +21680,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-libnet-main:{{revision}}
     - name: package-name
@@ -21107,6 +21747,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-parent-main:{{revision}}
     - name: package-name
@@ -21172,6 +21814,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-podlators-main:{{revision}}
     - name: package-name
@@ -21237,6 +21881,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-srpm-macros-main:{{revision}}
     - name: package-name
@@ -21302,6 +21948,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-threads-main:{{revision}}
     - name: package-name
@@ -21367,6 +22015,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/perl-threads-shared-main:{{revision}}
     - name: package-name
@@ -21432,6 +22082,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/php-main:{{revision}}
     - name: package-name
@@ -21499,6 +22151,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/php-patchwork-jsqueeze-main:{{revision}}
     - name: package-name
@@ -21566,6 +22220,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/php-pecl-zip-main:{{revision}}
     - name: package-name
@@ -21633,6 +22289,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pkgconf-main:{{revision}}
     - name: package-name
@@ -21702,6 +22360,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/podman-main:{{revision}}
     - name: package-name
@@ -21767,6 +22427,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/policycoreutils-main:{{revision}}
     - name: package-name
@@ -21832,6 +22494,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/poppler-main:{{revision}}
     - name: package-name
@@ -21897,6 +22561,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/popt-main:{{revision}}
     - name: package-name
@@ -21962,6 +22628,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/postgresql17-main:{{revision}}
     - name: package-name
@@ -22027,6 +22695,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/postgresql18-main:{{revision}}
     - name: package-name
@@ -22096,6 +22766,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/procps-ng-main:{{revision}}
     - name: package-name
@@ -22163,6 +22835,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/protobuf-c-main:{{revision}}
     - name: package-name
@@ -22228,6 +22902,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/psmisc-main:{{revision}}
     - name: package-name
@@ -22295,6 +22971,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/publicsuffix-list-main:{{revision}}
     - name: package-name
@@ -22360,6 +23038,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pyopenssl-main:{{revision}}
     - name: package-name
@@ -22427,6 +23107,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pyproject-rpm-macros-main:{{revision}}
     - name: package-name
@@ -22492,6 +23174,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/pytest-main:{{revision}}
     - name: package-name
@@ -22561,6 +23245,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-attrs-main:{{revision}}
     - name: package-name
@@ -22630,6 +23316,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-certifi-main:{{revision}}
     - name: package-name
@@ -22695,6 +23383,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-charset-normalizer-main:{{revision}}
     - name: package-name
@@ -22760,6 +23450,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-cryptography-main:{{revision}}
     - name: package-name
@@ -22837,6 +23529,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-gitlab-main:{{revision}}
     - name: package-name
@@ -22904,6 +23598,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-idna-main:{{revision}}
     - name: package-name
@@ -22971,6 +23667,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-iniconfig-main:{{revision}}
     - name: package-name
@@ -23038,6 +23736,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-jinja2-main:{{revision}}
     - name: package-name
@@ -23103,6 +23803,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-jinja2-cli-main:{{revision}}
     - name: package-name
@@ -23168,6 +23870,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-jsonschema-main:{{revision}}
     - name: package-name
@@ -23233,6 +23937,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-jsonschema-specifications-main:{{revision}}
     - name: package-name
@@ -23300,6 +24006,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-markupsafe-main:{{revision}}
     - name: package-name
@@ -23367,6 +24075,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-mypy-extensions-main:{{revision}}
     - name: package-name
@@ -23432,6 +24142,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-packaging-main:{{revision}}
     - name: package-name
@@ -23497,6 +24209,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-pathspec-main:{{revision}}
     - name: package-name
@@ -23564,6 +24278,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-pip-main:{{revision}}
     - name: package-name
@@ -23629,6 +24345,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-pluggy-main:{{revision}}
     - name: package-name
@@ -23696,6 +24414,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-productmd-main:{{revision}}
     - name: package-name
@@ -23761,6 +24481,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-pygments-main:{{revision}}
     - name: package-name
@@ -23834,6 +24556,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-referencing-main:{{revision}}
     - name: package-name
@@ -23899,6 +24623,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-requests-main:{{revision}}
     - name: package-name
@@ -23964,6 +24690,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-requests-toolbelt-main:{{revision}}
     - name: package-name
@@ -24029,6 +24757,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-rpds-py-main:{{revision}}
     - name: package-name
@@ -24096,6 +24826,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-rpm-lockfile-prototype-main:{{revision}}
     - name: package-name
@@ -24165,6 +24897,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-rpm-macros-main:{{revision}}
     - name: package-name
@@ -24230,6 +24964,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-sentry-sdk-main:{{revision}}
     - name: package-name
@@ -24295,6 +25031,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-setuptools-main:{{revision}}
     - name: package-name
@@ -24360,6 +25098,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-specfile-main:{{revision}}
     - name: package-name
@@ -24439,6 +25179,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-trustme-main:{{revision}}
     - name: package-name
@@ -24506,6 +25248,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-types-pyyaml-main:{{revision}}
     - name: package-name
@@ -24571,6 +25315,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-types-requests-main:{{revision}}
     - name: package-name
@@ -24636,6 +25382,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-typing-extensions-main:{{revision}}
     - name: package-name
@@ -24701,6 +25449,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python-urllib3-main:{{revision}}
     - name: package-name
@@ -24772,6 +25522,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python3-mypy-main:{{revision}}
     - name: package-name
@@ -24837,6 +25589,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python3-11-main:{{revision}}
     - name: package-name
@@ -24902,6 +25656,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python3-12-main:{{revision}}
     - name: package-name
@@ -24967,6 +25723,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python3-13-main:{{revision}}
     - name: package-name
@@ -25032,6 +25790,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/python3-14-main:{{revision}}
     - name: package-name
@@ -25101,6 +25861,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/qt5-main:{{revision}}
     - name: package-name
@@ -25168,6 +25930,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/qt6-main:{{revision}}
     - name: package-name
@@ -25235,6 +25999,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rdma-core-main:{{revision}}
     - name: package-name
@@ -25300,6 +26066,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/readline-main:{{revision}}
     - name: package-name
@@ -25365,6 +26133,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/redhat-rpm-config-main:{{revision}}
     - name: package-name
@@ -25434,6 +26204,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rootfiles-main:{{revision}}
     - name: package-name
@@ -25499,6 +26271,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rpm-main:{{revision}}
     - name: package-name
@@ -25566,6 +26340,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ruby3-3-main:{{revision}}
     - name: package-name
@@ -25631,6 +26407,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ruby3-4-main:{{revision}}
     - name: package-name
@@ -25696,6 +26474,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ruby4-0-main:{{revision}}
     - name: package-name
@@ -25763,6 +26543,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rubypick-main:{{revision}}
     - name: package-name
@@ -25828,6 +26610,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ruff-main:{{revision}}
     - name: package-name
@@ -25893,6 +26677,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-main:{{revision}}
     - name: package-name
@@ -25975,6 +26761,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-add-determinism-main:{{revision}}
     - name: package-name
@@ -26040,6 +26828,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-archery-main:{{revision}}
     - name: package-name
@@ -26105,6 +26895,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-imagequant-sys-main:{{revision}}
     - name: package-name
@@ -26170,6 +26962,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-podman-sequoia-main:{{revision}}
     - name: package-name
@@ -26235,6 +27029,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-rav1e-main:{{revision}}
     - name: package-name
@@ -26300,6 +27096,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-rpds-main:{{revision}}
     - name: package-name
@@ -26365,6 +27163,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/rust-rpm-sequoia-main:{{revision}}
     - name: package-name
@@ -26434,6 +27234,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/scap-security-guide-main:{{revision}}
     - name: package-name
@@ -26503,6 +27305,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/sdbus-cpp-main:{{revision}}
     - name: package-name
@@ -26568,6 +27372,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/sed-main:{{revision}}
     - name: package-name
@@ -26633,6 +27439,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/selinux-policy-main:{{revision}}
     - name: package-name
@@ -26698,6 +27506,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/setup-main:{{revision}}
     - name: package-name
@@ -26763,6 +27573,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/sgml-common-main:{{revision}}
     - name: package-name
@@ -26828,6 +27640,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/shadow-utils-main:{{revision}}
     - name: package-name
@@ -26893,6 +27707,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/skopeo-main:{{revision}}
     - name: package-name
@@ -26960,6 +27776,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/snappy-main:{{revision}}
     - name: package-name
@@ -27027,6 +27845,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/source-highlight-main:{{revision}}
     - name: package-name
@@ -27092,6 +27912,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/sqlite-main:{{revision}}
     - name: package-name
@@ -27159,6 +27981,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/subversion-main:{{revision}}
     - name: package-name
@@ -27224,6 +28048,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/svt-av1-main:{{revision}}
     - name: package-name
@@ -27289,6 +28115,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/syft-main:{{revision}}
     - name: package-name
@@ -27358,6 +28186,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/sysprof-main:{{revision}}
     - name: package-name
@@ -27423,6 +28253,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/systemd-main:{{revision}}
     - name: package-name
@@ -27488,6 +28320,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/systemd-stub-main:{{revision}}
     - name: package-name
@@ -27555,6 +28389,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tar-main:{{revision}}
     - name: package-name
@@ -27620,6 +28456,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tcl-main:{{revision}}
     - name: package-name
@@ -27687,6 +28525,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tk-main:{{revision}}
     - name: package-name
@@ -27754,6 +28594,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tomcat10-main:{{revision}}
     - name: package-name
@@ -27819,6 +28661,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tomcat11-main:{{revision}}
     - name: package-name
@@ -27888,6 +28732,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tpm2-tss-main:{{revision}}
     - name: package-name
@@ -27953,6 +28799,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tree-sitter-srpm-macros-main:{{revision}}
     - name: package-name
@@ -28018,6 +28866,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/trivy-main:{{revision}}
     - name: package-name
@@ -28083,6 +28933,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/ttmkfdir-main:{{revision}}
     - name: package-name
@@ -28148,6 +29000,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/tzdata-main:{{revision}}
     - name: package-name
@@ -28213,6 +29067,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/unbound-main:{{revision}}
     - name: package-name
@@ -28278,6 +29134,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/unzip-main:{{revision}}
     - name: package-name
@@ -28343,6 +29201,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/uriparser-main:{{revision}}
     - name: package-name
@@ -28408,6 +29268,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/util-linux-main:{{revision}}
     - name: package-name
@@ -28473,6 +29335,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/uuid-main:{{revision}}
     - name: package-name
@@ -28538,6 +29402,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/valkey-main:{{revision}}
     - name: package-name
@@ -28607,6 +29473,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/vmaf-main:{{revision}}
     - name: package-name
@@ -28672,6 +29540,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/which-main:{{revision}}
     - name: package-name
@@ -28739,6 +29609,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/xcaddy-main:{{revision}}
     - name: package-name
@@ -28808,6 +29680,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/xmlsec1-main:{{revision}}
     - name: package-name
@@ -28877,6 +29751,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/xorg-x11-fonts-main:{{revision}}
     - name: package-name
@@ -28942,6 +29818,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/xxhash-main:{{revision}}
     - name: package-name
@@ -29007,6 +29885,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/xz-main:{{revision}}
     - name: package-name
@@ -29072,6 +29952,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/yq-main:{{revision}}
     - name: package-name
@@ -29137,6 +30019,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/zchunk-main:{{revision}}
     - name: package-name
@@ -29202,6 +30086,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/zig-srpm-macros-main:{{revision}}
     - name: package-name
@@ -29267,6 +30153,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/zip-main:{{revision}}
     - name: package-name
@@ -29332,6 +30220,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/zlib-ng-main:{{revision}}
     - name: package-name
@@ -29397,6 +30287,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/zstd-main:{{revision}}
     - name: package-name
