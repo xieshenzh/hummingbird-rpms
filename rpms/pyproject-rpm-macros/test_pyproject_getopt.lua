@@ -268,6 +268,28 @@ function M.test_positional_with_spaces()
     assert_positional("module with spaces other")
 end
 
+function M.test_empty_positional_args()
+    pg.getopt(SAVE_FILES_SPEC, nil, {"", "foo", ""}, "test")
+    assert_positional(" foo ")
+end
+
+function M.test_whitespace_positional_args()
+    pg.getopt(SAVE_FILES_SPEC, nil, {" \t ", "foo", "\\\n"}, "test")
+    assert_positional("foo")
+end
+
+function M.test_newlines_embedded_in_tokens()
+    pg.getopt(CHECK_IMPORT_SPEC, nil,
+        {"\n-e", "mod.a", "-e", "mod.b\n-e", "mod.c", "-e", "mod.d\n"}, "test")
+    assert_value("e", "mod.a -e mod.b -e mod.c -e mod.d")
+end
+
+function M.test_trailing_backslash_stripped_after_newline_split()
+    pg.getopt(WHEEL_SPEC, nil,
+        {"-C\"key1=val1\" \\\n-C\"key2=val2\" \\\n-C\"key3=val3\"\n"}, "test")
+    assert_value("C", "\"key1=val1\",\"key2=val2\",\"key3=val3\"")
+end
+
 
 -- Errors
 

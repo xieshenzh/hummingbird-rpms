@@ -115,6 +115,13 @@ discover:
     - name: isort_c10s
       path: /tests
       test: ID=centos VERSION_ID=10 ./mocktest.sh python-isort
+  - name: rawhide_specs
+    how: shell
+    when: distro == fedora-rawhide
+    tests:
+    - name: rpm_specfile_check
+      path: /tests
+      test: ./test-rpm-specs-parse.sh
 prepare:
   - name: Install dependencies
     how: install

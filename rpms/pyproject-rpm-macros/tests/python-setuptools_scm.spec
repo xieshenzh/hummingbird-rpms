@@ -9,6 +9,7 @@ Source0:        %{pypi_source setuptools_scm}
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
+BuildRequires:  python3-pkg-resources
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  /usr/bin/git
 

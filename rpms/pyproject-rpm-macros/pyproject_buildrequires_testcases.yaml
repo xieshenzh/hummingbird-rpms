@@ -1925,6 +1925,36 @@ Dependency override drop_lower:
     python3dist(foo)
   result: 0
 
+Dependency override drop_lower (stderr contains overriden constraint):
+  installed:
+    setuptools: 50
+    wheel: 1
+    tomli: 1
+    bar: 1.5
+  include_runtime: false
+  dependency_overrides:
+    - "bar:drop_lower"
+  pyproject.toml: |
+    [build-system]
+    requires = ["setuptools", "wheel", "bar>=1.0,<2.0"]
+    build-backend = "setuptools.build_meta"
+  setup.cfg: |
+    [metadata]
+    name = test
+    version = 0.1
+  expected:
+    - |  # setuptools 70+
+      python3dist(bar) < 2~~
+      python3dist(setuptools)
+      python3dist(wheel)
+    - |  # setuptools < 70
+      python3dist(bar) < 2~~
+      python3dist(setuptools)
+      python3dist(wheel)
+      python3dist(wheel)
+  result: 0
+  stderr_contains: "Requirement satisfied: bar<2.0"
+
 Dependency override drop_constraints:
   installed:
     setuptools: 50

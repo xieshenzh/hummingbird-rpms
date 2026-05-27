@@ -74,7 +74,7 @@ def test_data(case_name, capfd, tmp_path, monkeypatch):
                 f'info not found for {dist_name}'
             )
     requirement_files = case.get('requirement_files', [])
-    requirement_files = [open(f) for f in requirement_files]
+    requirement_files = [Path(f) for f in requirement_files]
     use_build_system = case.get('use_build_system', True)
     pyproject_dependencies = case.get('pyproject_dependencies', False)
     try:
@@ -125,6 +125,3 @@ def test_data(case_name, capfd, tmp_path, monkeypatch):
                 stderr_contains = [stderr_contains]
             for expected_substring in stderr_contains:
                 assert expected_substring.format(**locals()) in err
-    finally:
-        for req in requirement_files:
-            req.close()
