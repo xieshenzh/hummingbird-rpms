@@ -9068,7 +9068,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[push]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/java-21-openjdk/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/java-21-openjdk/***, test/rpms/java-21-openjdk.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
@@ -9198,7 +9198,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[push]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/java-25-openjdk/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/java-25-openjdk/***, test/rpms/java-25-openjdk.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
