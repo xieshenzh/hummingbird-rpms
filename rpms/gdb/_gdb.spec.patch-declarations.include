@@ -57,3 +57,32 @@ Patch010: gdb-rhbz2413405-gcore-unreadable-pages.patch
 # components (e.g. "linux") in OUTDIR.
 Patch011: gdb-fileio-test-fixes.patch
 
+# Fix use of deprecated trace variable subcommand
+# (Tom de Vries)
+Patch012: gdb-fix-testsuite-newer-tcl.patch
+
+# Backport upstream commit 8bd08ee92c4 to address rhbz2366461.  This
+# commit will drop out with GDB 18.
+Patch013: gdb-rhbz2366461-missing-thread.patch
+
+# Backport upstream commit cd289df068e to address rhbz2366461.  This
+# commit will drop out with GDB 18.
+Patch014: gdb-rhbz2366461-bad-solib-entry-addr.patch
+
+# Backport the following upstream commits in order to address RHBZ
+# 2467251: d980317c7f1, 958d06262a7, 7d1d7386561, 8915de0883c,
+# 8f65ab7b71f.  These commits will all drop out when we rebase to GDB
+# 18.
+Patch015: gdb-rhbz2467251-computed-location-synthetic-pointers.patch
+
+# Fix EILSEQ problems for UTF8 related tests when using expect
+# enabled with Tcl 9 and full set of Tcl 9 compatibility fixes
+# from upstream PR80674 branch.  Required for testing GDB on
+# Fedora 44 and rawhide (Fedora 45).
+#
+# At the time of this Fedora commit, this patch was not upstream yet.
+# For its status, see:
+#
+# https://inbox.sourceware.org/gdb-patches/20260526192701.3835262-2-kevinb@redhat.com/T/#u
+Patch016: gdb-tcl9-utf8-encoding-fix.patch
+
