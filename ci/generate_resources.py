@@ -163,7 +163,7 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
             if "forked_from" in pkg_config:
                 rpm_data["forked_from"] = pkg_config["forked_from"]
 
-            extra_params = {}
+            extra_params = {"purl-rpm-namespace": "redhat"}
             if "extra_params" in pkg_config:
                 extra_params.update(pkg_config["extra_params"])
             if resource_type == "pull-request":

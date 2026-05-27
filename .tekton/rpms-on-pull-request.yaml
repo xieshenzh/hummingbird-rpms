@@ -26,6 +26,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -94,6 +96,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -162,6 +166,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -230,6 +236,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -298,6 +306,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -366,6 +376,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -434,6 +446,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -502,6 +516,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -570,6 +586,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -638,6 +656,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -706,6 +726,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -774,6 +796,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -844,6 +868,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -912,6 +938,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -980,6 +1008,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1048,6 +1078,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1116,6 +1148,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1184,6 +1218,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1252,6 +1288,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1320,6 +1358,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1388,6 +1428,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1456,6 +1498,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1524,6 +1568,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1592,6 +1638,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1660,6 +1708,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1732,6 +1782,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1800,6 +1852,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1868,6 +1922,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -1936,6 +1992,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2004,6 +2062,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2072,6 +2132,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2140,6 +2202,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2208,6 +2272,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2280,6 +2346,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2352,6 +2420,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2420,6 +2490,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2488,6 +2560,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2556,6 +2630,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2624,6 +2700,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2692,6 +2770,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2760,6 +2840,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2832,6 +2914,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2900,6 +2984,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -2968,6 +3054,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3036,6 +3124,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3104,6 +3194,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3172,6 +3264,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3240,6 +3334,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3312,6 +3408,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3380,6 +3478,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3448,6 +3548,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3516,6 +3618,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3584,6 +3688,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3652,6 +3758,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3720,6 +3828,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3788,6 +3898,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3864,6 +3976,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -3932,6 +4046,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4000,6 +4116,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4068,6 +4186,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4138,6 +4258,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4210,6 +4332,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4278,6 +4402,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4346,6 +4472,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4414,6 +4542,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4492,6 +4622,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4560,6 +4692,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4628,6 +4762,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4698,6 +4834,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4766,6 +4904,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4834,6 +4974,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4902,6 +5044,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -4970,6 +5114,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5038,6 +5184,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5106,6 +5254,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5174,6 +5324,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5246,6 +5398,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5314,6 +5468,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5384,6 +5540,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5456,6 +5614,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5526,6 +5686,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5594,6 +5756,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5662,6 +5826,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5730,6 +5896,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5806,6 +5974,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5874,6 +6044,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -5946,6 +6118,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6016,6 +6190,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6084,6 +6260,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6154,6 +6332,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6222,6 +6402,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6290,6 +6472,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6360,6 +6544,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6430,6 +6616,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6498,6 +6686,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6566,6 +6756,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6636,6 +6828,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6704,6 +6898,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6772,6 +6968,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6840,6 +7038,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6924,6 +7124,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -6994,6 +7196,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7062,6 +7266,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7130,6 +7336,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7202,6 +7410,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7270,6 +7480,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7338,6 +7550,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7408,6 +7622,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7476,6 +7692,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7544,6 +7762,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7612,6 +7832,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7680,6 +7902,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7748,6 +7972,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7822,6 +8048,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7894,6 +8122,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -7962,6 +8192,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8030,6 +8262,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8098,6 +8332,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8168,6 +8404,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8236,6 +8474,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8304,6 +8544,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8374,6 +8616,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8442,6 +8686,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8510,6 +8756,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8578,6 +8826,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8656,6 +8906,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8724,6 +8976,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8798,6 +9052,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8870,6 +9126,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -8938,6 +9196,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9006,6 +9266,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9078,6 +9340,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9146,6 +9410,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9214,6 +9480,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9282,6 +9550,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9352,6 +9622,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9426,6 +9698,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9494,6 +9768,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9562,6 +9838,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9630,6 +9908,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9698,6 +9978,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9766,6 +10048,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9834,6 +10118,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9902,6 +10188,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -9970,6 +10258,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10040,6 +10330,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10108,6 +10400,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10178,6 +10472,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10250,6 +10546,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10318,6 +10616,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10386,6 +10686,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10454,6 +10756,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10522,6 +10826,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10590,6 +10896,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10660,6 +10968,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10728,6 +11038,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10796,6 +11108,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10864,6 +11178,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -10932,6 +11248,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11000,6 +11318,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11068,6 +11388,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11136,6 +11458,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11204,6 +11528,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11272,6 +11598,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11340,6 +11668,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11408,6 +11738,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11476,6 +11808,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11544,6 +11878,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11612,6 +11948,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11680,6 +12018,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11748,6 +12088,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11816,6 +12158,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11884,6 +12228,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -11952,6 +12298,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12020,6 +12368,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12088,6 +12438,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12156,6 +12508,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12224,6 +12578,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12292,6 +12648,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12360,6 +12718,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12428,6 +12788,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12496,6 +12858,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12564,6 +12928,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12632,6 +12998,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12700,6 +13068,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12768,6 +13138,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12836,6 +13208,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12904,6 +13278,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -12972,6 +13348,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13040,6 +13418,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13108,6 +13488,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13176,6 +13558,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13244,6 +13628,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13312,6 +13698,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13380,6 +13768,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13448,6 +13838,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13516,6 +13908,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13584,6 +13978,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13652,6 +14048,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13724,6 +14122,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13792,6 +14192,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13860,6 +14262,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13928,6 +14332,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -13996,6 +14402,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14064,6 +14472,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14132,6 +14542,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14200,6 +14612,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14268,6 +14682,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14336,6 +14752,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14404,6 +14822,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14474,6 +14894,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14542,6 +14964,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14610,6 +15034,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14678,6 +15104,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14746,6 +15174,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14814,6 +15244,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14882,6 +15314,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -14950,6 +15384,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15018,6 +15454,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15086,6 +15524,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15156,6 +15596,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15224,6 +15666,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15292,6 +15736,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15360,6 +15806,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15432,6 +15880,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15504,6 +15954,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15572,6 +16024,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15640,6 +16094,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15714,6 +16170,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15782,6 +16240,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15850,6 +16310,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15920,6 +16382,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -15988,6 +16452,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16056,6 +16522,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16124,6 +16592,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16192,6 +16662,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16260,6 +16732,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16328,6 +16802,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16396,6 +16872,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16466,6 +16944,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16534,6 +17014,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16602,6 +17084,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16670,6 +17154,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16738,6 +17224,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16806,6 +17294,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16874,6 +17364,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -16942,6 +17434,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17010,6 +17504,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17078,6 +17574,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17146,6 +17644,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17242,6 +17742,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17314,6 +17816,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17382,6 +17886,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17456,6 +17962,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17530,6 +18038,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17600,6 +18110,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17668,6 +18180,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17736,6 +18250,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17804,6 +18320,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17872,6 +18390,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -17944,6 +18464,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18012,6 +18534,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18080,6 +18604,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18148,6 +18674,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18220,6 +18748,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18292,6 +18822,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18360,6 +18892,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18428,6 +18962,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18504,6 +19040,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18572,6 +19110,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18640,6 +19180,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18708,6 +19250,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18776,6 +19320,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18848,6 +19394,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18916,6 +19464,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -18984,6 +19534,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19056,6 +19608,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19128,6 +19682,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19200,6 +19756,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19268,6 +19826,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19336,6 +19896,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19404,6 +19966,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19476,6 +20040,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19544,6 +20110,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19614,6 +20182,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19684,6 +20254,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19752,6 +20324,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19820,6 +20394,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19888,6 +20464,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -19956,6 +20534,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20024,6 +20604,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20092,6 +20674,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20160,6 +20744,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20228,6 +20814,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20296,6 +20884,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20364,6 +20954,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20432,6 +21024,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20500,6 +21094,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20568,6 +21164,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20636,6 +21234,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20704,6 +21304,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20772,6 +21374,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20840,6 +21444,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20908,6 +21514,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -20976,6 +21584,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21044,6 +21654,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21112,6 +21724,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21180,6 +21794,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21248,6 +21864,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21316,6 +21934,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21384,6 +22004,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21452,6 +22074,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21520,6 +22144,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21588,6 +22214,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21656,6 +22284,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21724,6 +22354,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21792,6 +22424,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21860,6 +22494,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -21930,6 +22566,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22000,6 +22638,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22068,6 +22708,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22136,6 +22778,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22204,6 +22848,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22272,6 +22918,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22340,6 +22988,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22408,6 +23058,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22478,6 +23130,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22548,6 +23202,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22618,6 +23274,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22690,6 +23348,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22758,6 +23418,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22826,6 +23488,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22894,6 +23558,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -22962,6 +23628,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23030,6 +23698,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23102,6 +23772,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23172,6 +23844,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23240,6 +23914,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23310,6 +23986,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23378,6 +24056,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23448,6 +24128,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23516,6 +24198,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23588,6 +24272,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23660,6 +24346,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23728,6 +24416,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23796,6 +24486,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23876,6 +24568,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -23946,6 +24640,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24016,6 +24712,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24086,6 +24784,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24154,6 +24854,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24222,6 +24924,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24290,6 +24994,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24360,6 +25066,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24430,6 +25138,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24498,6 +25208,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24566,6 +25278,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24636,6 +25350,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24704,6 +25420,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24774,6 +25492,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24842,6 +25562,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24918,6 +25640,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -24986,6 +25710,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25054,6 +25780,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25122,6 +25850,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25192,6 +25922,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25264,6 +25996,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25332,6 +26066,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25400,6 +26136,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25468,6 +26206,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25550,6 +26290,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25620,6 +26362,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25688,6 +26432,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25756,6 +26502,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25824,6 +26572,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25898,6 +26648,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -25966,6 +26718,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26034,6 +26788,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26102,6 +26858,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26170,6 +26928,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26242,6 +27002,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26312,6 +27074,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26382,6 +27146,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26450,6 +27216,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26518,6 +27286,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26590,6 +27360,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26658,6 +27430,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26728,6 +27502,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26796,6 +27572,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26864,6 +27642,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -26934,6 +27714,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27002,6 +27784,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27070,6 +27854,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27155,6 +27941,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27223,6 +28011,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27291,6 +28081,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27359,6 +28151,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27427,6 +28221,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27495,6 +28291,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27563,6 +28361,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27635,6 +28435,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27707,6 +28509,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27775,6 +28579,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27843,6 +28649,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27911,6 +28719,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -27979,6 +28789,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28047,6 +28859,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28115,6 +28929,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28185,6 +29001,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28255,6 +29073,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28323,6 +29143,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28393,6 +29215,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28461,6 +29285,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28529,6 +29355,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28601,6 +29429,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28669,6 +29499,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28737,6 +29569,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28807,6 +29641,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28875,6 +29711,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -28945,6 +29783,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29015,6 +29855,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29083,6 +29925,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29155,6 +29999,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29223,6 +30069,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29291,6 +30139,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29359,6 +30209,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29427,6 +30279,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29495,6 +30349,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29563,6 +30419,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29631,6 +30489,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29699,6 +30559,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29767,6 +30629,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29835,6 +30699,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29907,6 +30773,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -29975,6 +30843,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30045,6 +30915,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30117,6 +30989,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30189,6 +31063,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30257,6 +31133,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30325,6 +31203,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30393,6 +31273,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30461,6 +31343,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30529,6 +31413,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30597,6 +31483,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30665,6 +31553,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
@@ -30733,6 +31623,8 @@ spec:
       value: '{{source_url}}'
     - name: revision
       value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
     - name: image-expires-after
       value: "5d"
     - name: ociStorage
