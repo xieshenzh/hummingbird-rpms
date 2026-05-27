@@ -12,7 +12,6 @@
       "matchStrings": [
         "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\n\\s*[A-Z_]+\\s*=\\s*\"[^\"@:]+(?::(?<currentValue>[^\"@]+))?@(?<currentDigest>sha256:[a-f0-9]+)\""
       ],
-      "currentValueTemplate": "latest",
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker"
     },
