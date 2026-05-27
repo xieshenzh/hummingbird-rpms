@@ -786,7 +786,7 @@ def dist_metadata(buildroot, record_path):
     return dist.metadata
 
 
-def pyproject_save_files_and_modules(buildroot, sitelib, sitearch, python_version, pyproject_record, prefix, assert_license, allow_no_modules, varargs):
+def pyproject_save_files_and_modules(buildroot, sitelib, sitearch, python_version, pyproject_record, prefix, assert_license, allow_no_modules, auto, varargs):
     """
     Takes arguments from the %{pyproject_save_files} macro
 
@@ -801,6 +801,7 @@ def pyproject_save_files_and_modules(buildroot, sitelib, sitearch, python_versio
     sitedirs = sorted({sitelib, sitearch})
 
     globs, include_auto = parse_varargs(varargs)
+    include_auto = include_auto or auto
     if not globs and not allow_no_modules:
         raise ValueError(
             "At least one module glob needs to be provided to %pyproject_save_files. "
@@ -854,6 +855,7 @@ def main(cli_args):
         cli_args.prefix,
         cli_args.assert_license,
         cli_args.allow_no_modules,
+        cli_args.auto,
         cli_args.varargs,
     )
 
@@ -867,7 +869,7 @@ def argparser():
         prog="%pyproject_save_files",
         add_help=False,
         # custom usage to add +auto
-        usage="%(prog)s  [-l|-L] MODULE_GLOB|-M [MODULE_GLOB ...] [+auto]",
+        usage="%(prog)s  [-l|-L] [-a|+auto] MODULE_GLOB|-M [MODULE_GLOB ...]",
     )
     parser.add_argument(
         '--help', action='help',
@@ -894,6 +896,10 @@ def argparser():
     parser.add_argument(
         "-M", "--allow-no-modules", action="store_true", default=False,
         help="Don't fail when no globs are provided, only include non-modules data in the generated filelist.",
+    )
+    parser.add_argument(
+        "-a", "--auto", action="store_true", default=False,
+        help="Include all non-module, non-sitelib files (same as +auto).",
     )
     parser.add_argument(
         "varargs", nargs="*", metavar="MODULE_GLOB",

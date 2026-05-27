@@ -63,7 +63,7 @@ set -o pipefail
 
 # Internal check for our macros: Assert both toxenvs were executed.
 grep -E 'py%{python3_version_nodots}-test: (OK|commands succeeded)' toxlog
-grep -E 'flake8: (OK|commands succeeded)' toxlog %{?!with_flake8:&& exit 1 || true}
+grep -E 'flake8: (OK|commands succeeded)' toxlog %{!?with_flake8:&& exit 1 || true}
 
 # Internal check for our macros
 # making sure that %%{_pyproject_ghost_distinfo} has the right content

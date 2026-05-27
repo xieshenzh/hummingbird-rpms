@@ -47,7 +47,7 @@ sed -i /Content-Length/d test_httpbin.py
 sed -Ei 's/\bdef (test_(relative_)?redirect_(to_post|n_(equals_to|higher_than)_1))/def no\1/' test_httpbin.py
 
 %generate_buildrequires
-%pyproject_buildrequires %{?with_tests:-t}%{?!with_tests:-R}
+%pyproject_buildrequires %{?with_tests:-t}%{!?with_tests:-R}
 
 
 %build

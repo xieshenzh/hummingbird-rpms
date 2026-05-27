@@ -20,6 +20,9 @@
 %pyproject_patch_dependency() %{expand:\\\
 %{!?1:%{error:%%pyproject_patch_dependency requires an argument}}\\\
 %{?2:%{error:%%pyproject_patch_dependency accepts exactly one argument per call}}\\\
+if [ -f %{__python3} ] && [ -f %{_rpmconfigdir}/redhat/pyproject_dependency_overrides.py ]; then
+  %{__python3} -Bs %{_rpmconfigdir}/redhat/pyproject_dependency_overrides.py '%1'
+fi
 echo '%1' >> %{_pyproject_dep_overrides}
 }
 
