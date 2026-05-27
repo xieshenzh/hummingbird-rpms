@@ -9,3 +9,8 @@
 %patch -p1 -P009
 %patch -p1 -P010
 %patch -p1 -P011
+%patch -p1 -P012
+%patch -p1 -P013
+%patch -p1 -P014
+%patch -p1 -P015
+%patch -p1 -P016

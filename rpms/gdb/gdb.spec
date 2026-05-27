@@ -45,7 +45,7 @@ Version: 17.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release: 5.1%{?dist}
+Release: 8%{?dist}
 
 License: GPL-3.0-or-later AND BSD-3-Clause AND FSFAP AND LGPL-2.1-or-later AND GPL-2.0-or-later AND LGPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain AND GFDL-1.3-or-later AND LGPL-2.0-or-later WITH GCC-exception-2.0 AND GPL-3.0-or-later WITH GCC-exception-3.1 AND GPL-2.0-or-later WITH GNU-compiler-exception AND MIT
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -162,7 +162,6 @@ BuildRequires: texinfo-tex
 BuildRequires: texlive-collection-latexrecommended
 # Permit rebuilding *.[0-9] files even if they are distributed in gdb-*.tar:
 BuildRequires: /usr/bin/pod2man
-BuildRequires: libbabeltrace-devel%{buildisa}
 %if %{defined use_guile}
     %if 0%{!?rhel:1}
 BuildRequires: guile22-devel%{buildisa}
@@ -514,7 +513,7 @@ export CXXFLAGS="$CFLAGS"
 # The configure flags we will use when building the full GDB.
 GDB_FULL_CONFIGURE_FLAGS="\
         --with-system-gdbinit=%{_sysconfdir}/gdbinit            \
-        --with-babeltrace                                       \
+        --without-babeltrace                                       \
         --with-expat                                            \
 $(: ppc64 host build crashes on ppc variant of libexpat.so )    \
         --without-libexpat-prefix                               \
@@ -932,6 +931,32 @@ fi
 # endif scl
 
 %changelog
+* Tue May 26 2026 Kevin Buettner <kevinb@redhat.com>
+- Applied proposed patch "[gdb/testsuite, Tcl 9] Fix EILSEQ problems for
+  UTF8 related tests".  This is required in order to complete a build
+  with testing.
+
+* Mon May 18 2026 Andrew Burgess <aburgess@redhat.com>
+- Remove BuildRequires for libbabeltrace, and build GDB without
+  babeltrace support.  Upstream commit 305ad81ae66 has removed Common
+  Trace Format (CTF) support, I have not backported that commit, but I
+  have disabled the CTF feature so we no longer require libbabeltrace.
+
+* Sat May 16 2026 Andrew Burgess <aburgess@redhat.com>
+- Backport the following upstream commits in order to address RHBZ
+  2467251: d980317c7f1, 958d06262a7, 7d1d7386561, 8915de0883c,
+  8f65ab7b71f.  These commits will all drop out when we rebase to GDB
+  18.
+
+* Tue Apr 21 2026 Andrew Burgess <aburgess@redhat.com>
+- Backport upstream commits 8bd08ee92c4 and cd289df068e to address
+  rhbz2366461.  These backports will not be needed once we rebase to
+  GDB 18.
+
+* Wed Apr 15 2026 Keith Seitz <keiths@redhat.com>
+- Backport upstream commit ef7727ae from Tom de Vries to
+  fix the test suite for newer Tcl releases.
+
 * Wed Feb 25 2026 Kevin Buettner <kevinb@redhat.com>
 - Backport upstream commit d2cc16cd7fc from Jan Vrany to fix
   FAILs in gdb.base/fileio.exp caused by macro expansion of
