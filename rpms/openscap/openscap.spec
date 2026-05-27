@@ -1,12 +1,13 @@
 Name:           openscap
 Version:        1.4.4
-Release:        1.1%{?dist}
+Release:        1.2%{?dist}
 Epoch:          1
 Summary:        Set of open source libraries enabling integration of the SCAP line of standards
 License:        LGPL-2.1-or-later
 URL:            http://www.open-scap.org/
 VCS:            git:https://github.com/OpenSCAP/openscap
 Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
+Patch0:         0001-signature-do-not-shutdown-xmlsec-crypto-after-validation.patch
 
 %global         common_description %{expand:
 OpenSCAP is a set of open source libraries providing an easier path
