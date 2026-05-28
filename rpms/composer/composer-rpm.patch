@@ -43,3 +43,16 @@ diff -up ./vendor/composer/ca-bundle/src/CaBundle.php.rpm ./vendor/composer/ca-b
  
          // cURL does not understand 'phar://' paths
          // see https://github.com/composer/ca-bundle/issues/10
+diff -up ./src/Composer/Command/SelfUpdateCommand.php.rpm ./src/Composer/Command/SelfUpdateCommand.php
+--- ./src/Composer/Command/SelfUpdateCommand.php.rpm	2026-05-28 14:51:24.953172177 +0200
++++ ./src/Composer/Command/SelfUpdateCommand.php	2026-05-28 14:51:30.174907909 +0200
+@@ -86,7 +86,8 @@ EOT
+                 $output->writeln('<comment>To update Composer, download a composer.phar from https://getcomposer.org and then run `composer.phar update composer/composer` in your project.</comment>');
+             } else {
+                 $output->writeln('<error>This instance of Composer does not have the self-update command.</error>');
+-                $output->writeln('<comment>This could be due to a number of reasons, such as Composer being installed as a system package on your OS, or Composer being installed as a package in the current project.</comment>');
++                $output->writeln('<comment>Composer is installed as a system package on your OS.</comment>');
++                $output->writeln('<comment>Update the composer RPM using the package manager (dnf).</comment>');
+             }
+ 
+             return 1;
