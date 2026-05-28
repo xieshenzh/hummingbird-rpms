@@ -2410,6 +2410,75 @@ def test_update_proceeds_when_track_version_matches(workdir: Path, upstream_repo
     assert metadata['version'] == '1.5'
 
 
+def test_update_skips_older_version(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Update skips when upstream version is older than current version."""
+    # Import vanilla at 1.0
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Bump local version to 2.0 ahead of upstream
+    add_upstream_commit(upstream_repos["vanilla"], 'vanilla', '1.0', '2.0')
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--skip-build-check', 'vanilla'],
+        cwd=workdir, check=True,
+    )
+    metadata_file = workdir / 'metadata' / 'vanilla.json'
+    with open(metadata_file) as f:
+        metadata = json.load(f)
+    assert metadata['version'] == '2.0'
+
+    # Now upstream goes back to 1.5 (simulating a branch reset or different branch state)
+    add_upstream_commit(upstream_repos["vanilla"], 'vanilla', '2.0', '1.5')
+
+    # Update should skip due to older version
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--skip-build-check', 'vanilla'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    )
+
+    assert "upstream version 1.5 is older than current 2.0" in result.stderr
+
+    # Verify package was NOT updated
+    with open(metadata_file) as f:
+        metadata = json.load(f)
+    assert metadata['version'] == '2.0'
+
+
+def test_sync_allows_older_version(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Sync allows downgrade to older upstream version."""
+    # Import vanilla at 1.0
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Bump local version to 2.0
+    add_upstream_commit(upstream_repos["vanilla"], 'vanilla', '1.0', '2.0')
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--skip-build-check', 'vanilla'],
+        cwd=workdir, check=True,
+    )
+
+    # Now upstream goes back to 1.5
+    add_upstream_commit(upstream_repos["vanilla"], 'vanilla', '2.0', '1.5')
+
+    # Sync should proceed despite older version
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'sync', 'vanilla'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    )
+
+    assert "Syncing vanilla" in result.stderr
+
+    # Verify package WAS updated (downgraded)
+    metadata_file = workdir / 'metadata' / 'vanilla.json'
+    with open(metadata_file) as f:
+        metadata = json.load(f)
+    assert metadata['version'] == '1.5'
+
+
 def test_rebuild(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     """Test rebuild command bumps Release field correctly."""
     # Import vanilla package

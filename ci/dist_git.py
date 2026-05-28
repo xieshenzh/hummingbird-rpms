@@ -22,7 +22,7 @@ import time
 import urllib.parse
 import xmlrpc.client
 import yaml
-from packaging.version import Version
+from packaging.version import InvalidVersion, Version
 from pathlib import Path
 from specfile import Specfile
 from typing import Iterator, Literal, NotRequired, TypedDict, cast
@@ -1254,6 +1254,17 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
                 release = resolved_release
 
         logging.info("Version: %s-%s", version, release)
+
+        # Skip if upstream version is older than current version (unless sync)
+        if not sync:
+            try:
+                if Version(version) < Version(metadata['version']):
+                    logging.warning(
+                        "Skipping %s: upstream version %s is older than current %s",
+                        package_name, version, metadata['version'])
+                    return
+            except InvalidVersion:
+                logging.debug("Could not compare versions for %s, proceeding", package_name)
 
         # Check track_upstream constraint - skip if upstream version doesn't match prefix
         tv = metadata.get('track_upstream')
