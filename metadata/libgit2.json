@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "4c37ddecc27848b3cff9e05c543641b8fbf1b9c2",
+  "release": "1",
+  "sha": "eeeb0f951a8296d5c94ebf4d7c69273a5feb8075",
   "source": "https://src.fedoraproject.org/rpms/libgit2.git",
   "upstream_repo": "https://github.com/libgit2/libgit2",
-  "version": "1.9.3"
+  "version": "1.9.4"
 }
