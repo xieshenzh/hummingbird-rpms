@@ -1,0 +1,48 @@
+summary: Tier 0 functional tests for shadow-utils
+description: |
+    Run comprehensive system tests for shadow-utils. These tests validate user and group
+    account management functionality by testing actual system operations including user
+    creation, password management, group operations, and verification of system files
+    (i.e. /etc/passwd, /etc/shadow).
+
+provision:
+    how: virtual
+    image: fedora
+
+prepare:
+    - name: Install general dependencies
+      how: install
+      package:
+        - expect
+        - git
+        - python3-pip
+
+    - name: Setup SSH keys for localhost testing
+      how: shell
+      script:
+        - ssh-keygen -t rsa -f /root/.ssh/id_rsa -N "" -q
+        - cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+        - chmod 600 /root/.ssh/authorized_keys
+        - ssh-keyscan -H localhost >> /root/.ssh/known_hosts
+
+    - name: Clone shadow repository
+      how: shell
+      script:
+        - git clone https://github.com/shadow-maint/shadow.git /tmp/shadow-test
+
+    - name: Copy test topology for Fedora CI
+      how: shell
+      script:
+        - cp tests/mhc-fedora-ci.yaml /tmp/shadow-test/tests/system
+
+    - name: Install test dependencies
+      how: shell
+      script:
+        - pip3 install -r /tmp/shadow-test/tests/system/requirements.txt
+
+execute:
+    how: tmt
+    duration: 30m
+    script: |
+        cd /tmp/shadow-test/tests/system
+        pytest --mh-config=mhc-fedora-ci.yaml --mh-lazy-ssh -v
