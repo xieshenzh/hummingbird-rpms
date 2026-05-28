@@ -1,0 +1,13 @@
+provisioned_topologies:
+- shadow
+domains:
+- id: shadow
+  hosts:
+  - hostname: localhost
+    role: shadow
+    conn:
+      type: ssh
+      host: localhost
+      user: root
+    artifacts:
+    - /var/log/*
