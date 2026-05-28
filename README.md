@@ -154,3 +154,12 @@ scanners; specific scanner implementations may vary in detail.
 [mobster]: https://github.com/konflux-ci/mobster
 [sbom-repo]: https://packages.redhat.com/api/pulp-content/public-hummingbird/metadata/sboms
 [vex-feed]: https://security.access.redhat.com/data/csaf/v2/vex-feed
+
+## License
+
+This repository is licensed under the [MIT License](LICENSE.txt). This license applies to the
+packaging files, tooling, and CI configuration in this repository. Individual upstream software
+packages are licensed under their own terms as declared in their respective spec files. Fedora spec
+files are MIT by default under the [FPCA][fpca-spec-license].
+
+[fpca-spec-license]: https://docs.fedoraproject.org/en-US/legal/misc/#_license_of_fedora_spec_files
