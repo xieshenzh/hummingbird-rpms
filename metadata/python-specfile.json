@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "f51d1bc1bda16932e511348a23391a91dd023dd1",
+  "sha": "146274fe8d09d522681adbf179732009fa256bf4",
   "source": "https://src.fedoraproject.org/rpms/python-specfile.git",
   "upstream_repo": "https://github.com/packit/specfile",
-  "version": "0.40.2"
+  "version": "0.41.0"
 }
