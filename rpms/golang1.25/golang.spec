@@ -98,7 +98,7 @@
 # Comment out go_prerelease and go_patch as needed
 %global go_api 1.25
 #global go_prerelease rc2
-%global go_patch 10
+%global go_patch 11
 
 %global go_version %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease:~%{go_prerelease}}
 %global go_source %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease}
@@ -110,7 +110,7 @@
 
 Name:           %{basepackagename}1.25
 Version:        %{go_version}
-Release:        2.2%{?dist}
+Release:        0.1%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
