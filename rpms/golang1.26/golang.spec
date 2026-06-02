@@ -102,7 +102,7 @@
 # Comment out go_prerelease and go_patch as needed
 %global go_api 1.26
 #global go_prerelease rc3
-%global go_patch 3
+%global go_patch 4
 
 %global go_version %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease:~%{go_prerelease}}
 %global go_source %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease}
@@ -114,7 +114,7 @@
 
 Name:           %{basepackagename}1.26
 Version:        %{go_version}
-Release:        2.2%{?dist}
+Release:        0.1%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
@@ -151,7 +151,7 @@ Provides: bundled(golang(golang.org/x/telemetry)) = 0.0.0.20251128220624.abf20d0
 Provides: bundled(golang(golang.org/x/term)) = 0.38.0
 Provides: bundled(golang(golang.org/x/text)) = 0.32.0
 Provides: bundled(golang(golang.org/x/tools)) = 0.27.0
-Provides: bundled(golang(golang.org/x/tools)) = 0.39.1.0.20260323181443.4f499ecaa91d
+Provides: bundled(golang(golang.org/x/tools)) = 0.39.1.0.20260527181557.0f52e3809b35
 Provides: bundled(golang(rsc.io/markdown)) = 0.0.0.20240306144322.0bf8f97ee8ef
 
 Requires:       %{name}-bin = %{version}-%{release}

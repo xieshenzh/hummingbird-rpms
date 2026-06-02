@@ -1,14 +1,14 @@
 {
   "branch": "rawhide",
   "cve_product": "Go ",
-  "modification_reason": "Default GOFIPS140=certified with host-auto FIPS detection; update to upstream version 1.26.3",
+  "modification_reason": "Update to upstream version 1.26.4",
   "modification_status": "modified",
-  "release": "2.1",
+  "release": "0.1",
   "release_monitoring_project_id": 1227,
   "sha": "3a0e672bf5dfab347e849381c2a97615874273a9",
   "source": "https://src.fedoraproject.org/rpms/golang.git",
   "track_upstream": "1.26",
   "upstream_branch": "release-branch.go1.26",
   "upstream_repo": "https://github.com/golang/go",
-  "version": "1.26.3"
+  "version": "1.26.4"
 }
