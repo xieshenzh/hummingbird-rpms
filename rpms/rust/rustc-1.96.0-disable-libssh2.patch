@@ -1,7 +1,7 @@
 diff -up rustc-beta-src/src/tools/cargo/Cargo.lock.orig rustc-beta-src/src/tools/cargo/Cargo.lock
---- rustc-beta-src/src/tools/cargo/Cargo.lock.orig	2026-01-27 13:27:00.716308204 -0800
-+++ rustc-beta-src/src/tools/cargo/Cargo.lock	2026-01-27 13:27:00.718429578 -0800
-@@ -2764,7 +2764,6 @@ checksum = "c9b3acc4b91781bb0b3386669d32
+--- rustc-beta-src/src/tools/cargo/Cargo.lock.orig	2026-04-23 13:22:07.239952036 -0700
++++ rustc-beta-src/src/tools/cargo/Cargo.lock	2026-04-23 13:23:43.576653041 -0700
+@@ -3108,7 +3108,6 @@ checksum = "c9b3acc4b91781bb0b3386669d32
  dependencies = [
   "cc",
   "libc",
@@ -9,10 +9,12 @@ diff -up rustc-beta-src/src/tools/cargo/Cargo.lock.orig rustc-beta-src/src/tools
   "libz-sys",
   "openssl-sys",
   "pkg-config",
-@@ -2828,20 +2828,6 @@ dependencies = [
+@@ -3155,20 +3154,6 @@ dependencies = [
+  "pkg-config",
+  "vcpkg",
  ]
- 
- [[package]]
+-
+-[[package]]
 -name = "libssh2-sys"
 -version = "0.3.1"
 -source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -25,20 +27,18 @@ diff -up rustc-beta-src/src/tools/cargo/Cargo.lock.orig rustc-beta-src/src/tools
 - "pkg-config",
 - "vcpkg",
 -]
--
--[[package]]
+ 
+ [[package]]
  name = "libz-sys"
- version = "1.1.23"
- source = "registry+https://github.com/rust-lang/crates.io-index"
 diff -up rustc-beta-src/src/tools/cargo/Cargo.toml.orig rustc-beta-src/src/tools/cargo/Cargo.toml
---- rustc-beta-src/src/tools/cargo/Cargo.toml.orig	2026-01-27 13:27:00.716725971 -0800
-+++ rustc-beta-src/src/tools/cargo/Cargo.toml	2026-01-27 13:29:24.709692974 -0800
-@@ -48,7 +48,7 @@ curl = "0.4.49"
- curl-sys = "=0.4.83"
- filetime = "0.2.26"
+--- rustc-beta-src/src/tools/cargo/Cargo.toml.orig	2026-04-23 13:22:07.240372063 -0700
++++ rustc-beta-src/src/tools/cargo/Cargo.toml	2026-04-23 13:23:37.142696088 -0700
+@@ -51,7 +51,7 @@ filetime = "0.2.27"
  flate2 = { version = "1.1.9", default-features = false, features = ["zlib-rs"] }
+ futures = { version = "0.3.32", default-features = false, features = ["std", "executor"]}
+ futures-timer = "3.0.3"
 -git2 = "0.20.4"
 +git2 = { version = "0.20.4", default-features = false, features = ["https"] }
  git2-curl = "0.21.0"
  # When updating this, also see if `gix-transport` further down needs updating or some auth-related tests will fail.
- gix = { version = "0.79.0", default-features = false, features = ["progress-tree", "parallel", "dirwalk", "status"] }
+ gix = { version = "0.81.0", default-features = false, features = ["sha1", "progress-tree", "parallel", "dirwalk", "status"] }
