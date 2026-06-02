@@ -14,6 +14,7 @@ unicode:
         # they are tests for those.
         - rustc-*-src/tests/ui/lint/issue-90614-accept-allow-text-direction-codepoint-in-comment-lint.rs
         - rustc-*-src/tests/ui/parser/unicode-control-codepoints.rs
+        - rustc-*-src/tests/ui/parser/unicode-control-doc-comment-issue-153096.rs
         - rustc-*-src/tests/ui/parser/macro/unicode-control-codepoints-macros.rs
         - rustc-*-src/tests/ui/parser/macro/auxiliary/unicode-control.rs
         - rustc-*-src/compiler/rustc_lint/src/hidden_unicode_codepoints.rs

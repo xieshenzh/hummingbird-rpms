@@ -4,3 +4,9 @@ discover:
     url: https://src.fedoraproject.org/tests/rust.git
 execute:
     how: tmt
+# Some tests like rpm-build/stratisd needs more memory or they OOM/timeout
+provision:
+  hardware:
+    memory: ">= 8 GiB"
+    disk:
+      - size: ">= 40GiB"
