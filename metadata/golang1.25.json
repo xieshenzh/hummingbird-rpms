@@ -1,14 +1,14 @@
 {
   "branch": "f43",
   "cve_product": "Go ",
-  "modification_reason": "Default GOFIPS140=certified with host-auto FIPS detection; update to upstream version 1.25.10",
+  "modification_reason": "Update to upstream version 1.25.11",
   "modification_status": "modified",
-  "release": "2.1",
+  "release": "0.1",
   "release_monitoring_project_id": 1227,
   "sha": "e82190b6bf093cb8e8ef8a1cd74b4d1ba52beb0c",
   "source": "https://src.fedoraproject.org/rpms/golang.git",
   "track_upstream": "1.25",
   "upstream_branch": "release-branch.go1.25",
   "upstream_repo": "https://github.com/golang/go",
-  "version": "1.25.10"
+  "version": "1.25.11"
 }
