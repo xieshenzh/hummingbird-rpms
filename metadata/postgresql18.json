@@ -5,6 +5,7 @@
   "release": "3",
   "sha": "c9bba8e3e7d5a052b4940a00286d4fd3b0124dca",
   "source": "https://src.fedoraproject.org/rpms/postgresql18.git",
+  "track_upstream": "18",
   "upstream_branch": "REL_18_STABLE",
   "upstream_repo": "https://github.com/postgres/postgres",
   "version": "18.3"
