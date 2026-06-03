@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "8",
-  "sha": "d7e38cfa172b96c455e8ee073727c0705449051e",
+  "release": "9",
+  "sha": "82d58a30722299b37a92a0c3ee10fd53c4ff6ae9",
   "source": "https://src.fedoraproject.org/rpms/attr.git",
   "upstream_repo": "https://git.savannah.nongnu.org/git/attr.git",
   "version": "2.5.2"
