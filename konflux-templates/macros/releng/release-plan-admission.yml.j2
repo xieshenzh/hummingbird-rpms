@@ -109,6 +109,18 @@ spec:
                 cpu: '1'
                 memory: 1Gi
             name: upload
+        # increase limits for verify-conforma to 8Gi memory and 2 cpu
+        # that is needed for rust
+      - pipelineTaskName: verify-conforma
+        stepSpecs:
+          - computeResources:
+              limits:
+                cpu: '2'
+                memory: 8Gi
+              requests:
+                cpu: '2'
+                memory: 8Gi
+            name: validate
     serviceAccountName: {{ service_account_name }}
     timeouts:
       pipeline: 4h0m0s
