@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "19e9106e6316f36f6c52428d57e3a7034c5496e5",
+  "sha": "84fb7146325c55ef8b1901b71ae19877bb8c4023",
   "source": "https://src.fedoraproject.org/rpms/php.git",
   "upstream_repo": "https://github.com/php/php-src",
-  "version": "8.5.6"
+  "version": "8.5.7"
 }
