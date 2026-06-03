@@ -10,15 +10,10 @@ upstream_tag_template: go{version}
 actions:
   changelog-entry:
     - bash -c "echo - New release ${PACKIT_PROJECT_VERSION}"
+  fix-spec-file:
+    - bash -c "cd $PACKIT_DOWNSTREAM_REPO && ./update-bundled-provides.sh golang.spec"
 
 jobs:
-  # Fedora 42 follows Go 1.25
-  # https://pagure.io/fesco/issue/3570
-  - job: pull_from_upstream
-    trigger: release
-    dist_git_branches: fedora-42
-    upstream_tag_include: "^go1.25.+"
-
   # Fedora 43 follows Go 1.25
   - job: pull_from_upstream
     trigger: release
