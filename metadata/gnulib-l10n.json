@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "0a498b7cadf7589c35b414a29c8a5daf3ea2c3a8",
+  "release": "3",
+  "sha": "94e9a540d20e99f472367430b447e5a6c0b9e6f6",
   "source": "https://src.fedoraproject.org/rpms/gnulib-l10n.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/gnulib.git",
   "version": "20241231"
