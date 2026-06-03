@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "feeee6a8585feef9e33fee2d4698319aff4c2334",
+  "release": "4",
+  "sha": "8236aac5d42c0255c5a3cf33386e62a1e2cfe3e9",
   "source": "https://src.fedoraproject.org/rpms/ninja-build.git",
   "upstream_repo": "https://github.com/ninja-build/ninja",
   "version": "1.13.2"
