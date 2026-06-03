@@ -1,0 +1,71 @@
+From 3771f52df17d0f80205a11cf0c3bd375f4923d91 Mon Sep 17 00:00:00 2001
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date: Fri, 10 Apr 2026 14:55:30 +0200
+Subject: [PATCH 9/9] feat(systemd-sysext): include
+ systemd-{sys,conf}ext-sysroot services
+
+systemd v261 introduces a pair of new systemd-{sys,conf}ext-sysroot services
+that are used to merge system and configuration extensions for the main system
+from the initramfs. This allows the extensions to update any part of the main
+system, including services that run during early boot.
+
+Include these services in the initramfs. systemd enables them by
+default (through 90-systemd-initrd.preset), but dracut does not yet support
+systemd presets, so these services are enabled manually. If the newly
+introduced logic is undesirable for any reason, systemd provides the
+'systemd.{sys,conf}ext=' kernel command-line options, meaning dracut does not
+need its own.
+
+(cherry picked from commit 420977f82467d048927a82bf9625132f79e028cd)
+---
+ modules.d/11systemd-sysext/module-setup.sh | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/modules.d/11systemd-sysext/module-setup.sh b/modules.d/11systemd-sysext/module-setup.sh
+index fd26fd61..f0af9774 100755
+--- a/modules.d/11systemd-sysext/module-setup.sh
++++ b/modules.d/11systemd-sysext/module-setup.sh
+@@ -44,17 +44,24 @@ install() {
+         "/usr/lib/extension-release.d/extension-release.*" \
+         "$systemdsystemunitdir"/systemd-confext${_suffix}.service \
+         "$systemdsystemunitdir/systemd-confext${_suffix}.service.d/*.conf" \
++        "$systemdsystemunitdir"/systemd-confext-sysroot.service \
++        "$systemdsystemunitdir/systemd-confext-sysroot.service.d/*.conf" \
+         "$systemdsystemunitdir"/systemd-sysext${_suffix}.service \
+         "$systemdsystemunitdir/systemd-sysext${_suffix}.service.d/*.conf" \
++        "$systemdsystemunitdir"/systemd-sysext-sysroot.service \
++        "$systemdsystemunitdir/systemd-sysext-sysroot.service.d/*.conf" \
+         "$systemdsystemunitdir"/initrd.target.wants/systemd-confext${_suffix}.service \
+         "$systemdsystemunitdir"/initrd.target.wants/systemd-sysext${_suffix}.service \
+         systemd-confext systemd-sysext
+ 
+-    # Enable systemd type unit(s) for systemd < v258 which doesn't ship
+-    # initrd.target.wants symlinks.
++    # Enable systemd-{confext, sysext} systemd type unit(s) for systemd < v258
++    # which doesn't ship initrd.target.wants symlinks and systemd-{confext,sysext}-sysroot.service
++    # which are enabled through systemd-initrd.preset.
+     for i in \
+         systemd-confext.service \
+-        systemd-sysext.service; do
++        systemd-sysext.service \
++        systemd-confext-sysroot.service \
++        systemd-sysext-sysroot.service; do
+         if [[ -e "$initdir$systemdsystemunitdir"/"$i" ]]; then
+             $SYSTEMCTL -q --root "$initdir" enable "$i"
+         fi
+@@ -67,7 +74,11 @@ install() {
+             "$systemdsystemconfdir"/systemd-confext${_suffix}.service \
+             "$systemdsystemconfdir/systemd-confext${_suffix}.service.d/*.conf" \
+             "$systemdsystemconfdir"/systemd-sysext${_suffix}.service \
+-            "$systemdsystemconfdir/systemd-sysext${_suffix}.service.d/*.conf"
++            "$systemdsystemconfdir/systemd-sysext${_suffix}.service.d/*.conf" \
++            "$systemdsystemconfdir"/systemd-confext-sysroot.service \
++            "$systemdsystemconfdir/systemd-confext-sysroot.service.d/*.conf" \
++            "$systemdsystemconfdir"/systemd-sysext-sysroot.service \
++            "$systemdsystemconfdir/systemd-sysext-sysroot.service.d/*.conf"
+     fi
+ 
+ }
+-- 
+2.54.0
+
