@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "947969671e5f6179d586e82d653d038882a07532",
+  "release": "3",
+  "sha": "1c6411e04c783b6d25a6d5f46e8a6d64fb1ae3c6",
   "source": "https://src.fedoraproject.org/rpms/perl-IO-Socket-SSL.git",
   "upstream_repo": "https://github.com/noxxi/p5-io-socket-ssl",
   "version": "2.098"
