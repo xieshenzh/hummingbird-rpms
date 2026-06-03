@@ -2,9 +2,9 @@
   "branch": "rawhide",
   "modification_reason": "Add missing libxml2 BuildRequires for xmllint; follow ComplianceAsCode/content master branch until 0.1.81 release",
   "modification_status": "modified",
-  "release": "0.1",
-  "sha": "81369569ea551f7a3efd221fbf6cb6b5ea0d503f",
+  "release": "1",
+  "sha": "287b196c303a73cd2f632d2048a782d342dcc18e",
   "source": "https://src.fedoraproject.org/rpms/scap-security-guide.git",
   "upstream_repo": "https://github.com/ComplianceAsCode/content",
-  "version": "0.1.80^20260423git07c4c5a"
+  "version": "0.1.81"
 }

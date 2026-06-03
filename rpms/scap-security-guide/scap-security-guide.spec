@@ -3,18 +3,13 @@
 # https://fedoraproject.org/wiki/Changes/CMake_to_do_out-of-source_builds
 %global _vpath_builddir build
 
-%global base_version 0.1.80
-%global gitdate 20260423
-%global commit 07c4c5ac26ede5e3c132952209f50c074588f1bb
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-
 Name:		scap-security-guide
-Version:	%{base_version}^%{gitdate}git%{shortcommit}
-Release:	0.1%{?dist}
+Version:	0.1.81
+Release:	1%{?dist}
 Summary:	Security guidance and baselines in SCAP formats
 License:	BSD-3-Clause
 URL:		https://github.com/ComplianceAsCode/content/
-Source0:	%{name}-%{base_version}-%{shortcommit}.tar.bz2
+Source0:	https://github.com/ComplianceAsCode/content/releases/download/v%{version}/scap-security-guide-%{version}.tar.bz2
 BuildArch:	noarch
 
 BuildRequires:	libxml2
@@ -59,7 +54,7 @@ The %{name}-rule-playbooks package contains individual ansible playbooks per rul
 %endif
 
 %prep
-%autosetup -n content-%{commit} -p1
+%autosetup -p1
 
 %define cmake_defines_common -DSSG_SEPARATE_SCAP_FILES_ENABLED=OFF -DSSG_BASH_SCRIPTS_ENABLED=OFF -DSSG_BUILD_SCAP_12_DS=OFF
 %define cmake_defines_specific %{nil}
@@ -102,6 +97,9 @@ rm %{buildroot}/%{_docdir}/%{name}/Contributors.md
 %endif
 
 %changelog
+* Tue Jun 02 2026 Vojtech Polasek <vpolasek@redhat.com> - 0.1.81-1
+- update to the latest upstream release 0.1.81
+
 * Fri Mar 27 2026 Vojtech Polasek <vpolasek@redhat.com> - 0.1.80-3
 - rebuilt to honor new test
 
