@@ -1,6 +1,6 @@
 Name:           package-notes
-Version:        0.17
-Release:        3.1%{?dist}
+Version:        0.18
+Release:        1%{?dist}
 Summary:        ELF Package and Dlopen Notes
 License:        0BSD
 URL:            https://github.com/systemd/package-notes
@@ -10,12 +10,6 @@ BuildArch:      noarch
 BuildRequires:  make
 
 Requires:       python3dist(pyelftools)
-
-Patch:          0001-Fix-type-in-group_by_feature.patch
-Patch:          0002-dlopen-notes-group-two-helper-functions-together.patch
-Patch:          0003-rpm-add-fileattr-multifile-generator.patch
-Patch:          0004-fakelib-add-test-for-the-new-fileattr-plugin.patch
-Patch:          0005-rpm-use-a-r-.-guard-around-package-notes-LDFLAGS.patch
 
 %description
 This package provides rpm macros to generate an '.note.package' ELF note in
