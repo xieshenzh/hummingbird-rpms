@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "6",
-  "sha": "e93b4d30cc6ca867b89501bccef20058fc9008cd",
+  "release": "7",
+  "sha": "ad75b14ed2ef92abe07ac4107b92572b43ccf90c",
   "source": "https://src.fedoraproject.org/rpms/acl.git",
   "upstream_repo": "https://git.savannah.nongnu.org/git/acl.git",
   "version": "2.3.2"
