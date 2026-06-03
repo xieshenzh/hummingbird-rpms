@@ -28,7 +28,7 @@
 
 %global rpmver 6.0.1
 #global snapver rc1
-%global baserelease 5
+%global baserelease 6
 %global sover 10
 
 %global srcver %{rpmver}%{?snapver:-%{snapver}}
@@ -37,7 +37,7 @@
 Summary: The RPM package management system
 Name: rpm
 Version: %{rpmver}
-Release: %{?snapver:0.%{snapver}.}%{baserelease}.1%{?dist}
+Release: %{?snapver:0.%{snapver}.}%{baserelease}%{?dist}
 Url: https://rpm.org/
 License: GPL-2.0-or-later
 Source0: http://ftp.rpm.org/releases/%{srcdir}/rpm-%{srcver}.tar.bz2
@@ -630,6 +630,9 @@ fi
 %doc %{_defaultdocdir}/rpm/API/
 
 %changelog
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 6.0.1-6
+- Rebuilt for Python 3.15
+
 * Mon Feb 16 2026 Panu Matilainen <pmatilai@redhat.com - 6.0.1-5
 - Enable enforcing signature checking by default, make it easy to flip back
   https://fedoraproject.org/wiki/Changes/Enforcing_signature_checking_by_default
