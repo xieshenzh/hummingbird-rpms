@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "12",
-  "sha": "6a3fa292d8c5c0965412d5578ecc37faec5ef120",
+  "release": "1",
+  "sha": "72dd256d978fb6695a31eb91acd44f4633d73b9a",
   "source": "https://src.fedoraproject.org/rpms/python-rpm-macros.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/python-rpm-macros",
-  "version": "3.14"
+  "version": "3.15"
 }
