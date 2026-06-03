@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "56",
-  "sha": "bc32123e9c5829735c4e2aef542ea6b877e843cd",
+  "release": "58",
+  "sha": "254091042a3e504c6b6a2d10d57bccc88d550fb7",
   "source": "https://src.fedoraproject.org/rpms/filesystem.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/filesystem",
   "version": "3.18"
