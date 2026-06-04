@@ -8,8 +8,8 @@
 %global selinuxmoduledir	%{selinuxmodulename}-selinux-%{selinuxmodulever}
 
 Name:           memcached
-Version:        1.6.41
-Release:        1.2%{?dist}
+Version:        1.6.42
+Release:        0.1%{?dist}
 Epoch:          0
 Summary:        High Performance, Distributed Memory Object Cache
 
