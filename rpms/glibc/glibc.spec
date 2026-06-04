@@ -1,4 +1,4 @@
-%global glibcsrcdir glibc-2.42-67-g4ebd33dd77
+%global glibcsrcdir glibc-2.42-70-g6cebb0b80f
 %global glibcversion 2.42
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
@@ -152,7 +152,7 @@ Version: %{glibcversion}
 # - It allows using the Release number without the %%dist tag in the dependency
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
-%global baserelease 13
+%global baserelease 14
 Release: %{baserelease}%{?dist}
 
 # Licenses:
@@ -2392,6 +2392,13 @@ update_gconv_modules_cache ()
 %endif
 
 %changelog
+* Tue Jun 02 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-14
+- Auto-sync with upstream branch release/2.42/master,
+  commit 6cebb0b80fd783e442a8ad27c3f52cde52a9cac7:
+- stdio-common: Allow partially-filled %mc buffers [BZ #12701] (DJ Delorie)
+- stdio-common: Reject insufficient character data in scanf [BZ #12701] (Maciej W. Rozycki)
+- support: Implement 'xfmemopen' for seamless 'fmemopen' use (Maciej W. Rozycki)
+
 * Tue May 12 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-13
 - Auto-sync with upstream branch release/2.42/master,
   commit 4ebd33dd77eabe8d4c45232bed4b42a31d2f9edc:
