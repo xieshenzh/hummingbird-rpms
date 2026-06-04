@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Pre-existing modification - requires review",
   "modification_status": "modified",
-  "release": "9",
-  "sha": "8ff0583949691aa14723d9a6257038dc738fe95f",
+  "release": "10",
+  "sha": "4ecb6981d2cfeaf3fe27590187721be98080c0e3",
   "source": "https://src.fedoraproject.org/rpms/gdb.git",
   "upstream_repo": "https://sourceware.org/git/binutils-gdb.git",
   "version": "17.1"
