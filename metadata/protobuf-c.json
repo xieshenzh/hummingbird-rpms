@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "0b6d4e9189f315474bd43e8775cf902df8028321",
+  "release": "3",
+  "sha": "71837fdb582e73cc0944bcaa11fd6d4a981e90eb",
   "source": "https://src.fedoraproject.org/rpms/protobuf-c.git",
   "upstream_repo": "https://github.com/protobuf-c/protobuf-c",
   "version": "1.5.2"
