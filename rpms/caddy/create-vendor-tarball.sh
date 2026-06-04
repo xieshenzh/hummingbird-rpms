@@ -33,8 +33,8 @@ esac
 echo "Using tag: $tag"
 echo "Using version: $version"
 
-git -c advice.detachedHead=false clone --branch $tag --depth 1 $REPO.git $PKG-$version
-pushd $PKG-$version
+git -c advice.detachedHead=false clone --branch "$tag" --depth 1 "$REPO".git "$PKG-$version"
+pushd "$PKG-$version"
 GOPROXY='https://proxy.golang.org,direct' go mod vendor
 popd
-tar -C $PKG-$version -czf $PKG-$version-vendor.tar.gz vendor
+tar -C "$PKG-$version" -cjf "$PKG-$version-vendor.tar.bz2" vendor
