@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "5",
-  "sha": "dffa8a0501aa700b7bb6f31e1659d6b12ed042fe",
+  "release": "6",
+  "sha": "b3b2c2dac5d558974b3ccfc3ee7b7b4d658e7d9e",
   "source": "https://src.fedoraproject.org/rpms/createrepo_c.git",
   "upstream_repo": "https://github.com/rpm-software-management/createrepo_c",
   "version": "1.2.1"
