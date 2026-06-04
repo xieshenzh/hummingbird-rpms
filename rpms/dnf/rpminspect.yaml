@@ -1,0 +1,4 @@
+---
+inspections:
+  # dnf-bootc is an empty metapackage.
+  emptyrpm: off
