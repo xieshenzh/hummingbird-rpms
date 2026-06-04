@@ -132,6 +132,9 @@ llvm21:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+memcached:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 nodejs25:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
   build_platforms:
