@@ -178,6 +178,9 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     # has since been superseded by the 0.3.1 update.
     bad_commits = [line for line in bad_commits if not line.startswith('fbd9bdab64f786daada3e54ae795936e8d822075 ')]
 
+    # glibc OPEN_TREE_* backport (bug 33921) superseded by upstream 2.42-14.
+    bad_commits = [line for line in bad_commits if not line.startswith('1edd3cab10e1047d6374e2233ede46443776f3c9 ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)
