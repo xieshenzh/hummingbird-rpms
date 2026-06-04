@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "f289011003bcdd8d1f1927005e5107a793c92e4f",
+  "release": "1",
+  "sha": "2c087dc49427d4d88fe725b5cb77f0e8d3809a6a",
   "source": "https://src.fedoraproject.org/rpms/rust-rpds.git",
   "upstream_repo": "https://github.com/orium/rpds",
-  "version": "1.2.0"
+  "version": "1.2.1"
 }
