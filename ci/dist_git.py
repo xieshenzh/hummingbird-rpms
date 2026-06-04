@@ -33,6 +33,7 @@ METADATA_DIR = ROOT_DIR / 'metadata'
 RELEASES_JSON = ROOT_DIR / 'upstream-releases.json'
 PACKAGE_OVERRIDES_YAML = ROOT_DIR / 'ci' / 'package-overrides.yaml'
 RENAMED_PACKAGES_JSON = ROOT_DIR / 'ci' / 'renamed_packages.json'
+UPDATE_STATE_FILE = ROOT_DIR / '.dist_git_update_state.json'
 
 # Match %autorelease in spec files (possibly with braces/options like -b, -e, etc.)
 # Can be anywhere, not just in the Release: line, as some packages like nodejs* use
@@ -573,6 +574,33 @@ def get_dist_tag(branch: str) -> str:
 
     sys.exit(f"ERROR: Unknown branch '{branch}'. Run 'update-releases' to refresh.")
 
+
+
+def _is_forward_branch_move(branch_changed: bool, old_branch: str, new_branch: str) -> bool:
+    """Check if a branch change should allow version downgrades.
+
+    Returns True for:
+    - Forward numbered moves (e.g., f43 -> f44)
+    - Moving from rawhide to any numbered branch (pinning to a release)
+    Returns False for backward numbered moves (f44 -> f43) or cross-distro moves.
+    """
+    if not branch_changed:
+        return False
+
+    # Moving from rawhide to a numbered branch is always allowed
+    if old_branch == 'rawhide':
+        return True
+
+    old_tag = get_dist_tag(old_branch)
+    new_tag = get_dist_tag(new_branch)
+
+    old_match = re.match(r'^f(\d+)$', old_tag)
+    new_match = re.match(r'^f(\d+)$', new_tag)
+
+    if old_match and new_match:
+        return int(new_match.group(1)) > int(old_match.group(1))
+
+    return False
 
 
 def get_highest_fedora_release() -> str | None:
@@ -1155,7 +1183,7 @@ def merge_local_modifications(package_name: str, package_dir: Path, tmpdir: Path
 
 def update(package_name: str, skip_build_check: bool = False, sync: bool = False,
            dry_run: bool = False, allow_prerelease: bool = False, mark: bool = False,
-           ref: str | None = None) -> None:
+           ref: str | None = None, branch: str | None = None) -> None:
     """Update a single package from upstream.
 
     In update mode (not sync), local modifications are automatically merged with upstream changes.
@@ -1163,7 +1191,9 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
 
     In sync mode, local modifications are discarded.
 
-    If ref is provided, update to that specific commit instead of latest."""
+    If ref is provided, update to that specific commit instead of latest.
+
+    If branch is provided, switch to that upstream branch and update from it."""
     if package_name not in imports:
         sys.exit(f"ERROR: Package {package_name} not found (missing metadata/{package_name}.json)")
 
@@ -1177,6 +1207,17 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
     if status == 'native':
         sys.exit(f"ERROR: Cannot update native package {package_name}\n")
 
+    # Resolve effective branch: --branch override or current metadata branch
+    old_branch = metadata['branch']
+    if branch and branch != old_branch:
+        branch_changed = True
+        effective_branch = branch
+        get_dist_tag(effective_branch)
+        logging.info("Switching %s from branch %s to %s", package_name, old_branch, effective_branch)
+    else:
+        branch_changed = False
+        effective_branch = old_branch
+
     # Extract the upstream package name from the source URL (for Koji queries)
     # This may differ from the directory name
     upstream_package_name = Path(metadata['source']).stem
@@ -1186,13 +1227,13 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
         latest_sha = ref  # Will be resolved to full SHA during clone
     else:
         # Use ls-remote to get latest commit (fast, no clone needed)
-        result = run_git('ls-remote', metadata['source'], metadata['branch'])
+        result = run_git('ls-remote', metadata['source'], effective_branch)
         if not result.stdout.strip():
             sys.exit(f"ERROR: Unable to query remote for {package_name}")
         latest_sha = result.stdout.split()[0]
 
     # Check if there's an update
-    if latest_sha == metadata['sha']:
+    if latest_sha == metadata['sha'] and not branch_changed:
         if sync and not mark:
             sys.exit(f"ERROR: Package {package_name} is already at upstream {latest_sha[:8]}")
         if not mark:
@@ -1202,8 +1243,11 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
         # Mark mode: verify package is actually unmodified and create empty commit
         with tempfile.TemporaryDirectory() as tmpdir:
             upstream_dir = Path(tmpdir) / package_name
-            run_git('clone', '--quiet', '--branch', metadata['branch'], '--single-branch',
-                    metadata['source'], str(upstream_dir))
+            clone_args = ['clone', '--quiet', '--branch', effective_branch]
+            if not branch_changed:
+                clone_args.append('--single-branch')
+            clone_args.extend([metadata['source'], str(upstream_dir)])
+            run_git(*clone_args)
 
             if not is_package_unmodified(package_name, metadata, upstream_dir):
                 sys.exit(f"ERROR: Cannot mark {package_name} as synced - package has modifications\n"
@@ -1218,12 +1262,17 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
         metadata['modification_status'] = 'clean'
         if 'modification_reason' in metadata:
             del metadata['modification_reason']
+        if branch_changed:
+            metadata['branch'] = effective_branch
 
         # Create empty commit with proper Upstream: trailer
         if not dry_run:
             save_package_metadata(package_name, metadata)
             run_git('add', str(METADATA_DIR / f'{package_name}.json'), cwd=ROOT_DIR)
-            commit_msg = f"Sync {package_name} to {version}-{release} (mark)\n\nUpstream: {latest_sha}"
+            if branch_changed:
+                commit_msg = f"Sync {package_name} to {version}-{release} (mark, {old_branch} -> {effective_branch})\n\nUpstream: {latest_sha}"
+            else:
+                commit_msg = f"Sync {package_name} to {version}-{release} (mark)\n\nUpstream: {latest_sha}"
             run_git_commit('--allow-empty', '-m', commit_msg, cwd=ROOT_DIR)
 
         logging.info("Marked %s as synced (no changes, empty commit)", package_name)
@@ -1234,8 +1283,15 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
 
     with tempfile.TemporaryDirectory() as tmpdir:
         upstream_dir = Path(tmpdir) / package_name
-        run_git('clone', '--quiet', '--branch', metadata['branch'], '--single-branch',
-                metadata['source'], str(upstream_dir))
+        clone_args = ['clone', '--quiet', '--branch', effective_branch]
+        if not branch_changed:
+            clone_args.append('--single-branch')
+        clone_args.extend([metadata['source'], str(upstream_dir)])
+        run_git(*clone_args)
+        if branch_changed:
+            # Create a local branch for the old branch so is_package_unmodified()
+            # and merge_local_modifications() can reference the old SHA
+            run_git('branch', old_branch, f'origin/{old_branch}', cwd=upstream_dir)
         if ref:
             logging.info("Checking out ref: %s", ref)
             run_git('checkout', '--quiet', ref, cwd=upstream_dir)
@@ -1249,14 +1305,14 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
         # Query MDAPI for autorelease if needed (but don't modify upstream_dir yet, it's a git repo)
         has_autorelease = uses_autorelease(upstream_dir)
         if has_autorelease:
-            resolved_release = query_autorelease_from_mdapi(upstream_package_name, metadata['branch'], release)
+            resolved_release = query_autorelease_from_mdapi(upstream_package_name, effective_branch, release)
             if resolved_release:
                 release = resolved_release
 
         logging.info("Version: %s-%s", version, release)
 
-        # Skip if upstream version is older than current version (unless sync)
-        if not sync:
+        # Skip if upstream version is older than current version (unless sync or forward branch move)
+        if not sync and not _is_forward_branch_move(branch_changed, old_branch, effective_branch):
             try:
                 if Version(version) < Version(metadata['version']):
                     logging.warning(
@@ -1268,15 +1324,15 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
 
         # Check track_upstream constraint - skip if upstream version doesn't match prefix
         tv = metadata.get('track_upstream')
-        if not sync and tv and tv != 'latest':
+        if not sync and not branch_changed and tv and tv != 'latest':
             if not (version == tv or version.startswith(tv + '.')):
                 logging.warning(
                     "Skipping %s: upstream version %s doesn't match tracked version %s",
                     package_name, version, tv)
                 return
 
-        # Check for pre-release version (unless sync or --allow-prerelease)
-        if not sync and not allow_prerelease:
+        # Check for pre-release version (unless sync, --allow-prerelease, or branch change)
+        if not sync and not allow_prerelease and not branch_changed:
             is_pre, pattern = is_prerelease(version, release)
             if is_pre:
                 logging.warning("Skipping %s: pre-release version detected - %s (version: %s-%s)",
@@ -1284,13 +1340,13 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
                 logging.info("Use --allow-prerelease to override this check")
                 return
 
-        dist_tag = get_dist_tag(metadata['branch'])
+        dist_tag = get_dist_tag(effective_branch)
 
         # Check if this version-release was built in Koji; syncing is a human thing,
         # assume they know what they are doing
         if not skip_build_check and not sync:
             logging.info("Checking Koji for build %s-%s-%s...", upstream_package_name, version, release)
-            if not check_koji_build(upstream_package_name, version, release, latest_sha, dist_tag, metadata['branch']):
+            if not check_koji_build(upstream_package_name, version, release, latest_sha, dist_tag, effective_branch):
                 logging.info("Skipping %s: %s-%s not built in Koji", package_name, version, release)
                 return
 
@@ -1324,6 +1380,8 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
         imports[package_name]['sha'] = latest_sha
         imports[package_name]['version'] = version
         imports[package_name]['release'] = release
+        if branch_changed:
+            imports[package_name]['branch'] = effective_branch
 
         if sync or not has_modifications:
             # Reset modification_status to clean after successful update/sync
@@ -1333,16 +1391,69 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
 
         save_package_metadata(package_name, imports[package_name])
 
-        # Commit the changes
+        # Commit the changes (or stage for manual resolution on conflict)
         if not dry_run:
+            if has_conflicts:
+                # Stage metadata but leave conflicted package files for manual resolution
+                run_git('add', '-f', f'metadata/{package_name}.json', cwd=ROOT_DIR)
+
+                # Save state for --continue
+                verb = "Sync" if sync else "Update"
+                branch_suffix = f" ({old_branch} -> {effective_branch})" if branch_changed else ""
+                commit_msg = f"{verb} {package_name} from {old_version}-{old_release} to {version}-{release}{branch_suffix}\n\nUpstream: {latest_sha}"
+                with open(UPDATE_STATE_FILE, 'w') as f:
+                    json.dump({'package': package_name, 'commit_msg': commit_msg}, f)
+
+                logging.warning(
+                    "Resolve conflicts in rpms/%s/, then:\n"
+                    "  ./ci/dist_git.py update --continue",
+                    package_name)
+                sys.exit(2)
+
             run_git('add', '-f', f'rpms/{package_name}', f'metadata/{package_name}.json', cwd=ROOT_DIR)
             verb = "Sync" if sync else "Update"
-            commit_msg = f"{verb} {package_name} from {old_version}-{old_release} to {version}-{release}\n\nUpstream: {latest_sha}"
+            branch_suffix = f" ({old_branch} -> {effective_branch})" if branch_changed else ""
+            commit_msg = f"{verb} {package_name} from {old_version}-{old_release} to {version}-{release}{branch_suffix}\n\nUpstream: {latest_sha}"
             run_git_commit('-m', commit_msg, cwd=ROOT_DIR)
 
-            # Exit with code 2 for conflicts (success but needs manual resolution)
-            if has_conflicts:
-                sys.exit(2)
+
+def continue_update(dry_run: bool = False) -> None:
+    """Continue a conflicted update after manual conflict resolution.
+
+    Reads the state file written by update() on conflict, verifies conflicts
+    are resolved, stages the package files, and commits.
+    """
+    if not UPDATE_STATE_FILE.exists():
+        sys.exit("ERROR: No update in progress. Nothing to continue.")
+
+    with open(UPDATE_STATE_FILE) as f:
+        state = json.load(f)
+
+    package_name = state['package']
+    commit_msg = state['commit_msg']
+    package_dir = RPMS_DIR / package_name
+
+    if not package_dir.exists():
+        UPDATE_STATE_FILE.unlink()
+        sys.exit(f"ERROR: Package directory rpms/{package_name}/ not found")
+
+    # Check for remaining conflict markers
+    for path in package_dir.rglob('*'):
+        if path.is_file():
+            try:
+                content = path.read_text()
+            except UnicodeDecodeError:
+                continue
+            if '<<<<<<<' in content:
+                sys.exit(f"ERROR: Unresolved conflicts in {path.relative_to(ROOT_DIR)}\n"
+                         f"       Resolve all conflicts, then run: ./ci/dist_git.py update --continue")
+
+    if not dry_run:
+        run_git('add', '-f', f'rpms/{package_name}', f'metadata/{package_name}.json', cwd=ROOT_DIR)
+        run_git_commit('-m', commit_msg, cwd=ROOT_DIR)
+
+    UPDATE_STATE_FILE.unlink()
+    logging.info("Committed resolved update for %s", package_name)
 
 
 def rebuild_package(package_name: str, reason: str, dry_run: bool = False) -> None:
@@ -1927,6 +2038,10 @@ Examples:
                               help='Allow updating to pre-release versions (rc, alpha, beta, dev, etc.)')
     update_parser.add_argument('--ref', type=str,
                               help='Update to specific commit/tag/ref instead of latest')
+    update_parser.add_argument('--branch', type=str,
+                              help='Switch to a different upstream branch and update from it (e.g., --branch f44)')
+    update_parser.add_argument('--continue', action='store_true', dest='continue_',
+                              help='Continue a conflicted update after resolving conflicts')
 
     # sync command
     sync_parser = subparsers.add_parser('sync', help='Force-sync package to upstream (discards local changes)')
@@ -1935,6 +2050,8 @@ Examples:
                             help='Mark package as synced even if already at upstream (creates empty commit with Upstream: trailer). Fails if package has actual modifications.')
     sync_parser.add_argument('--ref', type=str,
                             help='Sync to specific commit/tag/ref instead of latest')
+    sync_parser.add_argument('--branch', type=str,
+                            help='Switch to a different upstream branch and sync from it (e.g., --branch f44)')
 
     # rebuild command
     rebuild_parser = subparsers.add_parser('rebuild',
@@ -2041,12 +2158,22 @@ Examples:
         case 'import':
             import_(args.url, args.branch, args.ref, args.directory, args.dry_run)
         case 'update':
-            packages = [args.package] if args.package else list(imports.keys())
-            for pkg in packages:
-                update(pkg, args.skip_build_check, dry_run=args.dry_run,
-                       allow_prerelease=args.allow_prerelease, ref=args.ref)
+            if args.continue_:
+                continue_update(dry_run=args.dry_run)
+            else:
+                # Clean up stale state from a previous abandoned conflict
+                if UPDATE_STATE_FILE.exists():
+                    UPDATE_STATE_FILE.unlink()
+                if args.branch and not args.package:
+                    sys.exit("ERROR: --branch requires a package name (cannot change branch for all packages)")
+                packages = [args.package] if args.package else list(imports.keys())
+                for pkg in packages:
+                    update(pkg, args.skip_build_check, dry_run=args.dry_run,
+                           allow_prerelease=args.allow_prerelease, ref=args.ref,
+                           branch=args.branch)
         case 'sync':
-            update(args.package, sync=True, dry_run=args.dry_run, mark=args.mark, ref=args.ref)
+            update(args.package, sync=True, dry_run=args.dry_run, mark=args.mark,
+                   ref=args.ref, branch=args.branch)
         case 'rebuild':
             # Validate mutually exclusive options
             if args.all and args.packages:

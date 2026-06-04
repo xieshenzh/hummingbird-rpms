@@ -130,6 +130,22 @@ Test package chocolate (f40)
 """)
     subprocess.run(['git', 'add', 'chocolate.spec'], cwd=chocolate_dir, check=True)
     subprocess.run(['git', 'commit', '-m', 'Update for f40'], cwd=chocolate_dir, check=True)
+
+    # Create f99 branch (higher version than f40, for testing release upgrades)
+    subprocess.run(['git', 'checkout', '-b', 'f99'], cwd=chocolate_dir, check=True)
+    choc_spec.write_text("""Name: chocolate
+Version: 99
+Release: 1%{?dist}
+Summary: Test package chocolate
+License: GPL
+
+%description
+Test package chocolate (f99)
+
+%files
+""")
+    subprocess.run(['git', 'add', 'chocolate.spec'], cwd=chocolate_dir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Update for f99'], cwd=chocolate_dir, check=True)
     subprocess.run(['git', 'checkout', 'rawhide'], cwd=chocolate_dir, check=True)
 
     repos['chocolate'] = chocolate_dir
@@ -1225,7 +1241,7 @@ def test_update_merge_clean(workdir: Path, upstream_repos: dict[str, Path], modi
 
 
 def test_update_merge_conflict(workdir: Path, upstream_repos: dict[str, Path]) -> None:
-    """Update creates commit with conflict markers when local and upstream changes conflict."""
+    """Update leaves conflicts in working tree for manual resolution."""
     # Import chocolate
     subprocess.run(
         [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
@@ -1252,35 +1268,39 @@ def test_update_merge_conflict(workdir: Path, upstream_repos: dict[str, Path]) -
     subprocess.run(['git', 'commit', '-a', '-m', 'Change license to Apache'],
                    cwd=upstream_repos['chocolate'], check=True)
 
-    # Get the new upstream SHA
-    new_sha = subprocess.run(
-        ['git', 'rev-parse', 'HEAD'],
-        cwd=upstream_repos['chocolate'], capture_output=True, text=True, check=True
-    ).stdout.strip()
-
-    # update succeeds with exit code 2 (conflicts)
+    # update exits with code 2 (conflicts)
     result = subprocess.run(
         [str(workdir / 'ci' / 'dist_git.py'), 'update', '--skip-build-check', 'chocolate'],
         cwd=workdir, capture_output=True, text=True,
     )
     assert result.returncode == 2, f"Expected exit code 2 for conflicts, got {result.returncode}"
     assert 'conflict' in result.stderr.lower(), "Expected 'conflict' in stderr"
+    assert 'update --continue' in result.stderr, "Expected --continue instructions"
 
-    # Verify one commit was created
+    # Verify state file was written for --continue
+    state_file = workdir / '.dist_git_update_state.json'
+    assert state_file.exists(), "Expected state file for --continue"
+    with open(state_file) as f:
+        state = json.load(f)
+    assert state['package'] == 'chocolate'
+    assert 'Update chocolate' in state['commit_msg']
+
+    # Verify NO new commit was created (conflicts left in working tree)
     commits_after = subprocess.run(
         ['git', 'rev-list', '--count', 'HEAD'],
         cwd=workdir, capture_output=True, text=True, check=True
     ).stdout.strip()
-    # Initial commit, Import, Local modification; then the Update commit
-    assert commits_after == "4"
+    # Initial commit, Import, Local modification — no Update commit
+    assert commits_after == "3"
 
-    commit_msg = subprocess.run(
-        ['git', 'log', '-1', '--format=%B'],
+    # Verify metadata was staged (updated to new version)
+    metadata_status = subprocess.run(
+        ['git', 'diff', '--cached', '--name-only'],
         cwd=workdir, capture_output=True, text=True, check=True
-    ).stdout
-    assert commit_msg == f'Update chocolate from 10-1 to 11-1\n\nUpstream: {new_sha}\n\n'
+    ).stdout.strip()
+    assert 'metadata/chocolate.json' in metadata_status
 
-    # Verify spec file has conflict markers and both old and new License versions
+    # Verify spec file has conflict markers in working tree
     spec_content = chocolate_spec.read_text()
     assert '<<<<<<< HEAD' in spec_content
     assert '>>>>>>> hummingbird-local' in spec_content
@@ -3232,3 +3252,374 @@ def test_ls_sources() -> None:
     # Verify files were actually downloaded
     assert len(list(tar_dir.glob('tar-*.tar.xz'))) == 1
     assert len(list(tar_dir.glob('tar-*.tar.xz.sig'))) == 1
+
+
+#
+# --branch flag tests
+#
+
+def test_update_with_branch(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Update with --branch switches to a different upstream branch."""
+    # Import chocolate from rawhide (version 10)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Update with --branch f40 (version 4)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--branch', 'f40',
+         '--skip-build-check', 'chocolate'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify metadata updated
+    with open(workdir / 'metadata' / 'chocolate.json') as f:
+        metadata = json.load(f)
+    assert metadata['branch'] == 'f40'
+    assert metadata['version'] == '4'
+
+    # Verify spec file has f40 content
+    spec = (workdir / 'rpms' / 'chocolate' / 'chocolate.spec').read_text()
+    assert 'Version: 4' in spec
+
+    # Verify commit message includes branch change
+    subject, body = get_last_commit_info(workdir)
+    assert '(rawhide -> f40)' in subject
+    assert 'Upstream:' in body
+
+
+def test_update_with_branch_release_upgrade(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Update with --branch from one numbered release to a higher one (f40 -> f99)."""
+    # Import chocolate from f40 (version 4)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', '--branch', 'f40',
+         f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Update with --branch f99 (version 99)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--branch', 'f99',
+         '--skip-build-check', 'chocolate'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify metadata updated
+    with open(workdir / 'metadata' / 'chocolate.json') as f:
+        metadata = json.load(f)
+    assert metadata['branch'] == 'f99'
+    assert metadata['version'] == '99'
+
+    # Verify commit message includes branch change
+    subject, _ = get_last_commit_info(workdir)
+    assert '(f40 -> f99)' in subject
+
+
+def test_update_with_branch_modified_package(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Update with --branch merges local modifications across branch change."""
+    # Import chocolate from rawhide (version 10)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Add a local modification (extra comment in spec) and mark as modified
+    spec_path = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    spec_content = spec_path.read_text()
+    spec_path.write_text(spec_content + '# Hummingbird local modification\n')
+    subprocess.run(['git', 'add', '-A'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add local modification'], cwd=workdir, check=True)
+
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'mark-modified', '--modified',
+         '--reason', 'test modification', 'chocolate'],
+        cwd=workdir, check=True,
+    )
+
+    # Update with --branch f40 (version 4) — should merge our local mod
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--branch', 'f40',
+         '--skip-build-check', 'chocolate'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify metadata updated
+    with open(workdir / 'metadata' / 'chocolate.json') as f:
+        metadata = json.load(f)
+    assert metadata['branch'] == 'f40'
+    assert metadata['version'] == '4'
+    assert metadata['modification_status'] == 'modified'
+
+    # Verify local modification survived the merge
+    spec_content = spec_path.read_text()
+    assert '# Hummingbird local modification' in spec_content
+    assert 'Version: 4' in spec_content
+
+
+def test_update_with_branch_same_branch(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Update with --branch same as current behaves like normal update."""
+    # Import chocolate from rawhide (version 10)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Add upstream commit on rawhide
+    add_upstream_commit(upstream_repos["chocolate"], 'chocolate', '10', '11')
+
+    # Update with --branch rawhide (same branch)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--branch', 'rawhide',
+         '--skip-build-check', 'chocolate'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify normal update happened
+    with open(workdir / 'metadata' / 'chocolate.json') as f:
+        metadata = json.load(f)
+    assert metadata['branch'] == 'rawhide'
+    assert metadata['version'] == '11'
+
+    # Verify commit message does NOT include branch change annotation
+    subject, _ = get_last_commit_info(workdir)
+    assert '->' not in subject
+
+
+def test_update_with_branch_requires_package(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Update with --branch but no package name fails with error."""
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--branch', 'f40'],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode != 0
+    assert '--branch requires a package name' in result.stderr
+
+
+def test_update_with_branch_lower_version(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Forward branch move allows version downgrade; backward move blocks it."""
+    # Import chocolate from f99 (version 99)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', '--branch', 'f99',
+         f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # f99 -> f40 is a backward move — version downgrade should be blocked
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--branch', 'f40',
+         '--skip-build-check', 'chocolate'],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    # The update should silently skip (exit 0) with a warning about older version
+    assert result.returncode == 0
+    assert 'upstream version 4 is older than current 99' in result.stderr
+
+    # Verify metadata NOT changed (branch still f99)
+    with open(workdir / 'metadata' / 'chocolate.json') as f:
+        metadata = json.load(f)
+    assert metadata['branch'] == 'f99'
+    assert metadata['version'] == '99'
+
+    # rawhide -> f40 IS a forward move (rawhide resolves to f99, the highest)
+    # Re-import from rawhide first
+    subprocess.run(['git', 'rm', '-rf', 'rpms/chocolate', 'metadata/chocolate.json'],
+                   cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Remove chocolate'], cwd=workdir, check=True)
+
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # rawhide (v10) -> f40 (v4): version goes down but rawhide->f40 is forward
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--branch', 'f40',
+         '--skip-build-check', 'chocolate'],
+        cwd=workdir, check=True,
+    )
+
+    with open(workdir / 'metadata' / 'chocolate.json') as f:
+        metadata = json.load(f)
+    assert metadata['branch'] == 'f40'
+    assert metadata['version'] == '4'
+
+
+def test_sync_with_branch(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Sync with --branch switches branch and discards local modifications."""
+    # Import chocolate from rawhide (version 10)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Add local modification and mark as modified
+    spec_path = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    spec_content = spec_path.read_text()
+    spec_path.write_text(spec_content + '# Local change to discard\n')
+    subprocess.run(['git', 'add', '-A'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Local change'], cwd=workdir, check=True)
+
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'mark-modified', '--modified',
+         '--reason', 'test', 'chocolate'],
+        cwd=workdir, check=True,
+    )
+
+    # Sync with --branch f40
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'sync', '--branch', 'f40', 'chocolate'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify metadata updated and status reset
+    with open(workdir / 'metadata' / 'chocolate.json') as f:
+        metadata = json.load(f)
+    assert metadata['branch'] == 'f40'
+    assert metadata['version'] == '4'
+    assert metadata['modification_status'] == 'clean'
+
+    # Verify local modification discarded
+    spec_content = spec_path.read_text()
+    assert '# Local change to discard' not in spec_content
+    assert 'Version: 4' in spec_content
+
+    # Verify commit message
+    subject, _ = get_last_commit_info(workdir)
+    assert 'Sync' in subject
+    assert '(rawhide -> f40)' in subject
+
+
+def test_update_with_branch_and_ref(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Update with --branch and --ref uses specific commit from new branch."""
+    # Import chocolate from rawhide (version 10)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Add two commits to f40 branch
+    subprocess.run(['git', 'checkout', 'f40'], cwd=upstream_repos["chocolate"], check=True)
+    intermediate_sha = add_upstream_commit(upstream_repos["chocolate"], 'chocolate', '4', '5')
+    add_upstream_commit(upstream_repos["chocolate"], 'chocolate', '5', '6')
+    subprocess.run(['git', 'checkout', 'rawhide'], cwd=upstream_repos["chocolate"], check=True)
+
+    # Update with --branch f40 --ref to intermediate commit (version 5, not 6)
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--branch', 'f40',
+         '--ref', intermediate_sha, '--skip-build-check', 'chocolate'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify we got version 5, not 6
+    with open(workdir / 'metadata' / 'chocolate.json') as f:
+        metadata = json.load(f)
+    assert metadata['branch'] == 'f40'
+    assert metadata['version'] == '5'
+    assert metadata['sha'] == intermediate_sha
+
+
+#
+# --continue flag tests
+#
+
+def _create_conflict(workdir: Path, upstream_repos: dict[str, Path]) -> str:
+    """Set up a conflicted update and return the new upstream SHA.
+
+    Imports chocolate, makes a local License change, makes a conflicting upstream
+    change, and runs update which exits with code 2.
+    """
+    # Import chocolate from rawhide
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Make local modification: change License line
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    spec_content = chocolate_spec.read_text()
+    chocolate_spec.write_text(spec_content.replace('License: GPL', 'License: MIT'))
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), '--dry-run', 'mark-modified', '--modified',
+         '--reason', 'Local license change', 'chocolate'], cwd=workdir, check=True,
+    )
+    subprocess.run(['git', 'commit', '-a', '-m', 'Local modification'], cwd=workdir, check=True)
+
+    # Make conflicting upstream change
+    upstream_spec = upstream_repos['chocolate'] / 'chocolate.spec'
+    upstream_content = upstream_spec.read_text()
+    updated = upstream_content.replace('License: GPL', 'License: Apache-2.0')
+    updated = updated.replace('Version: 10', 'Version: 11')
+    upstream_spec.write_text(updated)
+    subprocess.run(['git', 'commit', '-a', '-m', 'Change license to Apache'],
+                   cwd=upstream_repos['chocolate'], check=True)
+
+    new_sha = subprocess.run(
+        ['git', 'rev-parse', 'HEAD'],
+        cwd=upstream_repos['chocolate'], capture_output=True, text=True, check=True
+    ).stdout.strip()
+
+    # Run update — exits with code 2 (conflicts)
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--skip-build-check', 'chocolate'],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode == 2
+    return new_sha
+
+
+def test_update_continue(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Full conflict -> resolve -> --continue flow."""
+    new_sha = _create_conflict(workdir, upstream_repos)
+
+    # Resolve conflicts by picking our License
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    spec_content = chocolate_spec.read_text()
+    resolved = re.sub(r'<<<<<<< HEAD\n.*?=======\n(.*?)>>>>>>> hummingbird-local\n',
+                      r'\1', spec_content, flags=re.DOTALL)
+    chocolate_spec.write_text(resolved)
+
+    # Run --continue
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--continue'],
+        cwd=workdir, check=True,
+    )
+
+    # Verify commit was created with correct message
+    subject, body = get_last_commit_info(workdir)
+    assert 'Update chocolate from 10-1 to 11-1' in subject
+    assert f'Upstream: {new_sha}' in body
+
+    # Verify state file was cleaned up
+    assert not (workdir / '.dist_git_update_state.json').exists()
+
+    # Verify resolved spec is committed (no conflict markers)
+    committed_spec = chocolate_spec.read_text()
+    assert '<<<<<<' not in committed_spec
+    assert 'License: MIT' in committed_spec
+
+
+def test_update_continue_no_state(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """--continue with no state file exits with error."""
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--continue'],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode != 0
+    assert 'No update in progress' in result.stderr
+
+
+def test_update_continue_unresolved(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """--continue with remaining conflict markers exits with error."""
+    _create_conflict(workdir, upstream_repos)
+
+    # Try --continue WITHOUT resolving conflicts
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--continue'],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode != 0
+    assert 'Unresolved conflicts' in result.stderr
+
+    # Verify state file still exists (for retry)
+    assert (workdir / '.dist_git_update_state.json').exists()
