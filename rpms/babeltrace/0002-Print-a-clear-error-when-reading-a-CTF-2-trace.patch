@@ -1,0 +1,131 @@
+From cc7676cd8312c71a645f8cd991a4e62cdffc2e4a Mon Sep 17 00:00:00 2001
+From: Philippe Proulx <eeppeliteloop@gmail.com>
+Date: Thu, 4 Jun 2026 09:41:55 -0400
+Subject: [PATCH 2/2] Print a clear error when reading a CTF 2 trace
+
+A CTF 2 metadata stream starts with an ASCII RS (0x1e) byte, which
+Babeltrace 1.x can't parse as TSDL.
+
+Detect it and fail with a message pointing to Babeltrace 2.1+ instead of
+confusing syntax errors.
+
+Resolves: S-2582
+Signed-off-by: Philippe Proulx <eeppeliteloop@gmail.com>
+Change-Id: If191d87c2b65a9df10c045c52d6ec2d01aea187d
+Reviewed-on: https://review.lttng.org/c/babeltrace/+/18016
+---
+ formats/ctf/ctf.c                       |  16 ++++++
+ tests/ctf-traces/fail/ctf-2/dummystream | Bin 0 -> 69 bytes
+ tests/ctf-traces/fail/ctf-2/metadata    |  72 ++++++++++++++++++++++++
+ 3 files changed, 88 insertions(+)
+ create mode 100644 tests/ctf-traces/fail/ctf-2/dummystream
+ create mode 100644 tests/ctf-traces/fail/ctf-2/metadata
+
+diff --git a/formats/ctf/ctf.c b/formats/ctf/ctf.c
+index 1ba9017fd..96a1e066b 100644
+--- a/formats/ctf/ctf.c
++++ b/formats/ctf/ctf.c
+@@ -1503,6 +1503,22 @@ int ctf_trace_metadata_read(struct ctf_trace *td, FILE *metadata_fp,
+ 	if (babeltrace_debug)
+ 		yydebug = 1;
+ 
++	/* CTF 2 support starts with Babeltrace 2.1 */
++	{
++		const int first = fgetc(fp);
++
++		rewind(fp);
++
++		if (first == 0x1e) {
++			fprintf(stderr,
++				"[warning] This is a CTF 2 trace: you need Babeltrace 2.1+ to read it.\n"
++				"          Babeltrace 1.x has reached end of life and is no longer\n"
++				"          maintained: please upgrade.\n");
++			ret = -1;
++			goto end;
++		}
++	}
++
+ 	if (packet_metadata(td, fp)) {
+ 		ret = ctf_trace_metadata_stream_read(td, &fp, &buf);
+ 		if (ret) {
+diff --git a/tests/ctf-traces/fail/ctf-2/metadata b/tests/ctf-traces/fail/ctf-2/metadata
+new file mode 100644
+index 000000000..6ba75e858
+--- /dev/null
++++ b/tests/ctf-traces/fail/ctf-2/metadata
+@@ -0,0 +1,72 @@
++{
++  "type": "preamble",
++  "uuid": [
++    42,
++    100,
++    34,
++    208,
++    108,
++    238,
++    17,
++    224,
++    140,
++    8,
++    203,
++    7,
++    215,
++    179,
++    165,
++    100
++  ],
++  "version": 2
++}
++{
++  "packet-header-field-class": {
++    "member-classes": [
++      {
++        "field-class": {
++          "alignment": 32,
++          "byte-order": "little-endian",
++          "length": 32,
++          "preferred-display-base": 16,
++          "roles": [
++            "packet-magic-number"
++          ],
++          "type": "fixed-length-unsigned-integer"
++        },
++        "name": "magic"
++      },
++      {
++        "field-class": {
++          "length": 16,
++          "roles": [
++            "metadata-stream-uuid"
++          ],
++          "type": "static-length-blob"
++        },
++        "name": "uuid"
++      }
++    ],
++    "type": "structure"
++  },
++  "type": "trace-class",
++  "uid": "2a6422d0-6cee-11e0-8c08-cb07d7b3a564"
++}
++{
++  "type": "data-stream-class"
++}
++{
++  "name": "string",
++  "payload-field-class": {
++    "member-classes": [
++      {
++        "field-class": {
++          "type": "null-terminated-string"
++        },
++        "name": "str"
++      }
++    ],
++    "type": "structure"
++  },
++  "type": "event-record-class"
++}
+-- 
+2.54.0
+
