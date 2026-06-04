@@ -9,7 +9,7 @@
 
 %global gomodulesmode GO111MODULE=on
 
-%bcond tests 0
+%bcond tests 1
 
 %if %{defined fedora}
 %define build_with_btrfs 1
