@@ -9,7 +9,7 @@ Name: redhat-rpm-config
 # the older branch. When the branch diverges, bump the Version to the Fedora
 # release number.
 Version: 344
-Release: 1.1%{?dist}
+Release: 2%{?dist}
 # config.guess, config.sub are GPL-3.0-or-later WITH Autoconf-exception-generic
 License: GPL-1.0-or-later AND GPL-2.0-or-later AND GPL-3.0-or-later WITH Autoconf-exception-generic
 URL: https://src.fedoraproject.org/rpms/redhat-rpm-config
@@ -93,6 +93,7 @@ Requires: cmake-srpm-macros
 Requires: fonts-srpm-macros
 # ↓ Provides macros.forge and forge.lua originally shipped by us
 Requires: forge-srpm-macros
+Requires: gnome-srpm-macros
 Requires: go-srpm-macros
 Requires: java-srpm-macros
 # ↓ Provides kmod.attr originally shipped by us
