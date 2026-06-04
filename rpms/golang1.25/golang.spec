@@ -110,7 +110,7 @@
 
 Name:           %{basepackagename}1.25
 Version:        %{go_version}
-Release:        0.1%{?dist}
+Release:        2%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
@@ -150,7 +150,6 @@ Provides: bundled(golang(golang.org/x/sys)) = 0.33.1.0.20260225210015.e0c9f78de9
 Provides: bundled(golang(golang.org/x/telemetry)) = 0.0.0.20250606142133.60998feb31a8
 Provides: bundled(golang(golang.org/x/term)) = 0.32.0
 Provides: bundled(golang(golang.org/x/text)) = 0.26.0
-Provides: bundled(golang(golang.org/x/tools)) = 0.27.0
 Provides: bundled(golang(golang.org/x/tools)) = 0.34.0
 Provides: bundled(golang(rsc.io/markdown)) = 0.0.0.20240306144322.0bf8f97ee8ef
 
