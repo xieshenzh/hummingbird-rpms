@@ -1,0 +1,255 @@
+From d31f7484b80032b13cb70d743b0600c843e0fd89 Mon Sep 17 00:00:00 2001
+From: Christophe Bedard <bedard.christophe@gmail.com>
+Date: Wed, 29 Apr 2026 18:26:45 -0700
+Subject: [PATCH 1/2] Fix: handle NULL list pointer to avoid Python segfault
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Before a change in SWIG 4.3.0 [0], `AppendOutput(Py_None, count_obj)`
+returned just `count_obj`, an `int`, when an error happens. That value
+is garbage because `*len` (`== count_obj`) is not initialized by
+`bt_ctf_get_field_list()` & friends when they return an error (e.g.,
+when called for an event scope that does not exist on the event, like
+`EVENT_CONTEXT` on an event without per-event context). However, it's
+not a `list`, so `if not isinstance(ret, list): return` in
+`EventDeclaration.fields_scope()` (and other location) prevents it from
+resulting in a crash.
+
+After that change, SWIG returns `[None, count_obj]` (still with garbage
+`count_obj`) in this case since it's a non-void return (see the SWIG
+commit). This is unfortunately a `list`, so it keeps going, iterates
+`range(garbage_count)` and dereferences a `NULL` list pointer.
+
+```
+Current thread 0x000073d613434200 [python3] (most recent call first):
+  File "/usr/lib/python3/dist-packages/babeltrace/babeltrace.py", line 83 in _bt_python_field_one_from_list
+  File "/usr/lib/python3/dist-packages/babeltrace/babeltrace.py", line 839 in _field_list_with_scope
+  File "/usr/lib/python3/dist-packages/babeltrace/babeltrace.py", line 719 in field_list_with_scope
+  File "/usr/lib/python3/dist-packages/babeltrace/babeltrace.py", line 792 in keys
+```
+
+See the new Python regression test.
+
+Fix this on the Python caller side: `count` shouldn't be used if the
+call failed in the first place. If `[list_ptr, count]` is returned
+(always the case in SWIG >=4.3.0), make sure `list_ptr is not None`
+before interpreting `count`. The existing checks for
+`isinstance(ret, list)` handle SWIG <4.3.0 returning just `count` when
+the underlying call fails.
+
+I used Claude Opus 4.7 to identify and fix this issue. I've verified
+that this actually resolves the issue.
+
+[0] https://github.com/swig/swig/commit/cd39cf132c96a0887be07c826b80804d7677a701
+
+Fixes: #1439
+
+Change-Id: Ic9ab84c011337f89281879c280f1ed2fe6dbf11a
+Signed-off-by: Christophe Bedard <bedard.christophe@gmail.com>
+Co-authored-by: Simon Marchi <simon.marchi@efficios.com>
+Reviewed-on: https://review.lttng.org/c/babeltrace/+/17654
+Reviewed-by: Jérémie Galarneau <jeremie.galarneau@efficios.com>
+---
+ bindings/python/babeltrace/babeltrace.i.in    |  15 ++-
+ tests/Makefile.am                             |   3 +-
+ tests/bin/intersection/Makefile.am            |   9 +-
+ .../test_python_event_no_context.py           | 104 ++++++++++++++++++
+ 4 files changed, 123 insertions(+), 8 deletions(-)
+ create mode 100755 tests/bin/intersection/test_python_event_no_context.py
+
+diff --git a/bindings/python/babeltrace/babeltrace.i.in b/bindings/python/babeltrace/babeltrace.i.in
+index 8eec1c1d1..38f09068a 100644
+--- a/bindings/python/babeltrace/babeltrace.i.in
++++ b/bindings/python/babeltrace/babeltrace.i.in
+@@ -492,6 +492,8 @@ class TraceHandle(object):
+ 			return
+ 
+ 		ptr_list, count = ret
++		if ptr_list is None:
++			return
+ 		for i in range(count):
+ 			tmp = EventDeclaration.__new__(EventDeclaration)
+ 			tmp._ed =  _bt_python_decl_one_from_list(ptr_list, i)
+@@ -785,7 +787,7 @@ class Event(collections_abc.Mapping):
+ 		for scope in _scopes:
+ 			scope_ptr = _bt_ctf_get_top_level_scope(self._e, scope)
+ 			ret = _bt_python_field_listcaller(self._e, scope_ptr)
+-			if isinstance(ret, list):
++			if isinstance(ret, list) and ret[0] is not None:
+ 				count += ret[1]
+ 		return count
+ 
+@@ -834,12 +836,15 @@ class Event(collections_abc.Mapping):
+ 		fields = []
+ 		scope_ptr = _bt_ctf_get_top_level_scope(self._e, scope)
+ 
+-		# Returns a list [list_ptr, count]. If list_ptr is NULL, SWIG will only
+-		# provide the "count" return value
++		# SWIG returns [list_ptr, count] when the C call wrote a list, or
++		# just the count integer when it returned NULL (SWIG <= 4.2 only;
++		# SWIG >= 4.3 returns [None, garbage]). Treat both NULL forms as
++		# "no fields" since the count is unreliable when list_ptr is NULL
++		# because the C wrapper does not initialize it on error.
+ 		count = 0
+ 		list_ptr = None
+ 		ret = _bt_python_field_listcaller(self._e, scope_ptr)
+-		if isinstance(ret, list):
++		if isinstance(ret, list) and ret[0] is not None:
+ 			list_ptr, count = ret
+ 
+ 		for i in range(count):
+@@ -893,6 +898,8 @@ class EventDeclaration(object):
+ 			return
+ 
+ 		list_ptr, count = ret
++		if list_ptr is None:
++			return
+ 		for i in range(count):
+ 			field_declaration_ptr = _bt_python_field_decl_one_from_list(list_ptr, i)
+ 			if field_declaration_ptr is not None:
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 98c7473c0..d3d7e94f0 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -23,5 +23,6 @@ TESTS += lib/test_dwarf_complete \
+ endif
+ 
+ if USE_PYTHON
+-TESTS += bin/intersection/test_multi_trace_intersection.py
++TESTS += bin/intersection/test_multi_trace_intersection.py \
++	bin/intersection/test_python_event_no_context.py
+ endif
+diff --git a/tests/bin/intersection/Makefile.am b/tests/bin/intersection/Makefile.am
+index 6c7330e58..6f37220d5 100644
+--- a/tests/bin/intersection/Makefile.am
++++ b/tests/bin/intersection/Makefile.am
+@@ -1,9 +1,12 @@
+ check_SCRIPTS = test_intersection \
+ 		bt_python_helper.py \
+-		test_multi_trace_intersection.py
++		test_multi_trace_intersection.py \
++		test_python_event_no_context.py
+ 
+-dist_noinst_SCRIPTS = test_multi_trace_intersection.py
+-EXTRA_DIST=test_multi_trace_intersection.py
++dist_noinst_SCRIPTS = test_multi_trace_intersection.py \
++		test_python_event_no_context.py
++EXTRA_DIST = test_multi_trace_intersection.py \
++		test_python_event_no_context.py
+ 
+ all-local:
+ 	@if [ x"$(srcdir)" != x"$(builddir)" ]; then \
+diff --git a/tests/bin/intersection/test_python_event_no_context.py b/tests/bin/intersection/test_python_event_no_context.py
+new file mode 100755
+index 000000000..d72534e89
+--- /dev/null
++++ b/tests/bin/intersection/test_python_event_no_context.py
+@@ -0,0 +1,104 @@
++#!/usr/bin/env python3
++#
++# The MIT License (MIT)
++#
++# Copyright (C) 2026 - EfficiOS, Inc.
++#
++# Permission is hereby granted, free of charge, to any person obtaining a copy
++# of this software and associated documentation files (the "Software"), to deal
++# in the Software without restriction, including without limitation the rights
++# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++# copies of the Software, and to permit persons to whom the Software is
++# furnished to do so, subject to the following conditions:
++#
++# The above copyright notice and this permission notice shall be included in
++# all copies or substantial portions of the Software.
++#
++# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++# SOFTWARE.
++#
++# This test reproduces a crash that happened when keys() iterated the
++# EVENT_CONTEXT scope of an event with no per-event context.
++
++import bt_python_helper
++import tempfile
++import babeltrace
++import uuid
++import shutil
++
++
++def create_trace(path):
++    writer = babeltrace.CTFWriter.Writer(path)
++    clock = babeltrace.CTFWriter.Clock('test_clock')
++    clock.uuid = uuid.uuid4()
++    writer.add_clock(clock)
++
++    int_type = babeltrace.CTFWriter.IntegerFieldDeclaration(32)
++    event_class = babeltrace.CTFWriter.EventClass('simple_event')
++    event_class.add_field(int_type, 'int_field')
++
++    stream_class = babeltrace.CTFWriter.StreamClass('test_stream')
++    stream_class.add_event_class(event_class)
++    stream_class.clock = clock
++
++    stream = writer.create_stream(stream_class)
++
++    for i in range(5):
++        clock.time = i
++        event = babeltrace.CTFWriter.Event(event_class)
++        event.payload('int_field').value = i
++        stream.append_event(event)
++
++    stream.flush()
++
++
++def print_test_result(test_number, result, description):
++    result_string = 'ok' if result else 'not ok'
++    result_string += ' {} - {}'.format(test_number, description)
++    print(result_string)
++
++
++TEST_COUNT = 3
++
++print('1..{}'.format(TEST_COUNT))
++
++trace_path = tempfile.mkdtemp()
++print('# Creating trace at {}'.format(trace_path))
++create_trace(trace_path)
++
++traces = babeltrace.TraceCollection()
++trace_handle = traces.add_trace(trace_path, 'ctf')
++print_test_result(1, trace_handle is not None, 'Opening generated trace')
++
++context_fields_ok = True
++event_keys_ok = True
++event_count = 0
++
++if trace_handle is not None:
++    for event in traces.events:
++        event_count += 1
++
++        # The crash happened right here.
++        context_fields = event.field_list_with_scope(
++            babeltrace.CTFScope.EVENT_CONTEXT)
++        if context_fields != []:
++            print('# Unexpected event context fields: {}'.format(
++                context_fields))
++            context_fields_ok = False
++
++        keys = event.keys()
++        if 'int_field' not in keys:
++            print('# Unexpected event keys: {}'.format(keys))
++            event_keys_ok = False
++
++print_test_result(2, context_fields_ok,
++                  'Missing EVENT_CONTEXT returns an empty field list')
++print_test_result(3, event_keys_ok and event_count == 5,
++                  'keys() includes payload fields without crashing')
++
++shutil.rmtree(trace_path)
+-- 
+2.54.0
+
