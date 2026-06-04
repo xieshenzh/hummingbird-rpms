@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "1e6dfa5a1e2fae97bf46b772c01b1fa16b92f6be",
+  "release": "3",
+  "sha": "e6e3eedfbf1f8eb36643138d5d31a46c0f9a920c",
   "source": "https://src.fedoraproject.org/rpms/cmake.git",
   "upstream_repo": "https://github.com/Kitware/CMake",
   "version": "4.3.0"
