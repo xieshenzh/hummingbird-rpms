@@ -1,3 +1,25 @@
+* Thu Jun 04 2026 Zdenek Pytela <zpytela@redhat.com> - 45.4-1
+- Update dbus_role_template() with communication over unix dgram socket
+- Allow staff user read nsfs files
+- Allow staff user additional sandboxing permissions
+- Dontaudit sa-update perfmon and sys_admin capabilities
+- packit: Stop notifying martinpitt for Cockpit test failures
+- Allow the kernel to execute also special files
+- Bring back execmem permission for svirt_tcg_t
+- Dontaudit tlp_t requesting dac_read_search (bsc#1265386)
+- Leave content of virtqemud_use_execmem empty
+- Dontaudit libvirt-daemons execmem
+- Allow virtstoraged to setattr fixed disk devices
+- Dontaudit ksmtuned dac_read_search and dac_override capabilities
+- Remove unused hypervkvp_unit_file_t
+- Allow mock create and use its private tmpfs files
+- Allow samba-bgqd send to nmbd over a unix datagram socket
+- Dontaudit apcupsd dac_override (bsc#1261232)
+- Allow virtqemud_t to call and transition into udev
+
+* Wed May 20 2026 Rachel Menge <rlmenge@gmail.com> - 45.3-2
+- Remove deprecated checkreqprot tmpfiles write in selinux-policy.conf
+
 * Mon May 18 2026 Zdenek Pytela <zpytela@redhat.com> - 45.3-1
 - Allow sys_resource on execution of generic executables conditionally
 - Label bootloader-migrate-generator with coreos_bootloader_migrate_generator_exec_t
