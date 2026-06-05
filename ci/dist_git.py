@@ -1451,9 +1451,10 @@ def continue_update(dry_run: bool = False) -> None:
     if not dry_run:
         run_git('add', '-f', f'rpms/{package_name}', f'metadata/{package_name}.json', cwd=ROOT_DIR)
         run_git_commit('-m', commit_msg, cwd=ROOT_DIR)
-
-    UPDATE_STATE_FILE.unlink()
-    logging.info("Committed resolved update for %s", package_name)
+        UPDATE_STATE_FILE.unlink()
+        logging.info("Committed resolved update for %s", package_name)
+    else:
+        logging.info("Dry run: would commit resolved update for %s", package_name)
 
 
 def rebuild_package(package_name: str, reason: str, dry_run: bool = False) -> None:
