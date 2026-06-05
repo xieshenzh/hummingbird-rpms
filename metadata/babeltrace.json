@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "19",
-  "sha": "5eeee0f9f9c3952a077854a205897885aeba36cf",
+  "release": "20",
+  "sha": "02b79c73880611a1c5f34cff1efecb661c84b81a",
   "source": "https://src.fedoraproject.org/rpms/babeltrace.git",
   "upstream_repo": "https://github.com/efficios/babeltrace",
   "version": "1.5.11"
