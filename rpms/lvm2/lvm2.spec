@@ -51,7 +51,7 @@ Name: lvm2
 Epoch: %{rhel}
 %endif
 Version: 2.03.41
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL-2.0-only
 URL: https://sourceware.org/lvm2
 Source0: https://sourceware.org/pub/lvm2/releases/LVM2.%{version}.tgz
