@@ -6,7 +6,7 @@
 
 Name:           cloud-init
 Version:        26.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Cloud instance init scripts
 License:        Apache-2.0 OR GPL-3.0-only
 URL:            https://github.com/canonical/cloud-init
