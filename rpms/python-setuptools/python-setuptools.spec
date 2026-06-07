@@ -11,7 +11,7 @@
 Name:           python-setuptools
 # When updating, update the bundled libraries versions bellow!
 Version:        82.0.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        Easily build and distribute Python packages
 # setuptools is MIT
 # autocommand is LGPL-3.0-only
@@ -189,6 +189,8 @@ test ! -d %{buildroot}%{python3_sitelib}/setuptools/_distutils/tests
 #   the tests require pip-run which we don't have in Fedora
 # -k "not test_wheel_includes_cli_scripts"
 #   the test expects removed .exe files to be installed
+# -k "not test_namespace_package_installed_and_cwd"
+#   the test is failing with python3.15.0b1 - https://github.com/python/cpython/issues/149671
 # --ignore=tools
 #   the tests test various upstream release tools we don't use/ship
 PRE_BUILT_SETUPTOOLS_WHEEL=%{_pyproject_wheeldir}/%{python_wheel_name} \
@@ -199,7 +201,7 @@ PYTHONPATH=$(pwd) %pytest \
  --ignore=setuptools/tests/test_editable_install.py \
  --ignore=setuptools/tests/config/test_apply_pyprojecttoml.py \
  --ignore=tools \
- -k "not test_wheel_includes_cli_scripts and not test_equivalent_output and not test_pkg_info_roundtrip"
+ -k "not test_wheel_includes_cli_scripts and not test_equivalent_output and not test_pkg_info_roundtrip and not test_namespace_package_installed_and_cwd"
 %endif # with tests
 
 
