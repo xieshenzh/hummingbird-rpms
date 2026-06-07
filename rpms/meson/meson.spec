@@ -5,7 +5,7 @@
 
 Name:           meson
 Version:        1.11.1
-Release:        2%{?dist}
+Release:        6%{?dist}
 Summary:        High productivity build system
 
 License:        Apache-2.0
@@ -147,7 +147,6 @@ export MESON_PRINT_TEST_OUTPUT=1
 %endif
 
 %files -f %{pyproject_files}
-%license COPYING
 %{_bindir}/%{name}
 %{_mandir}/man1/%{name}.1*
 %if %{with docs}
