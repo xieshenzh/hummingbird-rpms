@@ -3,7 +3,7 @@
 
 Name:           python-rpds-py
 Version:        0.30.0
-Release:        1.1%{?dist}
+Release:        2%{?dist}
 Summary:        Python bindings to the Rust rpds crate
 # Full license breakdown in LICENSES.dependencies
 License:        MIT AND Apache-2.0 AND (MIT OR Apache-2.0) AND MPL-2.0
