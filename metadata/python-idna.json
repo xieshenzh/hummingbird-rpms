@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "b79f52046a20a3ad77d0015923d1a1a072ea219f",
+  "release": "2",
+  "sha": "4cb094562bce0e6f18b891796adb455c07e26899",
   "source": "https://src.fedoraproject.org/rpms/python-idna.git",
   "upstream_repo": "https://github.com/kjd/idna",
   "version": "3.17"
