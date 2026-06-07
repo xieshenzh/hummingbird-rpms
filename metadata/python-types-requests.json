@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "52f750992a8b1b6eef3ff437c0152c338c192d12",
+  "release": "2",
+  "sha": "4ea064c118e4379ee35b1c667b92aeb5373abbce",
   "source": "https://src.fedoraproject.org/rpms/python-types-requests.git",
   "upstream_repo": "https://github.com/python/typeshed",
   "version": "2.32.4.20260107"
