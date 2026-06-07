@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "82e9e1e85cb9845f26d7bfad990e7735a3731eff",
+  "release": "28",
+  "sha": "37301c6bec66705992b56a7adbce3114cd2153e8",
   "source": "https://src.fedoraproject.org/rpms/subversion.git",
   "upstream_repo": "https://github.com/apache/subversion",
   "version": "1.14.5"

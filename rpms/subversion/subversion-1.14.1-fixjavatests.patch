@@ -5,6 +5,8 @@ javahl tests, particularly reproducible on aarch64.
 Message-ID: <11de5f5c-5059-b973-95a1-385e7913a63a@syntevo.com>
 From: Alexandr Miloslavskiy
 
+Merged upstream https://github.com/apache/subversion/commit/451c1f3436af8e88c004f87381313cf65a29750d
+
 --- subversion-1.14.1/subversion/bindings/javahl/tests/org/apache/subversion/javahl/BasicTests.java.fixjavatests
 +++ subversion-1.14.1/subversion/bindings/javahl/tests/org/apache/subversion/javahl/BasicTests.java
 @@ -4676,7 +4676,19 @@
