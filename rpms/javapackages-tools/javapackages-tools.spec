@@ -13,13 +13,14 @@
 
 Name:           javapackages-tools
 Version:        6.5.1
-Release:        3.1%{?dist}
+Release:        5%{?dist}
 Summary:        Macros and scripts for Java packaging support
 License:        BSD-3-Clause
 URL:            https://github.com/fedora-java/javapackages
 BuildArch:      noarch
 
 Source:         https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz
+Patch:          https://github.com/fedora-java/javapackages/pull/160.patch
 
 BuildRequires:  coreutils
 BuildRequires:  %{python_prefix}-devel

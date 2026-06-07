@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "drop asciidoctor BuildRequires",
   "modification_status": "modified",
-  "release": "3",
-  "sha": "a0cd4e498c44f2c75ee30568facc05d5c308be7b",
+  "release": "5",
+  "sha": "7256be8bf53d36f0269e62971c6826224c607ce2",
   "source": "https://src.fedoraproject.org/rpms/javapackages-tools.git",
   "upstream_repo": "https://github.com/fedora-java/javapackages",
   "version": "6.5.1"
