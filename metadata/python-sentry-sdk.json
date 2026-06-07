@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "7a98fe826ac0064017387ed4b5e8ee1935eb9e4b",
+  "release": "6",
+  "sha": "8aba68342e156165bb4e4fa07b951ec1829efa22",
   "source": "https://src.fedoraproject.org/rpms/python-sentry-sdk.git",
   "upstream_repo": "https://github.com/getsentry/sentry-python",
   "version": "2.48.0"

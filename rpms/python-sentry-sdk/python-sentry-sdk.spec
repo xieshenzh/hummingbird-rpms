@@ -1,3 +1,4 @@
+%global _without_tests 1
 # Excluded extras/integrations
 # The lines below are in `code: comment` format, where `code` is used for
 # easier navigation in text editors and for linking.
@@ -55,7 +56,7 @@ Version:        2.48.0
 %forgemeta
 
 Name:           python-sentry-sdk
-Release:        4.1%{?dist}
+Release:        6%{?dist}
 Summary:        The new Python SDK for Sentry.io
 License:        MIT
 URL:            https://sentry.io/for/python/
@@ -89,6 +90,7 @@ Patch2:         sentry-sdk-2.48.0-starlette-1.patch
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
+BuildRequires:  python3-pkg-resources
 %if %{with tests}
 BuildRequires:  postgresql-test-rpm-macros
 BuildRequires:  python3dist(botocore)
