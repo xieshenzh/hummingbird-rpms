@@ -157,9 +157,9 @@ BuildRequires: zlib-devel%{buildisa} libselinux-devel%{buildisa}
   %global __python %{__python3}
 BuildRequires: python3-devel%{buildisa}
 %endif
-# gdb-doc in PDF, see: https://bugzilla.redhat.com/show_bug.cgi?id=919891#c10
-BuildRequires: texinfo-tex
-BuildRequires: texlive-collection-latexrecommended
+# PDF docs not required in Hummingbird
+# BuildRequires: texinfo-tex
+# BuildRequires: texlive-collection-latexrecommended
 # Permit rebuilding *.[0-9] files even if they are distributed in gdb-*.tar:
 BuildRequires: /usr/bin/pod2man
 %if %{defined use_guile}
@@ -612,7 +612,7 @@ done  # fprofile
 cd %{gdb_build}
 
 %make_build \
-     -C gdb/doc {gdb,annotate}{.info,/index.html,.pdf} MAKEHTMLFLAGS=--no-split MAKEINFOFLAGS=--no-split V=1
+     -C gdb/doc {gdb,annotate}.info MAKEINFOFLAGS=--no-split V=1
 
 # Copy the <sourcetree>/gdb/NEWS file to the directory above it.
 cp $RPM_BUILD_DIR/%{gdb_src}/gdb/NEWS $RPM_BUILD_DIR/%{gdb_src}
@@ -897,7 +897,6 @@ done
 %endif
 
 %files doc
-%doc %{gdb_build}/gdb/doc/{gdb,annotate}.{html,pdf}
 %{_infodir}/annotate.info*
 %{_infodir}/gdb.info*
 
