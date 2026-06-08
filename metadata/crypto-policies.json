@@ -2,9 +2,9 @@
   "branch": "rawhide",
   "modification_reason": "Local changes in commit 642ebe20",
   "modification_status": "modified",
-  "release": "3.git19878fe",
-  "sha": "0da1c8d7a7ed49c46c39f65f760febb699643a55",
+  "release": "1.git4c567b2",
+  "sha": "f59e390b8cd07f123b24e63ee2ebe872bfa3cf5d",
   "source": "https://src.fedoraproject.org/rpms/crypto-policies.git",
   "upstream_repo": "https://gitlab.com/redhat-crypto/fedora-crypto-policies",
-  "version": "20251128"
+  "version": "20260331"
 }
