@@ -1,4 +1,3 @@
-%global _without_python 1
 # rpmbuild parameters:
 # --with testsuite: Run the testsuite (biarch if possible).  Default is without.
 # --with buildisa: Use %%{?_isa} for BuildRequires
@@ -46,7 +45,7 @@ Version: 17.1
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 License: GPL-3.0-or-later AND BSD-3-Clause AND FSFAP AND LGPL-2.1-or-later AND GPL-2.0-or-later AND LGPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain AND GFDL-1.3-or-later AND LGPL-2.0-or-later WITH GCC-exception-2.0 AND GPL-3.0-or-later WITH GCC-exception-3.1 AND GPL-2.0-or-later WITH GNU-compiler-exception AND MIT
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -158,9 +157,9 @@ BuildRequires: zlib-devel%{buildisa} libselinux-devel%{buildisa}
   %global __python %{__python3}
 BuildRequires: python3-devel%{buildisa}
 %endif
-# gdb-doc in PDF, see: https://bugzilla.redhat.com/show_bug.cgi?id=919891#c10
-BuildRequires: texinfo-tex
-BuildRequires: texlive-collection-latexrecommended
+# PDF docs not required in Hummingbird
+# BuildRequires: texinfo-tex
+# BuildRequires: texlive-collection-latexrecommended
 # Permit rebuilding *.[0-9] files even if they are distributed in gdb-*.tar:
 BuildRequires: /usr/bin/pod2man
 %if %{defined use_guile}
@@ -613,7 +612,7 @@ done  # fprofile
 cd %{gdb_build}
 
 %make_build \
-     -C gdb/doc {gdb,annotate}{.info,/index.html,.pdf} MAKEHTMLFLAGS=--no-split MAKEINFOFLAGS=--no-split V=1
+     -C gdb/doc {gdb,annotate}.info MAKEINFOFLAGS=--no-split V=1
 
 # Copy the <sourcetree>/gdb/NEWS file to the directory above it.
 cp $RPM_BUILD_DIR/%{gdb_src}/gdb/NEWS $RPM_BUILD_DIR/%{gdb_src}
@@ -898,7 +897,6 @@ done
 %endif
 
 %files doc
-%doc %{gdb_build}/gdb/doc/{gdb,annotate}.{html,pdf}
 %{_infodir}/annotate.info*
 %{_infodir}/gdb.info*
 
@@ -932,6 +930,9 @@ fi
 # endif scl
 
 %changelog
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com>
+- Rebuilt for Python 3.15
+
 * Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 17.1-9
 - Bootstrap for Python 3.15
 
