@@ -67,7 +67,7 @@
 
 # liburiparser version 1.0.0 required
 %global liburiparser_minver 1.0.0
-%global liburiparser_bunver 1.0.1
+%global liburiparser_bunver 1.0.2
 %if 0%{?fedora}
 # use system liburiparser when available
 %bcond_without       liburiparser
@@ -76,8 +76,8 @@
 %bcond_with          liburiparser
 %endif
 
-%global upver        8.5.6
-#global rcver        RC3
+%global upver        8.5.7
+#global rcver        RC2
 
 Summary: PHP scripting language for creating dynamic web sites
 %if %{with rename}
@@ -143,7 +143,6 @@ Patch47: php-8.4.0-phpinfo.patch
 Patch48: php-8.5.0-openssl-ec-param.patch
 
 # Upstream fixes (100+)
-Patch100: php-openssl4.patch
 
 # Security fixes (200+)
 
@@ -864,7 +863,6 @@ in pure PHP.
 %patch -P48 -p1 -b .ec-param
 
 # upstream patches
-%patch -P100 -p1 -b .v4
 
 # security patches
 
@@ -942,6 +940,15 @@ vlexbor=`sed -n '/Lexbor version/{s/.* is //;s/\.$//;p}' ext/lexbor/patches/READ
 if test "x${vlexbor}" != "x%{lexborver}"; then
    : Error: Upstream Lexbor version is now ${vlexbor}, expecting %{lexborver}.
    : Update the lexborver macro and rebuild.
+   exit 1
+fi
+
+vurimaj=$(sed  -n '/define URI_VER_MAJ/{s/.* //;s/\.$//;p}' ext/uri/uriparser/include/uriparser/UriBase.h)
+vurimin=$(sed  -n '/define URI_VER_MIN/{s/.* //;s/\.$//;p}' ext/uri/uriparser/include/uriparser/UriBase.h)
+vurirel=$(sed  -n '/define URI_VER_REL/{s/.* //;s/\.$//;p}' ext/uri/uriparser/include/uriparser/UriBase.h)
+if test "x${vurimaj}.${vurimin}.${vurirel}" != "x%{liburiparser_bunver}"; then
+   : Error: Upstream uriparser version is now ${vurimaj}.${vurimin}.${vurirel}, expecting %{liburiparser_bunver}.
+   : Update the liburiparser_bunver macro and rebuild.
    exit 1
 fi
 
@@ -1666,6 +1673,18 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 
 %changelog
+* Wed Jun  3 2026 Remi Collet <remi@remirepo.net> - 8.5.7-1
+- Update to 8.5.7 - http://www.php.net/releases/8_5_7.php
+
+* Wed May 27 2026 František Zatloukal <fzatlouk@redhat.com> - 8.5.7~RC2-2
+- Rebuilt for icu 78.3
+
+* Wed May 27 2026 Remi Collet <remi@remirepo.net> - 8.5.7~RC2-1
+- update to 8.5.7RC2
+
+* Wed May 20 2026 Remi Collet <remi@remirepo.net> - 8.5.7~RC1-1
+- update to 8.5.7RC1
+
 * Wed May  6 2026 Remi Collet <remi@remirepo.net> - 8.5.6-1
 - Update to 8.5.6 - http://www.php.net/releases/8_5_6.php
 
