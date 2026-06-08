@@ -14,8 +14,8 @@ expression = "Unlicense"
 
 [[licensing.licenses]]
 path = "vendor/github.com/alecthomas/chroma/v2/COPYING"
-sha256sum = "e7bf754e7153012a3a8ff697d21acd6c12e590d6a55f2aef8ee83616aa9a795f"
-expression = "MIT"
+sha256sum = "13654b052f885cb3fa47d7343e13975d9c8a64c3bcd84993c35d5eb01f22b23f"
+expression = "MIT AND OFL-1.1"
 
 [[licensing.licenses]]
 path = "vendor/github.com/oasdiff/yaml/LICENSE"
