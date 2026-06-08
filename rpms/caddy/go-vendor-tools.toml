@@ -1,0 +1,35 @@
+[archive]
+
+[licensing]
+detector = "askalono"
+exclude_files = ["vendor/github.com/miekg/dns/COPYRIGHT"]
+
+[[licensing.licenses]]
+path = "vendor/github.com/cloudflare/circl/LICENSE"
+sha256sum = "b0da1764fe4d13d610b695536fc3f2ebc362482d053a1cd258e36975bc6b97a7"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/dgraph-io/ristretto/z/LICENSE"
+sha256sum = "349fec2711443e0da8f36e388931fdfe2f874fdd4df307b9a379d01bb9764dc8"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shopspring/decimal/LICENSE"
+sha256sum = "b92ba0f6ee02f2309628bfdadb123668a17c016e475ba477b857d33470d9d625"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+
+[[licensing.licenses]]
+path = "vendor/howett.net/plist/LICENSE"
+sha256sum = "20d9b7d9372369484ecadae229d3e3efee8029b259e11c9a1b07d2e0a3c82e39"
+expression = "BSD-2-Clause AND BSD-3-Clause"
