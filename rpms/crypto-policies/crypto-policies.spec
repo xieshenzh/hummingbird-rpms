@@ -1,5 +1,5 @@
-%global git_date 20251128
-%global git_commit 19878fea4c5f62208655e32269842bce55c819b2
+%global git_date 20260331
+%global git_commit 4c567b2a200f1c23076c4c09bf7a5d380ed36ae6
 %{?git_commit:%global git_commit_hash %(c=%{git_commit}; echo ${c:0:7})}
 
 %global _python_bytecompile_extra 0
@@ -34,7 +34,7 @@ end
 
 Name:           crypto-policies
 Version:        %{git_date}
-Release:        4.git%{git_commit_hash}.1%{?dist}
+Release:        1.git%{git_commit_hash}%{?dist}
 Summary:        System-wide crypto policies
 
 License:        LGPL-2.1-or-later
@@ -60,8 +60,9 @@ BuildRequires: systemd-rpm-macros
 Conflicts: openssl-libs < 1:3.5.0-1
 Conflicts: nss < 3.105
 Conflicts: libreswan < 3.28
-Conflicts: openssh < 9.9
+Conflicts: openssh < 10.0
 Conflicts: gnutls < 3.8.10
+Conflicts: libssh < 0.12
 
 # Most users want this, the split is mostly for Fedora CoreOS
 Recommends: crypto-policies-scripts
@@ -316,6 +317,12 @@ exit 0
 # No files - policy is applied by %post scriptlet
 
 %changelog
+* Tue Mar 31 2026 Alexander Sosedkin <asosedkin@redhat.com> - 20260331-1.git4c567b2
+- FIPS: allow NIST hybrid kexes for openssh
+- libssh: enable NIST ML-KEM hybrids
+- libssh: add sntrup761x25519-sha512/mlkem768x25519-sha256
+- openssl: prefix every group and sigalg with a ?
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 20251128-3.git19878fe
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
