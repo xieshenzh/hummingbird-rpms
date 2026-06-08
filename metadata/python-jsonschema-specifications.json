@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "a16457fd53961741fca303f8e3110f2fed96a3c0",
+  "release": "3",
+  "sha": "c85e21265b02b14b5d64cd5859ff8ee74456e206",
   "source": "https://src.fedoraproject.org/rpms/python-jsonschema-specifications.git",
   "upstream_repo": "https://github.com/python-jsonschema/jsonschema-specifications",
   "version": "2025.9.1"
