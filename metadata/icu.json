@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "9d5685b4fa31e674e83fab07b0ead56ccb9c4324",
+  "release": "3",
+  "sha": "af300c7c04072aa07de52eaf02afee9cc1892cdc",
   "source": "https://src.fedoraproject.org/rpms/icu.git",
   "upstream_repo": "https://github.com/unicode-org/icu",
   "version": "78.3"
