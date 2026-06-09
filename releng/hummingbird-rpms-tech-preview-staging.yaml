@@ -628,6 +628,8 @@ spec:
           contentType: rpm
         - name: openssl-fips-provider-main
           contentType: rpm
+        - name: opentofu1-11-main
+          contentType: rpm
         - name: opentofu1-12-main
           contentType: rpm
         - name: oras-main

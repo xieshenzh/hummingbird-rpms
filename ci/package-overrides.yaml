@@ -158,6 +158,9 @@ openssl-fips-provider:
   # Use hummingbird lookaside cache instead of Fedora
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+opentofu1.11:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 opentofu1.12:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
