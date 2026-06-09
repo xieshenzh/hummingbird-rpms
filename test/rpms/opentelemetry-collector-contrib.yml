@@ -1,0 +1,140 @@
+---
+# Tests for opentelemetry-collector-contrib: verify binary version matches RPM
+# version, default config installed, health_check responds, and a pushed metric
+# is logged by the debug exporter.
+
+opentelemetry-collector-contrib-functionality:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "opentelemetry-collector-contrib" ]]; then
+      echo "Skipping: only runs on opentelemetry-collector-contrib (got: ${rpm_name})"
+      exit 0
+    fi
+
+    rpm_version=$(rpm -qp --queryformat '%{VERSION}' "${TEST_RPM}")
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      -e "RPM_VERSION=${rpm_version}" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y opentelemetry-collector-contrib curl
+
+        failed=0
+
+        # 1. Binary installed
+        if [[ ! -x /usr/bin/otelcol-contrib ]]; then
+          echo "FAIL: /usr/bin/otelcol-contrib not installed or not executable"
+          failed=1
+        else
+          echo "PASS: /usr/bin/otelcol-contrib installed"
+        fi
+
+        # 2. Version matches RPM version
+        version_output=$(otelcol-contrib --version 2>&1 || true)
+        if [[ "${version_output}" != *"${RPM_VERSION}"* ]]; then
+          echo "FAIL: expected version ${RPM_VERSION}, got: ${version_output}"
+          failed=1
+        else
+          echo "PASS: otelcol-contrib reports version ${RPM_VERSION}"
+        fi
+
+        # 3. Default config installed
+        if [[ ! -f /etc/otelcol-contrib/config.yaml ]]; then
+          echo "FAIL: /etc/otelcol-contrib/config.yaml not installed"
+          failed=1
+        else
+          echo "PASS: /etc/otelcol-contrib/config.yaml installed"
+        fi
+
+        # 4. Start collector; wait for OTLP HTTP endpoint
+        collector_log=$(mktemp)
+        otelcol-contrib --config /etc/otelcol-contrib/config.yaml >"${collector_log}" 2>&1 &
+        collector_pid=$!
+        collector_cleanup() {
+          kill "$collector_pid" 2>/dev/null || true
+          wait "$collector_pid" 2>/dev/null || true
+        }
+        trap collector_cleanup EXIT
+
+        status=
+        for i in $(seq 1 20); do
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST http://localhost:4318/v1/metrics \
+            -H "Content-Type: application/json" -d "{}" 2>/dev/null || true)
+          [[ "${status}" =~ ^(200|400)$ ]] && break
+          sleep 0.5
+        done
+        if [[ ! "${status}" =~ ^(200|400)$ ]]; then
+          echo "FAIL: OTLP HTTP endpoint did not become ready within 10 s"
+          cat "${collector_log}"
+          failed=1
+        else
+          echo "PASS: otelcol-contrib started and OTLP HTTP endpoint is ready"
+        fi
+
+        # 5. Push a metric via OTLP HTTP and verify debug exporter logs it
+        now_ns=$(date +%s)000000000
+        http_status=$(curl -s -o /dev/null -w "%{http_code}" \
+          -X POST http://localhost:4318/v1/metrics \
+          -H "Content-Type: application/json" \
+          -d "{
+            \"resourceMetrics\": [{
+              \"resource\": {
+                \"attributes\": [{
+                  \"key\": \"service.name\",
+                  \"value\": {\"stringValue\": \"hummingbird-test\"}
+                }]
+              },
+              \"scopeMetrics\": [{
+                \"scope\": {\"name\": \"hummingbird.test\"},
+                \"metrics\": [{
+                  \"name\": \"hummingbird.test.metric\",
+                  \"gauge\": {
+                    \"dataPoints\": [{
+                      \"asInt\": \"42\",
+                      \"timeUnixNano\": \"${now_ns}\"
+                    }]
+                  }
+                }]
+              }]
+            }]
+          }")
+        if [[ "${http_status}" != "200" ]]; then
+          echo "FAIL: OTLP HTTP export returned ${http_status}"
+          failed=1
+        else
+          echo "PASS: OTLP HTTP export returned 200"
+        fi
+
+        sleep 1
+        collector_cleanup
+
+        if ! grep -q "hummingbird.test.metric" "${collector_log}"; then
+          echo "FAIL: metric not found in collector log"
+          echo "--- collector log ---"
+          cat "${collector_log}"
+          failed=1
+        else
+          echo "PASS: debug exporter logged hummingbird.test.metric"
+        fi
+
+        exit $failed
+      '

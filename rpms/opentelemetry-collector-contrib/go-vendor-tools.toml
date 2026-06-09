@@ -1,0 +1,82 @@
+[archive]
+# No go_mod_dir: create-vendor-tarball.sh passes _build/ directly to
+# go_vendor_archive create, so it vendors from there without a subdirectory prefix.
+post_commands = [
+  ["curl", "-fSL", "-o", "vendor/bitbucket.org/atlassian/go-asap/v2/LICENSE", "https://bitbucket.org/atlassian/go-asap/raw/HEAD/LICENSE.txt"],
+  ["curl", "-fSL", "-o", "vendor/modernc.org/memory/LICENSE", "https://gitlab.com/cznic/memory/-/raw/master/LICENSE"],
+]
+
+[licensing]
+detector = "askalono"
+exclude_files = [
+  "vendor/github.com/DataDog/datadog-api-client-go/v2/LICENSE-3rdparty.csv",
+  "vendor/github.com/DataDog/sketches-go/LICENSE-3rdparty.csv",
+  "vendor/github.com/aws/aws-lambda-go/LICENSE-SUMMARY",
+  "vendor/modernc.org/memory/LICENSE-LOGO",
+  "vendor/modernc.org/sqlite/SQLITE-LICENSE",
+]
+
+[[licensing.licenses]]
+path = "vendor/github.com/digitalocean/godo/LICENSE.txt"
+sha256sum = "946d0e939f736a9d7061ea06591818107fb12d3cddad70ee81667b85f7f24c22"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/emirpasic/gods/LICENSE"
+sha256sum = "871b440e9b348d6b2485c72e15f1d18f4cf8ee7bb424cbcd854b6a4a772b61d8"
+expression = "BSD-2-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/gosnmp/gosnmp/LICENSE"
+sha256sum = "28b63cdfceda72f7b8c9a8db2d7ab07661eb4d6bb9fc020077925b6b4faf84fa"
+expression = "BSD-2-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/miekg/dns/COPYRIGHT"
+sha256sum = "66550c0ad5ca7ec1e08683e5f872cc45c741f311eee3b8ee484206ecbf9c740d"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/outcaste-io/ristretto/z/LICENSE"
+sha256sum = "349fec2711443e0da8f36e388931fdfe2f874fdd4df307b9a379d01bb9764dc8"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shirou/gopsutil/v3/LICENSE"
+sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shirou/gopsutil/v4/LICENSE"
+sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shopspring/decimal/LICENSE"
+sha256sum = "b92ba0f6ee02f2309628bfdadb123668a17c016e475ba477b857d33470d9d625"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/twmb/murmur3/LICENSE"
+sha256sum = "4228ef1819124b490d2e6a88e8c5e1348bedf32ff05b8fb5deed49921600e503"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/vmware/go-vmware-nsxt/LICENSE.txt"
+sha256sum = "5470ffaf0c804da1503d1b5f4f6b19cf31630bacd1adfe57d32c76a59737a62f"
+expression = "BSD-2-Clause"
+
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+
+[[licensing.licenses]]
+path = "vendor/modernc.org/libc/LICENSE-3RD-PARTY.md"
+sha256sum = "f597097efe3d97021f89170746bd3a0fb9a8b6fb26b82043ed68a4e0283bee6c"
+expression = "BSD-3-Clause"
