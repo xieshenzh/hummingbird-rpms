@@ -1,6 +1,7 @@
 builds/
 __pycache__
 .cache/
+.dist_git_update_state.json
 
 # Source tarballs (stored in lookaside cache, referenced via sources file)
 # Generate checksums with: sha512sum --tag <file>
