@@ -1,0 +1,67 @@
+---
+# Tests for jaeger: verify the binary installs correctly,
+# reports the expected version, and can validate a configuration.
+
+jaeger-functionality:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "jaeger" ]]; then
+      echo "Skipping: only runs on jaeger (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    test_files_dir="${TEST_FILES_DIR:-$(git rev-parse --show-toplevel)/test/rpms/jaeger}"
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      -v "${test_files_dir}:/tmp/test-files:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y jaeger
+
+        failed=0
+
+        # 1. Version reports correctly (ldflags injected)
+        version_output=$(jaeger version 2>&1 || true)
+        if [[ "${version_output}" == *"2.19."* ]]; then
+          echo "PASS: jaeger reports correct 2.19.x version"
+        else
+          echo "FAIL: unexpected version output: ${version_output}"
+          failed=1
+        fi
+
+        # 2. Help output works
+        help_output=$(jaeger --help 2>&1 || true)
+        if [[ "${help_output}" == *"Jaeger"* ]]; then
+          echo "PASS: jaeger --help produces expected output"
+        else
+          echo "FAIL: unexpected help output: ${help_output}"
+          failed=1
+        fi
+
+        # 3. Validate a minimal configuration file
+        jaeger validate --config=file:/tmp/test-files/config.yaml 2>&1 && \
+          echo "PASS: jaeger validates minimal config" || {
+          echo "FAIL: jaeger config validation failed"
+          failed=1
+        }
+
+        exit $failed
+      '

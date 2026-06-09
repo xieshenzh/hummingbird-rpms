@@ -346,6 +346,8 @@ spec:
           contentType: rpm
         - name: iproute-main
           contentType: rpm
+        - name: jaeger-main
+          contentType: rpm
         - name: jansson-main
           contentType: rpm
         - name: java-21-openjdk-main
