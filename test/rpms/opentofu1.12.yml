@@ -1,0 +1,58 @@
+---
+# Tests for opentofu1.12: verify the tofu binary installs correctly,
+# reports the expected version, and can manage infrastructure.
+
+tofu-version:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "opentofu1.12" ]]; then
+      echo "Skipping: only runs on opentofu1.12 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    test_files_dir="$(git rev-parse --show-toplevel)/test/rpms/opentofu"
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      -v "${test_files_dir}:/tmp/test-files:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y opentofu1.12
+
+        version_output=$(tofu version 2>&1)
+        if [[ "${version_output}" == *"OpenTofu v1.12."* ]]; then
+          echo "PASS: tofu reports correct 1.12.x version"
+        else
+          echo "FAIL: unexpected version output: ${version_output}"
+          exit 1
+        fi
+
+        workdir=$(mktemp -d)
+        cp /tmp/test-files/main.tf "${workdir}/"
+        tofu -chdir="${workdir}" init -input=false 2>&1
+        tofu -chdir="${workdir}" apply -input=false -auto-approve 2>&1
+
+        if [[ "$(cat /tmp/opentofu-test-output.txt)" == "opentofu works" ]]; then
+          echo "PASS: local_file resource created with correct content"
+        else
+          echo "FAIL: output file missing or has wrong content"
+          exit 1
+        fi
+      '

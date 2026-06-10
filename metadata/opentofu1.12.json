@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "release_monitoring_project_id": 371292,
+  "sha": "d05a391c90762c299695176913c2d825a2ca9aaf",
+  "source": "https://src.fedoraproject.org/rpms/opentofu.git",
+  "track_upstream": "1.12",
+  "upstream_repo": "https://github.com/opentofu/opentofu",
+  "version": "1.12.0"
+}
