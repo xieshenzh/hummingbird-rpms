@@ -1,0 +1,11 @@
+--- a/internal/command/views/state_test.go
++++ b/internal/command/views/state_test.go
+@@ -533,7 +533,7 @@ foo = "value"
+ 			wantJson: []map[string]any{
+ 				{
+ 					"format_version":    "1.0",
+-					"terraform_version": "1.12.0",
++					"terraform_version": "1.12.1",
+ 					"values": map[string]any{
+ 						"root_module": map[string]any{
+ 							"resources": []any{
