@@ -1,0 +1,29 @@
+--- a/cmd/jaeger/internal/extension/jaegermcp/server_test.go
++++ b/cmd/jaeger/internal/extension/jaegermcp/server_test.go
+@@ -175,7 +175,7 @@
+ 		{
+ 			name: "successful start and shutdown",
+ 			config: &Config{
+-				HTTP:                     createDefaultConfig().(*Config).HTTP,
++				HTTP:                     confighttp.ServerConfig{NetAddr: confignet.AddrConfig{Endpoint: "localhost:0", Transport: confignet.TransportTypeTCP}},
+ 				ServerName:               "jaeger",
+ 				ServerVersion:            "1.0.0",
+ 				MaxSpanDetailsPerRequest: 20,
+@@ -211,7 +211,7 @@
+ 	// Test that Start method properly retrieves QueryService from jaegerquery extension
+ 	host := newMockHost()
+ 	config := &Config{
+-		HTTP:                     createDefaultConfig().(*Config).HTTP,
++		HTTP:                     confighttp.ServerConfig{NetAddr: confignet.AddrConfig{Endpoint: "localhost:0", Transport: confignet.TransportTypeTCP}},
+ 		ServerName:               "jaeger",
+ 		ServerVersion:            "1.0.0",
+ 		MaxSpanDetailsPerRequest: 20,
+@@ -266,7 +266,7 @@
+ 	// Test that Start method fails when jaegerquery extension is not available
+ 	host := componenttest.NewNopHost() // No jaegerquery extension
+ 	config := &Config{
+-		HTTP:                     createDefaultConfig().(*Config).HTTP,
++		HTTP:                     confighttp.ServerConfig{NetAddr: confignet.AddrConfig{Endpoint: "localhost:0", Transport: confignet.TransportTypeTCP}},
+ 		ServerName:               "jaeger",
+ 		ServerVersion:            "1.0.0",
+ 		MaxSpanDetailsPerRequest: 20,

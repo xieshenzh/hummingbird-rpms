@@ -93,6 +93,9 @@ haproxy:
 httpd:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+jaeger:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 java-21-openjdk-portable:
   timeout_hours: 8
   build_platforms:

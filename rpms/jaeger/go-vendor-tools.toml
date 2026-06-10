@@ -1,0 +1,33 @@
+[archive]
+
+[licensing]
+detector = "askalono"
+[[licensing.licenses]]
+path = "vendor/github.com/shirou/gopsutil/v4/LICENSE"
+sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/dgraph-io/ristretto/v2/z/LICENSE"
+sha256sum = "08e26ca4ab0399871df0626c92944e62a7e763fddb0995ffb1728c66254a2a5f"
+expression = "MIT AND Apache-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shopspring/decimal/LICENSE"
+sha256sum = "b92ba0f6ee02f2309628bfdadb123668a17c016e475ba477b857d33470d9d625"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+
+[[licensing.licenses]]
+path = "vendor/github.com/twmb/murmur3/LICENSE"
+sha256sum = "4228ef1819124b490d2e6a88e8c5e1348bedf32ff05b8fb5deed49921600e503"
+expression = "BSD-3-Clause"

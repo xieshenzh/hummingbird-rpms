@@ -1,0 +1,8 @@
+{
+  "modification_status": "native",
+  "release": "1",
+  "release_monitoring_project_id": 371233,
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/jaegertracing/jaeger",
+  "version": "2.19.0"
+}
