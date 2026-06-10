@@ -37,3 +37,13 @@ badfuncs:
       - inet_ntoa
     /usr/lib*/mariadb/plugin/ha_sphinx.so:
       - inet_addr
+
+# The check_stack_overrun() function is intentionally compiled with
+# __attribute__((optimize("-O0"))) by MariaDB upstream (sql/sql_parse.cc)
+# to prevent GCC from optimizing away a dummy stack buffer used for
+# stack overflow detection. This causes a false positive in annocheck's
+# optimization test. Skip only this specific function, keeping all
+# other hardening checks active on all binaries.
+annocheck:
+  extra_opts:
+    hardened: --skip-optimization=check_stack_overrun

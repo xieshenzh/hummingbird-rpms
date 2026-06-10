@@ -2,10 +2,10 @@
   "branch": "rawhide",
   "modification_reason": "Remove runtime dependency on systemd",
   "modification_status": "modified",
-  "release": "2",
-  "sha": "fdc27849ae7e0ea4e434d351b56bc2a3c62008c1",
+  "release": "1",
+  "sha": "3930c0addb256163ef7674e18012390d41cc3c75",
   "source": "https://src.fedoraproject.org/rpms/mariadb11.8.git",
   "upstream_branch": "11.8",
   "upstream_repo": "https://github.com/MariaDB/server",
-  "version": "11.8.6"
+  "version": "11.8.8"
 }
