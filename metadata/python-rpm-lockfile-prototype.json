@@ -1,8 +1,8 @@
 {
   "modification_status": "native",
-  "release": "1",
+  "release": "0.1",
   "release_monitoring_project_id": 389884,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/konflux-ci/rpm-lockfile-prototype",
-  "version": "0.21.0"
+  "version": "0.22.0"
 }

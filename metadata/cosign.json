@@ -1,8 +1,8 @@
 {
   "modification_status": "native",
-  "release": "1",
+  "release": "0.1",
   "release_monitoring_project_id": 380017,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/sigstore/cosign",
-  "version": "3.0.6"
+  "version": "3.1.1"
 }

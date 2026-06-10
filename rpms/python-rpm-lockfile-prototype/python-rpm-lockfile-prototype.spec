@@ -1,8 +1,8 @@
 %global pypi_name rpm-lockfile-prototype
 
 Name:           python-%{pypi_name}
-Version:        0.21.0
-Release:        1%{?dist}
+Version:        0.22.0
+Release:        0.1%{?dist}
 Summary:        Generate lockfiles for RPM package dependencies
 
 License:        GPL-3.0-or-later

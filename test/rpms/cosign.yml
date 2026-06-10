@@ -46,10 +46,11 @@ cosign-functionality:
 
         # 1. Version reports correctly (ldflags injected)
         version_output=$(cosign version 2>&1)
-        if [[ "${version_output}" == *"v3.0.6"* ]]; then
-          echo "PASS: cosign reports correct version"
+        expected_version="v$(rpm -q --queryformat '%{VERSION}' cosign)"
+        if [[ "${version_output}" == *"${expected_version}"* ]]; then
+          echo "PASS: cosign reports correct version (${expected_version})"
         else
-          echo "FAIL: expected version v3.0.6, got: ${version_output}"
+          echo "FAIL: expected version ${expected_version}, got: ${version_output}"
           failed=1
         fi
 
