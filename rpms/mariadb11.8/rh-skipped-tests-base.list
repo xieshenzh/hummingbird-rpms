@@ -1,7 +1,5 @@
 # The SSL test are failing correctly. Fro more explanation, see:
 # https://jira.mariadb.org/browse/MDEV-8404?focusedCommentId=84275&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-84275
-main.ssl_7937                                : #1399847
-main.ssl_8k_key                              :
 main.ssl_crl                                 : #1399847
 
 # ------------------------------
@@ -18,6 +16,7 @@ sys_vars.slave_parallel_threads_basic        :
 # Expected to fail, the plugin is not build with server, but 'mariadb-connector-c' instead
 plugins.auth_ed25519                         :
 plugins.multiauth                            :
+plugins.mdev38550                            :
 
 # ------------------------------
 perfschema.nesting                           : #1399847
@@ -98,10 +97,6 @@ main.ssl_autoverify                         :
 main.tmp_space_usage                        : extended testsuite
 binlog.max_binlog_total_size                :
 plugins.parsec                              :
-
-# Fails since 11.8.3
-rpl.rpl_mixed_mixing_engines                :
-rpl.rpl_non_direct_mixed_mixing_engines     :
 
 # Unstable since the previous commit (Fedora downstream: def9e708480f10fbac6869a5e0155d5a358f0f1b)
 mariabackup.slave_provision_nolock          :
