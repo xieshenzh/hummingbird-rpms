@@ -1,5 +1,8 @@
 summary: centos stream tests for galera
 
+environment:
+  BUILD_PACKAGE: mariadb10.11-server
+
 prepare:
   how: shell
   script: |

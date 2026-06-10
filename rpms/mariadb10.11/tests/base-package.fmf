@@ -14,5 +14,9 @@ discover:
   ref: main
   filter: tag:base-package
 
+adjust:
+  context:
+    dbver: mariadb-10.11
+
 execute:
   how: tmt
