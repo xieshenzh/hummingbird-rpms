@@ -2,9 +2,9 @@
   "branch": "rawhide",
   "modification_reason": "Pre-existing modification - requires review",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "b0d46a1397c88238df0a7cd035c21429d8b583a9",
+  "release": "2",
+  "sha": "3b2500d06c9c0f2b7c608dec4f8a16956dfbb6bc",
   "source": "https://src.fedoraproject.org/rpms/ruff.git",
   "upstream_repo": "https://github.com/astral-sh/ruff",
-  "version": "0.15.11"
+  "version": "0.15.16"
 }
