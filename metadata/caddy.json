@@ -4,5 +4,5 @@
   "release_monitoring_project_id": 15601,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/caddyserver/caddy",
-  "version": "2.11.3"
+  "version": "2.11.4"
 }
