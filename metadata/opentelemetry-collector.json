@@ -1,0 +1,7 @@
+{
+  "modification_status": "native",
+  "release": "1",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/open-telemetry/opentelemetry-collector-releases",
+  "version": "0.153.0"
+}
