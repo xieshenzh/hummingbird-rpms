@@ -1,0 +1,113 @@
+From f7d5b763f691b36603cdd2ac1fc79a6a731bddbf Mon Sep 17 00:00:00 2001
+From: Pádraig Brady <P@draigBrady.com>
+Date: Tue, 28 Apr 2026 20:33:10 +0100
+Subject: [PATCH] unexpand: fix heap overflow
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* src/unexpand.c (unexpand): Use xinmalloc() to gracefully
+handle overflow.  Also use the runtime locale specific MB_CUR_MAX
+rather than the worst case MB_LEN_MAX.
+* tests/unexpand/mb.sh: Add a test case that fails in a default
+glibc build with either MB_CUR_MAX or MB_LEN_MAX.
+Reported by Michał Majchrowicz.
+
+(cherry picked from commit b60a159fdc5bfcf9988d3a4cb6f53abe8ad5d35d)
+---
+ src/unexpand.c       | 2 +-
+ tests/unexpand/mb.sh | 8 ++++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/unexpand.c b/src/unexpand.c
+index 4fbf9d3..761c8ea 100644
+--- a/src/unexpand.c
++++ b/src/unexpand.c
+@@ -131,7 +131,7 @@ unexpand (void)
+   /* The worst case is a non-blank character, then one blank, then a
+      tab stop, then MAX_COLUMN_WIDTH - 1 blanks, then a non-blank; so
+      allocate MAX_COLUMN_WIDTH bytes to store the blanks.  */
+-  pending_blank = ximalloc (max_column_width * sizeof (char) * MB_LEN_MAX);
++  pending_blank = xinmalloc (max_column_width, MB_CUR_MAX);
+ 
+   while (true)
+     {
+diff --git a/tests/unexpand/mb.sh b/tests/unexpand/mb.sh
+index 76a2679..076a1c1 100755
+--- a/tests/unexpand/mb.sh
++++ b/tests/unexpand/mb.sh
+@@ -17,6 +17,7 @@
+ 
+ . "${srcdir=.}/tests/init.sh"; path_prepend_ ./src
+ print_ver_ unexpand printf
++getlimits_
+ 
+ test "$LOCALE_FR_UTF8" != none || skip_ "French UTF-8 locale not available"
+ export LC_ALL="$LOCALE_FR_UTF8"
+@@ -161,4 +162,11 @@ EOF
+ unexpand -a ./in ./in > out || fail=1
+ compare exp out > /dev/null 2>&1 || fail=1
+ 
++# Ensure overflow is handed gracefully
++# coreutils v9.11 induced a buffer overflow with mb_mul=4 (or 16).
++for mb_mul in 4 6; do
++  printf '   \n' | unexpand -t $(expr $SIZE_MAX / $mb_mul + 1) 2>err; ret=$?
++  test "$ret" = 1 || test "$ret" = 0 || { cat err; fail=1; }
++done
++
+ Exit $fail
+-- 
+2.54.0
+
+From 528c740817d2235dd37269292c5e3167935d2761 Mon Sep 17 00:00:00 2001
+From: aizu-m <aizumusheer2@gmail.com>
+Date: Tue, 9 Jun 2026 12:37:06 +0530
+Subject: [PATCH] unexpand: fix heap overflow when a wide blank overshoots a
+ tab stop
+
+* src/unexpand.c (unexpand): Check if the column is greater or equal to
+the next_tab_column.
+* tests/unexpand/mb.sh: Add a test case.
+https://github.com/coreutils/coreutils/pull/285
+Copyright-paperwork-exempt: Yes
+
+(cherry picked from commit 4ade9cf77f6c7b39e3fdc5ce97a778f8e294694c)
+---
+ src/unexpand.c       | 2 +-
+ tests/unexpand/mb.sh | 9 +++++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/unexpand.c b/src/unexpand.c
+index 761c8ea..3bde985 100644
+--- a/src/unexpand.c
++++ b/src/unexpand.c
+@@ -201,7 +201,7 @@ unexpand (void)
+                         {
+                           column += c32width (g.ch);
+ 
+-                          if (! (prev_blank && column == next_tab_column))
++                          if (! (prev_blank && column >= next_tab_column))
+                             {
+                               /* It is not yet known whether the pending blanks
+                                  will be replaced by tabs.  */
+diff --git a/tests/unexpand/mb.sh b/tests/unexpand/mb.sh
+index 076a1c1..84ba035 100755
+--- a/tests/unexpand/mb.sh
++++ b/tests/unexpand/mb.sh
+@@ -169,4 +169,13 @@ for mb_mul in 4 6; do
+   test "$ret" = 1 || test "$ret" = 0 || { cat err; fail=1; }
+ done
+ 
++# A blank whose display width exceeds the tab distance must not overrun
++# the pending-blank buffer.  With -t1 every column is a tab stop, so a
++# width-2 ideographic space steps over the stop without landing on it;
++# the run of blanks then grew pending_blank without bound.
++ideo_space=$(env printf '\u3000')
++{ yes "$ideo_space" | head -n 40000 | tr -d '\n'; echo; } |
++  unexpand -t1 >out 2>err; ret=$?
++test "$ret" = 0 || { cat err; fail=1; }
++
+ Exit $fail
+-- 
+2.54.0
+
