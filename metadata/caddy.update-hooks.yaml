@@ -6,4 +6,4 @@ download_sources: |
   ./create-vendor-tarball.sh "v${UPDATE_NEW_VERSION}" >&2
   rm -rf "caddy-${UPDATE_NEW_VERSION}"
   echo "caddy-${UPDATE_NEW_VERSION}.tar.gz"
-  echo "caddy-${UPDATE_NEW_VERSION}-vendor.tar.gz"
+  echo "caddy-${UPDATE_NEW_VERSION}-vendor.tar.bz2"
