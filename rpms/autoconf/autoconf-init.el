@@ -1,3 +1,5 @@
+;;; autoconf-init.el --- Autoload autotest-mode  -*- lexical-binding: t; -*-
+
 ;; Activate autoconf-mode
 
 ;; Uncomment the following code if you feel that autoconf-mode.el does better
