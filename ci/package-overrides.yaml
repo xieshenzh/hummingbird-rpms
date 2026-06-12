@@ -154,6 +154,12 @@ nss-fips:
 opentelemetry-collector:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+opentelemetry-collector-contrib:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+  build_platforms:
+    - "linux-m2xlarge/arm64"
+    - "linux-m2xlarge/amd64"
+
 openssl:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
