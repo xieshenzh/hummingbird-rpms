@@ -135,6 +135,9 @@ llvm21:
 memcached:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+nodejs24:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 nodejs25:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
   build_platforms:

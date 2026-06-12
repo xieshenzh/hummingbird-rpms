@@ -1,10 +1,3 @@
-# Patch the %nodejs_define_version macro line directly because the
-# specfile library cannot trace through this custom macro.
-update_spec: >-
-  sed -Ei
-  '/^%nodejs_define_version\s+node\>/s|:[0-9]+\.[0-9]+\.[0-9]+-|:'"${UPDATE_NEW_VERSION}"'-|'
-  "${UPDATE_SPEC_FILE}"
-
 # Download and strip the upstream tarball, then print the resulting
 # filename. The script's own output is redirected to stderr so only
 # the filename reaches stdout.
