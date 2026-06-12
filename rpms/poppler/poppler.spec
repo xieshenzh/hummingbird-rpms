@@ -67,7 +67,9 @@ BuildRequires: cmake(Qt6Test)
 BuildRequires: cmake(Qt6Widgets)
 BuildRequires: cmake(Qt6Xml)
 %endif
-BuildRequires: boost-devel
+# boost-devel removed: boost-log not available in Hummingbird repo,
+# and boost is only needed for optional unit tests
+# BuildRequires: boost-devel
 # for %%gpgverify
 BuildRequires: gnupg2
 
@@ -191,6 +193,7 @@ chmod -x poppler/CairoFontEngine.cc
 %if 0%{?rhel} > 10
   -DENABLE_GPGME=OFF \
 %endif
+  -DENABLE_BOOST=OFF \
   -DENABLE_UNSTABLE_API_ABI_HEADERS=ON \
   -DENABLE_ZLIB=OFF \
   ..
