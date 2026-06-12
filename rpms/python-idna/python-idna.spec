@@ -1,8 +1,8 @@
 %global srcname idna
 
 Name:           python-%{srcname}
-Version:        3.17
-Release:        2%{?dist}
+Version:        3.18
+Release:        1%{?dist}
 Summary:        Internationalized Domain Names in Applications (IDNA)
 
 License:        BSD-3-Clause
