@@ -276,7 +276,7 @@ index 6d55f46..d5db894 100644
  #ifndef _HASHLIB_SCRYPT_METHODDEF
      #define _HASHLIB_SCRYPT_METHODDEF
  #endif /* !defined(_HASHLIB_SCRYPT_METHODDEF) */
--/*[clinic end generated code: output=a863ec4166ed2fbb input=a9049054013a1b77]*/
+-/*[clinic end generated code: output=3e8d61a057978436 input=a9049054013a1b77]*/
 +/*[clinic end generated code: output=6f4c186bcc85824b input=a9049054013a1b77]*/
 -- 
 2.52.0
