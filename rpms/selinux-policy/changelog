@@ -1,3 +1,18 @@
+* Fri Jun 12 2026 Zdenek Pytela <zpytela@redhat.com> - 45.5-1
+- Add anaconda_ioctl_fifo_files_install() and anaconda_write_fifo_files_install()
+- Allow install_t domain transition to insights_client_t
+- Allow staff user mounton /var/lib dirs
+- Allow systemd-coredump signull container runtime
+- Allow blueman get the attributes of a tmpfs filesystem
+- portage_compile_domain: Require xdm_xserver_tmp_t type
+- Add missing interface requirements
+- Dontaudit virt_driver_domain execmem
+- fixed file after comment from zpytela.
+- added caddy related paths.
+- Remove extra parameters from interface headers
+- Update bootupd policy for running lsblk
+- Allow pcscd_t to search cgroup
+
 * Thu Jun 04 2026 Zdenek Pytela <zpytela@redhat.com> - 45.4-1
 - Update dbus_role_template() with communication over unix dgram socket
 - Allow staff user read nsfs files
