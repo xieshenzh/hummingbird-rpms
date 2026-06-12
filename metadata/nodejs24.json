@@ -3,8 +3,10 @@
   "modification_reason": "disable networking tests that fail in konflux",
   "modification_status": "modified",
   "release": "1",
+  "release_monitoring_project_id": 8251,
   "sha": "fb4ff12e99dc4d01692cf6d68a056f59ced86ba2",
   "source": "https://src.fedoraproject.org/rpms/nodejs24.git",
+  "track_upstream": "24",
   "upstream_branch": "v24.x",
   "upstream_repo": "https://github.com/nodejs/node",
   "version": "24.15.0"
