@@ -2,10 +2,10 @@
   "branch": "f43",
   "modification_reason": "Backport security fixes from python3.14",
   "modification_status": "modified",
-  "release": "1.1",
-  "sha": "c731000e1eb1c378524d3d69641757947bac08d6",
+  "release": "1",
+  "sha": "a5e28d44e7880e566f0217425f9750aea8467eb5",
   "source": "https://src.fedoraproject.org/rpms/python3.13.git",
   "upstream_branch": "3.13",
   "upstream_repo": "https://github.com/python/cpython",
-  "version": "3.13.13"
+  "version": "3.13.14"
 }
