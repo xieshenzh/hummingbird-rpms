@@ -4,14 +4,8 @@
 %bcond qt 1
 
 %if %{with qt}
-# Enable qt5 support (or not)
-# RHEL 10 drops support for Qt5, adds Qt6
-%if %{undefined rhel} || 0%{?rhel} < 10
-%global qt5 1
-%endif
-%if %{undefined rhel} || 0%{?rhel} >= 10
+# Qt5 is EOL; Hummingbird follows RHEL 10+ which only ships Qt6
 %global qt6 1
-%endif
 %endif
 
 Summary: PDF rendering library
