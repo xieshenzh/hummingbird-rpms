@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "17",
-  "sha": "22c365eb09a380b2dd2b790744debab4a2e254ca",
+  "release": "18",
+  "sha": "175c9948c0c55cf2d82c7c3f3ebd8980a0495d2c",
   "source": "https://src.fedoraproject.org/rpms/libevent.git",
   "upstream_repo": "https://github.com/libevent/libevent",
   "version": "2.1.12"
