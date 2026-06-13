@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "6c2faa5970e281277332965d968f1b9ac5502050",
+  "release": "4",
+  "sha": "0bc449a59cfdd175eb3f1969413624e49ada0965",
   "source": "https://src.fedoraproject.org/rpms/libzip.git",
   "upstream_repo": "https://github.com/nih-at/libzip",
   "version": "1.11.4"
