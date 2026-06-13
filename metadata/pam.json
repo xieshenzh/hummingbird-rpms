@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "9291624db18374245f838dd21e1b9c4f8fe962b3",
+  "release": "2",
+  "sha": "c35d7d811c6ef84c88e3262572764c7391554327",
   "source": "https://src.fedoraproject.org/rpms/pam.git",
   "upstream_repo": "https://github.com/linux-pam/linux-pam",
   "version": "1.7.2"
