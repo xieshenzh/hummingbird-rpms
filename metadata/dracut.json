@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "a43b6aa7bc98c7864a7bcdc071a1efc2cf86e6f7",
+  "release": "4",
+  "sha": "55ce6a2271396e1085bc3789001b0e8c1ccfe0ff",
   "source": "https://src.fedoraproject.org/rpms/dracut.git",
   "upstream_repo": "https://github.com/dracut-ng/dracut-ng",
   "version": "109"
