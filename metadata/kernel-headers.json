@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "62",
-  "sha": "bb8d52c3a7008cd9c043aa936632cd84dcc2a136",
+  "release": "55",
+  "sha": "2577c9f7b127e97c56d63b731ac3f07cfbd5dc48",
   "source": "https://src.fedoraproject.org/rpms/kernel-headers.git",
   "upstream_repo": "https://github.com/torvalds/linux",
-  "version": "7.0.0"
+  "version": "7.1.0"
 }
