@@ -384,6 +384,8 @@ spec:
           contentType: rpm
         - name: kubernetes1-35-main
           contentType: rpm
+        - name: kubernetes1-36-main
+          contentType: rpm
         - name: langpacks-main
           contentType: rpm
         - name: less-main

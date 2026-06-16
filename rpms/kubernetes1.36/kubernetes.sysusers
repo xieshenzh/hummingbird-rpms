@@ -1,0 +1,3 @@
+#Type Name   ID    GECOS           Home directory  Shell
+u     kube -     "Kubernetes user" /var/lib/kubelet /sbin/nologin
+

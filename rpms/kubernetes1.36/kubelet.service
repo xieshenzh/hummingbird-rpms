@@ -1,0 +1,22 @@
+[Unit]
+Description=Kubelet: The Kubernetes Node Agent
+Documentation=https://kubernetes.io/docs/concepts/overview/components/#kubelet https://kubernetes.io/docs/reference/generated/kubelet/
+# there are other cri implementations beside cri-o and containerd
+# After=containerd.service crio.service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+WorkingDirectory=/var/lib/kubelet
+# EnvironmentFile=-/etc/kubernetes/config
+# EnvironmentFile=-/etc/kubernetes/kubelet
+ExecStart=/usr/bin/kubelet
+# add Upstream Restart configuration
+# Restart=on-failure
+Restart=always
+StartLimitInterval=0
+RestartSec=10
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
