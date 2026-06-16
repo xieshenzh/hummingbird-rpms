@@ -1,0 +1,8 @@
+# Update k8s_ver and k8s_tag macros directly because Version is derived
+# from %{k8s_ver} and the specfile library cannot trace that.
+update_spec: |
+  sed -Ei \
+    -e 's/^(%global k8s_ver\s+)[0-9.]+/\1'"${UPDATE_NEW_VERSION}"'/' \
+    -e 's/^(%global k8s_tag\s+)v[0-9.]+/\1v'"${UPDATE_NEW_VERSION}"'/' \
+    -e 's/^(Release:\s+)[^ ]+/\10.1%{?dist}/' \
+    "${UPDATE_SPEC_FILE}"
