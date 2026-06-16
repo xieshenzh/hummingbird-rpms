@@ -84,6 +84,9 @@ golang-fips1.25:
   # Use hummingbird lookaside cache
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+grype:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 haproxy:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

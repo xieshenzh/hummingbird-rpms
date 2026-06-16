@@ -1,0 +1,105 @@
+---
+# Tests for grype: verify binary installs correctly, version is embedded
+# via ldflags, vulnerability database operations work, and scanning
+# produces valid output in multiple formats.
+
+grype-version:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "grype" ]]; then
+      echo "Skipping: only runs on grype (got: ${rpm_name})"
+      exit 0
+    fi
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        dnf install -y /tmp/test.rpm
+
+        rpm_version=$(rpm -q --queryformat "%{VERSION}" grype)
+
+        # GitCommit/BuildDate remain "[not provided]" — only Version is set via ldflags
+        version=$(grype version 2>&1 | sed -n "s/^Version:[[:space:]]*//p")
+
+        if [[ -z "${version}" ]]; then
+          echo "FAIL: Version field is empty — ldflags not injected"
+          exit 1
+        fi
+
+        if [[ "${version}" != "${rpm_version}" ]]; then
+          echo "FAIL: grype reports \"${version}\", expected \"${rpm_version}\""
+          exit 1
+        fi
+
+        echo "PASS: version ${version}"
+      '
+
+grype-scan:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "grype" ]]; then
+      echo "Skipping: only runs on grype (got: ${rpm_name})"
+      exit 0
+    fi
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        dnf install -y /tmp/test.rpm
+        grype db update
+
+        # Scan /usr/bin, verify JSON structure
+        grype dir:/usr/bin -o json > /tmp/grype-out.json
+        jq -e ".matches | type == \"array\"" /tmp/grype-out.json > /dev/null || {
+          echo "FAIL: .matches is not an array"; exit 1
+        }
+        jq -e ".source.type" /tmp/grype-out.json > /dev/null || {
+          echo "FAIL: .source.type missing"; exit 1
+        }
+        match_count=$(jq ".matches | length" /tmp/grype-out.json)
+        echo "PASS: json scan produced valid output (${match_count} matches)"
+
+        # Verify other output formats
+        failed=0
+        for fmt in table sarif cyclonedx-json; do
+          grype dir:/usr/bin -o "${fmt}" > /dev/null 2>&1 \
+            && echo "PASS: ${fmt} output" \
+            || { echo "FAIL: ${fmt} output"; failed=1; }
+        done
+        exit $failed
+      '
+
+grype-db-check:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "grype" ]]; then
+      echo "Skipping: only runs on grype (got: ${rpm_name})"
+      exit 0
+    fi
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        dnf install -y /tmp/test.rpm
+
+        grype db update
+        echo "PASS: db update"
+
+        # db check is advisory — a slightly stale DB is not a build failure
+        grype db check \
+          && echo "PASS: db check (current)" \
+          || echo "INFO: db check (slightly out of date — non-fatal)"
+
+        db_status=$(grype db status 2>&1)
+        if [[ "${db_status}" != *"Location"* ]] && [[ "${db_status}" != *"Built"* ]]; then
+          echo "FAIL: unexpected db status output: ${db_status}"
+          exit 1
+        fi
+        echo "PASS: db status"
+      '

@@ -1,0 +1,8 @@
+{
+  "modification_status": "native",
+  "release": "0.1",
+  "release_monitoring_project_id": 380418,
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/anchore/grype",
+  "version": "0.114.0"
+}
