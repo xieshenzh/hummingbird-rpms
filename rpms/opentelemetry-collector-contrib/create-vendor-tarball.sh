@@ -22,6 +22,7 @@ curl -fSL -o "${releases_tarball}" \
 echo "Downloading OCB v${version}..." >&2
 curl -fSL -o ocb "${ocb_url}" >&2
 chmod +x ocb
+ocb_path="${PWD}/ocb"
 
 workdir=$(mktemp -d)
 trap "rm -rf '${workdir}' ocb" EXIT
@@ -30,7 +31,7 @@ tar -xzf "${releases_tarball}" -C "${workdir}"
 srcdir="${workdir}/opentelemetry-collector-releases-${version}"
 
 echo "Running OCB with otelcol-contrib manifest..." >&2
-(cd "${srcdir}" && "${PWD}/ocb" --skip-compilation \
+(cd "${srcdir}" && "${ocb_path}" --skip-compilation \
     --config distributions/otelcol-contrib/manifest.yaml) >&2
 
 echo "Capturing OCB-generated sources from _build/..." >&2
