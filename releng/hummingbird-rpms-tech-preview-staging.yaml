@@ -924,6 +924,8 @@ spec:
           contentType: rpm
         - name: tcl-main
           contentType: rpm
+        - name: tinysparql-main
+          contentType: rpm
         - name: tk-main
           contentType: rpm
         - name: tomcat10-main

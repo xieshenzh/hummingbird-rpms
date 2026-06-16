@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "sha": "5bc023b9d016cf3199323176ea18ef66caa5f9c0",
+  "source": "https://src.fedoraproject.org/rpms/tinysparql.git",
+  "version": "3.11.1"
+}
