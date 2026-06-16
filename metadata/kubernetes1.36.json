@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Patch TestParallel deadlock: raise -test.parallel minimum for 3-goroutine barrier",
+  "modification_status": "modified",
   "release": "2",
   "release_monitoring_project_id": 10954,
   "sha": "4b2c3318660b1e585ece5f614b3645199a1f26f0",

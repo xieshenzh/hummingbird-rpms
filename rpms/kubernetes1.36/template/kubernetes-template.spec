@@ -35,6 +35,10 @@ Source0:        %{gosource}
 Source1:        %{archivename}-vendor.tar.bz2
 Source2:        go-vendor-tools.toml
 
+# Raise -test.parallel minimum so TestParallel's 3-goroutine barrier does not
+# deadlock on constrained build hosts where GOMAXPROCS < 3.
+Patch1:         ktesting-parallel-fix.patch
+
 Source101:      kube-proxy.service
 Source102:      kube-apiserver.service
 Source103:      kube-scheduler.service
