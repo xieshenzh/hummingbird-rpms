@@ -1,0 +1,85 @@
+diff --git a/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp b/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
+index 0d4bc288ea..91df249778 100644
+--- a/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
++++ b/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
+@@ -593,6 +593,7 @@ void QFontconfigDatabase::populateFontDatabase()
+         ++f;
+     }
+
++    cacheEmojiFontFamily();
+     //QPA has very lazy population of the font db. We want it to be initialized when
+     //QApplication is constructed, so that the population procedure can do something like this to
+     //set the default font
+@@ -736,6 +737,9 @@ QStringList QFontconfigDatabase::fallbacksForFamily(const QString &family, QFont
+     if (!pattern)
+         return fallbackFamilies;
+
++    if (!m_cacheEmojiFontFamily.isEmpty())
++        fallbackFamilies << m_cacheEmojiFontFamily;
++
+     FcValue value;
+     value.type = FcTypeString;
+     const QByteArray cs = family.toUtf8();
+@@ -1015,4 +1019,47 @@ void QFontconfigDatabase::setupFontEngine(QFontEngineFT *engine, const QFontDef
+     engine->glyphFormat = format;
+ }
+
++void QFontconfigDatabase::cacheEmojiFontFamily()
++{
++    FcPattern *pattern;
++    pattern = FcPatternCreate();
++
++    FcValue value;
++    value.type = FcTypeString;
++    value.u.s = (const FcChar8 *)"emoji";
++    FcPatternAdd(pattern,FC_FAMILY,value,true);
++
++    FcLangSet *ls = FcLangSetCreate();
++    FcLangSetAdd(ls, (const FcChar8*)"und-zsye");
++    FcPatternAddLangSet(pattern, FC_LANG, ls);
++
++    FcConfigSubstitute(nullptr, pattern, FcMatchPattern);
++    FcDefaultSubstitute(pattern);
++
++    FcResult result = FcResultMatch;
++    FcFontSet *fontSet = FcFontSort(nullptr,pattern,FcTrue,nullptr,&result);
++    FcPatternDestroy(pattern);
++
++    if (fontSet) {
++        for (int i = 0; i < fontSet->nfont; i++) {
++            FcChar8 *value = nullptr;
++            if (FcPatternGetString(fontSet->fonts[i], FC_FAMILY, 0, &value) != FcResultMatch)
++                continue;
++
++            FcLangSet *rls = nullptr;
++            if (FcPatternGetLangSet(fontSet->fonts[i], FC_LANG, 0, &rls) != FcResultMatch)
++                continue;
++
++            if (!FcLangSetContains(rls, ls))
++                continue;
++
++            m_cacheEmojiFontFamily = QString::fromUtf8((const char *)value);
++            break;
++        }
++        FcFontSetDestroy(fontSet);
++    }
++
++    FcLangSetDestroy(ls);
++}
++
+ QT_END_NAMESPACE
+diff --git a/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase_p.h b/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase_p.h
+index a7257c2f98..13b182923e 100644
+--- a/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase_p.h
++++ b/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase_p.h
+@@ -72,7 +72,10 @@ public:
+     QFont defaultFont() const override;
+
+ private:
++    void cacheEmojiFontFamily();
+     void setupFontEngine(QFontEngineFT *engine, const QFontDef &fontDef) const;
++
++    QString m_cacheEmojiFontFamily;
+ };
+
+ QT_END_NAMESPACE

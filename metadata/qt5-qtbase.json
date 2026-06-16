@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "4",
+  "sha": "eb1dfe3da82df8c5e524c9c9d5752df1d065289e",
+  "source": "https://src.fedoraproject.org/rpms/qt5-qtbase.git",
+  "version": "5.15.18"
+}
