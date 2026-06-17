@@ -1,0 +1,33 @@
+discover:
+    how: fmf
+execute:
+    how: tmt
+prepare:
+    - when: distro == centos-stream or distro == rhel
+      how: feature
+      epel: enabled
+      order: 10
+    - when: initiator == packit
+      how: shell
+      script: bash contrib/tmt/update-deps.sh
+      order: 20
+
+/validate:
+    summary: Validate test
+    discover+:
+        test: /validate
+
+/unit:
+    summary: Unit tests
+    discover+:
+        test: /unit
+
+/integration:
+    summary: Integration tests
+    discover+:
+        test: /integration
+
+/msrv:
+    summary: MSRV test
+    discover+:
+        test: /msrv
