@@ -80,6 +80,8 @@ spec:
           contentType: rpm
         - name: shellcheck-main
           contentType: rpm
+        - name: aardvark-dns-main
+          contentType: rpm
         - name: abattis-cantarell-fonts-main
           contentType: rpm
         - name: acl-main
