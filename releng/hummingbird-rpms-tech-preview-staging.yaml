@@ -854,6 +854,8 @@ spec:
           contentType: rpm
         - name: qt6-main
           contentType: rpm
+        - name: qt6-qtbase-main
+          contentType: rpm
         - name: rdma-core-main
           contentType: rpm
         - name: readline-main
