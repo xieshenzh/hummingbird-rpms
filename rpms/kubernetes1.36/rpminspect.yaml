@@ -1,0 +1,11 @@
+---
+# skip annocheck unicode test
+# test fails for kubectl and kubelet on this symbol which looks correct:
+# 'go:(*struct { io.Reader; io.WriterTo }).Read'
+# temporarily skip broken branch protection test. should be fixed in
+# annochec annobin-13.14
+ annocheck:
+    extra_opts:
+        - hardened: --skip-unicode
+        - hardened: --skip-branch-protection
+...

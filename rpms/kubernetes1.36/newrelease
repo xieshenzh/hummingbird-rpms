@@ -1,0 +1,163 @@
+#!/bin/bash
+#
+# Version 1.0
+#
+
+# Use newrelease to update the kubernetes spec file with any change in release
+# or go lang version. The goal is to separate changes to the spec file related
+# to kubernetes from changes to spec file function and capabilities. This is not
+# needed for the current kubernetes packages in Fedora (a single version of
+# k8s for each Fedora release), but useful if not necessary for the planned
+# deployment of multiple versions of k8s per Fedora release.
+#
+#
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# default configuration file name
+CFG_NAME=./newrelease.conf
+GVTOML=go-vendor-tools.toml
+
+# default template name postfix
+# TEMPLATE_POSTFIX="-template.spec"
+
+###
+### newrelease - set up for a new version of kubernetes. Does the following:
+###    1. Checks for configuration file and creates if missing. Optionally,
+###       create a draft configuration file.
+###    2. Use data from configuration file to generate kubernetes.spec
+###       from the ./template/kubernetes-template.spec template file.
+###    3. Download source, if needed, based on configuration.
+###
+###    Configuration file is named 'newrelease.conf'.
+###
+### Usage:
+###   newrelease               -- this help file
+###   newrelease -h            -- this help file
+###   newrelease -c            -- generate configuration file
+###   newrelease -y            -- execute using configuration file
+###
+### Options:
+###  -y         Execute script using configuration file. If configuration
+###             does not exist then create draft
+###  -c         Create draft configuration file
+###  -h         Show this message
+###
+
+# See: https://gist.github.com/kovetskiy/a4bb510595b3a6b17bfd1bd9ac8bb4a5
+help() {
+  sed -rn 's/^### ?//;T;p' "$0"
+}
+
+# display help and exit if no arguements, -h or not either
+# -y or -c
+if [[ $# == 0 || $1 == "-h" || ! ($1 =~ (-y|-c)) ]]; then
+  help
+  exit 1
+fi
+
+# if -c flag, create config file and exit
+if [[ ($1 =~ (-c|-C)) || ($1 == "-y" && ! -f "$CFG_NAME") ]]; then
+
+  if [ -f "$CFG_NAME" ]
+  then
+    echo "** Configuration file already exists. "
+    echo "** Remove to create a new configuration file or edit and reuse."
+    help
+    exit 1
+  fi
+
+  echo " Creating draft configuration file"
+  echo " Edit ${CFG_NAME} with release information and rerun script"
+  {
+    printf "# spec file name\nexport SPEC_NAME=kubernetes\n\n"
+    printf "# spec template name and path\nTEMPLATE=./template/kubernetes-template.spec\n\n"
+    printf "# release tag from git repository\n# e.g. export GIT_TAG=v1.24.3\nexport GIT_TAG=vxx.xx.xx\n\n"
+    printf "# the 'built-with' golang version - expressed as SEMVER\n# e.g. export GOLANG_VERSION=1.18.3\nexport GOLANG_VERSION=xx.xx.xx\n"
+    printf "# optional configuration variables:\n"
+    printf "# export COMMIT=6911225c3f747e1cd9d109c305436d08b668f086\n"
+  } >> "${CFG_NAME}"
+  exit 1
+fi
+
+# load config file from local directory using CFG_NAME
+# format is standard bash source.
+
+# variables are:
+# SPEC_NAME - name of the spec file to process
+# GIT_TAG - release tag of package
+# GOLANG_VERSION - minimal golang version (version used in build)
+
+# shellcheck disable=SC1090
+source "${CFG_NAME}"
+echo "Sourcing ${CFG_NAME}"
+
+# generate needed values
+# do not edit warning
+export WARNING="# Do not edit this spec file. (Re-)Generate using newrelease"
+# spec file in this repository
+SPEC=${SPEC_NAME}.spec
+
+# strip and v or V prefix, if any for tar file name and spec name
+TAR_VERSION="${GIT_TAG#[vV]}"
+# replace dash (if any) with tilde for spec file version
+export SPEC_VERSION="${TAR_VERSION//-/\~}"
+# export CURR_MINOR_VERSION
+CURR_MINOR_VERSION=$( echo "${SPEC_VERSION}" | cut -f1,2 -d".")
+export CURR_MINOR_VERSION
+
+
+# echo settings
+echo "Spec file: ${SPEC}"
+echo "Spec name: ${SPEC_NAME}"
+echo "Template: ${TEMPLATE}"
+echo "GIT Tag: ${GIT_TAG}"
+echo "Tar Version: ${TAR_VERSION}"
+echo "Version: ${SPEC_VERSION}"
+echo "Major:Minor: ${CURR_MINOR_VERSION}"
+echo "Golang Version: ${GOLANG_VERSION}"
+
+# increment minor version to derive the next minor version
+# see https://stackoverflow.com/questions/4485399/how-can-i-bump-a-version-number-using-bash
+NEXT_MINOR_VERSION=$( echo "${CURR_MINOR_VERSION}" | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.)
+export NEXT_MINOR_VERSION
+echo "Next Minor Version: ${NEXT_MINOR_VERSION}"
+
+# basic clean up - remove spec if they exist
+if [ -f "./${SPEC}" ]; then
+  rm "./${SPEC}"
+  echo "removed old spec file - ${SPEC}"
+fi
+
+# basic clean up - remove other spec file(s) if they exist
+if [ -f "./*.spec" ]; then
+  rm "./*.spec"
+  echo "removed other spec file(s)"
+fi
+# create spec file from template using variables from
+# configuration file
+# inspiration: https://blog.tratif.com/2023/01/27/bash-tips-3-templating-in-bash-scripts/
+echo "creating ${SPEC}"
+
+# spec template spec file (must exist)
+if ! [ -f  "${TEMPLATE}" ]; then
+  echo "${TEMPLATE} - spec template missing"
+  exit 1
+fi
+
+# shellcheck disable=2016
+< "${TEMPLATE}" envsubst '$WARNING,$SPEC_NAME,$SPEC_VERSION,$GIT_TAG,$CURR_MINOR_VERSION\
+  $NEXT_MINOR_VERSION,$GOLANG_VERSION,$COMMIT' > "${SPEC}"
+echo "${SPEC} created"
+
+# download source
+echo "Downloading source if needed"
+spectool -g -s 0 "${SPEC}"
+
+go_vendor_archive create --config "${GVTOML}" --idempotent "${SPEC}"
+go_vendor_license --config "${GVTOML}" --path "${SPEC}" report expression --update-spec
+
+SPEC_URL=$(spectool -l "${SPEC}" | head -n1 | awk '{print $2}')
+TAR_NAME=$(basename "$SPEC_URL")
+echo "****Don't forget to run: fedpkg new-sources ${TAR_NAME}"

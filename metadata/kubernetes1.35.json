@@ -3,8 +3,10 @@
   "modification_reason": "Rename template spec to .spec.in to avoid CI multi-specfile detection",
   "modification_status": "modified",
   "release": "1",
+  "release_monitoring_project_id": 10954,
   "sha": "e3dbed35bbac9fa88f57c3554d0721cb3a8999ee",
   "source": "https://src.fedoraproject.org/rpms/kubernetes1.35.git",
+  "track_upstream": "1.35",
   "upstream_branch": "release-1.35",
   "upstream_repo": "https://github.com/kubernetes/kubernetes",
   "version": "1.35.6"
