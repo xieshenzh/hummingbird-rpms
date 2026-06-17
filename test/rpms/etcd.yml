@@ -1,0 +1,147 @@
+---
+# Tests for etcd: verify binaries install correctly, version is embedded
+# via ldflags, and basic key-value operations work.
+
+etcd-version:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "etcd" ]]; then
+      echo "Skipping: only runs on etcd (got: ${rpm_name})"
+      exit 0
+    fi
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        dnf install -y /tmp/test.rpm
+
+        rpm_version=$(rpm -q --queryformat "%{VERSION}" etcd)
+        version=$(etcd --version 2>&1 | sed -n "s/^etcd Version: *//p")
+
+        if [[ -z "${version}" ]]; then
+          echo "FAIL: Version field is empty"
+          exit 1
+        fi
+
+        if [[ "${version}" != "${rpm_version}" ]]; then
+          echo "FAIL: etcd reports \"${version}\", expected \"${rpm_version}\""
+          exit 1
+        fi
+
+        echo "PASS: etcd version ${version}"
+      '
+
+etcdctl-version:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "etcd" ]]; then
+      echo "Skipping: only runs on etcd (got: ${rpm_name})"
+      exit 0
+    fi
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        dnf install -y /tmp/test.rpm
+
+        rpm_version=$(rpm -q --queryformat "%{VERSION}" etcd)
+        version=$(etcdctl version 2>&1 | sed -n "s/^etcdctl version: *//p")
+
+        if [[ -z "${version}" ]]; then
+          echo "FAIL: etcdctl version field is empty"
+          exit 1
+        fi
+
+        if [[ "${version}" != "${rpm_version}" ]]; then
+          echo "FAIL: etcdctl reports \"${version}\", expected \"${rpm_version}\""
+          exit 1
+        fi
+
+        echo "PASS: etcdctl version ${version}"
+      '
+
+etcdutl-version:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "etcd" ]]; then
+      echo "Skipping: only runs on etcd (got: ${rpm_name})"
+      exit 0
+    fi
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        dnf install -y /tmp/test.rpm
+
+        rpm_version=$(rpm -q --queryformat "%{VERSION}" etcd)
+        version=$(etcdutl version 2>&1 | sed -n "s/^etcdutl version: *//p")
+
+        if [[ -z "${version}" ]]; then
+          echo "FAIL: etcdutl version field is empty"
+          exit 1
+        fi
+
+        if [[ "${version}" != "${rpm_version}" ]]; then
+          echo "FAIL: etcdutl reports \"${version}\", expected \"${rpm_version}\""
+          exit 1
+        fi
+
+        echo "PASS: etcdutl version ${version}"
+      '
+
+etcd-functional:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "etcd" ]]; then
+      echo "Skipping: only runs on etcd (got: ${rpm_name})"
+      exit 0
+    fi
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        dnf install -y /tmp/test.rpm
+
+        datadir=$(mktemp -d)
+        etcd --data-dir "${datadir}" \
+             --listen-client-urls http://127.0.0.1:2379 \
+             --advertise-client-urls http://127.0.0.1:2379 \
+             --listen-peer-urls http://127.0.0.1:2380 &
+        etcd_pid=$!
+        trap '\''kill $etcd_pid 2>/dev/null; rm -rf $datadir'\'' EXIT
+
+        for i in $(seq 1 30); do
+          if etcdctl --endpoints=http://127.0.0.1:2379 endpoint health 2>/dev/null; then
+            break
+          fi
+          sleep 1
+        done
+
+        # put/get round-trip
+        etcdctl --endpoints=http://127.0.0.1:2379 put testkey "hello etcd"
+        value=$(etcdctl --endpoints=http://127.0.0.1:2379 get testkey --print-value-only)
+
+        if [[ "${value}" != "hello etcd" ]]; then
+          echo "FAIL: expected \"hello etcd\", got \"${value}\""
+          exit 1
+        fi
+
+        echo "PASS: put/get round-trip works"
+
+        # member list
+        member_output=$(etcdctl --endpoints=http://127.0.0.1:2379 member list 2>&1)
+        if [[ "${member_output}" != *"default"* ]]; then
+          echo "FAIL: member list missing default member: ${member_output}"
+          exit 1
+        fi
+
+        echo "PASS: member list shows default member"
+      '
