@@ -10235,6 +10235,45 @@ spec:
 # PENDING
 # --- net-tools ---
 # PENDING
+# --- netavark ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: netavark-main
+spec:
+  application: rpms-main
+  componentName: netavark-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/netavark-main
+  source:
+    git:
+      context: rpms/netavark
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: netavark-main
+  name: netavark-main
+spec:
+  image:
+    name: hummingbird-tenant/netavark-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- netpbm ---
 # PENDING
 # --- nettle ---
