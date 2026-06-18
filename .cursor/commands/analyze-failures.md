@@ -224,6 +224,58 @@ structure helps diagnose failures:
 - Test script errors
 - Timeout issues
 
+### Hummingbird-Specific Resolution Patterns
+
+When analyzing dependency resolution failures (`calculate-deps`), check for these common patterns
+specific to the hummingbird build environment. These should be noted in the analysis report with
+concrete recommendations. **Do not apply fixes — only suggest them to the user.**
+
+**Pattern 1: Previous version already had a fix — re-apply local modifications**
+
+Automated `dist_git.py update` pulls the raw Fedora spec, overwriting local hummingbird
+modifications. If the previous version of the package had spec changes (e.g., conditional
+`BuildRequires` exclusions), the update discards them.
+
+- **How to detect**: Check `metadata/<package>.json` on the `main` branch. If
+  `modification_status` is `"modified"`, read `modification_reason` — it describes what was changed
+  and why. Then compare the main branch spec against the update branch spec to see what local
+  changes were lost.
+- **Suggested fix**: Re-apply the same conditional guards from the previous version to the updated spec.
+- **Example**: meson excludes `gcc-objc`, `qt5-qtbase-devel`, `gnustep-base-devel`, and `wxGTK-devel`
+  via `%if %{undefined rhel} && !%{defined hummingbird}` because hummingbird's gcc does not build
+  objc support and some dependencies conflict with hummingbird's libicu version.
+
+**Pattern 2: Missing packages — need to import into hummingbird**
+
+A Fedora package requires a library that conflicts with a hummingbird-overlay version (e.g.,
+`libicu 77` vs `libicu 78`). The Fedora package must be imported into hummingbird and rebuilt
+against the hummingbird version of the library.
+
+- **How to detect**: DNF error shows `cannot install both <pkg>-X.hum1 from hummingbird and
+  <pkg>-Y.fc43 from fedora`. Trace the dependency chain to find which Fedora package needs the
+  older library version.
+- **Suggested fix**: Import the Fedora package into hummingbird (`dist_git.py import`) so it gets
+  rebuilt against the hummingbird library version. This may cascade — importing one package can
+  reveal further dependency conflicts that require additional imports.
+- **Example**: poppler required importing tinysparql because `libtinysparql` (Fedora) needed
+  `libicu 77` while hummingbird ships `libicu 78`.
+
+**Pattern 3: Honor `%{rhel}` or `%{hummingbird}` conditionals**
+
+Many Fedora specs use `%if %{undefined rhel}` to gate optional BuildRequires that are unavailable
+or unnecessary on RHEL. Hummingbird is Fedora-based (does NOT define `%{rhel}`) but DOES define
+`%{hummingbird}`. When a BuildRequires is unavailable in hummingbird, adding
+`&& !%{defined hummingbird}` to an existing `%if %{undefined rhel}` guard is the standard fix.
+
+- **How to detect**: The failing BuildRequires is inside a `%if %{undefined rhel}` block in the
+  spec. The package exists in Fedora but cannot be installed due to conflicts with hummingbird
+  overlay packages (or simply is not available).
+- **Suggested fix**: Change `%if %{undefined rhel}` to
+  `%if %{undefined rhel} && !%{defined hummingbird}`. Update `metadata/<package>.json` with
+  `modification_status: "modified"` and a clear `modification_reason`.
+- **Example**: meson gates `wxGTK-devel` behind `!%{defined hummingbird}` because wxGTK depends on
+  webkit2gtk4.1 which requires `libicu 77`, conflicting with hummingbird's `libicu 78`.
+
 ## Workflow
 
 ### Setup Phase
