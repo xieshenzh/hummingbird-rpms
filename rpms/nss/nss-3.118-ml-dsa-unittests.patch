@@ -80311,14 +80311,14 @@ new file mode 100644
 diff --git a/gtests/pk11_gtest/pk11_gtest.gyp b/gtests/pk11_gtest/pk11_gtest.gyp
 --- a/gtests/pk11_gtest/pk11_gtest.gyp
 +++ b/gtests/pk11_gtest/pk11_gtest.gyp
-@@ -38,6 +38,7 @@
+@@ -39,6 +39,7 @@
          'pk11_kem_unittest.cc',
          'pk11_key_unittest.cc',
          'pk11_keygen.cc',
 +        'pk11_mldsa_unittest.cc',
          'pk11_module_unittest.cc',
+         'pk11_uri_unittest.cc',
          'pk11_pbe_unittest.cc',
-         'pk11_pbkdf2_unittest.cc',
 diff --git a/gtests/pk11_gtest/pk11_import_unittest.cc b/gtests/pk11_gtest/pk11_import_unittest.cc
 --- a/gtests/pk11_gtest/pk11_import_unittest.cc
 +++ b/gtests/pk11_gtest/pk11_import_unittest.cc
