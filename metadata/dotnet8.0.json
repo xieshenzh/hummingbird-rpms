@@ -4,10 +4,10 @@
   "modification_reason": "Pre-existing modification - requires review",
   "modification_status": "modified",
   "release": "1",
-  "sha": "142d1f3ba684216c69c4724df5da43e41b4acefd",
+  "sha": "2f8686bc7c3e953e482b2fbc9bc331eefb8de07d",
   "source": "https://src.fedoraproject.org/rpms/dotnet8.0.git",
   "upstream_branch": "release/8.0",
   "upstream_repo": "https://github.com/dotnet/runtime",
-  "version": "8.0.127",
+  "version": "8.0.128",
   "version_transform": "dotnet_sdk_to_runtime"
 }
