@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Exclude gcc-objc/gcc-objc++ BuildRequires (disabled in Hummingbird gcc build)",
+  "modification_reason": "Exclude gcc-objc/gcc-objc++, qt5-qtbase-devel, gnustep-base-devel BuildRequires (gcc-objc disabled in Hummingbird gcc build; qt5-qtbase conflicts with libicu 78)",
   "modification_status": "modified",
   "release": "6",
   "sha": "15bf64cbaf04f1c0686c4a68fb0e14c78aaf63c4",

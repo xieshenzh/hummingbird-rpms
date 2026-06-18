@@ -39,7 +39,7 @@ BuildRequires:  gcc-objc++
 %endif
 BuildRequires:  java-25-devel
 BuildRequires:  libomp-devel
-%if %{undefined rhel}
+%if %{undefined rhel} && !%{defined hummingbird}
 BuildRequires:  mono-core mono-devel
 %endif
 BuildRequires:  rust
@@ -50,33 +50,33 @@ BuildRequires:  rust
 # Various libs support
 BuildRequires:  boost-devel
 BuildRequires:  /usr/bin/clang-format
-%if %{undefined rhel}
+%if %{undefined rhel} && !%{defined hummingbird}
 BuildRequires:  clippy
 %endif
 BuildRequires:  gtest-devel
 BuildRequires:  gmock-devel
-%if %{undefined rhel}
+%if %{undefined rhel} && !%{defined hummingbird}
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  qt5-qtbase-private-devel
 BuildRequires:  qt5-linguist
 %endif
 BuildRequires:  vala
 BuildRequires:  python3-gobject-base
-%if %{undefined rhel}
+%if %{undefined rhel} && !%{defined hummingbird}
 BuildRequires:  wxGTK-devel
 BuildRequires:  bindgen
 %endif
 BuildRequires:  flex
 BuildRequires:  bison
 BuildRequires:  gettext
-%if %{undefined rhel}
+%if %{undefined rhel} && !%{defined hummingbird}
 BuildRequires:  gnustep-base-devel
 BuildRequires:  /usr/bin/gnustep-config
 %endif
 BuildRequires:  git-core
 BuildRequires:  pkgconfig(protobuf)
 BuildRequires:  pkgconfig(glib-2.0)
-%if %{undefined rhel}
+%if %{undefined rhel} && !%{defined hummingbird}
 BuildRequires:  pkgconfig(glib-sharp-2.0)
 %endif
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
@@ -99,7 +99,7 @@ BuildRequires:  /usr/bin/pcap-config
 BuildRequires:  pkgconfig(vulkan)
 BuildRequires:  llvm-devel
 BuildRequires:  cups-devel
-%if %{undefined rhel}
+%if %{undefined rhel} && !%{defined hummingbird}
 BuildRequires:  /usr/bin/wx-config
 %endif
 BuildRequires:  /usr/bin/sdl2-config
