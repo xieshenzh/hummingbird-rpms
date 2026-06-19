@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "54273a2c51d6f13bc3a8aef6a28542288dcb07b8",
+  "release": "2",
+  "sha": "78fbea44f106a2b40a934023291ea2129f5d6b7f",
   "source": "https://src.fedoraproject.org/rpms/chunkah.git",
   "upstream_repo": "https://github.com/coreos/chunkah",
   "version": "0.6.0"
