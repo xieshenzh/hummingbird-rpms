@@ -24,10 +24,10 @@
 %bcond bootstrap 0
 
 Name:           llhttp
-Version:        9.4.1
+Version:        9.4.2
 %global so_version 9.4
 %global previous_so_version 9.3
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Port of http_parser to llparse
 
 # SPDX
@@ -70,7 +70,7 @@ developing applications that use llhttp.
 
 %install -a
 %if %{with bootstrap}
-cp -vp %{_libdir}/libllhttp.so.%{previous_so_version}{,.*} \
+cp --verbose --preserve %{_libdir}/libllhttp.so.%{previous_so_version}{,.*} \
     %{buildroot}%{_libdir}
 %endif
 
