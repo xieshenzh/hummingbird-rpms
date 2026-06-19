@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Add doc bcond to disable asciidoctor dependency",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "00bb75318f0ecfd6e128bb4bcac033734e01c4b3",
+  "release": "2",
+  "sha": "d340ebd772cb08de2834e3ebf8a51ca345515899",
   "source": "https://src.fedoraproject.org/rpms/cryptsetup.git",
   "upstream_repo": "https://gitlab.com/cryptsetup/cryptsetup",
   "version": "2.8.6"
