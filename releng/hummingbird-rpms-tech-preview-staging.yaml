@@ -997,9 +997,9 @@ spec:
     pipelineRef:
       params:
         - name: url
-          value: https://github.com/scoheb/release-service-catalog.git
+          value: https://github.com/konflux-ci/release-service-catalog.git
         - name: revision
-          value: hummingbird-rpm-signing
+          value: development
         - name: pathInRepo
           value: "pipelines/managed/push-rpms-to-pulp/push-rpms-to-pulp.yaml"
       resolver: git
