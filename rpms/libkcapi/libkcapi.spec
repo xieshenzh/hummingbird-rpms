@@ -34,7 +34,9 @@
 # Use `--without fuzz_test` to skip the fuzz test during build
 %bcond_without fuzz_test
 # Use `--without doc` to build without the -doc subpackage
-%bcond_without doc
+# FIXME: docs fail to build with latest texlive:
+# https://bugzilla.redhat.com/show_bug.cgi?id=2488672
+%bcond_with doc
 # Use `--without clang_sa` to skip clang static analysis during build
 %bcond_without clang_sa
 
@@ -116,7 +118,7 @@ lib_path=%{buildroot}%{_libdir}                                  \
 
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        8%{?dist}
+Release:        10%{?dist}
 Summary:        User space interface to the Linux Kernel Crypto API
 
 License:        BSD-3-Clause OR GPL-2.0-only
