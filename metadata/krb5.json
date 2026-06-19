@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "cve_product": "MIT / Kerberos 5",
   "modification_status": "clean",
-  "release": "7",
-  "sha": "a93b369230397f8550bc75a0824a074fa7ab4f70",
+  "release": "8",
+  "sha": "3e2338cdf08b491b18c8cbd59711d19faffd1e61",
   "source": "https://src.fedoraproject.org/rpms/krb5.git",
   "upstream_repo": "https://github.com/krb5/krb5",
   "version": "1.22.2"
