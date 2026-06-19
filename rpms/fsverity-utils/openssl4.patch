@@ -1,0 +1,27 @@
+From 7bb0f0d82269dc7307989af74aea64621b6f89f0 Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Mon, 27 Apr 2026 18:11:02 -0400
+Subject: [PATCH] Fix build with OpenSSL 4
+
+OpenSSL 4 drops support for the ENGINE APIs, which have long been guarded.
+(OpenSSL 3 in RHEL 10 disabled them as well.)  This matches the conditional
+used in later in the code, and covers both BoringSSL and OpenSSL 4.
+
+Signed-off-by: Yaakov Selkowitz <yselkowi@redhat.com>
+---
+ lib/sign_digest.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/sign_digest.c b/lib/sign_digest.c
+index c22ff90..4ed0be9 100644
+--- a/lib/sign_digest.c
++++ b/lib/sign_digest.c
+@@ -19,7 +19,7 @@
+ #include <openssl/pkcs7.h>
+ #include <string.h>
+ 
+-#ifndef OPENSSL_IS_BORINGSSL
++#ifndef OPENSSL_NO_ENGINE
+ #include <openssl/engine.h>
+ #endif
+ 
