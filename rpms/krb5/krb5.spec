@@ -6,12 +6,12 @@
 %global configure_default_ccache_name 1
 %global configured_default_ccache_name KEYRING:persistent:%%{uid}
 
-%global krb5_release 8%{?dist}
+%global krb5_release 9%{?dist}
 
 # This should be e.g. beta1 or %%nil
 %global pre_release %nil
 %if "x%{?pre_release}" != "x"
-%global krb5_release 8%{?dist}
+%global krb5_release 9%{?dist}
 # Use for tarball
 %global krb5_pre_release -%{pre_release}
 %endif
