@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "35",
-  "sha": "c0c316e2f501a471102fd3de9ae3e738a82201e1",
+  "release": "36",
+  "sha": "bf720ae4e29cf1ec069c5bb0095f4967fcda7c21",
   "source": "https://src.fedoraproject.org/rpms/cyrus-sasl.git",
   "upstream_repo": "https://github.com/cyrusimap/cyrus-sasl",
   "version": "2.1.28"
