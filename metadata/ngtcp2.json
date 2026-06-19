@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "0b69672e985a466620b64fff6f804a3fed850ea7",
+  "release": "2",
+  "sha": "ff62ea6c8afe2e0b09ecb96014a2dde1c0e06323",
   "source": "https://src.fedoraproject.org/rpms/ngtcp2.git",
   "upstream_repo": "https://github.com/ngtcp2/ngtcp2",
   "version": "1.22.1"
