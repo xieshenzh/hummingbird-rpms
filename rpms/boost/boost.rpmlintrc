@@ -17,8 +17,11 @@ addFilter("boost.*: W: spelling-error Summary(en_US) numpy ")
 
 # The example code is useless without the headers
 addFilter("boost-examples.x86_64: E: devel-dependency boost-devel")
+addFilter("boost-examples.x86_64: E: no-binary")
 
 # These libs are statically linked
 addFilter("boost-date-time.x86_64: E: shared-lib-without-dependency-information /usr/lib64/libboost_date_time.so.*")
 addFilter("boost-system.x86_64: E: shared-lib-without-dependency-information /usr/lib64/libboost_system.so.*")
 addFilter("boost-stacktrace.x86_64: E: shared-lib-without-dependency-information /usr/lib64/libboost_stacktrace_noop.so.*")
+
+addFilter("file-not-utf8 /usr/share/doc/boost-examples/libs/serialization/example/demo_output.txt")
