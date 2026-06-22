@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "2",
-  "sha": "36a234147fcabb698bebe627b09a6e684de9b23d",
+  "sha": "054158500a9fb8a5867055fe1ec430b56c04569c",
   "source": "https://src.fedoraproject.org/rpms/systemd.git",
   "upstream_repo": "https://github.com/systemd/systemd",
-  "version": "260.1"
+  "version": "261"
 }
