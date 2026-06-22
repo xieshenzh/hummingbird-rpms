@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "acf503d52e57d1109204940a05dbeaa836ccaff2",
+  "sha": "9eaab2be16c698349c38ecb6ff8c6dac2bdd172c",
   "source": "https://src.fedoraproject.org/rpms/package-notes.git",
   "upstream_repo": "https://github.com/systemd/package-notes",
-  "version": "0.19"
+  "version": "0.20"
 }

@@ -1,5 +1,5 @@
 Name:           package-notes
-Version:        0.19
+Version:        0.20
 Release:        1%{?dist}
 Summary:        ELF Package and Dlopen Notes
 License:        0BSD
