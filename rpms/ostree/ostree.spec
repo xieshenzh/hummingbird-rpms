@@ -8,7 +8,7 @@
 Summary: Tool for managing bootable, immutable filesystem trees
 Name: ostree
 Version: 2026.1
-Release: 2%{?dist}
+Release: 4%{?dist}
 Source0: https://github.com/ostreedev/%{name}/releases/download/v%{version}/libostree-%{version}.tar.xz
 License: LGPL-2.0-or-later
 URL: https://ostreedev.github.io/ostree/
@@ -70,6 +70,7 @@ as well as container tools like flatpak and the atomic CLI.
 
 %package libs
 Summary: C shared libraries %{name}
+Requires: bubblewrap
 
 %description libs
 The %{name}-libs provides shared libraries for %{name}.
