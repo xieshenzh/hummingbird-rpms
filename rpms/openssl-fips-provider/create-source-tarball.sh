@@ -1,255 +1,111 @@
 #!/usr/bin/bash
 #
-# Create the openssl-fips-provider source tarball
+# Create the openssl-fips-provider source tarball.
 #
-# This script downloads the RHEL 9.2 OpenSSL RPMs from Red Hat CDN
-# using UBI9 containers with subscription-manager authentication,
-# then packages them into a tar.gz source tarball.
+# This script downloads the Red Hat openssl-fips-provider source RPM from the
+# public UBI source repository, extracts the embedded gold RPM bundle, then
+# repackages those RPMs into the source tarball used by this package.
 #
-# For aarch64 packages, it uses QEMU emulation via podman.
-#
-# Usage: ./create-source-tarball.sh --org <ORG_ID> --key <ACTIVATION_KEY>
-#
-#   --org, -o   Red Hat subscription organization ID
-#   --key, -k   Red Hat subscription activation key
-#
-# Alternatively, set environment variables:
-#   RHSM_ORG_ID        - Organization ID
-#   RHSM_ACTIVATION_KEY - Activation key
+# Usage: ./create-source-tarball.sh
 #
 # Requirements:
 # - podman
-# - qemu-user-static (for aarch64 emulation)
-# - Internet access to Red Hat CDN
+# - rpm2cpio
+# - cpio
+# - tar
 #
 set -euo pipefail
 
-# Parse command-line arguments
-ORG_ID="${RHSM_ORG_ID:-}"
-ACTIVATION_KEY="${RHSM_ACTIVATION_KEY:-}"
-
-usage() {
-    echo "Usage: $0 --org <ORG_ID> --key <ACTIVATION_KEY>"
-    echo ""
-    echo "Options:"
-    echo "  --org, -o    Red Hat subscription organization ID"
-    echo "  --key, -k    Red Hat subscription activation key"
-    echo ""
-    echo "Environment variables (alternative to CLI args):"
-    echo "  RHSM_ORG_ID         - Organization ID"
-    echo "  RHSM_ACTIVATION_KEY - Activation key"
-    exit 1
-}
-
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --org|-o)
-            ORG_ID="$2"
-            shift 2
-            ;;
-        --key|-k)
-            ACTIVATION_KEY="$2"
-            shift 2
-            ;;
-        --help|-h)
-            usage
-            ;;
-        *)
-            echo "Unknown option: $1"
-            usage
-            ;;
-    esac
-done
-
-# Validate required parameters
-if [[ -z "${ORG_ID}" ]]; then
-    echo "ERROR: Organization ID is required (--org or RHSM_ORG_ID)"
-    usage
-fi
-
-if [[ -z "${ACTIVATION_KEY}" ]]; then
-    echo "ERROR: Activation key is required (--key or RHSM_ACTIVATION_KEY)"
-    usage
-fi
-
 VERSION="3.0.7"
-RELEASE="18.el9_2"
-OVR="${VERSION}-${RELEASE}"
-TARBALL_NAME="openssl-fips-provider-${VERSION}"
+RHEL_RELEASE="11.el9_8"
+GOLD_RELEASE="11.el9_0"
+OVR="${VERSION}-${RHEL_RELEASE}"
+GOLD_OVR="${VERSION}-${GOLD_RELEASE}"
+PKGNAME="openssl-fips-provider"
+SOURCE_RPM="${PKGNAME}-${OVR}.src.rpm"
+RHEL_TARBALL="${PKGNAME}-${VERSION}-1.tar.gz"
+TARBALL_NAME="${PKGNAME}-${VERSION}"
 
-# Architectures to download
+# Architectures Hummingbird builds today.
 ARCHES=(x86_64 aarch64)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORK_DIR="${SCRIPT_DIR}/${TARBALL_NAME}"
+DOWNLOAD_DIR="${SCRIPT_DIR}/download-${TARBALL_NAME}"
 
 echo "=== Creating openssl-fips-provider source tarball ==="
 echo "Version: ${VERSION}"
-echo "RHEL Release: ${RELEASE}"
+echo "RHEL Package Release: ${RHEL_RELEASE}"
+echo "Gold Artifact Release: ${GOLD_RELEASE}"
 echo "Architectures: ${ARCHES[*]}"
 echo ""
 
-# Clean up any previous work
-rm -rf "${WORK_DIR}"
-mkdir -p "${WORK_DIR}"
+rm -rf "${WORK_DIR}" "${DOWNLOAD_DIR}"
+mkdir -p "${WORK_DIR}" "${DOWNLOAD_DIR}"
 
-# Function to download RPMs for a specific architecture
-download_rpms_for_arch() {
-    local arch=$1
-    local platform
+echo "=== Downloading RHEL source RPM from UBI source repository ==="
+podman run --rm \
+    -v "${DOWNLOAD_DIR}:/output:Z" \
+    registry.access.redhat.com/ubi9/ubi:latest \
+    /bin/bash -lc "cd /output && dnf download --source ${PKGNAME}-${OVR}"
 
-    echo ""
-    echo "=== Downloading RPMs for ${arch} ==="
-
-    # Map arch to container platform
-    case "${arch}" in
-        x86_64)
-            platform="linux/amd64"
-            ;;
-        aarch64)
-            platform="linux/arm64"
-            ;;
-        *)
-            echo "Unsupported architecture: ${arch}"
-            exit 1
-            ;;
-    esac
-
-    # Create the download script for this architecture
-    # Note: ACTIVATION_KEY and ORG_ID are passed as environment variables to the container
-    cat > "${WORK_DIR}/download-${arch}.sh" << 'INNER_EOF'
-#!/bin/bash
-set -euo pipefail
-
-# These are passed as environment variables from the host
-if [[ -z "${ACTIVATION_KEY:-}" ]] || [[ -z "${ORG_ID:-}" ]]; then
-    echo "ERROR: ACTIVATION_KEY and ORG_ID must be set as environment variables"
+if [[ ! -f "${DOWNLOAD_DIR}/${SOURCE_RPM}" ]]; then
+    echo "ERROR: missing ${SOURCE_RPM}"
     exit 1
 fi
 
-echo "Registering with subscription-manager..."
-subscription-manager register --activationkey="${ACTIVATION_KEY}" --org="${ORG_ID}"
+echo "=== Extracting embedded gold artifact bundle ==="
+rpm2cpio "${DOWNLOAD_DIR}/${SOURCE_RPM}" | (cd "${WORK_DIR}" && cpio -id --quiet)
 
-echo "Enabling required repositories (EUS for RHEL 9.2)..."
-subscription-manager repos --enable=rhel-9-for-${ARCH}-baseos-eus-rpms
-subscription-manager repos --enable=rhel-9-for-${ARCH}-baseos-eus-debug-rpms
-subscription-manager repos --enable=rhel-9-for-${ARCH}-baseos-eus-source-rpms
-
-# Set release version to 9.2 to ensure we get the correct packages
-subscription-manager release --set=9.2
-
-echo "Refreshing repository metadata..."
-dnf clean all
-dnf makecache
-
-cd /output
-
-# Download source RPM (only for first arch)
-if [ ! -f "openssl-${OVR}.src.rpm" ]; then
-    echo "=== Downloading source RPM ==="
-    dnf download --source openssl-${OVR}
+if [[ ! -f "${WORK_DIR}/${RHEL_TARBALL}" ]]; then
+    echo "ERROR: missing ${RHEL_TARBALL} in ${SOURCE_RPM}"
+    exit 1
 fi
 
-echo "=== Downloading binary RPMs for ${ARCH} ==="
-dnf download openssl-libs-${OVR}
-dnf download --enablerepo=rhel-9-for-${ARCH}-baseos-eus-debug-rpms openssl-libs-debuginfo-${OVR}
-dnf download --enablerepo=rhel-9-for-${ARCH}-baseos-eus-debug-rpms openssl-debuginfo-${OVR}
-dnf download --enablerepo=rhel-9-for-${ARCH}-baseos-eus-debug-rpms openssl-debugsource-${OVR}
+tar -xf "${WORK_DIR}/${RHEL_TARBALL}" -C "${WORK_DIR}"
+rm -f "${WORK_DIR}/${RHEL_TARBALL}"
+rm -f "${WORK_DIR}/${PKGNAME}.spec" "${WORK_DIR}/extract-src.sh" "${WORK_DIR}/extract-fips.sh" "${WORK_DIR}/README.md"
 
-echo ""
-echo "=== Downloaded files ==="
-ls -la /output/*.rpm
-
-echo ""
-echo "Unregistering..."
-subscription-manager unregister || true
-
-echo "Done downloading RPMs for ${ARCH}"
-INNER_EOF
-
-    chmod +x "${WORK_DIR}/download-${arch}.sh"
-
-    echo "Running ${platform} container for ${arch}..."
-    podman run --rm \
-        --platform "${platform}" \
-        -v "${WORK_DIR}:/output:Z" \
-        -e "ACTIVATION_KEY=${ACTIVATION_KEY}" \
-        -e "ORG_ID=${ORG_ID}" \
-        -e "ARCH=${arch}" \
-        -e "OVR=${OVR}" \
-        registry.access.redhat.com/ubi9/ubi:latest \
-        /bin/bash /output/download-${arch}.sh
-
-    # Clean up download script
-    rm -f "${WORK_DIR}/download-${arch}.sh"
-}
-
-# Download RPMs for each architecture
-for arch in "${ARCHES[@]}"; do
-    download_rpms_for_arch "${arch}"
-done
-
-echo ""
-echo "=== Verifying downloaded files ==="
-echo "Contents of ${WORK_DIR}:"
-ls -la "${WORK_DIR}/"
-
-# Verify required files exist
-echo ""
-echo "=== Checking required files ==="
-REQUIRED_FILES=("openssl-${OVR}.src.rpm")
+echo "=== Verifying embedded RPMs ==="
+REQUIRED_FILES=("${PKGNAME}-${GOLD_OVR}.src.rpm")
 for arch in "${ARCHES[@]}"; do
     REQUIRED_FILES+=(
-        "openssl-libs-${OVR}.${arch}.rpm"
-        "openssl-libs-debuginfo-${OVR}.${arch}.rpm"
-        "openssl-debuginfo-${OVR}.${arch}.rpm"
-        "openssl-debugsource-${OVR}.${arch}.rpm"
+        "${PKGNAME}-so-${GOLD_OVR}.${arch}.rpm"
+        "${PKGNAME}-so-debuginfo-${GOLD_OVR}.${arch}.rpm"
+        "${PKGNAME}-debugsource-${GOLD_OVR}.${arch}.rpm"
     )
 done
 
-MISSING=0
+missing=0
 for file in "${REQUIRED_FILES[@]}"; do
-    if [ -f "${WORK_DIR}/${file}" ]; then
-        echo "✓ ${file}"
+    if [[ -f "${WORK_DIR}/${file}" ]]; then
+        echo "OK: ${file}"
     else
-        echo "✗ ${file} - MISSING"
-        MISSING=1
+        echo "MISSING: ${file}"
+        missing=1
     fi
 done
 
-if [ "${MISSING}" -eq 1 ]; then
-    echo ""
-    echo "ERROR: Some required files are missing!"
+if [[ "${missing}" -eq 1 ]]; then
+    echo "ERROR: required files are missing"
     exit 1
 fi
 
-# Create tarball - files should be at root level (no subdirectory)
-echo ""
 echo "=== Creating tarball ==="
-cd "${WORK_DIR}"
-tar -czvf "${SCRIPT_DIR}/${TARBALL_NAME}.tar.gz" *.rpm
-cd "${SCRIPT_DIR}"
+(
+    cd "${WORK_DIR}"
+    tar -czvf "${SCRIPT_DIR}/${TARBALL_NAME}.tar.gz" *.rpm
+)
 
-echo ""
-echo "=== Tarball created ==="
-ls -la "${TARBALL_NAME}.tar.gz"
-
-# Generate SHA512 checksum
-echo ""
 echo "=== Generating SHA512 checksum ==="
-CHECKSUM=$(sha512sum "${TARBALL_NAME}.tar.gz" | awk '{print $1}')
-echo "SHA512 (${TARBALL_NAME}.tar.gz) = ${CHECKSUM}"
+CHECKSUM=$(sha512sum "${SCRIPT_DIR}/${TARBALL_NAME}.tar.gz" | awk '{print $1}')
+echo "SHA512 (${TARBALL_NAME}.tar.gz) = ${CHECKSUM}" > "${SCRIPT_DIR}/sources"
 
-# Update sources file
-echo "SHA512 (${TARBALL_NAME}.tar.gz) = ${CHECKSUM}" > sources
-echo ""
 echo "=== Updated sources file ==="
-cat sources
+cat "${SCRIPT_DIR}/sources"
 
-# Clean up work directory
-rm -rf "${WORK_DIR}"
+rm -rf "${WORK_DIR}" "${DOWNLOAD_DIR}"
 
-echo ""
 echo "=== Done ==="
 echo "Tarball: ${SCRIPT_DIR}/${TARBALL_NAME}.tar.gz"
 echo "Sources file updated with checksum"

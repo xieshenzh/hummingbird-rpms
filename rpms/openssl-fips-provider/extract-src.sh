@@ -1,14 +1,15 @@
 #!/usr/bin/bash -e
 
-# args: version release
-VERSION=$1
-RELEASE=$2
+# args: package version release
+PKGNAME=$1
+VERSION=$2
+RELEASE=$3
 OVR="${VERSION}-${RELEASE}"
-rpm2cpio openssl-${OVR}.src.rpm |cpio -id
+rpm2cpio ${PKGNAME}-${OVR}.src.rpm |cpio -id
 
 rm -fr openssl-${VERSION}
 tar --no-same-owner -xf openssl-${VERSION}-hobbled.tar.gz
-rm openssl.spec
+rm ${PKGNAME}.spec
 
 pushd openssl-${VERSION}
 git init
