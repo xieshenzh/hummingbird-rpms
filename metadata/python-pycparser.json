@@ -4,5 +4,6 @@
   "release": "2",
   "sha": "e0178728d3a89fd8a541c39b88a0c9a7fe50e51c",
   "source": "https://src.fedoraproject.org/rpms/python-pycparser.git",
+  "upstream_repo": "https://github.com/eliben/pycparser",
   "version": "3.00"
 }
