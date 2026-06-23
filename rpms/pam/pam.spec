@@ -14,7 +14,7 @@
 Summary: An extensible library which provides authentication for applications
 Name: pam
 Version: 1.7.2
-Release: 2%{?dist}
+Release: 2.1%{?dist}
 # The library is BSD licensed with option to relicense as GPLv2+
 # - this option is redundant as the BSD license allows that anyway.
 # pam_timestamp and pam_loginuid modules are GPLv2+.
@@ -39,12 +39,9 @@ Patch2:  pam-1.5.3-unix-nomsg.patch
 
 ### Dependencies ###
 Requires(meta): authselect >= 1.3
-Requires: gdbm
 Requires: libpwquality%{?_isa}
 Requires: pam-libs%{?_isa} = %{version}-%{release}
 Requires: setup
-
-Suggests: libdb-convert-util
 
 ### Build Dependencies ###
 BuildRequires: audit-libs-devel
@@ -140,9 +137,8 @@ cp %{SOURCE18} .
 %endif
   -Dlogind=disabled \
   -Dopenssl=enabled \
-  -Dpam_userdb=enabled \
+  -Dpam_userdb=disabled \
   -Dpwaccess=disabled \
-  -Ddb=gdbm \
   -Dselinux=enabled \
   -Dvendordir=''
 %meson_build
@@ -232,6 +228,7 @@ if [ -d ${dir} ] ; then
   [ ${dir} = "modules/pam_selinux" ] && continue
   [ ${dir} = "modules/pam_sepermit" ] && continue
   [ ${dir} = "modules/pam_tty_audit" ] && continue
+  [ ${dir} = "modules/pam_userdb" ] && continue
   if ! ls -1 %{buildroot}%{_pam_moduledir}/`basename ${dir}`*.so ; then
     echo ERROR `basename ${dir}` did not build a module.
     exit 1
@@ -312,7 +309,6 @@ done
 %{_pam_moduledir}/pam_unix_auth.so
 %{_pam_moduledir}/pam_unix_passwd.so
 %{_pam_moduledir}/pam_unix_session.so
-%{_pam_moduledir}/pam_userdb.so
 %{_pam_moduledir}/pam_usertype.so
 %{_pam_moduledir}/pam_warn.so
 %{_pam_moduledir}/pam_wheel.so

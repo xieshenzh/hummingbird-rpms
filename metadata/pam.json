@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Disable pam_userdb to eliminate CVE-2026-54411",
+  "modification_status": "modified",
   "release": "2",
   "sha": "c35d7d811c6ef84c88e3262572764c7391554327",
   "source": "https://src.fedoraproject.org/rpms/pam.git",
