@@ -26,7 +26,7 @@ Epoch: 5
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
 Version: 0.68.0
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: Apache-2.0
 BuildArch: noarch
 # for BuildRequires: go-md2man
@@ -54,6 +54,8 @@ Source1: https://raw.githubusercontent.com/containers/shortnames/refs/heads/main
 # a copy in repo or dist-git. Depending on distribution-gpg-keys rpm is also
 # not an option because that package doesn't exist on CentOS Stream.
 Source2: https://access.redhat.com/security/data/fd431d51.txt
+Source3: REKOR-signing-key
+Source4: SIGSTORE-redhat-release3
 
 %description
 This package contains common configuration files and documentation for container
@@ -127,6 +129,8 @@ install -Dp -m0644 common/rpm/00-rhel-registries.conf %{buildroot}%{_datadir}/co
 # fedora and centos
 %if %{defined fedora} || %{defined centos}
 install -Dp -m0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+install -Dp -m0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pki/sigstore/REKOR-signing-key
+install -Dp -m0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pki/sigstore/SIGSTORE-redhat-release3
 %endif
 
 install -Dp -m0644 common/contrib/redhat/registry.access.redhat.com.yaml -t %{buildroot}%{_datadir}/containers/registries.d
@@ -153,22 +157,6 @@ ln -s ../../../..%{_sysconfdir}/yum.repos.d/redhat.repo %{buildroot}%{_datadir}/
 # Placeholder check to silence rpmlint warnings
 %check
 
-%posttrans
-  # Restore user-modified config files from .rpmsave
-  for file in \
-      policy.json \
-      registries.conf \
-      registries.conf.d/000-shortnames.conf \
-      registries.d/default.yaml \
-      registries.d/registry.redhat.io.yaml \
-      registries.d/registry.access.redhat.com.yaml
-  do
-      file="%{_sysconfdir}/containers/${file}"
-      if [ -f "${file}.rpmsave" ]; then
-          mv "${file}.rpmsave" "${file}"
-      fi
-  done
-
 %files
 %dir %{_sysconfdir}/containers
 %dir %{_sysconfdir}/containers/certs.d
@@ -188,6 +176,9 @@ ln -s ../../../..%{_sysconfdir}/yum.repos.d/redhat.repo %{buildroot}%{_datadir}/
 
 %if 0%{?fedora} || 0%{?centos}
 %{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+%dir %{_sysconfdir}/pki/sigstore
+%{_sysconfdir}/pki/sigstore/REKOR-signing-key
+%{_sysconfdir}/pki/sigstore/SIGSTORE-redhat-release3
 %endif
 %ghost %{_sysconfdir}/containers/storage.conf
 %ghost %{_sysconfdir}/containers/containers.conf

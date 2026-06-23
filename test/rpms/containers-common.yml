@@ -1,0 +1,29 @@
+---
+# Tests specific to the containers-common package
+
+sigstore-keys-and-minimal-deps:
+  summary: Verify sigstore keys stay packaged without shell scriptlet dependencies
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "containers-common" ]]; then
+      echo "Skipping: only runs on containers-common (got: ${rpm_name})"
+      exit 0
+    fi
+
+    file_list=$(rpm -qpl "${TEST_RPM}")
+    for path in \
+      /etc/pki/sigstore \
+      /etc/pki/sigstore/REKOR-signing-key \
+      /etc/pki/sigstore/SIGSTORE-redhat-release3; do
+      if ! grep -qx "${path}" <<< "${file_list}"; then
+        echo "FAIL: missing ${path}"
+        exit 1
+      fi
+      echo "PASS: ${path} is packaged"
+    done
+
+    if rpm -qp --requires "${TEST_RPM}" | grep -Eq '^(sh|/bin/sh|/usr/bin/sh)$'; then
+      echo "FAIL: containers-common requires a shell interpreter"
+      exit 1
+    fi
+    echo "PASS: containers-common does not require a shell interpreter"
