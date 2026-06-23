@@ -1,0 +1,5 @@
+config:
+    # /etc/shadow is regenerated on every build
+    ignore:
+        - /etc/shadow
+
