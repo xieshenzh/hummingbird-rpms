@@ -1,4 +1,7 @@
 #!/usr/bin/bash -e
+PKGNAME=$1
+ORIGINAL_PACKAGE_VERSION=$2
+ORIGINAL_PACKAGE_RELEASE=$3
 
 # args: build-V-R arch
 
@@ -22,7 +25,7 @@ fi
 
 OVR=${ORIGINAL_PACKAGE_VERSION}-${ORIGINAL_PACKAGE_RELEASE}
 DBGDIR=usr/lib/debug
-DBGSRCDIR=usr/src/debug/openssl-${OVR}.${RPM_ARCH}
+DBGSRCDIR=usr/src/debug/${PKGNAME}-${OVR}.${RPM_ARCH}
 DEBUGINFO=${RPM_BUILD_DIR}/debuginfo.list
 DEBUGSOURCE=${RPM_BUILD_DIR}/debugsourcefiles.list
 
@@ -36,10 +39,9 @@ rm -fr ${RPM_BUILD_ROOT}/usr/src/debug/*
 mkdir extract
 pushd extract
 
-rpm2cpio ${RPM_BUILD_DIR}/openssl-libs-${OVR}.${PKG_ARCH}.rpm |cpio -id --quiet
-rpm2cpio ${RPM_BUILD_DIR}/openssl-libs-debuginfo-${OVR}.${PKG_ARCH}.rpm |cpio -id --quiet
-rpm2cpio ${RPM_BUILD_DIR}/openssl-debuginfo-${OVR}.${PKG_ARCH}.rpm |cpio -id --quiet
-rpm2cpio ${RPM_BUILD_DIR}/openssl-debugsource-${OVR}.${PKG_ARCH}.rpm |cpio -id --quiet
+rpm2cpio ${RPM_BUILD_DIR}/${PKGNAME}-so-${OVR}.${PKG_ARCH}.rpm |cpio -id --quiet
+rpm2cpio ${RPM_BUILD_DIR}/${PKGNAME}-so-debuginfo-${OVR}.${PKG_ARCH}.rpm |cpio -id --quiet
+rpm2cpio ${RPM_BUILD_DIR}/${PKGNAME}-debugsource-${OVR}.${PKG_ARCH}.rpm |cpio -id --quiet
 FIPS_SO=$(find usr -name fips.so)
 cp -adt ${RPM_BUILD_ROOT} --parents ${FIPS_SO}
 FIPS_SO_DBG=$(find usr -name fips.so-${OVR}.${RPM_ARCH}.debug)
@@ -48,12 +50,7 @@ cp -adt ${RPM_BUILD_ROOT} --parents ${FIPS_SO_DBG}
 FIPS_DBG_ID=$(find -L usr -samefile ${FIPS_SO_DBG} -xtype l)
 FIPS_DBG_ID_DIR=$(dirname ${FIPS_DBG_ID})
 cp -adt ${RPM_BUILD_ROOT} --parents ${FIPS_DBG_ID_DIR}
-cp -adt ${RPM_BUILD_ROOT} --parents ${DBGDIR}/.dwz
 
-#remove unnecessary parts
-rm -fr ${DBGSRCDIR}/apps
-rm -fr ${DBGSRCDIR}/engines
-rm -fr ${DBGSRCDIR}/ssl
 cp -adt ${RPM_BUILD_ROOT} --parents usr/src/debug
 
 popd

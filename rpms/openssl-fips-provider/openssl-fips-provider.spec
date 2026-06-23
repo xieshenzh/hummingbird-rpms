@@ -12,16 +12,18 @@
 
 %global debug_package %{nil}
 
-# This is the RHEL 9.2 openssl version that contains the NIST-validated FIPS module
-%define orig_release 18.el9_2
+# Red Hat published openssl-fips-provider-3.0.7-11.el9_8 for
+# CVE-2026-31790. Its source RPM contains the NIST-validated gold build
+# artifacts with this release suffix.
+%define gold_release 11.el9_0
 
 Summary: FIPS validated cryptographic module for OpenSSL
 Name: openssl-fips-provider
 Version: 3.0.7
-Release: 1.1%{?dist}
+Release: 1.2%{?dist}
 
-# The source tarball contains the RHEL openssl SRPMs and binary RPMs
-# that include the NIST-validated FIPS module
+# The source tarball contains the RHEL openssl-fips-provider SRPM and binary RPMs
+# that include the NIST-validated FIPS module.
 Source: %{name}-%{version}.tar.gz
 Source1: extract-src.sh
 Source2: extract-fips.sh
@@ -44,9 +46,9 @@ Requires: %{name}-so = %{version}-%{release}
 
 %description
 This package provides a NIST-validated OpenSSL FIPS cryptographic module
-for use with Hummingbird. The FIPS module is based on the RHEL 9.2 validated
-module (OpenSSL 3.0.7) and is intended for environments requiring FIPS 140-3
-compliance.
+for use with Hummingbird. The FIPS module is sourced from the Red Hat
+openssl-fips-provider build published in RHSA-2026:27744 (OpenSSL 3.0.7)
+and is intended for environments requiring FIPS 140-3 compliance.
 
 %files
 %doc README.md
@@ -58,9 +60,9 @@ Provides: fips-provider-so
 
 %description so
 This package provides a NIST-validated OpenSSL FIPS cryptographic module
-for use with Hummingbird. The FIPS module is based on the RHEL 9.2 validated
-module (OpenSSL 3.0.7) and is intended for environments requiring FIPS 140-3
-compliance.
+for use with Hummingbird. The FIPS module is sourced from the Red Hat
+openssl-fips-provider build published in RHSA-2026:27744 (OpenSSL 3.0.7)
+and is intended for environments requiring FIPS 140-3 compliance.
 
 %files so
 %attr(0755,root,root) %{_libdir}/ossl-modules/fips.so
@@ -90,7 +92,7 @@ package or when debugging this package.
 
 %prep
 tar xf %{SOURCE0}
-%{SOURCE1} %{version} %{orig_release}
+%{SOURCE1} %{name} %{version} %{gold_release}
 
 ## NOTE: we do a full build every time to ensure our ability to build
 ## from source as needed, but we ultimately throw away all binaries
@@ -188,16 +190,26 @@ popd
 %check
 # We are not using the actual built bits, so skip any checks on those binaries.
 
+# Defeat tools that try to modify the certified binaries after they are laid
+# down on the file system. Overwrite the binaries after normal brp processing.
+%define __spec_install_post \
+    %{?__debug_package:%{__debug_install_post}} \
+    %{__arch_install_post} \
+    %{__os_install_post} \
+    %{SOURCE2} %{name} %{version} %{gold_release} \
+%{nil}
+
 %install
-# We are not actually installing the build, as we replace all contents with the
-# content from the original RHEL rpms containing the validated FIPS module
-export ORIGINAL_PACKAGE_VERSION=%{version}
-export ORIGINAL_PACKAGE_RELEASE=%{orig_release}
-%{SOURCE2}
+# We are not actually installing the build. __spec_install_post replaces all
+# contents with the original RHEL RPM contents containing the validated module.
 install -d $RPM_BUILD_ROOT%{_pkgdocdir}
 install -m644 %{SOURCE3} $RPM_BUILD_ROOT%{_pkgdocdir}/README.md
 
 %changelog
+* Tue Jun 23 2026 Robert Sturla <rsturla@redhat.com> - 3.0.7-1.2
+- Update to RHEL openssl-fips-provider build for CVE-2026-31790
+- Resolves: RHSA-2026:27744
+
 * Fri Jan 23 2026 Robert Sturla <rsturla@redhat.com> - 3.0.7-1
 - Initial package for Hummingbird
-- Provides NIST-validated FIPS 140-3 cryptographic module from RHEL 9.2
+- Provides NIST-validated FIPS 140-3 cryptographic module from Red Hat

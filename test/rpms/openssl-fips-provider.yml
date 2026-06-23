@@ -24,6 +24,18 @@ fips-checksum-match:
     trap cleanup EXIT
 
     echo "Using RPM: ${TEST_RPM}"
+    rpm_arch=$(rpm -qp --queryformat '%{ARCH}' "${TEST_RPM}")
+    case "${rpm_arch}" in
+      x86_64)
+        ubi_platform="linux/amd64"
+        ;;
+      aarch64)
+        ubi_platform="linux/arm64"
+        ;;
+      *)
+        TEST_FAIL "Unsupported RPM architecture for UBI checksum comparison: ${rpm_arch}"
+        ;;
+    esac
 
     # Extract fips.so from our built RPM
     mkdir -p "${build_dir}/rpm-extract"
@@ -39,10 +51,11 @@ fips-checksum-match:
 
     # Extract fips.so from UBI9 container
     echo "Pulling UBI9 image..."
-    "${TEST_ENGINE}" pull "${UBI9_IMAGE}"
+    "${TEST_ENGINE}" pull --platform "${ubi_platform}" "${UBI9_IMAGE}"
 
     echo "Extracting fips.so from UBI9 container..."
-    "${TEST_ENGINE}" run --rm "${UBI9_IMAGE}" cat "${FIPS_SO_PATH}" > "${build_dir}/ubi9-fips.so"
+    "${TEST_ENGINE}" run --rm --platform "${ubi_platform}" "${UBI9_IMAGE}" cat "${FIPS_SO_PATH}" > \
+      "${build_dir}/ubi9-fips.so"
 
     if [[ ! -s ${build_dir}/ubi9-fips.so ]]; then
       TEST_FAIL "Failed to extract fips.so from UBI9 container"
