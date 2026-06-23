@@ -782,6 +782,8 @@ spec:
           contentType: rpm
         - name: python-certifi-main
           contentType: rpm
+        - name: python-cffi-main
+          contentType: rpm
         - name: python-charset-normalizer-main
           contentType: rpm
         - name: python-cryptography-main

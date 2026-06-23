@@ -1,0 +1,5 @@
+/cffi-*.tar.gz
+/cffi-*.tar.bz2
+/cffi-*/
+/results_python-cffi/
+*.rpm
