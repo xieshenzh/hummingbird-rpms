@@ -164,7 +164,15 @@ for k,_ in pairs(stripped_flags) do print(k .. " ") end
 %__cflags_arch_x86_64_common -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 %{_frame_pointers_cflags} %{_frame_pointers_cflags_x86_64}
 
 # Also used for s390.
-%__cflags_arch_s390x %[0%{?rhel} >= 9 ? "-march=z14 -mtune=z15" : "-march=z13 -mtune=z14"]
+# Fedora up to 44, and RHEL 8, target z13/z14
+# RHEL 9 targets z14/z15
+# RHEL 10 targets z14/z16
+# Fedora 45 and RHEL 11 target z15/z17
+%__cflags_arch_s390x %{shrink:
+  %[(0%{?fedora} >= 45 || 0%{?rhel} >= 11) ? "-march=z15 -mtune=z17" : ""]
+  %[0%{?rhel} == 10  ? "-march=z14 -mtune=z16" : ""]
+  %[0%{?rhel} == 9  ? "-march=z14 -mtune=z15" : ""]
+  %[!(0%{?fedora} >= 45 || 0%{?rhel} >= 9) ? "-march=z13 -mtune=z14" : ""]}
 
 %__cflags_arch_ppc64le %[0%{?rhel} >= 9 ? "-mcpu=power9 -mtune=power10" : "-mcpu=power8 -mtune=power8" ]
 

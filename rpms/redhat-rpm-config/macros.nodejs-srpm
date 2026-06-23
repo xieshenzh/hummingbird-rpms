@@ -4,4 +4,4 @@
 # those arches. Support for POWER and aarch64 arrived in nodejs v4. Support
 # for s390x arrived in nodejs v6
 
-%nodejs_arches %{ix86} x86_64 %{arm} aarch64 %{power64} s390x riscv64
+%nodejs_arches %{ix86} x86_64 %{arm} aarch64 %{power64} s390x riscv64 loongarch64

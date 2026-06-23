@@ -9,7 +9,7 @@ Name: redhat-rpm-config
 # the older branch. When the branch diverges, bump the Version to the Fedora
 # release number.
 Version: 344
-Release: 2%{?dist}
+Release: 5%{?dist}
 # config.guess, config.sub are GPL-3.0-or-later WITH Autoconf-exception-generic
 License: GPL-1.0-or-later AND GPL-2.0-or-later AND GPL-3.0-or-later WITH Autoconf-exception-generic
 URL: https://src.fedoraproject.org/rpms/redhat-rpm-config
