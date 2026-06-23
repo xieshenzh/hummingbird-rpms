@@ -28,7 +28,7 @@
 
 %global rpmver 6.0.1
 #global snapver rc1
-%global baserelease 6
+%global baserelease 6.1
 %global sover 10
 
 %global srcver %{rpmver}%{?snapver:-%{snapver}}
@@ -126,6 +126,8 @@ rpm-6.0-rpmformat.patch
 0001-Revert-Add-a-deprecation-warning-for-clamp_mtime_to_.patch
 
 # Patches already upstream:
+# Backport fix for shell injection via archive top-level dir name
+rpm-6.0.1-rpmuncompress-CVE-2026-44604.patch
 
 # These are not yet upstream
 rpm-4.7.1-geode-i686.patch

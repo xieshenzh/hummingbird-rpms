@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Backport rpmuncompress shell injection fix (CVE-2026-44604)",
+  "modification_status": "modified",
   "release": "6",
   "sha": "d5107250c2845dd4ad400356e70a3ed1354fd3bf",
   "source": "https://src.fedoraproject.org/rpms/rpm.git",
