@@ -19,7 +19,7 @@ print("# service-name  port/protocol  [aliases ...]   [# comment]")
 for record in tree.getroot().findall("iana:record", ns):
 
     name = record.find("iana:name", ns)
-    if name is None or not re.match(r"[A-Za-z0-9-]+$", name.text):
+    if name is None or not name.text or not re.match(r"[A-Za-z0-9-]+$", name.text):
         continue
 
     protocol = record.find("iana:protocol", ns)

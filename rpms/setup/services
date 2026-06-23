@@ -2,7 +2,7 @@
 # $Id: services,v 1.49 2017/08/18 12:43:23 ovasik Exp $
 #
 # Network services, Internet style
-# IANA services version: last updated 2021-01-19
+# IANA services version: last updated 2026-06-22
 #
 # Note that it is presently the policy of IANA to assign a single well-known
 # port number for both TCP and UDP; hence, most entries here have two entries
@@ -6161,6 +6161,8 @@ deskview        3298/tcp                # DeskView
 deskview        3298/udp                # DeskView
 pdrncs          3299/tcp                # pdrncs
 pdrncs          3299/udp                # pdrncs
+tarantool       3301/tcp                # Tarantool in-memory computing platform
+tarantool       3301/udp                # Tarantool in-memory computing platform
 mcs-fastmail    3302/tcp                # MCS Fastmail
 mcs-fastmail    3302/udp                # MCS Fastmail
 opsession-clnt  3303/tcp                # OP Session Client
@@ -8729,6 +8731,8 @@ hacl-poll       5315/udp                # HA Cluster UDP Polling
 hpbladems       5316/tcp                # HPBladeSystem Monitor Service
 hpdevms         5317/tcp                # HP Device Monitor Service
 pkix-cmc        5318/tcp                # PKIX Certificate
+roughtime       5319/tcp                # Roughtime time synchronization
+roughtime       5319/udp                # Roughtime time synchronization
 bsfserver-zn    5320/tcp                # Webservices-based Zn interface of BSF
 bsfsvr-zn-ssl   5321/tcp                # Webservices-based Zn interface of BSF over SSL
 kfserver        5343/tcp                # Sculptor Database Server
@@ -8884,6 +8888,8 @@ checkoutdb      5505/udp                # Checkout Database
 amc             5506/tcp                # Amcom Mobile Connect
 amc             5506/udp                # Amcom Mobile Connect
 psl-management  5507/tcp                # PowerSysLab Electrical
+matter          5540/tcp                # Matter Operational Discovery and Communication Protocol
+matter          5540/udp                # Matter Operational Discovery and Communication Protocol
 sgi-eventmond   5553/tcp                # SGI Eventmond Port
 sgi-eventmond   5553/udp                # SGI Eventmond Port
 sgi-esphttp     5554/tcp                # SGI ESP HTTP
@@ -9133,6 +9139,7 @@ nuxsl           5991/udp                # NUXSL
 consul-insight  5992/tcp                # Consul InSight Security
 consul-insight  5992/udp                # Consul InSight Security
 cim-rs          5993/tcp                # DMTF WBEM CIM REST
+rms-agent       5994/tcp                # RMS Agent Listening Service
 ndl-ahp-svc     6064/tcp                # NDL-AHP-SVC
 ndl-ahp-svc     6064/udp                # NDL-AHP-SVC
 winpharaoh      6065/tcp                # WinPharaoh
@@ -10118,6 +10125,7 @@ espeech         8416/tcp                # eSpeech Session Protocol
 espeech         8416/udp                # eSpeech Session Protocol
 espeech-rtp     8417/tcp                # eSpeech RTP Protocol
 espeech-rtp     8417/udp                # eSpeech RTP Protocol
+pgbackrest      8432/tcp                # PostgreSQL Backup
 cybro-a-bus     8442/tcp                # CyBro A-bus Protocol
 cybro-a-bus     8442/udp                # CyBro A-bus Protocol
 pcsync-https    8443/tcp                # PCsync HTTPS
@@ -10126,6 +10134,7 @@ pcsync-http     8444/tcp                # PCsync HTTP
 pcsync-http     8444/udp                # PCsync HTTP
 copy            8445/tcp                # Port for copy per sync feature
 copy-disc       8445/udp                # Port for copy discovery
+matrix-fed      8448/tcp                # Matrix Federation Protocol
 npmp            8450/tcp                # npmp
 npmp            8450/udp                # npmp
 nexentamv       8457/tcp                # Nexenta Management GUI
@@ -10723,6 +10732,7 @@ arena-server    11321/udp               # Arena Server Listen
 atm-uhas        11367/tcp               # ATM UHAS
 atm-uhas        11367/udp               # ATM UHAS
 lsdp            11430/udp               # Lenbrook Service Discovery Protocol
+ollama          11434/tcp
 tempest-port    11600/tcp               # Tempest Protocol Port
 tempest-port    11600/udp               # Tempest Protocol Port
 emc-xsw-dconfig 11623/tcp               # EMC XtremSW distributed config
