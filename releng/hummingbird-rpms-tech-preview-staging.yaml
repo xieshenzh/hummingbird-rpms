@@ -966,6 +966,8 @@ spec:
           contentType: rpm
         - name: valkey-main
           contentType: rpm
+        - name: vim-main
+          contentType: rpm
         - name: vmaf-main
           contentType: rpm
         - name: which-main
