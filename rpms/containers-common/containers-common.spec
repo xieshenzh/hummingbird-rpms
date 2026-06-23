@@ -157,22 +157,6 @@ ln -s ../../../..%{_sysconfdir}/yum.repos.d/redhat.repo %{buildroot}%{_datadir}/
 # Placeholder check to silence rpmlint warnings
 %check
 
-%posttrans
-  # Restore user-modified config files from .rpmsave
-  for file in \
-      policy.json \
-      registries.conf \
-      registries.conf.d/000-shortnames.conf \
-      registries.d/default.yaml \
-      registries.d/registry.redhat.io.yaml \
-      registries.d/registry.access.redhat.com.yaml
-  do
-      file="%{_sysconfdir}/containers/${file}"
-      if [ -f "${file}.rpmsave" ]; then
-          mv "${file}.rpmsave" "${file}"
-      fi
-  done
-
 %files
 %dir %{_sysconfdir}/containers
 %dir %{_sysconfdir}/containers/certs.d
