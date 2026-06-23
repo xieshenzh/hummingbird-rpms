@@ -14724,6 +14724,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- python-pycparser ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: python-pycparser-main
+spec:
+  application: rpms-main
+  componentName: python-pycparser-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/python-pycparser-main
+  source:
+    git:
+      context: rpms/python-pycparser
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: python-pycparser-main
+  name: python-pycparser-main
+spec:
+  image:
+    name: hummingbird-tenant/python-pycparser-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- python-pygments ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1

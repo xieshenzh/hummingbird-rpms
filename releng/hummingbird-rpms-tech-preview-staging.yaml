@@ -816,6 +816,8 @@ spec:
           contentType: rpm
         - name: python-productmd-main
           contentType: rpm
+        - name: python-pycparser-main
+          contentType: rpm
         - name: python-pygments-main
           contentType: rpm
         - name: python-referencing-main
