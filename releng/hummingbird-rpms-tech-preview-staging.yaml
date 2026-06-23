@@ -782,6 +782,8 @@ spec:
           contentType: rpm
         - name: python-certifi-main
           contentType: rpm
+        - name: python-cffi-main
+          contentType: rpm
         - name: python-charset-normalizer-main
           contentType: rpm
         - name: python-cryptography-main
@@ -813,6 +815,8 @@ spec:
         - name: python-pluggy-main
           contentType: rpm
         - name: python-productmd-main
+          contentType: rpm
+        - name: python-pycparser-main
           contentType: rpm
         - name: python-pygments-main
           contentType: rpm
