@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "7206586e589645362cf65851b8446ade70128e45",
+  "release": "1",
+  "sha": "452ae6f6b88d61c103f4b5bbe89671f02176721f",
   "source": "https://src.fedoraproject.org/rpms/libarchive.git",
   "upstream_repo": "https://github.com/libarchive/libarchive",
-  "version": "3.8.7"
+  "version": "3.8.8"
 }
