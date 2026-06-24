@@ -22,9 +22,6 @@ Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
 # which points to the GPG key as of April 7th 2016 of https://daniel.haxx.se/mykey.asc
 Source2: mykey.asc
 
-# Fix potential 100% CPU usage in curl_multi_socket()
-Patch001: 0001-curl-8.20.0-event-fix-wakeup-consumption.patch
-
 # patch making libcurl multilib ready
 Patch101: 0101-curl-7.32.0-multilib.patch
 
