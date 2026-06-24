@@ -7,11 +7,6 @@
 %global system_unit_dir %{pkgdir}/system
 %global user_unit_dir %{pkgdir}/user
 
-%if 0%{?__isa_bits} == 64
-%global elf_bits (64bit)
-%global elf_suffix ()%{elf_bits}
-%endif
-
 %bcond bzip2     1
 %bcond gnutls    1
 %bcond lz4       1
@@ -48,7 +43,7 @@
 %global __meson_auto_features auto
 %endif
 
-# Override %2%{?dist}. This is ugly, but rpmautospec doesn't implement
+# Override %2%{?dist}
 # autorelease correctly if the macro is conditionalized in the Release field.
 %{?release_override:%global autorelease %{release_override}%{?dist}}
 
@@ -76,11 +71,11 @@ Url:            https://systemd.io
 # But don't do that on OBS, otherwise the version subst fails, and will be
 # like 257-123-gabcd257.1 instead of 257-123-gabcd
 %if %{without obs}
-Version:        %{?version_override}%{!?version_override:260.1}
+Version:        %{?version_override}%{!?version_override:261}
 %else
 Version:        %{?version_override}%{!?version_override:%(cat meson.version)}
 %endif
-Release:        2.1%{?dist}
+Release:        2%{?dist}
 
 %global stable %(c="%version"; [ "$c" = "${c#*.*}" ]; echo $?)
 
@@ -147,7 +142,7 @@ Patch:          30846.patch
 
 # userdb: create userdb root directory with correct label
 # We can drop this after SELinux policy is updated to handle the transition.
-Patch:          38769.patch
+Patch:          0001-core-create-userdb-root-directory-with-correct-label.patch
 
 # Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=2415701
 Patch:          0002-machined-continue-without-resolve.hook-socket.patch
@@ -175,6 +170,8 @@ BuildRequires:  cryptsetup-devel
 # Require (previous version) of our macros package.
 # We use the %%systemd_{post,preun,…} macros for various services.
 BuildRequires:  systemd-rpm-macros
+# Use dlopen-notes to generate Requires/Recommends from embedded metadata.
+BuildRequires:  package-notes >= 0.18
 %endif
 BuildRequires:  dbus-devel
 BuildRequires:  util-linux
@@ -202,7 +199,7 @@ BuildRequires:  libcurl-devel
 BuildRequires:  kmod-devel
 BuildRequires:  elfutils-devel
 BuildRequires:  openssl-devel
-%if 0%{?fedora} >= 41
+%if 0%{?fedora} >= 41 && 0%{?fedora} < 45
 BuildRequires:  openssl-devel-engine
 %endif
 %if %{with gnutls}
@@ -229,7 +226,6 @@ BuildRequires:  docbook-style-xsl
 BuildRequires:  pkgconfig
 BuildRequires:  gperf
 BuildRequires:  gawk
-BuildRequires:  tree
 BuildRequires:  hostname
 BuildRequires:  python3
 BuildRequires:  python3-devel
@@ -287,9 +283,11 @@ Requires:       systemd-libs%{_isa} = %{version}-%{release}
 %{?fedora:Recommends:     systemd-resolved = %{version}-%{release}}
 Requires:       systemd-shared%{_isa} = %{version}-%{release}
 Requires:       /usr/bin/systemd-sysusers
+
 # The standalone version doesn't Provide the _isa suffix,
 # so this biases towards the common version.
 Recommends:     systemd-sysusers%{_isa} = %{version}-%{release}
+
 Recommends:     diffutils
 Requires:       (util-linux-core or util-linux)
 Requires:       (libbpf >= 2:1.4.7 if libbpf)
@@ -306,7 +304,7 @@ Conflicts:      initscripts < 9.56.1
 %if 0%{?fedora}
 Conflicts:      fedora-release < 23-0.12
 %endif
-%if 0%{?fedora} >= 41
+%if 0%{?fedora} >= 41 || 0%{?rhel} >= 11
 BuildRequires:  setup >= 2.15.0-3
 BuildRequires:  python3
 Conflicts:      setup < 2.15.0-3
@@ -338,45 +336,33 @@ Provides:       /usr/sbin/reboot
 Provides:       /usr/sbin/shutdown
 %endif
 
-# libmount is always required, even in containers, so make it a hard dependency.
-Requires:       libmount.so.1%{?elf_suffix}
-Requires:       libmount.so.1(MOUNT_2.26)%{?elf_bits}
-# Various systemd services have syscall filters so make libseccomp a hard dependency.
-Requires:       libseccomp.so.2%{?elf_suffix}
+%define dlopen_notes_features %{expand:
+  # Various systemd services have syscall filters so make libseccomp a hard dependency.
+  systemd:seccomp:required
 
-# Recommends to replace normal Requires deps for stuff that is dlopen()ed
-Recommends:     libxkbcommon.so.0%{?elf_suffix}
-Recommends:     libidn2.so.0%{?elf_suffix}
-Recommends:     libidn2.so.0(IDN2_0.0.0)%{?elf_bits}
-Recommends:     libpcre2-8.so.0%{?elf_suffix}
-Recommends:     libpwquality.so.1%{?elf_suffix}
-Recommends:     libpwquality.so.1(LIBPWQUALITY_1.0)%{?elf_bits}
-%if 0%{?fedora}
-Recommends:     libqrencode.so.4%{?elf_suffix}
-%endif
-Recommends:     libbpf.so.1%{?elf_suffix}
-Recommends:     libbpf.so.1(LIBBPF_0.4.0)%{?elf_bits}
+  # zstd is used for compression in the journal
+  systemd:zstd:required
 
-# used by systemd-coredump and systemd-analyze
-Recommends:     libdw.so.1%{?elf_suffix}
-Recommends:     libdw.so.1(ELFUTILS_0.186)%{?elf_bits}
-Recommends:     libelf.so.1%{?elf_suffix}
-Recommends:     libelf.so.1(ELFUTILS_1.7)%{?elf_bits}
+  # Libkmod is used to load modules. Assume that if we need udevd, we certainly
+  # want to load modules, so make this into a hard dependency here.
+  systemd-udev:kmod:required
 
-# used by dissect, integritysetup, veritysetyp, growfs, repart, cryptenroll, home
-Recommends:     libcryptsetup.so.12%{?elf_suffix}
-Recommends:     libcryptsetup.so.12(CRYPTSETUP_2.4)%{?elf_bits}
+  # We want to always use idn with resolved.
+  systemd-resolved:idn:required
 
-# Libkmod is used to load modules.
-Recommends:     libkmod.so.2%{?elf_suffix}
-# kmod_list_next, kmod_load_resources, kmod_module_get_initstate,
-# kmod_module_get_module, kmod_module_get_name, kmod_module_new_from_lookup,
-# kmod_module_probe_insert_module, kmod_module_unref, kmod_module_unref_list,
-# kmod_new, kmod_set_log_fn, kmod_unref, kmod_validate_resources
-# are part of LIBKMOD_5.
-Recommends:     libkmod.so.2(LIBKMOD_5)%{?elf_bits}
+  # libcurl is required by systemd-imdsd and systemd-report.
+  # Downgrade the dep for now.
+  systemd:curl:recommended
+  systemd-udev:curl:recommended
 
-Recommends:     libarchive.so.13%{?elf_suffix}
+  # libssl + libcrypto are required by systemd-resolved/resolvectl.
+  # Downgrade the dep in the main package.
+  systemd:libssl:recommended
+  systemd:libcrypto:recommended
+
+  # Disable qrencode on non-fedora builds
+  %{!?fedora:*:qrencode:ignored}
+}
 
 %description
 systemd is a system and service manager that runs as PID 1 and starts the rest
@@ -466,6 +452,7 @@ Requires(preun):  systemd%{_isa} = %{version}-%{release}
 Requires(postun): systemd%{_isa} = %{version}-%{release}
 Requires(post): grep
 Requires:       kmod >= 18-4
+
 Provides:       udev = %{version}
 Provides:       udev%{_isa} = %{version}
 %if 0%{?fedora} || 0%{?rhel} >= 10
@@ -483,36 +470,16 @@ Provides:       systemd-timesyncd = %{version}-%{release}
 %endif
 Conflicts:      systemd-networkd < %{version}-%{release}
 
-# Libkmod is used to load modules. Assume that if we need udevd, we certainly
-# want to load modules, so make this into a hard dependency here.
-Requires:       libkmod.so.2%{?elf_suffix}
-Requires:       libkmod.so.2(LIBKMOD_5)%{?elf_bits}
-# udev uses libblkid in various builtins so make it a hard dependency.
-Requires:       libblkid.so.1%{?elf_suffix}
-Requires:       libblkid.so.1(BLKID_2.30)%{?elf_bits}
-
-# Recommends to replace normal Requires deps for stuff that is dlopen()ed
-# used by dissect, integritysetup, veritysetyp, growfs, repart, cryptenroll, home
-Recommends:     libcryptsetup.so.12%{?elf_suffix}
-Recommends:     libcryptsetup.so.12(CRYPTSETUP_2.4)%{?elf_bits}
-
-# used by systemd-coredump and systemd-analyze
-Recommends:     libdw.so.1%{?elf_suffix}
-Recommends:     libdw.so.1(ELFUTILS_0.186)%{?elf_bits}
-Recommends:     libelf.so.1%{?elf_suffix}
-Recommends:     libelf.so.1(ELFUTILS_1.7)%{?elf_bits}
-
-# used by home, cryptsetup, cryptenroll, logind
-Recommends:     libfido2.so.1%{?elf_suffix}
-Recommends:     libp11-kit.so.0%{?elf_suffix}
-Recommends:     libtss2-esys.so.0%{?elf_suffix}
-Recommends:     libtss2-mu.so.0%{?elf_suffix}
-Recommends:     libtss2-rc.so.0%{?elf_suffix}
-
 # https://bugzilla.redhat.com/show_bug.cgi?id=1377733#c9
 Suggests:       systemd-bootchart
+
 # https://bugzilla.redhat.com/show_bug.cgi?id=1408878
+%if %{with upstream}
+# v261 handles missing setfont/loadkeys gracefully
+Recommends:     kbd
+%else
 Requires:       kbd
+%endif
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1753381
 Provides:       u2f-hidraw-policy = 1.0.2-40
@@ -625,6 +592,7 @@ Recommends:     qemu-kvm-core
 Recommends:     qemu-device-display-virtio-gpu
 Recommends:     qemu-device-display-virtio-vga
 %endif
+
 # Bias the system towards libcurl-minimal if nothing pulls in full libcurl (#1997040)
 Suggests:       libcurl-minimal
 License:        LGPL-2.1-or-later
@@ -679,8 +647,6 @@ enabled for this to have any effect.
 %package resolved
 Summary:        Network Name Resolution manager
 Requires:       systemd%{_isa} = %{version}-%{release}
-Requires:       libidn2.so.0%{?elf_suffix}
-Requires:       libidn2.so.0(IDN2_0.0.0)%{?elf_bits}
 Requires(posttrans): grep
 
 %description resolved
@@ -804,8 +770,6 @@ VMLINUX_H_PATH=$(%python3 -c '%find_vmlinux_h')
 CONFIGURE_OPTS=(
         -Dmode=release
         -Dslow-tests=true
-        -Dsysvinit-path=/etc/rc.d/init.d
-        -Drc-local=/etc/rc.d/rc.local
         -Dntp-servers='0.%{ntpvendor}.pool.ntp.org 1.%{ntpvendor}.pool.ntp.org 2.%{ntpvendor}.pool.ntp.org 3.%{ntpvendor}.pool.ntp.org'
         -Ddns-servers=
         -Dservice-watchdog=
@@ -836,7 +800,6 @@ CONFIGURE_OPTS=(
         -Daudit=enabled
         -Delfutils=enabled
         -Dlibcryptsetup=%[%{with bootstrap}?"disabled":"enabled"]
-        -Delfutils=enabled
         -Drepart=enabled
         -Dpwquality=enabled
         -Dqrencode=%[%{defined rhel}?"disabled":"enabled"]
@@ -844,7 +807,6 @@ CONFIGURE_OPTS=(
         -Dmicrohttpd=enabled
         -Dvmspawn=enabled
         -Dlibidn2=enabled
-        -Dlibiptc=disabled
         -Dlibcurl=enabled
         -Dlibfido2=enabled
         -Dxenctrl=%[0%{?have_xen}?"enabled":"disabled"]
@@ -1094,7 +1056,7 @@ install -Dm0644 -t %{buildroot}%{_prefix}/lib/udev/rules.d/ %{SOURCE18}
 
 sed -i 's|#!/usr/bin/env python3|#!%{__python3}|' %{buildroot}/usr/lib/systemd/tests/run-unit-tests.py
 
-%if 0%{?fedora} >= 42
+%if 0%{?fedora} >= 42 || 0%{?rhel} >= 11
 install -m 0644 -D %{SOURCE21} %{buildroot}%{_rpmconfigdir}/macros.d/macros.sysusers
 %else
 install -m 0644 -D %{SOURCE20} %{buildroot}%{_rpmconfigdir}/macros.d/macros.sysusers
@@ -1120,13 +1082,13 @@ ln -s --relative %{buildroot}%{_bindir}/kernel-install %{buildroot}%{_sbindir}/i
 mv -v %{buildroot}/usr/sbin/* %{buildroot}%{_bindir}/
 %endif
 
-%if 0%{?fedora} >= 41
+%if 0%{?fedora} >= 41 || 0%{?rhel} >= 11
 %if %{without upstream}
 # This requires https://pagure.io/setup/pull-request/50
 # and https://src.fedoraproject.org/rpms/setup/pull-request/10.
 # We skip this on upstream builds so that new users and groups
 # can be added without breaking the build.
-%if 0%{?fedora} >= 43
+%if 0%{?fedora} >= 43 || 0%{?rhel} >= 11
 IGNORED=empower \
   %{python3} %{SOURCE4} /usr/lib/sysusers.d/setup.conf %{buildroot}/usr/lib/sysusers.d/basic.conf
 %else
@@ -1308,6 +1270,7 @@ fi
                         systemd-pcrlock.socket
                         systemd-pcrlock@.service
                         systemd-pcrmachine.service
+                        systemd-pcrosseparator.service
                         systemd-pcrphase-initrd.service
                         systemd-pcrphase-sysinit.service
                         systemd-pcrphase.service
@@ -1346,18 +1309,6 @@ fi
                        }
 
 %post udev
-# Move old stuff around in /var/lib
-mv %{_localstatedir}/lib/random-seed %{_localstatedir}/lib/systemd/random-seed &>/dev/null
-mv %{_localstatedir}/lib/backlight %{_localstatedir}/lib/systemd/backlight &>/dev/null
-if [ -L %{_localstatedir}/lib/systemd/timesync ]; then
-    rm %{_localstatedir}/lib/systemd/timesync
-    mv %{_localstatedir}/lib/private/systemd/timesync %{_localstatedir}/lib/systemd/timesync
-fi
-if [ -f %{_localstatedir}/lib/systemd/clock ]; then
-    mkdir -p %{_localstatedir}/lib/systemd/timesync
-    mv %{_localstatedir}/lib/systemd/clock %{_localstatedir}/lib/systemd/timesync/.
-fi
-
 systemd-hwdb update &>/dev/null
 
 %systemd_post %udev_services
@@ -1365,11 +1316,6 @@ systemd-hwdb update &>/dev/null
 # Try to save the random seed, but don't complain if /dev/urandom is unavailable
 /usr/lib/systemd/systemd-random-seed save 2>&1 | \
     grep -v 'Failed to open /dev/urandom' || :
-
-# Replace obsolete keymaps
-# https://bugzilla.redhat.com/show_bug.cgi?id=1151958
-grep -q -E '^KEYMAP="?fi-latin[19]"?' /etc/vconsole.conf 2>/dev/null &&
-    sed -i.rpm.bak -r 's/^KEYMAP="?fi-latin[19]"?/KEYMAP="fi"/' /etc/vconsole.conf || :
 
 %preun udev
 %systemd_preun %udev_services
@@ -1409,20 +1355,7 @@ fi
                            }
 
 %post networkd
-# systemd-networkd was split out in systemd-246.6-2.
-# Ideally, we would have a trigger scriptlet to record enablement
-# state when upgrading from systemd <= systemd-246.6-1. But, AFAICS,
-# rpm doesn't allow us to trigger on another package, short of
-# querying the rpm database ourselves, which seems risky. For rpm,
-# systemd and systemd-networkd are completely unrelated.  So let's use
-# a hack to detect if an old systemd version is currently present in
-# the file system.
-# https://bugzilla.redhat.com/show_bug.cgi?id=1943263
-if [ $1 -eq 1 ] && ls /usr/lib/systemd/libsystemd-shared-24[0-6].so &>/dev/null; then
-    echo "Skipping presets for systemd-networkd.service, seems we are upgrading from old systemd."
-else
-    %systemd_post %networkd_services
-fi
+%systemd_post %networkd_services
 
 %preun networkd
 %systemd_preun %networkd_services
