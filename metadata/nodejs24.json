@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 24.17.0",
+  "modification_reason": "Update to upstream version 24.18.0",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 8251,
@@ -9,5 +9,5 @@
   "track_upstream": "24",
   "upstream_branch": "v24.x",
   "upstream_repo": "https://github.com/nodejs/node",
-  "version": "24.17.0"
+  "version": "24.18.0"
 }
