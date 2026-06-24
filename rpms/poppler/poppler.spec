@@ -4,20 +4,14 @@
 %bcond qt 1
 
 %if %{with qt}
-# Enable qt5 support (or not)
-# RHEL 10 drops support for Qt5, adds Qt6
-%if %{undefined rhel} || 0%{?rhel} < 10
-%global qt5 1
-%endif
-%if %{undefined rhel} || 0%{?rhel} >= 10
+# Qt5 is EOL; Hummingbird follows RHEL 10+ which only ships Qt6
 %global qt6 1
-%endif
 %endif
 
 Summary: PDF rendering library
 Name:    poppler
-Version: 26.01.0
-Release: 8%{?dist}
+Version: 26.06.0
+Release: 0.1%{?dist}
 License: (GPL-2.0-only OR GPL-3.0-only) AND GPL-2.0-or-later AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND MIT
 URL:     https://poppler.freedesktop.org/
 Source0: https://poppler.freedesktop.org/poppler-%{version}.tar.xz
@@ -30,8 +24,6 @@ Source3: %{name}-test-%{test_date}-%{test_sha}.tar.xz
 Patch1:  poppler-0.90.0-position-independent-code.patch
 
 Patch2:  poppler-21.01.0-glib-introspection.patch
-
-Patch3:  poppler-26.01.0-climits.patch
 
 BuildRequires: make
 BuildRequires: cmake
@@ -75,7 +67,9 @@ BuildRequires: cmake(Qt6Test)
 BuildRequires: cmake(Qt6Widgets)
 BuildRequires: cmake(Qt6Xml)
 %endif
-BuildRequires: boost-devel
+# boost-devel removed: boost-log not available in Hummingbird repo,
+# and boost is only needed for optional unit tests
+# BuildRequires: boost-devel
 # for %%gpgverify
 BuildRequires: gnupg2
 
@@ -199,6 +193,7 @@ chmod -x poppler/CairoFontEngine.cc
 %if 0%{?rhel} > 10
   -DENABLE_GPGME=OFF \
 %endif
+  -DENABLE_BOOST=OFF \
   -DENABLE_UNSTABLE_API_ABI_HEADERS=ON \
   -DENABLE_ZLIB=OFF \
   ..
@@ -240,7 +235,7 @@ test "$(pkg-config --modversion poppler-qt6)" = "%{version}"
 %files
 %doc README.md
 %license COPYING
-%{_libdir}/libpoppler.so.156*
+%{_libdir}/libpoppler.so.161*
 
 %files devel
 %{_libdir}/pkgconfig/poppler.pc

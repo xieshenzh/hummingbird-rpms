@@ -1,9 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "8",
+  "modification_reason": "Update to 26.06.0 for CVE-2026-10118",
+  "modification_status": "modified",
+  "release": "0.1",
   "sha": "72ab87ad96e4590fec629b828edf452c8339f794",
   "source": "https://src.fedoraproject.org/rpms/poppler.git",
   "upstream_repo": "https://gitlab.freedesktop.org/poppler/poppler",
-  "version": "26.01.0"
+  "version": "26.06.0"
 }
