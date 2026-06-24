@@ -12,8 +12,8 @@
 
 Summary: A utility for getting files from remote servers (FTP, HTTP, and others)
 Name: curl
-Version: 8.20.0
-Release: 2%{?dist}
+Version: 8.21.0
+Release: 0.1%{?dist}
 License: curl
 Source0: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz
 Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
@@ -21,9 +21,6 @@ Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
 # to Daniel's address page https://daniel.haxx.se/address.html for the GPG Key,
 # which points to the GPG key as of April 7th 2016 of https://daniel.haxx.se/mykey.asc
 Source2: mykey.asc
-
-# Fix potential 100% CPU usage in curl_multi_socket()
-Patch001: 0001-curl-8.20.0-event-fix-wakeup-consumption.patch
 
 # patch making libcurl multilib ready
 Patch101: 0101-curl-7.32.0-multilib.patch
@@ -391,7 +388,7 @@ for size in minimal full; do (
     export LD_LIBRARY_PATH="${PWD}/lib/.libs"
 
     # tests that must run in serial to avoid intermittent failures under parallel execution
-    serial_tests="766 2402 2404 2500 2502 3300"
+    serial_tests="766 1399 2402 2404 2500 2502 3300"
     serial_excludes=$(for t in $serial_tests; do printf ' !%s' "$t"; done)
     # run the bulk of tests in parallel, excluding serial ones
     # cap at 64 jobs to avoid overwhelming system resources on high-CPU machines
