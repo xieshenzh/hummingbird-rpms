@@ -1,3 +1,14 @@
+* Mon Jun 22 2026 Zdenek Pytela <zpytela@redhat.com> - 45.6-1
+- Allow systemd-hostnamed read hwdb files
+- Allow systemd-machined to manage nspawn runtime directory
+- Allow pcm-sensor-server the sys_admin capability
+- Allow nut/upsmon read nut_conf_t symlinks
+- Support new sanlock features - using libdm and SG_IO
+- Allow thumb_t mount proc filesystem
+- Allow aide connect to the GDM userdb provider socket
+- Allow postfix_postdrop_t/system_mail_t append to init unix domain stream sockets
+- Allow nfsd_t to create netlink_generic_socket (bsc#1267826)
+
 * Fri Jun 12 2026 Zdenek Pytela <zpytela@redhat.com> - 45.5-1
 - Add anaconda_ioctl_fifo_files_install() and anaconda_write_fifo_files_install()
 - Allow install_t domain transition to insights_client_t
