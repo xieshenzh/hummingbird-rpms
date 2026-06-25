@@ -44,8 +44,8 @@ srpm_build_deps:
   - make
 
 actions:
-  fix-spec-file: "bash .packit-copr-rpm.sh"
-  pre-sync: "bash .packit-rpm-git-commit.sh"
+  fix-spec-file: "bash contrib/packit-tmt/packit-copr-rpm.sh"
+  pre-sync: "bash contrib/packit-tmt/packit-rpm-git-commit.sh"
 
 jobs:
   - job: copr_build
@@ -105,6 +105,11 @@ jobs:
     targets:
       - fedora-all
     tmt_plan: "/plans/system/*"
+    tf_extra_params:
+      environments:
+        - artifacts:
+          - type: repository-file
+            id: https://copr.fedorainfracloud.org/coprs/rhcontainerbot/podman-next/repo/fedora-$releasever/rhcontainerbot-podman-next-fedora-$releasever.repo
 
   - job: tests
     identifier: cockpit-revdeps
@@ -112,15 +117,18 @@ jobs:
     packages: [podman-fedora]
     notifications:
       failure_comment:
-        message: "Cockpit tests failed for commit {commit_sha}. @martinpitt, @jelly, @mvollmer please check."
+        message: "Cockpit tests failed for commit {commit_sha}. @jelly, @mvollmer please check."
     targets:
       - fedora-latest-stable
       - fedora-development
+    tmt_plan: "/plans/cockpit-podman"
     tf_extra_params:
       environments:
         - artifacts:
           - type: repository-file
             id: https://copr.fedorainfracloud.org/coprs/g/cockpit/main-builds/repo/fedora-$releasever/group_cockpit-main-builds-fedora-$releasever.repo
+          - type: repository-file
+            id: https://copr.fedorainfracloud.org/coprs/rhcontainerbot/podman-next/repo/fedora-$releasever/rhcontainerbot-podman-next-fedora-$releasever.repo
           tmt:
             context:
               revdeps: "yes"
@@ -134,17 +142,26 @@ jobs:
         message: "tmt tests failed for commit {commit_sha}. @lsm5, @psss, @thrix please check."
     targets:
       - fedora-latest
-    fmf_url: https://github.com/teemtee/tmt
-    fmf_path: /plans/friends
-    fmf_ref: main
-    tmt_plan: "/podman"
+    tmt_plan: "/plans/tmt"
+    tf_extra_params:
+      environments:
+        - artifacts:
+          - type: repository-file
+            id: https://copr.fedorainfracloud.org/coprs/rhcontainerbot/podman-next/repo/fedora-$releasever/rhcontainerbot-podman-next-fedora-$releasever.repo
+          tmt:
+            context:
+              revdeps: "yes"
 
+  # NOTE: Breaking changes related to Podman6 will only be shipped to Fedora
+  # Rawhide (to be Fedora 45) and newer.
+  # TODO: Update dist_git_branches as and when new Fedora releases are
+  # available.
   - job: propose_downstream
     trigger: release
     update_release: false
     packages: [podman-fedora]
     dist_git_branches: &fedora_targets
-      - fedora-all
+      - fedora-rawhide
 
   - job: koji_build
     trigger: commit
