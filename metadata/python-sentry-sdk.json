@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "drop python3-pkg-resources BuildRequires; setuptools 82.0.1 removed pkg_resources",
+  "modification_status": "modified",
   "release": "6",
   "sha": "8aba68342e156165bb4e4fa07b951ec1829efa22",
   "source": "https://src.fedoraproject.org/rpms/python-sentry-sdk.git",
