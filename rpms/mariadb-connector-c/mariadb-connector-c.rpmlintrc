@@ -8,12 +8,6 @@
 # Spelling errors
 addFilter(r'spelling-error .*en_US.* (libmariadb|cnf|Testsuite|ctest) ')
 
-# Debugsource
-addFilter(r'^mariadb-connector-c\d?-debugsource\.[^:]+: (E|W): no-documentation')
-
-# Debuginfo
-addFilter(r'^mariadb-connector-c\d?-debuginfo\.[^:]+: (E|W): useless-provides debuginfo\(build-id\)')
-
 # Missing documentation from subpackages
 addFilter(r'^mariadb-connector-c\d?-(devel|config|test)\.[^:]+: (E|W): no-documentation')
 
@@ -23,6 +17,3 @@ addFilter(r'no-manual-page-for-binary (mariadb|mysql)_config$')
 
 # Tests files are expected in /usr/share
 addFilter(r'arch-dependent-file-in-usr-share /usr/share/mariadb-connector-c/tests/')
-
-# The provide is not needed
-addFilter(r'obsolete-not-provided mariadb-config')
