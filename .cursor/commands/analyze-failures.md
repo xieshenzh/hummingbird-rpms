@@ -230,7 +230,7 @@ When analyzing dependency resolution failures (`calculate-deps`), check for thes
 specific to the hummingbird build environment. These should be noted in the analysis report with
 concrete recommendations. **Do not apply fixes — only suggest them to the user.**
 
-**Pattern 1: Previous version already had a fix — re-apply local modifications**
+#### Pattern 1: Previous version already had a fix — re-apply local modifications
 
 Automated `dist_git.py update` pulls the raw Fedora spec, overwriting local hummingbird
 modifications. If the previous version of the package had spec changes (e.g., conditional
@@ -245,7 +245,7 @@ modifications. If the previous version of the package had spec changes (e.g., co
   via `%if %{undefined rhel} && !%{defined hummingbird}` because hummingbird's gcc does not build
   objc support and some dependencies conflict with hummingbird's libicu version.
 
-**Pattern 2: Missing packages — need to import into hummingbird**
+#### Pattern 2: Missing packages — need to import into hummingbird
 
 A Fedora package requires a library that conflicts with a hummingbird-overlay version (e.g.,
 `libicu 77` vs `libicu 78`). The Fedora package must be imported into hummingbird and rebuilt
@@ -260,7 +260,7 @@ against the hummingbird version of the library.
 - **Example**: poppler required importing tinysparql because `libtinysparql` (Fedora) needed
   `libicu 77` while hummingbird ships `libicu 78`.
 
-**Pattern 3: Honor `%{rhel}` or `%{hummingbird}` conditionals**
+#### Pattern 3: Honor `%{rhel}` or `%{hummingbird}` conditionals
 
 Many Fedora specs use `%if %{undefined rhel}` to gate optional BuildRequires that are unavailable
 or unnecessary on RHEL. Hummingbird is Fedora-based (does NOT define `%{rhel}`) but DOES define
