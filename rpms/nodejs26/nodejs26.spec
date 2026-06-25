@@ -333,8 +333,8 @@ readonly -a configure_flags=(
 %if %{without bundled_nodejs_undici}
     --shared-builtin-undici/undici-path=%{nodejs_common_sitelib}/undici/loader.js
 %endif
-    # Enable LTO where possible
-    --enable-lto
+    # Disable LTO temporarily to fix linking issues with ICU/Abseil
+    #--enable-lto
     # Enable Temporal API (TC39 Stage 4 / ES2026); requires Rust toolchain
     --v8-enable-temporal-support
     # Compile with small icu, extendable via full-i18n subpackage
