@@ -1,8 +1,8 @@
 %bcond check 1
 
 Name:           jq
-Version:        1.8.1
-Release:        3%{?dist}
+Version:        1.8.2
+Release:        0.1%{?dist}
 Summary:        Command-line JSON processor
 
 License:        MIT AND ICU AND CC-BY-3.0
