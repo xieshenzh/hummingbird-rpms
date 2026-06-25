@@ -1,8 +1,8 @@
 %bcond check 1
 
 Name:           jq
-Version:        1.8.1
-Release:        3%{?dist}
+Version:        1.8.2
+Release:        0.1%{?dist}
 Summary:        Command-line JSON processor
 
 License:        MIT AND ICU AND CC-BY-3.0
@@ -19,21 +19,6 @@ BuildRequires:  valgrind
 %endif
 BuildRequires:  make
 BuildRequires:  tzdata
-
-# Fix <skipped: too deep> error
-# https://github.com/jqlang/jq/issues/3413
-# Somewhat of a precursor to fix for CVE-2026-33947
-Patch:          skipped_too_deep.patch
-# https://github.com/jqlang/jq/security/advisories/GHSA-q3h9-m34w-h76f
-Patch:          CVE-2026-32316.patch
-# https://github.com/jqlang/jq/security/advisories/GHSA-6gc3-3g9p-xx28
-Patch:          CVE-2026-39956.patch
-# https://github.com/jqlang/jq/security/advisories/GHSA-2hhh-px8h-355p
-Patch:          CVE-2026-39979.patch
-# https://github.com/jqlang/jq/security/advisories/GHSA-wwj8-gxm6-jc29
-Patch:          CVE-2026-40164.patch
-# https://github.com/jqlang/jq/security/advisories/GHSA-6gc3-3g9p-xx28
-Patch:          CVE-2026-33947.patch
 
 %description
 lightweight and flexible command-line JSON processor

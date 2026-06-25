@@ -1,11 +1,12 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "3",
+  "modification_reason": "Update to upstream version 1.8.2",
+  "modification_status": "modified",
+  "release": "0.1",
   "release_monitoring_project_id": 13252,
   "sha": "7013b20589fb858ffa0933e41f7d57ba0bc376df",
   "source": "https://src.fedoraproject.org/rpms/jq.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/jqlang/jq",
-  "version": "1.8.1"
+  "version": "1.8.2"
 }
