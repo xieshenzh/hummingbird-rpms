@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "5",
-  "sha": "118e61f876e444dc426cff3133bb9731a427d99c",
+  "release": "1",
+  "sha": "0c1193b20855153e6e620e4c5d4bb8add81bb500",
   "source": "https://src.fedoraproject.org/rpms/mariadb-connector-c.git",
   "upstream_repo": "https://github.com/MariaDB/mariadb-connector-c",
-  "version": "3.4.8"
+  "version": "3.4.9"
 }
