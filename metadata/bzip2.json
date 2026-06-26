@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Backport bzip2recover off-by-one fix (CVE-2026-42250)",
+  "modification_status": "modified",
   "release": "23",
   "sha": "f00bdf4ea3c67f7ab51c8942961987079a41d60c",
   "source": "https://src.fedoraproject.org/rpms/bzip2.git",

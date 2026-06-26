@@ -3,7 +3,7 @@
 Summary: File compression utility
 Name: bzip2
 Version: 1.0.8
-Release: 23.1%{?dist}
+Release: 23.2%{?dist}
 License: BSD-4-Clause
 URL: https://sourceware.org/bzip2
 #Source0: http://www.bzip.org/%{version}/%{name}-%{version}.tar.gz
@@ -19,6 +19,7 @@ Patch0: bzip2-saneso.patch
 Patch1: bzip2-cflags.patch
 Patch2: bzip2-ldflags.patch
 Patch3: man_gzipdiff.patch
+Patch4: bzip2-CVE-2026-42250.patch
 
 BuildRequires: gcc
 BuildRequires: make
@@ -62,6 +63,7 @@ Static libraries for applications using the bzip2 compression format.
 %patch -P1 -p1
 %patch -P2 -p1
 %patch -P3 -p2
+%patch -P4 -p1
 
 cp -a %{SOURCE1} .
 sed -i "s|^libdir=|libdir=%{_libdir}|" bzip2.pc
