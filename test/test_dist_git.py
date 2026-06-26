@@ -1284,6 +1284,8 @@ def test_update_merge_conflict(workdir: Path, upstream_repos: dict[str, Path]) -
         state = json.load(f)
     assert state['package'] == 'chocolate'
     assert 'Update chocolate' in state['commit_msg']
+    assert 'metadata' in state, "State file should contain updated metadata for --continue"
+    assert state['metadata']['version'] == '11'
 
     # Verify NO new commit was created (conflicts left in working tree)
     commits_after = subprocess.run(
@@ -1293,12 +1295,17 @@ def test_update_merge_conflict(workdir: Path, upstream_repos: dict[str, Path]) -
     # Initial commit, Import, Local modification — no Update commit
     assert commits_after == "3"
 
-    # Verify metadata was staged (updated to new version)
+    # Verify metadata was NOT staged (HUM-2672: prevents leak into subsequent commits)
     metadata_status = subprocess.run(
         ['git', 'diff', '--cached', '--name-only'],
         cwd=workdir, capture_output=True, text=True, check=True
     ).stdout.strip()
-    assert 'metadata/chocolate.json' in metadata_status
+    assert 'metadata/chocolate.json' not in metadata_status
+
+    # Verify metadata on disk was not modified (HUM-2672: never written on conflict path)
+    with open(workdir / 'metadata' / 'chocolate.json') as f:
+        disk_metadata = json.load(f)
+    assert disk_metadata['version'] == '10', "Metadata on disk should remain at pre-update version"
 
     # Verify spec file has conflict markers in working tree
     spec_content = chocolate_spec.read_text()
@@ -3598,6 +3605,12 @@ def test_update_continue(workdir: Path, upstream_repos: dict[str, Path]) -> None
     assert '<<<<<<' not in committed_spec
     assert 'License: MIT' in committed_spec
 
+    # Verify metadata was restored to the updated version (HUM-2672)
+    with open(workdir / 'metadata' / 'chocolate.json') as f:
+        committed_metadata = json.load(f)
+    assert committed_metadata['version'] == '11', \
+        "Metadata committed by --continue should contain the updated version"
+
 
 def test_update_continue_no_state(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     """--continue with no state file exits with error."""
@@ -3623,3 +3636,35 @@ def test_update_continue_unresolved(workdir: Path, upstream_repos: dict[str, Pat
 
     # Verify state file still exists (for retry)
     assert (workdir / '.dist_git_update_state.json').exists()
+
+
+def test_update_continue_legacy_state(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """--continue with a pre-HUM-2672 state file (no 'metadata' key) should not crash.
+
+    Old state files written before the HUM-2672 fix lack the 'metadata' key.
+    continue_update() should still work, using whatever metadata is on disk.
+    """
+    _create_conflict(workdir, upstream_repos)
+
+    # Overwrite state file with the old format (no 'metadata' key)
+    state_file = workdir / '.dist_git_update_state.json'
+    with open(state_file) as f:
+        state = json.load(f)
+    state.pop('metadata', None)
+    with open(state_file, 'w') as f:
+        json.dump(state, f)
+
+    # Resolve conflicts
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    spec_content = chocolate_spec.read_text()
+    resolved = re.sub(r'<<<<<<< HEAD\n.*?=======\n(.*?)>>>>>>> hummingbird-local\n',
+                      r'\1', spec_content, flags=re.DOTALL)
+    chocolate_spec.write_text(resolved)
+
+    # --continue should succeed without error
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--continue'],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, f"--continue failed: {result.stderr}"
+    assert not state_file.exists()
