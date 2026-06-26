@@ -15,7 +15,7 @@
  my %DEFAULT_SSL_CLIENT_ARGS = (
 --- lib/IO/Socket/SSL.pod
 +++ lib/IO/Socket/SSL.pod
-@@ -1087,9 +1087,8 @@ ciphers for TLS 1.2 and lower. See the O
+@@ -1095,9 +1095,8 @@ ciphers for TLS 1.2 and lower. See the O
  for more details.
  
  Unless you fail to contact your peer because of no shared ciphers it is
