@@ -1,11 +1,13 @@
 Summary: X.Org X11 libXpm runtime library
 Name: libXpm
 Version: 3.5.17
-Release: 7.1%{?dist}
+Release: 7.2%{?dist}
 License: MIT AND X11-distribute-modifications-variant
 URL: http://www.x.org
 
 Source0: https://www.x.org/pub/individual/lib/%{name}-%{version}.tar.xz
+
+Patch0: CVE-2026-4367.patch
 
 BuildRequires: xorg-x11-util-macros
 BuildRequires: autoconf automake libtool make
@@ -25,6 +27,7 @@ X.Org X11 libXpm development package
 
 %prep
 %setup -q
+%patch -P0 -p1
 
 %build
 autoreconf -v --install --force
