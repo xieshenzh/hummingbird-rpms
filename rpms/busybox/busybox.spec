@@ -54,7 +54,7 @@
 
 Name:		busybox
 Version:	1.37.0
-Release:	7.2%{?dist}
+Release:	7.3%{?dist}
 Epoch:		1
 Summary:	Statically linked binary providing simplified versions of system commands
 License:	GPL-2.0-only
@@ -82,6 +82,10 @@ Patch2:		busybox-1.37.0-fix-conditional-for-sha1_process_block64_shaNI.patch
 # Backport from upstream master (commit 3fb6b31c716669e12f75a2accd31bb7685b1a1cb)
 # CVE-2026-26157, CVE-2026-26158: Strip unsafe hardlink components to prevent tar extraction attacks
 Patch3:		busybox-1.37.0-CVE-2026-26157-CVE-2026-26158.patch
+# CVE-2026-29004: heap buffer overflow in udhcpc6 DHCPv6 client
+# Upstream commits 42202bfb1e6a, d368f3f7836d
+Patch4:		busybox-1.37.0-CVE-2026-29004-fix-buffer-overflow.patch
+Patch5:		busybox-1.37.0-CVE-2026-29004-check-IAPREFIX-size.patch
 BuildRequires:	gcc
 BuildRequires:	libselinux-devel >= 1.27.7-2
 BuildRequires:	libsepol-devel
@@ -139,6 +143,8 @@ package is build against shared libraries, most notably glibc.
 %patch -P1 -p1 -b .cbq
 %patch -P2 -p1 -b .shani-fix
 %patch -P3 -p1 -b .tar-hardlink-fix
+%patch -P4 -p1 -b .dhcpv6-overflow-fix
+%patch -P5 -p1 -b .dhcpv6-iaprefix-fix
 
 %build
 # Fix architecture name maps

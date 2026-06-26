@@ -1,5 +1,6 @@
 {
   "branch": "rawhide",
+  "cve_product": "vda-linux / busybox_mirror",
   "modification_reason": "backport upstream security fixes",
   "modification_status": "modified",
   "release": "7",
