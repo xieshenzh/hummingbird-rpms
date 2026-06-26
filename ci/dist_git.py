@@ -1389,20 +1389,20 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
             imports[package_name].pop('modification_reason', None)
         # In merge mode with local modifications, keep modification_status as 'modified'
 
-        save_package_metadata(package_name, imports[package_name])
-
         # Commit the changes (or stage for manual resolution on conflict)
         if not dry_run:
             if has_conflicts:
-                # Stage metadata but leave conflicted package files for manual resolution
-                run_git('add', '-f', f'metadata/{package_name}.json', cwd=ROOT_DIR)
-
-                # Save state for --continue
+                # Save state for --continue (including metadata so we can
+                # restore it from a clean working tree)
                 verb = "Sync" if sync else "Update"
                 branch_suffix = f" ({old_branch} -> {effective_branch})" if branch_changed else ""
                 commit_msg = f"{verb} {package_name} from {old_version}-{old_release} to {version}-{release}{branch_suffix}\n\nUpstream: {latest_sha}"
                 with open(UPDATE_STATE_FILE, 'w') as f:
-                    json.dump({'package': package_name, 'commit_msg': commit_msg}, f)
+                    json.dump({
+                        'package': package_name,
+                        'commit_msg': commit_msg,
+                        'metadata': imports[package_name],
+                    }, f)
 
                 logging.warning(
                     "Resolve conflicts in rpms/%s/, then:\n"
@@ -1410,6 +1410,7 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
                     package_name)
                 sys.exit(2)
 
+            save_package_metadata(package_name, imports[package_name])
             run_git('add', '-f', f'rpms/{package_name}', f'metadata/{package_name}.json', cwd=ROOT_DIR)
             verb = "Sync" if sync else "Update"
             branch_suffix = f" ({old_branch} -> {effective_branch})" if branch_changed else ""
@@ -1449,6 +1450,10 @@ def continue_update(dry_run: bool = False) -> None:
                          f"       Resolve all conflicts, then run: ./ci/dist_git.py update --continue")
 
     if not dry_run:
+        # Restore the updated metadata saved during the conflict exit
+        if 'metadata' in state:
+            save_package_metadata(package_name, cast(PackageMetadata, state['metadata']))
+
         run_git('add', '-f', f'rpms/{package_name}', f'metadata/{package_name}.json', cwd=ROOT_DIR)
         run_git_commit('-m', commit_msg, cwd=ROOT_DIR)
         UPDATE_STATE_FILE.unlink()
