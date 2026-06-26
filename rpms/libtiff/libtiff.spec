@@ -1,11 +1,13 @@
 Summary:       Library of functions for manipulating TIFF format image files
 Name:          libtiff
 Version:       4.7.1
-Release:       2.1%{?dist}
+Release:       2.2%{?dist}
 License:       libtiff
 URL:           http://www.simplesystems.org/libtiff/
 
 Source:        http://download.osgeo.org/libtiff/tiff-%{version}.tar.gz
+
+Patch0:        0001-TIFFReadRGBAImage-prevent-integer-overflow-YCbCr.patch
 
 BuildRequires: gcc, gcc-c++
 BuildRequires: zlib-devel libjpeg-devel jbigkit-devel libzstd-devel libwebp-devel liblerc-devel
@@ -58,6 +60,7 @@ image files using the libtiff library.
 
 %prep
 %autosetup -n tiff-%{version} -N
+%autopatch -p1
 
 # Use build system's libtool.m4, not the one in the package.
 rm -f libtool.m4
@@ -168,6 +171,9 @@ fi
 %{_mandir}/man1/*
 
 %changelog
+* Fri Jun 26 2026 Prarit Bhargava <prarit@redhat.com> - 4.7.1-2.2
+- Fix CVE-2026-4775: signed integer overflow in YCbCr tile decoding (rhbz#2450768)
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.7.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
