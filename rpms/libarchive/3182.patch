@@ -1,0 +1,153 @@
+From 91c146e87d61e952c629e2f8a8f9f2a9267c13ff Mon Sep 17 00:00:00 2001
+From: Luca Boccassi <luca.boccassi@gmail.com>
+Date: Thu, 25 Jun 2026 16:53:19 +0100
+Subject: [PATCH] read_data_into_fd: Fix spurious "Seek error" for trailing
+ holes
+
+The final seek check never advanced actual_offset for the trailing
+hole created by the EOF pad_to(), so extracting any sparse file whose
+last region is a hole failed with ARCHIVE_FATAL "Seek error".
+
+This affects the systemd CI which does such an operation, and now
+fails since PR https://github.com/libarchive/libarchive/pull/3128
+was merged and appeared in Archlinux:
+
+ [  269.636946] TEST-13-NSPAWN.sh[5439]: + run0 --pipe -u testuser importctl -m --user import-tar - inodetest2
+ [  270.132545] TEST-13-NSPAWN.sh[5440]: Enqueued transfer job 7. Press C-c to continue download in background.
+ [  270.137660] TEST-13-NSPAWN.sh[5440]: Exporting '/home/testuser/.local/state/machines/inodetest', saving to 'pipe:[79515]' with compression 'uncompressed'.
+ [  270.148434] TEST-13-NSPAWN.sh[5441]: Enqueued transfer job 8. Press C-c to continue download in background.
+ [  270.173410] TEST-13-NSPAWN.sh[5441]: Importing 'pipe:[79515]', saving as 'inodetest2'.
+ [  270.178790] TEST-13-NSPAWN.sh[5441]: Operating on image directory '/home/testuser/.local/state/machines'.
+ [  270.386155] TEST-13-NSPAWN.sh[5440]: Operation completed successfully.
+ [  270.389171] TEST-13-NSPAWN.sh[5440]: Exiting.
+ [  270.689994] TEST-13-NSPAWN.sh[5441]: Failed to unpack regular file 'testfile': Seek error
+
+https://github.com/systemd/systemd/actions/runs/28159904022/job/83436896561?pr=42736
+
+A local and small regression test is added that replicates that test's
+behaviour.
+---
+ libarchive/archive_read_data_into_fd.c |  2 +
+ libarchive/test/test_read_data_large.c | 92 ++++++++++++++++++++++++++
+ 2 files changed, 94 insertions(+)
+
+diff --git a/libarchive/archive_read_data_into_fd.c b/libarchive/archive_read_data_into_fd.c
+index 38de5b4b4d..7eb20840d1 100644
+--- a/libarchive/archive_read_data_into_fd.c
++++ b/libarchive/archive_read_data_into_fd.c
+@@ -141,6 +141,8 @@ archive_read_data_into_fd(struct archive *a, int fd)
+ 		    target_offset, actual_offset);
+ 		if (r2 != ARCHIVE_OK)
+ 			r = r2;
++		else
++			actual_offset = target_offset;
+ 	}
+ 
+ cleanup:
+diff --git a/libarchive/test/test_read_data_large.c b/libarchive/test/test_read_data_large.c
+index 59cbfd496c..37182349cc 100644
+--- a/libarchive/test/test_read_data_large.c
++++ b/libarchive/test/test_read_data_large.c
+@@ -35,6 +35,7 @@
+ #if defined(_WIN32) && !defined(__CYGWIN__)
+ #define open _open
+ #define close _close
++#define ftruncate _chsize
+ #endif
+ 
+ static char buff1[11000000];
+@@ -108,3 +109,94 @@ DEFINE_TEST(test_read_data_large)
+ 	fclose(f);
+ 	assertEqualMem(buff2, buff3, sizeof(buff3));
+ }
++
++#define	FILE_SIZE	0x90000		/* 576 KiB total logical size */
++
++static char sparse_buff[0x10000];	/* Holds the (small) stored archive. */
++static char sparse_data[FILE_SIZE];
++static char sparse_expected[FILE_SIZE];
++
++/*
++ * Regression test for archive_read_data_into_fd() extracting a sparse
++ * file that ends in a hole. For a sparse entry libarchive seeks the
++ * destination descriptor forward to recreate holes. The trailing hole
++ * is created from the EOF handling after the last data block.
++ */
++DEFINE_TEST(test_read_data_into_fd_sparse)
++{
++	struct archive *a;
++	struct archive_entry *ae;
++	size_t archive_size = 0;
++	const char *skip_sparse_tests;
++	int fd;
++
++	skip_sparse_tests = getenv("SKIP_TEST_SPARSE");
++	if (skip_sparse_tests != NULL) {
++		skipping("Skipping sparse tests due to SKIP_TEST_SPARSE "
++		"environment variable");
++		return;
++	}
++
++	/*
++	 * The logical file is all 'a', and the sparse map marks two data
++	 * regions, everything else (including the tail) is a hole that
++	 * must read back as zero. The last data region ends at 0x81000
++	 * while the file size is 0x90000, so the file ends in a hole.
++	 */
++	memset(sparse_data, 'a', sizeof(sparse_data));
++	memset(sparse_expected, 0, sizeof(sparse_expected));
++	memset(sparse_expected + 0x10000, 'a', 0x1000);
++	memset(sparse_expected + 0x80000, 'a', 0x1000);
++
++	/* Create a sparse pax archive in memory. */
++	assert((a = archive_write_new()) != NULL);
++	assertEqualIntA(a, ARCHIVE_OK, archive_write_set_format_pax(a));
++	assertEqualIntA(a, ARCHIVE_OK, archive_write_add_filter_none(a));
++	assertEqualIntA(a, ARCHIVE_OK, archive_write_open_memory(a, sparse_buff,
++	    sizeof(sparse_buff), &archive_size));
++
++	assert((ae = archive_entry_new()) != NULL);
++	archive_entry_copy_pathname(ae, "file");
++	archive_entry_set_mode(ae, S_IFREG | 0644);
++	archive_entry_set_size(ae, FILE_SIZE);
++	archive_entry_sparse_add_entry(ae, 0x10000, 0x1000);
++	archive_entry_sparse_add_entry(ae, 0x80000, 0x1000);
++	assertEqualIntA(a, ARCHIVE_OK, archive_write_header(a, ae));
++	archive_entry_free(ae);
++	assertEqualIntA(a, FILE_SIZE,
++	    archive_write_data(a, sparse_data, sizeof(sparse_data)));
++	assertEqualIntA(a, ARCHIVE_OK, archive_write_close(a));
++	assertEqualInt(ARCHIVE_OK, archive_write_free(a));
++
++	/* Read it back and extract it into a real file descriptor. */
++	assert((a = archive_read_new()) != NULL);
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_support_format_all(a));
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_support_filter_all(a));
++	assertEqualIntA(a, ARCHIVE_OK,
++	    archive_read_open_memory(a, sparse_buff, archive_size));
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_next_header(a, &ae));
++	assertEqualInt(FILE_SIZE, archive_entry_size(ae));
++
++	fd = open("file", O_WRONLY | O_CREAT | O_BINARY, 0644);
++	assert(fd >= 0);
++
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_data_into_fd(a, fd));
++
++	/*
++	 * archive_read_data_into_fd() seeks over the trailing hole but, like
++	 * a regular extraction, leaves the on-disk size short. Truncate up
++	 * to the full size to realize the final hole, as a consumer does.
++	 */
++	assert(ftruncate(fd, FILE_SIZE) != -1);
++	close(fd);
++
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_close(a));
++	assertEqualInt(ARCHIVE_OK, archive_read_free(a));
++
++	/*
++	 * The reconstructed file must match byte for byte: data regions
++	 * are 'a', every hole (including the trailing one) is zero.
++	 */
++	assertFileSize("file", FILE_SIZE);
++	assertFileContents(sparse_expected, FILE_SIZE, "file");
++}
