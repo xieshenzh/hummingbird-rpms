@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Disable libssh2 for FIPS compliance, following RHEL",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "8ee77dc7eb5e5abb21840c72d7cd38078c07c61d",
+  "release": "4",
+  "sha": "398acf3cd401266aca7e5930befe58f1efb2def0",
   "source": "https://src.fedoraproject.org/rpms/rust.git",
   "upstream_repo": "https://github.com/rust-lang/rust",
   "version": "1.96.0"
