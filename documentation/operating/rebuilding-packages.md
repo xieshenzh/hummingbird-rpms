@@ -466,7 +466,7 @@ Use this commit message format:
 ```text
 <package>: backport <short description>
 
-Upstream: <link to PR or commit>
+Backport: <link to PR or commit>
 <ticket link if applicable>
 ```
 
@@ -475,7 +475,7 @@ Example:
 ```text
 dnf5: backport reproducible build sorting fix
 
-Upstream: https://github.com/rpm-software-management/dnf5/pull/2522
+Backport: https://github.com/rpm-software-management/dnf5/pull/2522
 ```
 
 ### 5. Mark package as modified
