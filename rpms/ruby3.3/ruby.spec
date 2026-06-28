@@ -188,7 +188,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 23.1%{?dist}
+Release: 23.2%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -301,6 +301,11 @@ Patch12: ruby-3.4.0-Extract-hardening-CFLAGS-to-a-special-hardenflags-variable.p
 # https://github.com/ruby/openssl/pull/710
 # https://github.com/ruby/ruby/commit/6213ab1a51387fd9cdcb5e87908722f3bbdf78cb
 Patch13: ruby-3.4.0-openssl-respect-crypto-policies-tls-min.patch
+# Backport net-imap 0.4.21 -> 0.4.24 security fixes:
+# CVE-2026-42246: Net::IMAP info disclosure via MitM bypassing TLS (Important)
+# CVE-2026-42245: Net::IMAP DoS via crafted IMAP responses (Moderate)
+# CVE-2026-42256: Net::IMAP DoS via large SCRAM iteration count (Moderate)
+Patch14: ruby-3.3.10-net-imap-0.4.24-security-fixes.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -640,7 +645,9 @@ Provides:   ruby-bundled-gems = %{version}-%{release}
 Provides:   bundled(rubygem-debug) = %{debug_version}
 Provides:   bundled(rubygem-matrix) = %{matrix_version}
 Provides:   bundled(rubygem-net-ftp) = %{net_ftp_version}
+# net-imap lib/ backported to 0.4.24 for CVE fixes; gem dir remains 0.4.21
 Provides:   bundled(rubygem-net-imap) = %{net_imap_version}
+Provides:   bundled(rubygem-net-imap) = 0.4.24
 Provides:   bundled(rubygem-net-pop) = %{net_pop_version}
 Provides:   bundled(rubygem-net-smtp) = %{net_smtp_version}
 Provides:   bundled(rubygem-prime) = %{prime_version}
@@ -808,6 +815,7 @@ analysis result in RBS format, a standard type description format for Ruby
 %patch 9 -p1
 %patch 12 -p1
 %patch 13 -p1
+%patch 14 -p1 -d .bundle/gems/net-imap-0.4.21
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
@@ -908,6 +916,11 @@ cp %{SOURCE1} %{buildroot}%{rubygems_dir}/rubygems/defaults
 
 # Move gems root into common direcotry, out of Ruby directory structure.
 mv %{buildroot}%{ruby_libdir}/gems %{buildroot}%{gem_dir}
+
+# Install net-imap bundled gem which is not installed by make install.
+cp -a .bundle/gems/net-imap-%{net_imap_version} %{buildroot}%{gem_dir}/gems/
+rm %{buildroot}%{gem_dir}/gems/net-imap-%{net_imap_version}/net-imap.gemspec
+cp -a .bundle/specifications/net-imap-%{net_imap_version}.gemspec %{buildroot}%{gem_dir}/specifications/
 
 # Create folders for gem binary extensions.
 # TODO: These folders should go into rubygem-filesystem but how to achieve it,
