@@ -1,7 +1,0 @@
-summary: Tier0 testplan
-
-plan:
-  import:
-    url: https://gitlab.cee.redhat.com/toolchain-qe/tests/golang.git
-    ref: main
-    name: /plans/tier0
