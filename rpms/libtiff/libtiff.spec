@@ -7,6 +7,7 @@ URL:           http://www.simplesystems.org/libtiff/
 
 Source:        http://download.osgeo.org/libtiff/tiff-%{version}.tar.gz
 
+# Backport: https://gitlab.com/libtiff/libtiff/-/commit/622e8edc07fe68189cf5338792603f31f0accc57
 Patch0:        0001-TIFFReadRGBAImage-prevent-integer-overflow-YCbCr.patch
 
 BuildRequires: gcc, gcc-c++
