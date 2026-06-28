@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3.1%{?dist}
+Release: 3.2%{?dist}
 License: Python-2.0.1
 
 
@@ -507,6 +507,12 @@ Patch487: 00487-cve-2025-13462.patch
 #
 # gh-146121: Clarify security model of pkgutil.getdata
 Patch488: 00488-cve-2026-3479.patch
+
+# 00489 # 76b3923d688c0efc580658476c5f525ec8735104
+# CVE-2026-6019
+#
+# gh-90309: Base64-encode cookie values embedded in JS
+Patch489: 00489-cve-2026-6019.patch
 
 # (New patches go here ^^^)
 #
