@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Add FIPS mode support (00329-fips.patch) - OpenSSL FIPS mode compliance for hashlib and hmac",
+  "modification_reason": "Add FIPS mode support (00329-fips.patch), CVE-2026-8723 fix for vendored qs",
   "modification_status": "modified",
-  "release": "1",
+  "release": "1.1",
   "sha": "f26b7fcd3ab8d0a62e0eb198fc5172537b8e085f",
   "source": "https://src.fedoraproject.org/rpms/python3.14.git",
   "upstream_branch": "3.14",
