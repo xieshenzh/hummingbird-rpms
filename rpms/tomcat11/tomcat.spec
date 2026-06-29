@@ -1,7 +1,7 @@
 %global jspspec 4.0
 %global major_version 11
 %global minor_version 0
-%global micro_version 22
+%global micro_version 23
 %global packdname apache-tomcat-%{version}-src
 %global servletspec 6.1
 %global elspec 6.0
