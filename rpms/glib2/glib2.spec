@@ -1,13 +1,11 @@
-%global major_minor_version %%(echo %%{version} | cut -d "." -f 1-2)
-
 Name:           glib2
-Version:        2.89.0
+Version:        2.89.1
 Release:        1%{?dist}
 Summary:        A library of handy utility functions
 
 License:        LGPL-2.1-or-later
 URL:            https://www.gtk.org
-Source:         https://download.gnome.org/sources/glib/%{major_minor_version}/glib-%{version}.tar.xz
+Source:         https://download.gnome.org/sources/glib/%{gnome_major_minor_version}/glib-%{version}.tar.xz
 
 # Disable GLib's built-in GHmac for FIPS compliance.
 # Applications should use a FIPS-certified crypto library directly.
