@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "ca0f709c83717b89dfaf53c22c4954bf2bbb2f2b",
+  "release": "2",
+  "sha": "8d109867ae761321bc141eeb07a673162599ba2d",
   "source": "https://src.fedoraproject.org/rpms/fmt.git",
   "upstream_repo": "https://github.com/fmtlib/fmt",
-  "version": "11.2.0"
+  "version": "12.1.0"
 }
