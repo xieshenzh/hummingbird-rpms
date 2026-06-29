@@ -389,6 +389,7 @@ straight-forward, and extensible.
 %package devel
 Summary:    A Ruby development environment
 Provides:   ruby-devel = %{version}-%{release}
+Provides:   ruby-devel
 Requires:   %{name}%{?_isa} = %{version}-%{release}
 # This would not be needed if ~50 packages depending on -devel used
 # --disable-gems
