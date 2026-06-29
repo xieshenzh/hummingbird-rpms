@@ -134,7 +134,7 @@
 
 Name:           %{basepackagename}%{go_api}
 Version:	%{go_version}
-Release:        0.1%{?dist}
+Release:        0.1.1%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
@@ -222,6 +222,8 @@ Patch6:         0006-Default-to-ld.bfd-on-ARM64.patch
 Patch7:         revert_dwarf5.patch
 # Skip TestTerminalSignal in podman containers - wait4() hangs with --init
 Patch10:        0010-Skip-TestTerminalSignal.patch
+# CVE-2026-42501: reject sumdb response lacking module hash
+Patch11:        0011-cmd-go-reject-sumdb-response-lacking-module-hash.patch
 
 # Having documentation separate was broken
 Obsoletes:      %{name}-docs < 1.1-4
