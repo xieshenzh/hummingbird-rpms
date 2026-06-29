@@ -1,6 +1,6 @@
 Name:           fmt
-Version:        11.2.0
-Release:        4.1%{?dist}
+Version:        12.1.0
+Release:        2%{?dist}
 
 License:        MIT
 Summary:        Small, safe and fast formatting library for C++
@@ -52,7 +52,7 @@ This package contains the header file for using %{name}.
 %files
 %license LICENSE
 %doc ChangeLog.md README.md
-%{_libdir}/lib%{name}.so.11*
+%{_libdir}/lib%{name}.so.12*
 
 %files devel
 %{_includedir}/%{name}
