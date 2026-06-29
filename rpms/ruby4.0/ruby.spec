@@ -205,7 +205,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 33.3%{?dist}
+Release: 33.4%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -313,6 +313,13 @@ Patch8: ruby-4.0.1-Support-customizable-rustc_flags-for-rustc-builds.patch
 # https://github.com/ruby/rdoc/pull/1531
 # Fix error with `gem install --document=rdoc,ri`
 Patch9: rdoc-pr1531-fix-mutilple-document-installation.patch
+# Backport net-imap lib/ changes from v0.6.2 to v0.6.4.1 to fix five CVEs:
+# CVE-2026-42246: Information disclosure via MitM bypassing TLS
+# CVE-2026-42245: DoS via crafted IMAP responses (quadratic complexity)
+# CVE-2026-42256: DoS via large SCRAM iteration count
+# CVE-2026-47240: Command injection via non-synchronizing literals
+# CVE-2026-47242: Arbitrary IMAP command injection via improper input validation
+Patch10: ruby-4.0.0-net-imap-0.6.4.1-security-fixes.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -852,6 +859,8 @@ popd
 %patch 7 -p1
 %patch 8 -p1
 
+%patch 10 -p1 -d .bundle/gems/net-imap-%{net_imap_version}
+
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
 
@@ -974,6 +983,11 @@ mv %{buildroot}%{ruby_libdir}/gems %{buildroot}%{gem_dir}
 # since noarch package cannot provide arch dependent subpackages?
 # http://rpm.org/ticket/78
 mkdir -p %{buildroot}%{_exec_prefix}/lib{,64}/gems/%{basepackagename}
+
+# Install net-imap bundled gem (make install does not place it in BUILDROOT)
+cp -a .bundle/gems/net-imap-%{net_imap_version} %{buildroot}%{gem_dir}/gems/
+rm %{buildroot}%{gem_dir}/gems/net-imap-%{net_imap_version}/net-imap.gemspec
+cp -a .bundle/specifications/net-imap-%{net_imap_version}.gemspec %{buildroot}%{gem_dir}/specifications/
 
 # Move bundled rubygems to %%gem_dir and %%gem_extdir_mri
 # make symlinks for io-console, which is considered to be part of stdlib by other Gems

@@ -1,7 +1,7 @@
 {
   "branch": "rawhide",
   "cve_product": "ruby-lang / ruby",
-  "modification_reason": "Add unversioned Provides for ruby and rubygem subpackages",
+  "modification_reason": "Add unversioned Provides for ruby and rubygem subpackages; backport net-imap 0.6.4.1 security fixes (CVE-2026-42245, CVE-2026-42246, CVE-2026-42256, CVE-2026-47240, CVE-2026-47242)",
   "modification_status": "modified",
   "release": "30",
   "sha": "95c21e57751a564afe4457e7f5a5c0393ec5f8bd",
