@@ -30,6 +30,9 @@
 aom:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+attr:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 caddy:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
