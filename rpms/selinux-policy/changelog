@@ -1,3 +1,13 @@
+* Fri Jun 26 2026 Zdenek Pytela <zpytela@redhat.com> - 45.7-1
+- Allow systemd-logind the sys_ptrace capability in the user namespace
+- Allow systemd-sleep the perfmon capability
+- Allow sshd_session_t dyntransition to sftpd_t
+- Allow lttng kernel tracing
+- Allow loadkeys create and use its private tmpfs files
+- Allow journald create and use netlink_tcpdiag_socket
+- Fix typo in the comment of build.conf
+- Allow gpg_pinentry_t to write session dbus socket files
+
 * Mon Jun 22 2026 Zdenek Pytela <zpytela@redhat.com> - 45.6-1
 - Allow systemd-hostnamed read hwdb files
 - Allow systemd-machined to manage nspawn runtime directory
