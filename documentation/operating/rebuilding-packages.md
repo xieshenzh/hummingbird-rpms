@@ -264,6 +264,9 @@ The diff should show only the Release line change:
 > **Important:** Only modify the Release line. Do not introduce any other changes such as whitespace
 > fixes or trailing newline modifications. If the diff shows additional changes, reset and retry
 > with `sed`.
+>
+> **Important:** The release field in `metadata/<package>.json` tracks the upstream Fedora release
+> and should not be modified during local changes like backports or rebuilds.
 
 #### 4. Verify the bump is correct
 
