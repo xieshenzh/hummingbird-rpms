@@ -1,0 +1,291 @@
+From 44f01f205fee29a565d8bfb8925eb65c04ff84fe Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 4 Jun 2026 16:04:31 +0200
+Subject: [PATCH] Upgrade to 1.9780
+
+---
+ Changes          |  1 +
+ HiRes.pm         |  2 +-
+ HiRes.xs         |  3 ++-
+ t/alarm.t        |  8 +++-----
+ t/clock.t        |  2 --
+ t/gettimeofday.t |  2 --
+ t/itimer.t       |  2 --
+ t/nanosleep.t    |  2 --
+ t/sleep.t        | 16 ++++++++++------
+ t/stat.t         | 20 +++++++++-----------
+ t/time.t         | 10 +++++++---
+ t/tv_interval.t  |  2 --
+ t/ualarm.t       |  2 --
+ t/usleep.t       |  2 --
+ t/utime.t        |  2 --
+ 15 files changed, 33 insertions(+), 43 deletions(-)
+
+diff --git a/Changes b/Changes
+index 31f28fe..0e991b5 100644
+--- a/Changes
++++ b/Changes
+@@ -19,6 +19,7 @@ Revision history for the Perl extension Time::HiRes.
+    build failures with MSVC.
+  - don't try to suppress C++ compatibility warnings in C++ builds, since
+    that warns.
++ - Fix sleep's prototype to match CORE::sleep (;$).
+ 
+ 1.9764 [2020-08-10]
+  - Fix a bunch of repeated-word typos
+diff --git a/HiRes.pm b/HiRes.pm
+index 6943637..f1fb463 100644
+--- a/HiRes.pm
++++ b/HiRes.pm
+@@ -50,7 +50,7 @@ our @EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
+                  stat lstat utime
+                 );
+ 
+-our $VERSION = '1.9778';
++our $VERSION = '1.9780';
+ our $XS_VERSION = $VERSION;
+ $VERSION = eval $VERSION;
+ 
+diff --git a/HiRes.xs b/HiRes.xs
+index b879198..0c4fde4 100644
+--- a/HiRes.xs
++++ b/HiRes.xs
+@@ -683,7 +683,7 @@ hrstatns(UV *atime_nsec, UV *mtime_nsec, UV *ctime_nsec)
+ #  endif
+ 
+ #  ifdef PERL_DARWIN_MUTEX
+-STATIC perl_mutex darwin_time_mutex;
++static perl_mutex darwin_time_mutex;
+ #  endif
+ 
+ #  include <mach/mach_time.h>
+@@ -1019,6 +1019,7 @@ nanosleep(nsec)
+ 
+ NV
+ sleep(...)
++PROTOTYPE: ;$
+     PREINIT:
+         struct timeval Ta, Tb;
+     CODE:
+diff --git a/t/alarm.t b/t/alarm.t
+index 6ebf380..10d7e61 100644
+--- a/t/alarm.t
++++ b/t/alarm.t
+@@ -11,9 +11,9 @@ use Config;
+ my $limit = 0.25; # 25% is acceptable slosh for testing timers
+ 
+ my $xdefine = '';
+-if (open(XDEFINE, "<", "xdefine")) {
+-    chomp($xdefine = <XDEFINE> || "");
+-    close(XDEFINE);
++if (open(my $fh, "<", "xdefine")) {
++    chomp($xdefine = <$fh> || "");
++    close($fh);
+ }
+ 
+ my $can_subsecond_alarm =
+@@ -224,5 +224,3 @@ SKIP: {
+         ok $got == 0 or print("# $got\n");
+     }
+ }
+-
+-1;
+diff --git a/t/clock.t b/t/clock.t
+index 810d63a..1490b9d 100644
+--- a/t/clock.t
++++ b/t/clock.t
+@@ -97,5 +97,3 @@ SKIP: {
+         $clock[2] > $clock[1] &&
+         $clock[3] > $clock[2];
+ }
+-
+-1;
+diff --git a/t/gettimeofday.t b/t/gettimeofday.t
+index 05cebbb..b710348 100644
+--- a/t/gettimeofday.t
++++ b/t/gettimeofday.t
+@@ -30,5 +30,3 @@ ok $f - $two[0] < 2 or print("# $f - $two[0] >= 2\n");
+ my $r = [Time::HiRes::gettimeofday()];
+ my $g = Time::HiRes::tv_interval $r;
+ ok $g < 2 or print("# $g\n");
+-
+-1;
+diff --git a/t/itimer.t b/t/itimer.t
+index 4e4ce6d..3782939 100644
+--- a/t/itimer.t
++++ b/t/itimer.t
+@@ -66,5 +66,3 @@ print("# at end, i=$i\n");
+ is($virt, 0, "time left should be zero");
+ 
+ $SIG{VTALRM} = 'DEFAULT';
+-
+-1;
+diff --git a/t/nanosleep.t b/t/nanosleep.t
+index ff05637..0343cec 100644
+--- a/t/nanosleep.t
++++ b/t/nanosleep.t
+@@ -34,5 +34,3 @@ SKIP: {
+     skip "flapping test - more than 0.9 sec could be necessary...", 1 if $ENV{CI};
+     cmp_ok $d, '<', 0.9 or diag("# slept $d secs $f to $f2\n");
+ }
+-
+-1;
+diff --git a/t/sleep.t b/t/sleep.t
+index 0451650..04929a6 100644
+--- a/t/sleep.t
++++ b/t/sleep.t
+@@ -1,6 +1,6 @@
+ use strict;
+ 
+-use Test::More tests => 4;
++use Test::More tests => 5;
+ BEGIN { push @INC, '.' }
+ use t::Watchdog;
+ 
+@@ -8,10 +8,16 @@ BEGIN { require_ok "Time::HiRes"; }
+ 
+ use Config;
+ 
++SKIP: {
++    skip "no hi-res sleep", 1 unless defined &Time::HiRes::sleep;
++    is prototype(\&Time::HiRes::sleep), prototype('CORE::sleep'),
++        "Time::HiRes::sleep's prototype matches CORE::sleep's";
++}
++
+ my $xdefine = '';
+-if (open(XDEFINE, "<", "xdefine")) {
+-    chomp($xdefine = <XDEFINE> || "");
+-    close(XDEFINE);
++if (open(my $fh, "<", "xdefine")) {
++    chomp($xdefine = <$fh> || "");
++    close($fh);
+ }
+ 
+ my $can_subsecond_alarm =
+@@ -35,5 +41,3 @@ SKIP: {
+     printf("# sleep...%s\n", Time::HiRes::tv_interval($r));
+     ok 1;
+ }
+-
+-1;
+diff --git a/t/stat.t b/t/stat.t
+index 2f72fdc..e82d480 100644
+--- a/t/stat.t
++++ b/t/stat.t
+@@ -22,9 +22,9 @@ my @mtime;
+ for (1..5) {
+     note "cycle $_";
+     Time::HiRes::sleep(rand(0.1) + 0.1);
+-    open(X, '>', $$);
+-    print X $$;
+-    close(X);
++    open(my $fh, '>', $$);
++    print $fh $$;
++    close($fh);
+     my($a, $stat, $b) = ("a", [Time::HiRes::stat($$)], "b");
+     is $a, "a", "stat stack discipline";
+     is $b, "b", "stat stack discipline";
+@@ -43,9 +43,9 @@ for (1..5) {
+         }
+         is_deeply $lstat, $stat, "write: stat and lstat returned same values";
+         Time::HiRes::sleep(rand(0.1) + 0.1);
+-        open(X, '<', $$);
+-        <X>;
+-        close(X);
++        open(my $fh, '<', $$);
++        <$fh>;
++        close($fh);
+         $stat = [Time::HiRes::stat($$)];
+         push @atime, $stat->[8];
+         $lstat = [Time::HiRes::lstat($$)];
+@@ -88,9 +88,9 @@ SKIP: {
+ my $targetname = "tgt$$";
+ my $linkname = "link$$";
+ SKIP: {
+-    open(X, '>', $targetname);
+-    print X $$;
+-    close(X);
++    open(my $fh, '>', $targetname);
++    print $fh $$;
++    close($fh);
+     eval { symlink $targetname, $linkname or die "can't symlink: $!"; };
+     skip "can't symlink", 7 if $@ ne "";
+     note "compare Time::HiRes::stat with ::lstat";
+@@ -111,5 +111,3 @@ SKIP: {
+ }
+ 1 while unlink $linkname;
+ 1 while unlink $targetname;
+-
+-1;
+diff --git a/t/time.t b/t/time.t
+index ad42f47..3843c77 100644
+--- a/t/time.t
++++ b/t/time.t
+@@ -1,11 +1,17 @@
+ use strict;
+ 
+-use Test::More tests => 2;
++use Test::More tests => 3;
+ BEGIN { push @INC, '.' }
+ use t::Watchdog;
+ 
+ BEGIN { require_ok "Time::HiRes"; }
+ 
++SKIP: {
++    skip "no hi-res time", 1 unless defined &Time::HiRes::time;
++    is prototype(\&Time::HiRes::time), prototype('CORE::time'),
++        "Time::HiRes::time's prototype matches CORE::time's";
++}
++
+ SKIP: {
+     skip "no gettimeofday", 1 unless &Time::HiRes::d_gettimeofday;
+     my ($s, $n, $i) = (0);
+@@ -20,5 +26,3 @@ SKIP: {
+         or print("# Time::HiRes::time() not close to CORE::time()\n");
+     printf("# s = $s, n = $n, s/n = %s\n", abs($s)/$n);
+ }
+-
+-1;
+diff --git a/t/tv_interval.t b/t/tv_interval.t
+index 8ac876d..479d1d6 100644
+--- a/t/tv_interval.t
++++ b/t/tv_interval.t
+@@ -6,5 +6,3 @@ BEGIN { require_ok "Time::HiRes"; }
+ 
+ my $f = Time::HiRes::tv_interval [5, 100_000], [10, 500_000];
+ ok abs($f - 5.4) < 0.001 or print("# $f\n");
+-
+-1;
+diff --git a/t/ualarm.t b/t/ualarm.t
+index d478224..3521b59 100644
+--- a/t/ualarm.t
++++ b/t/ualarm.t
+@@ -109,5 +109,3 @@ for my $n (100_000, 1_100_000, 2_200_000, 4_300_000) {
+     my $got2 = Time::HiRes::ualarm(0);
+     ok $got2 == 0 or print("# $got2\n");
+ }
+-
+-1;
+diff --git a/t/usleep.t b/t/usleep.t
+index 396341d..ebfd8bb 100644
+--- a/t/usleep.t
++++ b/t/usleep.t
+@@ -75,5 +75,3 @@ SKIP: {
+         ok $a < $limit or print("# $msg\n");
+     }
+ }
+-
+-1;
+diff --git a/t/utime.t b/t/utime.t
+index 8a4f071..220f7c1 100644
+--- a/t/utime.t
++++ b/t/utime.t
+@@ -248,5 +248,3 @@ print "# negative mtime dies;\n";
+ };
+ 
+ done_testing();
+-
+-1;
+-- 
+2.54.0
+
