@@ -7,7 +7,7 @@ Name: binutils%{?_with_debug:-debug}
 # The variable %%{source} (see below) should be set to indicate which of these
 # origins is being used.
 Version: 2.45.1
-Release: 5%{?dist}
+Release: 5.1%{?dist}
 License: GPL-3.0-or-later AND (GPL-3.0-or-later WITH Bison-exception-2.2) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND BSD-3-Clause AND GFDL-1.3-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-2.0-or-later
 URL: https://sourceware.org/binutils
 
@@ -339,6 +339,24 @@ Patch20: binutils-CVE-2025-11083.patch
 #            input file.  PR 33464
 # Lifetime: Fixed in 2.46
 Patch21: binutils-CVE-2025-11082.patch
+
+# Purpose:  Fix two out-of-bounds accesses in xcoff_link_add_symbols:
+#            improperly bounds-checked XTY_LD x_scnlen index (CVE-2026-3441)
+#            and unchecked r_symndx array index (CVE-2026-3442).
+# Lifetime: Fixed in 2.47
+Patch22: binutils-CVE-2026-3441-CVE-2026-3442.patch
+
+# Purpose:  Fix buffer overflow in xcoff_link_add_symbols where reloc_info
+#            array was sized by section_count instead of max target_index.
+#            PR 34049 (CVE-2026-6846).
+# Lifetime: Fixed in 2.47
+Patch23: binutils-CVE-2026-6846.patch
+
+# Purpose:  Fix out-of-bounds read in XCOFF relocation processing where
+#            r_type was used as an array index without bounds checking.
+#            PR 33919 (CVE-2026-4647).
+# Lifetime: Fixed in 2.47
+Patch24: binutils-CVE-2026-4647.patch
 
 #----------------------------------------------------------------------------
 
