@@ -53,6 +53,7 @@ Common operational tasks that users or AI agents may need to perform:
 | Update dist-git packages     | `update [<pkg>]`                                | [Updating Dist-git Packages](documentation/operating/updating-dist-git-packages.md)       | Test or trigger automated package updates from Fedora        |
 | Lookaside cache access       | _(AWS credentials setup)_                       | [Lookaside Cache Access](documentation/operating/lookaside-cache-access.md)               | Set up AWS credentials to upload source tarballs             |
 | Analyze upstream diffs       | `diff --all --stat`                             | [Upstream Diff Analysis](documentation/operating/upstream-diff-analysis.md)               | Classify modified packages for upstreaming                   |
+| Report CVE data issues       | _(see docs)_                                    | [Reporting CVE Data Issues](documentation/operating/reporting-cve-data-issues.md)         | Get incorrect CVE data on cve.org or NIST corrected          |
 | Konflux resource deployment  | _(background info)_                             | [Konflux Resource Deployment](documentation/background/konflux-resource-deployment.md)    | Understand how Konflux resources are deployed                |
 
 ## Post-Import / Post-Add Requirements
