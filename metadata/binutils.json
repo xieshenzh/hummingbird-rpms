@@ -1,6 +1,6 @@
 {
   "branch": "f43",
-  "modification_reason": "Backport CVE-2026-3441, CVE-2026-3442, CVE-2026-6846, CVE-2026-4647 fixes",
+  "modification_reason": "Backport CVE-2026-3441, CVE-2026-3442, CVE-2026-6846, CVE-2026-4647 fixes; backport fix for CVE-2026-6845",
   "modification_status": "modified",
   "release": "5",
   "sha": "4c95d31d7dc88cf0cb400572d393b1f147d03802",
