@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: Python-2.0.1
 
 
@@ -427,6 +427,12 @@ Patch329: 00329-fips.patch
 # 00486 # 5ae0b81b3135319f8d75a886fb7a11fa40ac11f4
 # gh-148646: Add --enable-prebuilt-jit-stencils configure flag
 Patch486: 00486-gh-148646-add---enable-prebuilt-jit-stencils-configure-flag.patch
+
+# 00487 # CVE-2026-8723
+# qs: Denial of Service due to improper handling of null/undefined array elements
+# Update vendored qs 6.15.0 -> 6.15.2 in emscripten browser_test package-lock.json
+# Upstream fix: https://github.com/ljharb/qs/commit/21f80b33e5c8b3f7eba1034fff0da4a4a37a1d41
+Patch487: 00487-cve-2026-8723.patch
 
 # (New patches go here ^^^)
 #
