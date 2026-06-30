@@ -1,0 +1,322 @@
+From c4d1559e1f749be9fbcf6ca9ce20599e8c699083 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Tue, 23 Jun 2026 14:47:52 +0200
+Subject: [PATCH] Upgrade to 3.95
+
+---
+ Cwd.pm                     |  2 +-
+ Cwd.xs                     | 30 +++++++++++++++---------------
+ lib/File/Spec.pm           |  2 +-
+ lib/File/Spec/AmigaOS.pm   |  2 +-
+ lib/File/Spec/Cygwin.pm    |  2 +-
+ lib/File/Spec/Epoc.pm      |  2 +-
+ lib/File/Spec/Functions.pm |  2 +-
+ lib/File/Spec/Mac.pm       |  2 +-
+ lib/File/Spec/OS2.pm       |  2 +-
+ lib/File/Spec/Unix.pm      |  2 +-
+ lib/File/Spec/VMS.pm       |  2 +-
+ lib/File/Spec/Win32.pm     |  2 +-
+ t/cwd_enoent.t             |  7 ++++---
+ 13 files changed, 30 insertions(+), 29 deletions(-)
+
+diff --git a/Cwd.pm b/Cwd.pm
+index b8828b6..fe72ec0 100644
+--- a/Cwd.pm
++++ b/Cwd.pm
+@@ -3,7 +3,7 @@ use strict;
+ use Exporter;
+ 
+ 
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ my $xs_version = $VERSION;
+ $VERSION =~ tr/_//d;
+ 
+diff --git a/Cwd.xs b/Cwd.xs
+index bca575c..ac40c5c 100644
+--- a/Cwd.xs
++++ b/Cwd.xs
+@@ -76,8 +76,8 @@
+  * char *realpath(const char *path, char resolved[MAXPATHLEN]);
+  *
+  * Find the real name of path, by removing all ".", ".." and symlink
+- * components.  Returns (resolved) on success, or (NULL) on failure,
+- * in which case the path which caused trouble is left in (resolved).
++ * components.  Returns resolved on success, or NULL on failure,
++ * in which case the path which caused trouble is left in resolved.
+  */
+ static
+ char *
+@@ -98,20 +98,20 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+             resolved[0] = '/';
+             resolved[1] = '\0';
+             if (path[1] == '\0')
+-                    return (resolved);
++                    return resolved;
+             resolved_len = 1;
+             remaining_len = my_strlcpy(remaining, path + 1, sizeof(remaining));
+ 	} else {
+             if (getcwd(resolved, MAXPATHLEN) == NULL) {
+                 my_strlcpy(resolved, ".", MAXPATHLEN);
+-                return (NULL);
++                return NULL;
+             }
+             resolved_len = strlen(resolved);
+             remaining_len = my_strlcpy(remaining, path, sizeof(remaining));
+ 	}
+ 	if (remaining_len >= sizeof(remaining) || resolved_len >= MAXPATHLEN) {
+             errno = ENAMETOOLONG;
+-            return (NULL);
++            return NULL;
+ 	}
+ 
+ 	/*
+@@ -129,7 +129,7 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+ 
+             if ((STRLEN)(s - remaining) >= (STRLEN)sizeof(next_token)) {
+                 errno = ENAMETOOLONG;
+-                return (NULL);
++                return NULL;
+             }
+             memcpy(next_token, remaining, s - remaining);
+             next_token[s - remaining] = '\0';
+@@ -147,7 +147,7 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+             if (resolved[resolved_len - 1] != '/') {
+                 if (resolved_len + 1 >= MAXPATHLEN) {
+                     errno = ENAMETOOLONG;
+-                    return (NULL);
++                    return NULL;
+                 }
+                 resolved[resolved_len++] = '/';
+                 resolved[resolved_len] = '\0';
+@@ -178,7 +178,7 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+             resolved_len = my_strlcat(resolved, next_token, MAXPATHLEN);
+             if (resolved_len >= MAXPATHLEN) {
+                 errno = ENAMETOOLONG;
+-                return (NULL);
++                return NULL;
+             }
+ #if defined(HAS_LSTAT) && defined(HAS_READLINK) && defined(HAS_SYMLINK)
+             {
+@@ -186,9 +186,9 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+                 if (PerlLIO_lstat(resolved, &sb) != 0) {
+                     if (errno == ENOENT && p == NULL) {
+                         errno = serrno;
+-                        return (resolved);
++                        return resolved;
+                     }
+-                    return (NULL);
++                    return NULL;
+                 }
+                 if (S_ISLNK(sb.st_mode)) {
+                     int slen;
+@@ -196,11 +196,11 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+ 
+                     if (symlinks++ > MAXSYMLINKS) {
+                         errno = ELOOP;
+-                        return (NULL);
++                        return NULL;
+                     }
+                     slen = PerlLIO_readlink(resolved, symlink, sizeof(symlink) - 1);
+                     if (slen < 0)
+-                        return (NULL);
++                        return NULL;
+                     symlink[slen] = '\0';
+ #  ifdef OS390
+                     /* Replace all instances of $SYSNAME/foo simply by /foo */
+@@ -232,7 +232,7 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+                         if (symlink[slen - 1] != '/') {
+                             if ((STRLEN)(slen + 1) >= (STRLEN)sizeof(symlink)) {
+                                 errno = ENAMETOOLONG;
+-                                return (NULL);
++                                return NULL;
+                             }
+                             symlink[slen] = '/';
+                             symlink[slen + 1] = 0;
+@@ -240,7 +240,7 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+                         remaining_len = my_strlcat(symlink, remaining, sizeof(symlink));
+                         if (remaining_len >= sizeof(remaining)) {
+                             errno = ENAMETOOLONG;
+-                            return (NULL);
++                            return NULL;
+                         }
+                     }
+                     remaining_len = my_strlcpy(remaining, symlink, sizeof(remaining));
+@@ -258,7 +258,7 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+ 	 */
+ 	if (resolved_len > 1 && resolved[resolved_len - 1] == '/')
+             resolved[resolved_len - 1] = '\0';
+-	return (resolved);
++	return resolved;
+ }
+ #endif
+ 
+diff --git a/lib/File/Spec.pm b/lib/File/Spec.pm
+index a6a5e7c..d8f991f 100644
+--- a/lib/File/Spec.pm
++++ b/lib/File/Spec.pm
+@@ -4,7 +4,7 @@ use strict;
+ 
+ # Keep $VERSION consistent in all *.pm files in this distribution, including
+ # Cwd.pm.
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ $VERSION =~ tr/_//d;
+ 
+ my %module = (
+diff --git a/lib/File/Spec/AmigaOS.pm b/lib/File/Spec/AmigaOS.pm
+index 2a95123..bb354b1 100644
+--- a/lib/File/Spec/AmigaOS.pm
++++ b/lib/File/Spec/AmigaOS.pm
+@@ -3,7 +3,7 @@ package File::Spec::AmigaOS;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Cygwin.pm b/lib/File/Spec/Cygwin.pm
+index 2c97c81..d6e8f9f 100644
+--- a/lib/File/Spec/Cygwin.pm
++++ b/lib/File/Spec/Cygwin.pm
+@@ -3,7 +3,7 @@ package File::Spec::Cygwin;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Epoc.pm b/lib/File/Spec/Epoc.pm
+index a95fb3b..c5a3e3f 100644
+--- a/lib/File/Spec/Epoc.pm
++++ b/lib/File/Spec/Epoc.pm
+@@ -2,7 +2,7 @@ package File::Spec::Epoc;
+ 
+ use strict;
+ 
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ $VERSION =~ tr/_//d;
+ 
+ require File::Spec::Unix;
+diff --git a/lib/File/Spec/Functions.pm b/lib/File/Spec/Functions.pm
+index 94f3126..146776f 100644
+--- a/lib/File/Spec/Functions.pm
++++ b/lib/File/Spec/Functions.pm
+@@ -3,7 +3,7 @@ package File::Spec::Functions;
+ use File::Spec;
+ use strict;
+ 
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ $VERSION =~ tr/_//d;
+ 
+ require Exporter;
+diff --git a/lib/File/Spec/Mac.pm b/lib/File/Spec/Mac.pm
+index 4dc2e19..453dd86 100644
+--- a/lib/File/Spec/Mac.pm
++++ b/lib/File/Spec/Mac.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/OS2.pm b/lib/File/Spec/OS2.pm
+index 77a9509..74cc311 100644
+--- a/lib/File/Spec/OS2.pm
++++ b/lib/File/Spec/OS2.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Unix.pm b/lib/File/Spec/Unix.pm
+index 96d1d6c..0da74d3 100644
+--- a/lib/File/Spec/Unix.pm
++++ b/lib/File/Spec/Unix.pm
+@@ -3,7 +3,7 @@ package File::Spec::Unix;
+ use strict;
+ use Cwd ();
+ 
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ $VERSION =~ tr/_//d;
+ 
+ =head1 NAME
+diff --git a/lib/File/Spec/VMS.pm b/lib/File/Spec/VMS.pm
+index 3730d6d..48211ee 100644
+--- a/lib/File/Spec/VMS.pm
++++ b/lib/File/Spec/VMS.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Win32.pm b/lib/File/Spec/Win32.pm
+index 297a757..3964b01 100644
+--- a/lib/File/Spec/Win32.pm
++++ b/lib/File/Spec/Win32.pm
+@@ -5,7 +5,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.94';
++our $VERSION = '3.95';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/t/cwd_enoent.t b/t/cwd_enoent.t
+index fcd0008..55f94dc 100644
+--- a/t/cwd_enoent.t
++++ b/t/cwd_enoent.t
+@@ -5,6 +5,7 @@ use Config;
+ use Errno qw();
+ use File::Temp qw(tempdir);
+ use Test::More;
++use Cwd ();
+ 
+ if($^O eq "cygwin") {
+     # This test skipping should be removed when the Cygwin bug is fixed.
+@@ -13,13 +14,15 @@ if($^O eq "cygwin") {
+ my $prefix = $Config{prefix};
+ my $osvers = $Config{osvers};
+ 
++my $cwd = Cwd::getcwd();
++END { chdir $cwd; }
++
+ my $tmp = tempdir(CLEANUP => 1);
+ unless(mkdir("$tmp/testdir") && chdir("$tmp/testdir") && rmdir("$tmp/testdir")){
+     plan skip_all => "can't be in non-existent directory";
+ }
+ 
+ plan tests => 8;
+-require Cwd;
+ 
+ my @acceptable_errnos = (&Errno::ENOENT, (defined &Errno::ESTALE ? &Errno::ESTALE : ()));
+ foreach my $type (qw(regular perl)) {
+@@ -59,6 +62,4 @@ foreach my $type (qw(regular perl)) {
+ 
+ chdir $tmp or die "$tmp: $!";
+ 
+-END { chdir $tmp; }
+-
+ 1;
+-- 
+2.54.0
+
