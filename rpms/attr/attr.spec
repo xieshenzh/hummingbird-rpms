@@ -4,10 +4,9 @@ Version: 2.6.0
 Release: 9.1%{?dist}
 Source0: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.gz
 Source1: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.gz.sig
-# Retreived from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
+# attr 2.6.0 tarball is signed by Andreas Gruenbacher (user_id=15000)
+# Retrieved from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
 Source2: agruen-key.gpg
-# Retrieved from https://savannah.nongnu.org/people/viewgpg.php?user_id=42032
-# Source2: vapier-key.gpg
 
 License: GPL-2.0-or-later
 URL: https://savannah.nongnu.org/projects/attr
