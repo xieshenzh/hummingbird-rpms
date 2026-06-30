@@ -1,6 +1,6 @@
 %global major_version 3
 %global minor_version 4
-%global teeny_version 8
+%global teeny_version 9
 %global major_minor_version %{major_version}.%{minor_version}
 %global ruby_major_minor %{major_version}.%{minor_version}
 %global _rubygem_pkg rubygem%{ruby_major_minor}
@@ -111,7 +111,7 @@
 %global win32ole_version 1.9.1
 %global win32_registry_version 0.1.0
 %global yaml_version 0.4.0
-%global zlib_version 3.2.1
+%global zlib_version 3.2.3
 
 # Gemified default gems.
 %global io_console_version 0.8.1
@@ -192,7 +192,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 31.3%{?dist}
+Release: 31.4%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -1954,6 +1954,10 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 
 
 %changelog
+* Mon Jun 29 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.9-30
+- Update to Ruby 3.4.9
+- Resolves: CVE-2026-27820
+
 * Wed Dec 17 2025 Vít Ondruch <vondruch@redhat.com> - 3.4.8-29
 - Update to Ruby 3.4.8.
   Resolves: rhbz#2422963
