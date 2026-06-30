@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to 2.15.3 (ahead of Fedora)",
+  "modification_reason": "Update to 2.15.3 (ahead of Fedora); Backport fix for CVE-2026-11979",
   "modification_status": "modified",
   "release": "0.1",
   "sha": "93d41c31ba576bf339d17ba20537fffd45c0af46",
