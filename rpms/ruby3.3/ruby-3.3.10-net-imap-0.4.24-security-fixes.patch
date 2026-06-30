@@ -1,0 +1,465 @@
+diff --git a/lib/net/imap.rb b/lib/net/imap.rb
+index 84bc0946e808..16b91c36c74e 100644
+--- a/lib/net/imap.rb
++++ b/lib/net/imap.rb
+@@ -460,6 +460,9 @@ module Net
+   #   +LITERAL-+, and +SPECIAL-USE+.</em>
+   #
+   # ==== RFC2087: +QUOTA+
++  # +NOTE:+ Only the +STORAGE+ quota resource type is currently supported.
++  # - Obsoleted by <tt>QUOTA=RES-*</tt> [RFC9208[https://www.rfc-editor.org/rfc/rfc9208]],
++  #   although the commands are backward compatible.
+   # - #getquota: returns the resource usage and limits for a quota root
+   # - #getquotaroot: returns the list of quota roots for a mailbox, as well as
+   #   their resource usage and limits.
+@@ -572,6 +575,16 @@ module Net
+   #   See FetchData#emailid and FetchData#emailid.
+   # - Updates #status with support for the +MAILBOXID+ status attribute.
+   #
++  # ==== RFC9208: <tt>QUOTA=RES-*</tt>
++  # +NOTE:+ Only the +STORAGE+ quota resource type is currently supported.
++  # - Obsoletes the +QUOTA+ [RFC2087[https://www.rfc-editor.org/rfc/rfc2087]]
++  #   extension and provides strict semantics for different resource types.
++  # - #getquota: returns the resource usage and limits for a quota root
++  # - #getquotaroot: returns the list of quota roots for a mailbox, as well as
++  #   their resource usage and limits.
++  # - #setquota: sets the resource limits for a given quota root.
++  # - Updates #status with <tt>"DELETED"</tt> and +DELETED-STORAGE+ attributes.
++  #
+   # == References
+   #
+   # [{IMAP4rev1}[https://www.rfc-editor.org/rfc/rfc3501.html]]::
+@@ -681,14 +694,13 @@ module Net
+   #
+   # === \IMAP Extensions
+   #
+-  # [QUOTA[https://tools.ietf.org/html/rfc9208]]::
+-  #   Melnikov, A., "IMAP QUOTA Extension", RFC 9208, DOI 10.17487/RFC9208,
+-  #   March 2022, <https://www.rfc-editor.org/info/rfc9208>.
++  # [QUOTA[https://www.rfc-editor.org/rfc/rfc2087]]::
++  #   Myers, J., "IMAP4 QUOTA extension", RFC 2087, DOI 10.17487/RFC2087,
++  #   January 1997, <https://www.rfc-editor.org/info/rfc2087>.
+   #
+-  #   <em>Note: obsoletes</em>
+-  #   RFC-2087[https://tools.ietf.org/html/rfc2087]<em> (January 1997)</em>.
+-  #   <em>Net::IMAP does not fully support the RFC9208 updates yet.</em>
+-  # [IDLE[https://tools.ietf.org/html/rfc2177]]::
++  #   *NOTE*: _obsoleted_ by RFC9208[https://www.rfc-editor.org/rfc/rfc9208]
++  #   (March 2022).
++  # [IDLE[https://www.rfc-editor.org/rfc/rfc2177]]::
+   #   Leiba, B., "IMAP4 IDLE command", RFC 2177, DOI 10.17487/RFC2177,
+   #   June 1997, <https://www.rfc-editor.org/info/rfc2177>.
+   # [NAMESPACE[https://tools.ietf.org/html/rfc2342]]::
+@@ -739,9 +751,15 @@ module Net
+   #   Gondwana, B., Ed., "IMAP Extension for Object Identifiers",
+   #   RFC 8474, DOI 10.17487/RFC8474, September 2018,
+   #   <https://www.rfc-editor.org/info/rfc8474>.
++  # [{QUOTA=RES-*}[https://www.rfc-editor.org/rfc/rfc9208]]::
++  #   Melnikov, A., "IMAP QUOTA Extension", RFC 9208, DOI 10.17487/RFC9208,
++  #   March 2022, <https://www.rfc-editor.org/info/rfc9208>.
++  #
++  #   Obsoletes RFC2087[https://www.rfc-editor.org/rfc/rfc2087].
+   #
+   # === IANA registries
+   # * {IMAP Capabilities}[http://www.iana.org/assignments/imap4-capabilities]
++  #   * {IMAP Quota Resource Types}[http://www.iana.org/assignments/imap4-capabilities#imap-capabilities-2]
+   # * {IMAP Response Codes}[https://www.iana.org/assignments/imap-response-codes/imap-response-codes.xhtml]
+   # * {IMAP Mailbox Name Attributes}[https://www.iana.org/assignments/imap-mailbox-name-attributes/imap-mailbox-name-attributes.xhtml]
+   # * {IMAP and JMAP Keywords}[https://www.iana.org/assignments/imap-jmap-keywords/imap-jmap-keywords.xhtml]
+@@ -761,7 +779,7 @@ module Net
+   # * {IMAP URLAUTH Authorization Mechanism Registry}[https://www.iana.org/assignments/urlauth-authorization-mechanism-registry/urlauth-authorization-mechanism-registry.xhtml]
+   #
+   class IMAP < Protocol
+-    VERSION = "0.4.21"
++    VERSION = "0.4.24"
+ 
+     # Aliases for supported capabilities, to be used with the #enable command.
+     ENABLE_ALIASES = {
+@@ -1294,9 +1312,11 @@ module Net
+     #
+     def starttls(**options)
+       @ssl_ctx_params, @ssl_ctx = build_ssl_ctx(options)
++      handled = false
+       error = nil
+       ok = send_command("STARTTLS") do |resp|
+         if resp.kind_of?(TaggedResponse) && resp.name == "OK"
++          handled = true
+           clear_cached_capabilities
+           clear_responses
+           start_tls_session
+@@ -1308,6 +1328,13 @@ module Net
+         disconnect
+         raise error
+       end
++      unless handled
++        disconnect
++        raise InvalidResponseError,
++              "STARTTLS handler was bypassed, although server responded %p" % [
++                ok.raw_data.chomp
++              ]
++      end
+       ok
+     end
+ 
+@@ -1742,12 +1769,18 @@ module Net
+     # to both admin and user.  If this mailbox exists, it returns an array
+     # containing objects of type MailboxQuotaRoot and MailboxQuota.
+     #
++    # *NOTE:* Currently, Net::IMAP only supports +QUOTA+ responses with a single
++    # resource type.  This is usually +STORAGE+, but you may need to verify this
++    # with UntaggedResponse#raw_data.
++    #
+     # Related: #getquota, #setquota, MailboxQuotaRoot, MailboxQuota
+     #
+     # ===== Capabilities
+     #
+-    # The server's capabilities must include +QUOTA+
+-    # [RFC2087[https://tools.ietf.org/html/rfc2087]].
++    # Requires +QUOTA+ [RFC2087[https://www.rfc-editor.org/rfc/rfc2087]]
++    # capability, or a capability prefixed with <tt>QUOTA=RES-*</tt>
++    # {[RFC9208]}[https://www.rfc-editor.org/rfc/rfc9208] for each supported
++    # resource type.
+     def getquotaroot(mailbox)
+       synchronize do
+         send_command("GETQUOTAROOT", mailbox)
+@@ -1759,41 +1792,59 @@ module Net
+     end
+ 
+     # Sends a {GETQUOTA command [RFC2087 §4.2]}[https://www.rfc-editor.org/rfc/rfc2087#section-4.2]
+-    # along with specified +mailbox+.  If this mailbox exists, then an array
+-    # containing a MailboxQuota object is returned.  This command is generally
+-    # only available to server admin.
++    # for the +quota_root+.  If this quota root exists, then an array
++    # containing a MailboxQuota object is returned.
++    #
++    # The names of quota roots that are applicable to a particular mailbox can
++    # be discovered with #getquotaroot.
++    #
++    # *NOTE:* Currently, Net::IMAP only supports +QUOTA+ responses with a single
++    # resource type.  This is usually +STORAGE+, but you may need to verify this
++    # with UntaggedResponse#raw_data.
+     #
+     # Related: #getquotaroot, #setquota, MailboxQuota
+     #
+     # ===== Capabilities
+     #
+-    # The server's capabilities must include +QUOTA+
+-    # [RFC2087[https://tools.ietf.org/html/rfc2087]].
+-    def getquota(mailbox)
++    # Requires +QUOTA+ [RFC2087[https://www.rfc-editor.org/rfc/rfc2087]]
++    # capability, or a capability prefixed with <tt>QUOTA=RES-*</tt>
++    # {[RFC9208]}[https://www.rfc-editor.org/rfc/rfc9208] for each supported
++    # resource type.
++    def getquota(quota_root)
+       synchronize do
+-        send_command("GETQUOTA", mailbox)
++        send_command("GETQUOTA", quota_root)
+         clear_responses("QUOTA")
+       end
+     end
+ 
+     # Sends a {SETQUOTA command [RFC2087 §4.1]}[https://www.rfc-editor.org/rfc/rfc2087#section-4.1]
+-    # along with the specified +mailbox+ and +quota+.  If +quota+ is nil, then
+-    # +quota+ will be unset for that mailbox.  Typically one needs to be logged
+-    # in as a server admin for this to work.
++    # along with the specified +quota_root+ and +storage_limit+.  If
++    # +storage_limit+ is +nil+, resource limits are unset for that quota root.
++    # If +storage_limit+ is a number, it sets the +STORAGE+ resource limit.
++    #
++    #   imap.setquota "#user/alice", 100
++    #   imap.getquota "#user/alice"
++    #   # => [#<struct Net::IMAP::MailboxQuota mailbox="#user/alice" usage=54 quota=100>]
++    #
++    # Typically one needs to be logged in as a server admin for this to work.
++    #
++    # *NOTE:* Currently, Net::IMAP only supports setting +STORAGE+ quota limits.
+     #
+     # Related: #getquota, #getquotaroot
+     #
+     # ===== Capabilities
+     #
+-    # The server's capabilities must include +QUOTA+
+-    # [RFC2087[https://tools.ietf.org/html/rfc2087]].
+-    def setquota(mailbox, quota)
+-      if quota.nil?
+-        data = '()'
++    # Requires +QUOTA+ [RFC2087[https://www.rfc-editor.org/rfc/rfc2087]]
++    # capability, or both +QUOTASET+ and a capability prefixed with
++    # <tt>QUOTA=RES-*</tt> {[RFC9208]}[https://www.rfc-editor.org/rfc/rfc9208]
++    # for each supported resource type.
++    def setquota(quota_root, storage_limit)
++      if storage_limit.nil?
++        list = []
+       else
+-        data = '(STORAGE ' + quota.to_s + ')'
++        list = ["STORAGE", Integer(storage_limit)]
+       end
+-      send_command("SETQUOTA", mailbox, RawData.new(data))
++      send_command("SETQUOTA", quota_root, list)
+     end
+ 
+     # Sends a {SETACL command [RFC4314 §3.1]}[https://www.rfc-editor.org/rfc/rfc4314#section-3.1]
+@@ -1900,7 +1951,10 @@ module Net
+     # <tt>STATUS=SIZE</tt>
+     # {[RFC8483]}[https://www.rfc-editor.org/rfc/rfc8483.html].
+     #
+-    # +DELETED+ requires the server's capabilities to include +IMAP4rev2+.
++    # +DELETED+ must be supported when the server's capabilities includes
++    # +IMAP4rev2+.
++    # or <tt>QUOTA=RES-MESSAGES</tt>
++    # {[RFC9208]}[https://www.rfc-editor.org/rfc/rfc9208.html].
+     #
+     # +HIGHESTMODSEQ+ requires the server's capabilities to include +CONDSTORE+
+     # {[RFC7162]}[https://www.rfc-editor.org/rfc/rfc7162.html].
+@@ -2049,6 +2103,14 @@ module Net
+     #
+     # ===== Search criteria
+     #
++    # >>>
++    #   When +criteria+ is an Array, elements in the array will be validated and
++    #   formatted.  When +criteria+ is a String, it will be sent <em>with
++    #   minimal validation and no encoding or formatting</em>.
++    #
++    #   <em>*WARNING:* Although CRLF is prohibited, this is vulnerable to other
++    #   types of attribute injection attack if unvetted user input is used.</em>
++    #
+     # For a full list of search criteria,
+     # see [{IMAP4rev1 §6.4.4}[https://www.rfc-editor.org/rfc/rfc3501.html#section-6.4.4]],
+     # or  [{IMAP4rev2 §6.4.4}[https://www.rfc-editor.org/rfc/rfc9051.html#section-6.4.4]],
+@@ -2136,6 +2198,13 @@ module Net
+     #
+     # +attr+ is a list of attributes to fetch; see the documentation
+     # for FetchData for a list of valid attributes.
++    # >>>
++    #   When +attr+ is a String, it will be sent <em>with minimal validation and
++    #   no encoding or formatting</em>.  When +attr+ is an Array, each String in
++    #   +attr+ will be sent this way.
++    #
++    #   <em>*WARNING:* Although CRLF is prohibited, this is vulnerable to other
++    #   types of attribute injection attack if unvetted user input is used.</em>
+     #
+     # +changedsince+ is an optional integer mod-sequence.  It limits results to
+     # messages with a mod-sequence greater than +changedsince+.
+@@ -2691,7 +2760,7 @@ module Net
+           warn(RESPONSES_DEPRECATION_MSG, uplevel: 1)
+         when :frozen_dup
+           synchronize {
+-            responses = @responses.transform_values(&:freeze)
++            responses = @responses.transform_values { _1.dup.freeze }
+             responses.default_proc = nil
+             responses.default = [].freeze
+             return responses.freeze
+@@ -2992,6 +3061,7 @@ module Net
+           put_string(" ")
+           send_data(i, tag)
+         end
++        guard_against_tagged_response_skipping_handler!(tag)
+         put_string(CRLF)
+         if cmd == "LOGOUT"
+           @logout_command_tag = tag
+@@ -3007,6 +3077,17 @@ module Net
+           end
+         end
+       end
++    rescue InvalidResponseError
++      disconnect
++      raise
++    end
++
++    def guard_against_tagged_response_skipping_handler!(tag)
++      return unless (resp = @tagged_responses[tag])&.name&.upcase == "OK"
++      raise(InvalidResponseError,
++            "Server sent tagged 'OK' before command was finished: %p. " \
++            "This could indicate a malicious server or client-side " \
++            "command injection. Disconnecting." % [resp.raw_data.chomp])
+     end
+ 
+     def generate_tag
+@@ -3071,7 +3152,7 @@ module Net
+     end
+ 
+     def store_internal(cmd, set, attr, flags, unchangedsince: nil)
+-      attr = RawData.new(attr) if attr.instance_of?(String)
++      attr = Atom.new(attr) if attr.instance_of?(String)
+       args = [MessageSet.new(set)]
+       args << ["UNCHANGEDSINCE", Integer(unchangedsince)] if unchangedsince
+       args << attr << flags
+diff --git a/lib/net/imap/response_reader.rb b/lib/net/imap/response_reader.rb
+index fd7561fa7dc2..5ba837259a35 100644
+--- a/lib/net/imap/response_reader.rb
++++ b/lib/net/imap/response_reader.rb
+@@ -8,6 +8,7 @@ module Net
+ 
+       def initialize(client, sock)
+         @client, @sock = client, sock
++        @buff = @literal_size = nil
+       end
+ 
+       def read_response_buffer
+@@ -15,13 +16,13 @@ module Net
+         catch :eof do
+           while true
+             read_line
+-            break unless (@literal_size = get_literal_size)
++            break unless literal_size
+             read_literal
+           end
+         end
+         buff
+       ensure
+-        @buff = nil
++        @buff = @literal_size = nil
+       end
+ 
+       private
+@@ -31,12 +32,18 @@ module Net
+       def bytes_read;       buff.bytesize                         end
+       def empty?;           buff.empty?                           end
+       def done?;            line_done? && !get_literal_size       end
++      def done?;            line_done? && !literal_size           end
+       def line_done?;       buff.end_with?(CRLF)                  end
+-      def get_literal_size; /\{(\d+)\}\r\n\z/n =~ buff && $1.to_i end
++
++      def get_literal_size(buff)
++        buff.end_with?("}\r\n") && buff.rindex(/\{(\d+)\}\r\n\z/n) && $1.to_i
++      end
+ 
+       def read_line
+-        buff << (@sock.gets(CRLF, read_limit) or throw :eof)
++        line = (@sock.gets(CRLF, read_limit) or throw :eof)
++        buff << line
+         max_response_remaining! unless line_done?
++        @literal_size = get_literal_size(line)
+       end
+ 
+       def read_literal
+diff --git a/lib/net/imap/sasl/scram_authenticator.rb b/lib/net/imap/sasl/scram_authenticator.rb
+index 141e8321cc15..47cb4c49d06d 100644
+--- a/lib/net/imap/sasl/scram_authenticator.rb
++++ b/lib/net/imap/sasl/scram_authenticator.rb
+@@ -75,13 +75,19 @@ module Net
+         # * #password ― Password or passphrase associated with this #username.
+         # * _optional_ #authzid ― Alternate identity to act as or on behalf of.
+         # * _optional_ #min_iterations - Overrides the default value (4096).
++        # * _optional_ #max_iterations - Overrides the default value (2³¹ - 1).
+         #
+         # Any other keyword parameters are quietly ignored.
++        #
++        # *NOTE:* <em>It is the user's responsibility</em> to enforce minimum
++        # and maximum iteration counts that are appropriate for their security
++        # context.
+         def initialize(username_arg = nil, password_arg = nil,
+                        authcid: nil, username: nil,
+                        authzid: nil,
+                        password: nil, secret: nil,
+                        min_iterations: 4096, # see both RFC5802 and RFC7677
++                       max_iterations: 2**31 - 1,  # max int32
+                        cnonce: nil, # must only be set in tests
+                        **options)
+           @username = username || username_arg || authcid or
+@@ -94,7 +100,22 @@ module Net
+           @min_iterations.positive? or
+             raise ArgumentError, "min_iterations must be positive"
+ 
++          @max_iterations = Integer max_iterations.to_int
++          @min_iterations <= @max_iterations or
++            raise ArgumentError, "max_iterations must be more than min_iterations"
++
+           @cnonce = cnonce || SecureRandom.base64(32)
++
++          # These attrs are set from the server challenges
++          @server_first_message = @snonce = @salt = @iterations = nil
++          @server_error = nil
++
++          # Memoized after @salt and @iterations have been sent.
++          @salted_password = @client_key = @server_key = nil
++
++          # These values are created and cached in response to server challenges
++          @client_first_message_bare = nil
++          @client_final_message_without_proof = nil
+         end
+ 
+         # Authentication identity: the identity that matches the #password.
+@@ -127,8 +148,43 @@ module Net
+ 
+         # The minimal allowed iteration count.  Lower #iterations will raise an
+         # Error.
++        #
++        # *WARNING:* The default value (4096) is set to match guidance from
++        # both {RFC5802}[https://www.rfc-editor.org/rfc/rfc5802#page-12]
++        # and RFC7677[https://www.rfc-editor.org/rfc/rfc7677#section-4], but
++        # {modern recommendations}[https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2]
++        # are significantly higher.
++        #
++        # It is ultimately the server's responsibility to securely store
++        # password hashes.  While this parameter can alert the user to
++        # insecure password storage and prevent insecure authentication
++        # exchange, updating the iteration count generally requires resetting
++        # the password on the server.
+         attr_reader :min_iterations
+ 
++        # The maximal allowed iteration count.  Higher #iterations will raise an
++        # Error.
++        #
++        # As noted in {RFC5802}[https://www.rfc-editor.org/rfc/rfc5802#section-9]
++        # >>>
++        #   A hostile server can perform a computational denial-of-service
++        #   attack on clients by sending a big iteration count value.
++        #
++        # *WARNING:* The default value is <tt>2³¹ - 1</tt>, the maximum signed
++        # 32-bit integer.  This is large enough for the computation to take
++        # several minutes, and insufficient protection against hostile servers.
++        #
++        # Note that <tt>OpenSSL::KDF.pbkdf2_hmac</tt> is implemented by a
++        # blocking C function, and cannot be interrupted by +Timeout+ or
++        # <tt>Thread.raise</tt>.  And it keeps the Global VM lock, as of v4.0 of
++        # the +openssl+ gem, so other ruby threads will not be able to run.
++        #
++        # <em>To prevent a denial of service attack,</em> this must be set to a
++        # safe value, depending on hardware and version of OpenSSL.  <em>It is
++        # the user's responsibility</em> to enforce minimum and maximum
++        # iteration counts that are appropriate for their security context.
++        attr_reader :max_iterations
++
+         # The client nonce, generated by SecureRandom
+         attr_reader :cnonce
+ 
+@@ -147,6 +203,15 @@ module Net
+         # Net::IMAP::NoResponseError.
+         attr_reader :server_error
+ 
++        # Memoized ScramAlgorithm#salted_password (needs #salt and #iterations)
++        def salted_password; @salted_password ||= compute_salted { super } end
++
++        # Memoized ScramAlgorithm#client_key (needs #salt and #iterations)
++        def client_key; @client_key ||= compute_salted { super } end
++
++        # Memoized ScramAlgorithm#server_key (needs #salt and #iterations)
++        def server_key; @server_key ||= compute_salted { super } end
++
+         # Returns a new OpenSSL::Digest object, set to the appropriate hash
+         # function for the chosen mechanism.
+         #
+@@ -186,6 +251,13 @@ module Net
+ 
+         private
+ 
++        # Checks for +salt+ and +iterations+ before yielding
++        def compute_salted
++          String === salt        or raise Error, "unknown salt"
++          Integer === iterations or raise Error, "unknown iterations"
++          yield
++        end
++
+         # Need to store this for auth_message
+         attr_reader :server_first_message
+ 
+@@ -202,6 +274,8 @@ module Net
+             raise Error, "server did not send iteration count"
+           min_iterations <= iterations or
+             raise Error, "too few iterations: %d" % [iterations]
++          max_iterations.nil? || iterations <= max_iterations or
++            raise Error, "too many iterations: %d" % [iterations]
+           mext = sparams["m"] and
+             raise Error, "mandatory extension: %p" % [mext]
+           snonce.start_with? cnonce or
