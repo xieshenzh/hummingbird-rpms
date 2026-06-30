@@ -1,7 +1,7 @@
 Summary: Access control list utilities
 Name: acl
-Version: 2.3.2
-Release: 7%{?dist}
+Version: 2.4.0
+Release: 0.1%{?dist}
 BuildRequires: gawk
 BuildRequires: gcc
 BuildRequires: gettext
@@ -12,13 +12,8 @@ BuildRequires: gnupg2
 Requires: libacl%{?_isa} = %{version}-%{release}
 Source0: https://download-mirror.savannah.gnu.org/releases/acl/acl-%{version}.tar.gz
 Source1: https://download-mirror.savannah.gnu.org/releases/acl/acl-%{version}.tar.gz.sig
-# Retreived from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
-# Source2: agruen-key.gpg
-# Retrieved from https://savannah.nongnu.org/people/viewgpg.php?user_id=42032
-Source2: vapier-key.gpg
-
-# avoid permission denied problem with LD_PRELOAD in the test-suite
-Patch1: 0001-acl-2.2.53-test-runwrapper.patch
+# Retrieved from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
+Source2: agruen-key.gpg
 
 License: GPL-2.0-or-later AND LGPL-2.1-or-later
 URL: https://savannah.nongnu.org/projects/acl
