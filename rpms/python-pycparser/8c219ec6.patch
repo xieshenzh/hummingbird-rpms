@@ -1,0 +1,23 @@
+From 8c219ec62ea3bf835c473954f30ea9b1202069eb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Mon, 23 Mar 2026 14:18:23 +0100
+Subject: [PATCH] Drop an unneeded direct build depndency on wheel (#597)
+
+- wheel is not needed to build sdists
+ - with setuptools 71+, wheel is not needed to build wheels either
+ - older setuptools would communicate the dependency on wheel themselves
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 5b9d7d38..9bc8da7f 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools>=69", "wheel"]
++requires = ["setuptools>=69"]
+ build-backend = "setuptools.build_meta"
+ 
+ [project]
