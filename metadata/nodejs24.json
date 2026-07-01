@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 24.18.0",
+  "modification_reason": "Update to upstream version 24.18.0; backport fix for CVE-2026-13149",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 8251,
