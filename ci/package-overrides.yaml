@@ -27,6 +27,9 @@
 # All available MPLs can be found in the:
 # https://konflux.pages.redhat.com/docs/users/getting-started/multi-platform-builds.html documentation.
 
+acl:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 aom:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
