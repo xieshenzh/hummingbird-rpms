@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "0319ddebb0629b4d901dc4a9b4a0a3dbf86e3b53",
+  "sha": "bb849b505bd689d961f556217c8d7ea90352671e",
   "source": "https://src.fedoraproject.org/rpms/libsepol.git",
   "upstream_repo": "https://github.com/SELinuxProject/selinux",
-  "version": "3.10"
+  "version": "3.11"
 }
