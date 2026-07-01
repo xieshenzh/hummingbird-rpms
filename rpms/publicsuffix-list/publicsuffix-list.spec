@@ -1,8 +1,8 @@
 %bcond_without  dafsa
 
 Name:           publicsuffix-list
-Version:        20260116
-Release:        1.1%{?dist}
+Version:        20260624
+Release:        1%{?dist}
 Summary:        Cross-vendor public domain suffix database
 
 License:        MPL-2.0

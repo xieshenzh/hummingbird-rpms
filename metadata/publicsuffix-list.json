@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "f309cd3f13ca16ef464a35f69a02b0eb9b6caa6f",
+  "sha": "2f6d2346ddfe2273a7dcff5ad1aca5eebb522f6b",
   "source": "https://src.fedoraproject.org/rpms/publicsuffix-list.git",
   "upstream_repo": "https://github.com/publicsuffix/list",
-  "version": "20260116"
+  "version": "20260624"
 }
