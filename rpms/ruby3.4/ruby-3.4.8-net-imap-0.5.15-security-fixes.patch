@@ -1,0 +1,542 @@
+diff --git a/lib/net/imap.rb b/lib/net/imap.rb
+index 16f05445e..21d7511f6 100644
+--- a/lib/net/imap.rb
++++ b/lib/net/imap.rb
+@@ -806,7 +806,7 @@ module Net
+   # * {IMAP URLAUTH Authorization Mechanism Registry}[https://www.iana.org/assignments/urlauth-authorization-mechanism-registry/urlauth-authorization-mechanism-registry.xhtml]
+   #
+   class IMAP < Protocol
+-    VERSION = "0.5.14"
++    VERSION = "0.5.15"
+ 
+     # Aliases for supported capabilities, to be used with the #enable command.
+     ENABLE_ALIASES = {
+@@ -1149,22 +1149,24 @@ def tls_verified?; @tls_verified end
+ 
+     # Disconnects from the server.
+     #
+-    # Waits for receiver thread to close before returning.  Slow or stuck
+-    # response handlers can cause #disconnect to hang until they complete.
++    # Waits for receiver thread to close before returning, except when called
++    # from inside the connection mutex such as from a response handler.  Slow or
++    # stuck response handlers can cause #disconnect to hang until they complete.
+     #
+     # Related: #logout, #logout!
+     def disconnect
+       in_logout_state = try_state_logout?
+       return if disconnected?
++      in_receiver_thread = Thread.current == @receiver_thread
+       begin
+         @sock.to_io.shutdown
+       rescue Errno::ENOTCONN
+         # ignore `Errno::ENOTCONN: Socket is not connected' on some platforms.
+       rescue Exception => e
+-        @receiver_thread.raise(e)
++        @receiver_thread.raise(e) unless in_receiver_thread
+       end
+       @sock.close
+-      @receiver_thread.join
++      @receiver_thread.join unless mon_owned? || in_receiver_thread
+       raise e if e
+     ensure
+       # Try again after shutting down the receiver thread.  With no reciever
+@@ -2209,6 +2211,7 @@ def uid_expunge(uid_set)
+     # provided as an array or a string.
+     # See {"Argument translation"}[rdoc-ref:#search@Argument+translation]
+     # and {"Search criteria"}[rdoc-ref:#search@Search+criteria], below.
++    # <em>Please note</em> the warning for when +criteria+ is a String.
+     #
+     # +return+ options control what kind of information is returned about
+     # messages matching the search +criteria+.  Specifying +return+ should force
+@@ -2619,7 +2622,8 @@ def search(...)
+     # backward compatibility) but adds SearchResult#modseq when the +CONDSTORE+
+     # capability has been enabled.
+     #
+-    # See #search for documentation of parameters.
++    # See #search for documentation of parameters.  <em>Please note</em> the
++    # warning for when +criteria+ is a String.
+     #
+     # ==== Capabilities
+     #
+@@ -2705,7 +2709,8 @@ def fetch(...)
+     # {SequenceSet[...]}[rdoc-ref:SequenceSet@Creating+sequence+sets].
+     # (For message sequence numbers, use #fetch instead.)
+     #
+-    # +attr+ behaves the same as with #fetch.
++    # +attr+ behaves the same as with #fetch.  <em>Please note</em> the #fetch
++    # warning on the +attr+ argument.
+     # >>>
+     #   *Note:* Servers _MUST_ implicitly include the +UID+ message data item as
+     #   part of any +FETCH+ response caused by a +UID+ command, regardless of
+@@ -2917,8 +2922,10 @@ def uid_move(set, mailbox)
+ 
+     # Sends a {SORT command [RFC5256 §3]}[https://www.rfc-editor.org/rfc/rfc5256#section-3]
+     # to search a mailbox for messages that match +search_keys+ and return an
+-    # array of message sequence numbers, sorted by +sort_keys+.  +search_keys+
+-    # are interpreted the same as for #search.
++    # array of message sequence numbers, sorted by +sort_keys+.
++    #
++    # +search_keys+ are interpreted the same as the +criteria+ argument for
++    # #search.  <em>Please note</em> the #search warning for String +criteria+.
+     #
+     #--
+     # TODO: describe +sort_keys+
+@@ -2943,8 +2950,10 @@ def sort(sort_keys, search_keys, charset)
+ 
+     # Sends a {UID SORT command [RFC5256 §3]}[https://www.rfc-editor.org/rfc/rfc5256#section-3]
+     # to search a mailbox for messages that match +search_keys+ and return an
+-    # array of unique identifiers, sorted by +sort_keys+.  +search_keys+ are
+-    # interpreted the same as for #search.
++    # array of unique identifiers, sorted by +sort_keys+.
++    #
++    # +search_keys+ are interpreted the same as the +criteria+ argument for
++    # #search.  <em>Please note</em> the #search warning for String +criteria+.
+     #
+     # Related: #sort, #search, #uid_search, #thread, #uid_thread
+     #
+@@ -2958,8 +2967,10 @@ def uid_sort(sort_keys, search_keys, charset)
+ 
+     # Sends a {THREAD command [RFC5256 §3]}[https://www.rfc-editor.org/rfc/rfc5256#section-3]
+     # to search a mailbox and return message sequence numbers in threaded
+-    # format, as a ThreadMember tree.  +search_keys+ are interpreted the same as
+-    # for #search.
++    # format, as a ThreadMember tree.
++    #
++    # +search_keys+ are interpreted the same as the +criteria+ argument for
++    # #search.  <em>Please note</em> the #search warning for String +criteria+.
+     #
+     # The supported algorithms are:
+     #
+@@ -2985,6 +2996,9 @@ def thread(algorithm, search_keys, charset)
+     # Similar to #thread, but returns unique identifiers instead of
+     # message sequence numbers.
+     #
++    # +search_keys+ are interpreted the same as the +criteria+ argument for
++    # #search.  <em>Please note</em> the #search warning for String +criteria+.
++    #
+     # Related: #thread, #search, #uid_search, #sort, #uid_sort
+     #
+     # ==== Capabilities
+@@ -3094,10 +3108,11 @@ def enable(*capabilities)
+       capabilities = capabilities
+         .flatten
+         .map {|e| ENABLE_ALIASES[e] || e }
++        .flat_map { _1.is_a?(String) && !_1.empty? ? _1.split(/ /, -1) : [_1] }
+         .uniq
+-        .join(' ')
++        .map { Atom[_1] }
+       synchronize do
+-        send_command("ENABLE #{capabilities}")
++        send_command("ENABLE", *capabilities)
+         result = clear_responses("ENABLED").last || []
+         @utf8_strings ||= result.include? "UTF8=ACCEPT"
+         @utf8_strings ||= result.include? "IMAP4REV2"
+diff --git a/lib/net/imap/command_data.rb b/lib/net/imap/command_data.rb
+index 3516b4443..183f24bb2 100644
+--- a/lib/net/imap/command_data.rb
++++ b/lib/net/imap/command_data.rb
+@@ -5,6 +5,8 @@
+ require_relative "errors"
+ require_relative "data_lite"
+ 
++# :enddoc:
++
+ module Net
+   class IMAP < Protocol
+ 
+@@ -15,17 +17,19 @@ def validate_data(data)
+       when nil
+       when String
+       when Integer
+-        NumValidator.ensure_number(data)
++        # Covers modseq-valzer, which is the largest valid IMAP integer
++        if data.negative?
++          raise DataFormatError, "Integer argument must be unsigned: #{data}"
++        elsif 0xffff_ffff_ffff_ffff < data
++          raise DataFormatError, "Integer argument must fit in 64 bits: #{data}"
++        end
+       when Array
+-        if data[0] == 'CHANGEDSINCE'
+-          NumValidator.ensure_mod_sequence_value(data[1])
+-        else
+-          data.each do |i|
+-            validate_data(i)
+-          end
++        data.each do |i|
++          validate_data(i)
+         end
+       when Time, Date, DateTime
+       when Symbol
++        Flag.validate(data)
+       else
+         data.validate
+       end
+@@ -46,7 +50,7 @@ def send_data(data, tag = nil)
+       when Date
+         send_date_data(data)
+       when Symbol
+-        send_symbol_data(data)
++        Flag[data].send_data(self, tag)
+       else
+         data.send_data(self, tag)
+       end
+@@ -78,9 +82,31 @@ def send_quoted_string(str)
+       put_string('"' + str.gsub(/["\\]/, "\\\\\\&") + '"')
+     end
+ 
+-    def send_literal(str, tag = nil)
++    def send_binary_literal(*a, **kw); send_literal(*a, **kw, binary: true) end
++
++    # `non_sync` is an optional tri-state flag:
++    # * `true`  -> Force non-synchronizing `LITERAL+`/`LITERAL-` behavior.
++    #   NOTE: raises DataFormatError when server doesn't support
++    #   non-synchronizing literal, or literal is too large for LITERAL-.
++    # * `false` -> Force normal synchronizing literal behavior.
++    # * `nil`   -> (default) Currently behaves like `false` (will be dynamic).
++    #   TODO: Dynamic, based on capabilities and bytesize.
++    def send_literal(str, tag = nil, binary: false, non_sync: nil)
++      bytesize = str.bytesize
+       synchronize do
+-        put_string("{" + str.bytesize.to_s + "}" + CRLF)
++        if non_sync && !non_sync_literal_allowed?(bytesize)
++          # TODO: check in Printer, so we don't need to close the connection.
++          @sock.close
++          raise DataFormatError, "Connection closed: " \
++            "Cannot send non-synchronizing literal without known server support"
++        end
++        prefix = "~" if binary
++        plus = "+" if non_sync
++        put_string("#{prefix}{#{bytesize}#{plus}}\r\n")
++        if non_sync
++          put_string(str)
++          return
++        end
+         @continued_command_tag = tag
+         @continuation_request_exception = nil
+         begin
+@@ -95,8 +121,18 @@ def send_literal(str, tag = nil)
+       end
+     end
+ 
++    def non_sync_literal_allowed?(bytesize)
++      return unless capabilities_cached?
++      return "+" if capable?("LITERAL+")
++      return "-" if capable_literal_minus? && bytesize <= 4096
++      false
++    end
++
++    def capable_literal_minus? = capable?("LITERAL-") || capable?("IMAP4rev2")
++
++    # NOTE: +num+ should already be an Integer
+     def send_number_data(num)
+-      put_string(num.to_s)
++      put_string(Integer(num).to_s)
+     end
+ 
+     def send_list_data(list, tag = nil)
+@@ -116,11 +152,13 @@ def send_list_data(list, tag = nil)
+     def send_date_data(date) put_string Net::IMAP.encode_date(date) end
+     def send_time_data(time) put_string Net::IMAP.encode_time(time) end
+ 
+-    def send_symbol_data(symbol)
+-      put_string("\\" + symbol.to_s)
+-    end
+-
+     CommandData = Data.define(:data) do # :nodoc:
++      def self.validate(...)
++        data = new(...)
++        data.validate
++        data
++      end
++
+       def send_data(imap, tag)
+         raise NoMethodError, "#{self.class} must implement #{__method__}"
+       end
+@@ -129,27 +167,176 @@ def validate
+       end
+     end
+ 
++    # Represents IMAP +text+ or +quoted+ data, which share the same
++    # validations of decoded #data, and differ only in how they are formatted.
++    #
++    # +data+ may contain any 7-bit ASCII character except +NULL+, +CR+, or +LF+.
++    # Any multibyte +UTF-8+ character is also allowed when the connection
++    # supports UTF8: either +UTF8=ACCEPT+ or +IMAP4rev2+ have been enabled, or
++    # the server supports only +IMAP4rev2+ and not earlier IMAP revisions, or
++    # the server advertises +UTF8=ONLY+.
++    #
++    # NOTE: This does not verify whether the connection supports UTF-8, but that
++    # may change in future versions.
++    #
++    # The string's bytes must be valid ASCII or valid UTF-8.  The string's
++    # reported encoding is ignored, but the string is _not_ transcoded.
++    class ValidNonLiteralData < CommandData
++      def initialize(data:)
++        data = String(data.to_str)
++        unless data.encoding in Encoding::ASCII | Encoding::UTF_8
++          data = data.dup.force_encoding(data.ascii_only? ? "ASCII" : "UTF-8")
++        end
++        data = -data
++        super
++        validate
++      end
++
++      def validate
++        if !(data.encoding in Encoding::ASCII | Encoding::UTF_8)
++          raise DataFormatError, "must use ASCII or UTF-8 encoding"
++        elsif !data.valid_encoding?
++          raise DataFormatError, "invalid UTF-8 must be literal encoded"
++        elsif data.include?("\0")
++          raise DataFormatError, "NULL byte must be binary literal encoded"
++        elsif /[\r\n]/.match?(data)
++          raise DataFormatError, "CR and LF bytes must be literal encoded"
++        end
++      end
++
++      def ascii_only? = data.ascii_only?
++
++      def send_data(imap, tag = nil) = imap.__send__(:put_string, formatted)
++    end
++
++    # Represents IMAP +text+ data, which covers everything in the IMAP grammar,
++    # except for +literal+, +literal8+, and the concluding +CRLF+.
++    #
++    # NOTE: The current implementation does not verify that the connection
++    # supports UTF-8.  Future versions may validate this.
++    class RawText < ValidNonLiteralData # :nodoc:
++      # raw: no formatting necessary
++      alias formatted data
++    end
++
+     class RawData < CommandData # :nodoc:
+-      def send_data(imap, tag)
+-        imap.__send__(:put_string, data)
++      def initialize(data:)
++        case data
++        in String then data = self.class.split(data)
++        in Array  if   data.all? { _1 in RawText | Literal }
++        else
++          raise TypeError, "expected String or Array[#{RawText} | #{Literal}]"
++        end
++        super
++        validate
+       end
++
++      def send_data(imap, tag) = data.each do _1.send_data(imap, tag) end
++
++      def validate
++        return unless data.last in RawText(data: text)
++        if text.rindex(/\{\d+\+?\}\z/n)
++          raise DataFormatError, "RawData cannot end with literal continuation"
++        end
++      end
++
++      # Splits an input +string+ into an array of RawText and Literal/Literal8.
++      #
++      # NOTE: unlike RawData#validate, this does not prevent the final RawText
++      # from ending with a literal prefix.
++      def self.split(data)
++        data = data.b # dups and ensures BINARY encoding
++        parts = []
++        while data.match(/(~)?\{(0|[1-9]\d*)(\+)?\}\r\n/n)
++          text, binary, bytesize, non_sync, data = $`, !!$1, $2, !!$3, $'
++          bytesize = Integer bytesize, 10
++          parts << RawText[text] unless text.empty?
++          parts << extract_literal(data, binary:, bytesize:, non_sync:)
++          data[0, bytesize] = ""
++        end
++        parts << RawText[data] unless data.empty?
++        parts
++      end
++
++      def self.extract_literal(data, binary:, bytesize:, non_sync:)
++        if data.bytesize < bytesize
++          raise DataFormatError, "Too few bytes in string for literal, " \
++            "expected: %s, remaining: %s" % [bytesize, data.bytesize]
++        end
++        literal = data.byteslice(0, bytesize)
++        (binary ? Literal8 : Literal).new(data: literal, non_sync:)
++      end
++      private_class_method :extract_literal
+     end
+ 
+     class Atom < CommandData # :nodoc:
++      def initialize(**)
++        super
++        validate
++      end
++
++      def validate
++        data.to_s.ascii_only? \
++          or raise DataFormatError, "#{self.class} must be ASCII only"
++        data.match?(ResponseParser::Patterns::ATOM_SPECIALS) \
++          and raise DataFormatError, "#{self.class} must not contain atom-specials"
++        data.empty? \
++          and raise DataFormatError, "#{self.class} must not be empty"
++      end
++
+       def send_data(imap, tag)
+-        imap.__send__(:put_string, data)
++        imap.__send__(:put_string, data.to_s)
+       end
+     end
+ 
+-    class QuotedString < CommandData # :nodoc:
++    class Flag < Atom # :nodoc:
+       def send_data(imap, tag)
+-        imap.__send__(:send_quoted_string, data)
++        imap.__send__(:put_string, "\\#{data}")
+       end
+     end
+ 
+-    class Literal < CommandData # :nodoc:
++    # Represents a IMAP +quoted+ string, which can encode any valid ASCII or
++    # UTF-8 string, unless it contains any +CR+, +LF+, or +NULL+ bytes.
++    #
++    # NOTE: The current implementation does not verify that the connection
++    # supports UTF-8.  Future versions may validate this.
++    class QuotedString < ValidNonLiteralData # :nodoc:
++      def formatted = %("#{data.gsub(/["\\]/, "\\\\\\&")}")
++    end
++
++    class Literal < Data.define(:data, :non_sync) # :nodoc:
++      def self.validate(...)
++        data = new(...)
++        data.validate
++        data
++      end
++
++      def initialize(data:, non_sync: nil)
++        data = -String(data.to_str).b or
++          raise DataFormatError, "#{self.class} expects string input"
++        super
++        validate
++      end
++
++      def bytesize; data.bytesize end
++
++      def validate
++        if data.include?("\0")
++          raise DataFormatError, "NULL byte not allowed in #{self.class}.  " \
++            "Use #{Literal8} or a null-safe encoding."
++        end
++      end
++
++      def send_data(imap, tag)
++        imap.__send__(:send_literal, data, tag, non_sync:)
++      end
++    end
++
++    class Literal8 < Literal # :nodoc:
++      def validate; nil end # all bytes are okay
++
+       def send_data(imap, tag)
+-        imap.__send__(:send_literal, data, tag)
++        imap.__send__(:send_binary_literal, data, tag, non_sync:)
+       end
+     end
+ 
+diff --git a/lib/net/imap/response_parser.rb b/lib/net/imap/response_parser.rb
+index 03e54b202..988711834 100644
+--- a/lib/net/imap/response_parser.rb
++++ b/lib/net/imap/response_parser.rb
+@@ -2189,10 +2189,7 @@ def next_token
+             if $1
+               return Token.new(T_SPACE, $+)
+             elsif $2
+-              len = $+.to_i
+-              val = @str[@pos, len]
+-              @pos += len
+-              return Token.new(T_LITERAL8, val)
++              literal_token($+, T_LITERAL8)
+             elsif $3 && $7
+               # greedily match ATOM, prefixed with NUMBER, NIL, or PLUS.
+               return Token.new(T_ATOM, $3)
+@@ -2220,10 +2217,7 @@ def next_token
+             elsif $15
+               return Token.new(T_RBRA, $+)
+             elsif $16
+-              len = $+.to_i
+-              val = @str[@pos, len]
+-              @pos += len
+-              return Token.new(T_LITERAL, val)
++              literal_token($+)
+             elsif $17
+               return Token.new(T_PERCENT, $+)
+             elsif $18
+@@ -2249,10 +2243,7 @@ def next_token
+             elsif $4
+               return Token.new(T_QUOTED, Patterns.unescape_quoted($+))
+             elsif $5
+-              len = $+.to_i
+-              val = @str[@pos, len]
+-              @pos += len
+-              return Token.new(T_LITERAL, val)
++              literal_token($+)
+             elsif $6
+               return Token.new(T_LPAR, $+)
+             elsif $7
+@@ -2267,6 +2258,23 @@ def next_token
+         else
+           parse_error("invalid @lex_state - %s", @lex_state.inspect)
+         end
++      rescue DataFormatError => error
++        parse_error error.message
++      end
++
++      def literal_token(len, type = T_LITERAL)
++        len = coerce_number64 len.to_i
++        val = @str[@pos, len]
++        @pos += len
++        Token.new(type, val)
++      end
++
++      # copied/adapted from NumValidator in v0.6
++      def coerce_number64(num)
++        int = num.to_i
++        return int if 0 <= int && int <= 0x7fff_ffff_ffff_ffff
++        raise DataFormatError,
++          "number64 must be unsigned 63-bit integer: #{num}"
+       end
+ 
+     end
+diff --git a/lib/net/imap/response_reader.rb b/lib/net/imap/response_reader.rb
+index dd19d98da..590f6266c 100644
+--- a/lib/net/imap/response_reader.rb
++++ b/lib/net/imap/response_reader.rb
+@@ -4,6 +4,8 @@ module Net
+   class IMAP
+     # See https://www.rfc-editor.org/rfc/rfc9051#section-2.2.2
+     class ResponseReader # :nodoc:
++      include NumValidator
++
+       attr_reader :client
+ 
+       def initialize(client, sock)
+@@ -35,7 +37,10 @@ def done?               = line_done? && !literal_size
+       def line_done?          = buff.end_with?(CRLF)
+ 
+       def get_literal_size(buff)
+-        buff.end_with?("}\r\n") && buff.rindex(/\{(\d+)\}\r\n\z/n) && $1.to_i
++        buff.end_with?("}\r\n") && buff.rindex(/\{(\d+)\}\r\n\z/n) &&
++          coerce_number64($1)
++      rescue DataFormatError
++        raise DataFormatError, format("invalid response literal size (%s)", $1)
+       end
+ 
+       def read_line
+@@ -74,6 +79,14 @@ def max_response_remaining!
+         )
+       end
+ 
++      # copied/adapted from NumValidator in v0.6
++      def coerce_number64(num)
++        int = num.to_i
++        return int if 0 <= int && int <= 0x7fff_ffff_ffff_ffff
++        raise DataFormatError,
++          "number64 must be unsigned 63-bit integer: #{num}"
++      end
++
+     end
+   end
+ end
