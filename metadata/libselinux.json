@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "2b3f64772da44774d175d76e606d400bc470c6e3",
+  "release": "1",
+  "sha": "41d874fcf8813b7531ab920c23e1bb050503fce9",
   "source": "https://src.fedoraproject.org/rpms/libselinux.git",
   "upstream_repo": "https://github.com/SELinuxProject/selinux",
-  "version": "3.10"
+  "version": "3.11"
 }
