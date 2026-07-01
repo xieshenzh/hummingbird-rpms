@@ -76,8 +76,8 @@
 %bcond_with          liburiparser
 %endif
 
-%global upver        8.5.7
-#global rcver        RC2
+%global upver        8.5.8
+#global rcver        RC1
 
 Summary: PHP scripting language for creating dynamic web sites
 %if %{with rename}
@@ -86,7 +86,7 @@ Name: php%{major_version}
 Name: php
 %endif
 Version: %{upver}%{?rcver:~%{rcver}}
-Release: 4%{?dist}
+Release: 2%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -131,7 +131,6 @@ Patch41: php-8.5.0-parser.patch
 # use system tzdata
 Patch42: php-8.5.0-systzdata-v24.patch
 # See http://bugs.php.net/53436
-# + display PHP version backported from 8.4
 Patch43: php-8.4.0-phpize.patch
 # Use -lldap_r for OpenLDAP
 Patch45: php-8.5.0-ldap_r.patch
@@ -388,8 +387,8 @@ Provides: php-zts-devel%{?_isa} = %{version}-%{release}
 %endif
 %if %{with rename}
 Conflicts:  php-devel         < %{major_version}
-Provides:   php-devel         = %{version}-%{release}
-Provides:   php-devel%{?_isa} = %{version}-%{release}
+# Don't provide "php-devel" to avoid best provider
+# for extension BuildRequires
 %endif
 Recommends: php-nikic-php-parser5 >= 5.6.1
 Conflicts:  php-nikic-php-parser5 <  5.6.1
@@ -858,6 +857,9 @@ in pure PHP.
 %patch -P41 -p1 -b .syslib
 %patch -P42 -p1 -b .systzdata
 %patch -P43 -p1 -b .headers
+%if %{with rename}
+sed -e 's/php-devel/php%{major_version}-devel/' -i scripts/phpize.in
+%endif
 %patch -P45 -p1 -b .ldap_r
 %patch -P47 -p1 -b .phpinfo
 %patch -P48 -p1 -b .ec-param
@@ -1673,6 +1675,15 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 
 %changelog
+* Wed Jul  1 2026 Remi Collet <remi@remirepo.net> - 8.5.8-1
+- Update to 8.5.8 - http://www.php.net/releases/8_5_8.php
+
+* Thu Jun 18 2026 Remi Collet <remi@remirepo.net> - 8.5.8~RC1-2
+- Rebuilt for openssl 4.0
+
+* Wed Jun 17 2026 Remi Collet <remi@remirepo.net> - 8.5.8~RC1-1
+- update to 8.5.8RC1
+
 * Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 8.5.7-4
 - Rebuilt for openssl 4.0
 
