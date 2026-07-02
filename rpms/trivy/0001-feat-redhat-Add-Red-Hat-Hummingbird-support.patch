@@ -1,4 +1,4 @@
-From d92470b9034c2033f3993e732be01dfce810b31f Mon Sep 17 00:00:00 2001
+From cc1b1f58eaf376a012d6d572e661d6bd8bbf266b Mon Sep 17 00:00:00 2001
 From: Prarit Bhargava <prarit@redhat.com>
 Date: Thu, 19 Mar 2026 14:19:32 -0400
 Subject: [PATCH] feat(redhat): Add Red Hat Hummingbird support
@@ -38,10 +38,10 @@ Signed-off-by: Prarit Bhargava <prarit@redhat.com>
  create mode 100644 pkg/detector/ospkg/hummingbird/hummingbird.go
 
 diff --git a/pkg/detector/ospkg/detect.go b/pkg/detector/ospkg/detect.go
-index 8f4cff7cf8ed..766ef277444f 100644
+index 865f62f60c94..6fb392e31dcc 100644
 --- a/pkg/detector/ospkg/detect.go
 +++ b/pkg/detector/ospkg/detect.go
-@@ -16,6 +16,7 @@ import (
+@@ -18,6 +18,7 @@ import (
  	"github.com/aquasecurity/trivy/pkg/detector/ospkg/debian"
  	"github.com/aquasecurity/trivy/pkg/detector/ospkg/driver"
  	"github.com/aquasecurity/trivy/pkg/detector/ospkg/echo"
@@ -49,7 +49,7 @@ index 8f4cff7cf8ed..766ef277444f 100644
  	"github.com/aquasecurity/trivy/pkg/detector/ospkg/minimos"
  	"github.com/aquasecurity/trivy/pkg/detector/ospkg/oracle"
  	"github.com/aquasecurity/trivy/pkg/detector/ospkg/photon"
-@@ -62,6 +63,7 @@ var (
+@@ -64,6 +65,7 @@ var (
  		ftypes.Wolfi:              wolfi.NewScanner(),
  		ftypes.Chainguard:         chainguard.NewScanner(),
  		ftypes.Echo:               echo.NewScanner(),
@@ -231,7 +231,7 @@ index e6fa93ebe957..4f513c4a8ef6 100644
  
  	for _, vendor := range osVendors {
 diff --git a/pkg/fanal/types/const.go b/pkg/fanal/types/const.go
-index 7c6cc93b4209..28832e30e8b3 100644
+index 9adcb878a64e..e8f76d109e49 100644
 --- a/pkg/fanal/types/const.go
 +++ b/pkg/fanal/types/const.go
 @@ -35,6 +35,7 @@ const (
@@ -242,7 +242,7 @@ index 7c6cc93b4209..28832e30e8b3 100644
  	MinimOS            OSType = "minimos"
  	OpenSUSE           OSType = "opensuse"
  	OpenSUSELeap       OSType = "opensuse-leap"
-@@ -151,6 +152,7 @@ var (
+@@ -152,6 +153,7 @@ var (
  		Debian,
  		Echo,
  		Fedora,
@@ -251,10 +251,10 @@ index 7c6cc93b4209..28832e30e8b3 100644
  		OpenSUSE,
  		OpenSUSELeap,
 diff --git a/pkg/purl/purl.go b/pkg/purl/purl.go
-index 03e0e9d075d1..5df8bae1847f 100644
+index d6a0ffc561e1..663b35db3a34 100644
 --- a/pkg/purl/purl.go
 +++ b/pkg/purl/purl.go
-@@ -486,7 +486,7 @@ func purlType(t ftypes.TargetType) string {
+@@ -485,7 +485,7 @@ func purlType(t ftypes.TargetType) string {
  	case ftypes.Debian, ftypes.Ubuntu, ftypes.Echo:
  		return packageurl.TypeDebian
  	case ftypes.RedHat, ftypes.CentOS, ftypes.Rocky, ftypes.Alma,
@@ -264,5 +264,5 @@ index 03e0e9d075d1..5df8bae1847f 100644
  		ftypes.Azure, ftypes.CBLMariner, ftypes.CoreOS:
  		return packageurl.TypeRPM
 -- 
-2.53.0
+2.54.0
 

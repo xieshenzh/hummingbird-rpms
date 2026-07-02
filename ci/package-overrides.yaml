@@ -254,6 +254,9 @@ syft:
 tomcat11:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+trivy:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 valkey:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

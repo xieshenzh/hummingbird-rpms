@@ -62,6 +62,7 @@ post_commands = [
 
 [licensing]
 exclude_directories = [
+    "_build",
     "pkg",
     "vendor/github.com/google/licenseclassifier/v2/assets",
 ]
@@ -93,14 +94,6 @@ expression = "MIT"
 path = "vendor/github.com/BurntSushi/toml/COPYING"
 sha256sum = "d21cb1c60785d6d3a84a7059323ccafc45c645b1bbda281c76a62d66ad2d7dc3"
 expression = "MIT"
-[[licensing.licenses]]
-path = "pkg/iac/scanners/helm/test/mysql/README.md"
-sha256sum = "99cd80ccf23c3d771ee4ac483ae9dab0247b2f9f340e18fa48e5b77ec1a24cc1"
-expression = "Apache-2.0"
-[[licensing.licenses]]
-path = "pkg/iac/scanners/helm/test/mysql/charts/common/README.md"
-sha256sum = "62b77785b81344c7108495e6d0f29fa1b6e0d4078b88284d85f3113ab84a48f1"
-expression = "Apache-2.0"
 [[licensing.licenses]]
 path = "vendor/github.com/rcrowley/go-metrics/LICENSE"
 sha256sum = "d2571186acad91c8a3121fb31f1aa5963e82ccd08608d00cef3eb3f3a6c8ad38"
@@ -153,11 +146,3 @@ expression = "BSD-3-Clause"
 path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.MPL-2.0"
 sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
 expression = "MPL-2.0"
-[[licensing.licenses]]
-path = "vendor/cyphar.com/go-pathrs/COPYING"
-sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
-expression = "MPL-2.0"
-[[licensing.licenses]]
-path = "vendor/github.com/invopop/jsonschema/COPYING"
-sha256sum = "ed76298aa9c218e9010aa186c1107ceb6c7618db50ae0222b9a1b4196101a411"
-expression = "MIT"
