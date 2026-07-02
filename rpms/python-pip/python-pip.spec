@@ -12,7 +12,7 @@
 
 Name:           python-%{srcname}
 Version:        %{base_version}%{?prerel:~%{prerel}}
-Release:        3%{?dist}
+Release:        3.1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 # We bundle a lot of libraries with pip, which itself is under MIT license.
@@ -94,6 +94,10 @@ Patch:          dummy-certifi.patch
 # https://github.com/pypa/pip/commit/a4b40f62332ccb3228b12cc5ae1493c75177247a
 # We don't need a layer to check that, as we're by default in an offline environment
 Patch:          downstream-remove-pytest-subket.patch
+
+# CVE-2026-8643: Reject entry point names that escape scripts dir
+# https://github.com/pypa/pip/pull/14000
+Patch:          CVE-2026-8643-reject-entrypoint-path-traversal.patch
 
 # Remove -s from Python shebang - ensure that packages installed with pip
 # to user locations are seen by pip itself
