@@ -1,19 +1,12 @@
 Summary: Utilities for managing filesystem extended attributes
 Name: attr
-Version: 2.5.2
-Release: 9%{?dist}
-Source0: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.xz
-Source1: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.xz.sig
-# Retreived from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
-# Source2: agruen-key.gpg
-# Retrieved from https://savannah.nongnu.org/people/viewgpg.php?user_id=42032
-Source2: vapier-key.gpg
-
-# xattr.conf: remove entries for NFSv4 ACLs namespaces (#1031423)
-# https://lists.nongnu.org/archive/html/acl-devel/2019-03/msg00000.html
-# https://lists.nongnu.org/archive/html/acl-devel/2019-03/msg00001.html
-# https://lists.nongnu.org/archive/html/acl-devel/2019-05/msg00000.html
-Patch3:  0003-attr-2.4.48-xattr-conf-nfs4-acls.patch
+Version: 2.6.0
+Release: 9.1%{?dist}
+Source0: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.gz
+Source1: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.gz.sig
+# attr 2.6.0 tarball is signed by Andreas Gruenbacher (user_id=15000)
+# Retrieved from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
+Source2: agruen-key.gpg
 
 License: GPL-2.0-or-later
 URL: https://savannah.nongnu.org/projects/attr
@@ -77,7 +70,6 @@ sed -e 's|test/root/getfattr.test||' \
 
 %build
 %configure
-%make_build -C po ka.gmo
 %make_build
 
 %check
