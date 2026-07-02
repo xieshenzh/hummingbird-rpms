@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Backport fix for CVE-2026-8643",
+  "modification_status": "modified",
   "release": "3",
   "sha": "5fd8a26f31437569c50e05afc5a4e668bab9ffac",
   "source": "https://src.fedoraproject.org/rpms/python-pip.git",
