@@ -1,6 +1,6 @@
 Name:           rust
-Version:        1.96.0
-Release:        4%{?dist}
+Version:        1.96.1
+Release:        1%{?dist}
 Summary:        The Rust Programming Language
 License:        (Apache-2.0 OR MIT) AND (Artistic-2.0 AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0 AND Unicode-3.0)
 # ^ written as: (rust itself) and (bundled libraries)
@@ -147,7 +147,7 @@ Source102:      cargo_vendor.attr
 Source103:      cargo_vendor.prov
 
 # Disable cargo->libgit2->libssh2 on RHEL, as it's not approved for FIPS (rhbz1732949)
-Patch100:       rustc-1.96.0-disable-libssh2.patch
+Patch100:       rustc-1.96.1-disable-libssh2.patch
 
 # Get the Rust triple for any architecture and ABI.
 %{lua: function rust_triple(arch, abi)
@@ -760,8 +760,11 @@ rm -rf src/tools/rustc-perf/collector/*-benchmarks/
 %clear_dir vendor/libsqlite3-sys*/sqlite3/
 %endif
 
+%clear_dir src/tools/cargo/third-party/libssh2-sys/libssh2/
+
 %if %with disabled_libssh2
 rm -rf vendor/libssh2-sys*/
+rm -rf src/tools/cargo/third-party/libssh2-sys
 %endif
 
 # This only affects the transient rust-installer, but let it use our dynamic xz-libs
@@ -798,7 +801,8 @@ find -name '*.rs' -type f -perm /111 -exec chmod -v -x '{}' '+'
     " RUSTC_TARGET_CPU_X86_64=x86-64" .. ((rhel >= 10) and "-v3" or (rhel == 9) and "-v2" or "")
     .. " RUSTC_TARGET_CPU_PPC64LE=" .. ((rhel >= 9) and "pwr9" or "pwr8")
     .. " RUSTC_TARGET_CPU_S390X=" ..
-        ((rhel >= 9) and "z14" or (rhel == 8 or fedora >= 38) and "z13" or
+        ((rhel >= 11 or fedora >= 45) and "z15" or (rhel >= 9) and "z14" or
+         (rhel == 8 or fedora >= 38) and "z13" or
          (fedora >= 26) and "zEC12" or (rhel == 7) and "z196" or "z10")
   print(env)
 end}
