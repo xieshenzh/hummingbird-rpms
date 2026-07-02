@@ -1,4 +1,4 @@
-From 740ef2e87ee34612ac62c60a70fc155e8c69f6fe Mon Sep 17 00:00:00 2001
+From 211d44c2e7b629f3ac073147a4c31449bcbe4478 Mon Sep 17 00:00:00 2001
 From: Petr Lautrbach <plautrba@redhat.com>
 Date: Wed, 18 Jul 2018 09:09:35 +0200
 Subject: [PATCH] sandbox: Use matchbox-window-manager instead of openbox
@@ -11,10 +11,10 @@ Content-type: text/plain
  3 files changed, 3 insertions(+), 17 deletions(-)
 
 diff --git a/sandbox/sandbox b/sandbox/sandbox
-index e3fd6119ed4d..e01425f0c637 100644
+index 4e7d56fdedfd..5f79c5367bda 100644
 --- a/sandbox/sandbox
 +++ b/sandbox/sandbox
-@@ -270,7 +270,7 @@ class Sandbox:
+@@ -266,7 +266,7 @@ class Sandbox:
              copyfile(f, "/tmp", self.__tmpdir)
              copyfile(f, "/var/tmp", self.__tmpdir)
  
@@ -23,7 +23,7 @@ index e3fd6119ed4d..e01425f0c637 100644
          execfile = self.__homedir + "/.sandboxrc"
          fd = open(execfile, "w+")
          if self.__options.session:
-@@ -370,7 +370,7 @@ sandbox [-h] [-l level ] [-[X|M] [-H homedir] [-T tempdir]] [-I includefile ] [-
+@@ -366,7 +366,7 @@ sandbox [-h] [-l level ] [-[X|M] [-H homedir] [-T tempdir]] [-I includefile ] [-
  
          parser.add_option("-W", "--windowmanager", dest="wm",
                            type="string",
@@ -71,5 +71,5 @@ index 28169182ce42..e2a7ad9b2ac7 100644
      if [ -z "$WAYLAND_DISPLAY" ]; then
          DISPLAY_COMMAND='/usr/bin/Xephyr -resizeable -title "$TITLE" -terminate -screen $SCREENSIZE -dpi $DPI -nolisten tcp -displayfd 5 5>&1 2>/dev/null'
 -- 
-2.52.0
+2.54.0
 

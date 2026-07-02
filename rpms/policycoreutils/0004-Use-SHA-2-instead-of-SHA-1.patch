@@ -1,4 +1,4 @@
-From dcf1b282d45d326b24ee8b723e94848647440afd Mon Sep 17 00:00:00 2001
+From cbaf1040c655bd544eedca3b8e070720dfc3b2be Mon Sep 17 00:00:00 2001
 From: Petr Lautrbach <plautrba@redhat.com>
 Date: Fri, 30 Jul 2021 14:14:37 +0200
 Subject: [PATCH] Use SHA-2 instead of SHA-1
@@ -13,7 +13,7 @@ The use of SHA-1 in RHEL9 is deprecated
  4 files changed, 20 insertions(+), 20 deletions(-)
 
 diff --git a/policycoreutils/setfiles/restorecon.8 b/policycoreutils/setfiles/restorecon.8
-index 1134420e0e28..77dd05421d11 100644
+index b7ff9715a49b..66b9c800dc73 100644
 --- a/policycoreutils/setfiles/restorecon.8
 +++ b/policycoreutils/setfiles/restorecon.8
 @@ -103,14 +103,14 @@ display usage information and exit.
@@ -34,7 +34,7 @@ index 1134420e0e28..77dd05421d11 100644
  enable usage of the
  .IR security.sehash
  extended attribute.
-@@ -208,7 +208,7 @@ the
+@@ -211,7 +211,7 @@ the
  .B \-D
  option to
  .B restorecon
@@ -43,7 +43,7 @@ index 1134420e0e28..77dd05421d11 100644
  attribute named
  .IR security.sehash
  on each directory specified in
-@@ -225,7 +225,7 @@ for further details.
+@@ -228,7 +228,7 @@ for further details.
  .sp
  The
  .B \-I
@@ -90,7 +90,7 @@ index 51d12a4dbb80..09bfd8c40ab4 100644
  .I security.sehash
  directory digest entries, and is shown for reference only).
 diff --git a/policycoreutils/setfiles/restorecon_xattr.c b/policycoreutils/setfiles/restorecon_xattr.c
-index 31fb82fd2099..bc22d3fd4560 100644
+index e8604ec63c29..738319edb4a4 100644
 --- a/policycoreutils/setfiles/restorecon_xattr.c
 +++ b/policycoreutils/setfiles/restorecon_xattr.c
 @@ -38,7 +38,7 @@ int main(int argc, char **argv)
@@ -102,7 +102,7 @@ index 31fb82fd2099..bc22d3fd4560 100644
  	unsigned char *fc_digest = NULL;
  	size_t i, fc_digest_len = 0, num_specfiles;
  
-@@ -133,8 +133,8 @@ int main(int argc, char **argv)
+@@ -134,8 +134,8 @@ int main(int argc, char **argv)
  			exit(-1);
  		}
  
@@ -110,9 +110,9 @@ index 31fb82fd2099..bc22d3fd4560 100644
 -		if (!sha1_buf) {
 +		sha256_buf = malloc(fc_digest_len * 2 + 1);
 +		if (!sha256_buf) {
- 			fprintf(stderr,
- 				"Error allocating digest buffer: %s\n",
- 							    strerror(errno));
+ 			fprintf(stderr, "Error allocating digest buffer: %s\n",
+ 				strerror(errno));
+ 			selabel_close(hnd);
 @@ -143,16 +143,16 @@ int main(int argc, char **argv)
  		}
  
@@ -174,5 +174,5 @@ index d43e4ad20f54..458f3f9f1693 100644
  and provided the
  .B \-n
 -- 
-2.52.0
+2.54.0
 
