@@ -1,0 +1,8 @@
+%add_changelog(changelog:) %{lua:
+  local f = io.open(arg[1], 'r')
+  if f then
+    local content = f:read('*all')
+    f:close()
+    print(content)
+  end
+} 
