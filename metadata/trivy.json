@@ -3,8 +3,10 @@
   "modification_reason": "Update to 0.72.0 (ahead of Fedora); Waiting for code to be accepted upstream",
   "modification_status": "modified",
   "release": "0.1",
+  "release_monitoring_project_id": 141362,
   "sha": "1741a090d7d41332bef492d4d294226992a9e4ed",
   "source": "https://src.fedoraproject.org/rpms/trivy.git",
+  "track_upstream": "latest",
   "upstream_repo": "https://github.com/aquasecurity/trivy",
   "version": "0.72.0"
 }
