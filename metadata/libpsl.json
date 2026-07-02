@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "7",
-  "sha": "acc8b93c474727147bb9e021b3a69116dec3f895",
+  "release": "1",
+  "sha": "f8616b99d12cc795a578fab56c126262bb5a88e8",
   "source": "https://src.fedoraproject.org/rpms/libpsl.git",
   "upstream_repo": "https://github.com/rockdaboot/libpsl",
-  "version": "0.21.5"
+  "version": "0.22.0"
 }
