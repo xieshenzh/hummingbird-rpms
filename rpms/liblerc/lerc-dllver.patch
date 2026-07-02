@@ -1,6 +1,6 @@
-diff -rupN --no-dereference lerc-4.1.0/CMakeLists.txt lerc-4.1.0-new/CMakeLists.txt
---- lerc-4.1.0/CMakeLists.txt	2026-03-09 19:08:17.000000000 +0100
-+++ lerc-4.1.0-new/CMakeLists.txt	2026-03-10 10:50:51.715842267 +0100
+diff -rupN --no-dereference lerc-4.1.1/CMakeLists.txt lerc-4.1.1-new/CMakeLists.txt
+--- lerc-4.1.1/CMakeLists.txt	2026-07-02 18:41:23.000000000 +0200
++++ lerc-4.1.1-new/CMakeLists.txt	2026-07-02 19:25:38.218560292 +0200
 @@ -30,6 +30,9 @@ if(BUILD_SHARED_LIBS)
          PROPERTIES
          SOVERSION ${CMAKE_PROJECT_VERSION_MAJOR}
