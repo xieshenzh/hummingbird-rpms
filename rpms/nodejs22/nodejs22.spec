@@ -164,6 +164,7 @@ Source101:      nodejs.srpm.macros
 %patchlist
 0001-Remove-unused-OpenSSL-config.patch
 0001-fips-disable-options.patch
+0001-CVE-2026-13149-brace-expansion-fix-exponential-time.patch
 
 %description
 Node.js is a platform built on Chrome's JavaScript runtime
