@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "4b2fb92358c462fc3d5f6d4110762724934369ce",
+  "sha": "5daa1b08767f624a7d716ea80444007db32e3bdd",
   "source": "https://src.fedoraproject.org/rpms/vmaf.git",
   "upstream_repo": "https://github.com/Netflix/vmaf",
-  "version": "3.1.0"
+  "version": "3.2.0"
 }
