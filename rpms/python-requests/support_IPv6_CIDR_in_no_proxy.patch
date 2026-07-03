@@ -1,7 +1,7 @@
-From 91526670ad66e83e799459cb23b031b88bb680b4 Mon Sep 17 00:00:00 2001
+From 6604ff793ce7090a950f935171fd7298dae528c2 Mon Sep 17 00:00:00 2001
 From: Derek Higgins <derekh@redhat.com>
 Date: Thu, 30 May 2024 11:15:18 +0200
-Subject: [PATCH 2/2] Add ipv6 support to should_bypass_proxies
+Subject: [PATCH] Add ipv6 support to should_bypass_proxies
 
 Add support to should_bypass_proxies to support
 IPv6 ipaddresses and CIDRs in no_proxy. Includes
@@ -14,10 +14,10 @@ Co-authored-by: Lumir Balhar <lbalhar@redhat.com>
  2 files changed, 132 insertions(+), 17 deletions(-)
 
 diff --git a/src/requests/utils.py b/src/requests/utils.py
-index ae6c42f..0363698 100644
+index 120336d..c10695b 100644
 --- a/src/requests/utils.py
 +++ b/src/requests/utils.py
-@@ -679,18 +679,46 @@ def requote_uri(uri):
+@@ -723,18 +723,46 @@ def requote_uri(uri: str) -> str:
          return quote(uri, safe=safe_without_percent)
  
  
@@ -35,7 +35,7 @@ index ae6c42f..0363698 100644
 +    return bits
 +
 +
- def address_in_network(ip, net):
+ def address_in_network(ip: str, net: str) -> bool:
      """This function allows you to check if an IP belongs to a network subnet
  
      Example: returns True if ip = 192.168.1.1 and net = 192.168.1.0/24
@@ -67,7 +67,7 @@ index ae6c42f..0363698 100644
      return (ipaddr & netmask) == (network & netmask)
  
  
-@@ -710,12 +738,39 @@ def is_ipv4_address(string_ip):
+@@ -754,12 +782,39 @@ def is_ipv4_address(string_ip: str) -> bool:
      :rtype: bool
      """
      try:
@@ -105,10 +105,10 @@ index ae6c42f..0363698 100644
 +        return False
 +
 +
- def is_valid_cidr(string_network):
+ def is_valid_cidr(string_network: str) -> bool:
      """
      Very simple check of the cidr format in no_proxy variable.
-@@ -723,17 +778,19 @@ def is_valid_cidr(string_network):
+@@ -767,17 +822,19 @@ def is_valid_cidr(string_network: str) -> bool:
      :rtype: bool
      """
      if string_network.count("/") == 1:
@@ -135,23 +135,23 @@ index ae6c42f..0363698 100644
              return False
      else:
          return False
-@@ -790,12 +847,12 @@ def should_bypass_proxies(url, no_proxy):
+@@ -836,12 +893,12 @@ def should_bypass_proxies(url: str, no_proxy: str | None) -> bool:
          # the end of the hostname, both with and without the port.
-         no_proxy = (host for host in no_proxy.replace(" ", "").split(",") if host)
+         no_proxy_hosts = (host for host in no_proxy.replace(" ", "").split(",") if host)
  
--        if is_ipv4_address(parsed.hostname):
-+        if is_ipv4_address(parsed.hostname) or is_ipv6_address(parsed.hostname):
-             for proxy_ip in no_proxy:
+-        if is_ipv4_address(hostname):
++        if is_ipv4_address(hostname) or is_ipv6_address(hostname):
+             for proxy_ip in no_proxy_hosts:
                  if is_valid_cidr(proxy_ip):
-                     if address_in_network(parsed.hostname, proxy_ip):
+                     if address_in_network(hostname, proxy_ip):
                          return True
--                elif parsed.hostname == proxy_ip:
-+                elif compare_ips(parsed.hostname, proxy_ip):
+-                elif hostname == proxy_ip:
++                elif compare_ips(hostname, proxy_ip):
                      # If no_proxy ip was defined in plain IP notation instead of cidr notation &
                      # matches the IP of the index
                      return True
 diff --git a/tests/test_utils.py b/tests/test_utils.py
-index 5e9b56e..befbb46 100644
+index 091a9fd..bdab54f 100644
 --- a/tests/test_utils.py
 +++ b/tests/test_utils.py
 @@ -14,9 +14,11 @@ from requests._internal_utils import unicode_is_ascii
@@ -166,7 +166,7 @@ index 5e9b56e..befbb46 100644
      dotted_netmask,
      extract_zipped_paths,
      get_auth_from_url,
-@@ -263,8 +265,15 @@ class TestIsIPv4Address:
+@@ -292,8 +294,15 @@ class TestIsIPv4Address:
  
  
  class TestIsValidCIDR:
@@ -184,7 +184,7 @@ index 5e9b56e..befbb46 100644
  
      @pytest.mark.parametrize(
          "value",
-@@ -274,6 +283,11 @@ class TestIsValidCIDR:
+@@ -303,6 +312,11 @@ class TestIsValidCIDR:
              "192.168.1.0/128",
              "192.168.1.0/-1",
              "192.168.1.999/24",
@@ -196,7 +196,7 @@ index 5e9b56e..befbb46 100644
          ),
      )
      def test_invalid(self, value):
-@@ -287,6 +301,12 @@ class TestAddressInNetwork:
+@@ -316,6 +330,12 @@ class TestAddressInNetwork:
      def test_invalid(self):
          assert not address_in_network("172.16.0.1", "192.168.1.0/24")
  
@@ -209,7 +209,7 @@ index 5e9b56e..befbb46 100644
  
  class TestGuessFilename:
      @pytest.mark.parametrize(
-@@ -722,6 +742,11 @@ def test_urldefragauth(url, expected):
+@@ -754,6 +774,11 @@ def test_urldefragauth(url, expected):
          ("http://172.16.1.12:5000/", False),
          ("http://google.com:5000/v1.0/", False),
          ("file:///some/path/on/disk", True),
@@ -221,7 +221,7 @@ index 5e9b56e..befbb46 100644
      ),
  )
  def test_should_bypass_proxies(url, expected, monkeypatch):
-@@ -730,11 +755,11 @@ def test_should_bypass_proxies(url, expected, monkeypatch):
+@@ -762,11 +787,11 @@ def test_should_bypass_proxies(url, expected, monkeypatch):
      """
      monkeypatch.setenv(
          "no_proxy",
@@ -235,7 +235,7 @@ index 5e9b56e..befbb46 100644
      )
      assert should_bypass_proxies(url, no_proxy=None) == expected
  
-@@ -956,3 +981,36 @@ def test_should_bypass_proxies_win_registry_ProxyOverride_value(monkeypatch):
+@@ -1011,3 +1036,36 @@ def test_should_bypass_proxies_win_registry_ProxyOverride_value(monkeypatch):
      monkeypatch.setattr(winreg, "OpenKey", OpenKey)
      monkeypatch.setattr(winreg, "QueryValueEx", QueryValueEx)
      assert should_bypass_proxies("http://example.com/", None) is False
@@ -273,5 +273,5 @@ index 5e9b56e..befbb46 100644
 +def test_compare_ips(a, b, expected):
 +    assert compare_ips(a, b) == expected
 -- 
-2.45.1
+2.54.0
 
