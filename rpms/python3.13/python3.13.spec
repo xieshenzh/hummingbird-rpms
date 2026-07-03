@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1.1%{?dist}
+Release: 1.2%{?dist}
 License: Python-2.0.1
 
 
@@ -405,6 +405,14 @@ Patch475: 00475-cve-2025-15367.patch
 # which is modified with this patch, hence they need a
 # direct call to the check function.
 Patch477: 00477-raise-an-error-when-importing-stdlib-modules-compiled-for-a-different-python-version.patch
+
+# 00478 # CVE-2026-11972
+# tarfile module: Denial of Service via improper EOF handling in streaming mode
+#
+# When using the tarfile module with a file opened in streaming mode (mode="r|"),
+# the module did not properly handle EOF, meaning an archive could be parsed
+# in an infinite loop.
+Patch478: 00478-cve-2026-11972.patch
 
 
 # (New patches go here ^^^)
