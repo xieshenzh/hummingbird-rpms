@@ -199,6 +199,7 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
 def build_konflux_variables(branch: str, tenant: str, git_repo: str) -> dict:
     """Build variables for Konflux templates."""
     packages = get_all_packages()
+    package_overrides = load_yaml_file(ROOT_DIR / "ci" / "package-overrides.yaml") or {}
 
     application_name = f"rpms-{branch}"
 
@@ -215,8 +216,13 @@ def build_konflux_variables(branch: str, tenant: str, git_repo: str) -> dict:
             "tags": ["latest"],
         }
 
-        # Load properties.yml if it exists (only for imported packages)
         if imported:
+            pkg_config = package_overrides.get(name, {})
+            private_product = pkg_config.get("private_product")
+            if private_product:
+                rpm_data["application_name"] = f"private-{private_product}-rpms-{branch}"
+
+            # Load properties.yml if it exists (only for imported packages)
             properties_file = ROOT_DIR / "rpms" / name / "properties.yml"
             if properties_file.exists():
                 properties = load_yaml_file(properties_file)
@@ -234,14 +240,9 @@ def build_konflux_variables(branch: str, tenant: str, git_repo: str) -> dict:
     }
 
 
-def build_releng_variables() -> dict:
-    """Build variables for releng (ReleasePlanAdmission) templates."""
-    config_path = ROOT_DIR / "ci" / "konflux_rpa_config.yml"
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
-
-    global_config = config["global"]
-    rpa_config = config["rpas"][0]
+def build_releng_variables(rpa_config: dict, global_config: dict) -> dict:
+    """Build variables for a single ReleasePlanAdmission."""
+    package_overrides = load_yaml_file(ROOT_DIR / "ci" / "package-overrides.yaml") or {}
 
     packages = get_all_packages()
 
@@ -250,6 +251,21 @@ def build_releng_variables() -> dict:
     if path_prefix:
         filter_dir = ROOT_DIR / path_prefix.rstrip("/")
         packages = [pkg for pkg in packages if (filter_dir / pkg).is_dir()]
+
+    # Filter by private_product assignment
+    private_product = rpa_config.get("private_product")
+    exclude_private = rpa_config.get("exclude_private", False)
+
+    if private_product:
+        packages = [
+            pkg for pkg in packages
+            if package_overrides.get(pkg, {}).get("private_product") == private_product
+        ]
+    elif exclude_private:
+        packages = [
+            pkg for pkg in packages
+            if "private_product" not in package_overrides.get(pkg, {})
+        ]
 
     component_list = [
         {"component_name": f"{sanitize_component_name(pkg)}-{global_config['branch']}"}
@@ -274,19 +290,33 @@ def build_releng_variables() -> dict:
     }
 
 
-def generate_releng() -> str:
-    """Generate releng (ReleasePlanAdmission) resources."""
-    print("Building releng template variables...", file=sys.stderr)
-    variables = build_releng_variables()
+def load_releng_config() -> dict:
+    """Load the releng RPA configuration file."""
+    config_path = ROOT_DIR / "ci" / "konflux_rpa_config.yml"
+    with open(config_path) as f:
+        return yaml.safe_load(f)
 
-    print("Rendering releng resources...", file=sys.stderr)
+
+def generate_releng() -> dict[str, str]:
+    """Generate releng (ReleasePlanAdmission) resources for all configured RPAs."""
+    config = load_releng_config()
+    global_config = config["global"]
+
     template_path = ROOT_DIR / "konflux-templates" / "releng-staging.yml.j2"
     macros_dir = ROOT_DIR / "konflux-templates" / "macros" / "releng"
 
-    result = render_template(template_path, macros_dir, variables)
-    if not result.endswith("\n"):
-        result += "\n"
-    return result
+    results = {}
+    for rpa_config in config["rpas"]:
+        print(f"Building releng variables for {rpa_config['name']}...", file=sys.stderr)
+        variables = build_releng_variables(rpa_config, global_config)
+
+        print(f"Rendering {rpa_config['name']}...", file=sys.stderr)
+        result = render_template(template_path, macros_dir, variables)
+        if not result.endswith("\n"):
+            result += "\n"
+        results[rpa_config["name"]] = result
+
+    return results
 
 
 def render_template(template_path: Path, macros_dir: Path, variables: dict) -> str:
@@ -378,7 +408,10 @@ def main():
     elif args.command == "konflux":
         print(generate_konflux(args.branch, args.tenant, args.git_repo))
     elif args.command == "releng":
-        print(generate_releng())
+        releng_results = generate_releng()
+        for name, content in releng_results.items():
+            print(f"--- {name} ---", file=sys.stderr)
+            print(content)
     elif args.command == "all":
         # Generate all resources (equivalent to generate.sh)
         pac_push = generate_pac("push", args.branch, args.tenant)
@@ -390,12 +423,11 @@ def main():
         konflux = generate_konflux(args.branch, args.tenant, args.git_repo)
         (ROOT_DIR / "konflux-templates" / "rendered.yml").write_text(konflux)
 
-        releng = generate_releng()
+        releng_results = generate_releng()
         releng_dir = ROOT_DIR / "releng"
         releng_dir.mkdir(exist_ok=True)
-        (releng_dir / "hummingbird-rpms-tech-preview-staging.yaml").write_text(
-            releng
-        )
+        for name, content in releng_results.items():
+            (releng_dir / f"{name}.yaml").write_text(content)
 
         print("Generated all resources.", file=sys.stderr)
 

@@ -8,6 +8,8 @@
 
 ## Setup
 
+### Using existing credentials
+
 - Obtain the value of the field `cli.toml` from the secret located
   in the vault at
   `rhel-primitives/PULP_PUBLIC_RHEL_PRIMITIVES_CONFIG_FILE`
@@ -15,6 +17,13 @@
 - You can either copy this file to the default location
   `~/.config/pulp/cli.toml` or pass its path using the `--config`
   argument to the creation script.
+
+### Creating a new Pulp service account
+
+See [Pulp Access](../../documentation/operating/pulp-access.md) for instructions on creating
+a new service account, configuring `cli.toml`, and storing credentials in the vault.
+
+Then use it with the creation script via `--config ./cli.toml`.
 
 ## Create
 
