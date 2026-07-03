@@ -8,5 +8,5 @@ After=named-setup-rndc.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/libexec/setup-named-chroot.sh /var/named/chroot on /etc/named-chroot.files
-ExecStop=/usr/libexec/setup-named-chroot.sh /var/named/chroot off /etc/named-chroot.files
+ExecStart=/usr/libexec/%{name}/setup-named-chroot.sh /var/named/chroot on /etc/named-chroot.files
+ExecStop=/usr/libexec/%{name}/setup-named-chroot.sh /var/named/chroot off /etc/named-chroot.files
