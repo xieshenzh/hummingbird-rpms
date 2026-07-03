@@ -12,7 +12,7 @@ metadata:
     test.appstudio.openshift.io/comment_strategy: disable_all
   name: {{ rpm.component_name }}
 spec:
-  application: {{ application_name }}
+  application: {{ rpm.application_name | default(application_name) }}
   componentName: {{ rpm.component_name }}
   containerImage: quay.io/redhat-user-workloads/{{ tenant }}/{{ rpm.component_name }}
   source:
