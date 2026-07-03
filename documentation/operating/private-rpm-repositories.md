@@ -84,8 +84,8 @@ grep '<package>-main' releng/hummingbird-rpms-tech-preview-staging.yaml
 ## Onboarding a New Private Product
 
 Adding a new LTS product (beyond existing ones) requires these steps: service account,
-Pulp infrastructure, credentials secret, Konflux Application, RPA configuration, and
-resource regeneration.
+Pulp infrastructure, credentials secret, Konflux Application, RPA configuration,
+resource regeneration, and content guard setup.
 
 ### 1. Create a Pulp service account (optional)
 
@@ -290,6 +290,20 @@ This produces:
 - Updated `konflux-templates/rendered.yml` with per-component application assignments
 - A new RPA file at `releng/hummingbird-rpms-private-<product>.yaml`
 - Updated public RPA excluding private packages
+
+### 7. Set up Pulp content guard
+
+To restrict access to the private Pulp repositories, a content guard must be configured
+so only customers with the correct subscription can access the content:
+
+1. Obtain a **SKU** for the private product's subscription offering.
+2. Create a **feature** for that SKU in the Feature service.
+3. Contact the **Pulp team** to:
+   - Map the organization ID to the feature
+   - Set up the content guard on the private Pulp domain(s)
+
+This step is required before customers can access the private repositories. Without it,
+the repositories are created but have no access control.
 
 ### Pulp credentials
 
