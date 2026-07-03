@@ -52,23 +52,23 @@ spec:
       rpm-repositories:
         - name: x86_64
           arch: x86_64
-          repository_id: public-hummingbird-x86_64-rpms
+          repository_id: {{ pulp_signed_domain }}-x86_64-rpms
           repository_name: x86_64
           distro: hummingbird-20251124
         - name: aarch64
           arch: aarch64
-          repository_id: public-hummingbird-aarch64-rpms
+          repository_id: {{ pulp_signed_domain }}-aarch64-rpms
           repository_name: aarch64
           distro: hummingbird-20251124
         - name: src
           arch: src
-          repository_id: public-hummingbird-source-rpms
+          repository_id: {{ pulp_signed_domain }}-source-rpms
           repository_name: source
           distro: hummingbird-20251124
         # leaving this here for backwards compatibility before HUM-808
         - name: source
           arch: source
-          repository_id: public-hummingbird-source-rpms
+          repository_id: {{ pulp_signed_domain }}-source-rpms
           repository_name: source
           distro: hummingbird-20251124
       defaults:
