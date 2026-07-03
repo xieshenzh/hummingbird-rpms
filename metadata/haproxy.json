@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 3.0.24",
+  "modification_reason": "Update to upstream version 3.0.25",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 1298,
@@ -8,5 +8,5 @@
   "source": "https://src.fedoraproject.org/rpms/haproxy.git",
   "track_upstream": "3.0",
   "upstream_repo": "https://git.haproxy.org/git/haproxy.git",
-  "version": "3.0.24"
+  "version": "3.0.25"
 }
