@@ -460,3 +460,37 @@ class TestPrivateProductKonfluxVariables:
 
         assert variables["application_name"] == "rpms-main"
         assert "application_name" not in variables["rpms"][0]
+
+
+class TestValidation:
+    """Tests for configuration validation."""
+
+    def test_unknown_private_product_raises(self, gen_module, mock_repo):
+        """private_product value with no matching RPA raises ValueError."""
+        (mock_repo / "ci" / "package-overrides.yaml").write_text(
+            textwrap.dedent("""\
+            alpha:
+              private_product: nonexistent
+            """)
+        )
+        with patch.object(gen_module, "ROOT_DIR", mock_repo):
+            with pytest.raises(ValueError, match="nonexistent"):
+                gen_module.generate_releng()
+
+    def test_missing_rpa_field_raises(self, gen_module, mock_repo):
+        """Missing required field in RPA config raises ValueError."""
+        (mock_repo / "ci" / "konflux_rpa_config.yml").write_text(
+            textwrap.dedent("""\
+            global:
+              branch: main
+              tenant: hummingbird-tenant
+              release_tenant: rhtap-releng-tenant
+              git_repo: https://gitlab.com/redhat/hummingbird/rpms.git
+            rpas:
+              - name: incomplete-rpa
+                application_prefix: rpms
+            """)
+        )
+        with patch.object(gen_module, "ROOT_DIR", mock_repo):
+            with pytest.raises(ValueError, match="incomplete-rpa.*release_org"):
+                gen_module.generate_releng()

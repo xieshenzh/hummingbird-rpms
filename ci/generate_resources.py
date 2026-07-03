@@ -240,8 +240,23 @@ def build_konflux_variables(branch: str, tenant: str, git_repo: str) -> dict:
     }
 
 
+_REQUIRED_RPA_FIELDS = [
+    "name", "application_prefix", "release_org", "single_component_mode",
+    "service_account_name", "pulp_unsigned_domain", "pulp_signed_domain",
+    "pulp_secret_name", "pipeline_revision", "pipeline_url",
+]
+
+
 def build_releng_variables(rpa_config: dict, global_config: dict) -> dict:
     """Build variables for a single ReleasePlanAdmission."""
+    rpa_name = rpa_config.get("name", "<unnamed>")
+    for field in _REQUIRED_RPA_FIELDS:
+        if field not in rpa_config:
+            raise ValueError(
+                f"RPA '{rpa_name}' is missing required field '{field}' "
+                f"in ci/konflux_rpa_config.yml"
+            )
+
     package_overrides = load_yaml_file(ROOT_DIR / "ci" / "package-overrides.yaml") or {}
 
     packages = get_all_packages()
@@ -301,6 +316,21 @@ def generate_releng() -> dict[str, str]:
     """Generate releng (ReleasePlanAdmission) resources for all configured RPAs."""
     config = load_releng_config()
     global_config = config["global"]
+
+    package_overrides = load_yaml_file(ROOT_DIR / "ci" / "package-overrides.yaml") or {}
+    known_products = {
+        rpa["private_product"]
+        for rpa in config["rpas"]
+        if "private_product" in rpa
+    }
+    for pkg, cfg in package_overrides.items():
+        product = cfg.get("private_product") if isinstance(cfg, dict) else None
+        if product and product not in known_products:
+            raise ValueError(
+                f"Package '{pkg}' has private_product: '{product}' but no RPA "
+                f"entry has private_product: '{product}'. "
+                f"Known products: {sorted(known_products)}"
+            )
 
     template_path = ROOT_DIR / "konflux-templates" / "releng-staging.yml.j2"
     macros_dir = ROOT_DIR / "konflux-templates" / "macros" / "releng"
