@@ -231,12 +231,32 @@ there following the same pattern as `rpms-main`:
        - konflux-rh03/hummingbird-tenant
    ```
 
-4. Optionally copy `01-release-plans.yml.j2` and IntegrationTestScenario templates from
-   `kubernetes/rpms-main/` if the private application needs them.
+4. Add `01-release-plans.yml.j2` with a ReleasePlan that references the private RPA.
+   Copy from `kubernetes/rpms-main/01-release-plans.yml.j2` and update the
+   `releasePlanAdmission` label to match the private RPA name:
+
+   ```yaml
+   metadata:
+     name: hummingbird-rpm-release-private-<product>
+     labels:
+       release.appstudio.openshift.io/auto-release: "true"
+       release.appstudio.openshift.io/standing-attribution: "true"
+       release.appstudio.openshift.io/releasePlanAdmission: hummingbird-rpms-private-<product>
+   spec:
+     application: {{ env["PROJECT_NAME"] }}
+     target: rhtap-releng-tenant
+     # ... copy remaining spec from rpms-main/01-release-plans.yml.j2
+   ```
+
+   The ReleasePlan connects the private Application to its ReleasePlanAdmission. Without
+   it, builds in the private Application will not trigger releases.
+
+5. Optionally copy IntegrationTestScenario templates from `kubernetes/rpms-main/` if the
+   private application needs them.
 
 Merge this MR in the infrastructure repo first — the CI pipeline will deploy the Application
-to the cluster. Components and RPAs in this repo reference it by name, so the Application
-must exist before they are applied.
+and ReleasePlan to the cluster. Components and RPAs in this repo reference it by name, so
+the Application must exist before they are applied.
 
 ### 5. Add RPA configuration
 
