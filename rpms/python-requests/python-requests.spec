@@ -6,8 +6,8 @@
 %bcond extradeps %{undefined rhel}
 
 Name:           python-requests
-Version:        2.33.1
-Release:        4%{?dist}
+Version:        2.34.2
+Release:        1%{?dist}
 Summary:        HTTP library, written in Python, for human beings
 
 License:        Apache-2.0
