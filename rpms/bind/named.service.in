@@ -1,0 +1,28 @@
+[Unit]
+Description=Berkeley Internet Name Domain (DNS)
+Wants=nss-lookup.target
+Wants=named-setup-rndc.service
+Before=nss-lookup.target
+After=named-setup-rndc.service
+After=network.target
+
+[Service]
+Type=forking
+Environment=OPTIONS=
+Environment=NAMEDCONF=/etc/named.conf
+EnvironmentFile=-/etc/sysconfig/named
+Environment=KRB5_KTNAME=/etc/named.keytab
+PIDFile=/run/named/named.pid
+
+ExecStartPre=/bin/bash -c 'if [ ! "$DISABLE_ZONE_CHECKING" == "yes" ]; then %{_sbindir}/named-checkconf%{program_suffix} -z "$NAMEDCONF"; else echo "Checking of zone files is disabled"; fi'
+ExecStart=%{_sbindir}/named%{program_suffix} -u named -c ${NAMEDCONF} $OPTIONS
+
+ExecReload=/bin/sh -c 'if %{_sbindir}/rndc%{program_suffix} null > /dev/null 2>&1; then %{_sbindir}/rndc%{program_suffix} reload; else %{_bindir}/kill -HUP $MAINPID; fi'
+
+ExecStop=/bin/sh -c '%{_sbindir}/rndc%{program_suffix} stop > /dev/null 2>&1 || %{_bindir}/kill -TERM $MAINPID'
+
+PrivateTmp=true
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target

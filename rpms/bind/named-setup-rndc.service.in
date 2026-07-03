@@ -4,4 +4,4 @@ Description=Generate rndc key for BIND (DNS)
 [Service]
 Type=oneshot
 
-ExecStart=/usr/libexec/generate-rndc-key.sh
+ExecStart=/usr/libexec/%{name}/generate-rndc-key.sh
