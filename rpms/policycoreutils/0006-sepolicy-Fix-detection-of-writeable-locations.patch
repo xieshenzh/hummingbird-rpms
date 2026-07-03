@@ -1,4 +1,4 @@
-From 9f2811d24a705b6fb4c1c0339dfe9bd30909228b Mon Sep 17 00:00:00 2001
+From b5d8719fdcaa7a7209bacb6e0d2f57f0f428706d Mon Sep 17 00:00:00 2001
 From: Petr Lautrbach <lautrbach@redhat.com>
 Date: Mon, 5 May 2025 18:28:40 +0200
 Subject: [PATCH] sepolicy: Fix detection of writeable locations
@@ -26,17 +26,20 @@ Fixes:
 
 Signed-off-by: Petr Lautrbach <lautrbach@redhat.com>
 ---
- python/sepolicy/sepolicy/generate.py | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ python/sepolicy/sepolicy/generate.py | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
 diff --git a/python/sepolicy/sepolicy/generate.py b/python/sepolicy/sepolicy/generate.py
-index cde6a840e452..9b360e96c9d1 100644
+index 02d9066c8a42..9b360e96c9d1 100644
 --- a/python/sepolicy/sepolicy/generate.py
 +++ b/python/sepolicy/sepolicy/generate.py
-@@ -1324,15 +1324,15 @@ allow %s_t %s_t:%s_socket name_%s;
+@@ -1324,18 +1324,15 @@ allow %s_t %s_t:%s_socket name_%s;
          import dnf
  
          with dnf.Base() as base:
+-            if base.conf.substitutions.get('releasever') is None:
+-                base.conf.substitutions['releasever'] = ''
+-
 +            base.conf.substitutions.update_from_etc('/')
              base.read_all_repos()
              base.fill_sack(load_system_repo=True)
@@ -52,7 +55,7 @@ index cde6a840e452..9b360e96c9d1 100644
                  self.rpms.append(pkg.name)
                  for fname in pkg.files:
                      for b in self.DEFAULT_DIRS:
-@@ -1345,7 +1345,7 @@ allow %s_t %s_t:%s_socket name_%s;
+@@ -1348,7 +1345,7 @@ allow %s_t %s_t:%s_socket name_%s;
                                  self.add_dir(fname)
                  sq = query.available()
                  sq = sq.filter(provides=pkg.source_name)
@@ -62,5 +65,5 @@ index cde6a840e452..9b360e96c9d1 100644
                          for b in self.DEFAULT_DIRS:
                              if b == "/etc":
 -- 
-2.52.0
+2.54.0
 

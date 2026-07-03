@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "5",
-  "sha": "dd6c2e4568bb8017d2f14b919bd0b3544fefe99a",
+  "release": "1",
+  "sha": "f118670c734f1e88d73c76ce6c65a89193a4d5b6",
   "source": "https://src.fedoraproject.org/rpms/policycoreutils.git",
   "upstream_repo": "https://github.com/SELinuxProject/selinux",
-  "version": "3.10"
+  "version": "3.11"
 }
