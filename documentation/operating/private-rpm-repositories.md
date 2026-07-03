@@ -155,8 +155,8 @@ If using a dedicated service account (step 1), add a Kubernetes Secret template 
        deployed: true
    ```
 
-The secret name (`pulp-private-hummingbird-config-file-secret`) must match the
-`pulp_secret_name` in the private RPA configuration (step 6).
+   The secret name (`pulp-private-hummingbird-config-file-secret`) must match the
+   `pulp_secret_name` in the private RPA configuration (step 5).
 
 3. Add an ExternalSecret to the **konflux-release-data repo** (`rhtap-release-data`) so the
    credentials are available to the release pipeline. Create the ExternalSecret in the
@@ -219,12 +219,16 @@ there following the same pattern as `rpms-main`:
      gitOpsRepository: {url: ""}
    ```
 
-3. Add the new project to the CI matrix in `infrastructure/.gitlab-ci.yml` under the
-   `konflux-rh03/hummingbird-tenant` context:
+3. Add the new project to the CI matrix in `infrastructure/.gitlab-ci.yml`. Find the
+   `PROJECT_NAME` list under the `konflux-rh03/hummingbird-tenant` context and add the
+   new application name:
 
    ```yaml
-   - PROJECT_NAME: private-<product>-rpms-main
-     PROJECT_CONTEXT: konflux-rh03/hummingbird-tenant
+   - PROJECT_NAME:
+       - rpms-main
+       - private-<product>-rpms-main   # add this line
+     PROJECT_CONTEXT:
+       - konflux-rh03/hummingbird-tenant
    ```
 
 4. Optionally copy `01-release-plans.yml.j2` and IntegrationTestScenario templates from
@@ -253,7 +257,7 @@ rpas:
     service_account_name: hummingbird-rpm-release-staging
     pulp_unsigned_domain: private-hummingbird-<product>-unsigned
     pulp_signed_domain: private-hummingbird-<product>
-    pulp_secret_name: hummingbird-pulp-<product>-secret
+    pulp_secret_name: hummingbird-pulp-credentials-private-production-secret
     pipeline_revision: <release-pipeline-branch>
     pipeline_url: https://github.com/scoheb/release-service-catalog.git
     private_product: <product>
@@ -270,7 +274,7 @@ Key fields:
 | `private_product` | Matches the `private_product` value in `package-overrides.yaml` |
 | `pulp_unsigned_domain` | Pulp domain for unsigned RPMs (staging) |
 | `pulp_signed_domain` | Pulp domain for signed RPMs (production) |
-| `pulp_secret_name` | Kubernetes secret for Pulp publishing (shared across all RPAs) |
+| `pulp_secret_name` | Kubernetes secret containing Pulp publishing credentials |
 
 ### 6. Assign packages and regenerate
 
@@ -320,3 +324,4 @@ public RPA entry in `ci/konflux_rpa_config.yml`.
 | `ci/pulp-setup/create-pulp-resources.sh` | Creates Pulp domains and repositories |
 | `konflux-templates/macros/releng/release-plan-admission.yml.j2` | RPA template |
 | `konflux-templates/macros/component.yml.j2` | Component template (per-component application) |
+| `konflux-templates/macros/image-repository.yml.j2` | ImageRepository template (per-component application) |
