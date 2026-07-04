@@ -258,6 +258,8 @@ spec:
           contentType: rpm
         - name: forge-srpm-macros-main
           contentType: rpm
+        - name: foundationdb-main
+          contentType: rpm
         - name: fpc-srpm-macros-main
           contentType: rpm
         - name: freetype-main
@@ -939,6 +941,10 @@ spec:
         - name: source-highlight-main
           contentType: rpm
         - name: spdlog-main
+          contentType: rpm
+        - name: spire1-14-main
+          contentType: rpm
+        - name: spire1-15-main
           contentType: rpm
         - name: sqlite-main
           contentType: rpm

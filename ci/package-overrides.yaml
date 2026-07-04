@@ -275,6 +275,12 @@ rust-rpm-sequoia:
 scap-security-guide:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+spire1.14:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+spire1.15:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
