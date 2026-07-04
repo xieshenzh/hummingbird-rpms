@@ -355,6 +355,8 @@ packages:
   - mpich
   - multilib-rpm-config
   - musl
+  - nats-server2.12
+  - nats-server2.14
   - ncurses
   - net-snmp
   - net-tools

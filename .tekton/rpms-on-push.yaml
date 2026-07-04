@@ -17463,6 +17463,148 @@ spec:
 # PENDING
 # --- musl ---
 # PENDING
+# --- nats-server2.12 ---
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/redhat/hummingbird/rpms/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-event: "[push]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/nats-server2.12/***, test/rpms/nats-server2.12.yml]"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: rpms-main
+    appstudio.openshift.io/component: nats-server2-12-main
+    pipelines.appstudio.openshift.io/type: build
+  name: nats-server2-12-main-on-push
+  namespace: hummingbird-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
+    - name: ociStorage
+      value: quay.io/redhat-user-workloads/hummingbird-tenant/nats-server2-12-main:{{revision}}
+    - name: package-name
+      value: nats-server2.12
+    - name: target-branch
+      value: '{{target_branch}}'
+    - name: build-architectures
+      value:
+        - aarch64
+        - x86_64
+    - name: build-platforms
+      value:
+        - "linux/x86_64"
+        - "linux/arm64"
+    - name: specfile
+      value: "nats-server2.12.spec"
+    - name: monorepo-subdir
+      value: "rpms/nats-server2.12"
+    - name: mock-config-template-filename-in-sources
+      value: "mock/mock.cfg"
+    - name: dist-git-client-configdir
+      value: "mock/"
+    - name: forked-from
+      value: "https://gitlab.com/redhat/hummingbird/rpms"
+  pipelineRef:
+    resolver: bundles
+    params:
+      - name: name
+        value: build-rpm-package
+      - name: kind
+        value: pipeline
+      - name: bundle
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-nats-server2-12-main
+  timeouts:
+    pipeline: 4h
+    tasks: 4h
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{git_auth_secret}}'
+# --- nats-server2.14 ---
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/redhat/hummingbird/rpms/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-event: "[push]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/nats-server2.14/***, test/rpms/nats-server2.14.yml]"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: rpms-main
+    appstudio.openshift.io/component: nats-server2-14-main
+    pipelines.appstudio.openshift.io/type: build
+  name: nats-server2-14-main-on-push
+  namespace: hummingbird-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
+    - name: ociStorage
+      value: quay.io/redhat-user-workloads/hummingbird-tenant/nats-server2-14-main:{{revision}}
+    - name: package-name
+      value: nats-server2.14
+    - name: target-branch
+      value: '{{target_branch}}'
+    - name: build-architectures
+      value:
+        - aarch64
+        - x86_64
+    - name: build-platforms
+      value:
+        - "linux/x86_64"
+        - "linux/arm64"
+    - name: specfile
+      value: "nats-server2.14.spec"
+    - name: monorepo-subdir
+      value: "rpms/nats-server2.14"
+    - name: mock-config-template-filename-in-sources
+      value: "mock/mock.cfg"
+    - name: dist-git-client-configdir
+      value: "mock/"
+    - name: forked-from
+      value: "https://gitlab.com/redhat/hummingbird/rpms"
+  pipelineRef:
+    resolver: bundles
+    params:
+      - name: name
+        value: build-rpm-package
+      - name: kind
+        value: pipeline
+      - name: bundle
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-nats-server2-14-main
+  timeouts:
+    pipeline: 4h
+    tasks: 4h
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{git_auth_secret}}'
 # --- ncurses ---
 ---
 apiVersion: tekton.dev/v1
