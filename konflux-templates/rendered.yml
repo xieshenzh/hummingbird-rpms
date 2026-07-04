@@ -10832,6 +10832,45 @@ spec:
 # PENDING
 # --- numpy ---
 # PENDING
+# --- oauth2-proxy ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: oauth2-proxy-main
+spec:
+  application: rpms-main
+  componentName: oauth2-proxy-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/oauth2-proxy-main
+  source:
+    git:
+      context: rpms/oauth2-proxy
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: oauth2-proxy-main
+  name: oauth2-proxy-main
+spec:
+  image:
+    name: hummingbird-tenant/oauth2-proxy-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- ocaml-srpm-macros ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1

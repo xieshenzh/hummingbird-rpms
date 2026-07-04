@@ -169,6 +169,9 @@ nss-fips:
   # Use hummingbird lookaside cache instead of Fedora
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+oauth2-proxy:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 opentelemetry-collector:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
