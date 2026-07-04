@@ -338,6 +338,8 @@ spec:
           contentType: rpm
         - name: harfbuzz-main
           contentType: rpm
+        - name: helm-main
+          contentType: rpm
         - name: hiredis-main
           contentType: rpm
         - name: hostname-main
