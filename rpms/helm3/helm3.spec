@@ -24,6 +24,8 @@ Source0:        %{gosource}
 Source1:        %{archivename}-vendor.tar.bz2
 Source2:        go-vendor-tools.toml
 
+Provides:       helm = %{version}-%{release}
+
 Obsoletes:      golang-helm-3 < 3.11.1-6
 Obsoletes:      golang-helm-3-devel < 3.11.1-6
 
@@ -57,19 +59,19 @@ export GO_LDFLAGS="-X helm.sh/helm/v3/internal/version.version=v%{version} \
                 -X helm.sh/helm/v3/pkg/lint/rules.k8sVersionMinor=%{k8s_minor} \
                 -X helm.sh/helm/v3/pkg/chartutil.k8sVersionMajor=%{k8s_major} \
                 -X helm.sh/helm/v3/pkg/chartutil.k8sVersionMinor=%{k8s_minor}"
-%gobuild -o %{gobuilddir}/bin/%{name} %{goipath}/cmd/helm
+%gobuild -o %{gobuilddir}/bin/helm %{goipath}/cmd/helm
 
-%{gobuilddir}/bin/%{name} completion bash > %{name}.bash
-%{gobuilddir}/bin/%{name} completion fish > %{name}.fish
-%{gobuilddir}/bin/%{name} completion zsh  > %{name}.zsh
+%{gobuilddir}/bin/helm completion bash > helm.bash
+%{gobuilddir}/bin/helm completion fish > helm.fish
+%{gobuilddir}/bin/helm completion zsh  > helm.zsh
 
 %install
 %go_vendor_license_install -c %{S:2}
 install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
-install -Dpm 0644 %{name}.bash %{buildroot}%{bash_completions_dir}/%{name}
-install -Dpm 0644 %{name}.fish %{buildroot}%{fish_completions_dir}/%{name}.fish
-install -Dpm 0644 %{name}.zsh  %{buildroot}%{zsh_completions_dir}/_%{name}
+install -Dpm 0644 helm.bash %{buildroot}%{bash_completions_dir}/helm
+install -Dpm 0644 helm.fish %{buildroot}%{fish_completions_dir}/helm.fish
+install -Dpm 0644 helm.zsh  %{buildroot}%{zsh_completions_dir}/_helm
 
 
 %check
@@ -86,10 +88,10 @@ done
 %files -f %{go_vendor_license_filelist}
 %license vendor/modules.txt
 %doc ADOPTERS.md CONTRIBUTING.md README.md SECURITY.md code-of-conduct.md
-%{_bindir}/helm3
-%{bash_completions_dir}/%{name}
-%{fish_completions_dir}/%{name}.fish
-%{zsh_completions_dir}/_%{name}
+%{_bindir}/helm
+%{bash_completions_dir}/helm
+%{fish_completions_dir}/helm.fish
+%{zsh_completions_dir}/_helm
 
 %changelog
 %autochangelog

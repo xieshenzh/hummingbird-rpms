@@ -5280,45 +5280,6 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
-# --- helm ---
----
-apiVersion: appstudio.redhat.com/v1alpha1
-kind: Component
-metadata:
-  annotations:
-    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
-    git-provider: gitlab
-    git-provider-url: https://gitlab.com
-    mintmaker.appstudio.redhat.com/disabled: "true"
-    test.appstudio.openshift.io/comment_strategy: disable_all
-  name: helm-main
-spec:
-  application: rpms-main
-  componentName: helm-main
-  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/helm-main
-  source:
-    git:
-      context: rpms/helm
-      revision: main
-      url: https://gitlab.com/redhat/hummingbird/rpms.git
----
-apiVersion: appstudio.redhat.com/v1alpha1
-kind: ImageRepository
-metadata:
-  labels:
-    appstudio.redhat.com/application: rpms-main
-    appstudio.redhat.com/component: helm-main
-  name: helm-main
-spec:
-  image:
-    name: hummingbird-tenant/helm-main
-    visibility: public
-  notifications:
-  - config:
-      url: https://bombino.api.redhat.com/v1/sbom/quay/push
-    event: repo_push
-    method: webhook
-    title: SBOM-event-to-Bombino
 # --- helm3 ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1
@@ -5351,6 +5312,45 @@ metadata:
 spec:
   image:
     name: hummingbird-tenant/helm3-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
+# --- helm4 ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: helm4-main
+spec:
+  application: rpms-main
+  componentName: helm4-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/helm4-main
+  source:
+    git:
+      context: rpms/helm4
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: helm4-main
+  name: helm4-main
+spec:
+  image:
+    name: hummingbird-tenant/helm4-main
     visibility: public
   notifications:
   - config:

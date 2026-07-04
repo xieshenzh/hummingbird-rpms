@@ -1,8 +1,0 @@
-{
-  "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "1",
-  "sha": "a53b20b924c7a3361f827227cac644b63e783df2",
-  "source": "https://src.fedoraproject.org/rpms/helm.git",
-  "version": "4.2.2"
-}
