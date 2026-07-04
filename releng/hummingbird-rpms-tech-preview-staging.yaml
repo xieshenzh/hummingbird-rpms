@@ -340,6 +340,8 @@ spec:
           contentType: rpm
         - name: helm-main
           contentType: rpm
+        - name: helm3-main
+          contentType: rpm
         - name: hiredis-main
           contentType: rpm
         - name: hostname-main

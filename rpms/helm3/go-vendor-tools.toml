@@ -1,0 +1,56 @@
+[licensing]
+detector = "askalono"
+exclude_files = [
+    "scripts/coverage.sh",
+    "scripts/release-notes.sh",
+    "scripts/sync-repo.sh",
+    "scripts/util.sh",
+    "scripts/validate-license.sh",
+    "vendor/github.com/lib/pq/notice.go",
+    "vendor/go.opentelemetry.io/otel/get_main_pkgs.sh",
+    "vendor/go.opentelemetry.io/otel/verify_examples.sh",
+    "vendor/k8s.io/kubectl/pkg/util/i18n/translations/extract.py"
+]
+exclude_directories = [
+    # Exclude testdata in pkg/
+    "pkg",
+]
+
+[[licensing.licenses]]
+path = "vendor/github.com/BurntSushi/toml/COPYING"
+sha256sum = "d21cb1c60785d6d3a84a7059323ccafc45c645b1bbda281c76a62d66ad2d7dc3"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/go-errors/errors/LICENSE.MIT"
+sha256sum = "4c1b2259f160d975ec6594b602be5db4e6c0c06afe312ca3cd7cff91b75c7c26"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/miekg/dns/COPYRIGHT"
+sha256sum = "66550c0ad5ca7ec1e08683e5f872cc45c741f311eee3b8ee484206ecbf9c740d"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v2/LICENSE.libyaml"
+sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v2/LICENSE.libyaml"
+sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+[[licensing.licenses]]
+path = "vendor/github.com/shopspring/decimal/LICENSE"
+sha256sum = "b92ba0f6ee02f2309628bfdadb123668a17c016e475ba477b857d33470d9d625"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+[archive]
