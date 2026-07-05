@@ -922,6 +922,8 @@ spec:
           contentType: rpm
         - name: source-highlight-main
           contentType: rpm
+        - name: spdlog-main
+          contentType: rpm
         - name: sqlite-main
           contentType: rpm
         - name: subversion-main
