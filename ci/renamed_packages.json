@@ -1,4 +1,5 @@
 {
+  "erlang27": "erlang",
   "golang1.25": "golang",
   "golang1.26": "golang",
   "rabbitmq-server4.3": "rabbitmq-server",

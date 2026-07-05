@@ -232,6 +232,8 @@ spec:
           contentType: rpm
         - name: erlang-rpm-macros-main
           contentType: rpm
+        - name: erlang27-main
+          contentType: rpm
         - name: expat-main
           contentType: rpm
         - name: fedora-logos-main

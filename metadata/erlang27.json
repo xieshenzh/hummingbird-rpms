@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "44bb544159f0206befb39afbab96022d68abcd76",
+  "source": "https://src.fedoraproject.org/rpms/erlang.git",
+  "version": "27.3.4.14"
+}
