@@ -1,0 +1,39 @@
+---
+# Tests specific to the erlang27 package
+
+unversioned-provides-alias:
+  command: |
+    # erlang27 (and every subpackage) must Provide the unversioned Fedora
+    # name (erlang, erlang-kernel, erlang-eldap, ...) so consumers like
+    # rabbitmq-server that BuildRequire/Require plain "erlang"/"erlang-*"
+    # keep resolving without editing their specs, matching the
+    # golang1.26/ruby3.4 versioned-package convention.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    case "${rpm_name}" in
+      erlang27)
+        expected="erlang" ;;
+      erlang27-debuginfo|erlang27-debugsource|*-debuginfo|*-debugsource)
+        echo "Skipping: debuginfo/debugsource packages don't carry an alias (got: ${rpm_name})"
+        exit 0
+        ;;
+      erlang27-*)
+        expected="erlang-${rpm_name#erlang27-}" ;;
+      *)
+        echo "Skipping: not an erlang27 package (got: ${rpm_name})"
+        exit 0
+        ;;
+    esac
+
+    version_release=$(rpm -qp --queryformat '%{VERSION}-%{RELEASE}' "${TEST_RPM}")
+    provides=$(rpm -qp --provides "${TEST_RPM}")
+
+    # Strip arch qualifiers like "(x86-64)" before matching — the spec
+    # uses %{?_isa} so provides are arch-qualified, but we only care
+    # that the unversioned name alias exists at the correct version.
+    provides_plain=$(echo "${provides}" | sed 's/([^)]*)//g')
+
+    if echo "${provides_plain}" | grep -qxF "${expected} = ${version_release}"; then
+      echo "PASS: ${rpm_name} provides ${expected} = ${version_release}"
+    else
+      TEST_FAIL "${rpm_name} is missing unversioned Provides: ${expected} = ${version_release} (got: $(echo "${provides}" | grep -F "${expected} =" || echo none))"
+    fi

@@ -5371,7 +5371,7 @@ spec:
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/erlang27-main:{{revision}}
     - name: package-name
-      value: erlang
+      value: erlang27
     - name: target-branch
       value: '{{target_branch}}'
     - name: build-architectures
@@ -5388,6 +5388,10 @@ spec:
       value: "rpms/erlang27"
     - name: mock-config-template-filename-in-sources
       value: "mock/mock.cfg"
+    - name: dist-git-client-configdir
+      value: "mock/"
+    - name: forked-from
+      value: "https://gitlab.com/redhat/hummingbird/rpms"
   pipelineRef:
     resolver: bundles
     params:
