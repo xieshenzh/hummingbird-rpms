@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1.1%{?dist}
+Release: 1.2%{?dist}
 License: Python-2.0.1
 
 
@@ -433,6 +433,11 @@ Patch486: 00486-gh-148646-add---enable-prebuilt-jit-stencils-configure-flag.patc
 # Update vendored qs 6.15.0 -> 6.15.2 in emscripten browser_test package-lock.json
 # Upstream fix: https://github.com/ljharb/qs/commit/21f80b33e5c8b3f7eba1034fff0da4a4a37a1d41
 Patch487: 00487-cve-2026-8723.patch
+
+# 00488 # CVE-2026-11972
+# tarfile: Denial of Service via improper EOF handling in streaming mode
+# Upstream fix: https://github.com/python/cpython/commit/e86666c9dd256d52d0fbef6feb1ea4a51768fdec
+Patch488: 00488-cve-2026-11972.patch
 
 # (New patches go here ^^^)
 #
