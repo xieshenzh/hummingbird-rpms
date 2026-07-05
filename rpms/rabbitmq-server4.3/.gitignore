@@ -1,0 +1,7 @@
+*~
+/rabbitmq-server-*.tar.gz
+/rabbitmq-server-*.tar.xz
+/rabbitmq-server_*.orig.tar.gz
+/rabbitmq-server_*.orig.tar.gz.asc
+/rabbitmq-server_*.orig.tar.xz
+/rabbitmq-server_*.orig.tar.xz.asc
