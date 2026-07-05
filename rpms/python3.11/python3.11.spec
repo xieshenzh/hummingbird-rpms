@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 4.3%{?dist}
+Release: 4.4%{?dist}
 License: Python-2.0.1
 
 
@@ -441,6 +441,14 @@ Patch488: 00488-cve-2026-3479.patch
 #
 # gh-90309: Base64-encode cookie values embedded in JS
 Patch489: 00489-cve-2026-6019.patch
+
+# 00490 # 3a426f061dd7eeb352b8e71744329507dbddc56a
+# CVE-2026-11972
+#
+# gh-151981: Make tarfile._Stream.seek break at EOF
+#
+# (cherry-picked from commit f50bf13566189c8d0ce5a814f33eff3d89951896)
+Patch490: 00490-cve-2026-11972.patch
 
 # (New patches go here ^^^)
 #
