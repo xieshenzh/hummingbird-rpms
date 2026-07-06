@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "sha": "947202a218bc2bc3249575ff6d03153335260340",
+  "source": "https://src.fedoraproject.org/rpms/spdlog.git",
+  "upstream_repo": "https://github.com/gabime/spdlog",
+  "version": "1.17.0"
+}
