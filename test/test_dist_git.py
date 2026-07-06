@@ -1315,6 +1315,51 @@ def test_update_merge_conflict(workdir: Path, upstream_repos: dict[str, Path]) -
     assert 'License: Apache-2.0' in spec_content
 
 
+def test_multi_mr_commits_conflicted_update_for_dry_run_mr(
+    workdir: Path, upstream_repos: dict[str, Path]
+) -> None:
+    """Multi-MR wrapper turns dist_git exit 2 into a conflict MR candidate."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    chocolate_spec.write_text(chocolate_spec.read_text().replace('License: GPL', 'License: MIT'))
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), '--dry-run', 'mark-modified', '--modified',
+         '--reason', 'Local license change', 'chocolate'], cwd=workdir, check=True,
+    )
+    subprocess.run(['git', 'commit', '-a', '-m', 'Local modification'], cwd=workdir, check=True)
+
+    upstream_spec = upstream_repos['chocolate'] / 'chocolate.spec'
+    updated_upstream = upstream_spec.read_text().replace('License: GPL', 'License: Apache-2.0')
+    updated_upstream = updated_upstream.replace('Version: 10', 'Version: 11')
+    upstream_spec.write_text(updated_upstream)
+    subprocess.run(['git', 'commit', '-a', '-m', 'Change license to Apache'],
+                   cwd=upstream_repos['chocolate'], check=True)
+
+    branch = subprocess.run(
+        ['git', 'branch', '--show-current'],
+        cwd=workdir, capture_output=True, text=True, check=True
+    ).stdout.strip()
+    env = os.environ.copy()
+    env['CI_COMMIT_BRANCH'] = branch
+    env['GITLAB_REMOTE_URL'] = f'file://{workdir}'
+    env['DIST_GIT_UPDATE_SKIP_BUILD_CHECK'] = 'true'
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git_update_multi_mr.sh'),
+         '--clone', '--only-package=chocolate'],
+        cwd=workdir, capture_output=True, text=True, env=env,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert 'Update found (CONFLICTS - needs manual resolution)' in result.stdout
+    assert 'Type: CONFLICT (no auto-merge)' in result.stdout
+    assert 'Updates failed:          0' in result.stdout
+
+
 def test_update_merge_version_bump(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     """Update handles modified packages where the local change is a Version bump.
 
@@ -1362,6 +1407,65 @@ def test_update_merge_version_bump(workdir: Path, upstream_repos: dict[str, Path
     assert '# Upstream comment' in merged_spec, "Upstream change should be merged in"
     assert 'Version: 2.0' in merged_spec or '<<<<<<< HEAD' in merged_spec, \
         "Upstream version or conflict markers should be present"
+
+
+def test_update_skips_package_without_upstream_metadata(workdir: Path) -> None:
+    """Packages without source/branch/sha are skipped instead of crashing."""
+    package_dir = workdir / 'rpms' / 'signed-stub'
+    package_dir.mkdir()
+    (package_dir / 'signed-stub.spec').write_text("""Name: signed-stub
+Version: 1
+Release: 1
+Summary: Signed stub
+License: MIT
+
+%description
+Signed stub
+
+%files
+""")
+    (workdir / 'metadata' / 'signed-stub.json').write_text(json.dumps({
+        'version': '1',
+        'release': '1',
+        'modification_status': 'modified',
+        'modification_reason': 'trigger rebuild to sign the RPMs',
+    }, indent=2) + '\n')
+    subprocess.run(['git', 'add', '.'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add signed stub'], cwd=workdir, check=True)
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', 'signed-stub'],
+        cwd=workdir, capture_output=True, text=True,
+    )
+
+    assert result.returncode == 0
+    assert 'Skipping signed-stub: no Fedora upstream configured' in result.stderr
+
+
+def test_update_skips_upstream_without_spec(
+    workdir: Path, upstream_repos: dict[str, Path]
+) -> None:
+    """Retired/no-spec upstream branches are skipped instead of failing all updates."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+
+    vanilla_spec = upstream_repos['vanilla'] / 'vanilla.spec'
+    vanilla_spec.unlink()
+    (upstream_repos['vanilla'] / 'dead.package').write_text('Retired package\n')
+    subprocess.run(['git', 'add', '-A'], cwd=upstream_repos['vanilla'], check=True)
+    subprocess.run(['git', 'commit', '-m', 'Retire package'], cwd=upstream_repos['vanilla'], check=True)
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--skip-build-check', 'vanilla'],
+        cwd=workdir, capture_output=True, text=True,
+    )
+
+    assert result.returncode == 0
+    assert 'Skipping vanilla: upstream branch rawhide is retired' in result.stderr
+    metadata = json.loads((workdir / 'metadata' / 'vanilla.json').read_text())
+    assert metadata['version'] == '1.0'
 
 
 def test_native_package_blocks_update(workdir: Path, upstream_repos: dict[str, Path]) -> None:
@@ -2039,6 +2143,25 @@ def test_update_autorelease_modified(workdir: Path, upstream_repos: dict[str, Pa
         metadata = json.load(f)
     assert metadata['version'] == '1.0'
     assert metadata['release'] == '3'
+
+
+def test_replace_autorelease_optional_when_local_merge_removed_macro(
+    tmp_path: Path, dist_git_module
+) -> None:
+    """Update merge path tolerates local specs that already replaced %autorelease."""
+    package_dir = tmp_path / 'package'
+    package_dir.mkdir()
+    spec_file = package_dir / 'package.spec'
+    spec_file.write_text("""Name: package
+Version: 1.0
+Release: 0.1%{?dist}
+Summary: Test package
+License: MIT
+""")
+
+    dist_git_module.replace_autorelease_in_spec(package_dir, '3', required=False)
+
+    assert spec_file.read_text().count('Release: 0.1%{?dist}') == 1
 
 
 def test_update_with_ref(workdir: Path, upstream_repos: dict[str, Path]) -> None:
