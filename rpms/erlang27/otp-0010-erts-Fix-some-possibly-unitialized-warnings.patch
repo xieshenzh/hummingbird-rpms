@@ -1,0 +1,111 @@
+From: =?UTF-8?q?Lukas=20Backstr=C3=B6m?= <lukas@erlang.org>
+Date: Tue, 13 May 2025 09:20:58 +0200
+Subject: [PATCH] erts: Fix some possibly unitialized warnings
+
+
+diff --git a/erts/emulator/beam/atom.c b/erts/emulator/beam/atom.c
+index 036816df2f..26f97f9b39 100644
+--- a/erts/emulator/beam/atom.c
++++ b/erts/emulator/beam/atom.c
+@@ -246,6 +246,8 @@ erts_atom_put_index(const byte *name, Sint len, ErtsAtomEncoding enc, int trunc)
+     Atom a;
+     int aix;
+ 
++    ERTS_UNDEF(no_latin1_chars, -1);
++
+ #ifdef ERTS_ATOM_PUT_OPS_STAT
+     erts_atomic_inc_nob(&atom_put_ops);
+ #endif
+diff --git a/erts/emulator/beam/big.c b/erts/emulator/beam/big.c
+index e3a12e324c..df6e8e8dac 100644
+--- a/erts/emulator/beam/big.c
++++ b/erts/emulator/beam/big.c
+@@ -2345,6 +2345,7 @@ term_to_Uint(Eterm term, Uint *up)
+ 	    return 0;
+ 	}
+ 	while (xl-- > 0) {
++            ASSERT(n < 64);
+ 	    uval |= ((Uint)(*xr++)) << n;
+ 	    n += D_EXP;
+ 	}
+@@ -2497,6 +2498,7 @@ int term_to_Sint(Eterm term, Sint *sp)
+ 	    return 0;
+ 	}
+ 	while (xl-- > 0) {
++            ASSERT(n < 64);
+ 	    uval |= ((Uint)(*xr++)) << n;
+ 	    n += D_EXP;
+ 	}
+diff --git a/erts/emulator/beam/erl_db.c b/erts/emulator/beam/erl_db.c
+index 83bf0771c7..3be001c666 100644
+--- a/erts/emulator/beam/erl_db.c
++++ b/erts/emulator/beam/erl_db.c
+@@ -1440,6 +1440,7 @@ do_update_counter(Process *p, DbTable* tb,
+     Eterm* htop;          /* actual heap usage */
+     Eterm* hstart;
+     Eterm* hend;
++    ERTS_UNDEF(ret, THE_NON_VALUE);
+ 
+     UseTmpHeap(5, p);
+     if (!(tb->common.status & (DB_SET | DB_ORDERED_SET | DB_CA_ORDERED_SET))) {
+diff --git a/erts/emulator/beam/jit/x86/instr_bs.cpp b/erts/emulator/beam/jit/x86/instr_bs.cpp
+index 568dcf7e82..f3e2ed3c35 100644
+--- a/erts/emulator/beam/jit/x86/instr_bs.cpp
++++ b/erts/emulator/beam/jit/x86/instr_bs.cpp
+@@ -659,6 +659,7 @@ void BeamModuleAssembler::emit_bs_get_integer2(const ArgLabel &Fail,
+                                                const ArgRegister &Dst) {
+     Uint size;
+     Uint flags = Flags.get();
++    ERTS_UNDEF(size, 0);
+ 
+     if (flags & BSF_NATIVE) {
+         flags &= ~BSF_NATIVE;
+diff --git a/erts/emulator/drivers/common/inet_drv.c b/erts/emulator/drivers/common/inet_drv.c
+index d6835828bf..3a802d6833 100644
+--- a/erts/emulator/drivers/common/inet_drv.c
++++ b/erts/emulator/drivers/common/inet_drv.c
+@@ -14266,7 +14266,7 @@ static int packet_inet_init(void)
+ #ifdef AF_UNSPEC
+     disassoc_sa.sa_family = AF_UNSPEC;
+ #endif /* #ifdef AF_UNSPEC */
+-    disassoc_sa_size = disassoc_sa.sa_data - (char *)&disassoc_sa;
++    disassoc_sa_size = offsetof(struct sockaddr, sa_data);
+ 
+     return 0;
+ }
+diff --git a/erts/emulator/nifs/common/prim_socket_nif.c b/erts/emulator/nifs/common/prim_socket_nif.c
+index 05d44d1343..26bc5cf702 100644
+--- a/erts/emulator/nifs/common/prim_socket_nif.c
++++ b/erts/emulator/nifs/common/prim_socket_nif.c
+@@ -6371,7 +6371,7 @@ ERL_NIF_TERM nif_recvmsg(ErlNifEnv*         env,
+     ssize_t          bufSz,   ctrlSz;
+     int              flags;
+     ERL_NIF_TERM     res;
+-    BOOLEAN_T        a1ok, a2ok;
++    BOOLEAN_T        a1ok, a2ok = FALSE;
+ 
+     ESOCK_ASSERT( argc == 5 );
+ 
+@@ -12753,7 +12753,7 @@ int esock_select_cancel(ErlNifEnv*             env,
+                                       ESockDescriptor* descP,   \
+                                       ERL_NIF_TERM     sockRef) \
+     {                                                        \
+-        BOOLEAN_T          popped, activated;                \
++        BOOLEAN_T          popped, activated = FALSE;        \
+         int                sres;                             \
+         ERL_NIF_TERM       reason;                           \
+         ESockRequestor*    reqP = &descP->R;                 \
+diff --git a/erts/emulator/nifs/common/socket_util.c b/erts/emulator/nifs/common/socket_util.c
+index 33c833d175..3d1df20e5c 100644
+--- a/erts/emulator/nifs/common/socket_util.c
++++ b/erts/emulator/nifs/common/socket_util.c
+@@ -1668,6 +1668,9 @@ BOOLEAN_T esock_decode_in6_addr(ErlNifEnv*       env,
+         int                 arity;
+         size_t              n;
+         struct in6_addr     sa;
++        #ifndef VALGRIND
++        sys_memzero(&sa, sizeof(sa));
++        #endif
+ 
+         if (! GET_TUPLE(env, eAddr, &arity, &tuple))
+             return FALSE;

@@ -232,6 +232,8 @@ spec:
           contentType: rpm
         - name: erlang-rpm-macros-main
           contentType: rpm
+        - name: erlang27-main
+          contentType: rpm
         - name: expat-main
           contentType: rpm
         - name: fedora-logos-main
@@ -865,6 +867,10 @@ spec:
         - name: qt6-main
           contentType: rpm
         - name: qt6-qtbase-main
+          contentType: rpm
+        - name: rabbitmq-server4-2-main
+          contentType: rpm
+        - name: rabbitmq-server4-3-main
           contentType: rpm
         - name: rdma-core-main
           contentType: rpm
