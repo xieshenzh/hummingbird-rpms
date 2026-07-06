@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "30f2459928158f4ee10828ff7a098631f0ed26b3",
+  "release": "5",
+  "sha": "fc58e95bf8d3a498b50bf1903b9d78a7d90f36aa",
   "source": "https://src.fedoraproject.org/rpms/fedora-logos.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/fedora-logos",
   "version": "42.0.1"
