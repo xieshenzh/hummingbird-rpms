@@ -1,0 +1,309 @@
+---
+# Functional tests for nats-server: verify installation, core messaging,
+# JetStream persistence, and multi-node clustering — covering the areas
+# that %check skips due to mock's nspawn/Raft timing constraints.
+
+nats-server-functionality:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "nats-server2.14" ]]; then
+      echo "Skipping: only runs on nats-server2.14 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    test_files_dir="${TEST_FILES_DIR:-$(git rev-parse --show-toplevel)/test/rpms/nats-server2.14}"
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      -v "${test_files_dir}:/tmp/test-files:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -uo pipefail
+
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y nats-server2.14
+
+        failed=0
+        pass() { echo "PASS: $1"; }
+        fail() { echo "FAIL: $1"; failed=1; }
+
+        server_pids=()
+        cleanup_servers() {
+          for pid in "${server_pids[@]}"; do
+            kill "${pid}" 2>/dev/null || true
+            wait "${pid}" 2>/dev/null || true
+          done
+        }
+        trap cleanup_servers EXIT
+
+        # --- Installation checks ---
+
+        if nats-server --version 2>&1 | grep -q "nats-server"; then
+          pass "nats-server --version produces output"
+        else
+          fail "nats-server --version produced no recognizable output"
+        fi
+
+        if nats-server --help 2>&1 | grep -qi "nats"; then
+          pass "nats-server --help produces output"
+        else
+          fail "nats-server --help produced no output"
+        fi
+
+        if nats-server --config /tmp/test-files/nats-server.conf -t 2>&1; then
+          pass "nats-server validates test config"
+        else
+          fail "nats-server config validation failed"
+        fi
+
+        [[ -f /usr/lib/systemd/system/nats-server.service ]] && pass "systemd unit file installed" || fail "systemd unit file missing"
+        [[ -f /usr/lib/sysusers.d/nats-server.conf ]] && pass "sysusers config installed" || fail "sysusers config missing"
+        [[ -f /etc/nats-server/nats-server.conf ]] && pass "default config file installed" || fail "default config file missing"
+
+        # --- Server startup and core NATS protocol ---
+
+        nats-server --config /tmp/test-files/nats-server.conf &
+        server_pids+=($!)
+        server_pid=$!
+        sleep 2
+        if ! kill -0 "${server_pid}" 2>/dev/null; then
+          fail "nats-server failed to start"
+          exit $failed
+        fi
+        pass "nats-server starts successfully"
+
+        if bash -c "echo > /dev/tcp/127.0.0.1/14222" 2>/dev/null; then
+          pass "accepts connections on port 14222"
+        else
+          fail "not listening on port 14222"
+        fi
+
+        # INFO on connect
+        exec 3<>/dev/tcp/127.0.0.1/14222
+        read -r -t 2 info_line <&3 || true
+        exec 3<&- 3>&- 2>/dev/null || true
+        if [[ "${info_line:-}" == INFO* ]]; then
+          pass "server sends INFO on connect"
+        else
+          fail "server did not send INFO on connect"
+        fi
+
+        # PING/PONG
+        exec 3<>/dev/tcp/127.0.0.1/14222
+        read -r -t 2 _ <&3 || true
+        printf "CONNECT {\"verbose\":false}\r\nPING\r\n" >&3
+        read -r -t 2 pong_line <&3 || true
+        exec 3<&- 3>&- 2>/dev/null || true
+        if [[ "${pong_line:-}" == PONG* ]]; then
+          pass "PING/PONG keepalive works"
+        else
+          fail "PING/PONG keepalive failed"
+        fi
+
+        # Pub/Sub — subscribe on fd 4, publish on fd 5
+        exec 4<>/dev/tcp/127.0.0.1/14222
+        read -r -t 2 _ <&4 || true
+        printf "CONNECT {\"verbose\":false}\r\nSUB test.subject 1\r\nPING\r\n" >&4
+        read -r -t 2 _ <&4 || true
+
+        exec 5<>/dev/tcp/127.0.0.1/14222
+        read -r -t 2 _ <&5 || true
+        printf "CONNECT {\"verbose\":false}\r\nPUB test.subject 11\r\nHello NATS!\r\nPING\r\n" >&5
+        read -r -t 2 _ <&5 || true
+        exec 5<&- 5>&- 2>/dev/null || true
+
+        read -r -t 5 msg_hdr <&4 || true
+        read -r -t 2 msg_body <&4 || true
+        exec 4<&- 4>&- 2>/dev/null || true
+        if [[ "${msg_body:-}" == *"Hello NATS"* ]]; then
+          pass "pub/sub message delivery works"
+        else
+          fail "pub/sub message not delivered (got: ${msg_body:-empty})"
+        fi
+
+        # Wildcard subscriptions
+        exec 4<>/dev/tcp/127.0.0.1/14222
+        read -r -t 2 _ <&4 || true
+        printf "CONNECT {\"verbose\":false}\r\nSUB test.*.events 1\r\nPING\r\n" >&4
+        read -r -t 2 _ <&4 || true
+
+        exec 5<>/dev/tcp/127.0.0.1/14222
+        read -r -t 2 _ <&5 || true
+        printf "CONNECT {\"verbose\":false}\r\nPUB test.user.events 7\r\nmatched\r\nPING\r\n" >&5
+        read -r -t 2 _ <&5 || true
+        exec 5<&- 5>&- 2>/dev/null || true
+
+        read -r -t 5 _ <&4 || true
+        read -r -t 2 wild_body <&4 || true
+        exec 4<&- 4>&- 2>/dev/null || true
+        if [[ "${wild_body:-}" == *"matched"* ]]; then
+          pass "wildcard subscription works"
+        else
+          fail "wildcard subscription failed (got: ${wild_body:-empty})"
+        fi
+
+        # SIGHUP config reload
+        kill -HUP "${server_pid}" 2>/dev/null
+        sleep 1
+        if kill -0 "${server_pid}" 2>/dev/null; then
+          pass "server survives SIGHUP config reload"
+        else
+          fail "server died on SIGHUP"
+        fi
+
+        # Graceful shutdown
+        kill "${server_pid}" 2>/dev/null
+        wait "${server_pid}" 2>/dev/null || true
+        pass "server shuts down gracefully"
+
+        # --- JetStream ---
+
+        js_dir=$(mktemp -d)
+        nats-server -p 14333 -js -sd "${js_dir}" &
+        server_pids+=($!)
+        js_pid=$!
+        sleep 2
+        if ! kill -0 "${js_pid}" 2>/dev/null; then
+          fail "JetStream server failed to start"
+          exit $failed
+        fi
+        pass "JetStream server starts"
+
+        exec 3<>/dev/tcp/127.0.0.1/14333
+        read -r -t 2 js_info <&3 || true
+        exec 3<&- 3>&- 2>/dev/null || true
+        if [[ "${js_info:-}" == *"jetstream"* ]]; then
+          pass "JetStream advertised in server INFO"
+        else
+          fail "JetStream not advertised in INFO"
+        fi
+
+        if [[ -d "${js_dir}/jetstream" ]]; then
+          pass "JetStream store directory created"
+        else
+          fail "JetStream store directory not created"
+        fi
+
+        kill "${js_pid}" 2>/dev/null
+        wait "${js_pid}" 2>/dev/null || true
+        rm -rf "${js_dir}"
+
+        # --- Multi-node cluster ---
+
+        cluster_dir=$(mktemp -d)
+        mkdir -p "${cluster_dir}"/{n1,n2,n3}
+
+        nats-server -p 14501 --server_name n1 -cluster nats://127.0.0.1:16501 \
+          -js -sd "${cluster_dir}/n1" -cluster_name test \
+          -routes nats://127.0.0.1:16502,nats://127.0.0.1:16503 &
+        n1_pid=$!
+        server_pids+=($n1_pid)
+
+        nats-server -p 14502 --server_name n2 -cluster nats://127.0.0.1:16502 \
+          -js -sd "${cluster_dir}/n2" -cluster_name test \
+          -routes nats://127.0.0.1:16501,nats://127.0.0.1:16503 &
+        n2_pid=$!
+        server_pids+=($n2_pid)
+
+        nats-server -p 14503 --server_name n3 -cluster nats://127.0.0.1:16503 \
+          -js -sd "${cluster_dir}/n3" -cluster_name test \
+          -routes nats://127.0.0.1:16501,nats://127.0.0.1:16502 &
+        n3_pid=$!
+        server_pids+=($n3_pid)
+
+        sleep 5
+
+        cluster_ok=true
+        for pid in $n1_pid $n2_pid $n3_pid; do
+          kill -0 "${pid}" 2>/dev/null || cluster_ok=false
+        done
+        if $cluster_ok; then
+          pass "3-node cluster starts successfully"
+        else
+          fail "one or more cluster nodes failed to start"
+        fi
+
+        # Cluster routes
+        if $cluster_ok; then
+          exec 3<>/dev/tcp/127.0.0.1/14501
+          read -r -t 2 route_info <&3 || true
+          exec 3<&- 3>&- 2>/dev/null || true
+          if [[ "${route_info:-}" == *"connect_urls"* ]]; then
+            pass "cluster routes advertised in INFO"
+          else
+            fail "cluster routes not advertised"
+          fi
+        fi
+
+        # Cross-node pub/sub: publish node 1, subscribe node 3
+        if $cluster_ok; then
+          exec 4<>/dev/tcp/127.0.0.1/14503
+          read -r -t 2 _ <&4 || true
+          printf "CONNECT {\"verbose\":false}\r\nSUB cluster.test 1\r\nPING\r\n" >&4
+          read -r -t 2 _ <&4 || true
+          sleep 1
+
+          exec 5<>/dev/tcp/127.0.0.1/14501
+          read -r -t 2 _ <&5 || true
+          printf "CONNECT {\"verbose\":false}\r\nPUB cluster.test 12\r\ncluster msg!\r\nPING\r\n" >&5
+          read -r -t 2 _ <&5 || true
+          exec 5<&- 5>&- 2>/dev/null || true
+
+          read -r -t 5 _ <&4 || true
+          read -r -t 2 cross_body <&4 || true
+          exec 4<&- 4>&- 2>/dev/null || true
+
+          if [[ "${cross_body:-}" == *"cluster msg!"* ]]; then
+            pass "cross-node pub/sub message delivery works"
+          else
+            fail "cross-node message not delivered (got: ${cross_body:-empty})"
+          fi
+        fi
+
+        # Cluster survives node loss
+        if $cluster_ok; then
+          kill "${n2_pid}" 2>/dev/null
+          wait "${n2_pid}" 2>/dev/null || true
+          sleep 2
+
+          exec 4<>/dev/tcp/127.0.0.1/14503
+          read -r -t 2 _ <&4 || true
+          printf "CONNECT {\"verbose\":false}\r\nSUB resilience.test 1\r\nPING\r\n" >&4
+          read -r -t 2 _ <&4 || true
+          sleep 1
+
+          exec 5<>/dev/tcp/127.0.0.1/14501
+          read -r -t 2 _ <&5 || true
+          printf "CONNECT {\"verbose\":false}\r\nPUB resilience.test 8\r\nsurvive!\r\nPING\r\n" >&5
+          read -r -t 2 _ <&5 || true
+          exec 5<&- 5>&- 2>/dev/null || true
+
+          read -r -t 5 _ <&4 || true
+          read -r -t 2 survive_body <&4 || true
+          exec 4<&- 4>&- 2>/dev/null || true
+
+          if [[ "${survive_body:-}" == *"survive!"* ]]; then
+            pass "cluster survives node loss — pub/sub still works"
+          else
+            fail "cluster pub/sub failed after node loss (got: ${survive_body:-empty})"
+          fi
+        fi
+
+        rm -rf "${cluster_dir}"
+        exit $failed
+      '

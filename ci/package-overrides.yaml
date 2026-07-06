@@ -197,6 +197,12 @@ opentofu1.11:
 opentofu1.12:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+nats-server2.12:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+nats-server2.14:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 oras:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
