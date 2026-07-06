@@ -1353,6 +1353,76 @@ def test_cli_error_exit_two(cuv_module, workdir: Path) -> None:
     assert exc_info.value.code == 2
 
 
+def test_update_continues_after_package_failure(cuv_module, workdir: Path) -> None:
+    """A failed package update is restored and does not block later packages."""
+    _create_package(workdir, 'bad', '1.0',
+                    metadata={'version': '1.0', 'release': '1',
+                              'track_upstream': 'latest'})
+    _create_package(workdir, 'good', '1.0',
+                    metadata={'version': '1.0', 'release': '1',
+                              'track_upstream': 'latest'})
+    subprocess.run(['git', 'add', '.'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add packages'], cwd=workdir, check=True)
+
+    cuv_module.ROOT_DIR = workdir
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    results = {
+        'bad': cuv_module.VersionCheckResult(
+            package='bad',
+            current_version='1.0',
+            upstream_version='2.0',
+            has_update=True,
+        ),
+        'good': cuv_module.VersionCheckResult(
+            package='good',
+            current_version='1.0',
+            upstream_version='2.0',
+            has_update=True,
+        ),
+    }
+
+    def fake_update(package: str, new_version: str) -> list[str]:
+        spec_path = workdir / 'rpms' / package / f'{package}.spec'
+        spec_path.write_text(
+            spec_path.read_text().replace('Version: 1.0', f'Version: {new_version}')
+        )
+        metadata_path = workdir / 'metadata' / f'{package}.json'
+        metadata = json.loads(metadata_path.read_text())
+        metadata['version'] = new_version
+        metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + '\n')
+
+        if package == 'bad':
+            raise cuv_module.urllib.error.HTTPError(
+                'https://example.com/bad-2.0.tar.gz', 404, 'Not Found', {}, None
+            )
+        return []
+
+    with patch.object(cuv_module, 'check_package_version',
+                      side_effect=lambda package, distro='Fedora': results[package]), \
+         patch.object(cuv_module, 'update_spec_version', side_effect=fake_update), \
+         patch('sys.argv', ['check_upstream_versions.py', 'check', '--update',
+                            '--quiet', 'bad', 'good']), \
+         pytest.raises(SystemExit) as exc_info:
+        cuv_module.main()
+
+    assert exc_info.value.code == 1
+    assert 'Version: 1.0' in (workdir / 'rpms' / 'bad' / 'bad.spec').read_text()
+    assert 'Version: 2.0' in (workdir / 'rpms' / 'good' / 'good.spec').read_text()
+
+    bad_metadata = json.loads((workdir / 'metadata' / 'bad.json').read_text())
+    good_metadata = json.loads((workdir / 'metadata' / 'good.json').read_text())
+    assert bad_metadata['version'] == '1.0'
+    assert good_metadata['version'] == '2.0'
+
+    subject = subprocess.run(
+        ['git', 'log', '-1', '--format=%s'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    assert subject == 'Update good to 2.0'
+
+
 #
 # Tests — track_upstream filtering
 #

@@ -835,6 +835,13 @@ def update_spec_version(package: str, new_version: str) -> list[str]:
     return downloaded
 
 
+def discard_package_changes(package: str) -> None:
+    """Discard uncommitted changes for one package after update failure."""
+    paths = [f"rpms/{package}", f"metadata/{package}.json"]
+    run_git("restore", "--staged", "--worktree", "--", *paths, cwd=ROOT_DIR)
+    run_git("clean", "-fd", "--", f"rpms/{package}", cwd=ROOT_DIR)
+
+
 def query_anitya(package: str, distro: str = DEFAULT_DISTRO) -> dict:
     """
     Query release-monitoring.org for package information.
@@ -1172,32 +1179,54 @@ def run_check(args: argparse.Namespace) -> None:
         for result in results:
             if not result.has_update or not result.upstream_version:
                 continue
-            downloaded = update_spec_version(
-                result.package, result.upstream_version
-            )
+            try:
+                downloaded = update_spec_version(
+                    result.package, result.upstream_version
+                )
+                result.downloaded_sources = downloaded
+
+                # Add downloaded sources to .gitignore so they
+                # are not committed (they live in the lookaside cache)
+                if downloaded:
+                    _update_gitignore(RPMS_DIR / result.package, downloaded)
+
+                # Commit the changes (no -f so .gitignore is respected)
+                run_git(
+                    "add",
+                    f"rpms/{result.package}",
+                    f"metadata/{result.package}.json",
+                    cwd=ROOT_DIR,
+                )
+                commit_msg = (
+                    f"Update {result.package} to"
+                    f" {result.upstream_version}\n\n"
+                    f"Upstream version detected via"
+                    f" release-monitoring.org"
+                )
+                run_git_commit("-m", commit_msg, cwd=ROOT_DIR)
+            except (
+                OSError,
+                RuntimeError,
+                ValueError,
+                subprocess.CalledProcessError,
+                urllib.error.URLError,
+            ) as e:
+                result.update_error = str(e)
+                logger.error("%s: failed to apply update: %s", result.package, e)
+                try:
+                    discard_package_changes(result.package)
+                except subprocess.CalledProcessError as cleanup_error:
+                    cleanup_msg = (
+                        f"{result.update_error}; failed to clean working tree: "
+                        f"{cleanup_error}"
+                    )
+                    result.update_error = cleanup_msg
+                    logger.error("%s: %s", result.package, cleanup_msg)
+                    raise
+                continue
+
             result.updated = True
-            result.downloaded_sources = downloaded
             updates_applied += 1
-
-            # Add downloaded sources to .gitignore so they
-            # are not committed (they live in the lookaside cache)
-            if downloaded:
-                _update_gitignore(RPMS_DIR / result.package, downloaded)
-
-            # Commit the changes (no -f so .gitignore is respected)
-            run_git(
-                "add",
-                f"rpms/{result.package}",
-                f"metadata/{result.package}.json",
-                cwd=ROOT_DIR,
-            )
-            commit_msg = (
-                f"Update {result.package} to"
-                f" {result.upstream_version}\n\n"
-                f"Upstream version detected via"
-                f" release-monitoring.org"
-            )
-            run_git_commit("-m", commit_msg, cwd=ROOT_DIR)
 
     # Output results
     if args.json:
