@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Update to 5.0.7 to fix CVE-2025-67873",
   "modification_status": "modified",
-  "release": "4",
-  "sha": "6ae6bcb25955c41deafe1d334f935e9ee712475a",
+  "release": "5",
+  "sha": "3129fc32ec1f3415d0d7e217ff8d957a1ed05e1f",
   "source": "https://src.fedoraproject.org/rpms/capstone.git",
   "upstream_repo": "https://github.com/capstone-engine/capstone",
   "version": "5.0.6"
