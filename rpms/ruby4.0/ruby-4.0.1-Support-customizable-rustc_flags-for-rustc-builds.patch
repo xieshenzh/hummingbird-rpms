@@ -55,7 +55,7 @@ index 2bbce78fd0..a3aa6dc383 100644
  
  [begin]_group "environment section" && {
  HAVE_BASERUBY=yes
-@@ -4054,6 +4055,11 @@ AS_CASE(["${ZJIT_SUPPORT}"],
+@@ -4051,6 +4054,11 @@ AS_CASE(["${ZJIT_SUPPORT}"],
      AC_DEFINE(USE_ZJIT, 0)
  ])
  
@@ -67,7 +67,7 @@ index 2bbce78fd0..a3aa6dc383 100644
  JIT_RUST_FLAGS='--crate-type=staticlib --cfg feature=\"stats_allocator\"'
  RLIB_DIR=
  AS_CASE(["$JIT_CARGO_SUPPORT:$YJIT_SUPPORT:$ZJIT_SUPPORT"],
-@@ -4111,6 +4117,7 @@ AS_IF([test -n "$RUST_LIB"], [
+@@ -4108,6 +4114,7 @@ AS_IF([test -n "$RUST_LIB"], [
  dnl These variables end up in ::RbConfig::CONFIG
  AC_SUBST(RUSTC)dnl Rust compiler command
  AC_SUBST(JIT_RUST_FLAGS)dnl the common rustc flags for JIT crates such as zjit
@@ -75,7 +75,7 @@ index 2bbce78fd0..a3aa6dc383 100644
  AC_SUBST(CARGO)dnl Cargo command for Rust builds
  AC_SUBST(CARGO_BUILD_ARGS)dnl for selecting Rust build profiles
  AC_SUBST(YJIT_SUPPORT)dnl what flavor of YJIT the Ruby build includes
-@@ -4855,6 +4862,7 @@ config_summary "strip command"       "$STRIP"
+@@ -4852,6 +4859,7 @@ config_summary "strip command"       "$STRIP"
  config_summary "install doc"         "$DOCTARGETS"
  config_summary "YJIT support"        "$YJIT_SUPPORT"
  config_summary "ZJIT support"        "$ZJIT_SUPPORT"
