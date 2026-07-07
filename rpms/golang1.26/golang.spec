@@ -168,10 +168,6 @@ Patch10:        0010-Skip-TestTerminalSignal.patch
 # FIPS activates automatically on FIPS-enabled hosts, stays off otherwise.
 # Users can override with GODEBUG=fips140=on or godebug fips140=auto in go.mod.
 Patch15:        0015-Default-GOFIPS140-certified-fips-auto.patch
-# Backport of https://github.com/golang/go/commit/be193f3a97dce50bad1cf6100aa662c2f6ba57f7
-# go get fails when GOFIPS140 is set to a snapshot version (e.g. certified).
-# IsStandardPackage uses os.ReadDir which can't see fsys.Bind overlays.
-Patch20:        0020-Fix-go-get-with-GOFIPS140-snapshot.patch
 
 # Having documentation separate was broken
 Obsoletes:      %{name}-docs < 1.1-4
