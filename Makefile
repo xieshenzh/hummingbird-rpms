@@ -57,6 +57,13 @@ check-frontmatter-host:
 	done; \
 	if [ "$$fail" = 1 ]; then exit 1; fi
 
+.PHONY: check-conflict-markers-host
+check-conflict-markers-host:
+	@if git grep -nE '^<{7} .+|^={7}$$|^>{7} .+' -- . \
+	    ':(exclude)documentation/operating/package-modification-tracking.md'; then \
+	  echo "ERROR: conflict markers found in the files above"; exit 1; \
+	fi
+
 .PHONY: check-host check
 check-host:
 	git ls-files -z 'ci/*.sh' | xargs -0 shellcheck --external-sources --enable=all
@@ -72,6 +79,7 @@ check-host:
 	fi
 	$(MAKE) markdownlint-host
 	$(MAKE) check-frontmatter-host
+	$(MAKE) check-conflict-markers-host
 
 check:
 	$(PODMAN_RUN) $(PODMAN_IMAGE) make check-host
