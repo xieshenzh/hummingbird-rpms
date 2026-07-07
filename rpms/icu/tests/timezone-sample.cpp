@@ -102,24 +102,39 @@ int main(int argc, char** argv) {
 
     // timezone, year, month (0-11), day, hour, minute, second,
     // std offset expected, dst offset expected:
-    test_dst("Asia/Gaza", 2019, 9, 25, 20, 59, 59, 2, 1);
-    // Why doesn’t this work with the exactly correct time?:
-    test_dst("Asia/Gaza", 2019, 9, 25, 21, 0, 0, 2, 1); // wrong!
+    test_dst("Asia/Gaza", 2019, 9, 25, 22, 59, 59, 2, 1);
     test_dst("Asia/Gaza", 2019, 9, 25, 23, 0, 0, 2, 0);
 
     // Asia/Gaza  Fri Oct 23 21:59:59 2020 UT = Sat Oct 24 00:59:59 2020 EEST isdst=1 gmtoff=10800
     // Asia/Gaza  Fri Oct 23 22:00:00 2020 UT = Sat Oct 24 00:00:00 2020 EET isdst=0 gmtoff=7200
-    test_dst("Asia/Gaza", 2020, 9, 23, 21, 59, 59, 2, 1);
-    test_dst("Asia/Gaza", 2020, 9, 23, 22, 0, 0, 2, 1); // wrong!
-    test_dst("Asia/Gaza", 2020, 9, 24, 22, 0, 0, 2, 0);
+    test_dst("Asia/Gaza", 2020, 9, 23, 23, 59, 59, 2, 1);
+    test_dst("Asia/Gaza", 2020, 9, 24, 0, 0, 0, 2, 0);
 
     // Asia/Gaza  Thu Oct 28 21:59:59 2021 UT = Fri Oct 29 00:59:59 2021 EEST isdst=1 gmtoff=10800
     // Asia/Gaza  Thu Oct 28 22:00:00 2021 UT = Fri Oct 29 00:00:00 2021 EET isdst=0 gmtoff=7200
 
-    test_dst("Asia/Gaza", 2021, 9, 28, 21, 59, 59, 2, 1);
-    test_dst("Asia/Gaza", 2021, 9, 28, 22, 0, 0, 2, 1); // wrong!
-    test_dst("Asia/Gaza", 2021, 9, 29, 21, 59, 59, 2, 0);
-    test_dst("Asia/Gaza", 2021, 9, 30, 22, 0, 0, 2, 0);
+    test_dst("Asia/Gaza", 2021, 9, 28, 23, 59, 59, 2, 1);
+    test_dst("Asia/Gaza", 2021, 9, 29, 0, 0, 0, 2, 0);
+
+    // tzdata-2026b:
+    // zdump -c 2025,2027 -v America/Vancouver
+    // America/Vancouver  Sun Mar  9 09:59:59 2025 UT = Sun Mar  9 01:59:59 2025 PST isdst=0 gmtoff=-28800
+    // America/Vancouver  Sun Mar  9 10:00:00 2025 UT = Sun Mar  9 03:00:00 2025 PDT isdst=1 gmtoff=-25200
+    // America/Vancouver  Sun Nov  2 08:59:59 2025 UT = Sun Nov  2 01:59:59 2025 PDT isdst=1 gmtoff=-25200
+    // America/Vancouver  Sun Nov  2 09:00:00 2025 UT = Sun Nov  2 01:00:00 2025 PST isdst=0 gmtoff=-28800
+    // America/Vancouver  Sun Mar  8 09:59:59 2026 UT = Sun Mar  8 01:59:59 2026 PST isdst=0 gmtoff=-28800
+    // America/Vancouver  Sun Mar  8 10:00:00 2026 UT = Sun Mar  8 03:00:00 2026 PDT isdst=1 gmtoff=-25200
+    // America/Vancouver  Sun Nov  1 08:59:59 2026 UT = Sun Nov  1 01:59:59 2026 PDT isdst=1 gmtoff=-25200
+    // America/Vancouver  Sun Nov  1 09:00:00 2026 UT = Sun Nov  1 02:00:00 2026 MST isdst=0 gmtoff=-25200
+    test_dst("America/Vancouver", 2025, 2, 9, 1, 59, 59, -8, 0);
+    test_dst("America/Vancouver", 2025, 2, 9, 3, 0, 0, -8, 1);
+    test_dst("America/Vancouver", 2025, 10, 2, 0, 59, 59, -8, 1);
+    test_dst("America/Vancouver", 2025, 10, 2, 1, 59, 59, -8, 0);
+    test_dst("America/Vancouver", 2026, 2, 8, 1, 59, 59, -8, 0);
+    test_dst("America/Vancouver", 2026, 2, 8, 3, 0, 0, -8, 1);
+    test_dst("America/Vancouver", 2026, 10, 1, 0, 59, 59, -8, 1);
+    // test_dst("America/Vancouver", 2026, 10, 1, 2, 0, 0, -8, 0); // tzdata < 2026b
+    test_dst("America/Vancouver", 2026, 10, 1, 2, 0, 0, -8, 1); // tzdata >= 2026b
 
     // Print summary and exit with the number of failed test or
     // exit with 0 if all tests passed.

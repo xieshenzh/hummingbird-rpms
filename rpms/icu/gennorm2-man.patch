@@ -2,9 +2,9 @@ Description: supply manual page for program that doesn't have one
 Author: Jay Berkenbilt <qjb@debian.org>
 Bug: http://bugs.icu-project.org/trac/ticket/7554
 
-diff -r -u -N icu.orig/source/tools/gennorm2/gennorm2.8.in icu/source/tools/gennorm2/gennorm2.8.in
---- icu.orig/source/tools/gennorm2/gennorm2.8.in	1970-01-01 01:00:00.000000000 +0100
-+++ icu/source/tools/gennorm2/gennorm2.8.in	2013-02-25 16:43:28.297062638 +0100
+diff -r -u -N a/icu4c/source/tools/gennorm2/gennorm2.8.in b/icu4c/source/tools/gennorm2/gennorm2.8.in
+--- a/icu4c/source/tools/gennorm2/gennorm2.8.in	1970-01-01 01:00:00.000000000 +0100
++++ b/icu4c/source/tools/gennorm2/gennorm2.8.in	2013-02-25 16:43:28.297062638 +0100
 @@ -0,0 +1,71 @@
 +.\" Hey, Emacs! This is -*-nroff-*- you know...
 +.\"
@@ -77,9 +77,9 @@ diff -r -u -N icu.orig/source/tools/gennorm2/gennorm2.8.in icu/source/tools/genn
 +this is a good trade-off.)
 +.SH COPYRIGHT
 +Copyright (C) 2009-2010 International Business Machines Corporation and others
-diff -r -u -N icu.orig/source/tools/gennorm2/Makefile.in icu/source/tools/gennorm2/Makefile.in
---- icu.orig/source/tools/gennorm2/Makefile.in	2013-01-11 01:23:32.000000000 +0100
-+++ icu/source/tools/gennorm2/Makefile.in	2013-02-25 16:43:28.296062632 +0100
+diff -r -u -N a/icu4c/source/tools/gennorm2/Makefile.in b/icu4c/source/tools/gennorm2/Makefile.in
+--- a/icu4c/source/tools/gennorm2/Makefile.in	2013-01-11 01:23:32.000000000 +0100
++++ b/icu4c/source/tools/gennorm2/Makefile.in	2013-02-25 16:43:28.296062632 +0100
 @@ -16,8 +16,13 @@
  
  TARGET_STUB_NAME = gennorm2

@@ -5,13 +5,13 @@ Subject: [PATCH] ICU-23120 Mask UnicodeStringTest::TestLargeMemory on 32-bit
  platforms
 
 ---
- source/test/intltest/ustrtest.cpp | 2 +-
+ icu4c/source/test/intltest/ustrtest.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/source/test/intltest/ustrtest.cpp b/source/test/intltest/ustrtest.cpp
+diff --git a/icu4c/source/test/intltest/ustrtest.cpp b/icu4c/source/test/intltest/ustrtest.cpp
 index 56976b3e3d23..26225f5b5b56 100644
---- a/source/test/intltest/ustrtest.cpp
-+++ b/source/test/intltest/ustrtest.cpp
+--- a/icu4c/source/test/intltest/ustrtest.cpp
++++ b/icu4c/source/test/intltest/ustrtest.cpp
 @@ -2353,7 +2353,7 @@ void UnicodeStringTest::TestUnicodeStringInsertAppendToSelf() {
  }
 

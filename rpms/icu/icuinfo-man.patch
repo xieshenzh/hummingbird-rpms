@@ -1,11 +1,11 @@
 Description: supply manual page for program that doesn't have one
 Author: Jay Berkenbilt <qjb@debian.org>
 Bug: http://bugs.icu-project.org/trac/ticket/7665
-erAck: adapted to ICU 56.1 icu/source/tools/icuinfo/Makefile.in
+erAck: adapted to ICU 56.1 b/icu4c/source/tools/icuinfo/Makefile.in
 
-diff -Nur orig.icu/source/tools/icuinfo/icuinfo.1.in icu/source/tools/icuinfo/icuinfo.1.in
---- orig.icu/source/tools/icuinfo/icuinfo.1.in	1970-01-01 01:00:00.000000000 +0100
-+++ icu/source/tools/icuinfo/icuinfo.1.in	2015-10-27 19:19:35.184056800 +0100
+diff -Nur a/icu4c/source/tools/icuinfo/icuinfo.1.in b/icu4c/source/tools/icuinfo/icuinfo.1.in
+--- a/icu4c/source/tools/icuinfo/icuinfo.1.in	1970-01-01 01:00:00.000000000 +0100
++++ b/icu4c/source/tools/icuinfo/icuinfo.1.in	2015-10-27 19:19:35.184056800 +0100
 @@ -0,0 +1,76 @@
 +.\" Hey, Emacs! This is -*-nroff-*- you know...
 +.\"
@@ -83,9 +83,9 @@ diff -Nur orig.icu/source/tools/icuinfo/icuinfo.1.in icu/source/tools/icuinfo/ic
 +Print the current UTC time in milliseconds.
 +.SH COPYRIGHT
 +Copyright (C) 2010 International Business Machines Corporation and others
-diff -Nur orig.icu/source/tools/icuinfo/Makefile.in icu/source/tools/icuinfo/Makefile.in
---- orig.icu/source/tools/icuinfo/Makefile.in	2015-10-08 05:53:56.000000000 +0200
-+++ icu/source/tools/icuinfo/Makefile.in	2015-10-27 19:23:19.115509906 +0100
+diff -Nur a/icu4c/source/tools/icuinfo/Makefile.in b/icu4c/source/tools/icuinfo/Makefile.in
+--- a/icu4c/source/tools/icuinfo/Makefile.in	2015-10-08 05:53:56.000000000 +0200
++++ b/icu4c/source/tools/icuinfo/Makefile.in	2015-10-27 19:23:19.115509906 +0100
 @@ -14,8 +14,15 @@
  ## Build directory information
  subdir = tools/icuinfo
