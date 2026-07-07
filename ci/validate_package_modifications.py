@@ -185,6 +185,10 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     # the Upstream: trailer before the policy was fully enforced.
     bad_commits = [line for line in bad_commits if not line.startswith('57730ec76cb2fb006c2d4f93550895e242309c38 ')]
 
+    # openscap xmlsec1 >= 1.3 segfault fix was committed without the Upstream: trailer.
+    # The fix has since been superseded by upstream Fedora openscap 1.4.4-4 (2360.patch).
+    bad_commits = [line for line in bad_commits if not line.startswith('134c5f3502ca505092f7d000388821ea375a491d ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)

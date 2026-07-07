@@ -1,0 +1,39 @@
+From 32fb2674256cabe003b2c391475b6e760035a205 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20=C4=8Cern=C3=BD?= <jcerny@redhat.com>
+Date: Wed, 22 Apr 2026 16:31:37 +0200
+Subject: [PATCH] Skip verifying RPM signatures in tests
+
+Our tests install some dummy test RPM pacakges. Starting from
+rpm version 6.0.0 rpm by default requires veryfing signatures.
+Our dummy packages aren't signed, which causes that they aren't
+installed and the tests fail.
+
+This commit should fix the broken CI on Rawhide.
+
+Addressing:
+package foobar-1.0-1.noarch does not verify: no signature
+
+The following tests FAILED:
+	228 - probes/rpm/rpminfo/test_probes_rpminfo_offline.sh (Failed)
+	230 - probes/rpm/rpmverify/test_probes_rpmverify_not_equals_operation_offline.sh (Failed)
+	233 - probes/rpm/rpmverifyfile/test_probes_rpmverifyfile_offline.sh (Failed)
+	235 - probes/rpm/rpmverifypackage/test_probes_rpmverifypackage_offline.sh (Failed)
+---
+ tests/probes/rpm/rpm_common.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/probes/rpm/rpm_common.sh b/tests/probes/rpm/rpm_common.sh
+index eb96f76d80..909ad6ad39 100755
+--- a/tests/probes/rpm/rpm_common.sh
++++ b/tests/probes/rpm/rpm_common.sh
+@@ -31,8 +31,8 @@ function rpm_prepare_offline {
+     cp /usr/lib/rpm/rpmrc ${RPMTEST}/usr/lib/rpm/rpmrc
+     cp /usr/lib/rpm/macros ${RPMTEST}/usr/lib/rpm/macros
+     rpm_build
+-    rpm -i ${RPMBUILD}/RPMS/noarch/foobar-1.0-1.noarch.rpm --badreloc --relocate="/etc=${RPMTEST}/etc/" --dbpath="${RPMTEST}${RPMDB_PATH}"
+-    rpm -i ${RPMBUILD}/RPMS/noarch/foo-1.0-1.noarch.rpm --badreloc --relocate="/etc=${RPMTEST}/etc/" --dbpath="${RPMTEST}${RPMDB_PATH}"
++    rpm -i --nosignature ${RPMBUILD}/RPMS/noarch/foobar-1.0-1.noarch.rpm --badreloc --relocate="/etc=${RPMTEST}/etc/" --dbpath="${RPMTEST}${RPMDB_PATH}"
++    rpm -i --nosignature ${RPMBUILD}/RPMS/noarch/foo-1.0-1.noarch.rpm --badreloc --relocate="/etc=${RPMTEST}/etc/" --dbpath="${RPMTEST}${RPMDB_PATH}"
+ }
+ 
+ function rpm_cleanup_offline {
