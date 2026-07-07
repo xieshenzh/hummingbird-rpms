@@ -212,6 +212,8 @@ spec:
           contentType: rpm
         - name: dotnet9-0-main
           contentType: rpm
+        - name: doxygen-main
+          contentType: rpm
         - name: dracut-main
           contentType: rpm
         - name: drpm-main
