@@ -2,11 +2,7 @@
 
 Name:           jq
 Version:        1.8.2
-<<<<<<< HEAD
 Release:        4%{?dist}
-=======
-Release:        0.1%{?dist}
->>>>>>> hummingbird-local
 Summary:        Command-line JSON processor
 
 License:        MIT AND ICU AND CC-BY-3.0
@@ -24,11 +20,6 @@ BuildRequires:  valgrind
 BuildRequires:  make
 BuildRequires:  tzdata
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> hummingbird-local
 %description
 lightweight and flexible command-line JSON processor
 
