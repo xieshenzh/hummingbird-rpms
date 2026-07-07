@@ -1,0 +1,14 @@
+---
+
+annocheck:
+  jobs:
+
+    # --skip-lto
+    # Disable Link-Time Optimization checks
+    # Upstream GDB is not fully compatible with LTO
+    #
+    # --skip-stack-realign
+    # Skip stack-realign test for i686
+    # GDB code is compiled with -mstackrealign, but the binary links
+    # against static code which was compiled without this flag
+    - hardened: --skip-lto --skip-stack-realign

@@ -597,7 +597,7 @@ diff --git a/gdb/dwarf2/read-gdb-index.c b/gdb/dwarf2/read-gdb-index.c
 diff --git a/gdb/symtab.c b/gdb/symtab.c
 --- a/gdb/symtab.c
 +++ b/gdb/symtab.c
-@@ -4830,7 +4830,50 @@ symbol_search::compare_search_syms (const symbol_search &sym_a,
+@@ -4869,7 +4869,50 @@ symbol_search::compare_search_syms (const symbol_search &sym_a,
    if (sym_a.block != sym_b.block)
      return sym_a.block - sym_b.block;
  
