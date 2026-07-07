@@ -424,19 +424,6 @@ Patch484: 00484-cve-2026-3644.patch
 # Stack overflow parsing XML with deeply nested DTD content models
 Patch485: 00485-cve-2026-4224.patch
 
-<<<<<<< HEAD
-# 00489 # 008af720a5f6f98ed3feb8ebdbf88ab9dea4db22
-# Use BIO_eof to detect EOF for SSL_FILETYPE_ASN1
-#
-# In PEM, we need to parse until error and then suppress `PEM_R_NO_START_LINE`, because PEM allows arbitrary leading and trailing data. DER, however, does not. Parsing until error and suppressing `ASN1_R_HEADER_TOO_LONG` doesn't quite work because that error also covers some cases that should be rejected.
-#
-# Instead, check `BIO_eof` early and stop the loop that way.
-#
-# This fixes https://github.com/python/cpython/issues/151504 and adds compatibility with OpenSSL 3.5.7+
-#
-# (cherry-picked from commit acfe02f3b05436658d92add6b168538b30f357f0)
-Patch489: 00489-openssl-3.5.7.patch
-=======
 # 00487 # ae99fe3a33b43e303a05f012815cef60b611a9c7
 # CVE-2025-13462
 #
@@ -462,7 +449,18 @@ Patch489: 00489-cve-2026-6019.patch
 #
 # (cherry-picked from commit f50bf13566189c8d0ce5a814f33eff3d89951896)
 Patch490: 00490-cve-2026-11972.patch
->>>>>>> hummingbird-local
+
+# 00491 # 008af720a5f6f98ed3feb8ebdbf88ab9dea4db22
+# Use BIO_eof to detect EOF for SSL_FILETYPE_ASN1
+#
+# In PEM, we need to parse until error and then suppress `PEM_R_NO_START_LINE`, because PEM allows arbitrary leading and trailing data. DER, however, does not. Parsing until error and suppressing `ASN1_R_HEADER_TOO_LONG` doesn't quite work because that error also covers some cases that should be rejected.
+#
+# Instead, check `BIO_eof` early and stop the loop that way.
+#
+# This fixes https://github.com/python/cpython/issues/151504 and adds compatibility with OpenSSL 3.5.7+
+#
+# (cherry-picked from commit acfe02f3b05436658d92add6b168538b30f357f0)
+Patch491: 00491-openssl-3.5.7.patch
 
 # (New patches go here ^^^)
 #
