@@ -22,10 +22,12 @@ to separate Pulp domains via dedicated Konflux Applications and ReleasePlanAdmis
 
 1. Each private product has a dedicated **Konflux Application** (e.g.,
    `private-<product>-rpms-main`) separate from the public `rpms-main` application.
-2. Packages are assigned to a private product via `private_product` in
+2. A **ReleasePlan** connects the private Application to its RPA, enabling
+   auto-releases when builds complete.
+3. Packages are assigned to a private product via `private_product` in
    `ci/package-overrides.yaml`.
-3. A dedicated **RPA** per product routes those packages to private Pulp repositories.
-4. The public RPA uses `exclude_private: true` to exclude private packages from public repos.
+4. A dedicated **RPA** per product routes those packages to private Pulp repositories.
+5. The public RPA uses `exclude_private: true` to exclude private packages from public repos.
 
 ### Architecture
 
@@ -41,6 +43,11 @@ package-overrides.yaml          konflux_rpa_config.yml
   Component resource              ReleasePlanAdmission
   application: private-           targets: private-<product>-rpms-main
     <product>-rpms-main           pulp_signed_domain: private-hummingbird-<product>
+                                           ^
+                                           |
+                                  ReleasePlan
+                                  application: private-<product>-rpms-main
+                                  releasePlanAdmission: hummingbird-rpms-private-<product>
 ```
 
 ## Assigning a Package to a Private Product
@@ -251,12 +258,14 @@ there following the same pattern as `rpms-main`:
    The ReleasePlan connects the private Application to its ReleasePlanAdmission. Without
    it, builds in the private Application will not trigger releases.
 
-5. Optionally copy IntegrationTestScenario templates from `kubernetes/rpms-main/` if the
-   private application needs them.
+5. Copy `10-integration-test-scenarios-testing-farm.yml.j2` from `kubernetes/rpms-main/`.
+   The template is fully parameterized with `{{ env["PROJECT_NAME"] }}` so no edits are
+   needed. This may be needed to prevent the Konflux PR group integration test from
+   blocking MRs that touch private product packages.
 
-Merge this MR in the infrastructure repo first — the CI pipeline will deploy the Application
-and ReleasePlan to the cluster. Components and RPAs in this repo reference it by name, so
-the Application must exist before they are applied.
+Merge this MR in the infrastructure repo first — the CI pipeline will deploy the Application,
+ReleasePlan, and IntegrationTestScenarios to the cluster. Components and RPAs in this repo
+reference it by name, so the Application must exist before they are applied.
 
 ### 5. Add RPA configuration
 
