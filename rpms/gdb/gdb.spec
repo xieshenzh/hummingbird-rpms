@@ -141,12 +141,8 @@ Source4: gdbinit
 
 # Include the auto-generated file containing the "Patch:" directives.
 # See README.local-patches for more details.
-<<<<<<< HEAD
-Source9998: _gdb.spec.Patch.include
-=======
 Source9998: _gdb.spec.patch-declarations.include
 Source9999: _gdb.spec.patch-applications.include
->>>>>>> hummingbird-local
 %include %{SOURCE9998}
 
 BuildRequires: readline-devel%{buildisa} >= 7.0
