@@ -116,7 +116,7 @@ def query_autorelease_from_mdapi(package_name: str, branch: str, fallback_releas
         return None
 
 
-def replace_autorelease_in_spec(package_dir: Path, release: str) -> None:
+def replace_autorelease_in_spec(package_dir: Path, release: str, required: bool = True) -> None:
     """Replace %autorelease in spec file with actual release value."""
     spec_files = list(package_dir.glob('*.spec'))
     if spec_files:
@@ -128,7 +128,10 @@ def replace_autorelease_in_spec(package_dir: Path, release: str) -> None:
             spec_content
         )
         if new_content == spec_content:
-            raise ValueError(f"Failed to replace %autorelease in {spec_file.name}")
+            if required:
+                raise ValueError(f"Failed to replace %autorelease in {spec_file.name}")
+            logging.info("No %%autorelease found in %s after merging local changes", spec_file.name)
+            return
         spec_file.write_text(new_content)
         logging.info("Replaced %%autorelease with %s%%{?dist} in %s", release, spec_file.name)
 
@@ -1207,6 +1210,10 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
     if status == 'native':
         sys.exit(f"ERROR: Cannot update native package {package_name}\n")
 
+    if not all(key in metadata for key in ('source', 'branch', 'sha')):
+        logging.info("Skipping %s: no Fedora upstream configured", package_name)
+        return
+
     # Resolve effective branch: --branch override or current metadata branch
     old_branch = metadata['branch']
     if branch and branch != old_branch:
@@ -1299,6 +1306,14 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
             latest_sha = run_git('rev-parse', 'HEAD', cwd=upstream_dir).stdout.strip()
             logging.info("Commit: %s", latest_sha)
 
+        spec_files = list(upstream_dir.glob('*.spec'))
+        if not spec_files:
+            if (upstream_dir / 'dead.package').exists():
+                logging.warning("Skipping %s: upstream branch %s is retired", package_name, effective_branch)
+            else:
+                logging.warning("Skipping %s: upstream branch %s has no spec file", package_name, effective_branch)
+            return
+
         # Parse spec file to get version-release
         version, release = parse_spec_version(upstream_dir)
 
@@ -1368,7 +1383,7 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
 
         # Replace %autorelease in package_dir (now safe, no longer a git repo)
         if has_autorelease:
-            replace_autorelease_in_spec(package_dir, release)
+            replace_autorelease_in_spec(package_dir, release, required=False)
 
         logging.info("Updated to %s-%s", version, release)
 

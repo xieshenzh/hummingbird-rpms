@@ -17,6 +17,8 @@
 #
 # Environment variables:
 #   CHORE_MR_GITLAB_TOKEN    - GitLab API token with write_repository scope (required for --create-mrs)
+#   DIST_GIT_UPDATE_SKIP_BUILD_CHECK
+#                           - Set to true to pass --skip-build-check to dist_git.py update
 #   GITLAB_REMOTE_URL        - GitLab repo URL (default: https://gitlab.com/redhat/hummingbird/rpms.git)
 
 set -euo pipefail
@@ -275,7 +277,12 @@ for metadata_file in "${packages_to_check[@]}"; do
 
     # Run update and capture exit code without exiting (despite set -e)
     UPDATE_EXIT_CODE=0
-    ./ci/dist_git.py update "${package}" 2>&1 || UPDATE_EXIT_CODE=$?
+    UPDATE_ARGS=(update)
+    if [[ "${DIST_GIT_UPDATE_SKIP_BUILD_CHECK:-false}" == true ]]; then
+        UPDATE_ARGS+=(--skip-build-check)
+    fi
+    UPDATE_ARGS+=("${package}")
+    ./ci/dist_git.py "${UPDATE_ARGS[@]}" 2>&1 || UPDATE_EXIT_CODE=$?
 
     # Check if a commit was created
     COMMIT_AFTER=$(git rev-parse HEAD)
@@ -290,6 +297,16 @@ for metadata_file in "${packages_to_check[@]}"; do
         fi
     elif [[ ${UPDATE_EXIT_CODE} -eq 2 ]]; then
         # Update with conflicts
+        if [[ "${COMMIT_BEFORE}" == "${COMMIT_AFTER}" && -f .dist_git_update_state.json ]]; then
+            COMMIT_MSG_FILE=$(mktemp)
+            jq -r '.commit_msg' .dist_git_update_state.json > "${COMMIT_MSG_FILE}"
+            jq '.metadata' .dist_git_update_state.json > "metadata/${package}.json"
+            git add -f "rpms/${package}" "metadata/${package}.json"
+            git commit -F "${COMMIT_MSG_FILE}" >/dev/null
+            rm -f "${COMMIT_MSG_FILE}" .dist_git_update_state.json
+            COMMIT_AFTER=$(git rev-parse HEAD)
+        fi
+
         if [[ "${COMMIT_BEFORE}" != "${COMMIT_AFTER}" ]]; then
             echo "  ⚠ Update found (CONFLICTS - needs manual resolution)"
             updates_found=$((updates_found + 1))
