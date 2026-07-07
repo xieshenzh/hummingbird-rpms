@@ -183,16 +183,17 @@ for PULP_REPOSITORY in "${PULP_REPOSITORIES[@]}"; do
       echo "🆕 Repository '${PULP_REPOSITORY}' not found. Creating..."
       pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository create --name "${PULP_REPOSITORY}"
       repo_created=true
-      if [[ "${PULP_TYPE}" == "rpm" ]]; then
-        pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update --name "${PULP_REPOSITORY}" --autopublish
+      # --autopublish is supported for rpm and file types
+      update_args=(--autopublish)
+      if [[ "${PULP_TYPE}" == "file" && -n "${PULP_FILE_RETAIN_REPO_VERSIONS}" ]]; then
+        update_args+=(--retain-repo-versions "${PULP_FILE_RETAIN_REPO_VERSIONS}")
+        echo "📝 Setting autopublish and retain_repo_versions=${PULP_FILE_RETAIN_REPO_VERSIONS} for new repository '${PULP_REPOSITORY}'..."
       fi
+      pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update --name "${PULP_REPOSITORY}" "${update_args[@]}"
     fi
     if [[ "${PULP_TYPE}" == "file" && -n "${PULP_FILE_RETAIN_REPO_VERSIONS}" ]]; then
       if [[ "${repo_created}" == true ]]; then
-        echo "📝 Setting retain_repo_versions to ${PULP_FILE_RETAIN_REPO_VERSIONS} for new repository '${PULP_REPOSITORY}'..."
-        pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository update \
-          --name "${PULP_REPOSITORY}" \
-          --retain-repo-versions "${PULP_FILE_RETAIN_REPO_VERSIONS}"
+        : # already handled above
       else
         repo_json=$(pulp "${PULP_CONFIG_OPT[@]}" --domain "${PULP_DOMAIN}" "${PULP_TYPE}" repository show \
           --name "${PULP_REPOSITORY}" --format json) || {
