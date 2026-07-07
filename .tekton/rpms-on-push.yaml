@@ -8872,7 +8872,7 @@ metadata:
     pipelinesascode.tekton.dev/on-path-change: "[rpms/hello/***]"
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: rpms-main
+    appstudio.openshift.io/application: private-example-rpms-main
     appstudio.openshift.io/component: hello-main
     pipelines.appstudio.openshift.io/type: build
   name: hello-main-on-push

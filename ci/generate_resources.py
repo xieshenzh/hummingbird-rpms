@@ -163,6 +163,10 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
             if "forked_from" in pkg_config:
                 rpm_data["forked_from"] = pkg_config["forked_from"]
 
+            private_product = pkg_config.get("private_product")
+            if private_product:
+                rpm_data["application_name"] = f"private-{private_product}-rpms-{branch}"
+
             extra_params = {"purl-rpm-namespace": "redhat"}
             if "extra_params" in pkg_config:
                 extra_params.update(pkg_config["extra_params"])

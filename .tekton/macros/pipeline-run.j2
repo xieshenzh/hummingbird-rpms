@@ -17,7 +17,7 @@ metadata:
     pipelinesascode.tekton.dev/on-path-change: "[rpms/{{ rpm.dname }}/***{%- for path in extra_path_changes %}, {{ path }}{%- endfor %}]"
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: {{ application_name }}
+    appstudio.openshift.io/application: {{ rpm.application_name | default(application_name) }}
     appstudio.openshift.io/component: {{ rpm.name }}
     pipelines.appstudio.openshift.io/type: build
   name: {{ rpm.name }}-on-{{ event_type.replace('_', '-') }}
