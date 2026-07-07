@@ -4,7 +4,7 @@ apiVersion: appstudio.redhat.com/v1alpha1
 kind: ImageRepository
 metadata:
   labels:
-    appstudio.redhat.com/application: {{ application_name }}
+    appstudio.redhat.com/application: {{ rpm.application_name | default(application_name) }}
     appstudio.redhat.com/component: {{ rpm.component_name }}
   name: {{ rpm.component_name }}
 spec:

@@ -58,6 +58,8 @@ def mock_repo(tmp_path):
         """)
     )
 
+    (tmp_path / "ci" / "package-overrides.yaml").write_text("{}\n")
+
     tmpl_dir = tmp_path / "konflux-templates"
     tmpl_dir.mkdir()
     macros_dir = tmpl_dir / "macros" / "releng"
@@ -116,10 +118,17 @@ class TestExpandTaskRunSpecs:
         ]
 
 
+def _load_rpa_config(gen_module, index=0):
+    """Load RPA config and global config from the config file."""
+    config = gen_module.load_releng_config()
+    return config["rpas"][index], config["global"]
+
+
 class TestBuildRelengVariables:
     def test_basic_structure(self, gen_module, mock_repo):
         with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            variables = gen_module.build_releng_variables()
+            rpa_config, global_config = _load_rpa_config(gen_module)
+            variables = gen_module.build_releng_variables(rpa_config, global_config)
 
         assert variables["name"] == "hummingbird-rpms-tech-preview-staging"
         assert variables["application_prefix"] == "rpms"
@@ -137,7 +146,8 @@ class TestBuildRelengVariables:
 
     def test_component_list_from_packages(self, gen_module, mock_repo):
         with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            variables = gen_module.build_releng_variables()
+            rpa_config, global_config = _load_rpa_config(gen_module)
+            variables = gen_module.build_releng_variables(rpa_config, global_config)
 
         names = [c["component_name"] for c in variables["component_list"]]
         assert "alpha-main" in names
@@ -151,7 +161,8 @@ class TestBuildRelengVariables:
         (mock_repo / "rpms" / "lib.name").mkdir()
 
         with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            variables = gen_module.build_releng_variables()
+            rpa_config, global_config = _load_rpa_config(gen_module)
+            variables = gen_module.build_releng_variables(rpa_config, global_config)
 
         names = [c["component_name"] for c in variables["component_list"]]
         assert "foo-bar-main" in names
@@ -166,7 +177,8 @@ class TestBuildRelengVariables:
         )
 
         with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            variables = gen_module.build_releng_variables()
+            rpa_config, global_config = _load_rpa_config(gen_module)
+            variables = gen_module.build_releng_variables(rpa_config, global_config)
 
         names = [c["component_name"] for c in variables["component_list"]]
         assert "alpha-main" in names
@@ -175,33 +187,37 @@ class TestBuildRelengVariables:
 
     def test_component_list_sorted(self, gen_module, mock_repo):
         with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            variables = gen_module.build_releng_variables()
+            rpa_config, global_config = _load_rpa_config(gen_module)
+            variables = gen_module.build_releng_variables(rpa_config, global_config)
 
         names = [c["component_name"] for c in variables["component_list"]]
         assert names == sorted(names)
 
     def test_component_count_matches_rpms_dirs(self, gen_module, mock_repo):
         with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            variables = gen_module.build_releng_variables()
+            rpa_config, global_config = _load_rpa_config(gen_module)
+            variables = gen_module.build_releng_variables(rpa_config, global_config)
 
         rpms_dirs = [d for d in (mock_repo / "rpms").iterdir() if d.is_dir()]
         assert len(variables["component_list"]) == len(rpms_dirs)
 
 
 class TestGenerateReleng:
-    def test_produces_valid_yaml(self, gen_module, mock_repo):
+    @staticmethod
+    def _get_single_rpa(gen_module, mock_repo):
+        """Helper: generate and return the single public RPA doc."""
         with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            output = gen_module.generate_releng()
+            results = gen_module.generate_releng()
+        assert len(results) == 1
+        return yaml.safe_load(next(iter(results.values())))
 
-        doc = yaml.safe_load(output)
+    def test_produces_valid_yaml(self, gen_module, mock_repo):
+        doc = self._get_single_rpa(gen_module, mock_repo)
         assert doc is not None
         assert doc["kind"] == "ReleasePlanAdmission"
 
     def test_yaml_structure(self, gen_module, mock_repo):
-        with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            output = gen_module.generate_releng()
-
-        doc = yaml.safe_load(output)
+        doc = self._get_single_rpa(gen_module, mock_repo)
         assert doc["apiVersion"] == "appstudio.redhat.com/v1alpha1"
         assert doc["metadata"]["name"] == "hummingbird-rpms-tech-preview-staging"
         assert doc["metadata"]["namespace"] == "rhtap-releng-tenant"
@@ -210,53 +226,42 @@ class TestGenerateReleng:
         assert doc["spec"]["policy"] == "rpm-hummingbird-stage"
 
     def test_parameterized_pulp_values(self, gen_module, mock_repo):
-        with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            output = gen_module.generate_releng()
-
-        doc = yaml.safe_load(output)
+        doc = self._get_single_rpa(gen_module, mock_repo)
         pulp = doc["spec"]["data"]["pulp"]
         assert pulp["domain"] == "public-hummingbird-staging-unsigned"
         assert pulp["secretName"] == "hummingbird-pulp-credentials-staging-secret"
 
-    def test_parameterized_pipeline_revision(self, gen_module, mock_repo):
-        with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            output = gen_module.generate_releng()
+    def test_parameterized_repo_ids(self, gen_module, mock_repo):
+        """Repository IDs use the parameterized pulp_signed_domain."""
+        doc = self._get_single_rpa(gen_module, mock_repo)
+        repos = doc["spec"]["data"]["mapping"]["rpm-repositories"]
+        for repo in repos:
+            assert repo["repository_id"].startswith("public-hummingbird-staging-")
 
-        doc = yaml.safe_load(output)
+    def test_parameterized_pipeline_revision(self, gen_module, mock_repo):
+        doc = self._get_single_rpa(gen_module, mock_repo)
         params = doc["spec"]["pipeline"]["pipelineRef"]["params"]
         revision_param = next(p for p in params if p["name"] == "revision")
         assert revision_param["value"] == "development"
 
     def test_parameterized_pipeline_url(self, gen_module, mock_repo):
-        with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            output = gen_module.generate_releng()
-
-        doc = yaml.safe_load(output)
+        doc = self._get_single_rpa(gen_module, mock_repo)
         params = doc["spec"]["pipeline"]["pipelineRef"]["params"]
         url_param = next(p for p in params if p["name"] == "url")
         assert url_param["value"] == "https://github.com/konflux-ci/release-service-catalog.git"
 
     def test_components_have_rpm_content_type(self, gen_module, mock_repo):
-        with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            output = gen_module.generate_releng()
-
-        doc = yaml.safe_load(output)
+        doc = self._get_single_rpa(gen_module, mock_repo)
         components = doc["spec"]["data"]["mapping"]["components"]
         for comp in components:
             assert comp["contentType"] == "rpm"
 
     def test_single_component_mode(self, gen_module, mock_repo):
-        with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            output = gen_module.generate_releng()
-
-        doc = yaml.safe_load(output)
+        doc = self._get_single_rpa(gen_module, mock_repo)
         assert doc["spec"]["data"]["singleComponentMode"] is True
 
     def test_data_sections_present(self, gen_module, mock_repo):
-        with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            output = gen_module.generate_releng()
-
-        doc = yaml.safe_load(output)
+        doc = self._get_single_rpa(gen_module, mock_repo)
         data = doc["spec"]["data"]
         assert data["intention"] in ("staging", "production")
         assert "sign" in data
@@ -266,10 +271,7 @@ class TestGenerateReleng:
         assert "mapping" in data
 
     def test_pipeline_config(self, gen_module, mock_repo):
-        with patch.object(gen_module, "ROOT_DIR", mock_repo):
-            output = gen_module.generate_releng()
-
-        doc = yaml.safe_load(output)
+        doc = self._get_single_rpa(gen_module, mock_repo)
         pipeline = doc["spec"]["pipeline"]
         assert pipeline["serviceAccountName"] == "hummingbird-rpm-release-staging"
         params = {p["name"]: p["value"] for p in pipeline["pipelineRef"]["params"]}
@@ -282,16 +284,213 @@ class TestGenerateRelengIntegration:
     """Integration tests using the real repo data."""
 
     def test_real_repo_component_count(self, gen_module):
-        """All rpms/ directories produce components."""
-        variables = gen_module.build_releng_variables()
+        """All rpms/ directories produce components across all RPAs."""
+        config = gen_module.load_releng_config()
+        all_components = []
+        for rpa_config in config["rpas"]:
+            variables = gen_module.build_releng_variables(rpa_config, config["global"])
+            all_components.extend(c["component_name"] for c in variables["component_list"])
         rpms_dirs = [
             d for d in (REPO_ROOT / "rpms").iterdir() if d.is_dir()
         ]
-        assert len(variables["component_list"]) == len(rpms_dirs)
+        assert len(all_components) == len(rpms_dirs)
 
     def test_real_repo_produces_valid_yaml(self, gen_module):
-        output = gen_module.generate_releng()
-        doc = yaml.safe_load(output)
-        assert doc["kind"] == "ReleasePlanAdmission"
-        components = doc["spec"]["data"]["mapping"]["components"]
+        results = gen_module.generate_releng()
+        assert len(results) >= 1
+        for name, output in results.items():
+            doc = yaml.safe_load(output)
+            assert doc["kind"] == "ReleasePlanAdmission"
+        public_doc = yaml.safe_load(next(iter(results.values())))
+        components = public_doc["spec"]["data"]["mapping"]["components"]
         assert len(components) > 300
+
+
+class TestPrivateProductFiltering:
+    """Tests for private_product-based component filtering."""
+
+    @pytest.fixture
+    def mock_repo_with_private(self, mock_repo):
+        """Extend mock_repo with private_product overrides and multi-RPA config."""
+        (mock_repo / "ci" / "package-overrides.yaml").write_text(
+            textwrap.dedent("""\
+            alpha:
+              private_product: example
+            """)
+        )
+
+        (mock_repo / "ci" / "konflux_rpa_config.yml").write_text(
+            textwrap.dedent("""\
+            global:
+              branch: main
+              tenant: hummingbird-tenant
+              release_tenant: rhtap-releng-tenant
+              git_repo: https://gitlab.com/redhat/hummingbird/rpms.git
+            rpas:
+              - name: hummingbird-rpms-tech-preview-staging
+                application_prefix: rpms
+                release_org: registry.stage.redhat.io/hummingbird-tech-preview
+                single_component_mode: true
+                service_account_name: hummingbird-rpm-release-staging
+                pulp_unsigned_domain: public-hummingbird-staging-unsigned
+                pulp_signed_domain: public-hummingbird-staging
+                pulp_secret_name: hummingbird-pulp-credentials-staging-secret
+                pipeline_revision: development
+                pipeline_url: https://github.com/konflux-ci/release-service-catalog.git
+                exclude_private: true
+                component_filter:
+                  path_prefix: rpms/
+              - name: hummingbird-rpms-private-example
+                application_prefix: private-example-rpms
+                release_org: registry.stage.redhat.io/hummingbird-tech-preview
+                single_component_mode: true
+                service_account_name: hummingbird-rpm-release-staging
+                pulp_unsigned_domain: private-hummingbird-example-unsigned
+                pulp_signed_domain: private-hummingbird-example
+                pulp_secret_name: hummingbird-pulp-credentials-private-production-secret
+                pipeline_revision: development
+                pipeline_url: https://github.com/konflux-ci/release-service-catalog.git
+                private_product: example
+                component_filter:
+                  path_prefix: rpms/
+            """)
+        )
+        return mock_repo
+
+    def test_exclude_private_removes_private_packages(self, gen_module, mock_repo_with_private):
+        """Public RPA with exclude_private: true excludes private_product packages."""
+        with patch.object(gen_module, "ROOT_DIR", mock_repo_with_private):
+            rpa_config, global_config = _load_rpa_config(gen_module, index=0)
+            variables = gen_module.build_releng_variables(rpa_config, global_config)
+
+        names = [c["component_name"] for c in variables["component_list"]]
+        assert "alpha-main" not in names
+        assert "beta-lib-main" in names
+        assert "gamma-utils-main" in names
+
+    def test_private_product_includes_only_matching(self, gen_module, mock_repo_with_private):
+        """Private RPA with private_product: example includes only matching packages."""
+        with patch.object(gen_module, "ROOT_DIR", mock_repo_with_private):
+            rpa_config, global_config = _load_rpa_config(gen_module, index=1)
+            variables = gen_module.build_releng_variables(rpa_config, global_config)
+
+        names = [c["component_name"] for c in variables["component_list"]]
+        assert names == ["alpha-main"]
+
+    def test_private_rpa_uses_private_pulp_domain(self, gen_module, mock_repo_with_private):
+        """Private RPA renders with its own Pulp domain in repo IDs."""
+        with patch.object(gen_module, "ROOT_DIR", mock_repo_with_private):
+            results = gen_module.generate_releng()
+
+        assert "hummingbird-rpms-private-example" in results
+        doc = yaml.safe_load(results["hummingbird-rpms-private-example"])
+        repos = doc["spec"]["data"]["mapping"]["rpm-repositories"]
+        for repo in repos:
+            assert repo["repository_id"].startswith("private-hummingbird-example-")
+
+    def test_multi_rpa_generates_all(self, gen_module, mock_repo_with_private):
+        """generate_releng() produces one output per RPA entry."""
+        with patch.object(gen_module, "ROOT_DIR", mock_repo_with_private):
+            results = gen_module.generate_releng()
+
+        assert len(results) == 2
+        assert "hummingbird-rpms-tech-preview-staging" in results
+        assert "hummingbird-rpms-private-example" in results
+
+        for name, output in results.items():
+            doc = yaml.safe_load(output)
+            assert doc["kind"] == "ReleasePlanAdmission"
+
+    def test_total_components_across_rpas(self, gen_module, mock_repo_with_private):
+        """All packages appear in exactly one RPA."""
+        with patch.object(gen_module, "ROOT_DIR", mock_repo_with_private):
+            config = gen_module.load_releng_config()
+            all_components = []
+            for rpa_config in config["rpas"]:
+                variables = gen_module.build_releng_variables(rpa_config, config["global"])
+                all_components.extend(c["component_name"] for c in variables["component_list"])
+
+        rpms_dirs = [d for d in (mock_repo_with_private / "rpms").iterdir() if d.is_dir()]
+        assert len(all_components) == len(rpms_dirs)
+        assert len(set(all_components)) == len(all_components)
+
+    def test_no_exclude_private_includes_all(self, gen_module, mock_repo_with_private):
+        """RPA without exclude_private includes all packages (both public and private)."""
+        with patch.object(gen_module, "ROOT_DIR", mock_repo_with_private):
+            rpa_config, global_config = _load_rpa_config(gen_module, index=0)
+            rpa_config.pop("exclude_private")
+            variables = gen_module.build_releng_variables(rpa_config, global_config)
+
+        names = [c["component_name"] for c in variables["component_list"]]
+        assert "alpha-main" in names
+        assert "beta-lib-main" in names
+        assert "gamma-utils-main" in names
+
+
+class TestPrivateProductKonfluxVariables:
+    """Tests for per-component application names in Konflux variables."""
+
+    def test_private_product_sets_application_name(self, gen_module, tmp_path):
+        """Packages with private_product get a per-component application_name."""
+        (tmp_path / "rpms" / "mypkg").mkdir(parents=True)
+        (tmp_path / "rpms" / "normalpkg").mkdir(parents=True)
+        (tmp_path / "ci").mkdir()
+        (tmp_path / "ci" / "package-overrides.yaml").write_text(
+            textwrap.dedent("""\
+            mypkg:
+              private_product: example
+            """)
+        )
+
+        with patch.object(gen_module, "ROOT_DIR", tmp_path):
+            variables = gen_module.build_konflux_variables("main", "hummingbird-tenant", "https://example.com/rpms.git")
+
+        rpms_by_name = {r["name"]: r for r in variables["rpms"]}
+        assert rpms_by_name["mypkg"]["application_name"] == "private-example-rpms-main"
+        assert "application_name" not in rpms_by_name["normalpkg"]
+
+    def test_default_application_name_unchanged(self, gen_module, tmp_path):
+        """Global application_name is still rpms-{branch}."""
+        (tmp_path / "rpms" / "pkg").mkdir(parents=True)
+        (tmp_path / "ci").mkdir()
+        (tmp_path / "ci" / "package-overrides.yaml").write_text("{}\n")
+
+        with patch.object(gen_module, "ROOT_DIR", tmp_path):
+            variables = gen_module.build_konflux_variables("main", "hummingbird-tenant", "https://example.com/rpms.git")
+
+        assert variables["application_name"] == "rpms-main"
+        assert "application_name" not in variables["rpms"][0]
+
+
+class TestValidation:
+    """Tests for configuration validation."""
+
+    def test_unknown_private_product_raises(self, gen_module, mock_repo):
+        """private_product value with no matching RPA raises ValueError."""
+        (mock_repo / "ci" / "package-overrides.yaml").write_text(
+            textwrap.dedent("""\
+            alpha:
+              private_product: nonexistent
+            """)
+        )
+        with patch.object(gen_module, "ROOT_DIR", mock_repo):
+            with pytest.raises(ValueError, match="nonexistent"):
+                gen_module.generate_releng()
+
+    def test_missing_rpa_field_raises(self, gen_module, mock_repo):
+        """Missing required field in RPA config raises ValueError."""
+        (mock_repo / "ci" / "konflux_rpa_config.yml").write_text(
+            textwrap.dedent("""\
+            global:
+              branch: main
+              tenant: hummingbird-tenant
+              release_tenant: rhtap-releng-tenant
+              git_repo: https://gitlab.com/redhat/hummingbird/rpms.git
+            rpas:
+              - name: incomplete-rpa
+                application_prefix: rpms
+            """)
+        )
+        with patch.object(gen_module, "ROOT_DIR", mock_repo):
+            with pytest.raises(ValueError, match="incomplete-rpa.*release_org"):
+                gen_module.generate_releng()

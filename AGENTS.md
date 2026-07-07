@@ -52,9 +52,11 @@ Common operational tasks that users or AI agents may need to perform:
 | Add per-package update hooks | _(edit metadata hooks YAML)_                    | [Package Modification Tracking](documentation/operating/package-modification-tracking.md) | Customize spec update, source download, or post-update steps |
 | Update dist-git packages     | `update [<pkg>]`                                | [Updating Dist-git Packages](documentation/operating/updating-dist-git-packages.md)       | Test or trigger automated package updates from Fedora        |
 | Lookaside cache access       | _(AWS credentials setup)_                       | [Lookaside Cache Access](documentation/operating/lookaside-cache-access.md)               | Set up AWS credentials to upload source tarballs             |
+| Pulp access                  | _(service account setup)_                       | [Pulp Access](documentation/operating/pulp-access.md)                                     | Create Pulp service accounts and configure CLI credentials   |
 | Analyze upstream diffs       | `diff --all --stat`                             | [Upstream Diff Analysis](documentation/operating/upstream-diff-analysis.md)               | Classify modified packages for upstreaming                   |
 | Report CVE data issues       | _(see docs)_                                    | [Reporting CVE Data Issues](documentation/operating/reporting-cve-data-issues.md)         | Get incorrect CVE data on cve.org or NIST corrected          |
 | Konflux resource deployment  | _(background info)_                             | [Konflux Resource Deployment](documentation/background/konflux-resource-deployment.md)    | Understand how Konflux resources are deployed                |
+| Private RPM repositories     | _(package-overrides + RPA config)_              | [Private RPM Repositories](documentation/operating/private-rpm-repositories.md)           | Route packages to private per-product Pulp repos             |
 
 ## Post-Import / Post-Add Requirements
 

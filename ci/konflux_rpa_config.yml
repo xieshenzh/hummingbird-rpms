@@ -23,6 +23,23 @@ rpas:
     pipeline_url: "https://github.com/scoheb/release-service-catalog.git"
     pipeline_revision: HUM-2609-remove-oversized-task-results
     skip_pyxis_mr: true  # Set to true to skip pyxis-repo-configs MR for this RPA
+    exclude_private: true
     component_filter:
       path_prefix: rpms/  # Only components from this directory (e.g., images/, rpms/)
       exclude_patterns: []  # Optional: patterns to exclude
+
+  - name: hummingbird-rpms-private-example
+    target_file: config/kflux-prd-rh03.nnv1.p1/product/ReleasePlanAdmission/hummingbird/hummingbird-rpms-private-example.yaml
+    template: macros/releng/release-plan-admission.yml.j2
+    application_prefix: private-example-rpms
+    release_org: registry.stage.redhat.io/hummingbird-tech-preview
+    single_component_mode: true
+    service_account_name: hummingbird-rpm-release-staging
+    pulp_unsigned_domain: private-hummingbird-example-unsigned
+    pulp_signed_domain: private-hummingbird-example
+    pulp_secret_name: hummingbird-pulp-credentials-private-production-secret
+    pipeline_url: "https://github.com/scoheb/release-service-catalog.git"
+    pipeline_revision: HUM-2609-remove-oversized-task-results
+    private_product: example
+    component_filter:
+      path_prefix: rpms/

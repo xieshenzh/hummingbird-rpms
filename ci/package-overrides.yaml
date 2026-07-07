@@ -6,6 +6,10 @@
 #   build_platforms: Override the default MPLs (instance sizes) for builds
 #   forked_from: Override the upstream dist-git repository URL for lookaside cache resolution
 #                (default: https://src.fedoraproject.org/rpms/<package-name>)
+#   private_product: Route this package to a private per-product Pulp repository
+#                    instead of (or in addition to) the public one. The value is the
+#                    product name (e.g., "example", "dotnet") which must match an entry
+#                    in ci/konflux_rpa_config.yml.
 #
 # Example:
 # llvm:
@@ -101,6 +105,9 @@ grype:
 
 haproxy:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+hello:
+  private_product: example
 
 httpd:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"

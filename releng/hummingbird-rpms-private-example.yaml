@@ -1,20 +1,20 @@
-{%- macro release_plan_admission(name, application_prefix, component_list, release_org, single_component_mode, service_account_name) -%}---
+---
 apiVersion: appstudio.redhat.com/v1alpha1
 kind: ReleasePlanAdmission
 metadata:
   labels:
     release.appstudio.openshift.io/block-releases: 'false'
     pp.engineering.redhat.com/business-unit: rhel-platforms
-  name: {{ name }}
-  namespace: {{ release_tenant }}
+  name: hummingbird-rpms-private-example
+  namespace: rhtap-releng-tenant
 spec:
   applications:
-    - {{ application_prefix }}-{{ branch }}
+    - private-example-rpms-main
   data:
     intention: production
     pulp:
-      domain: {{ pulp_unsigned_domain }}
-      secretName: {{ pulp_secret_name }}
+      domain: private-hummingbird-example-unsigned
+      secretName: hummingbird-pulp-credentials-private-production-secret
     signOptions:
       signKeytab:
         principal: "konflux-release-signing-prod@IPA.REDHAT.COM"
@@ -26,8 +26,8 @@ spec:
       artifactStorageSecret: "signing-artifact-storage-prod"
       signKeyAlias:
         key: "release4,release2,ima"
-      unsignedRpmsDomain: {{ pulp_unsigned_domain }}
-      signedRpmsDomain: {{ pulp_signed_domain }}
+      unsignedRpmsDomain: private-hummingbird-example-unsigned
+      signedRpmsDomain: private-hummingbird-example
     releaseNotes:
       product_id: [1071]
       product_name: "Red Hat Hardened Images"
@@ -39,7 +39,7 @@ spec:
       # topic:
       # description:
       #
-    singleComponentMode: {{ single_component_mode | tojson }}
+    singleComponentMode: true
     sign:
       configMapName: hacbs-signing-pipeline-config-staging-e2e
       cosignSecretName: konflux-cosign-signing-stage
@@ -52,40 +52,38 @@ spec:
       rpm-repositories:
         - name: x86_64
           arch: x86_64
-          repository_id: {{ pulp_signed_domain }}-x86_64-rpms
+          repository_id: private-hummingbird-example-x86_64-rpms
           repository_name: x86_64
           distro: hummingbird-20251124
         - name: aarch64
           arch: aarch64
-          repository_id: {{ pulp_signed_domain }}-aarch64-rpms
+          repository_id: private-hummingbird-example-aarch64-rpms
           repository_name: aarch64
           distro: hummingbird-20251124
         - name: src
           arch: src
-          repository_id: {{ pulp_signed_domain }}-source-rpms
+          repository_id: private-hummingbird-example-source-rpms
           repository_name: source
           distro: hummingbird-20251124
         # leaving this here for backwards compatibility before HUM-808
         - name: source
           arch: source
-          repository_id: {{ pulp_signed_domain }}-source-rpms
+          repository_id: private-hummingbird-example-source-rpms
           repository_name: source
           distro: hummingbird-20251124
       defaults:
         pushSourceContainer: true
       components:
-{%- for component in component_list %}
-        - name: {{ component.component_name }}
+        - name: hello-main
           contentType: rpm
-{%- endfor %}
-  origin: {{ tenant }}
+  origin: hummingbird-tenant
   pipeline:
     pipelineRef:
       params:
         - name: url
-          value: {{ pipeline_url }}
+          value: https://github.com/scoheb/release-service-catalog.git
         - name: revision
-          value: {{ pipeline_revision }}
+          value: HUM-2609-remove-oversized-task-results
         - name: pathInRepo
           value: "pipelines/managed/push-rpms-to-pulp/push-rpms-to-pulp.yaml"
       resolver: git
@@ -121,9 +119,8 @@ spec:
                 cpu: '2'
                 memory: 8Gi
             name: validate
-    serviceAccountName: {{ service_account_name }}
+    serviceAccountName: hummingbird-rpm-release-staging
     timeouts:
       pipeline: 4h0m0s
       tasks: 4h0m0s
   policy: rpm-hummingbird-stage
-{%- endmacro -%}

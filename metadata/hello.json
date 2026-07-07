@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "f9bf9c65a7b3c4f97418d42047ebff94d54e350d",
+  "source": "https://src.fedoraproject.org/rpms/hello.git",
+  "upstream_repo": "https://ftp.gnu.org/gnu/hello/",
+  "version": "2.12.3"
+}
