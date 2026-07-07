@@ -107,10 +107,6 @@ Patch:          https://github.com/pypa/pip/commit/6099a54ddd.patch
 # wrong installation.
 Patch:          https://github.com/pypa/pip/commit/4c6d7471de.patch
 
-# CVE-2026-8643: Reject entry point names that escape scripts dir
-# https://github.com/pypa/pip/pull/14000
-Patch:          CVE-2026-8643-reject-entrypoint-path-traversal.patch
-
 # Remove -s from Python shebang - ensure that packages installed with pip
 # to user locations are seen by pip itself
 %undefine _py3_shebang_s
