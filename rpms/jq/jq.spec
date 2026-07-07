@@ -2,7 +2,7 @@
 
 Name:           jq
 Version:        1.8.2
-Release:        0.1%{?dist}
+Release:        4%{?dist}
 Summary:        Command-line JSON processor
 
 License:        MIT AND ICU AND CC-BY-3.0
@@ -66,6 +66,8 @@ Development files for %{name}
 
 %install
 %make_install
+find %{buildroot} -name '*.la' -delete
+rm -f %{buildroot}%{_docdir}/%{name}/COPYING
 
 %if %{with check}
 %check
@@ -77,7 +79,7 @@ make check
 
 %files
 %license COPYING
-%doc AUTHORS COPYING NEWS.md README.md
+%doc AUTHORS NEWS.md README.md
 %{_bindir}/%{name}
 %{_libdir}/libjq.so.*
 %{_datadir}/man/man1/jq.1.gz
