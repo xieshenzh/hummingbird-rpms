@@ -1,7 +1,7 @@
 Summary: GNU data compression program
 Name: gzip
 Version: 1.14
-Release: 2.2%{?dist}
+Release: 2.3%{?dist}
 # info pages are under GFDL license
 License: GPL-3.0-or-later AND GFDL-1.3-only
 Source0: https://ftp.gnu.org/gnu/gzip/gzip-%{version}.tar.xz
@@ -13,6 +13,7 @@ Source101: colorzgrep.sh
 
 Patch1: s390_errno.patch
 Patch2: CVE-2026-41991.patch
+Patch3: CVE-2026-41992.patch
 
 # Fixed in upstream code.
 # http://thread.gmane.org/gmane.comp.gnu.gzip.bugs/378
@@ -42,6 +43,7 @@ very commonly used data compression program.
 %setup -q
 %patch 1 -p1
 %patch 2 -p1
+%patch 3 -p1
 
 cp %{SOURCE1} .
 autoreconf
