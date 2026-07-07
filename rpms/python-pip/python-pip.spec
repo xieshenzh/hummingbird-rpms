@@ -6,13 +6,13 @@
 %bcond man 1
 
 %global srcname pip
-%global base_version 26.1.1
+%global base_version 26.1.2
 %global upstream_version %{base_version}%{?prerel}
 %global python_wheel_name %{srcname}-%{upstream_version}-py3-none-any.whl
 
 Name:           python-%{srcname}
 Version:        %{base_version}%{?prerel:~%{prerel}}
-Release:        3.1%{?dist}
+Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 # We bundle a lot of libraries with pip, which itself is under MIT license.
@@ -95,9 +95,23 @@ Patch:          dummy-certifi.patch
 # We don't need a layer to check that, as we're by default in an offline environment
 Patch:          downstream-remove-pytest-subket.patch
 
+<<<<<<< HEAD
+# Fix sitecustomize.py used for build isolation on Python 3.15+
+Patch:          https://github.com/pypa/pip/commit/6099a54ddd.patch
+
+# Fix user-site path ordering in the test suite on Python 3.15+
+# The same CPython gh-149819 change that broke build env isolation also broke
+# _customize_site() in tests/lib/venv.py: site.addsitedir() no longer
+# re-appends paths already in sys.path, so the detection of system-site paths
+# produces an empty list and user site ends up after venv site-packages instead
+# of before it, causing user-site install/uninstall tests to operate on the
+# wrong installation.
+Patch:          https://github.com/pypa/pip/commit/4c6d7471de.patch
+=======
 # CVE-2026-8643: Reject entry point names that escape scripts dir
 # https://github.com/pypa/pip/pull/14000
 Patch:          CVE-2026-8643-reject-entrypoint-path-traversal.patch
+>>>>>>> hummingbird-local
 
 # Remove -s from Python shebang - ensure that packages installed with pip
 # to user locations are seen by pip itself
@@ -174,7 +188,9 @@ Requires:       ca-certificates
 # Virtual provides for the packages bundled by pip:
 %{bundled %{python3_pkgversion}}
 
+%if "%{python3_pkgversion}" == "3"
 Provides:       pip = %{version}-%{release}
+%endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
 pip is a package management system used to install and manage software packages
@@ -311,9 +327,8 @@ grep "pem$" %{pyproject_files} && exit 1 || true
 pytest_k='not completion'
 # this clashes with our PYTHONPATH
 pytest_k="$pytest_k and not environments_with_no_pip"
-# this seems to require internet (despite no network marker)
-# added in https://github.com/pypa/pip/pull/13378 TODO drop this in the next release
-pytest_k="$pytest_k and not test_prompt_for_keyring_if_needed and not test_double_install_fail and not test_install_sdist_links and not test_lock_vcs and not test_lock_archive and not test_backend_sees_config_via_sdist"
+# this requires internet without the keyring local wheel
+pytest_k="$pytest_k and not test_prompt_for_keyring_if_needed"
 # this cannot import breezy, TODO investigate
 pytest_k="$pytest_k and not (functional and bazaar)"
 # failures to investigate
