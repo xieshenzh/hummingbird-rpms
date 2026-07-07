@@ -337,16 +337,13 @@ rm CHANGELOG.md
     -s TestWaitForAllPodsUnmount
     %dnl on x86_64 connection error
     %[ "%{_arch}" == "x86_64" ? "-s TestValidateScaleForDeclarative" : "" ]
-<<<<<<< HEAD
     %dnl TestUpdate... tests flaky on several arches
     -s "TestUpdateNewNodeStatus"
     -s "TestUpdateExistingNodeStatus"
-=======
     %dnl /etc/resolv.conf missing in mock chroot
     -s "TestGetPodDNS"
     %dnl on ppcle64 concurrent_unmount_-_many_pods_(20)_with_timeout_errors
     %[ "%{_arch}" == "ppcle64" ? "-s TestWaitForAllPodsUnmount" : "" ]
->>>>>>> hummingbird-local
     %dnl see hack/make-rules/test.sh kube::test::find_go_packages
     -t "third_party"
     -t "cmd/kubeadm/test"
