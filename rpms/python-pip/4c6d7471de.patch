@@ -1,0 +1,29 @@
+From 4c6d7471dec62fb004a47a7c2164b6b5b089ac06 Mon Sep 17 00:00:00 2001
+From: Richard Si <sichard26@gmail.com>
+Date: Fri, 5 Jun 2026 15:44:14 -0400
+Subject: [PATCH] Also fix user site patching in test suite
+
+---
+ tests/lib/venv.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tests/lib/venv.py b/tests/lib/venv.py
+index 67b01d9f31..4e86b92b3b 100644
+--- a/tests/lib/venv.py
++++ b/tests/lib/venv.py
+@@ -174,11 +174,13 @@ def _customize_site(self) -> None:
+                     site.ENABLE_USER_SITE = {self._user_site_packages}
+                     # First, drop system-sites related paths.
+                     original_sys_path = sys.path[:]
++                    # To discover system-sites related paths, clear sys.path
++                    # and build a new one with only system paths.
++                    sys.path = []
+                     known_paths = set()
+                     for path in site.getsitepackages():
+                         site.addsitedir(path, known_paths=known_paths)
+-                    system_paths = sys.path[len(original_sys_path):]
+-                    for path in system_paths:
++                    for path in sys.path:
+                         if path in original_sys_path:
+                             original_sys_path.remove(path)
+                     sys.path = original_sys_path
