@@ -39,7 +39,7 @@
 Summary: An open source implementation of SSH protocol version 2
 Name: openssh
 Version: %{openssh_ver}
-Release: 4%{?dist}
+Release: 6%{?dist}
 URL: http://www.openssh.com/portable.html
 Source0: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz
 Source1: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz.asc
@@ -514,6 +514,19 @@ test -f %{sysconfig_anaconda} && \
 %attr(0755,root,root) %{_libdir}/sshtest/sk-dummy.so
 
 %changelog
+* Tue Jul 07 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 10.3p1-6
+- Improve GSS KEX algorithms documentation
+  Patches are submitted by xspielinbox+redhat@protonmail.com
+  Resolves: rhbz#2241564
+
+* Tue Jul 07 2026 Zoltan Fridrich <zfridric@redhat.com> - 10.3p1-5
+- CVE-2026-55653: Fix double free in openssh DH-GEX client path during
+  FIPS known-group validation that leads to client-side denial of service
+- CVE-2026-55654: Fix heap out-of-bounds read during GSSAPI indicator
+  cleanup due to missing NULL terminator
+- CVE-2026-55655: Fix MITM of X11 forwarding via abstract UNIX socket
+  pre-binding
+
 * Fri Jun 12 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 10.3p1-4
 - Rebuild against OpenSSL 4.0.1
 
@@ -1057,7 +1070,7 @@ test -f %{sysconfig_anaconda} && \
 - Update cached passwd structure after PAM authentication
 - Do not fall back to sshd_net_t SELinux context
 - Fix corner cases of PKCS#11 URI implementation
-- Do not negotiate arbitrary primes with DH GEX in FIPS
+- Do not negotiate arbitrary primes with DH GEX in FIPS 
 
 * Wed Feb 06 2019 Jakub Jelen <jjelen@redhat.com> - 7.9p1-4 + 0.10.3.6
 - Log when a client requests an interactive session and only sftp is allowed
@@ -1748,7 +1761,7 @@ test -f %{sysconfig_anaconda} && \
 - compile ssh-askpass with corect CFLAGS
 
 * Mon Aug  8 2011 Jan F. Chadima <jchadima@redhat.com> - 5.8p2-18 + 0.9.2-31
-- improve selinux's change context log
+- improve selinux's change context log 
 
 * Mon Aug  8 2011 Jan F. Chadima <jchadima@redhat.com> - 5.8p2-17 + 0.9.2-31
 - repair broken man pages
@@ -1838,7 +1851,7 @@ test -f %{sysconfig_anaconda} && \
 - improve periodical reseeding of random generator
 
 * Thu Mar 17 2011 Jan F. Chadima <jchadima@redhat.com> - 5.8p1-18 + 0.9.2-30
-- add periodical reseeding of random generator
+- add periodical reseeding of random generator 
 - change selinux contex for internal sftp in do_usercontext
 - exit(0) after sigterm
 
@@ -2308,7 +2321,7 @@ test -f %{sysconfig_anaconda} && \
 * Tue Jan 16 2007 Tomas Mraz <tmraz@redhat.com> - 4.5p1-2
 - support mls on labeled networks (#220487)
 - support mls level selection on unlabeled networks
-- allow / in usernames in scp (only beginning /, ./, and ../ is special)
+- allow / in usernames in scp (only beginning /, ./, and ../ is special) 
 
 * Thu Dec 21 2006 Tomas Mraz <tmraz@redhat.com> - 4.5p1-1
 - update to 4.5p1 (#212606)
@@ -2396,7 +2409,7 @@ test -f %{sysconfig_anaconda} && \
 * Tue Nov 22 2005 Tomas Mraz <tmraz@redhat.com> - 4.2p1-9
 - drop x11-ssh-askpass from the package
 - drop old build_6x ifs from spec file
-- improve gnome-ssh-askpass so it doesn't reveal number of passphrase
+- improve gnome-ssh-askpass so it doesn't reveal number of passphrase 
   characters to person looking at the display
 - less hackish fix for the __USE_GNU problem
 
@@ -2482,7 +2495,7 @@ test -f %{sysconfig_anaconda} && \
 - add spaces to messages in initscript (#138508)
 
 * Tue Feb  8 2005 Tomas Mraz <tmraz@redhat.com> 3.9p1-10
-- enable trusted forwarding by default if X11 forwarding is
+- enable trusted forwarding by default if X11 forwarding is 
   required by user (#137685 and duplicates)
 - disable protocol 1 support by default in sshd server config (#88329)
 - keep the gnome-askpass dialog above others (#69131)
@@ -2562,7 +2575,7 @@ test -f %{sysconfig_anaconda} && \
 - Built RHLE3 U2 update package.
 
 * Wed Mar 3 2004 Daniel Walsh <dwalsh@redhat.com> 3.6.1p2-33
-- Close file descriptors on exec
+- Close file descriptors on exec 
 
 * Mon Mar  1 2004 Thomas Woerner <twoerner@redhat.com> 3.6.1p2-32
 - fixed pie build
@@ -2761,7 +2774,7 @@ test -f %{sysconfig_anaconda} && \
 - pull patch from CVS to avoid printing error messages when some of the
   default keys aren't available when running ssh-add
 - refresh to current revisions of Simon's patches
-
+ 
 * Thu Mar 21 2002 Nalin Dahyabhai <nalin@redhat.com> 3.1p1-2gss
 - reintroduce Simon's gssapi patches
 - add buildprereq for autoconf253, which is needed to regenerate configure
@@ -2907,7 +2920,7 @@ test -f %{sysconfig_anaconda} && \
 
 * Sun Apr  8 2001 Preston Brown <pbrown@redhat.com>
 - remove explicit openssl requirement, fixes builddistro issue
-- make initscript stop() function wait until sshd really dead to avoid
+- make initscript stop() function wait until sshd really dead to avoid 
   races in condrestart
 
 * Mon Apr  2 2001 Nalin Dahyabhai <nalin@redhat.com>

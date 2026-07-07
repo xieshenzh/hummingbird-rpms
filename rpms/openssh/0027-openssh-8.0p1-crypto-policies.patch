@@ -91,7 +91,7 @@ index 9e5163774..306fa1d8a 100644
  The list of key exchange algorithms that are offered for GSSAPI
  key exchange. Possible values are
  .Bd -literal -offset 3n
-@@ -1034,10 +1033,8 @@ gss-nistp256-sha256-,
+@@ -1034,9 +1033,6 @@ gss-nistp256-sha256-,
  gss-curve25519-sha256-
  .Ed
  .Pp
@@ -99,11 +99,9 @@ index 9e5163774..306fa1d8a 100644
 -.Dq gss-group14-sha256-,gss-group16-sha512-,gss-nistp256-sha256-,
 -gss-curve25519-sha256-,gss-group14-sha1-,gss-gex-sha1- .
  This option only applies to connections using GSSAPI.
-+.Pp
- .It Cm HashKnownHosts
- Indicates that
- .Xr ssh 1
-@@ -1056,38 +1053,25 @@ will not be converted automatically,
+ .Pp
+ The list of supported key exchange algorithms may also be obtained using
+@ -1056,38 +1053,25 @@ will not be converted automatically,
  but may be manually hashed using
  .Xr ssh-keygen 1 .
  .It Cm HostbasedAcceptedAlgorithms
@@ -180,7 +178,7 @@ index 9e5163774..306fa1d8a 100644
  Specifies the permitted KEX (Key Exchange) algorithms that will be used and
  their preference order.
  The selected algorithm will be the first algorithm in this list that
-@@ -1372,29 +1372,17 @@ Multiple algorithms must be comma-separated.
+@@ -1375,28 +1374,16 @@ Multiple algorithms must be comma-separated.
  .Pp
  If the specified list begins with a
  .Sq +
@@ -209,11 +207,10 @@ index 9e5163774..306fa1d8a 100644
 -diffie-hellman-group18-sha512,
 -diffie-hellman-group14-sha256
 -.Ed
- .Pp
 +built-in openssh default set.
+ .Pp
  The list of supported key exchange algorithms may also be obtained using
  .Qq ssh -Q kex .
- .It Cm KnownHostsCommand
 @@ -1510,37 +1498,33 @@ function, and all code in the
  file.
  This option is intended for debugging and no overrides are enabled by default.
@@ -311,7 +308,7 @@ index 9e5163774..306fa1d8a 100644
  .Qq ssh -Q PubkeyAcceptedAlgorithms .
 +.Pp
 +This option affects also
-+.Cm HostKeyAlgorithms
++.Cm HostKeyAlgorithms .
  .It Cm PubkeyAuthentication
  Specifies whether to try public key authentication.
  The argument to this keyword must be
@@ -397,7 +394,7 @@ index 1762874c4..1d16dabaf 100644
  The list of available ciphers may also be obtained using
  .Qq ssh -Q cipher .
  .It Cm ClientAliveCountMax
-@@ -789,55 +783,43 @@ For this to work
+@@ -789,58 +783,46 @@ For this to work
  .Cm GSSAPIKeyExchange
  needs to be enabled in the server and also used by the client.
  .It Cm GSSAPIKexAlgorithms
@@ -428,6 +425,9 @@ index 1762874c4..1d16dabaf 100644
 -.Dq gss-group14-sha256-,gss-group16-sha512-,gss-nistp256-sha256-,
 -gss-curve25519-sha256-,gss-group14-sha1-,gss-gex-sha1- .
  This option only applies to connections using GSSAPI.
+ .Pp
+ The list of supported key exchange algorithms may also be obtained using
+ .Qq ssh -Q GSSAPIKexAlgorithms .
  .It Cm HostbasedAcceptedAlgorithms
 +The default is handled system-wide by
 +.Xr crypto-policies 7 .
