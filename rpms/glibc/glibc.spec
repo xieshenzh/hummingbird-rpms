@@ -1,4 +1,4 @@
-%global glibcsrcdir glibc-2.42-70-g6cebb0b80f
+%global glibcsrcdir glibc-2.42-74-g0be5a6a72a
 %global glibcversion 2.42
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
@@ -152,7 +152,7 @@ Version: %{glibcversion}
 # - It allows using the Release number without the %%dist tag in the dependency
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
-%global baserelease 14
+%global baserelease 15
 Release: %{baserelease}%{?dist}
 
 # Licenses:
@@ -2392,9 +2392,24 @@ update_gconv_modules_cache ()
 %endif
 
 %changelog
-* Tue Jun 02 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-14
+* Tue Jul 07 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-15
+- Auto-sync with upstream branch release/2.42/master,
+  commit 0be5a6a72a4a3132bc211720d2b6949a84f54dc3:
+- hppa: Fix missing call to __feraiseexcept (BZ 34306) (John David Anglin)
+- arm: Save/restore VFP registers in PLT trampolines (BZ 34144, BZ 15792) (Adhemerval Zanella)
+- iconv: Suppress intermediate errors with //TRANSLIT (bug 34236) (Florian Weimer)
+- elf: don't clobber ld.so.conf in tst-glibc-hwcaps-prepend-cache [BZ #34210] (Sam James)
+- stdio-common: Allow partially-filled %mc buffers [BZ #12701] (DJ Delorie)
+- stdio-common: Reject insufficient character data in scanf [BZ #12701] (Maciej W. Rozycki)
+- support: Implement 'xfmemopen' for seamless 'fmemopen' use (Maciej W. Rozycki)
+
+* Thu Jun 04 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-14
 - Auto-sync with upstream branch release/2.42/master,
   commit 6cebb0b80fd783e442a8ad27c3f52cde52a9cac7:
+- stdio-common: Allow partially-filled %mc buffers [BZ #12701] (DJ Delorie)
+- stdio-common: Reject insufficient character data in scanf [BZ #12701] (Maciej W. Rozycki)
+- support: Implement 'xfmemopen' for seamless 'fmemopen' use (Maciej W. Rozycki)
+
 - stdio-common: Allow partially-filled %mc buffers [BZ #12701] (DJ Delorie)
 - stdio-common: Reject insufficient character data in scanf [BZ #12701] (Maciej W. Rozycki)
 - support: Implement 'xfmemopen' for seamless 'fmemopen' use (Maciej W. Rozycki)
