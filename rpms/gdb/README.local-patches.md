@@ -84,8 +84,6 @@ control files.  These control files are:
 
   - `_gdb.spec.Patch.include`: This file contains the `Patch:` directives.
 
-  - `_gdb.spec.patch.include`: This file contains the `%patch` directives.
-
   - `_patch_order`: This file contains the patches, in the exact order
     that they must be applied.  It is used when importing the patches
     into the git repository.

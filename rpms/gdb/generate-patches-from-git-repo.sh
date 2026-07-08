@@ -69,10 +69,9 @@ common_ancestor=`git merge-base HEAD $commit_or_tag`
 test -z "$common_ancestor" && die "Could not find common ancestor between HEAD and $commit_or_tag."
 
 temp_PATCH_file=/tmp/_gdb.spec.Patch.include
-temp_patch_file=/tmp/_gdb.spec.patch.include
 temp_patch_order_file=/tmp/_patch_order
 
-rm -f $temp_PATCH_file $temp_patch_file $temp_patch_order_file
+rm -f $temp_PATCH_file $temp_patch_order_file
 
 for c in `git rev-list --reverse ${common_ancestor}..HEAD` ; do
     fname=`git log -1 --pretty='format:%s' $c`
@@ -100,13 +99,11 @@ for c in `git rev-list --reverse ${common_ancestor}..HEAD` ; do
 `git log -1 --pretty='format:%b' $c | sed -n 's/^;;/#/p'`
 EOF
     printf "Patch%03d: %s\n\n" $idx $fname >> $temp_PATCH_file
-    printf "%%patch -p1 -P%03d\n" $idx >> $temp_patch_file
     echo $fname >> $temp_patch_order_file
     idx=`expr $idx + 1`
 done
 
 cd $orig_dir
 mv $temp_PATCH_file _gdb.spec.Patch.include
-mv $temp_patch_file _gdb.spec.patch.include
 mv $temp_patch_order_file _patch_order
 echo "$common_ancestor" > _git_upstream_commit

@@ -6,7 +6,6 @@ gdb-rhbz2424325-c23-more-const-fixes.patch
 gdb-rhbz2424325-c++20-implicit-lambda-capture.patch
 gdb-rhbz2403580-misplaced-symtabs.patch
 gdb-index-generation-fixes.patch
-gdb-rhbz2435950-skip-revert.patch
 gdb-rhbz2413405-gcore-unreadable-pages.patch
 gdb-fileio-test-fixes.patch
 gdb-fix-testsuite-newer-tcl.patch
@@ -14,3 +13,4 @@ gdb-rhbz2366461-missing-thread.patch
 gdb-rhbz2366461-bad-solib-entry-addr.patch
 gdb-rhbz2467251-computed-location-synthetic-pointers.patch
 gdb-tcl9-utf8-encoding-fix.patch
+gdb-backport-dap-core-file-support.patch

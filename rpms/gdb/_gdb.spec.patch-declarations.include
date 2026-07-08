@@ -44,36 +44,32 @@ Patch007: gdb-rhbz2403580-misplaced-symtabs.patch
 # These backports will all drop out when rebasing onto GDB 18.
 Patch008: gdb-index-generation-fixes.patch
 
-# Backport of upstream commit f08ffbbf2691bad2d5df660ee644647687775f0c
-# Can be dropped on a rebase to gdb 17.2 or 18.1
-Patch009: gdb-rhbz2435950-skip-revert.patch
-
 # Backport of upstream commit c1da013915e from Kevin Buettner
 # (RHBZ 2413405).
-Patch010: gdb-rhbz2413405-gcore-unreadable-pages.patch
+Patch009: gdb-rhbz2413405-gcore-unreadable-pages.patch
 
 # Backport of upstream commit d2cc16cd7fc from Jan Vrany fixing
 # FAILs in gdb.base/fileio.exp caused by macro expansion of path
 # components (e.g. "linux") in OUTDIR.
-Patch011: gdb-fileio-test-fixes.patch
+Patch010: gdb-fileio-test-fixes.patch
 
 # Fix use of deprecated trace variable subcommand
 # (Tom de Vries)
-Patch012: gdb-fix-testsuite-newer-tcl.patch
+Patch011: gdb-fix-testsuite-newer-tcl.patch
 
 # Backport upstream commit 8bd08ee92c4 to address rhbz2366461.  This
 # commit will drop out with GDB 18.
-Patch013: gdb-rhbz2366461-missing-thread.patch
+Patch012: gdb-rhbz2366461-missing-thread.patch
 
 # Backport upstream commit cd289df068e to address rhbz2366461.  This
 # commit will drop out with GDB 18.
-Patch014: gdb-rhbz2366461-bad-solib-entry-addr.patch
+Patch013: gdb-rhbz2366461-bad-solib-entry-addr.patch
 
 # Backport the following upstream commits in order to address RHBZ
 # 2467251: d980317c7f1, 958d06262a7, 7d1d7386561, 8915de0883c,
 # 8f65ab7b71f.  These commits will all drop out when we rebase to GDB
 # 18.
-Patch015: gdb-rhbz2467251-computed-location-synthetic-pointers.patch
+Patch014: gdb-rhbz2467251-computed-location-synthetic-pointers.patch
 
 # Fix EILSEQ problems for UTF8 related tests when using expect
 # enabled with Tcl 9 and full set of Tcl 9 compatibility fixes
@@ -84,5 +80,9 @@ Patch015: gdb-rhbz2467251-computed-location-synthetic-pointers.patch
 # For its status, see:
 #
 # https://inbox.sourceware.org/gdb-patches/20260526192701.3835262-2-kevinb@redhat.com/T/#u
-Patch016: gdb-tcl9-utf8-encoding-fix.patch
+Patch015: gdb-tcl9-utf8-encoding-fix.patch
+
+# Backport of upstream commit e492fb22b70
+# gdb: backport DAP core file support
+Patch016: gdb-backport-dap-core-file-support.patch
 
