@@ -11,7 +11,7 @@ diff --git a/configure.ac b/configure.ac
 index b3bdfad1eb..411322a27f 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4536,6 +4536,8 @@ AC_SUBST(vendorarchdir)dnl
+@@ -4533,6 +4533,8 @@ AC_SUBST(vendorarchdir)dnl
  AC_SUBST(CONFIGURE, "`echo $0 | sed 's|.*/||'`")dnl
  AC_SUBST(configure_args, "`echo "${ac_configure_args}" | sed 's/\\$/$$/g'`")dnl
  

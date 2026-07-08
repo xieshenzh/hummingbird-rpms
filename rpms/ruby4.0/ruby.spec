@@ -1,6 +1,6 @@
 %global major_version 4
 %global minor_version 0
-%global teeny_version 0
+%global teeny_version 5
 %global major_minor_version %{major_version}.%{minor_version}
 %global ruby_major_minor %{major_version}.%{minor_version}
 %global _rubygem_pkg rubygem%{ruby_major_minor}
@@ -45,19 +45,19 @@
 ## BUNDLED_GEMS_VERSIONS
 
 # Bundled libraries versions
-%global rubygems_version 4.0.3
+%global rubygems_version 4.0.10
 %global rubygems_molinillo_version 0.8.0
 %global rubygems_net_http_version 0.7.0
 %global rubygems_net_protocol_version 0.2.2
 %global rubygems_optparse_version 0.8.0
-%global rubygems_resolv_version 0.6.2
+%global rubygems_resolv_version 0.7.0
 %global rubygems_securerandom_version 0.4.1
 %global rubygems_timeout_version 0.4.4
 %global rubygems_tsort_version 0.2.0
 %global rubygems_uri_version 1.1.1
 
 # Default gems.
-%global bundler_version 4.0.3
+%global bundler_version 4.0.10
 %global bundler_connection_pool_version 2.5.4
 %global bundler_fileutils_version 1.8.0
 %global bundler_net_http_persistent_version 4.0.6
@@ -72,7 +72,7 @@
 %global did_you_mean_version 2.0.0
 %global digest_version 3.2.1
 %global english_version 0.8.1
-%global erb_version 6.0.1
+%global erb_version 6.0.1.1
 %global error_highlight_version 0.7.1
 %global etc_version 1.4.6
 %global fcntl_version 1.3.0
@@ -88,11 +88,11 @@
 %global net_protocol_version 0.2.2
 %global open_uri_version 0.5.0
 %global open3_version 0.2.1
-%global openssl_version 4.0.0
+%global openssl_version 4.0.2
 %global optparse_version 0.8.1
 %global pp_version 0.6.3
 %global prettyprint_version 0.2.0
-%global prism_version 1.7.0
+%global prism_version 1.8.1
 %global psych_version 5.3.1
 %global resolv_version 0.7.0
 %global ruby2_keywords_version 0.0.5
@@ -101,7 +101,7 @@
 %global singleton_version 0.3.0
 %global stringio_version 3.2.0
 %global strscan_version 3.1.6
-%global syntax_suggest_version 2.0.2
+%global syntax_suggest_version 2.0.3
 %global tempfile_version 0.3.1
 %global time_version 0.4.2
 %global timeout_version 0.6.0
@@ -112,7 +112,7 @@
 %global weakref_version 0.1.4
 %global win32_registry_version 0.1.2
 %global yaml_version 0.4.0
-%global zlib_version 3.2.2
+%global zlib_version 3.2.3
 
 # Bundled gems.
 %global abbrev_version 0.1.2
@@ -138,11 +138,11 @@
 %global ostruct_version 0.6.3
 %global power_assert_version 3.0.1
 %global prime_version 0.1.4
-%global pstore_version 0.2.0
+%global pstore_version 0.2.1
 %global racc_version 1.8.1
 %global rake_version 13.3.1
 %global rbs_version 3.10.0
-%global rdoc_version 7.0.3
+%global rdoc_version 7.0.4
 %global readline_version 0.0.4
 %global reline_version 0.6.3
 %global repl_type_completor_version 0.1.12
@@ -205,7 +205,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 33.4%{?dist}
+Release: 35%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -312,14 +312,19 @@ Patch7: ruby-3.3.0-Disable-syntax-suggest-test-case.patch
 Patch8: ruby-4.0.1-Support-customizable-rustc_flags-for-rustc-builds.patch
 # https://github.com/ruby/rdoc/pull/1531
 # Fix error with `gem install --document=rdoc,ri`
+# Fixed in rdoc 7.1.0 but not in 7.0.4
 Patch9: rdoc-pr1531-fix-mutilple-document-installation.patch
+# https://bugs.ruby-lang.org/issues/22069
+# https://github.com/ruby/ruby/pull/16947
+# Backport ruby/openssl 4.0.2 from ruby 4.0 branch to support openssl 4.0
+Patch10: ruby-pr16947-openssl-4_0_2-from-ruby_4_0.patch
 # Backport net-imap lib/ changes from v0.6.2 to v0.6.4.1 to fix five CVEs:
 # CVE-2026-42246: Information disclosure via MitM bypassing TLS
 # CVE-2026-42245: DoS via crafted IMAP responses (quadratic complexity)
 # CVE-2026-42256: DoS via large SCRAM iteration count
 # CVE-2026-47240: Command injection via non-synchronizing literals
 # CVE-2026-47242: Arbitrary IMAP command injection via improper input validation
-Patch10: ruby-4.0.0-net-imap-0.6.4.1-security-fixes.patch
+Patch11: ruby-4.0.0-net-imap-0.6.4.1-security-fixes.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -859,8 +864,9 @@ popd
 %patch 6 -p1
 %patch 7 -p1
 %patch 8 -p1
+%patch 10 -p1
 
-%patch 10 -p1 -d .bundle/gems/net-imap-%{net_imap_version}
+%patch 11 -p1 -d .bundle/gems/net-imap-%{net_imap_version}
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
@@ -946,6 +952,7 @@ ln -srf %{buildroot}%{_bindir}/%{name} \
 # Version is empty if --with-ruby-version is specified.
 # http://bugs.ruby-lang.org/issues/7807
 sed -i 's/Version: \${ruby_version}/Version: %{ruby_version}/' %{buildroot}%{_libdir}/pkgconfig/%{basepackagename}.pc
+
 
 # Kill bundled certificates, as they should be part of ca-certificates.
 for cert in \
@@ -1609,7 +1616,6 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 
 %files doc -f .ruby-doc.en -f .ruby-doc.ja
 %doc README.md
-%doc ChangeLog
 %{?with_systemtap:%doc ruby-exercise.stp}
 %{_datadir}/ri
 
@@ -2041,6 +2047,22 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 
 
 %changelog
+* Sun Jun 14 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 4.0.5-35
+- Backport ruby/openssl 4.0.2 from ruby 4.0 branch to support openssl 4.0
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com>
+- Rebuilt for openssl 4.0
+
+* Mon Jun 08 2026 Mamoru TASAKA <mtasaka@fedoraproject.org>- 4.0.5-33
+- Update to Ruby 4.0.5
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org>
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 13 2026 Vít Ondruch <vondruch@redhat.com> - 4.0.1-31
+- Upgrade to Ruby 4.0.1.
+  Resolves: rhbz#2428861
+
 * Fri Jan 02 2026 Jarek Prokop <jprokop@redhat.com> - 4.0.0-30
 - Upgrade to Ruby 4.0.0.
   Resolves: rhbz#2425358
