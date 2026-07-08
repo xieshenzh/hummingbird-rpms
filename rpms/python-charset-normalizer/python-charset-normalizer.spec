@@ -1,6 +1,6 @@
 Name:           python-charset-normalizer
-Version:        3.4.7
-Release:        2%{?dist}
+Version:        3.4.8
+Release:        1%{?dist}
 Summary:        The Real First Universal Charset Detector
 # SPDX
 License:        MIT
