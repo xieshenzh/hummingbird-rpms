@@ -2,8 +2,10 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
+  "release_monitoring_project_id": 12959,
   "sha": "948282631868ca0a00f8a41baf4f01d99fb732bf",
   "source": "https://src.fedoraproject.org/rpms/hugo.git",
+  "track_upstream": "latest",
   "upstream_repo": "https://github.com/gohugoio/hugo",
   "version": "0.162.1"
 }
