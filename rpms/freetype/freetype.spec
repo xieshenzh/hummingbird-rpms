@@ -4,7 +4,7 @@
 
 Name: freetype
 Version: 2.14.3
-Release: 1.1%{?dist}
+Release: 1.2%{?dist}
 Summary: A free and portable font rendering engine
 License: (FTL OR GPL-2.0-or-later) AND BSD-3-Clause AND MIT AND MIT-Modern-Variant AND LicenseRef-Fedora-Public-Domain AND Zlib
 URL: http://www.freetype.org
@@ -23,6 +23,8 @@ Patch3:  freetype-2.6.5-libtool.patch
 Patch4:  freetype-2.8-multilib.patch
 
 Patch5:  freetype-2.10.0-internal-outline.patch
+
+Patch6:  freetype-CVE-2026-50811.patch
 
 BuildRequires: gcc
 BuildRequires: libX11-devel
@@ -81,6 +83,7 @@ FreeType.
 %patch 3 -p1 -b .libtool
 %patch 4 -p1 -b .multilib
 %patch 5 -p1 -b .internal-outline
+%patch 6 -p1 -b .cve-2026-50811
 
 %build
 
