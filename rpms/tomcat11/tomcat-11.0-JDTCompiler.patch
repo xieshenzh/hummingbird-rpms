@@ -1,6 +1,6 @@
 --- java/org/apache/jasper/compiler/JDTCompiler.java.orig	2025-02-23 00:00:00.000000000 +0000
 +++ java/org/apache/jasper/compiler/JDTCompiler.java	2025-02-23 00:00:00.000000000 +0000
-@@ -320,21 +320,21 @@
+@@ -327,23 +327,23 @@
              } else if (opt.equals("17")) {
                  settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_17);
              } else if (opt.equals("18")) {
@@ -28,9 +28,12 @@
 -                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_25);
 +                settings.put(CompilerOptions.OPTION_Source, "25");
              } else if (opt.equals("26")) {
+-                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_26);
++                settings.put(CompilerOptions.OPTION_Source, "26");
+             } else if (opt.equals("27")) {
                  // Constant not available in latest ECJ version shipped with
                  // Tomcat. May be supported in a snapshot build.
-@@ -402,29 +402,29 @@
+@@ -416,32 +416,32 @@
                  settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_17);
                  settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_17);
              } else if (opt.equals("18")) {
@@ -74,5 +77,10 @@
 +                settings.put(CompilerOptions.OPTION_TargetPlatform, "25");
 +                settings.put(CompilerOptions.OPTION_Compliance, "25");
              } else if (opt.equals("26")) {
+-                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_26);
+-                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_26);
++                settings.put(CompilerOptions.OPTION_TargetPlatform, "26");
++                settings.put(CompilerOptions.OPTION_Compliance, "26");
+             } else if (opt.equals("27")) {
                  // Constant not available in latest ECJ version shipped with
                  // Tomcat. May be supported in a snapshot build.
