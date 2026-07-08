@@ -101,7 +101,7 @@ index 9e5163774..306fa1d8a 100644
  This option only applies to connections using GSSAPI.
  .Pp
  The list of supported key exchange algorithms may also be obtained using
-@ -1056,38 +1053,25 @@ will not be converted automatically,
+@@ -1056,38 +1053,25 @@ will not be converted automatically,
  but may be manually hashed using
  .Xr ssh-keygen 1 .
  .It Cm HostbasedAcceptedAlgorithms

@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "6",
-  "sha": "eba6246f724790c17a895e9c9151cd89caf6c84b",
+  "release": "8",
+  "sha": "5bce4c8e4ccaff6d55d0c637bd2d790aa52b17a3",
   "source": "https://src.fedoraproject.org/rpms/openssh.git",
   "upstream_repo": "https://github.com/openssh/openssh-portable",
   "version": "10.3p1"
