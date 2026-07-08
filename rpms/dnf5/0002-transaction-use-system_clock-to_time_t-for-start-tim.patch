@@ -1,0 +1,34 @@
+From 0f7fcde0bf281b8bf7a2aa5fdabb9e24496df6bf Mon Sep 17 00:00:00 2001
+From: Kefu Chai <tchaikov@gmail.com>
+Date: Mon, 29 Jun 2026 11:23:52 +0800
+Subject: [PATCH] transaction: use system_clock::to_time_t for start time
+
+On i686, time_t is a 32-bit long, so deriving the start time via
+duration_cast<seconds>(now().time_since_epoch()).count() narrows the
+64-bit count and trips GCC 16's -Wconversion, failing the build under
+-Werror. system_clock::to_time_t() returns a time_t directly, so the
+narrowing is gone and the intent reads more clearly.
+
+For: https://github.com/rpm-software-management/dnf5/issues/2798
+Signed-off-by: Kefu Chai <tchaikov@gmail.com>
+---
+ libdnf5/base/transaction.cpp | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/libdnf5/base/transaction.cpp b/libdnf5/base/transaction.cpp
+index ac6ee089..089e9ba0 100644
+--- a/libdnf5/base/transaction.cpp
++++ b/libdnf5/base/transaction.cpp
+@@ -967,8 +967,7 @@ Transaction::TransactionRunResult Transaction::Impl::_run(
+     info.set_description(description);
+     info.set_comment(comment);
+     info.set_pid(getpid());
+-    info.set_start_time(
+-        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count());
++    info.set_start_time(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+ 
+     // acquire the lock
+     std::filesystem::path lock_file_path = config.get_installroot_option().get_value();
+-- 
+2.55.0
+
