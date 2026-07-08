@@ -114,8 +114,8 @@ index 769a36810..c0761ae8f 100644
  #endif
  
 @@ -207,7 +208,10 @@ kex_names_valid(const char *names)
- 	for ((p = strsep(&cp, ",")); p && *p != '\0';
- 	    (p = strsep(&cp, ","))) {
+ 			return 0;
+ 		}
  		if (kex_alg_by_name(p) == NULL) {
 -			error("Unsupported KEX algorithm \"%.100s\"", p);
 +			if (FIPS_mode())
@@ -276,17 +276,18 @@ index 1c2194a8f..f9a58b955 100644
  #include <sys/types.h>
  
  #include <openssl/bn.h>
-@@ -114,6 +115,10 @@ input_kex_dh_gex_group(int type, uint32_t seq, struct ssh *ssh)
- 		r = SSH_ERR_ALLOC_FAIL;
- 		goto out;
+@@ -117,6 +118,11 @@ input_kex_dh_gex_group(int type, u_int32
  	}
+ 	p = g = NULL; /* belong to kex->dh now */
+ 
 +	if (FIPS_mode() && dh_is_known_group(kex->dh) == 0) {
 +		r = SSH_ERR_INVALID_ARGUMENT;
 +		goto out;
 +	}
- 	p = g = NULL; /* belong to kex->dh now */
- 
++
  	/* generate and send 'e', client DH public key */
+ 	if ((r = dh_gen_key(kex->dh, kex->we_need * 8)) != 0)
+ 		goto out;
 diff --git a/myproposal.h b/myproposal.h
 index d992d8b12..6433e0820 100644
 --- a/myproposal.h

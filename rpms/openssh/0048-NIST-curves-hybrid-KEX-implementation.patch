@@ -218,8 +218,8 @@ index 882f2905b..60fc487b0 100644
  	for (k = kexalgs; k->name != NULL; k++) {
  		if (strcmp(k->name, name) == 0)
 @@ -229,8 +288,16 @@ kex_names_valid(const char *names)
- 	for ((p = strsep(&cp, ",")); p && *p != '\0';
- 	    (p = strsep(&cp, ","))) {
+ 			return 0;
+ 		}
  		if (kex_alg_by_name(p) == NULL) {
 -			if (FIPS_mode())
 -				error("\"%.100s\" is not allowed in FIPS mode", p);

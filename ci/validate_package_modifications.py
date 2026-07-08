@@ -189,6 +189,10 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     # The fix has since been superseded by upstream Fedora openscap 1.4.4-4 (2360.patch).
     bad_commits = [line for line in bad_commits if not line.startswith('134c5f3502ca505092f7d000388821ea375a491d ')]
 
+    # openssh /sbin/nologin move to openssh-server was committed locally and later
+    # incorporated upstream in Fedora's 10.3p1-3 release.
+    bad_commits = [line for line in bad_commits if not line.startswith('f0c23ce5ebcfd6a2b9bb0c4ff359e34059a7a724 ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)

@@ -1333,6 +1333,19 @@ index 751f06cea..769a36810 100644
  	return NULL;
  }
  
+@@ -172,6 +206,12 @@ kex_names_valid(const char *names)
+ 		return 0;
+ 	for ((p = strsep(&cp, ",")); p && *p != '\0';
+ 	    (p = strsep(&cp, ","))) {
++		if (strncmp(p, "gss-", 4) == 0
++		  && kex_alg_by_name(p) != NULL) {
++			error("GSSAPI KEX algorithm \"%.100s\" is only allowed in GSSAPIKexAlgorithms", p);
++			free(s);
++			return 0;
++		}
+ 		if (kex_alg_by_name(p) == NULL) {
+ 			error("Unsupported KEX algorithm \"%.100s\"", p);
+ 			free(s);
 @@ -334,3 +368,26 @@ kex_assemble_names(char **listp, const char *def, const char *all)
  	free(ret);
  	return r;
@@ -1351,7 +1364,7 @@ index 751f06cea..769a36810 100644
 +	    (p = strsep(&cp, ","))) {
 +		if (strncmp(p, "gss-", 4) != 0
 +		  || kex_alg_by_name(p) == NULL) {
-+			error("Unsupported KEX algorithm \"%.100s\"", p);
++			error("Unsupported GSS KEX algorithm \"%.100s\"", p);
 +			free(s);
 +			return 0;
 +		}
@@ -3703,11 +3716,12 @@ diff --git a/ssh.c b/ssh.c
 index 531f28eb2..bc3be8f8e 100644
 --- a/ssh.c
 +++ b/ssh.c
-@@ -805,6 +805,8 @@ main(int ac, char **av)
+@@ -805,6 +805,9 @@ main(int ac, char **av)
  			else if (strcmp(optarg, "kex") == 0 ||
  			    strcasecmp(optarg, "KexAlgorithms") == 0)
  				cp = kex_alg_list('\n');
-+			else if (strcmp(optarg, "kex-gss") == 0)
++			else if (strcmp(optarg, "kex-gss") == 0 ||
++			    strcasecmp(optarg, "GSSAPIKexAlgorithms") == 0)
 +				cp = kex_gss_alg_list('\n');
  			else if (strcmp(optarg, "key") == 0)
  				cp = sshkey_alg_list(0, 0, 0, '\n');
@@ -3740,7 +3754,7 @@ diff --git a/ssh_config.5 b/ssh_config.5
 index b459b0449..9e5163774 100644
 --- a/ssh_config.5
 +++ b/ssh_config.5
-@@ -976,10 +976,68 @@ The default is
+@@ -976,10 +976,71 @@ The default is
  Specifies whether user authentication based on GSSAPI is allowed.
  The default is
  .Cm no .
@@ -3806,6 +3820,9 @@ index b459b0449..9e5163774 100644
 +.Dq gss-group14-sha256-,gss-group16-sha512-,gss-nistp256-sha256-,
 +gss-curve25519-sha256-,gss-group14-sha1-,gss-gex-sha1- .
 +This option only applies to connections using GSSAPI.
++.Pp
++The list of supported key exchange algorithms may also be obtained using
++.Qq ssh -Q GSSAPIKexAlgorithms .
  .It Cm HashKnownHosts
  Indicates that
  .Xr ssh 1
@@ -4202,7 +4219,7 @@ index ca425a8da..5928b6cd2 100644
  .It Cm GSSAPIStrictAcceptorCheck
  Determines whether to be strict about the identity of the GSSAPI acceptor
  a client authenticates against.
-@@ -769,6 +779,32 @@ machine's default store.
+@@ -769,6 +779,35 @@ machine's default store.
  This facility is provided to assist with operation on multi homed machines.
  The default is
  .Cm yes .
@@ -4232,6 +4249,9 @@ index ca425a8da..5928b6cd2 100644
 +.Dq gss-group14-sha256-,gss-group16-sha512-,gss-nistp256-sha256-,
 +gss-curve25519-sha256-,gss-group14-sha1-,gss-gex-sha1- .
 +This option only applies to connections using GSSAPI.
++.Pp
++The list of supported key exchange algorithms may also be obtained using
++.Qq ssh -Q GSSAPIKexAlgorithms .
  .It Cm HostbasedAcceptedAlgorithms
  Specifies the signature algorithms that will be accepted for hostbased
  authentication as a list of comma-separated patterns.

@@ -173,7 +173,7 @@ index 6eb7d2163..686ac4eb3 100644
  
  ssh_gssapi_mech gssapi_null_mech =
      { NULL, NULL, {0, NULL}, NULL, NULL, NULL, NULL, NULL};
-@@ -297,6 +297,95 @@ ssh_gssapi_parse_ename(Gssctxt *ctx, gss_buffer_t ename, gss_buffer_t name)
+@@ -295,6 +295,99 @@ ssh_gssapi_parse_ename(Gssctxt *ctx, gss
  	return GSS_S_COMPLETE;
  }
  
@@ -196,62 +196,66 @@ index 6eb7d2163..686ac4eb3 100644
 +	int is_mechname, authenticated, complete, more;
 +	size_t count, i;
 +
++	/* always initialize client->indicators */
++	client->indicators = NULL;
++
 +	ctx->major = gss_inquire_name(&ctx->minor, gss_name,
 +				      &is_mechname, NULL, &attrs);
-+	if (ctx->major != GSS_S_COMPLETE) {
-+		return (ctx->major);
-+	}
++	if (ctx->major != GSS_S_COMPLETE)
++		return ctx->major;
 +
 +	if (attrs == GSS_C_NO_BUFFER_SET) {
-+		/* No indicators in the ticket */
-+		return (0);
++		/* no indicators in the ticket */
++		return GSS_S_COMPLETE;
 +	}
 +
-+	client->indicators = NULL;
++	/* client->indicators is NULL terminated */
 +	count = 0;
++	client->indicators = xcalloc(count + 1, sizeof(char *));
++
 +	for (i = 0; i < attrs->count; i++) {
 +		authenticated = 0;
 +		complete = 0;
 +		more = -1;
++
 +		/* skip anything but auth-indicators */
 +		if (((sizeof(AUTH_INDICATORS_TAG) - 1) != attrs->elements[i].length) ||
-+		    memcmp(AUTH_INDICATORS_TAG,
-+			   attrs->elements[i].value,
++		    memcmp(AUTH_INDICATORS_TAG, attrs->elements[i].value,
 +			   sizeof(AUTH_INDICATORS_TAG) - 1) != 0)
 +			continue;
++
 +		/* retrieve all indicators */
 +		while (more != 0) {
 +			value.value = NULL;
 +			display_value.value = NULL;
++
 +			ctx->major = gss_get_name_attribute(&ctx->minor, gss_name,
-+							    &attrs->elements[i], &authenticated,
-+							    &complete, &value, &display_value, &more);
++							    &attrs->elements[i],
++							    &authenticated, &complete,
++							    &value, &display_value, &more);
 +			if (ctx->major != GSS_S_COMPLETE)
 +				goto out;
 +
-+			if ((value.value != NULL) && authenticated) {
-+				if (count >= SSH_GSSAPI_MAX_INDICATORS) {
-+					logit("ssh_gssapi_getindicators: too many "
-+					    "indicators, truncating at %d",
-+					    SSH_GSSAPI_MAX_INDICATORS);
-+					/* value/display_value released at out: */
-+					goto done;
-+				}
++			if (value.value == NULL || !authenticated)
++				continue;
 +
-+				client->indicators = xrecallocarray(client->indicators, count, count + 1, sizeof(char*));
-+				if (client->indicators == NULL) {
-+					fatal("ssh_gssapi_getindicators failed to allocate memory");
-+				}
-+				client->indicators[count] = xmalloc(value.length + 1);
-+				memcpy(client->indicators[count], value.value, value.length);
-+				client->indicators[count][value.length] = '\0';
-+				count++;
++			if (count >= SSH_GSSAPI_MAX_INDICATORS) {
++				logit("ssh_gssapi_getindicators:"
++				      " too many indicators, truncating at %d",
++				      SSH_GSSAPI_MAX_INDICATORS);
++				goto out;
 +			}
++
++			client->indicators[count] = xmalloc(value.length + 1);
++			memcpy(client->indicators[count], value.value, value.length);
++			client->indicators[count][value.length] = '\0';
++			count++;
++
++			/* add NULL terminator */
++			client->indicators = xrecallocarray(client->indicators, count,
++							    count + 1, sizeof(char *));
 +		}
 +	}
-+
-+done:
-+	/* slot [count] is zeroed by recallocarray, serves as NULL sentinel */
 +
 +out:
 +	if (ctx->major != GSS_S_COMPLETE && client->indicators != NULL) {
@@ -260,10 +264,10 @@ index 6eb7d2163..686ac4eb3 100644
 +		free(client->indicators);
 +		client->indicators = NULL;
 +	}
-+	(void) gss_release_buffer(&ctx->minor, &value);
-+	(void) gss_release_buffer(&ctx->minor, &display_value);
-+	(void) gss_release_buffer_set(&ctx->minor, &attrs);
-+	return (ctx->major);
++	gss_release_buffer(&ctx->minor, &value);
++	gss_release_buffer(&ctx->minor, &display_value);
++	gss_release_buffer_set(&ctx->minor, &attrs);
++	return ctx->major;
 +}
 +
  /* Extract the client details from a given context. This can only reliably
@@ -425,10 +429,10 @@ diff --git a/sshd_config.5 b/sshd_config.5
 index 1d16dabaf..4ca80016c 100644
 --- a/sshd_config.5
 +++ b/sshd_config.5
-@@ -800,6 +800,52 @@ gss-nistp256-sha256-
- gss-curve25519-sha256-
- .Ed
- This option only applies to connections using GSSAPI.
+@@ -803,6 +803,52 @@ This option only applies to connections using GSSAPI.
+ .Pp
+ The list of supported key exchange algorithms may also be obtained using
+ .Qq ssh -Q GSSAPIKexAlgorithms .
 +.It Cm GSSAPIIndicators
 +Specifies whether to accept or deny GSSAPI authenticated access if Kerberos
 +mechanism is used and Kerberos ticket contains a particular set of
