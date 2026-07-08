@@ -112,6 +112,9 @@ hello:
 httpd:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+hugo:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 jaeger:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
