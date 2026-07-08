@@ -1,0 +1,54 @@
+From e2ce40a8191b76165a68289bb3a9876171f42dea Mon Sep 17 00:00:00 2001
+From: Jaco Kroon <jaco@uls.co.za>
+Date: Tue, 16 Sep 2025 16:44:01 +0200
+Subject: [PATCH] Make building of doxygen based C API docs configurable.
+
+Signed-off-by: Jaco Kroon <jaco@uls.co.za>
+---
+ README.md          | 6 ++++++
+ doc/CMakeLists.txt | 7 ++++---
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/README.md b/README.md
+index 79ee3b0..4c90feb 100644
+--- a/README.md
++++ b/README.md
+@@ -61,6 +61,12 @@ Commands I am using for building the RPM:
+     make clean && make
+ ## Other build options
+ 
++### ``-DBUILD_DOC_C=OFF``
++
++Build C API documentation (Default: ON)
++
++Disable building of C API documentation, which requires doxygen to be present.
++
+ ### ``-DENABLE_LEGACY_WEAKDEPS=ON``
+ 
+ Enable legacy SUSE/Mageia/Mandriva weakdeps support (Default: ON)
+diff --git a/doc/CMakeLists.txt b/doc/CMakeLists.txt
+index 6332b91..f14520d 100644
+--- a/doc/CMakeLists.txt
++++ b/doc/CMakeLists.txt
+@@ -3,14 +3,15 @@ ADD_SUBDIRECTORY (python)
+ ADD_CUSTOM_TARGET (doc)
+ ADD_DEPENDENCIES (doc doc-python)
+ 
+-find_package(Doxygen)
+-if(DOXYGEN_FOUND)
++option(BUILD_DOC_C "Build C API documentation" ON)
++if(BUILD_DOC_C)
++    find_package(Doxygen REQUIRED)
+     CONFIGURE_FILE("Doxyfile.in.in" "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.in" @ONLY)
+     add_custom_target(doc-c
+         ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.in
+         COMMENT "Building C API documentation with Doxygen" VERBATIM)
+     ADD_DEPENDENCIES (doc doc-c)
+-endif(DOXYGEN_FOUND)
++endif(BUILD_DOC_C)
+ 
+ IF(CREATEREPO_C_INSTALL_MANPAGES)
+     INSTALL(FILES createrepo_c.8 mergerepo_c.8 modifyrepo_c.8 sqliterepo_c.8
+-- 
+2.55.0
+
