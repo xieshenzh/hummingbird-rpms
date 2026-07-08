@@ -1,0 +1,25 @@
+From 843c0e4fd0e11fea4219cf5c55ca952edfdab6d9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 3 Mar 2026 10:33:57 +0100
+Subject: [PATCH 9/9] spec: Disable modularity from RHEL 11
+
+---
+ createrepo_c.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/createrepo_c.spec b/createrepo_c.spec
+index 96d4de1..f2a1014 100644
+--- a/createrepo_c.spec
++++ b/createrepo_c.spec
+@@ -21,7 +21,7 @@
+ %bcond_without zchunk
+ %endif
+ 
+-%if 0%{?rhel} && 0%{?rhel} < 7
++%if 0%{?rhel} && ( 0%{?rhel} < 7 || 0%{?rhel} >= 11 )
+ %bcond_with libmodulemd
+ %else
+ %bcond_without libmodulemd
+-- 
+2.55.0
+

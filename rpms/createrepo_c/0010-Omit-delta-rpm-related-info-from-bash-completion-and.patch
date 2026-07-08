@@ -1,0 +1,153 @@
+From e8cac4f0e3eee39970fc095cdb3ae5b625a003e3 Mon Sep 17 00:00:00 2001
+From: Shreenidhi Shedi <shreenidhi.shedi@broadcom.com>
+Date: Wed, 25 Feb 2026 00:36:08 +0530
+Subject: [PATCH] Omit delta rpm related info from bash completion and man
+ pages
+
+Add these info to respective files when delta rpm feature is enabled.
+
+Signed-off-by: Shreenidhi Shedi <shreenidhi.shedi@broadcom.com>
+---
+ CMakeLists.txt                            | 10 ++++++++--
+ createrepo_c.bash => createrepo_c.bash.in | 13 ++++++++++---
+ doc/CMakeLists.txt                        |  9 ++++++++-
+ doc/{createrepo_c.8 => createrepo_c.8.in} |  2 ++
+ 4 files changed, 28 insertions(+), 6 deletions(-)
+ rename createrepo_c.bash => createrepo_c.bash.in (91%)
+ rename doc/{createrepo_c.8 => createrepo_c.8.in} (99%)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c4bf525..e118853 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -77,6 +77,11 @@ IF (ENABLE_DRPM)
+     include_directories (${DRPM_INCLUDE_DIRS})
+     ADD_DEFINITIONS("-DCR_DELTA_RPM_SUPPORT")
+ ENDIF (ENABLE_DRPM)
++IF (ENABLE_DRPM)
++    SET (ENABLE_DRPM_BASH 1)
++ELSE ()
++    SET (ENABLE_DRPM_BASH 0)
++ENDIF ()
+ 
+ # option to enable/disable python support
+ OPTION (ENABLE_PYTHON "Enable python support?" ON)
+@@ -125,18 +130,19 @@ message("Package version: ${VERSION}")
+ 
+ OPTION(ENABLE_BASHCOMP "Install Bash autocompletions?" ON)
+ IF (ENABLE_BASHCOMP)
++    CONFIGURE_FILE(createrepo_c.bash.in ${CMAKE_BINARY_DIR}/createrepo_c.bash @ONLY)
+     pkg_check_modules(BASHCOMP bash-completion)
+     IF (BASHCOMP_FOUND)
+         execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=completionsdir bash-completion OUTPUT_VARIABLE BASHCOMP_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+         message("Bash completion directory: ${BASHCOMP_DIR}")
+-        INSTALL(FILES createrepo_c.bash DESTINATION ${BASHCOMP_DIR} RENAME createrepo_c)
++        INSTALL(FILES ${CMAKE_BINARY_DIR}/createrepo_c.bash DESTINATION ${BASHCOMP_DIR} RENAME createrepo_c)
+         INSTALL(CODE "
+             execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink createrepo_c \$ENV{DESTDIR}${BASHCOMP_DIR}/mergerepo_c)
+             execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink createrepo_c \$ENV{DESTDIR}${BASHCOMP_DIR}/modifyrepo_c)
+             execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink createrepo_c \$ENV{DESTDIR}${BASHCOMP_DIR}/sqliterepo_c)
+             ")
+     ELSEIF (BASHCOMP_FOUND)
+-        INSTALL(FILES createrepo_c.bash DESTINATION "/etc/bash_completion.d")
++        INSTALL(FILES ${CMAKE_BINARY_DIR}/createrepo_c.bash DESTINATION "/etc/bash_completion.d")
+         message("Bash completion directory: /etc/bash_completion.d")
+     ENDIF (BASHCOMP_FOUND)
+ ENDIF (ENABLE_BASHCOMP)
+diff --git a/createrepo_c.bash b/createrepo_c.bash.in
+similarity index 91%
+rename from createrepo_c.bash
+rename to createrepo_c.bash.in
+index e3f7f36..31ec392 100644
+--- a/createrepo_c.bash
++++ b/createrepo_c.bash.in
+@@ -13,15 +13,19 @@ _cr_checksum_type()
+ _cr_createrepo()
+ {
+     COMPREPLY=()
++    local _cr_has_drpm=@ENABLE_DRPM_BASH@
+ 
+     case $3 in
+         -V|--version|-h|--help)
+             return 0
+             ;;
+-        --update-md-path|-o|--outputdir|--oldpackagedirs)
++        --update-md-path|-o|--outputdir)
+             COMPREPLY=( $( compgen -d -- "$2" ) )
+             return 0
+             ;;
++        --oldpackagedirs)
++            (( _cr_has_drpm )) && COMPREPLY=( $( compgen -d -- "$2" ) ) && return 0
++            ;;
+         -g|--groupfile)
+             COMPREPLY=( $( compgen -f -o plusdirs -X '!*.xml' -- "$2" ) )
+             return 0
+@@ -59,7 +63,7 @@ _cr_createrepo()
+     esac
+ 
+     if [[ $2 == -* ]] ; then
+-        COMPREPLY=( $( compgen -W '--help --version --quiet --verbose
++        local cr_opts='--help --version --quiet --verbose
+             --excludes --basedir --baseurl --groupfile --checksum
+             --pretty --database --no-database --update --update-md-path
+             --skip-stat --pkglist --includepkg --outputdir
+@@ -69,8 +73,11 @@ _cr_createrepo()
+             --compress-type --keep-all-metadata --compatibility
+             --retain-old-md-by-age --cachedir --local-sqlite
+             --cut-dirs --location-prefix
++            --recycle-pkglist'
++        (( _cr_has_drpm )) && cr_opts="$cr_opts
+             --deltas --oldpackagedirs
+-            --num-deltas --max-delta-rpm-size --recycle-pkglist' -- "$2" ) )
++            --num-deltas --max-delta-rpm-size"
++        COMPREPLY=( $( compgen -W "$cr_opts" -- "$2" ) )
+     else
+         COMPREPLY=( $( compgen -d -- "$2" ) )
+     fi
+diff --git a/doc/CMakeLists.txt b/doc/CMakeLists.txt
+index 704e6a5..6f523e6 100644
+--- a/doc/CMakeLists.txt
++++ b/doc/CMakeLists.txt
+@@ -15,8 +15,15 @@ if(BUILD_DOC_C)
+     ADD_DEPENDENCIES (doc doc-c)
+ endif(BUILD_DOC_C)
+ 
++IF(ENABLE_DRPM)
++    SET(ENABLE_DRPM_MAN 1)
++ELSE()
++    SET(ENABLE_DRPM_MAN 0)
++ENDIF()
++CONFIGURE_FILE(createrepo_c.8.in ${CMAKE_CURRENT_BINARY_DIR}/createrepo_c.8 @ONLY)
++
+ IF(CREATEREPO_C_INSTALL_MANPAGES)
+-    INSTALL(FILES createrepo_c.8 mergerepo_c.8 modifyrepo_c.8 sqliterepo_c.8
++    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/createrepo_c.8 mergerepo_c.8 modifyrepo_c.8 sqliterepo_c.8
+             DESTINATION "${CMAKE_INSTALL_MANDIR}/man8"
+             COMPONENT bin)
+ ENDIF(CREATEREPO_C_INSTALL_MANPAGES)
+diff --git a/doc/createrepo_c.8 b/doc/createrepo_c.8.in
+similarity index 99%
+rename from doc/createrepo_c.8
+rename to doc/createrepo_c.8.in
+index d76cd62..539e603 100644
+--- a/doc/createrepo_c.8
++++ b/doc/createrepo_c.8.in
+@@ -189,6 +189,7 @@ During \-\-update, remove all files in repodata/ which are older then the specif
+ .SS \-c \-\-cachedir CACHEDIR.
+ .sp
+ Set path to cache dir
++.if @ENABLE_DRPM_MAN@ \{\
+ .SS \-\-deltas
+ .sp
+ Tells createrepo to generate deltarpms and the delta metadata.
+@@ -201,6 +202,7 @@ The number of older versions to make deltas against. Defaults to 1.
+ .SS \-\-max\-delta\-rpm\-size MAX_DELTA_RPM_SIZE
+ .sp
+ Max size of an rpm that to run deltarpm against (in bytes).
++.\}
+ .SS \-\-local\-sqlite
+ .sp
+ Gen sqlite DBs locally (into a directory for temporary files). Sometimes, sqlite has a trouble to gen DBs on a NFS mount, use this option in such cases. This option could lead to a higher memory consumption if TMPDIR is set to /tmp or not set at all, because then the /tmp is used and /tmp dir is often a ramdisk.
+-- 
+2.55.0
+

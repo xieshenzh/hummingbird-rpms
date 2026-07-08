@@ -1,0 +1,50 @@
+From 681106422208da62008f48456656f699d91e7178 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 6 Mar 2026 13:22:28 +0100
+Subject: [PATCH 8/9] doc: Omit modularity-related texts if built without
+ modularity support
+
+---
+ doc/CMakeLists.txt    | 5 +++++
+ doc/createrepo_c.8.in | 2 ++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/doc/CMakeLists.txt b/doc/CMakeLists.txt
+index 6f523e6..6cc635f 100644
+--- a/doc/CMakeLists.txt
++++ b/doc/CMakeLists.txt
+@@ -20,6 +20,11 @@ IF(ENABLE_DRPM)
+ ELSE()
+     SET(ENABLE_DRPM_MAN 0)
+ ENDIF()
++IF(WITH_LIBMODULEMD)
++    SET(WITH_LIBMODULEMD_MAN 1)
++ELSE()
++    SET(WITH_LIBMODULEMD_MAN 0)
++ENDIF()
+ CONFIGURE_FILE(createrepo_c.8.in ${CMAKE_CURRENT_BINARY_DIR}/createrepo_c.8 @ONLY)
+ 
+ IF(CREATEREPO_C_INSTALL_MANPAGES)
+diff --git a/doc/createrepo_c.8.in b/doc/createrepo_c.8.in
+index 539e603..217ce20 100644
+--- a/doc/createrepo_c.8.in
++++ b/doc/createrepo_c.8.in
+@@ -38,6 +38,7 @@ createrepo_c [options] <directory>
+ .SH DESCRIPTION
+ .sp
+ Uses rpm packages from <directory> to create repodata.
++.if @WITH_LIBMODULEMD_MAN@ \{\
+ .sp
+ If compiled with libmodulemd support modular metadata inside <directory> identified by the patterns below and all their compressed variants are automatically collected, merged and added to the repodata.
+ .sp
+@@ -54,6 +55,7 @@ modules.yaml (recommended way of importing multiple documents at once)
+ .UNINDENT
+ .UNINDENT
+ .UNINDENT
++.\}
+ .SH OPTIONS
+ .SS \-V \-\-version
+ .sp
+-- 
+2.55.0
+
