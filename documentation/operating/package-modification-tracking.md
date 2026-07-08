@@ -321,7 +321,7 @@ conflicts, they result in draft MRs with:
 
    ```bash
    # Find all files with conflict markers
-   git grep "^<<<<<<< HEAD" rpms/PACKAGENAME/
+   git grep -nE '^<{7} .+|^={7}$|^>{7} .+' -- rpms/PACKAGENAME/
 
    # View the specific conflict
    git show HEAD:rpms/PACKAGENAME/PACKAGENAME.spec | grep -B5 -A10 "^<<<<<<< HEAD"
@@ -358,7 +358,7 @@ conflicts, they result in draft MRs with:
    hummingbird-local, or merge both). Verify no markers remain:
 
    ```bash
-   git grep -E "^(<<<<<<<|=======|>>>>>>>)" rpms/PACKAGENAME/
+   git grep -nE '^<{7} .+|^={7}$|^>{7} .+' -- rpms/PACKAGENAME/
    ```
 
 5. **Validate the resolution:** Check that local modifications are preserved:
