@@ -1999,6 +1999,179 @@ def list_packages(status_filter: str | None = None, prerelease_filter: bool = Fa
             print(f"    → {reason}")
 
 
+def _setup_infra_repo(product: str, infra_path: Path, dry_run: bool) -> None:
+    project_name = f"private-{product}-rpms-main"
+    target_dir = infra_path / "kubernetes" / project_name
+
+    if not infra_path.is_dir():
+        logging.error(f"Infrastructure repo path does not exist: {infra_path}")
+        sys.exit(1)
+
+    rpms_main_dir = infra_path / "kubernetes" / "rpms-main"
+    if not rpms_main_dir.is_dir():
+        logging.error(f"Cannot find rpms-main templates at: {rpms_main_dir}")
+        sys.exit(1)
+
+    if target_dir.exists():
+        logging.error(f"Directory already exists: {target_dir}")
+        sys.exit(1)
+
+    if dry_run:
+        logging.info(f"Dry run: would create infrastructure templates in {target_dir}")
+        logging.info(f"Dry run: would add {project_name} to .gitlab-ci.yml CI matrix")
+        return
+
+    target_dir.mkdir(parents=True)
+
+    shutil.copy(rpms_main_dir / "00-application.yml.j2", target_dir / "00-application.yml.j2")
+    logging.info(f"Copied 00-application.yml.j2 to {target_dir}")
+
+    release_plan_src = rpms_main_dir / "01-release-plans.yml.j2"
+    release_plan_content = release_plan_src.read_text()
+    old_name = "hummingbird-rpm-release\n"
+    if old_name not in release_plan_content:
+        logging.error(f"Cannot find ReleasePlan name pattern in {release_plan_src}")
+        sys.exit(1)
+    release_plan_content = release_plan_content.replace(
+        old_name, f"hummingbird-rpm-release-private-{product}\n", 1,
+    )
+    old_rpa = "releasePlanAdmission: hummingbird-rpms-tech-preview-staging"
+    if old_rpa not in release_plan_content:
+        logging.error(f"Cannot find releasePlanAdmission pattern in {release_plan_src}")
+        sys.exit(1)
+    release_plan_content = release_plan_content.replace(
+        old_rpa, f"releasePlanAdmission: hummingbird-rpms-private-{product}", 1,
+    )
+    (target_dir / "01-release-plans.yml.j2").write_text(release_plan_content)
+    logging.info(f"Created 01-release-plans.yml.j2 for {project_name}")
+
+    its_src = rpms_main_dir / "10-integration-test-scenarios-testing-farm.yml.j2"
+    if its_src.exists():
+        shutil.copy(its_src, target_dir / "10-integration-test-scenarios-testing-farm.yml.j2")
+        logging.info(f"Copied IntegrationTestScenario template to {target_dir}")
+
+    ci_yml_path = infra_path / ".gitlab-ci.yml"
+    ci_content = ci_yml_path.read_text()
+    marker = "          - rpms-main\n"
+    if marker not in ci_content:
+        logging.error("Cannot find rpms-main entry in .gitlab-ci.yml CI matrix")
+        sys.exit(1)
+    ci_content = ci_content.replace(
+        marker, f"{marker}          - {project_name}\n", 1,
+    )
+    ci_yml_path.write_text(ci_content)
+    logging.info(f"Added {project_name} to CI matrix in .gitlab-ci.yml")
+
+
+def add_private_product(product: str, packages: list[str], pulp_config: str | None,
+                        pulp_secret_name: str, infra_repo: str,
+                        dry_run: bool) -> None:
+    rpa_config_path = ROOT_DIR / 'ci' / 'konflux_rpa_config.yml'
+    overrides_path = PACKAGE_OVERRIDES_YAML
+
+    for pkg in packages:
+        pkg_dir = ROOT_DIR / 'rpms' / pkg
+        if not pkg_dir.is_dir():
+            logging.error(f"Package directory does not exist: rpms/{pkg}")
+            sys.exit(1)
+
+    with open(rpa_config_path) as f:
+        rpa_config = yaml.safe_load(f)
+
+    for rpa in rpa_config.get('rpas', []):
+        if rpa.get('private_product') == product:
+            logging.error(f"Product '{product}' already exists in {rpa_config_path.relative_to(ROOT_DIR)}")
+            sys.exit(1)
+
+    with open(overrides_path) as f:
+        overrides = yaml.safe_load(f) or {}
+
+    for pkg in packages:
+        pkg_overrides = overrides.get(pkg, {})
+        if pkg_overrides and pkg_overrides.get('private_product'):
+            logging.error(f"Package '{pkg}' already has private_product: {pkg_overrides['private_product']}")
+            sys.exit(1)
+
+    pulp_script = str(ROOT_DIR / 'ci' / 'pulp-setup' / 'create-pulp-resources.sh')
+    repo_specs = [
+        (f"private-hummingbird-{product}-unsigned", None),
+        (f"private-hummingbird-{product}-unsigned", "file"),
+        (f"private-hummingbird-{product}", None),
+        (f"private-hummingbird-{product}", "file"),
+    ]
+
+    if not dry_run:
+        for domain, repo_type in repo_specs:
+            cmd = [pulp_script, '--domain', domain]
+            if repo_type:
+                cmd.extend(['--type', repo_type])
+            if pulp_config:
+                cmd.extend(['--config', pulp_config])
+            logging.info(f"Running: {' '.join(cmd)}")
+            subprocess.run(cmd, check=True)
+    else:
+        logging.info("Dry run: skipping Pulp resource creation")
+
+    public_rpa = next(
+        (r for r in rpa_config['rpas'] if 'private_product' not in r), None,
+    )
+    if not public_rpa:
+        logging.error("No public RPA found in konflux_rpa_config.yml")
+        sys.exit(1)
+    pipeline_url = public_rpa['pipeline_url']
+    pipeline_revision = public_rpa['pipeline_revision']
+
+    new_rpa = {
+        'name': f'hummingbird-rpms-private-{product}',
+        'target_file': f'config/kflux-prd-rh03.nnv1.p1/product/ReleasePlanAdmission/hummingbird/hummingbird-rpms-private-{product}.yaml',
+        'template': 'macros/releng/release-plan-admission.yml.j2',
+        'application_prefix': f'private-{product}-rpms',
+        'release_org': 'registry.stage.redhat.io/hummingbird-tech-preview',
+        'single_component_mode': True,
+        'service_account_name': 'hummingbird-rpm-release-staging',
+        'pulp_unsigned_domain': f'private-hummingbird-{product}-unsigned',
+        'pulp_signed_domain': f'private-hummingbird-{product}',
+        'pulp_secret_name': pulp_secret_name,
+        'pipeline_url': pipeline_url,
+        'pipeline_revision': pipeline_revision,
+        'private_product': product,
+        'component_filter': {'path_prefix': 'rpms/'},
+    }
+
+    if dry_run:
+        logging.info(f"Dry run: would add RPA entry: {new_rpa['name']}")
+    else:
+        rpa_config['rpas'].append(new_rpa)
+        with open(rpa_config_path, 'w') as f:
+            yaml.dump(rpa_config, f, default_flow_style=False, sort_keys=False)
+        logging.info(f"Added RPA entry: {new_rpa['name']}")
+
+    if dry_run:
+        logging.info(f"Dry run: would assign packages to product '{product}': {', '.join(packages)}")
+    else:
+        for pkg in packages:
+            if pkg in overrides:
+                overrides[pkg]['private_product'] = product
+            else:
+                overrides[pkg] = {'private_product': product}
+        with open(overrides_path, 'w') as f:
+            yaml.dump(overrides, f, default_flow_style=False, sort_keys=False)
+        logging.info(f"Assigned packages to product '{product}': {', '.join(packages)}")
+
+    _setup_infra_repo(product, Path(infra_repo), dry_run)
+
+    if not dry_run:
+        logging.info("Calling generate_resources.py to update Tekton resources...")
+        subprocess.run([sys.executable, str(ROOT_DIR / 'ci' / 'generate_resources.py'), 'all'], check=True)
+
+        run_git('add',
+                str(rpa_config_path.relative_to(ROOT_DIR)),
+                str(overrides_path.relative_to(ROOT_DIR)),
+                'konflux-templates', '.tekton', 'releng', cwd=ROOT_DIR)
+        commit_msg = f"Add private product '{product}' with packages: {', '.join(packages)}"
+        run_git_commit('-m', commit_msg, cwd=ROOT_DIR)
+
+
 def main() -> None:
     global imports, releases
 
@@ -2161,6 +2334,30 @@ Examples:
     ls_sources_parser = subparsers.add_parser('ls-sources', help='List contents of sources archives')
     ls_sources_parser.add_argument('package', help='Package name to inspect')
 
+    add_private_parser = subparsers.add_parser(
+        'add-private-product',
+        help='Create a private product with Pulp repos, RPA config, and package assignments',
+    )
+    add_private_parser.add_argument('product', help='Product name (e.g., openjdk, dotnet)')
+    add_private_parser.add_argument(
+        '--packages', required=True,
+        help='Comma-separated list of packages to assign to this product',
+    )
+    add_private_parser.add_argument(
+        '--pulp-config',
+        help='Path to Pulp CLI config file for create-pulp-resources.sh',
+    )
+    add_private_parser.add_argument(
+        '--pulp-secret-name',
+        default='hummingbird-pulp-credentials-production-secret',
+        help='K8s secret name for Pulp credentials',
+    )
+    add_private_parser.add_argument(
+        '--infra-repo', required=True,
+        help='Path to local infrastructure repo checkout; creates Application, '
+        'ReleasePlan, and IntegrationTestScenario templates',
+    )
+
     args = parser.parse_args()
 
     # Set global sign-off flag
@@ -2299,6 +2496,9 @@ Examples:
             sys.exit(1 if has_diffs else 0)
         case 'ls-sources':
             ls_sources(args.package)
+        case 'add-private-product':
+            pkgs = [p.strip() for p in args.packages.split(',')]
+            add_private_product(args.product, pkgs, args.pulp_config, args.pulp_secret_name, args.infra_repo, args.dry_run)
 
 
 if __name__ == '__main__':

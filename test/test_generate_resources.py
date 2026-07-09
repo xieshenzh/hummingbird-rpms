@@ -337,7 +337,6 @@ class TestPrivateProductFiltering:
                 pulp_secret_name: hummingbird-pulp-credentials-staging-secret
                 pipeline_revision: development
                 pipeline_url: https://github.com/konflux-ci/release-service-catalog.git
-                exclude_private: true
                 component_filter:
                   path_prefix: rpms/
               - name: hummingbird-rpms-private-example
@@ -357,8 +356,8 @@ class TestPrivateProductFiltering:
         )
         return mock_repo
 
-    def test_exclude_private_removes_private_packages(self, gen_module, mock_repo_with_private):
-        """Public RPA with exclude_private: true excludes private_product packages."""
+    def test_public_rpa_excludes_private_packages(self, gen_module, mock_repo_with_private):
+        """Public RPA automatically excludes packages with private_product."""
         with patch.object(gen_module, "ROOT_DIR", mock_repo_with_private):
             rpa_config, global_config = _load_rpa_config(gen_module, index=0)
             variables = gen_module.build_releng_variables(rpa_config, global_config)
@@ -413,19 +412,6 @@ class TestPrivateProductFiltering:
         rpms_dirs = [d for d in (mock_repo_with_private / "rpms").iterdir() if d.is_dir()]
         assert len(all_components) == len(rpms_dirs)
         assert len(set(all_components)) == len(all_components)
-
-    def test_no_exclude_private_includes_all(self, gen_module, mock_repo_with_private):
-        """RPA without exclude_private includes all packages (both public and private)."""
-        with patch.object(gen_module, "ROOT_DIR", mock_repo_with_private):
-            rpa_config, global_config = _load_rpa_config(gen_module, index=0)
-            rpa_config.pop("exclude_private")
-            variables = gen_module.build_releng_variables(rpa_config, global_config)
-
-        names = [c["component_name"] for c in variables["component_list"]]
-        assert "alpha-main" in names
-        assert "beta-lib-main" in names
-        assert "gamma-utils-main" in names
-
 
 class TestPrivateProductKonfluxVariables:
     """Tests for per-component application names in Konflux variables."""

@@ -272,15 +272,16 @@ def build_releng_variables(rpa_config: dict, global_config: dict) -> dict:
         packages = [pkg for pkg in packages if (filter_dir / pkg).is_dir()]
 
     # Filter by private_product assignment
+    # - Private RPAs (with private_product set): include only matching packages
+    # - Non-private RPAs: automatically exclude packages that have a private_product
     private_product = rpa_config.get("private_product")
-    exclude_private = rpa_config.get("exclude_private", False)
 
     if private_product:
         packages = [
             pkg for pkg in packages
             if package_overrides.get(pkg, {}).get("private_product") == private_product
         ]
-    elif exclude_private:
+    else:
         packages = [
             pkg for pkg in packages
             if "private_product" not in package_overrides.get(pkg, {})

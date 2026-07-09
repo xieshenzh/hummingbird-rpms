@@ -27,7 +27,7 @@ to separate Pulp domains via dedicated Konflux Applications and ReleasePlanAdmis
 3. Packages are assigned to a private product via `private_product` in
    `ci/package-overrides.yaml`.
 4. A dedicated **RPA** per product routes those packages to private Pulp repositories.
-5. The public RPA uses `exclude_private: true` to exclude private packages from public repos.
+5. Packages with `private_product` are automatically excluded from the public RPA.
 
 ### Architecture
 
@@ -35,7 +35,6 @@ to separate Pulp domains via dedicated Konflux Applications and ReleasePlanAdmis
 package-overrides.yaml          konflux_rpa_config.yml
   <package>:                      rpas:
     private_product: <product>      - name: ...public...
-                                      exclude_private: true
                                     - name: ...private-<product>...
                                       private_product: <product>
         |                                    |
@@ -70,7 +69,7 @@ This will:
 
 - Set the package's Konflux Component to use `application: private-<product>-rpms-main`
 - Include the package in the private product's RPA component list
-- Exclude the package from the public RPA (when `exclude_private: true` is set)
+- Automatically exclude the package from the public RPA
 
 ### Verifying the assignment
 
@@ -89,6 +88,27 @@ grep '<package>-main' releng/hummingbird-rpms-tech-preview-staging.yaml
 ```
 
 ## Onboarding a New Private Product
+
+### Automated onboarding
+
+Use the `add-private-product` subcommand to automate Pulp setup, RPA configuration,
+package assignment, and resource regeneration in a single step:
+
+```bash
+./ci/dist_git.py add-private-product <product> \
+  --packages pkg1,pkg2 \
+  --infra-repo <path-to-infrastructure-repo> \
+  --pulp-config <path-to-cli.toml>
+```
+
+This handles Pulp infrastructure (step 2), RPA config (step 5), package assignment
+(step 6), infrastructure repo templates (step 4 file creation), and resource regeneration.
+You still need to manually complete: credentials secret deployment (step 3), merging the
+infrastructure repo MR created by this tool (step 4), and content guard setup (step 7).
+
+Use `--dry-run` to preview changes without modifying anything.
+
+### Manual onboarding
 
 Adding a new LTS product (beyond existing ones) requires these steps: service account,
 Pulp infrastructure, credentials secret, Konflux Application, RPA configuration,
@@ -273,9 +293,8 @@ Add a new entry to the `rpas:` list in `ci/konflux_rpa_config.yml`:
 
 ```yaml
 rpas:
-  # Existing public RPA (ensure exclude_private: true is set)
+  # Existing public RPA (private packages are automatically excluded)
   - name: hummingbird-rpms-tech-preview-staging
-    exclude_private: true
     # ... existing config ...
 
   # New private product RPA
@@ -344,18 +363,11 @@ as the public RPA (`hummingbird-pulp-credentials-production-secret`). Per-produc
 control for customers is handled downstream by Red Hat's subscription entitlement system,
 not at the Pulp publishing layer.
 
-## Controlling Public/Private Routing
+## Public/Private Routing
 
-The `exclude_private` flag on the public RPA controls whether private packages are excluded
-from public repositories:
-
-| `exclude_private` | Behavior |
-| --- | --- |
-| `true` (default) | Private packages appear only in their product's private RPA |
-| `false` | Private packages appear in both the public and private RPAs |
-
-To publish a package to both public and private repos, set `exclude_private: false` on the
-public RPA entry in `ci/konflux_rpa_config.yml`.
+Packages with `private_product` set in `ci/package-overrides.yaml` are automatically
+excluded from the public RPA and included only in their product's private RPA. Removing
+the `private_product` field returns the package to public-only publishing.
 
 ## Related Files
 
