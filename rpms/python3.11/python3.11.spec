@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 5%{?dist}
+Release: 5.1%{?dist}
 License: Python-2.0.1
 
 
@@ -461,6 +461,12 @@ Patch490: 00490-cve-2026-11972.patch
 #
 # (cherry-picked from commit acfe02f3b05436658d92add6b168538b30f357f0)
 Patch491: 00491-openssl-3.5.7.patch
+
+# 00492 # bcf98ddbc40ec9b3ee87da0124a5660b19b7e606
+# CVE-2026-15308
+#
+# gh-153030: Fix quadratic complexity in incremental parsing in HTMLParser
+Patch492: 00492-cve-2026-15308.patch
 
 # (New patches go here ^^^)
 #
