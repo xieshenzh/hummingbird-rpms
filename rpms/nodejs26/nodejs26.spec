@@ -162,6 +162,7 @@ Source101:      nodejs.srpm.macros
 0001-fips-disable-options.patch
 CVE-2026-13149-brace-expansion-dos.patch
 CVE-2026-59869-js-yaml-merge-keys.patch
+0002-cares-host-callback-compat.patch
 
 %description
 Node.js is a platform built on Chrome's JavaScript runtime
