@@ -1,22 +1,20 @@
-From ea30e158dcece39525beb0bc16eb4a26d8eb801f Mon Sep 17 00:00:00 2001
+From e0b2b31b38e6e3d1ad810782d3777def81a87a86 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 15/54] openssh-7.7p1-gssapi-new-unique
 
-# Improve ccache handling in openssh (#991186, #1199363, #1566494)
-# https://bugzilla.mindrot.org/show_bug.cgi?id=2775
 ---
  auth-krb5.c     | 262 ++++++++++++++++++++++++++++++++++++++++++------
  auth.h          |   3 +-
  gss-serv-krb5.c |  42 +++-----
  gss-serv.c      |  12 +--
- servconf.c      |  12 ++-
+ servconf.c      |   5 +
  servconf.h      |   2 +
  session.c       |   5 +-
  ssh-gss.h       |   4 +-
  sshd-session.c  |   2 +-
  sshd_config.5   |   8 ++
- 10 files changed, 280 insertions(+), 72 deletions(-)
+ 10 files changed, 274 insertions(+), 71 deletions(-)
 
 diff --git a/auth-krb5.c b/auth-krb5.c
 index 3c6dc0622..0de1aaf8d 100644
@@ -341,7 +339,7 @@ index 3c6dc0622..0de1aaf8d 100644
  #endif /* !HEIMDAL */
  #endif /* KRB5 */
 diff --git a/auth.h b/auth.h
-index 32ee3cbf4..9e55ff8ad 100644
+index efe819323..2a19e2b34 100644
 --- a/auth.h
 +++ b/auth.h
 @@ -85,6 +85,7 @@ struct Authctxt {
@@ -352,7 +350,7 @@ index 32ee3cbf4..9e55ff8ad 100644
  #endif
  	struct sshbuf	*loginmsg;
  
-@@ -243,7 +244,7 @@ FILE	*auth_openprincipals(const char *, struct passwd *, int);
+@@ -244,7 +245,7 @@ FILE	*auth_openprincipals(const char *, struct passwd *, int);
  int	 sys_auth_passwd(struct ssh *, const char *);
  
  #if defined(KRB5) && !defined(HEIMDAL)
@@ -516,83 +514,49 @@ index 8b4fa9cfe..6eb7d2163 100644
  
  	ok = mm_ssh_gssapi_update_creds(&gssapi_client.store);
 diff --git a/servconf.c b/servconf.c
-index de3fa9481..10b43d56a 100644
+index 6700f5d51..2d11e1d00 100644
 --- a/servconf.c
 +++ b/servconf.c
-@@ -131,6 +131,7 @@ initialize_server_options(ServerOptions *options)
- 	options->kerberos_or_local_passwd = -1;
- 	options->kerberos_ticket_cleanup = -1;
- 	options->kerberos_get_afs_token = -1;
-+	options->kerberos_unique_ccache = -1;
- 	options->gss_authentication=-1;
- 	options->gss_keyex = -1;
- 	options->gss_cleanup_creds = -1;
-@@ -374,6 +375,8 @@ fill_default_server_options(ServerOptions *options)
- 		options->kerberos_ticket_cleanup = 1;
- 	if (options->kerberos_get_afs_token == -1)
- 		options->kerberos_get_afs_token = 0;
-+	if (options->kerberos_unique_ccache == -1)
-+		options->kerberos_unique_ccache = 0;
- 	if (options->gss_authentication == -1)
- 		options->gss_authentication = 0;
- 	if (options->gss_keyex == -1)
-@@ -561,7 +564,7 @@ typedef enum {
- 	sPort, sHostKeyFile, sLoginGraceTime,
- 	sPermitRootLogin, sLogFacility, sLogLevel, sLogVerbose,
- 	sKerberosAuthentication, sKerberosOrLocalPasswd, sKerberosTicketCleanup,
--	sKerberosGetAFSToken, sPasswordAuthentication,
-+	sKerberosGetAFSToken, sKerberosUniqueCCache, sPasswordAuthentication,
- 	sKbdInteractiveAuthentication, sListenAddress, sAddressFamily,
- 	sPrintMotd, sPrintLastLog, sIgnoreRhosts,
- 	sX11Forwarding, sX11DisplayOffset, sX11UseLocalhost,
-@@ -652,11 +655,13 @@ static struct {
- #else
- 	{ "kerberosgetafstoken", sUnsupported, SSHCFG_GLOBAL },
- #endif
-+	{ "kerberosuniqueccache", sKerberosUniqueCCache, SSHCFG_GLOBAL },
- #else
- 	{ "kerberosauthentication", sUnsupported, SSHCFG_ALL },
- 	{ "kerberosorlocalpasswd", sUnsupported, SSHCFG_GLOBAL },
- 	{ "kerberosticketcleanup", sUnsupported, SSHCFG_GLOBAL },
- 	{ "kerberosgetafstoken", sUnsupported, SSHCFG_GLOBAL },
-+	{ "kerberosuniqueccache", sUnsupported, SSHCFG_GLOBAL },
- #endif
- 	{ "kerberostgtpassing", sUnsupported, SSHCFG_GLOBAL },
- 	{ "afstokenpassing", sUnsupported, SSHCFG_GLOBAL },
-@@ -1669,6 +1674,10 @@ process_server_config_line_depth(ServerOptions *options, char *line,
- 		intptr = &options->kerberos_get_afs_token;
- 		goto parse_flag;
+@@ -1437,6 +1437,10 @@ process_server_config_line_depth(ServerOptions *options, char *line,
+ #endif /* USE_AFS */
+ #endif /* KRB5 */
  
 +	case sKerberosUniqueCCache:
 +		intptr = &options->kerberos_unique_ccache;
 +		goto parse_flag;
 +
- 	case sGssAuthentication:
+ #ifdef GSSAPI
+ 	case sGSSAPIAuthentication:
  		intptr = &options->gss_authentication;
- 		goto parse_flag;
-@@ -3329,6 +3338,7 @@ dump_config(ServerOptions *o)
+@@ -4238,6 +4242,7 @@ dump_config(ServerOptions *o)
  # ifdef USE_AFS
  	dump_cfg_fmtint(sKerberosGetAFSToken, o->kerberos_get_afs_token);
  # endif
 +	dump_cfg_fmtint(sKerberosUniqueCCache, o->kerberos_unique_ccache);
  #endif
  #ifdef GSSAPI
- 	dump_cfg_fmtint(sGssAuthentication, o->gss_authentication);
+ 	dump_cfg_fmtint(sGSSAPIAuthentication, o->gss_authentication);
 diff --git a/servconf.h b/servconf.h
-index 76641d580..bf589911a 100644
+index ddb0f130a..6ca89b24e 100644
 --- a/servconf.h
 +++ b/servconf.h
-@@ -150,6 +150,8 @@ typedef struct {
- 						 * file on logout. */
- 	int     kerberos_get_afs_token;		/* If true, try to get AFS token if
- 						 * authenticated with Kerberos. */
-+	int     kerberos_unique_ccache;		/* If true, the acquired ticket will
-+						 * be stored in per-session ccache */
- 	int     gss_authentication;	/* If true, permit GSSAPI authentication */
- 	int     gss_keyex;		/* If true, permit GSSAPI key exchange */
- 	int     gss_cleanup_creds;	/* If true, destroy cred cache on logout */
+@@ -303,12 +303,14 @@ SSHCONF_UNSUPPORTED_INT(kerberos_get_afs_token, KerberosGetAFSToken, SSHCFG_GLOB
+ SSHCONF_INTFLAG(kerberos_authentication, KerberosAuthentication, SSHCFG_ALL, 0, SSHCFG_COPY_MATCH) \
+ SSHCONF_INTFLAG(kerberos_or_local_passwd, KerberosOrLocalPasswd, SSHCFG_GLOBAL, 1, SSHCFG_COPY_NONE) \
+ SSHCONF_INTFLAG(kerberos_ticket_cleanup, KerberosTicketCleanup, SSHCFG_GLOBAL, 1, SSHCFG_COPY_NONE) \
++SSHCONF_INTFLAG(kerberos_unique_ccache, KerberosUniqueCCache, SSHCFG_GLOBAL, 0, SSHCFG_COPY_NONE) \
+ SSHD_CONFIG_KRB5_AFS
+ #else /* KRB5 */
+ #define SSHD_CONFIG_ENTRIES_KRB5 \
+ SSHCONF_UNSUPPORTED_INT(kerberos_authentication, KerberosAuthentication, SSHCFG_ALL) \
+ SSHCONF_UNSUPPORTED_INT(kerberos_or_local_passwd, KerberosOrLocalPasswd, SSHCFG_GLOBAL) \
+ SSHCONF_UNSUPPORTED_INT(kerberos_ticket_cleanup, KerberosTicketCleanup, SSHCFG_GLOBAL) \
++SSHCONF_UNSUPPORTED_INT(kerberos_unique_ccache, KerberosUniqueCCache, SSHCFG_GLOBAL) \
+ SSHCONF_UNSUPPORTED_INT(kerberos_get_afs_token, KerberosGetAFSToken, SSHCFG_GLOBAL)
+ #endif /* KRB5 */
+ 
 diff --git a/session.c b/session.c
-index 610a2cc6f..517cab6b6 100644
+index b4db64ea4..c2cdd6c4f 100644
 --- a/session.c
 +++ b/session.c
 @@ -988,7 +988,8 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
@@ -637,10 +601,10 @@ index db34d77f4..a894e23c9 100644
  
  char *ssh_gssapi_server_mechanisms(void);
 diff --git a/sshd-session.c b/sshd-session.c
-index f847fc0a9..9d75a4555 100644
+index 352237474..3d2672cfd 100644
 --- a/sshd-session.c
 +++ b/sshd-session.c
-@@ -1295,7 +1295,7 @@ main(int ac, char **av)
+@@ -1296,7 +1296,7 @@ main(int ac, char **av)
  #ifdef GSSAPI
  	if (options.gss_authentication) {
  		temporarily_use_uid(authctxt->pw);
@@ -650,10 +614,10 @@ index f847fc0a9..9d75a4555 100644
  	}
  #endif
 diff --git a/sshd_config.5 b/sshd_config.5
-index 5928b6cd2..d0b0dfe36 100644
+index b719fc915..372af241b 100644
 --- a/sshd_config.5
 +++ b/sshd_config.5
-@@ -1057,6 +1057,14 @@ Specifies whether to automatically destroy the user's ticket cache
+@@ -1068,6 +1068,14 @@ Specifies whether to automatically destroy the user's ticket cache
  file on logout.
  The default is
  .Cm yes .
@@ -669,5 +633,5 @@ index 5928b6cd2..d0b0dfe36 100644
  Specifies the permitted KEX (Key Exchange) algorithms that the server will
  offer to clients.
 -- 
-2.53.0
+2.55.0
 

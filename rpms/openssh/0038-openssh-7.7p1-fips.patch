@@ -1,4 +1,4 @@
-From 55c0d54b91cc39ed6f10542f883dbaad6a3213ca Mon Sep 17 00:00:00 2001
+From eb6be743509407de959ef3a5e95cd76815b48dca Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 28 Aug 2025 14:01:38 +0200
 Subject: [PATCH 38/54] openssh-7.7p1-fips
@@ -9,7 +9,7 @@ Subject: [PATCH 38/54] openssh-7.7p1-fips
  kex-names.c              |  6 +++-
  kex.c                    |  3 +-
  kexgen.c                 | 74 ++++++++++++++++++++++++++++++++--------
- kexgexc.c                |  5 +++
+ kexgexc.c                |  6 ++++
  myproposal.h             | 33 ++++++++++++++++++
  readconf.c               | 21 +++++++++---
  sandbox-seccomp-filter.c |  3 ++
@@ -23,7 +23,7 @@ Subject: [PATCH 38/54] openssh-7.7p1-fips
  sshconnect2.c            | 11 +++++-
  sshd.c                   | 19 +++++++++++
  sshkey.c                 | 37 ++++++++++++++++++++
- 19 files changed, 300 insertions(+), 30 deletions(-)
+ 19 files changed, 301 insertions(+), 30 deletions(-)
 
 diff --git a/dh.c b/dh.c
 index b291750d8..3efe0a69f 100644
@@ -102,7 +102,7 @@ index c6326a39d..e51e292b8 100644
  u_int	 dh_estimate(int);
  void	 dh_set_moduli_file(const char *);
 diff --git a/kex-names.c b/kex-names.c
-index 769a36810..c0761ae8f 100644
+index 3bc38130b..dcb6efc13 100644
 --- a/kex-names.c
 +++ b/kex-names.c
 @@ -32,6 +32,7 @@
@@ -113,7 +113,7 @@ index 769a36810..c0761ae8f 100644
  #include <openssl/evp.h>
  #endif
  
-@@ -207,7 +208,10 @@ kex_names_valid(const char *names)
+@@ -213,7 +214,10 @@ kex_names_valid(const char *names)
  			return 0;
  		}
  		if (kex_alg_by_name(p) == NULL) {
@@ -126,7 +126,7 @@ index 769a36810..c0761ae8f 100644
  			return 0;
  		}
 diff --git a/kex.c b/kex.c
-index 70bebce6a..e1059dec4 100644
+index 3fbf1dd43..abd13a0e2 100644
 --- a/kex.c
 +++ b/kex.c
 @@ -37,6 +37,7 @@
@@ -265,7 +265,7 @@ index a2beb3f10..2f8252488 100644
  	default:
  		r = SSH_ERR_INVALID_ARGUMENT;
 diff --git a/kexgexc.c b/kexgexc.c
-index 1c2194a8f..f9a58b955 100644
+index 1c2194a8f..2763e862a 100644
 --- a/kexgexc.c
 +++ b/kexgexc.c
 @@ -29,6 +29,7 @@
@@ -276,7 +276,7 @@ index 1c2194a8f..f9a58b955 100644
  #include <sys/types.h>
  
  #include <openssl/bn.h>
-@@ -117,6 +118,11 @@ input_kex_dh_gex_group(int type, u_int32
+@@ -116,6 +117,11 @@ input_kex_dh_gex_group(int type, uint32_t seq, struct ssh *ssh)
  	}
  	p = g = NULL; /* belong to kex->dh now */
  
@@ -340,7 +340,7 @@ index d992d8b12..6433e0820 100644
  #define	SSH_ALLOWED_CA_SIGALGS	\
  	"ssh-ed25519," \
 diff --git a/readconf.c b/readconf.c
-index 9004076e4..058e53cf1 100644
+index 1b7d4ae4e..e971ca5c4 100644
 --- a/readconf.c
 +++ b/readconf.c
 @@ -38,6 +38,12 @@
@@ -379,7 +379,7 @@ index 9004076e4..058e53cf1 100644
  	do { \
  		if ((r = kex_assemble_names(&options->what, \
 diff --git a/sandbox-seccomp-filter.c b/sandbox-seccomp-filter.c
-index e21048f3a..25c9df42a 100644
+index b65413c95..17e1cea72 100644
 --- a/sandbox-seccomp-filter.c
 +++ b/sandbox-seccomp-filter.c
 @@ -258,6 +258,9 @@ static const struct sock_filter preauth_insns[] = {
@@ -393,7 +393,7 @@ index e21048f3a..25c9df42a 100644
  	SC_DENY(__NR_openat, EACCES),
  #endif
 diff --git a/servconf.c b/servconf.c
-index 8045756fb..6c1ba77f6 100644
+index 8c1e9c253..bee75d486 100644
 --- a/servconf.c
 +++ b/servconf.c
 @@ -38,7 +38,15 @@
@@ -412,7 +412,7 @@ index 8045756fb..6c1ba77f6 100644
  
  #include "xmalloc.h"
  #include "ssh.h"
-@@ -242,11 +250,16 @@ assemble_algorithms(ServerOptions *o)
+@@ -213,11 +221,16 @@ assemble_algorithms(ServerOptions *o)
  	all_key = sshkey_alg_list(0, 0, 1, ',');
  	all_sig = sshkey_alg_list(0, 1, 1, ',');
  	/* remove unsupported algos from default lists */
@@ -485,7 +485,7 @@ index a894e23c9..329dc9da0 100644
  
  typedef struct {
 diff --git a/ssh-keygen.c b/ssh-keygen.c
-index 584d5a899..12430e6a4 100644
+index a62e5dc4a..eb880dbc0 100644
 --- a/ssh-keygen.c
 +++ b/ssh-keygen.c
 @@ -22,6 +22,7 @@
@@ -524,7 +524,7 @@ index 584d5a899..12430e6a4 100644
  	else {
  		switch (sshkey_type_from_shortname(key_type_name)) {
  #ifdef OPENSSL_HAS_ECC
-@@ -1057,9 +1063,17 @@ do_gen_all_hostkeys(struct passwd *pw)
+@@ -1065,9 +1071,17 @@ do_gen_all_hostkeys(struct passwd *pw)
  			first = 1;
  			printf("%s: generating new host keys: ", __progname);
  		}
@@ -543,7 +543,7 @@ index 584d5a899..12430e6a4 100644
  		if ((fd = mkstemp(prv_tmp)) == -1) {
  			error("Could not save your private key in %s: %s",
  			    prv_tmp, strerror(errno));
-@@ -3768,7 +3782,7 @@ main(int argc, char **argv)
+@@ -3776,7 +3790,7 @@ main(int argc, char **argv)
  	}
  
  	if (key_type_name == NULL)
@@ -553,7 +553,7 @@ index 584d5a899..12430e6a4 100644
  	type = sshkey_type_from_shortname(key_type_name);
  	type_bits_valid(type, key_type_name, &bits);
 diff --git a/ssh-keyscan.c b/ssh-keyscan.c
-index bb3ee462d..3cea1daac 100644
+index c455ef532..1f15f3077 100644
 --- a/ssh-keyscan.c
 +++ b/ssh-keyscan.c
 @@ -21,6 +21,7 @@
@@ -564,7 +564,7 @@ index bb3ee462d..3cea1daac 100644
  
  #include <errno.h>
  #include <limits.h>
-@@ -234,6 +235,14 @@ keygrab_ssh2(con *c)
+@@ -235,6 +236,14 @@ keygrab_ssh2(con *c)
  	char *myproposal[PROPOSAL_MAX] = { KEX_CLIENT };
  	int r;
  
@@ -609,7 +609,7 @@ index ccadb14ca..5af39bb39 100644
  		goto out;
  	}
 diff --git a/ssh.c b/ssh.c
-index bc3be8f8e..e7bdba327 100644
+index 07bb1e38f..4dee7849f 100644
 --- a/ssh.c
 +++ b/ssh.c
 @@ -71,6 +71,7 @@
@@ -620,7 +620,7 @@ index bc3be8f8e..e7bdba327 100644
  #include "openbsd-compat/openssl-compat.h"
  
  #include "xmalloc.h"
-@@ -1631,6 +1632,10 @@ main(int ac, char **av)
+@@ -1613,6 +1614,10 @@ main(int ac, char **av)
  		exit(0);
  	}
  
@@ -632,7 +632,7 @@ index bc3be8f8e..e7bdba327 100644
  	if (options.sk_provider != NULL && *options.sk_provider == '$' &&
  	    strlen(options.sk_provider) > 1) {
 diff --git a/sshconnect2.c b/sshconnect2.c
-index 31bbc0ed8..2ddd89d5c 100644
+index e1d4388ad..ca9dc0e8a 100644
 --- a/sshconnect2.c
 +++ b/sshconnect2.c
 @@ -45,6 +45,10 @@
@@ -646,7 +646,7 @@ index 31bbc0ed8..2ddd89d5c 100644
  #include "xmalloc.h"
  #include "ssh.h"
  #include "ssh2.h"
-@@ -263,6 +267,9 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr *hostaddr, u_short port,
+@@ -265,6 +269,9 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr_storage *hostaddr,
  
  #if defined(GSSAPI) && defined(WITH_OPENSSL)
  	if (options.gss_keyex) {
@@ -656,7 +656,7 @@ index 31bbc0ed8..2ddd89d5c 100644
  		/* Add the GSSAPI mechanisms currently supported on this
  		 * client to the key exchange algorithm proposal */
  		orig = myproposal[PROPOSAL_KEX_ALGS];
-@@ -282,7 +289,9 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr *hostaddr, u_short port,
+@@ -284,7 +291,9 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr_storage *hostaddr,
  		}
  
  		gss = ssh_gssapi_client_mechanisms(gss_host,
@@ -668,7 +668,7 @@ index 31bbc0ed8..2ddd89d5c 100644
  			debug("Offering GSSAPI proposal: %s", gss);
  			xasprintf(&myproposal[PROPOSAL_KEX_ALGS],
 diff --git a/sshd.c b/sshd.c
-index 22ad4dff0..2865619c7 100644
+index 6b9847f67..ae26b10b3 100644
 --- a/sshd.c
 +++ b/sshd.c
 @@ -43,6 +43,7 @@
@@ -693,8 +693,8 @@ index 22ad4dff0..2865619c7 100644
  #ifdef HAVE_SECUREWARE
  #include <sys/security.h>
  #include <prot.h>
-@@ -1604,6 +1612,13 @@ main(int ac, char **av)
- 		    &key, NULL)) != 0 && r != SSH_ERR_SYSTEM_ERROR)
+@@ -1605,6 +1613,13 @@ main(int ac, char **av)
+ 		    r != SSH_ERR_SYSTEM_ERROR && !have_agent)
  			do_log2_r(r, ll, "Unable to load host key \"%s\"",
  			    options.host_key_files[i]);
 +		if (FIPS_mode() && key != NULL && (sshkey_type_plain(key->type) == KEY_ED25519_SK
@@ -707,7 +707,7 @@ index 22ad4dff0..2865619c7 100644
  		if (sshkey_is_sk(key) &&
  		    key->sk_flags & SSH_SK_USER_PRESENCE_REQD) {
  			debug("host key %s requires user presence, ignoring",
-@@ -1827,6 +1842,10 @@ main(int ac, char **av)
+@@ -1829,6 +1844,10 @@ main(int ac, char **av)
  	/* Reinitialize the log (because of the fork above). */
  	log_init(__progname, options.log_level, options.log_facility, log_stderr);
  
@@ -719,7 +719,7 @@ index 22ad4dff0..2865619c7 100644
  	 * Chdir to the root directory so that the current disk can be
  	 * unmounted if desired.
 diff --git a/sshkey.c b/sshkey.c
-index ccc35dbf5..82e55509d 100644
+index 6bb8feaa9..e3fb29e70 100644
 --- a/sshkey.c
 +++ b/sshkey.c
 @@ -36,6 +36,7 @@
@@ -738,7 +738,7 @@ index ccc35dbf5..82e55509d 100644
  #include "ssh-sk.h"
  #include "ssh-pkcs11.h"
  
-@@ -399,6 +401,18 @@ sshkey_alg_list(int certs_only, int plain_only, int include_sigonly, char sep)
+@@ -407,6 +409,18 @@ sshkey_alg_list(int certs_only, int plain_only, int include_sigonly, char sep)
  		impl = keyimpls[i];
  		if (impl->name == NULL || impl->type == KEY_NULL)
  			continue;
@@ -757,7 +757,7 @@ index ccc35dbf5..82e55509d 100644
  		if (!include_sigonly && impl->sigonly)
  			continue;
  		if ((certs_only && !impl->cert) || (plain_only && impl->cert))
-@@ -1431,6 +1445,20 @@ sshkey_read(struct sshkey *ret, char **cpp)
+@@ -1443,6 +1457,20 @@ sshkey_read(struct sshkey *ret, char **cpp)
  		return SSH_ERR_EC_CURVE_MISMATCH;
  	}
  
@@ -778,7 +778,7 @@ index ccc35dbf5..82e55509d 100644
  	/* Fill in ret from parsed key */
  	sshkey_free_contents(ret);
  	*ret = *k;
-@@ -2264,6 +2292,11 @@ sshkey_sign(struct sshkey *key,
+@@ -2276,6 +2304,11 @@ sshkey_sign(struct sshkey *key,
  		*lenp = 0;
  	if (datalen > SSH_KEY_MAX_SIGN_DATA_SIZE)
  		return SSH_ERR_INVALID_ARGUMENT;
@@ -790,7 +790,7 @@ index ccc35dbf5..82e55509d 100644
  	if ((impl = sshkey_impl_from_key(key)) == NULL)
  		return SSH_ERR_KEY_TYPE_UNKNOWN;
  	if ((r = sshkey_unshield_private(key)) != 0)
-@@ -2303,6 +2336,10 @@ sshkey_verify(const struct sshkey *key,
+@@ -2315,6 +2348,10 @@ sshkey_verify(const struct sshkey *key,
  		*detailsp = NULL;
  	if (siglen == 0 || dlen > SSH_KEY_MAX_SIGN_DATA_SIZE)
  		return SSH_ERR_INVALID_ARGUMENT;
@@ -802,5 +802,5 @@ index ccc35dbf5..82e55509d 100644
  		return SSH_ERR_KEY_TYPE_UNKNOWN;
  	return impl->funcs->verify(key, sig, siglen, data, dlen,
 -- 
-2.53.0
+2.55.0
 

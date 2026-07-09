@@ -1,4 +1,4 @@
-From ec63856f2c4276da3aa22c78feacfebfbfb594dc Mon Sep 17 00:00:00 2001
+From 62cef37ebf112f4389a520e7277fd7cc30a7019c Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 11/54] openssh-8.7p1-redhat
@@ -76,10 +76,10 @@ index 0f4a3a724..608203e4b 100644
  #AddressFamily any
  #ListenAddress 0.0.0.0
 diff --git a/sshd_config.0 b/sshd_config.0
-index 770ec742e..1f71c37c3 100644
+index 9bafd243e..dc685568a 100644
 --- a/sshd_config.0
 +++ b/sshd_config.0
-@@ -1247,9 +1247,9 @@ DESCRIPTION
+@@ -1255,9 +1255,9 @@ DESCRIPTION
  
       SyslogFacility
               Gives the facility code that is used when logging messages from
@@ -93,10 +93,10 @@ index 770ec742e..1f71c37c3 100644
       TCPKeepAlive
               Specifies whether the system should send TCP keepalive messages
 diff --git a/sshd_config.5 b/sshd_config.5
-index 3f5e29812..ca425a8da 100644
+index 39a864dee..3896d21b0 100644
 --- a/sshd_config.5
 +++ b/sshd_config.5
-@@ -1971,7 +1971,7 @@ By default no subsystems are defined.
+@@ -1979,7 +1979,7 @@ By default no subsystems are defined.
  .It Cm SyslogFacility
  Gives the facility code that is used when logging messages from
  .Xr sshd 8 .
@@ -143,5 +143,5 @@ index 000000000..1d592d13f
 +Include /etc/crypto-policies/back-ends/opensshserver.config
 +
 -- 
-2.53.0
+2.55.0
 

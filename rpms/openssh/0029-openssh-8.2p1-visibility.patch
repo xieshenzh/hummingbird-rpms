@@ -1,4 +1,4 @@
-From 03f96498c3b1c5a01014a47a800f94430c7c92ce Mon Sep 17 00:00:00 2001
+From 8ec6e23e9f608226d2a28c927deb8707c2c05d19 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 29/54] openssh-8.2p1-visibility
@@ -49,5 +49,5 @@ index 4c96e8827..4af5209db 100644
      struct sk_resident_key ***rks, size_t *nrks)
  {
 -- 
-2.53.0
+2.55.0
 

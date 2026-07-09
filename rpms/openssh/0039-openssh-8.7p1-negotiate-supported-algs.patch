@@ -1,4 +1,4 @@
-From bfbdaf0b1355e06be5c40dae3986d4ddde50ac08 Mon Sep 17 00:00:00 2001
+From caab11e7840ce22b21e88fdd6fac693cb897c0a8 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 39/54] openssh-8.7p1-negotiate-supported-algs
@@ -7,12 +7,13 @@ Subject: [PATCH 39/54] openssh-8.7p1-negotiate-supported-algs
 # upstream MR:
 # https://github.com/openssh/openssh-portable/pull/323
 ---
- regress/hostkey-agent.sh | 32 +++++++++++++++++++++++++-------
- sshconnect2.c            | 17 +++++++++++++++--
- 2 files changed, 40 insertions(+), 9 deletions(-)
+ regress/hostkey-agent.sh      | 32 +++++++++++++++++++++++++-------
+ regress/knownhosts-command.sh |  8 ++++++--
+ sshconnect2.c                 | 17 +++++++++++++++--
+ 3 files changed, 46 insertions(+), 11 deletions(-)
 
 diff --git a/regress/hostkey-agent.sh b/regress/hostkey-agent.sh
-index 28dcfe170..b9e716dcd 100644
+index 0e7962e3c..251d5258e 100644
 --- a/regress/hostkey-agent.sh
 +++ b/regress/hostkey-agent.sh
 @@ -17,8 +17,21 @@ trace "make CA key"
@@ -86,12 +87,37 @@ index 28dcfe170..b9e716dcd 100644
  	verbose "cert type $k"
  	opts="-oHostKeyAlgorithms=$k -F $OBJ/ssh_proxy"
  	SSH_CONNECTION=`${SSH} $opts host 'echo $SSH_CONNECTION'`
+diff --git a/regress/knownhosts-command.sh b/regress/knownhosts-command.sh
+index 58004b80e..036a7c2b9 100644
+--- a/regress/knownhosts-command.sh
++++ b/regress/knownhosts-command.sh
+@@ -38,8 +38,12 @@ _EOF
+ chmod a+x $OBJ/knownhosts_command
+ ${SSH} -F $OBJ/ssh_proxy x true && fail "ssh connect succeeded with bad exit"
+ 
++PUBKEY_ACCEPTED_ALGOS=`$SSH -G "example.com" | \
++    grep -i "PubkeyAcceptedAlgorithms" | cut -d ' ' -f2- | tr "," "|"`
++SSH_ACCEPTED_HOSTKEY_TYPES=`echo "$SSH_HOSTKEY_TYPES" | tr ' ' '\n' | egrep "$PUBKEY_ACCEPTED_ALGOS"`
++
+ cp $OBJ/sshd_proxy $OBJ/sshd_proxy.bak
+-for keytype in ${SSH_HOSTKEY_TYPES} ; do
++for keytype in ${SSH_ACCEPTED_HOSTKEY_TYPES} ; do
+ 	grep -vi HostKeyAlgorithms $OBJ/sshd_proxy.bak > $OBJ/sshd_proxy
+ 	echo "HostKeyAlgorithms=+$keytype" >> $OBJ/sshd_proxy
+ 	algs=$keytype
+@@ -53,5 +57,5 @@ test "x\$3" = "x$LOGNAME" || die "wrong username \$3 (expected $LOGNAME)"
+ grep -- "\$1.*\$2" $OBJ/known_hosts
+ _EOF
+ 	${SSH} -F $OBJ/ssh_proxy -oHostKeyAlgorithms=$algs x true ||
+-	    fail "ssh connect failed for keytype $x"
++	    fail "ssh connect failed for keytype $keytype"
+ done
 diff --git a/sshconnect2.c b/sshconnect2.c
-index 2ddd89d5c..31f51be62 100644
+index ca9dc0e8a..2dc08b8a1 100644
 --- a/sshconnect2.c
 +++ b/sshconnect2.c
-@@ -224,7 +224,7 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr *hostaddr, u_short port,
-     const struct ssh_conn_info *cinfo)
+@@ -224,7 +224,7 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr_storage *hostaddr,
+     u_short port, const struct ssh_conn_info *cinfo)
  {
  	char *myproposal[PROPOSAL_MAX];
 -	char *all_key, *hkalgs = NULL;
@@ -99,9 +125,9 @@ index 2ddd89d5c..31f51be62 100644
  	int r, use_known_hosts_order = 0;
  
  #if defined(GSSAPI) && defined(WITH_OPENSSL)
-@@ -260,10 +260,22 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr *hostaddr, u_short port,
- 	if (use_known_hosts_order)
- 		hkalgs = order_hostkeyalgs(host, hostaddr, port, cinfo);
+@@ -262,10 +262,22 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr_storage *hostaddr,
+ 		    port, cinfo);
+ 	}
  
 +	filtered_algs = hkalgs ? match_filter_allowlist(hkalgs, options.pubkey_accepted_algos)
 +		               : match_filter_allowlist(options.hostkeyalgorithms,
@@ -123,7 +149,7 @@ index 2ddd89d5c..31f51be62 100644
  
  #if defined(GSSAPI) && defined(WITH_OPENSSL)
  	if (options.gss_keyex) {
-@@ -307,6 +319,7 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr *hostaddr, u_short port,
+@@ -309,6 +321,7 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr_storage *hostaddr,
  #endif
  
  	free(hkalgs);
@@ -132,5 +158,5 @@ index 2ddd89d5c..31f51be62 100644
  	/* start key exchange */
  	if ((r = kex_setup(ssh, myproposal)) != 0)
 -- 
-2.53.0
+2.55.0
 

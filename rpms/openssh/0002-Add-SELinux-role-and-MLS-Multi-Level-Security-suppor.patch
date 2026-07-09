@@ -1,7 +1,7 @@
-From cdb21e545ffde9b237fa9ab7be8e32b78ffc00bb Mon Sep 17 00:00:00 2001
+From 0ff113d55dffee623a622e081b426e5b7e57c571 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Mon, 13 Apr 2026 14:06:32 +0200
-Subject: [PATCH 01/54] Add SELinux role and MLS (Multi-Level Security) support
+Subject: [PATCH 02/54] Add SELinux role and MLS (Multi-Level Security) support
 
 openssh-7.8p1-role-mls
 
@@ -35,7 +35,7 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
  10 files changed, 131 insertions(+), 8 deletions(-)
 
 diff --git a/auth.h b/auth.h
-index 634a84aa8..32ee3cbf4 100644
+index 0f11458ca..efe819323 100644
 --- a/auth.h
 +++ b/auth.h
 @@ -65,6 +65,9 @@ struct Authctxt {
@@ -49,10 +49,10 @@ index 634a84aa8..32ee3cbf4 100644
  	/* Method lists for multiple authentication */
  	char		**auth_methods;	/* modified from server config */
 diff --git a/auth2-gss.c b/auth2-gss.c
-index 053548527..b380dc117 100644
+index 85251b7d0..dfee5613e 100644
 --- a/auth2-gss.c
 +++ b/auth2-gss.c
-@@ -284,6 +284,7 @@ input_gssapi_mic(int type, uint32_t plen, struct ssh *ssh)
+@@ -282,6 +282,7 @@ input_gssapi_mic(int type, uint32_t plen, struct ssh *ssh)
  	Authctxt *authctxt = ssh->authctxt;
  	Gssctxt *gssctxt;
  	int r, authenticated = 0;
@@ -60,7 +60,7 @@ index 053548527..b380dc117 100644
  	struct sshbuf *b;
  	gss_buffer_desc mic, gssbuf;
  	u_char *p;
-@@ -300,7 +301,13 @@ input_gssapi_mic(int type, uint32_t plen, struct ssh *ssh)
+@@ -299,7 +300,13 @@ input_gssapi_mic(int type, uint32_t plen, struct ssh *ssh)
  		fatal_f("sshbuf_new failed");
  	mic.value = p;
  	mic.length = len;
@@ -75,7 +75,7 @@ index 053548527..b380dc117 100644
  	    "gssapi-with-mic", ssh->kex->session_id);
  
  	if ((gssbuf.value = sshbuf_mutable_ptr(b)) == NULL)
-@@ -313,6 +320,8 @@ input_gssapi_mic(int type, uint32_t plen, struct ssh *ssh)
+@@ -312,6 +319,8 @@ input_gssapi_mic(int type, uint32_t plen, struct ssh *ssh)
  		logit("GSSAPI MIC check failed");
  
  	sshbuf_free(b);
@@ -83,7 +83,7 @@ index 053548527..b380dc117 100644
 +		free(micuser);
  	free(mic.value);
  
- 	authctxt->postponed = 0;
+ 	if (!authenticated)
 diff --git a/auth2-hostbased.c b/auth2-hostbased.c
 index 8a1acdec3..a287091ec 100644
 --- a/auth2-hostbased.c
@@ -158,10 +158,10 @@ index e446ef412..319e42b2b 100644
  
  	uid_swapped = 1;
 diff --git a/auth2.c b/auth2.c
-index 3a1682746..bfd425eab 100644
+index 3f353a719..497fa8ed2 100644
 --- a/auth2.c
 +++ b/auth2.c
-@@ -271,6 +271,9 @@ input_userauth_request(int type, uint32_t seq, struct ssh *ssh)
+@@ -277,6 +277,9 @@ input_userauth_request(int type, uint32_t seq, struct ssh *ssh)
  	Authctxt *authctxt = ssh->authctxt;
  	Authmethod *m = NULL;
  	char *user = NULL, *service = NULL, *method = NULL, *style = NULL;
@@ -171,7 +171,7 @@ index 3a1682746..bfd425eab 100644
  	int r, authenticated = 0;
  	double tstart = monotime_double();
  
-@@ -284,6 +287,11 @@ input_userauth_request(int type, uint32_t seq, struct ssh *ssh)
+@@ -290,6 +293,11 @@ input_userauth_request(int type, uint32_t seq, struct ssh *ssh)
  	debug("userauth-request for user %s service %s method %s", user, service, method);
  	debug("attempt %d failures %d", authctxt->attempt, authctxt->failures);
  
@@ -183,7 +183,7 @@ index 3a1682746..bfd425eab 100644
  	if ((style = strchr(user, ':')) != NULL)
  		*style++ = 0;
  
-@@ -295,6 +303,9 @@ input_userauth_request(int type, uint32_t seq, struct ssh *ssh)
+@@ -301,6 +309,9 @@ input_userauth_request(int type, uint32_t seq, struct ssh *ssh)
  		authctxt->user = xstrdup(user);
  		authctxt->service = xstrdup(service);
  		authctxt->style = style ? xstrdup(style) : NULL;
@@ -193,7 +193,7 @@ index 3a1682746..bfd425eab 100644
  		if (authctxt->pw && strcmp(service, "ssh-connection")==0) {
  			authctxt->valid = 1;
  			debug2_f("setting up authctxt for %s", user);
-@@ -314,6 +325,9 @@ input_userauth_request(int type, uint32_t seq, struct ssh *ssh)
+@@ -320,6 +331,9 @@ input_userauth_request(int type, uint32_t seq, struct ssh *ssh)
  		    authctxt->valid ? "authenticating " : "invalid ", user);
  		setproctitle("%s [net]", authctxt->valid ? user : "unknown");
  		mm_inform_authserv(service, style);
@@ -204,7 +204,7 @@ index 3a1682746..bfd425eab 100644
  		if ((r = kex_server_update_ext_info(ssh)) != 0)
  			fatal_fr(r, "kex_server_update_ext_info failed");
 diff --git a/misc.c b/misc.c
-index ed3e9d314..e96fa8d61 100644
+index 517fa7a97..c0e16437a 100644
 --- a/misc.c
 +++ b/misc.c
 @@ -869,6 +869,7 @@ char *
@@ -229,7 +229,7 @@ index ed3e9d314..e96fa8d61 100644
  	}
  	return NULL;
  }
-@@ -2828,7 +2836,8 @@ stdfd_devnull(int do_stdin, int do_stdout, int do_stderr)
+@@ -2830,7 +2838,8 @@ stdfd_devnull(int do_stdin, int do_stdout, int do_stderr)
  pid_t
  subprocess(const char *tag, const char *command,
      int ac, char **av, FILE **child, u_int flags,
@@ -239,7 +239,7 @@ index ed3e9d314..e96fa8d61 100644
  {
  	FILE *f = NULL;
  	struct stat st;
-@@ -2961,6 +2970,13 @@ subprocess(const char *tag, const char *command,
+@@ -2963,6 +2972,13 @@ subprocess(const char *tag, const char *command,
  			error("%s: dup2: %s", tag, strerror(errno));
  			_exit(1);
  		}
@@ -254,7 +254,7 @@ index ed3e9d314..e96fa8d61 100644
  			execve(av[0], av, env);
  		else
 diff --git a/monitor.c b/monitor.c
-index 9d6672bb6..1e41dfa53 100644
+index 73a85408e..6fe9f46fc 100644
 --- a/monitor.c
 +++ b/monitor.c
 @@ -111,6 +111,9 @@ int mm_answer_sign(struct ssh *, int, struct sshbuf *);
@@ -277,7 +277,7 @@ index 9d6672bb6..1e41dfa53 100644
      {MONITOR_REQ_AUTH2_READ_BANNER, MON_ONCE, mm_answer_auth2_read_banner},
      {MONITOR_REQ_AUTHPASSWORD, MON_AUTH, mm_answer_authpassword},
  #ifdef USE_PAM
-@@ -946,6 +952,9 @@ mm_answer_pwnamallow(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -920,6 +926,9 @@ mm_answer_pwnamallow(struct ssh *ssh, int sock, struct sshbuf *m)
  
  	/* Allow service/style information on the auth context */
  	monitor_permit(mon_dispatch, MONITOR_REQ_AUTHSERV, 1);
@@ -287,7 +287,7 @@ index 9d6672bb6..1e41dfa53 100644
  	monitor_permit(mon_dispatch, MONITOR_REQ_AUTH2_READ_BANNER, 1);
  
  #ifdef USE_PAM
-@@ -1020,6 +1029,26 @@ key_base_type_match(const char *method, const struct sshkey *key,
+@@ -994,6 +1003,26 @@ key_base_type_match(const char *method, const struct sshkey *key,
  	return found;
  }
  
@@ -314,7 +314,7 @@ index 9d6672bb6..1e41dfa53 100644
  int
  mm_answer_authpassword(struct ssh *ssh, int sock, struct sshbuf *m)
  {
-@@ -1392,7 +1421,7 @@ monitor_valid_userblob(struct ssh *ssh, const u_char *data, u_int datalen)
+@@ -1366,7 +1395,7 @@ monitor_valid_userblob(struct ssh *ssh, const u_char *data, u_int datalen)
  	struct sshbuf *b;
  	struct sshkey *hostkey = NULL;
  	const u_char *p;
@@ -323,7 +323,7 @@ index 9d6672bb6..1e41dfa53 100644
  	size_t len;
  	u_char type;
  	int hostbound = 0, r, fail = 0;
-@@ -1423,6 +1452,8 @@ monitor_valid_userblob(struct ssh *ssh, const u_char *data, u_int datalen)
+@@ -1397,6 +1426,8 @@ monitor_valid_userblob(struct ssh *ssh, const u_char *data, u_int datalen)
  		fail++;
  	if ((r = sshbuf_get_cstring(b, &cp, NULL)) != 0)
  		fatal_fr(r, "parse userstyle");
@@ -332,7 +332,7 @@ index 9d6672bb6..1e41dfa53 100644
  	xasprintf(&userstyle, "%s%s%s", authctxt->user,
  	    authctxt->style ? ":" : "",
  	    authctxt->style ? authctxt->style : "");
-@@ -1473,7 +1504,7 @@ monitor_valid_hostbasedblob(const u_char *data, u_int datalen,
+@@ -1447,7 +1478,7 @@ monitor_valid_hostbasedblob(const u_char *data, u_int datalen,
  {
  	struct sshbuf *b;
  	const u_char *p;
@@ -341,7 +341,7 @@ index 9d6672bb6..1e41dfa53 100644
  	size_t len;
  	int r, fail = 0;
  	u_char type;
-@@ -1494,6 +1525,8 @@ monitor_valid_hostbasedblob(const u_char *data, u_int datalen,
+@@ -1468,6 +1499,8 @@ monitor_valid_hostbasedblob(const u_char *data, u_int datalen,
  		fail++;
  	if ((r = sshbuf_get_cstring(b, &cp, NULL)) != 0)
  		fatal_fr(r, "parse userstyle");
@@ -366,10 +366,10 @@ index fe0b00b2e..1b46e794e 100644
  	MONITOR_REQ_PAM_ACCOUNT = 102, MONITOR_ANS_PAM_ACCOUNT = 103,
  	MONITOR_REQ_PAM_INIT_CTX = 104, MONITOR_ANS_PAM_INIT_CTX = 105,
 diff --git a/monitor_wrap.c b/monitor_wrap.c
-index 81596a4cc..f3c341bc7 100644
+index e2b9a2802..b5aeb8b2c 100644
 --- a/monitor_wrap.c
 +++ b/monitor_wrap.c
-@@ -473,6 +473,27 @@ mm_inform_authserv(char *service, char *style)
+@@ -438,6 +438,27 @@ mm_inform_authserv(char *service, char *style)
  	sshbuf_free(m);
  }
  
@@ -398,7 +398,7 @@ index 81596a4cc..f3c341bc7 100644
  int
  mm_auth_password(struct ssh *ssh, char *password)
 diff --git a/monitor_wrap.h b/monitor_wrap.h
-index c2f7f97d9..3e08ddd78 100644
+index f43759b21..30585187c 100644
 --- a/monitor_wrap.h
 +++ b/monitor_wrap.h
 @@ -51,6 +51,9 @@ int mm_sshkey_sign(struct ssh *, struct sshkey *, u_char **, size_t *,
@@ -412,5 +412,5 @@ index c2f7f97d9..3e08ddd78 100644
  char *mm_auth2_read_banner(void);
  int mm_auth_password(struct ssh *, char *);
 -- 
-2.53.0
+2.55.0
 

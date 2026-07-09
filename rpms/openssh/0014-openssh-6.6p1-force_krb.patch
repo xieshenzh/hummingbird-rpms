@@ -1,4 +1,4 @@
-From a0339453b9b0ac515752d0c60ffd9bcb46563e71 Mon Sep 17 00:00:00 2001
+From 1dea30d6fd38833e2a6b99d04ee551949082156b Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 14/54] openssh-6.6p1-force_krb
@@ -218,7 +218,7 @@ index be401fe0e..c26174928 100644
  /* This writes out any forwarded credentials from the structure populated
   * during userauth. Called after we have setuid to the user */
 diff --git a/session.c b/session.c
-index f14d5fab8..610a2cc6f 100644
+index 7b76f1f71..b4db64ea4 100644
 --- a/session.c
 +++ b/session.c
 @@ -643,6 +643,29 @@ do_exec(struct ssh *ssh, Session *s, const char *command)
@@ -292,5 +292,5 @@ index 0226a8303..e2d8ff003 100644
  This directory is the default location for all user-specific configuration
  and authentication information.
 -- 
-2.53.0
+2.55.0
 

@@ -1,4 +1,4 @@
-From fc166604790409eefd5f550c71c232be3c18d94d Mon Sep 17 00:00:00 2001
+From 16878783113f7c49eaec1db60d2667f2cd36223e Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 40/54] openssh-9.0p1-evp-fips-kex
@@ -140,10 +140,10 @@ index 3efe0a69f..bf324309c 100644
  
  DH *
 diff --git a/kex.c b/kex.c
-index e1059dec4..1eb3ca9d3 100644
+index abd13a0e2..a51e26398 100644
 --- a/kex.c
 +++ b/kex.c
-@@ -1619,3 +1619,142 @@ kex_exchange_identification(struct ssh *ssh, int timeout_ms,
+@@ -1624,3 +1624,142 @@ kex_exchange_identification(struct ssh *ssh, int timeout_ms,
  	return r;
  }
  
@@ -287,7 +287,7 @@ index e1059dec4..1eb3ca9d3 100644
 +}
 +#endif /* WITH_OPENSSL */
 diff --git a/kex.h b/kex.h
-index 0a0cb1562..ff41324e9 100644
+index 692e28363..d22f6deb3 100644
 --- a/kex.h
 +++ b/kex.h
 @@ -37,6 +37,9 @@
@@ -300,7 +300,7 @@ index 0a0cb1562..ff41324e9 100644
  # ifdef OPENSSL_HAS_ECC
  #  include <openssl/ec.h>
  # else /* OPENSSL_HAS_ECC */
-@@ -317,6 +320,9 @@ int	kexc25519_shared_key_ext(const u_char key[CURVE25519_SIZE],
+@@ -318,6 +321,9 @@ int	kexc25519_shared_key_ext(const u_char key[CURVE25519_SIZE],
      const u_char pub[CURVE25519_SIZE], struct sshbuf *out, int)
  	__attribute__((__bounded__(__minbytes__, 1, CURVE25519_SIZE)))
  	__attribute__((__bounded__(__minbytes__, 2, CURVE25519_SIZE)));
@@ -611,5 +611,5 @@ index 6a9058cdc..b661e0705 100644
  	return r;
  }
 -- 
-2.53.0
+2.55.0
 

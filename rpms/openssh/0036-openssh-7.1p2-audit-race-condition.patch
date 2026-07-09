@@ -1,4 +1,4 @@
-From d18c0e8c12110d7a46bcbfb67cb6e28e7ebcecf1 Mon Sep 17 00:00:00 2001
+From 89eacbbddf3f04349b37f9cfc75f0080f9d82b5d Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 36/54] openssh-7.1p2-audit-race-condition
@@ -11,10 +11,10 @@ Subject: [PATCH 36/54] openssh-7.1p2-audit-race-condition
  3 files changed, 102 insertions(+), 7 deletions(-)
 
 diff --git a/monitor_wrap.c b/monitor_wrap.c
-index ef419b743..fa3718924 100644
+index 7ccf8729c..cd70a4e12 100644
 --- a/monitor_wrap.c
 +++ b/monitor_wrap.c
-@@ -1446,4 +1446,50 @@ mm_audit_destroy_sensitive_data(struct ssh *ssh, const char *fp, pid_t pid, uid_
+@@ -1394,4 +1394,50 @@ mm_audit_destroy_sensitive_data(struct ssh *ssh, const char *fp, pid_t pid, uid_
  	mm_request_send(pmonitor->m_recvfd, MONITOR_REQ_AUDIT_SERVER_KEY_FREE, m);
  	sshbuf_free(m);
  }
@@ -66,7 +66,7 @@ index ef419b743..fa3718924 100644
 +}
  #endif /* SSH_AUDIT_EVENTS */
 diff --git a/monitor_wrap.h b/monitor_wrap.h
-index 9856968f9..0865f59cb 100644
+index 7f846f085..41e4b79fe 100644
 --- a/monitor_wrap.h
 +++ b/monitor_wrap.h
 @@ -98,6 +98,8 @@ void mm_audit_unsupported_body(struct ssh *, int);
@@ -79,7 +79,7 @@ index 9856968f9..0865f59cb 100644
  
  struct Session;
 diff --git a/session.c b/session.c
-index 75ff1080e..1a7f5ca7a 100644
+index d36c1b702..bd8dc808c 100644
 --- a/session.c
 +++ b/session.c
 @@ -161,6 +161,10 @@ static Session *sessions = NULL;
@@ -200,5 +200,5 @@ index 75ff1080e..1a7f5ca7a 100644
  	if (s->authctxt->force_pwchange) {
  		do_setusercontext(pw);
 -- 
-2.53.0
+2.55.0
 
