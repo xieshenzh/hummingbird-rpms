@@ -24,6 +24,7 @@ dependencies (`specfile`, `packaging`, `jinja2`) that are installed there.
 | `./ci/dist_git.py diff [<pkg>…\|--all]` | Show what changed locally vs Fedora upstream |
 | `./ci/dist_git.py ls-sources <pkg>` | Inspect source archives for a package |
 | `./ci/dist_git.py update-releases` | Refresh `upstream-releases.json` from Bodhi |
+| `./ci/dist_git.py add-private-product <product> --packages pkg1,pkg2` | Create a private product: Pulp repos, RPA config, and package assignments |
 
 The `--dry-run` flag is available on most commands to preview without committing.
 
@@ -57,6 +58,7 @@ Common operational tasks that users or AI agents may need to perform:
 | Report CVE data issues       | _(see docs)_                                    | [Reporting CVE Data Issues](documentation/operating/reporting-cve-data-issues.md)         | Get incorrect CVE data on cve.org or NIST corrected          |
 | Konflux resource deployment  | _(background info)_                             | [Konflux Resource Deployment](documentation/background/konflux-resource-deployment.md)    | Understand how Konflux resources are deployed                |
 | Private RPM repositories     | _(package-overrides + RPA config)_              | [Private RPM Repositories](documentation/operating/private-rpm-repositories.md)           | Route packages to private per-product Pulp repos             |
+| Add private product          | `add-private-product <product> --packages ...`  | [Private RPM Repositories](documentation/operating/private-rpm-repositories.md)           | Create a private product with Pulp repos, RPA, and packages  |
 
 ## Post-Import / Post-Add Requirements
 

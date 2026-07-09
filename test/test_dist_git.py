@@ -11,6 +11,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+import yaml
 
 project_root = Path(__file__).parent.parent
 
@@ -3791,3 +3792,117 @@ def test_update_continue_legacy_state(workdir: Path, upstream_repos: dict[str, P
     )
     assert result.returncode == 0, f"--continue failed: {result.stderr}"
     assert not state_file.exists()
+
+
+@pytest.fixture
+def mock_infra_repo(tmp_path: Path) -> Path:
+    """Create a mock infrastructure repo with rpms-main templates."""
+    infra = tmp_path / 'infrastructure'
+    rpms_main = infra / 'kubernetes' / 'rpms-main'
+    rpms_main.mkdir(parents=True)
+    (rpms_main / '00-application.yml.j2').write_text(
+        '---\napiVersion: appstudio.redhat.com/v1alpha1\nkind: Application\n'
+        'metadata:\n  name: {{ env["PROJECT_NAME"] }}\n'
+    )
+    (rpms_main / '01-release-plans.yml.j2').write_text(
+        '---\napiVersion: appstudio.redhat.com/v1alpha1\nkind: ReleasePlan\n'
+        'metadata:\n  name: hummingbird-rpm-release\n  labels:\n'
+        '    release.appstudio.openshift.io/releasePlanAdmission: '
+        'hummingbird-rpms-tech-preview-staging\nspec:\n'
+        '  application: {{ env["PROJECT_NAME"] }}\n'
+    )
+    (rpms_main / '10-integration-test-scenarios-testing-farm.yml.j2').write_text(
+        '---\napiVersion: appstudio.redhat.com/v1beta2\nkind: IntegrationTestScenario\n'
+    )
+    (infra / '.gitlab-ci.yml').write_text(
+        '      - PROJECT_NAME:\n          - rpms-main\n'
+        '          - rpms-releases\n'
+    )
+    return infra
+
+
+def test_add_private_product(workdir: Path, upstream_repos: dict[str, Path],
+                             mock_infra_repo: Path) -> None:
+    """Test add-private-product dry run shows all planned actions."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, capture_output=True, check=True, text=True,
+    )
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), '--dry-run', 'add-private-product', 'testprod',
+         '--packages', 'chocolate', '--infra-repo', str(mock_infra_repo)],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, f"dry run failed: {result.stderr}"
+    assert 'would add RPA entry' in result.stderr
+    assert 'would assign packages' in result.stderr
+    assert 'would create infrastructure templates' in result.stderr
+    assert 'would add private-testprod-rpms-main to .gitlab-ci.yml' in result.stderr
+
+    with open(workdir / 'ci' / 'konflux_rpa_config.yml') as f:
+        config = yaml.safe_load(f)
+    assert not any(r.get('private_product') == 'testprod' for r in config['rpas'])
+    assert not (mock_infra_repo / 'kubernetes' / 'private-testprod-rpms-main').exists()
+
+
+def test_add_private_product_nonexistent_package(workdir: Path, mock_infra_repo: Path) -> None:
+    """Test add-private-product fails for nonexistent package."""
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'add-private-product', 'testprod',
+         '--packages', 'nonexistent', '--infra-repo', str(mock_infra_repo)],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode != 0
+    assert 'does not exist' in result.stderr
+
+
+def test_add_private_product_duplicate_product(workdir: Path, upstream_repos: dict[str, Path],
+                                               mock_infra_repo: Path) -> None:
+    """Test add-private-product fails if product already exists."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, capture_output=True, check=True, text=True,
+    )
+
+    with open(workdir / 'ci' / 'konflux_rpa_config.yml') as f:
+        config = yaml.safe_load(f)
+    config['rpas'].append({'name': 'test', 'private_product': 'existing'})
+    with open(workdir / 'ci' / 'konflux_rpa_config.yml', 'w') as f:
+        yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+    subprocess.run(['git', 'add', '.'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'add existing product'], cwd=workdir, check=True)
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'add-private-product', 'existing',
+         '--packages', 'chocolate', '--infra-repo', str(mock_infra_repo)],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode != 0
+    assert 'already exists' in result.stderr
+
+
+def test_add_private_product_already_assigned(workdir: Path, upstream_repos: dict[str, Path],
+                                              mock_infra_repo: Path) -> None:
+    """Test add-private-product fails if package already has a private_product."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, capture_output=True, check=True, text=True,
+    )
+
+    overrides_path = workdir / 'ci' / 'package-overrides.yaml'
+    with open(overrides_path) as f:
+        overrides = yaml.safe_load(f) or {}
+    overrides['chocolate'] = {'private_product': 'other-product'}
+    with open(overrides_path, 'w') as f:
+        yaml.dump(overrides, f)
+    subprocess.run(['git', 'add', '.'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'assign to other product'], cwd=workdir, check=True)
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'add-private-product', 'testprod',
+         '--packages', 'chocolate', '--infra-repo', str(mock_infra_repo)],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode != 0
+    assert 'already has private_product' in result.stderr
