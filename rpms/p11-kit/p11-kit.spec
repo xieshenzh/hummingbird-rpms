@@ -7,7 +7,7 @@
 
 
 Version:        0.26.2
-Release:        1.1%{?dist}
+Release:        1.2%{?dist}
 Name:           p11-kit
 Summary:        Library for loading and sharing PKCS#11 modules
 
@@ -18,6 +18,8 @@ Source1:        https://github.com/p11-glue/p11-kit/releases/download/%{version}
 Source2:        https://p11-glue.github.io/p11-glue/p11-kit/p11-kit-release-keyring.gpg
 Source3:        trust-extract-compat
 Source4:        p11-kit-client.service
+
+Patch0:         CVE-2026-13757-rpc-recursion-depth-limit.patch
 
 BuildRequires:  gcc
 BuildRequires:  libtasn1-devel >= 2.3
