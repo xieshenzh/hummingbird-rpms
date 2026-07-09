@@ -1,4 +1,4 @@
-From 816d931356b3b72f61929c8d66746b55d96882bc Mon Sep 17 00:00:00 2001
+From 54fa512753bac8db13eed233f5b421e2f733294d Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 41/54] openssh-8.7p1-nohostsha1proof
@@ -65,10 +65,10 @@ index 1a19060fc..2e6db5bf9 100644
  /* #define unused		0x00000020 */
  #define SSH_BUG_DEBUG		0x00000040
 diff --git a/monitor.c b/monitor.c
-index 305883278..bf5a5105b 100644
+index 7dfc7976b..0393c71aa 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -755,11 +755,18 @@ int
+@@ -741,11 +741,18 @@ int
  mm_answer_setcompat(struct ssh *ssh, int sock, struct sshbuf *m)
  {
  	int r;
@@ -88,7 +88,7 @@ index 305883278..bf5a5105b 100644
  	compat_set = 1;
  
  	return (0);
-@@ -773,10 +780,12 @@ mm_answer_sign(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -759,10 +766,12 @@ mm_answer_sign(struct ssh *ssh, int sock, struct sshbuf *m)
  	struct sshbuf *sigbuf = NULL;
  	u_char *p = NULL, *signature = NULL;
  	char *alg = NULL;
@@ -103,7 +103,7 @@ index 305883278..bf5a5105b 100644
  
  	debug3_f("entering");
  
-@@ -838,18 +847,30 @@ mm_answer_sign(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -824,18 +833,30 @@ mm_answer_sign(struct ssh *ssh, int sock, struct sshbuf *m)
  	}
  
  	if ((key = get_hostkey_by_index(keyid)) != NULL) {
@@ -152,7 +152,7 @@ index 16c2f2dff..f4700deeb 100644
  	kex_params.proposal[PROPOSAL_SERVER_HOST_KEY_ALGS] = keyname;
  	ASSERT_INT_EQ(ssh_init(&client, 0, &kex_params), 0);
 diff --git a/regress/unittests/sshkey/test_file.c b/regress/unittests/sshkey/test_file.c
-index e412b75d8..5b06bc905 100644
+index 296e90e78..1d30cf22f 100644
 --- a/regress/unittests/sshkey/test_file.c
 +++ b/regress/unittests/sshkey/test_file.c
 @@ -106,6 +106,7 @@ sshkey_file_tests(void)
@@ -173,10 +173,10 @@ index e412b75d8..5b06bc905 100644
  	TEST_START("load RSA cert with SHA512 signature");
  	ASSERT_INT_EQ(sshkey_load_cert(test_data_file("rsa_1_sha512"), &k2), 0);
 diff --git a/regress/unittests/sshkey/test_fuzz.c b/regress/unittests/sshkey/test_fuzz.c
-index d0f47d7cf..ba4d506d5 100644
+index fb178c1e4..6ecb5872d 100644
 --- a/regress/unittests/sshkey/test_fuzz.c
 +++ b/regress/unittests/sshkey/test_fuzz.c
-@@ -273,13 +273,14 @@ sshkey_fuzz_tests(void)
+@@ -317,13 +317,14 @@ sshkey_fuzz_tests(void)
  	TEST_DONE();
  
  #ifdef WITH_OPENSSL
@@ -193,7 +193,7 @@ index d0f47d7cf..ba4d506d5 100644
  	TEST_START("fuzz RSA SHA256 sig");
  	buf = load_file("rsa_1");
 diff --git a/regress/unittests/sshkey/test_sshkey.c b/regress/unittests/sshkey/test_sshkey.c
-index 1701c87c5..36f6fd335 100644
+index ec0ce452c..db3e22277 100644
 --- a/regress/unittests/sshkey/test_sshkey.c
 +++ b/regress/unittests/sshkey/test_sshkey.c
 @@ -59,6 +59,9 @@ build_cert(struct sshbuf *b, struct sshkey *k, const char *type,
@@ -247,7 +247,7 @@ index 1701c87c5..36f6fd335 100644
  	free(sig);
  }
  
-@@ -552,7 +560,7 @@ sshkey_tests(void)
+@@ -650,7 +658,7 @@ sshkey_tests(void)
  	ASSERT_INT_EQ(sshkey_load_public(test_data_file("rsa_1.pub"), &k2,
  	    NULL), 0);
  	k3 = get_private("rsa_1");
@@ -257,7 +257,7 @@ index 1701c87c5..36f6fd335 100644
  	    SSH_ERR_KEY_CERT_INVALID_SIGN_KEY);
  	ASSERT_PTR_EQ(k4, NULL);
 diff --git a/serverloop.c b/serverloop.c
-index 8e63480ec..1087a6c7d 100644
+index 8a6e3db80..e50985e90 100644
 --- a/serverloop.c
 +++ b/serverloop.c
 @@ -76,6 +76,7 @@
@@ -295,10 +295,10 @@ index 5af39bb39..88232c6ed 100644
  			goto out;
  		}
 diff --git a/sshconnect2.c b/sshconnect2.c
-index 31f51be62..eee1f9794 100644
+index 2dc08b8a1..0c82c7782 100644
 --- a/sshconnect2.c
 +++ b/sshconnect2.c
-@@ -1440,6 +1440,14 @@ identity_sign(struct identity *id, u_char **sigp, size_t *lenp,
+@@ -1442,6 +1442,14 @@ identity_sign(struct identity *id, u_char **sigp, size_t *lenp,
  			retried = 1;
  			goto retry_pin;
  		}
@@ -314,10 +314,10 @@ index 31f51be62..eee1f9794 100644
  	}
  
 diff --git a/sshd-session.c b/sshd-session.c
-index d8972fbd5..7064afd7c 100644
+index fa1192c09..0284c8e42 100644
 --- a/sshd-session.c
 +++ b/sshd-session.c
-@@ -1260,6 +1260,27 @@ main(int ac, char **av)
+@@ -1261,6 +1261,27 @@ main(int ac, char **av)
  
  	check_ip_options(ssh);
  
@@ -346,5 +346,5 @@ index d8972fbd5..7064afd7c 100644
  	channel_init_channels(ssh);
  	channel_set_af(ssh, options.address_family);
 -- 
-2.53.0
+2.55.0
 

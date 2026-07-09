@@ -1,9 +1,10 @@
-From 50a4a4adde0ff965afe34dbc059996d86d4fcfc6 Mon Sep 17 00:00:00 2001
+From bb9fdcfebdd652ea819b5fbf3316794e9a7ee9e2 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Mon, 15 Dec 2025 14:24:07 +0100
-Subject: [PATCH 53/54] openssh-10.2p1-pkcs11-uri
+Subject: [PATCH 52/54] openssh-10.2p1-pkcs11-uri
 
 ---
+ .depend                          |   1 +
  Makefile.in                      |  26 +-
  configure.ac                     |  37 ++
  regress/Makefile                 |   5 +-
@@ -21,17 +22,29 @@ Subject: [PATCH 53/54] openssh-10.2p1-pkcs11-uri
  ssh.c                            | 104 ++++-
  ssh_config.5                     |  15 +
  sshkey.c                         |   4 +
- 17 files changed, 2133 insertions(+), 273 deletions(-)
+ 18 files changed, 2134 insertions(+), 273 deletions(-)
  create mode 100644 regress/pkcs11-uri.sh
  create mode 100644 regress/unittests/pkcs11/tests.c
  create mode 100644 ssh-pkcs11-uri.c
  create mode 100644 ssh-pkcs11-uri.h
 
+diff --git a/.depend b/.depend
+index 7e5f3dcd3..9037c6ef6 100644
+--- a/.depend
++++ b/.depend
+@@ -144,6 +144,7 @@ ssh-mldsa-eddsa.o: includes.h config.h defines.h platform.h openbsd-compat/openb
+ ssh-pkcs11-client.o: includes.h config.h defines.h platform.h openbsd-compat/openbsd-compat.h openbsd-compat/base64.h openbsd-compat/sigact.h openbsd-compat/readpassphrase.h openbsd-compat/vis.h openbsd-compat/getrrsetbyname.h openbsd-compat/sha1.h openbsd-compat/bsd-sha2.h openbsd-compat/md5.h openbsd-compat/blf.h openbsd-compat/fnmatch.h openbsd-compat/getopt.h openbsd-compat/bsd-signal.h openbsd-compat/bsd-misc.h openbsd-compat/bsd-setres_id.h openbsd-compat/bsd-statvfs.h openbsd-compat/bsd-waitpid.h openbsd-compat/bsd-poll.h openbsd-compat/fake-rfc2553.h openbsd-compat/bsd-cygwin_util.h openbsd-compat/port-aix.h openbsd-compat/port-irix.h openbsd-compat/port-linux.h openbsd-compat/port-solaris.h openbsd-compat/port-net.h openbsd-compat/port-uw.h openbsd-compat/bsd-nextstep.h entropy.h pathnames.h xmalloc.h sshbuf.h log.h ssherr.h misc.h sshkey.h authfd.h atomicio.h ssh-pkcs11.h
+ ssh-pkcs11-helper.o: includes.h config.h defines.h platform.h openbsd-compat/openbsd-compat.h openbsd-compat/base64.h openbsd-compat/sigact.h openbsd-compat/readpassphrase.h openbsd-compat/vis.h openbsd-compat/getrrsetbyname.h openbsd-compat/sha1.h openbsd-compat/bsd-sha2.h openbsd-compat/md5.h openbsd-compat/blf.h openbsd-compat/fnmatch.h openbsd-compat/getopt.h openbsd-compat/bsd-signal.h openbsd-compat/bsd-misc.h openbsd-compat/bsd-setres_id.h openbsd-compat/bsd-statvfs.h openbsd-compat/bsd-waitpid.h openbsd-compat/bsd-poll.h openbsd-compat/fake-rfc2553.h openbsd-compat/bsd-cygwin_util.h openbsd-compat/port-aix.h openbsd-compat/port-irix.h openbsd-compat/port-linux.h openbsd-compat/port-solaris.h openbsd-compat/port-net.h openbsd-compat/port-uw.h openbsd-compat/bsd-nextstep.h entropy.h xmalloc.h sshbuf.h log.h ssherr.h misc.h sshkey.h authfd.h ssh-pkcs11.h
+ ssh-pkcs11.o: includes.h config.h defines.h platform.h openbsd-compat/openbsd-compat.h openbsd-compat/base64.h openbsd-compat/sigact.h openbsd-compat/readpassphrase.h openbsd-compat/vis.h openbsd-compat/getrrsetbyname.h openbsd-compat/sha1.h openbsd-compat/bsd-sha2.h openbsd-compat/md5.h openbsd-compat/blf.h openbsd-compat/fnmatch.h openbsd-compat/getopt.h openbsd-compat/bsd-signal.h openbsd-compat/bsd-misc.h openbsd-compat/bsd-setres_id.h openbsd-compat/bsd-statvfs.h openbsd-compat/bsd-waitpid.h openbsd-compat/bsd-poll.h openbsd-compat/fake-rfc2553.h openbsd-compat/bsd-cygwin_util.h openbsd-compat/port-aix.h openbsd-compat/port-irix.h openbsd-compat/port-linux.h openbsd-compat/port-solaris.h openbsd-compat/port-net.h openbsd-compat/port-uw.h openbsd-compat/bsd-nextstep.h entropy.h log.h ssherr.h sshkey.h ssh-pkcs11.h
++ssh-pkcs11-uri.o: includes.h config.h defines.h platform.h openbsd-compat/openbsd-compat.h openbsd-compat/base64.h openbsd-compat/sigact.h openbsd-compat/readpassphrase.h openbsd-compat/vis.h openbsd-compat/getrrsetbyname.h openbsd-compat/sha1.h openbsd-compat/bsd-sha2.h openbsd-compat/md5.h openbsd-compat/blf.h openbsd-compat/fnmatch.h openbsd-compat/getopt.h openbsd-compat/bsd-signal.h openbsd-compat/bsd-misc.h openbsd-compat/bsd-setres_id.h openbsd-compat/bsd-statvfs.h openbsd-compat/bsd-waitpid.h openbsd-compat/bsd-poll.h openbsd-compat/fake-rfc2553.h openbsd-compat/bsd-cygwin_util.h openbsd-compat/port-aix.h openbsd-compat/port-irix.h openbsd-compat/port-linux.h openbsd-compat/port-solaris.h openbsd-compat/port-net.h openbsd-compat/port-uw.h openbsd-compat/bsd-nextstep.h entropy.h
+ ssh-rsa.o: includes.h config.h defines.h platform.h openbsd-compat/openbsd-compat.h openbsd-compat/base64.h openbsd-compat/sigact.h openbsd-compat/readpassphrase.h openbsd-compat/vis.h openbsd-compat/getrrsetbyname.h openbsd-compat/sha1.h openbsd-compat/bsd-sha2.h openbsd-compat/md5.h openbsd-compat/blf.h openbsd-compat/fnmatch.h openbsd-compat/getopt.h openbsd-compat/bsd-signal.h openbsd-compat/bsd-misc.h openbsd-compat/bsd-setres_id.h openbsd-compat/bsd-statvfs.h openbsd-compat/bsd-waitpid.h openbsd-compat/bsd-poll.h openbsd-compat/fake-rfc2553.h openbsd-compat/bsd-cygwin_util.h openbsd-compat/port-aix.h openbsd-compat/port-irix.h openbsd-compat/port-linux.h openbsd-compat/port-solaris.h openbsd-compat/port-net.h openbsd-compat/port-uw.h openbsd-compat/bsd-nextstep.h entropy.h
+ ssh-sk-client.o: includes.h config.h defines.h platform.h openbsd-compat/openbsd-compat.h openbsd-compat/base64.h openbsd-compat/sigact.h openbsd-compat/readpassphrase.h openbsd-compat/vis.h openbsd-compat/getrrsetbyname.h openbsd-compat/sha1.h openbsd-compat/bsd-sha2.h openbsd-compat/md5.h openbsd-compat/blf.h openbsd-compat/fnmatch.h openbsd-compat/getopt.h openbsd-compat/bsd-signal.h openbsd-compat/bsd-misc.h openbsd-compat/bsd-setres_id.h openbsd-compat/bsd-statvfs.h openbsd-compat/bsd-waitpid.h openbsd-compat/bsd-poll.h openbsd-compat/fake-rfc2553.h openbsd-compat/bsd-cygwin_util.h openbsd-compat/port-aix.h openbsd-compat/port-irix.h openbsd-compat/port-linux.h openbsd-compat/port-solaris.h openbsd-compat/port-net.h openbsd-compat/port-uw.h openbsd-compat/bsd-nextstep.h entropy.h log.h ssherr.h sshbuf.h sshkey.h msg.h pathnames.h ssh-sk.h misc.h
+ ssh-sk-helper.o: includes.h config.h defines.h platform.h openbsd-compat/openbsd-compat.h openbsd-compat/base64.h openbsd-compat/sigact.h openbsd-compat/readpassphrase.h openbsd-compat/vis.h openbsd-compat/getrrsetbyname.h openbsd-compat/sha1.h openbsd-compat/bsd-sha2.h openbsd-compat/md5.h openbsd-compat/blf.h openbsd-compat/fnmatch.h openbsd-compat/getopt.h openbsd-compat/bsd-signal.h openbsd-compat/bsd-misc.h openbsd-compat/bsd-setres_id.h openbsd-compat/bsd-statvfs.h openbsd-compat/bsd-waitpid.h openbsd-compat/bsd-poll.h openbsd-compat/fake-rfc2553.h openbsd-compat/bsd-cygwin_util.h openbsd-compat/port-aix.h openbsd-compat/port-irix.h openbsd-compat/port-linux.h openbsd-compat/port-solaris.h openbsd-compat/port-net.h openbsd-compat/port-uw.h openbsd-compat/bsd-nextstep.h entropy.h xmalloc.h log.h ssherr.h sshkey.h authfd.h misc.h sshbuf.h msg.h uidswap.h ssh-sk.h ssh-pkcs11.h
 diff --git a/Makefile.in b/Makefile.in
-index f80c95846..c3c8da863 100644
+index 56c4c88cf..23cf085a5 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -112,12 +112,12 @@ LIBSSH_OBJS=${LIBOPENSSH_OBJS} \
+@@ -113,12 +113,12 @@ LIBSSH_OBJS=${LIBOPENSSH_OBJS} \
  	sftp-realpath.o platform-pledge.o platform-tracing.o platform-misc.o \
  	sshbuf-io.o misc-agent.o ssherr-libcrypto.o auditstub.o
  
@@ -46,7 +59,7 @@ index f80c95846..c3c8da863 100644
  
  SSHDOBJS=sshd.o \
  	platform-listen.o \
-@@ -161,11 +161,11 @@ SSHADD_OBJS=	ssh-add.o $(P11OBJS) $(SKOBJS)
+@@ -162,11 +162,11 @@ SSHADD_OBJS=	ssh-add.o $(P11OBJS) $(SKOBJS)
  
  SSHAGENT_OBJS=	ssh-agent.o $(P11OBJS) $(SKOBJS)
  
@@ -60,7 +73,7 @@ index f80c95846..c3c8da863 100644
  
  SKHELPER_OBJS=	ssh-sk-helper.o ssh-sk.o sk-usbhid.o ssherr-nolibcrypto.o
  
-@@ -331,6 +331,8 @@ clean:	regressclean
+@@ -336,6 +336,8 @@ clean:	regressclean
  	rm -f regress/unittests/sshsig/test_sshsig$(EXEEXT)
  	rm -f regress/unittests/utf8/*.o
  	rm -f regress/unittests/utf8/test_utf8$(EXEEXT)
@@ -69,7 +82,7 @@ index f80c95846..c3c8da863 100644
  	rm -f regress/misc/sk-dummy/*.o
  	rm -f regress/misc/sk-dummy/*.lo
  	rm -f regress/misc/ssh-verify-attestation/ssh-verify-attestation$(EXEEXT)
-@@ -370,6 +372,8 @@ distclean:	regressclean
+@@ -379,6 +381,8 @@ distclean:	regressclean
  	rm -f regress/unittests/sshsig/test_sshsig
  	rm -f regress/unittests/utf8/*.o
  	rm -f regress/unittests/utf8/test_utf8
@@ -78,7 +91,7 @@ index f80c95846..c3c8da863 100644
  	rm -f regress/misc/sk-dummy/*.o
  	rm -f regress/misc/sk-dummy/*.lo
  	rm -f regress/misc/sk-dummy/sk-dummy.so
-@@ -550,6 +554,7 @@ regress-prep:
+@@ -561,6 +565,7 @@ regress-prep:
  	$(MKDIR_P) `pwd`/regress/unittests/sshkey
  	$(MKDIR_P) `pwd`/regress/unittests/sshsig
  	$(MKDIR_P) `pwd`/regress/unittests/utf8
@@ -86,7 +99,7 @@ index f80c95846..c3c8da863 100644
  	$(MKDIR_P) `pwd`/regress/misc/sk-dummy
  	$(MKDIR_P) `pwd`/regress/misc/ssh-verify-attestation
  	[ -f `pwd`/regress/Makefile ] || \
-@@ -725,6 +730,16 @@ regress/unittests/utf8/test_utf8$(EXEEXT): \
+@@ -764,6 +769,16 @@ regress/unittests/utf8/test_utf8$(EXEEXT): \
  	    regress/unittests/test_helper/libtest_helper.a \
  	    -lssh -lopenbsd-compat -lssh -lopenbsd-compat $(TESTLIBS)
  
@@ -103,7 +116,7 @@ index f80c95846..c3c8da863 100644
  # These all need to be compiled -fPIC, so they are treated differently.
  SK_DUMMY_OBJS=\
  	regress/misc/sk-dummy/sk-dummy.lo \
-@@ -770,7 +785,8 @@ regress-unit-binaries: regress-prep $(REGRESSLIBS) \
+@@ -811,7 +826,8 @@ regress-unit-binaries: regress-prep $(REGRESSLIBS) \
  	regress/unittests/sshbuf/test_sshbuf$(EXEEXT) \
  	regress/unittests/sshkey/test_sshkey$(EXEEXT) \
  	regress/unittests/sshsig/test_sshsig$(EXEEXT) \
@@ -114,7 +127,7 @@ index f80c95846..c3c8da863 100644
  tests:	file-tests t-exec interop-tests extra-tests unit
  	echo all tests passed
 diff --git a/configure.ac b/configure.ac
-index 62b2bf9e7..f581a9801 100644
+index 918ccd5df..8e679f770 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -2305,12 +2305,14 @@ AC_LINK_IFELSE(
@@ -173,7 +186,7 @@ index 62b2bf9e7..f581a9801 100644
  # IRIX has a const char return value for gai_strerror()
  AC_CHECK_FUNCS([gai_strerror], [
  	AC_DEFINE([HAVE_GAI_STRERROR])
-@@ -5991,6 +6027,7 @@ echo "                  BSD Auth support: $BSD_AUTH_MSG"
+@@ -5982,6 +6018,7 @@ echo "                  BSD Auth support: $BSD_AUTH_MSG"
  echo "              Random number source: $RAND_MSG"
  echo "             Privsep sandbox style: $SANDBOX_STYLE"
  echo "                   PKCS#11 support: $enable_pkcs11"
@@ -182,7 +195,7 @@ index 62b2bf9e7..f581a9801 100644
  
  echo ""
 diff --git a/regress/Makefile b/regress/Makefile
-index ae45bd463..cbe7a9610 100644
+index a6f81bef4..98a653256 100644
 --- a/regress/Makefile
 +++ b/regress/Makefile
 @@ -118,6 +118,7 @@ LTESTS= 	connect \
@@ -628,15 +641,15 @@ index 000000000..72d69bda0
 +# Restore original ssh_proxy
 +mv $OBJ/ssh_proxy_bak $OBJ/ssh_proxy
 diff --git a/regress/unittests/Makefile b/regress/unittests/Makefile
-index e370900e4..d6c89c129 100644
+index 5d482eab4..51bed5baf 100644
 --- a/regress/unittests/Makefile
 +++ b/regress/unittests/Makefile
 @@ -1,6 +1,6 @@
- #	$OpenBSD: Makefile,v 1.13 2023/09/24 08:14:13 claudio Exp $
+ #	$OpenBSD: Makefile,v 1.15 2026/06/14 04:08:05 djm Exp $
  
  SUBDIR=	test_helper sshbuf sshkey bitmap kex hostkeys utf8 match conversion
--SUBDIR+=authopt misc sshsig
-+SUBDIR+=authopt misc sshsig pkcs11
+-SUBDIR+=authopt misc sshsig servconf crypto
++SUBDIR+=authopt misc sshsig servconf crypto pkcs11
  
  .include <bsd.subdir.mk>
 diff --git a/regress/unittests/pkcs11/tests.c b/regress/unittests/pkcs11/tests.c
@@ -999,7 +1012,7 @@ index 000000000..89ba45c4e
 +}
 +
 diff --git a/ssh-add.c b/ssh-add.c
-index 1e9eddf90..e476fa662 100644
+index 7ce451036..5eb564a7e 100644
 --- a/ssh-add.c
 +++ b/ssh-add.c
 @@ -70,6 +70,7 @@
@@ -1082,7 +1095,7 @@ index 1e9eddf90..e476fa662 100644
  	if (deleting) {
  		if (delete_file(agent_fd, file, key_only,
  		    cert_only, qflag) == -1)
-@@ -1003,7 +1043,7 @@ main(int argc, char **argv)
+@@ -1004,7 +1044,7 @@ main(int argc, char **argv)
  		if (update_card(agent_fd, !deleting, pkcs11provider,
  		    qflag, key_only, cert_only,
  		    dest_constraints, ndest_constraints,
@@ -1092,10 +1105,10 @@ index 1e9eddf90..e476fa662 100644
  		for (n = 0; n < ncerts; n++)
  			sshkey_free(certs[n]);
 diff --git a/ssh-agent.c b/ssh-agent.c
-index 7773a4b07..3451d7a14 100644
+index 17b2a96c0..1f1fc024d 100644
 --- a/ssh-agent.c
 +++ b/ssh-agent.c
-@@ -1546,10 +1546,75 @@ add_p11_identity(struct sshkey *key, char *comment, const char *provider,
+@@ -1553,10 +1553,75 @@ add_p11_identity(struct sshkey *key, char *comment, const char *provider,
  	idtab->nentries++;
  }
  
@@ -1172,7 +1185,7 @@ index 7773a4b07..3451d7a14 100644
  	char **comments = NULL;
  	int r, i, count = 0, success = 0, confirm = 0;
  	u_int seconds = 0;
-@@ -1578,25 +1643,18 @@ process_add_smartcard_key(SocketEntry *e)
+@@ -1585,25 +1650,18 @@ process_add_smartcard_key(SocketEntry *e)
  		    "providers is disabled", provider);
  		goto send;
  	}
@@ -1203,7 +1216,7 @@ index 7773a4b07..3451d7a14 100644
  		}
  		for (j = 0; j < ncerts; j++) {
  			if (!sshkey_is_cert(certs[j]))
-@@ -1606,13 +1664,13 @@ process_add_smartcard_key(SocketEntry *e)
+@@ -1613,13 +1671,13 @@ process_add_smartcard_key(SocketEntry *e)
  			if (pkcs11_make_cert(keys[i], certs[j], &k) != 0)
  				continue;
  			add_p11_identity(k, xstrdup(comments[i]),
@@ -1219,7 +1232,7 @@ index 7773a4b07..3451d7a14 100644
  			    dest_constraints, ndest_constraints);
  			keys[i] = NULL;		/* transferred */
  			comments[i] = NULL;	/* transferred */
-@@ -1625,6 +1683,7 @@ process_add_smartcard_key(SocketEntry *e)
+@@ -1632,6 +1690,7 @@ process_add_smartcard_key(SocketEntry *e)
  send:
  	free(pin);
  	free(provider);
@@ -1227,7 +1240,7 @@ index 7773a4b07..3451d7a14 100644
  	free(keys);
  	free(comments);
  	free_dest_constraints(dest_constraints, ndest_constraints);
-@@ -1637,8 +1696,8 @@ send:
+@@ -1644,8 +1703,8 @@ send:
  static void
  process_remove_smartcard_key(SocketEntry *e)
  {
@@ -1238,7 +1251,7 @@ index 7773a4b07..3451d7a14 100644
  	Identity *id, *nxt;
  
  	debug2_f("entering");
-@@ -1649,30 +1708,38 @@ process_remove_smartcard_key(SocketEntry *e)
+@@ -1656,30 +1715,38 @@ process_remove_smartcard_key(SocketEntry *e)
  	}
  	free(pin);
  
@@ -1286,10 +1299,10 @@ index 7773a4b07..3451d7a14 100644
  }
  #endif /* ENABLE_PKCS11 */
 diff --git a/ssh-keygen.c b/ssh-keygen.c
-index 12430e6a4..266462f07 100644
+index eb880dbc0..25906f3c1 100644
 --- a/ssh-keygen.c
 +++ b/ssh-keygen.c
-@@ -831,8 +831,11 @@ do_download(struct passwd *pw)
+@@ -835,8 +835,11 @@ do_download(struct passwd *pw)
  			free(fp);
  		} else {
  			(void) sshkey_write(keys[i], stdout); /* XXX check */
@@ -3202,10 +3215,10 @@ index 1d0277a6d..13459644c 100644
  	    const u_char *, size_t, const char *, const char *,
  	    const char *, u_int);
 diff --git a/ssh.c b/ssh.c
-index 4a17c0a7d..b41ae82d2 100644
+index c319d08af..c79d69ef0 100644
 --- a/ssh.c
 +++ b/ssh.c
-@@ -862,6 +862,14 @@ main(int ac, char **av)
+@@ -844,6 +844,14 @@ main(int ac, char **av)
  			options.gss_deleg_creds = 1;
  			break;
  		case 'i':
@@ -3220,7 +3233,7 @@ index 4a17c0a7d..b41ae82d2 100644
  			p = tilde_expand_filename(optarg, getuid());
  			if (stat(p, &st) == -1)
  				fprintf(stderr, "Warning: Identity file %s "
-@@ -1838,6 +1846,7 @@ main(int ac, char **av)
+@@ -1823,6 +1831,7 @@ main(int ac, char **av)
  
  #ifdef ENABLE_PKCS11
  	(void)pkcs11_del_provider(options.pkcs11_provider);
@@ -3228,7 +3241,7 @@ index 4a17c0a7d..b41ae82d2 100644
  #endif
  
   skip_connect:
-@@ -2349,6 +2358,45 @@ ssh_session2(struct ssh *ssh, const struct ssh_conn_info *cinfo)
+@@ -2334,6 +2343,45 @@ ssh_session2(struct ssh *ssh, const struct ssh_conn_info *cinfo)
  	    options.escape_char : SSH_ESCAPECHAR_NONE, id);
  }
  
@@ -3274,7 +3287,7 @@ index 4a17c0a7d..b41ae82d2 100644
  /* Loads all IdentityFile and CertificateFile keys */
  static void
  load_public_identity_files(const struct ssh_conn_info *cinfo)
-@@ -2363,11 +2411,6 @@ load_public_identity_files(const struct ssh_conn_info *cinfo)
+@@ -2348,11 +2396,6 @@ load_public_identity_files(const struct ssh_conn_info *cinfo)
  	char *certificate_files[SSH_MAX_CERTIFICATE_FILES];
  	struct sshkey *certificates[SSH_MAX_CERTIFICATE_FILES];
  	int certificate_file_userprovided[SSH_MAX_CERTIFICATE_FILES];
@@ -3286,7 +3299,7 @@ index 4a17c0a7d..b41ae82d2 100644
  
  	n_ids = n_certs = 0;
  	memset(identity_files, 0, sizeof(identity_files));
-@@ -2380,33 +2423,46 @@ load_public_identity_files(const struct ssh_conn_info *cinfo)
+@@ -2365,33 +2408,46 @@ load_public_identity_files(const struct ssh_conn_info *cinfo)
  	    sizeof(certificate_file_userprovided));
  
  #ifdef ENABLE_PKCS11
@@ -3353,10 +3366,10 @@ index 4a17c0a7d..b41ae82d2 100644
  		free(cp);
  		check_load(sshkey_load_public(filename, &public, NULL),
 diff --git a/ssh_config.5 b/ssh_config.5
-index ab98c172f..699b3f67d 100644
+index 67d52d874..12cd3f7e1 100644
 --- a/ssh_config.5
 +++ b/ssh_config.5
-@@ -1262,6 +1262,21 @@ may also be used in conjunction with
+@@ -1301,6 +1301,21 @@ may also be used in conjunction with
  .Cm CertificateFile
  in order to provide any certificate also needed for authentication with
  the identity.
@@ -3379,10 +3392,10 @@ index ab98c172f..699b3f67d 100644
  Specifies a pattern-list of unknown options to be ignored if they are
  encountered in configuration parsing.
 diff --git a/sshkey.c b/sshkey.c
-index 5225eabf2..583f6421d 100644
+index e3fb29e70..82ef1c8da 100644
 --- a/sshkey.c
 +++ b/sshkey.c
-@@ -856,8 +856,10 @@ sshkey_free_contents(struct sshkey *k)
+@@ -868,8 +868,10 @@ sshkey_free_contents(struct sshkey *k)
  
  	if (k == NULL)
  		return;
@@ -3393,7 +3406,7 @@ index 5225eabf2..583f6421d 100644
  	if ((impl = sshkey_impl_from_type(k->type)) != NULL &&
  	    impl->funcs->cleanup != NULL)
  		impl->funcs->cleanup(k);
-@@ -2304,9 +2306,11 @@ sshkey_sign(struct sshkey *key,
+@@ -2316,9 +2318,11 @@ sshkey_sign(struct sshkey *key,
  	if (sshkey_is_sk(key)) {
  		r = sshsk_sign(sk_provider, key, sigp, lenp, data,
  		    datalen, compat, sk_pin);
@@ -3406,5 +3419,5 @@ index 5225eabf2..583f6421d 100644
  		if (impl->funcs->sign == NULL)
  			r = SSH_ERR_SIGN_ALG_UNSUPPORTED;
 -- 
-2.53.0
+2.55.0
 

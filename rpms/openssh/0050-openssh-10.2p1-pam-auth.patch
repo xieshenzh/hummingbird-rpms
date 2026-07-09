@@ -1,7 +1,7 @@
-From 04c13392280d1839b19cfe6e4dba48db3a8a8e77 Mon Sep 17 00:00:00 2001
+From e002da5afc245e3ed67f8319bd1c6ded83e959a4 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Sun, 12 Apr 2026 12:25:04 +0200
-Subject: [PATCH 51/54] openssh-10.2p1-pam-auth
+Subject: [PATCH 50/54] openssh-10.2p1-pam-auth
 
 https://bugzilla.redhat.com/show_bug.cgi?id=2423900
 
@@ -39,5 +39,5 @@ index d3dcd037b..aaad16765 100644
  	}
  	return PAM_SUCCESS;
 -- 
-2.53.0
+2.55.0
 

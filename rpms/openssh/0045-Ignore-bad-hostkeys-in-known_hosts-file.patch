@@ -1,7 +1,7 @@
-From def442146bbfe1116ca51c0b81a2eebc13a86eeb Mon Sep 17 00:00:00 2001
+From 0ae45c6f50cd9eefdefa7251a61fdde30464a9a7 Mon Sep 17 00:00:00 2001
 From: Zoltan Fridrich <zfridric@redhat.com>
 Date: Mon, 5 May 2025 11:52:25 +0200
-Subject: [PATCH 46/54] Ignore bad hostkeys in known_hosts file
+Subject: [PATCH 45/54] Ignore bad hostkeys in known_hosts file
 
 Signed-off-by: Zoltan Fridrich <zfridric@redhat.com>
 
@@ -64,7 +64,7 @@ index a24a4e329..0e9b1a19a 100644
  
  #endif
 diff --git a/ssh.c b/ssh.c
-index e7bdba327..4a17c0a7d 100644
+index 4dee7849f..c319d08af 100644
 --- a/ssh.c
 +++ b/ssh.c
 @@ -97,6 +97,7 @@
@@ -75,7 +75,7 @@ index e7bdba327..4a17c0a7d 100644
  
  #ifdef ENABLE_PKCS11
  #include "ssh-pkcs11.h"
-@@ -1375,6 +1376,7 @@ main(int ac, char **av)
+@@ -1357,6 +1358,7 @@ main(int ac, char **av)
  			options.update_hostkeys = 0;
  		}
  	}
@@ -84,5 +84,5 @@ index e7bdba327..4a17c0a7d 100644
  		fatal("Invalid number of ConnectionAttempts");
  
 -- 
-2.53.0
+2.55.0
 

@@ -1,7 +1,7 @@
-From 8b25614132c78116498a2b94634b2b8bacf82f5f Mon Sep 17 00:00:00 2001
+From f87a7cf01057bcf495974502de3e6f4bfc472a5d Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Mon, 13 Apr 2026 14:06:47 +0200
-Subject: [PATCH 02/54] Implement SELinux environment variable setup for
+Subject: [PATCH 03/54] Implement SELinux environment variable setup for
  subprocess execution
 
 openssh-6.6p1-selinux-env-setup
@@ -648,7 +648,7 @@ index fd1a7a7c2..66d0c2a6b 100644
  }
  
 diff --git a/sshd-session.c b/sshd-session.c
-index e9a488d08..967737c5b 100644
+index be30c8d70..d7d4f32c5 100644
 --- a/sshd-session.c
 +++ b/sshd-session.c
 @@ -123,7 +123,7 @@ char *config_file_name = _PATH_SERVER_CONFIG_FILE;
@@ -660,7 +660,7 @@ index e9a488d08..967737c5b 100644
  
  /* debug goes to stderr unless inetd_flag is set */
  static int log_stderr = 0;
-@@ -1274,6 +1274,11 @@ main(int ac, char **av)
+@@ -1275,6 +1275,11 @@ main(int ac, char **av)
  		restore_uid();
  	}
  #endif
@@ -673,5 +673,5 @@ index e9a488d08..967737c5b 100644
  	if (options.use_pam) {
  		do_pam_setcred();
 -- 
-2.53.0
+2.55.0
 

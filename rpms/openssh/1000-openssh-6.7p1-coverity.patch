@@ -1,4 +1,4 @@
-From d0225bcdbc0d783df878ccfb5128bdcb787d82ed Mon Sep 17 00:00:00 2001
+From 20271efdf2801f1ddcc308a81db131548872b056 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Fri, 12 Dec 2025 14:25:41 +0100
 Subject: [PATCH 54/54] openssh-6.7p1-coverity
@@ -98,7 +98,7 @@ index 7499aa975..2807cad4a 100644
  	    MIN_SIZEOF(ut->ut_host, li->hostname));
  # endif
 diff --git a/misc.c b/misc.c
-index e96fa8d61..556c112c3 100644
+index c0e16437a..f5275d108 100644
 --- a/misc.c
 +++ b/misc.c
 @@ -1620,6 +1620,8 @@ sanitise_stdfd(void)
@@ -110,7 +110,7 @@ index e96fa8d61..556c112c3 100644
  }
  
  char *
-@@ -2821,6 +2823,7 @@ stdfd_devnull(int do_stdin, int do_stdout, int do_stderr)
+@@ -2823,6 +2825,7 @@ stdfd_devnull(int do_stdin, int do_stdout, int do_stderr)
  	}
  	if (devnull > STDERR_FILENO)
  		close(devnull);
@@ -119,7 +119,7 @@ index e96fa8d61..556c112c3 100644
  }
  
 diff --git a/monitor.c b/monitor.c
-index 36db1afee..3b60059a9 100644
+index 63180e2a9..be55a32f3 100644
 --- a/monitor.c
 +++ b/monitor.c
 @@ -410,7 +410,7 @@ monitor_child_preauth(struct ssh *ssh, struct monitor *pmonitor)
@@ -131,7 +131,7 @@ index 36db1afee..3b60059a9 100644
  		;
  
  	/* Wait for the child's exit status */
-@@ -1855,7 +1855,7 @@ mm_answer_pty(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -1829,7 +1829,7 @@ mm_answer_pty(struct ssh *ssh, int sock, struct sshbuf *m)
  	s->ptymaster = s->ptyfd;
  
  	debug3_f("tty %s ptyfd %d", s->tty, s->ttyfd);
@@ -185,7 +185,7 @@ index 26bdc3e08..8e2939b95 100644
  		FD_CLR(notify_pipe[0], readset);
  	}
 diff --git a/readconf.c b/readconf.c
-index 058e53cf1..14f149cc1 100644
+index e971ca5c4..4baeb108d 100644
 --- a/readconf.c
 +++ b/readconf.c
 @@ -2164,6 +2164,7 @@ parse_pubkey_algos:
@@ -197,10 +197,10 @@ index 058e53cf1..14f149cc1 100644
  			}
  			free(arg2);
 diff --git a/servconf.c b/servconf.c
-index e05a31584..3ffa49c3a 100644
+index ab7327a2a..8480e9321 100644
 --- a/servconf.c
 +++ b/servconf.c
-@@ -2382,8 +2382,9 @@ process_server_config_line_depth(ServerOptions *options, char *line,
+@@ -2121,8 +2121,9 @@ process_server_config_line_depth(ServerOptions *options, char *line,
  		if (*activep && *charptr == NULL) {
  			*charptr = tilde_expand_filename(arg, getuid());
  			/* increase optional counter */
@@ -213,7 +213,7 @@ index e05a31584..3ffa49c3a 100644
  		break;
  
 diff --git a/serverloop.c b/serverloop.c
-index 1087a6c7d..b65c9dd66 100644
+index e50985e90..de2dfeef9 100644
 --- a/serverloop.c
 +++ b/serverloop.c
 @@ -536,7 +536,7 @@ server_request_tun(struct ssh *ssh)
@@ -226,5 +226,5 @@ index 1087a6c7d..b65c9dd66 100644
  		    auth_opts->force_tun_device != (int)tun)
  			goto done;
 -- 
-2.53.0
+2.55.0
 

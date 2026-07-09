@@ -1,4 +1,4 @@
-From 8a4843f8726028ca6b10285698dccea852632592 Mon Sep 17 00:00:00 2001
+From a5dc196b4c6d2462e87f5cb825e1b630b1217d06 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 37/54] openssh-9.0p1-audit-log
@@ -262,5 +262,5 @@ index 45d66ccff..05ac132cf 100644
  void	audit_unsupported(struct ssh *, int);
  void	audit_kex(struct ssh *, int, char *, char *, char *, char *);
 -- 
-2.53.0
+2.55.0
 

@@ -1,4 +1,4 @@
-From c095e2f48e279af65a9419f580ac9cae14453a93 Mon Sep 17 00:00:00 2001
+From a19debf855d417dc8c309ff93ed6a98c61418b66 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 18/54] openssh-6.4p1-fromto-remote
@@ -9,7 +9,7 @@ Subject: [PATCH 18/54] openssh-6.4p1-fromto-remote
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/scp.c b/scp.c
-index 1faa9a555..d87d939a1 100644
+index 28ac7a29d..4821514ba 100644
 --- a/scp.c
 +++ b/scp.c
 @@ -1143,7 +1143,10 @@ toremote(int argc, char **argv, enum scp_mode_e mode, char *sftp_direct)
@@ -25,5 +25,5 @@ index 1faa9a555..d87d939a1 100644
  				addargs(&alist, "%s",
  				    remote_remote_args.list[j]);
 -- 
-2.53.0
+2.55.0
 

@@ -1,4 +1,4 @@
-From f05d0adc8f15e01a3479d49645df26170be9d776 Mon Sep 17 00:00:00 2001
+From f4e2f83ba316fa67ab8052489f428c1cbe8cf3f4 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 16/54] openssh-7.2p2-k5login_directory
@@ -38,10 +38,10 @@ index 0de1aaf8d..148242cbf 100644
  #endif /* !HEIMDAL */
  #endif /* KRB5 */
 diff --git a/auth.h b/auth.h
-index 9e55ff8ad..815f821f9 100644
+index 2a19e2b34..9dd25f494 100644
 --- a/auth.h
 +++ b/auth.h
-@@ -245,6 +245,8 @@ int	 sys_auth_passwd(struct ssh *, const char *);
+@@ -246,6 +246,8 @@ int	 sys_auth_passwd(struct ssh *, const char *);
  
  #if defined(KRB5) && !defined(HEIMDAL)
  krb5_error_code ssh_krb5_cc_new_unique(krb5_context, krb5_ccache *, int *);
@@ -99,5 +99,5 @@ index e2d8ff003..fa33f5232 100644
  .It Pa ~/.ssh/
  This directory is the default location for all user-specific configuration
 -- 
-2.53.0
+2.55.0
 

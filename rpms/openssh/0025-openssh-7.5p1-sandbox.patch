@@ -1,4 +1,4 @@
-From 164a1599ea7f147919f6c925ee17c21820b9e7ee Mon Sep 17 00:00:00 2001
+From 7c814435d1c439bcbfb916c4e9962be59641d663 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 25/54] openssh-7.5p1-sandbox
@@ -9,7 +9,7 @@ Subject: [PATCH 25/54] openssh-7.5p1-sandbox
  1 file changed, 21 insertions(+)
 
 diff --git a/sandbox-seccomp-filter.c b/sandbox-seccomp-filter.c
-index 7b2444930..e21048f3a 100644
+index bf753eef2..b65413c95 100644
 --- a/sandbox-seccomp-filter.c
 +++ b/sandbox-seccomp-filter.c
 @@ -305,6 +305,9 @@ static const struct sock_filter preauth_insns[] = {
@@ -55,5 +55,5 @@ index 7b2444930..e21048f3a 100644
  	SC_ALLOW(__NR_getuid),
  #endif
 -- 
-2.53.0
+2.55.0
 

@@ -1,4 +1,4 @@
-From 00ef565336c933f9464b09c55134fa3b3c76ad40 Mon Sep 17 00:00:00 2001
+From 134511907ac99564a417a5b45e3ea13d4afbf8ae Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 35/54] openssh-7.6p1-audit
@@ -35,10 +35,10 @@ Subject: [PATCH 35/54] openssh-7.6p1-audit
  create mode 100644 auditstub.c
 
 diff --git a/Makefile.in b/Makefile.in
-index a12f6ad1d..f80c95846 100644
+index 106306024..56c4c88cf 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -110,7 +110,7 @@ LIBSSH_OBJS=${LIBOPENSSH_OBJS} \
+@@ -111,7 +111,7 @@ LIBSSH_OBJS=${LIBOPENSSH_OBJS} \
  	kexsntrup761x25519.o kexmlkem768x25519.o sntrup761.o kexgen.o \
  	kexgssc.o \
  	sftp-realpath.o platform-pledge.o platform-tracing.o platform-misc.o \
@@ -796,10 +796,10 @@ index 142ac5afd..1858bddab 100644
  	}
  	if (!allowed_user(ssh, pw))
 diff --git a/auth.h b/auth.h
-index 815f821f9..b72b76163 100644
+index 9dd25f494..066f5effa 100644
 --- a/auth.h
 +++ b/auth.h
-@@ -213,6 +213,8 @@ struct sshkey	*get_hostkey_private_by_type(int, int, struct ssh *);
+@@ -214,6 +214,8 @@ struct sshkey	*get_hostkey_private_by_type(int, int, struct ssh *);
  int	 get_hostkey_index(struct sshkey *, int, struct ssh *);
  int	 sshd_hostkey_sign(struct ssh *, struct sshkey *, struct sshkey *,
      u_char **, size_t *, const u_char *, size_t, const char *);
@@ -808,7 +808,7 @@ index 815f821f9..b72b76163 100644
  
  /* Key / cert options linkage to auth layer */
  int	 auth_activate_options(struct ssh *, struct sshauthopt *);
-@@ -238,6 +240,8 @@ int	 auth_check_authkey_line(struct passwd *, struct sshkey *,
+@@ -239,6 +241,8 @@ int	 auth_check_authkey_line(struct passwd *, struct sshkey *,
      char *, const char *, const char *, const char *, struct sshauthopt **);
  int	 auth_check_authkeys_file(struct passwd *, FILE *, char *,
      struct sshkey *, const char *, const char *, struct sshauthopt **);
@@ -886,10 +886,10 @@ index 319e42b2b..973810dc9 100644
  match_principals_file(struct passwd *pw, char *file,
      struct sshkey_cert *cert, struct sshauthopt **authoptsp)
 diff --git a/auth2.c b/auth2.c
-index 3c3bdb776..790bb3454 100644
+index f0f39707f..71460d78f 100644
 --- a/auth2.c
 +++ b/auth2.c
-@@ -315,9 +315,6 @@ input_userauth_request(int type, uint32_t seq, struct ssh *ssh)
+@@ -321,9 +321,6 @@ input_userauth_request(int type, uint32_t seq, struct ssh *ssh)
  			authctxt->valid = 0;
  			/* Invalid user, fake password information */
  			authctxt->pw = fakepw();
@@ -900,7 +900,7 @@ index 3c3bdb776..790bb3454 100644
  #ifdef USE_PAM
  		if (options.use_pam)
 diff --git a/cipher.c b/cipher.c
-index f770e666c..b05755d73 100644
+index 0697e559b..82076d4bd 100644
 --- a/cipher.c
 +++ b/cipher.c
 @@ -63,25 +63,6 @@ struct sshcipher_ctx {
@@ -929,7 +929,7 @@ index f770e666c..b05755d73 100644
  static const struct sshcipher ciphers[] = {
  #ifdef WITH_OPENSSL
  #ifndef OPENSSL_NO_DES
-@@ -410,7 +391,7 @@ cipher_get_length(struct sshcipher_ctx *cc, u_int *plenp, u_int seqnr,
+@@ -418,7 +399,7 @@ cipher_get_length(struct sshcipher_ctx *cc, u_int *plenp, u_int seqnr,
  void
  cipher_free(struct sshcipher_ctx *cc)
  {
@@ -939,7 +939,7 @@ index f770e666c..b05755d73 100644
  	if ((cc->cipher->flags & CFLAG_CHACHAPOLY) != 0) {
  		chachapoly_free(cc->cp_ctx);
 diff --git a/cipher.h b/cipher.h
-index 6533ff2bb..2e05a0210 100644
+index 32abdde22..e953dfc3c 100644
 --- a/cipher.h
 +++ b/cipher.h
 @@ -47,7 +47,25 @@
@@ -970,7 +970,7 @@ index 6533ff2bb..2e05a0210 100644
  
  const struct sshcipher *cipher_by_name(const char *);
 diff --git a/kex.c b/kex.c
-index 54e711810..70bebce6a 100644
+index 5b6066169..3fbf1dd43 100644
 --- a/kex.c
 +++ b/kex.c
 @@ -64,6 +64,7 @@
@@ -981,7 +981,7 @@ index 54e711810..70bebce6a 100644
  
  /* prototype */
  static int kex_choose_conf(struct ssh *, uint32_t seq);
-@@ -826,12 +827,16 @@ kex_start_rekex(struct ssh *ssh)
+@@ -831,12 +832,16 @@ kex_start_rekex(struct ssh *ssh)
  }
  
  static int
@@ -1000,7 +1000,7 @@ index 54e711810..70bebce6a 100644
  	if ((enc->cipher = cipher_by_name(name)) == NULL) {
  		error_f("unsupported cipher %s", name);
  		free(name);
-@@ -852,8 +857,12 @@ choose_mac(struct ssh *ssh, struct sshmac *mac, char *client, char *server)
+@@ -857,8 +862,12 @@ choose_mac(struct ssh *ssh, struct sshmac *mac, char *client, char *server)
  {
  	char *name = match_list(client, server, NULL);
  
@@ -1014,7 +1014,7 @@ index 54e711810..70bebce6a 100644
  	if (mac_setup(mac, name) < 0) {
  		error_f("unsupported MAC %s", name);
  		free(name);
-@@ -866,12 +875,16 @@ choose_mac(struct ssh *ssh, struct sshmac *mac, char *client, char *server)
+@@ -871,12 +880,16 @@ choose_mac(struct ssh *ssh, struct sshmac *mac, char *client, char *server)
  }
  
  static int
@@ -1033,7 +1033,7 @@ index 54e711810..70bebce6a 100644
  #ifdef WITH_ZLIB
  	if (strcmp(name, "zlib@openssh.com") == 0) {
  		comp->type = COMP_DELAYED;
-@@ -1035,7 +1048,7 @@ kex_choose_conf(struct ssh *ssh, uint32_t seq)
+@@ -1040,7 +1053,7 @@ kex_choose_conf(struct ssh *ssh, uint32_t seq)
  		nenc  = ctos ? PROPOSAL_ENC_ALGS_CTOS  : PROPOSAL_ENC_ALGS_STOC;
  		nmac  = ctos ? PROPOSAL_MAC_ALGS_CTOS  : PROPOSAL_MAC_ALGS_STOC;
  		ncomp = ctos ? PROPOSAL_COMP_ALGS_CTOS : PROPOSAL_COMP_ALGS_STOC;
@@ -1042,7 +1042,7 @@ index 54e711810..70bebce6a 100644
  		    sprop[nenc])) != 0) {
  			kex->failed_choice = peer[nenc];
  			peer[nenc] = NULL;
-@@ -1050,7 +1063,7 @@ kex_choose_conf(struct ssh *ssh, uint32_t seq)
+@@ -1055,7 +1068,7 @@ kex_choose_conf(struct ssh *ssh, uint32_t seq)
  			peer[nmac] = NULL;
  			goto out;
  		}
@@ -1051,7 +1051,7 @@ index 54e711810..70bebce6a 100644
  		    sprop[ncomp])) != 0) {
  			kex->failed_choice = peer[ncomp];
  			peer[ncomp] = NULL;
-@@ -1073,6 +1086,10 @@ kex_choose_conf(struct ssh *ssh, uint32_t seq)
+@@ -1078,6 +1091,10 @@ kex_choose_conf(struct ssh *ssh, uint32_t seq)
  		dh_need = MAXIMUM(dh_need, newkeys->enc.block_size);
  		dh_need = MAXIMUM(dh_need, newkeys->enc.iv_len);
  		dh_need = MAXIMUM(dh_need, newkeys->mac.key_len);
@@ -1062,7 +1062,7 @@ index 54e711810..70bebce6a 100644
  	}
  	/* XXX need runden? */
  	kex->we_need = need;
-@@ -1342,6 +1359,36 @@ dump_digest(const char *msg, const u_char *digest, int len)
+@@ -1347,6 +1364,36 @@ dump_digest(const char *msg, const u_char *digest, int len)
  }
  #endif
  
@@ -1100,10 +1100,10 @@ index 54e711810..70bebce6a 100644
   * Send a plaintext error message to the peer, suffixed by \r\n.
   * Only used during banner exchange, and there only for the server.
 diff --git a/kex.h b/kex.h
-index 2c86b25f9..0a0cb1562 100644
+index d229df7e6..692e28363 100644
 --- a/kex.h
 +++ b/kex.h
-@@ -261,6 +261,8 @@ int	 kexgss_client(struct ssh *);
+@@ -262,6 +262,8 @@ int	 kexgss_client(struct ssh *);
  int	 kexgss_server(struct ssh *);
  #endif
  
@@ -1113,7 +1113,7 @@ index 2c86b25f9..0a0cb1562 100644
  int	 kex_dh_enc(struct kex *, const struct sshbuf *, struct sshbuf **,
      struct sshbuf **);
 diff --git a/mac.c b/mac.c
-index 17607830c..2913b8a8c 100644
+index 30496b402..d47df0cdf 100644
 --- a/mac.c
 +++ b/mac.c
 @@ -230,6 +230,20 @@ mac_clear(struct sshmac *mac)
@@ -1149,7 +1149,7 @@ index 04089f41b..6b5ebc44b 100644
  
  #endif /* SSHMAC_H */
 diff --git a/monitor.c b/monitor.c
-index 5255083ab..305883278 100644
+index 7e1c9061c..7dfc7976b 100644
 --- a/monitor.c
 +++ b/monitor.c
 @@ -83,6 +83,7 @@
@@ -1204,7 +1204,7 @@ index 5255083ab..305883278 100644
  #endif
      {0, 0, NULL}
  };
-@@ -1603,8 +1620,10 @@ mm_answer_keyverify(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -1577,8 +1594,10 @@ mm_answer_keyverify(struct ssh *ssh, int sock, struct sshbuf *m)
  	int r, ret, req_presence = 0, req_verify = 0, valid_data = 0;
  	int encoded_ret;
  	struct sshkey_sig_details *sig_details = NULL;
@@ -1216,7 +1216,7 @@ index 5255083ab..305883278 100644
  	    (r = sshbuf_get_string_direct(m, &signature, &signaturelen)) != 0 ||
  	    (r = sshbuf_get_string_direct(m, &data, &datalen)) != 0 ||
  	    (r = sshbuf_get_cstring(m, &sigalg, NULL)) != 0)
-@@ -1613,6 +1632,8 @@ mm_answer_keyverify(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -1587,6 +1606,8 @@ mm_answer_keyverify(struct ssh *ssh, int sock, struct sshbuf *m)
  	if (hostbased_cuser == NULL || hostbased_chost == NULL ||
  	  !monitor_allowed_key(blob, bloblen))
  		fatal_f("bad key, not previously allowed");
@@ -1225,7 +1225,7 @@ index 5255083ab..305883278 100644
  
  	/* Empty signature algorithm means NULL. */
  	if (*sigalg == '\0') {
-@@ -1628,14 +1649,19 @@ mm_answer_keyverify(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -1602,14 +1623,19 @@ mm_answer_keyverify(struct ssh *ssh, int sock, struct sshbuf *m)
  	case MM_USERKEY:
  		valid_data = monitor_valid_userblob(ssh, data, datalen);
  		auth_method = "publickey";
@@ -1245,7 +1245,7 @@ index 5255083ab..305883278 100644
  		break;
  	}
  	if (!valid_data)
-@@ -1647,8 +1673,6 @@ mm_answer_keyverify(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -1621,8 +1647,6 @@ mm_answer_keyverify(struct ssh *ssh, int sock, struct sshbuf *m)
  	    SSH_FP_DEFAULT)) == NULL)
  		fatal_f("sshkey_fingerprint failed");
  
@@ -1254,7 +1254,7 @@ index 5255083ab..305883278 100644
  	debug3_f("%s %s signature using %s %s%s%s", auth_method,
  	    sshkey_type(key), sigalg == NULL ? "default" : sigalg,
  	    (ret == 0) ? "verified" : "unverified",
-@@ -1736,13 +1760,19 @@ mm_record_login(struct ssh *ssh, Session *s, struct passwd *pw)
+@@ -1710,13 +1734,19 @@ mm_record_login(struct ssh *ssh, Session *s, struct passwd *pw)
  }
  
  static void
@@ -1275,7 +1275,7 @@ index 5255083ab..305883278 100644
  	session_unused(s->self);
  }
  
-@@ -1809,7 +1839,7 @@ mm_answer_pty(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -1783,7 +1813,7 @@ mm_answer_pty(struct ssh *ssh, int sock, struct sshbuf *m)
  
   error:
  	if (s != NULL)
@@ -1284,7 +1284,7 @@ index 5255083ab..305883278 100644
  	if ((r = sshbuf_put_u32(m, 0)) != 0)
  		fatal_fr(r, "assemble 0");
  	mm_request_send(sock, MONITOR_ANS_PTY, m);
-@@ -1828,7 +1858,7 @@ mm_answer_pty_cleanup(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -1802,7 +1832,7 @@ mm_answer_pty_cleanup(struct ssh *ssh, int sock, struct sshbuf *m)
  	if ((r = sshbuf_get_cstring(m, &tty, NULL)) != 0)
  		fatal_fr(r, "parse tty");
  	if ((s = session_by_tty(tty)) != NULL)
@@ -1293,7 +1293,7 @@ index 5255083ab..305883278 100644
  	sshbuf_reset(m);
  	free(tty);
  	return (0);
-@@ -1850,6 +1880,8 @@ mm_answer_term(struct ssh *ssh, int sock, struct sshbuf *req)
+@@ -1824,6 +1854,8 @@ mm_answer_term(struct ssh *ssh, int sock, struct sshbuf *req)
  		sshpam_cleanup();
  #endif
  
@@ -1302,7 +1302,7 @@ index 5255083ab..305883278 100644
  	while (waitpid(pmonitor->m_pid, &status, 0) == -1)
  		if (errno != EINTR)
  			exit(1);
-@@ -1896,12 +1928,46 @@ mm_answer_audit_command(struct ssh *ssh, int socket, struct sshbuf *m)
+@@ -1870,12 +1902,46 @@ mm_answer_audit_command(struct ssh *ssh, int socket, struct sshbuf *m)
  {
  	char *cmd;
  	int r;
@@ -1350,7 +1350,7 @@ index 5255083ab..305883278 100644
  	free(cmd);
  	return (0);
  }
-@@ -1974,6 +2040,7 @@ monitor_apply_keystate(struct ssh *ssh, struct monitor *pmonitor)
+@@ -1948,6 +2014,7 @@ monitor_apply_keystate(struct ssh *ssh, struct monitor *pmonitor)
  void
  mm_get_keystate(struct ssh *ssh, struct monitor *pmonitor)
  {
@@ -1358,7 +1358,7 @@ index 5255083ab..305883278 100644
  	debug3_f("Waiting for new keys");
  
  	if ((child_state = sshbuf_new()) == NULL)
-@@ -1981,6 +2048,19 @@ mm_get_keystate(struct ssh *ssh, struct monitor *pmonitor)
+@@ -1955,6 +2022,19 @@ mm_get_keystate(struct ssh *ssh, struct monitor *pmonitor)
  	mm_request_receive_expect(pmonitor->m_sendfd, MONITOR_REQ_KEYEXPORT,
  	    child_state);
  	debug3_f("GOT new keys");
@@ -1378,7 +1378,7 @@ index 5255083ab..305883278 100644
  }
  
  
-@@ -2275,3 +2355,102 @@ mm_answer_gss_updatecreds(struct ssh *ssh, int socket, struct sshbuf *m) {
+@@ -2249,3 +2329,102 @@ mm_answer_gss_updatecreds(struct ssh *ssh, int socket, struct sshbuf *m) {
  
  #endif /* GSSAPI */
  
@@ -1501,10 +1501,10 @@ index f4721c472..087addff5 100644
  	MONITOR_REQ_GSSSIGN = 150, MONITOR_ANS_GSSSIGN = 151,
  	MONITOR_REQ_GSSUPCREDS = 152, MONITOR_ANS_GSSUPCREDS = 153,
 diff --git a/monitor_wrap.c b/monitor_wrap.c
-index 496de436e..ef419b743 100644
+index 2d905c16a..7ccf8729c 100644
 --- a/monitor_wrap.c
 +++ b/monitor_wrap.c
-@@ -598,7 +598,7 @@ mm_key_allowed(enum mm_keytype type, const char *user, const char *host,
+@@ -563,7 +563,7 @@ mm_key_allowed(enum mm_keytype type, const char *user, const char *host,
   */
  
  int
@@ -1513,7 +1513,7 @@ index 496de436e..ef419b743 100644
      const u_char *data, size_t datalen, const char *sigalg, u_int compat,
      struct sshkey_sig_details **sig_detailsp)
  {
-@@ -614,7 +614,8 @@ mm_sshkey_verify(const struct sshkey *key, const u_char *sig, size_t siglen,
+@@ -579,7 +579,8 @@ mm_sshkey_verify(const struct sshkey *key, const u_char *sig, size_t siglen,
  		*sig_detailsp = NULL;
  	if ((m = sshbuf_new()) == NULL)
  		fatal_f("sshbuf_new failed");
@@ -1523,7 +1523,7 @@ index 496de436e..ef419b743 100644
  	    (r = sshbuf_put_string(m, sig, siglen)) != 0 ||
  	    (r = sshbuf_put_string(m, data, datalen)) != 0 ||
  	    (r = sshbuf_put_cstring(m, sigalg == NULL ? "" : sigalg)) != 0)
-@@ -647,6 +648,22 @@ mm_sshkey_verify(const struct sshkey *key, const u_char *sig, size_t siglen,
+@@ -612,6 +613,22 @@ mm_sshkey_verify(const struct sshkey *key, const u_char *sig, size_t siglen,
  	return 0;
  }
  
@@ -1546,7 +1546,7 @@ index 496de436e..ef419b743 100644
  void
  mm_send_keystate(struct ssh *ssh, struct monitor *monitor)
  {
-@@ -1063,11 +1080,12 @@ mm_audit_event(struct ssh *ssh, ssh_audit_event_t event)
+@@ -1011,11 +1028,12 @@ mm_audit_event(struct ssh *ssh, ssh_audit_event_t event)
  	sshbuf_free(m);
  }
  
@@ -1561,7 +1561,7 @@ index 496de436e..ef419b743 100644
  
  	debug3_f("entering command %s", command);
  
-@@ -1077,6 +1095,30 @@ mm_audit_run_command(const char *command)
+@@ -1025,6 +1043,30 @@ mm_audit_run_command(const char *command)
  		fatal_fr(r, "buffer error");
  
  	mm_request_send(pmonitor->m_recvfd, MONITOR_REQ_AUDIT_COMMAND, m);
@@ -1592,7 +1592,7 @@ index 496de436e..ef419b743 100644
  	sshbuf_free(m);
  }
  #endif /* SSH_AUDIT_EVENTS */
-@@ -1325,3 +1367,83 @@ server_get_connection_info(struct ssh *ssh, int populate, int use_dns)
+@@ -1273,3 +1315,83 @@ server_get_connection_info(struct ssh *ssh, int populate, int use_dns)
  	return &ci;
  }
  
@@ -1677,7 +1677,7 @@ index 496de436e..ef419b743 100644
 +}
 +#endif /* SSH_AUDIT_EVENTS */
 diff --git a/monitor_wrap.h b/monitor_wrap.h
-index a708bf4d8..9856968f9 100644
+index 07b207d1d..7f846f085 100644
 --- a/monitor_wrap.h
 +++ b/monitor_wrap.h
 @@ -63,7 +63,9 @@ int mm_user_key_allowed(struct ssh *ssh, struct passwd *, struct sshkey *, int,
@@ -1706,7 +1706,7 @@ index a708bf4d8..9856968f9 100644
  
  struct Session;
 diff --git a/packet.c b/packet.c
-index 190a579d1..fa6f4c843 100644
+index 4c89e60c5..5cf682b0e 100644
 --- a/packet.c
 +++ b/packet.c
 @@ -77,6 +77,7 @@
@@ -1717,7 +1717,7 @@ index 190a579d1..fa6f4c843 100644
  #include "compat.h"
  #include "ssh2.h"
  #include "cipher.h"
-@@ -511,6 +512,13 @@ ssh_packet_get_connection_out(struct ssh *ssh)
+@@ -516,6 +517,13 @@ ssh_packet_get_connection_out(struct ssh *ssh)
  	return ssh->state->connection_out;
  }
  
@@ -1731,7 +1731,7 @@ index 190a579d1..fa6f4c843 100644
  /*
   * Returns the IP-address of the remote host as a string.  The returned
   * string must not be freed.
-@@ -681,22 +689,19 @@ ssh_packet_close_internal(struct ssh *ssh, int do_close)
+@@ -686,22 +694,19 @@ ssh_packet_close_internal(struct ssh *ssh, int do_close)
  	struct session_state *state = ssh->state;
  	u_int mode;
  	struct packet *p;
@@ -1759,7 +1759,7 @@ index 190a579d1..fa6f4c843 100644
  	while ((p = TAILQ_FIRST(&state->outgoing))) {
  		sshbuf_free(p->payload);
  		TAILQ_REMOVE(&state->outgoing, p, next);
-@@ -737,8 +742,18 @@ ssh_packet_close_internal(struct ssh *ssh, int do_close)
+@@ -742,8 +747,18 @@ ssh_packet_close_internal(struct ssh *ssh, int do_close)
  #endif	/* WITH_ZLIB */
  	cipher_free(state->send_context);
  	cipher_free(state->receive_context);
@@ -1778,7 +1778,7 @@ index 190a579d1..fa6f4c843 100644
  		free(ssh->local_ipaddr);
  		ssh->local_ipaddr = NULL;
  		free(ssh->remote_ipaddr);
-@@ -1004,6 +1019,7 @@ ssh_set_newkeys(struct ssh *ssh, int mode)
+@@ -1009,6 +1024,7 @@ ssh_set_newkeys(struct ssh *ssh, int mode)
  		    (unsigned long long)state->p_send.bytes,
  		    (unsigned long long)state->p_send.blocks);
  		kex_free_newkeys(state->newkeys[mode]);
@@ -1786,7 +1786,7 @@ index 190a579d1..fa6f4c843 100644
  		state->newkeys[mode] = NULL;
  	}
  	/* note that both bytes and the seqnr are not reset */
-@@ -2385,6 +2401,72 @@ ssh_packet_get_output(struct ssh *ssh)
+@@ -2397,6 +2413,72 @@ ssh_packet_get_output(struct ssh *ssh)
  	return (void *)ssh->state->output;
  }
  
@@ -1870,7 +1870,7 @@ index 3e8acb2cd..e9aefdaad 100644
 +void	 packet_destroy_all(struct ssh *, int, int);
  #endif				/* PACKET_H */
 diff --git a/session.c b/session.c
-index 0c26448d9..75ff1080e 100644
+index 572487b4a..d36c1b702 100644
 --- a/session.c
 +++ b/session.c
 @@ -139,6 +139,7 @@ static int session_pty_req(struct ssh *, Session *);
@@ -1930,7 +1930,7 @@ index 0c26448d9..75ff1080e 100644
  
  	/* Force a password change */
  	if (s->authctxt->force_pwchange) {
-@@ -1717,6 +1734,9 @@ session_unused(int id)
+@@ -1718,6 +1735,9 @@ session_unused(int id)
  	sessions[id].ttyfd = -1;
  	sessions[id].ptymaster = -1;
  	sessions[id].x11_chanids = NULL;
@@ -1940,7 +1940,7 @@ index 0c26448d9..75ff1080e 100644
  	sessions[id].next_unused = sessions_first_unused;
  	sessions_first_unused = id;
  }
-@@ -1795,6 +1815,19 @@ session_open(Authctxt *authctxt, int chanid)
+@@ -1796,6 +1816,19 @@ session_open(Authctxt *authctxt, int chanid)
  	return 1;
  }
  
@@ -1960,7 +1960,7 @@ index 0c26448d9..75ff1080e 100644
  Session *
  session_by_tty(char *tty)
  {
-@@ -2413,6 +2446,32 @@ session_exit_message(struct ssh *ssh, Session *s, int status)
+@@ -2417,6 +2450,32 @@ session_exit_message(struct ssh *ssh, Session *s, int status)
  		chan_write_failed(ssh, c);
  }
  
@@ -1993,7 +1993,7 @@ index 0c26448d9..75ff1080e 100644
  void
  session_close(struct ssh *ssh, Session *s)
  {
-@@ -2426,6 +2485,10 @@ session_close(struct ssh *ssh, Session *s)
+@@ -2430,6 +2489,10 @@ session_close(struct ssh *ssh, Session *s)
  
  	if (s->ttyfd != -1)
  		session_pty_cleanup(s);
@@ -2004,7 +2004,7 @@ index 0c26448d9..75ff1080e 100644
  	free(s->term);
  	free(s->display);
  	free(s->x11_chanids);
-@@ -2502,14 +2565,14 @@ session_close_by_channel(struct ssh *ssh, int id, int force, void *arg)
+@@ -2506,14 +2569,14 @@ session_close_by_channel(struct ssh *ssh, int id, int force, void *arg)
  }
  
  void
@@ -2021,7 +2021,7 @@ index 0c26448d9..75ff1080e 100644
  			else
  				session_close(ssh, s);
  		}
-@@ -2635,6 +2698,15 @@ do_authenticated2(struct ssh *ssh, Authctxt *authctxt)
+@@ -2639,6 +2702,15 @@ do_authenticated2(struct ssh *ssh, Authctxt *authctxt)
  	server_loop2(ssh, authctxt);
  }
  
@@ -2037,7 +2037,7 @@ index 0c26448d9..75ff1080e 100644
  void
  do_cleanup(struct ssh *ssh, Authctxt *authctxt)
  {
-@@ -2698,7 +2770,7 @@ do_cleanup(struct ssh *ssh, Authctxt *authctxt)
+@@ -2702,7 +2774,7 @@ do_cleanup(struct ssh *ssh, Authctxt *authctxt)
  	 * or if running in monitor.
  	 */
  	if (mm_is_monitor())
@@ -2078,7 +2078,7 @@ index 344a1ddf9..a41c6efcd 100644
  void	 session_close(struct ssh *, Session *);
  void	 do_setusercontext(struct passwd *);
 diff --git a/sshd-session.c b/sshd-session.c
-index 23b80eb01..d8972fbd5 100644
+index 6f07c843a..fa1192c09 100644
 --- a/sshd-session.c
 +++ b/sshd-session.c
 @@ -181,8 +181,8 @@ struct include_list includes = TAILQ_HEAD_INITIALIZER(includes);
@@ -2221,7 +2221,7 @@ index 23b80eb01..d8972fbd5 100644
  
  	reseed_prngs();
  
-@@ -1333,6 +1402,9 @@ main(int ac, char **av)
+@@ -1334,6 +1403,9 @@ main(int ac, char **av)
  	do_authenticated(ssh, authctxt);
  
  	/* The connection has been terminated. */
@@ -2231,7 +2231,7 @@ index 23b80eb01..d8972fbd5 100644
  	ssh_packet_get_bytes(ssh, &ibytes, &obytes);
  	verbose("Transferred: sent %llu, received %llu bytes",
  	    (unsigned long long)obytes, (unsigned long long)ibytes);
-@@ -1378,6 +1450,16 @@ sshd_hostkey_sign(struct ssh *ssh, struct sshkey *privkey,
+@@ -1379,6 +1451,16 @@ sshd_hostkey_sign(struct ssh *ssh, struct sshkey *privkey,
  void
  cleanup_exit(int i)
  {
@@ -2248,7 +2248,7 @@ index 23b80eb01..d8972fbd5 100644
  	if (the_active_state != NULL && the_authctxt != NULL) {
  		do_cleanup(the_active_state, the_authctxt);
  		if (privsep_is_preauth &&
-@@ -1392,7 +1474,9 @@ cleanup_exit(int i)
+@@ -1393,7 +1475,9 @@ cleanup_exit(int i)
  	}
  #ifdef SSH_AUDIT_EVENTS
  	/* done after do_cleanup so it can cancel the PAM auth 'thread' */
@@ -2260,7 +2260,7 @@ index 23b80eb01..d8972fbd5 100644
  #endif
  	/* Override default fatal exit value when auth was attempted */
 diff --git a/sshd.c b/sshd.c
-index 552435817..22ad4dff0 100644
+index f66e1f86f..6b9847f67 100644
 --- a/sshd.c
 +++ b/sshd.c
 @@ -206,6 +206,15 @@ close_listen_socks(void)
@@ -2288,5 +2288,5 @@ index 552435817..22ad4dff0 100644
  			if (options.pid_file != NULL)
  				unlink(options.pid_file);
 -- 
-2.53.0
+2.55.0
 

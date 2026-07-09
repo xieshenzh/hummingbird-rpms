@@ -1,15 +1,15 @@
-From 1d53d34290defbbb3b6daa967c74b8f00282dc7e Mon Sep 17 00:00:00 2001
+From e82d981cb2d297bfb2097ee4c54b4b79af80561d Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 43/54] openssh-9.9p1-openssl-mlkem
 
 ---
  kex-names.c         |  23 +++-
- kexmlkem768x25519.c | 291 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 313 insertions(+), 1 deletion(-)
+ kexmlkem768x25519.c | 292 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 314 insertions(+), 1 deletion(-)
 
 diff --git a/kex-names.c b/kex-names.c
-index c0761ae8f..882f2905b 100644
+index dcb6efc13..6cc8ab47c 100644
 --- a/kex-names.c
 +++ b/kex-names.c
 @@ -108,6 +108,19 @@ static const struct kexalg gss_kexalgs[] = {
@@ -58,13 +58,13 @@ index c0761ae8f..882f2905b 100644
  		if (strcmp(k->name, name) == 0)
  			return k;
 diff --git a/kexmlkem768x25519.c b/kexmlkem768x25519.c
-index 2585d1db3..ab6167221 100644
+index e2c2c0a86..36658120f 100644
 --- a/kexmlkem768x25519.c
 +++ b/kexmlkem768x25519.c
-@@ -44,10 +44,127 @@
+@@ -45,9 +45,127 @@
+ 
  #ifdef USE_MLKEM768X25519
  
- #include "libcrux_mlkem768_sha3.h"
 +#include <openssl/err.h>
 +#include <openssl/evp.h>
 +#include <stdio.h>
@@ -181,16 +181,16 @@ index 2585d1db3..ab6167221 100644
 +
 +    return r;
 +}
- 
++
  int
  kex_kem_mlkem768x25519_keypair(struct kex *kex)
  {
 +#if 0
  	struct sshbuf *buf = NULL;
- 	u_char rnd[LIBCRUX_ML_KEM_KEY_PAIR_PRNG_LEN], *cp = NULL;
+ 	u_char *cp = NULL;
  	size_t need;
-@@ -82,6 +199,36 @@ kex_kem_mlkem768x25519_keypair(struct kex *kex)
- 	explicit_bzero(rnd, sizeof(rnd));
+@@ -78,6 +196,36 @@ kex_kem_mlkem768x25519_keypair(struct kex *kex)
+  out:
  	sshbuf_free(buf);
  	return r;
 +#else
@@ -226,7 +226,7 @@ index 2585d1db3..ab6167221 100644
  }
  
  int
-@@ -89,6 +236,7 @@ kex_kem_mlkem768x25519_enc(struct kex *kex,
+@@ -85,6 +233,7 @@ kex_kem_mlkem768x25519_enc(struct kex *kex,
     const struct sshbuf *client_blob, struct sshbuf **server_blobp,
     struct sshbuf **shared_secretp)
  {
@@ -234,7 +234,7 @@ index 2585d1db3..ab6167221 100644
  	struct sshbuf *server_blob = NULL;
  	struct sshbuf *buf = NULL;
  	const u_char *client_pub;
-@@ -181,12 +329,97 @@ kex_kem_mlkem768x25519_enc(struct kex *kex,
+@@ -170,12 +319,97 @@ kex_kem_mlkem768x25519_enc(struct kex *kex,
  	sshbuf_free(server_blob);
  	sshbuf_free(buf);
  	return r;
@@ -277,13 +277,13 @@ index 2585d1db3..ab6167221 100644
 +		r = SSH_ERR_ALLOC_FAIL;
 +		goto out;
 +	}
-+	if (mlkem768_encap_secret(client_pub, enc.snd, enc.fst.value) != 0)
++	if (mlkem768_encap_secret(client_pub, enc.snd.data, enc.fst.data) != 0)
 +		goto out;
 +
 +	/* generate ECDH key pair, store server pubkey after ciphertext */
 +	kexc25519_keygen(server_key, server_pub);
-+	if ((r = sshbuf_put(buf, enc.snd, sizeof(enc.snd))) != 0 ||
-+	    (r = sshbuf_put(server_blob, enc.fst.value, sizeof(enc.fst.value))) != 0 ||
++	if ((r = sshbuf_put(buf, enc.snd.data, sizeof(enc.snd.data))) != 0 ||
++	    (r = sshbuf_put(server_blob, enc.fst.data, sizeof(enc.fst.data))) != 0 ||
 +	    (r = sshbuf_put(server_blob, server_pub, sizeof(server_pub))) != 0)
 +		goto out;
 +	/* append ECDH shared key */
@@ -295,8 +295,8 @@ index 2585d1db3..ab6167221 100644
 +#ifdef DEBUG_KEXECDH
 +	dump_digest("server public key 25519:", server_pub, CURVE25519_SIZE);
 +	dump_digest("server cipher text:",
-+	    enc.fst.value, sizeof(enc.fst.value));
-+	dump_digest("server kem key:", enc.snd, sizeof(enc.snd));
++	    enc.fst.data, sizeof(enc.fst.data));
++	dump_digest("server kem key:", enc.snd.data, sizeof(enc.snd.data));
 +	dump_digest("concatenation of KEM key and ECDH shared key:",
 +	    sshbuf_ptr(buf), sshbuf_len(buf));
 +#endif
@@ -330,10 +330,10 @@ index 2585d1db3..ab6167221 100644
  {
 +#if 0
  	struct sshbuf *buf = NULL;
- 	u_char mlkem_key[crypto_kem_mlkem768_BYTES];
+ 	u_char shared_secret[MLKEM768_BYTES];
  	const u_char *ciphertext, *server_pub;
-@@ -254,6 +487,64 @@ kex_kem_mlkem768x25519_dec(struct kex *kex,
- 	explicit_bzero(mlkem_key, sizeof(mlkem_key));
+@@ -236,6 +470,64 @@ kex_kem_mlkem768x25519_dec(struct kex *kex,
+ 	explicit_bzero(shared_secret, sizeof(shared_secret));
  	sshbuf_free(buf);
  	return r;
 +#else
@@ -398,5 +398,5 @@ index 2585d1db3..ab6167221 100644
  #else /* USE_MLKEM768X25519 */
  int
 -- 
-2.53.0
+2.55.0
 

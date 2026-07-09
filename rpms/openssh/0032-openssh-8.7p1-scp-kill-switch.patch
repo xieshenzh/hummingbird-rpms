@@ -1,4 +1,4 @@
-From 61acc5e94ea087db20504777e74bdb5591762056 Mon Sep 17 00:00:00 2001
+From 40e36d72995b4f013d65e4688bb6aa611e08b178 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 32/54] openssh-8.7p1-scp-kill-switch
@@ -11,12 +11,12 @@ Subject: [PATCH 32/54] openssh-8.7p1-scp-kill-switch
  3 files changed, 16 insertions(+)
 
 diff --git a/pathnames.h b/pathnames.h
-index ae01c69e2..80db76e00 100644
+index 2f0b9f4f6..ce5ddc14f 100644
 --- a/pathnames.h
 +++ b/pathnames.h
-@@ -40,6 +40,7 @@
- #define _PATH_HOST_RSA_KEY_FILE		SSHDIR "/ssh_host_rsa_key"
+@@ -41,6 +41,7 @@
  #define _PATH_HOST_ED25519_KEY_FILE	SSHDIR "/ssh_host_ed25519_key"
+ #define _PATH_HOST_MLDSA44_ED25519_KEY_FILE SSHDIR "/ssh_host_mldsa44_ed25519_key"
  #define _PATH_DH_MODULI			SSHDIR "/moduli"
 +#define _PATH_SCP_KILL_SWITCH		SSHDIR "/disable_scp"
  
@@ -41,7 +41,7 @@ index 7bce0fe6f..2bb838c7d 100644
  .Ex -std scp
  .Sh SEE ALSO
 diff --git a/scp.c b/scp.c
-index 5618e28e7..76dcb6040 100644
+index ac43ec5f4..5775be457 100644
 --- a/scp.c
 +++ b/scp.c
 @@ -628,6 +628,14 @@ main(int argc, char **argv)
@@ -60,5 +60,5 @@ index 5618e28e7..76dcb6040 100644
  		fatal("unknown user %u", (u_int) userid);
  
 -- 
-2.53.0
+2.55.0
 

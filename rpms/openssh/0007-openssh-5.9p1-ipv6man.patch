@@ -1,7 +1,7 @@
-From ba20c2380b3108b1f8e2c00689a8efc6623cd481 Mon Sep 17 00:00:00 2001
+From f0d07631a0b6312bf35aced2c9629b74d70d81e1 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
-Subject: [PATCH 06/54] openssh-5.9p1-ipv6man
+Subject: [PATCH 07/54] openssh-5.9p1-ipv6man
 
 #(drop?) https://bugzilla.mindrot.org/show_bug.cgi?id=1925
 ---
@@ -10,10 +10,10 @@ Subject: [PATCH 06/54] openssh-5.9p1-ipv6man
  2 files changed, 4 insertions(+)
 
 diff --git a/ssh.1 b/ssh.1
-index 82ae5480c..c2c8f50f1 100644
+index 22f385f06..28eaeac2f 100644
 --- a/ssh.1
 +++ b/ssh.1
-@@ -1669,6 +1669,8 @@ manual page for more information.
+@@ -1670,6 +1670,8 @@ manual page for more information.
  .Nm
  exits with the exit status of the remote command or with 255
  if an error occurred.
@@ -36,5 +36,5 @@ index 7fbca776a..0226a8303 100644
  .Xr scp 1 ,
  .Xr sftp 1 ,
 -- 
-2.53.0
+2.55.0
 

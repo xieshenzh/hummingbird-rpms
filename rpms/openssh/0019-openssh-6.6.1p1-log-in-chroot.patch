@@ -1,9 +1,8 @@
-From f187210c18f933a3b239c49bd09efeabba4e4712 Mon Sep 17 00:00:00 2001
+From 1befa886920ae129c1fdae4bd0dcfa960c6196c4 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 19/54] openssh-6.6.1p1-log-in-chroot
 
-# log via monitor in chroots without /dev/log (#2681)
 ---
  log.c              | 11 +++++++++--
  log.h              |  1 +
@@ -58,10 +57,10 @@ index 8e8dfc23f..70048a8af 100644
  int      log_change_level(LogLevel);
  int      log_is_on_stderr(void);
 diff --git a/monitor.c b/monitor.c
-index 025c6abbe..5255083ab 100644
+index cddbc0a22..7e1c9061c 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -2030,9 +2030,22 @@ monitor_init(void)
+@@ -2004,9 +2004,22 @@ monitor_init(void)
  }
  
  void
@@ -100,7 +99,7 @@ index 75a0d6181..f4721c472 100644
  struct Authctxt;
  void monitor_child_preauth(struct ssh *, struct monitor *);
 diff --git a/session.c b/session.c
-index 517cab6b6..0c26448d9 100644
+index c2cdd6c4f..572487b4a 100644
 --- a/session.c
 +++ b/session.c
 @@ -162,6 +162,7 @@ login_cap_t *lc;
@@ -154,12 +153,12 @@ index 517cab6b6..0c26448d9 100644
  	do_rc_files(ssh, s, shell);
  
  	/* restore SIGPIPE for child */
-@@ -1645,9 +1641,17 @@ do_child(struct ssh *ssh, Session *s, const char *command)
+@@ -1646,9 +1642,17 @@ do_child(struct ssh *ssh, Session *s, const char *command)
  #ifdef WITH_SELINUX
  		ssh_selinux_change_context("sftpd_t");
  #endif
--		exit(sftp_server_main(i, argv, s->pw));
-+		exit(sftp_server_main(i, argv, s->pw, have_dev_log));
+-		exit(sftp_server_main(sftp_argc, sftp_argv, s->pw));
++		exit(sftp_server_main(sftp_argc, sftp_argv, s->pw, have_dev_log));
  	}
  
 +	/*
@@ -185,10 +184,10 @@ index 2c70f89bc..bbb79f278 100644
 +	return (sftp_server_main(argc, argv, user_pw, 0));
  }
 diff --git a/sftp-server.c b/sftp-server.c
-index ebdb31d32..7a6e4fa88 100644
+index f87fc5825..eef9a96f8 100644
 --- a/sftp-server.c
 +++ b/sftp-server.c
-@@ -1893,7 +1893,7 @@ sftp_server_usage(void)
+@@ -1918,7 +1918,7 @@ sftp_server_usage(void)
  }
  
  int
@@ -197,7 +196,7 @@ index ebdb31d32..7a6e4fa88 100644
  {
  	int i, r, in, out, ch, skipargs = 0, log_stderr = 0;
  	ssize_t len, olen;
-@@ -1905,7 +1905,7 @@ sftp_server_main(int argc, char **argv, struct passwd *user_pw)
+@@ -1930,7 +1930,7 @@ sftp_server_main(int argc, char **argv, struct passwd *user_pw)
  	extern char *__progname;
  
  	__progname = ssh_get_progname(argv[0]);
@@ -206,7 +205,7 @@ index ebdb31d32..7a6e4fa88 100644
  
  	pw = pwcopy(user_pw);
  
-@@ -1978,7 +1978,7 @@ sftp_server_main(int argc, char **argv, struct passwd *user_pw)
+@@ -2003,7 +2003,7 @@ sftp_server_main(int argc, char **argv, struct passwd *user_pw)
  		}
  	}
  
@@ -227,7 +226,7 @@ index 2bde8bb7f..ddf1a3968 100644
 +int	sftp_server_main(int, char **, struct passwd *, int);
  void	sftp_server_cleanup_exit(int) __attribute__((noreturn));
 diff --git a/sshd-session.c b/sshd-session.c
-index 9d75a4555..23b80eb01 100644
+index 3d2672cfd..6f07c843a 100644
 --- a/sshd-session.c
 +++ b/sshd-session.c
 @@ -387,7 +387,7 @@ privsep_postauth(struct ssh *ssh, Authctxt *authctxt)
@@ -252,5 +251,5 @@ index 9d75a4555..23b80eb01 100644
  	/* Demote the private keys to public keys. */
  	demote_sensitive_data();
 -- 
-2.53.0
+2.55.0
 
