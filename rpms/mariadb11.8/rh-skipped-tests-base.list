@@ -112,3 +112,11 @@ mysql_sha2.tcp_nossl                        :
 # Fails since 11.8.6
 main.chained_ssl_certificates               :
 plugins.mdev38431                           :
+
+# OpenSSL 4.0 compatibility (Fedora >= 45)
+#   AES_ENCRYPT() with cipher-name and non-ECB block_encryption_mode returns NULL 
+#   KDF() output used with AES_ENCRYPT() returns NULL
+# Underlying functionality is broken, not just test expectations
+# Reported upstream as: https://jira.mariadb.org/browse/MDEV-40287
+main.func_str                               :
+main.func_kdf                               :
