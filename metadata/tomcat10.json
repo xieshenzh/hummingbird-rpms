@@ -4,9 +4,9 @@
   "modification_reason": "Local changes in commit 2273cfe5; remove runtime dependency on systemd",
   "modification_status": "modified",
   "release": "1",
-  "sha": "f122281172acc51bdfdbe02390da871eb6b82417",
+  "sha": "e911d524145cd3a9d64c85a88c383899543e3dd3",
   "source": "https://src.fedoraproject.org/rpms/tomcat.git",
   "upstream_branch": "10.1.x",
   "upstream_repo": "https://github.com/apache/tomcat",
-  "version": "10.1.56"
+  "version": "10.1.57"
 }
