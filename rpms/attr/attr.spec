@@ -1,12 +1,19 @@
 Summary: Utilities for managing filesystem extended attributes
 Name: attr
 Version: 2.6.0
-Release: 9.1%{?dist}
-Source0: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.gz
-Source1: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.gz.sig
-# attr 2.6.0 tarball is signed by Andreas Gruenbacher (user_id=15000)
-# Retrieved from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
+Release: 1%{?dist}
+Source0: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.xz
+Source1: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.xz.sig
+# Retreived from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
 Source2: agruen-key.gpg
+# Retrieved from https://savannah.nongnu.org/people/viewgpg.php?user_id=42032
+# Source2: vapier-key.gpg
+
+# xattr.conf: remove entries for NFSv4 ACLs namespaces (#1031423)
+# https://lists.nongnu.org/archive/html/acl-devel/2019-03/msg00000.html
+# https://lists.nongnu.org/archive/html/acl-devel/2019-03/msg00001.html
+# https://lists.nongnu.org/archive/html/acl-devel/2019-05/msg00000.html
+Patch3:  0003-attr-2.4.48-xattr-conf-nfs4-acls.patch
 
 License: GPL-2.0-or-later
 URL: https://savannah.nongnu.org/projects/attr
@@ -89,9 +96,6 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/libattr.{l,}a
 # drop already installed documentation, we will use an RPM macro to install it
 rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}*
 
-# temporarily provide attr/xattr.h symlink until users are migrated (#1601482)
-ln -fs ../sys/xattr.h $RPM_BUILD_ROOT%{_includedir}/attr/xattr.h
-
 %find_lang %{name}
 
 %ldconfig_scriptlets -n libattr
@@ -117,6 +121,11 @@ ln -fs ../sys/xattr.h $RPM_BUILD_ROOT%{_includedir}/attr/xattr.h
 %config(noreplace) %{_sysconfdir}/xattr.conf
 
 %changelog
+* Thu Jul 09 2026 Lukáš Zaoral <lzaoral@redhat.com> - 2.6.0-1
+- rebase to the latest upstream release (rhbz#2494157)
+  - CVE-2026-54371 - Symlink Traversal Privilege Escalation via getfattr (rhbz#2494172)
+- remove a long-overdue workaround for /usr/include/attr/xattr.h
+
 * Wed Jun 03 2026 Lukáš Zaoral <lzaoral@redhat.com> - 2.5.2-9
 - remove redundant build require
 

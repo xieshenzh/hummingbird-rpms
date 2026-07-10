@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "modified",
   "modification_reason": "Updated to 2.6.0 for CVE-2026-54371",
-  "release": "9.1",
-  "sha": "82d58a30722299b37a92a0c3ee10fd53c4ff6ae9",
+  "release": "1",
+  "sha": "12723c8fef87f774e28311d45bfeea6b9388de75",
   "source": "https://src.fedoraproject.org/rpms/attr.git",
   "upstream_repo": "https://git.savannah.nongnu.org/git/attr.git",
   "version": "2.6.0"
