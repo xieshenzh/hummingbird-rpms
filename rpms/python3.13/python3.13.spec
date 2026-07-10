@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1.2%{?dist}
+Release: 1.3%{?dist}
 License: Python-2.0.1
 
 
@@ -413,6 +413,13 @@ Patch477: 00477-raise-an-error-when-importing-stdlib-modules-compiled-for-a-diff
 # the module did not properly handle EOF, meaning an archive could be parsed
 # in an infinite loop.
 Patch478: 00478-cve-2026-11972.patch
+
+# 00479 # 7933f4bf7131aa4140750f9404f5de0aa2969ced
+# CVE-2026-15308
+#
+# html.parser.HTMLParser: prevent quadratic behavior when repeatedly feeding
+# unterminated markup declarations.
+Patch479: 00479-cve-2026-15308.patch
 
 
 # (New patches go here ^^^)
