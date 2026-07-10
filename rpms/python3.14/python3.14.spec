@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1.3%{?dist}
+Release: 1.4%{?dist}
 License: Python-2.0.1
 
 
@@ -444,6 +444,12 @@ Patch488: 00488-cve-2026-11972.patch
 # markup declarations
 # Upstream fix: https://github.com/python/cpython/commit/07efb08123ba9367a7107325adb9d5626dca1ca9
 Patch489: 00489-cve-2026-15308.patch
+
+# 00490 # 79c06bd5c6afa3c440d50faf7ee1b147c8832b4c
+# CVE-2026-11940
+#
+# gh-151558: Fix symlink escape via tarfile hardlink-extraction fallback
+Patch490: 00490-cve-2026-11940.patch
 
 # (New patches go here ^^^)
 #
