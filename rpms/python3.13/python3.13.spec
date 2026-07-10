@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1.3%{?dist}
+Release: 1.4%{?dist}
 License: Python-2.0.1
 
 
@@ -421,6 +421,11 @@ Patch478: 00478-cve-2026-11972.patch
 # unterminated markup declarations.
 Patch479: 00479-cve-2026-15308.patch
 
+# 00480 # 771d12dda5140313db0ac550292987975651bbde
+# CVE-2026-11940
+#
+# gh-151558: Fix symlink escape via tarfile hardlink-extraction fallback
+Patch480: 00480-cve-2026-11940.patch
 
 # (New patches go here ^^^)
 #
