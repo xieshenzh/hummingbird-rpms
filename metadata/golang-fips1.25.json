@@ -1,6 +1,7 @@
 {
   "branch": "c10s",
   "cve_product": "Go ",
+  "fix_status": 0,
   "modification_reason": "Exclude go-toolset meta-package; backport CVE-2026-42501 fix",
   "modification_status": "modified",
   "release": "0.1",

@@ -1,5 +1,6 @@
 {
   "branch": "rawhide",
+  "fix_status": 0,
   "modification_reason": "disable some unit tests that don't work in Konflux",
   "modification_status": "modified",
   "release": "3",
