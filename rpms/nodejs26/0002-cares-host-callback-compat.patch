@@ -1,0 +1,57 @@
+From 9f08d9a4b3b0d93b9ea4fe8857e6f6d2428c1f11 Mon Sep 17 00:00:00 2001
+From: Prarit Bhargava <prarit@redhat.com>
+Date: Thu, 9 Jul 2026 19:31:00 -0400
+Subject: [PATCH] deps: make c-ares host callback signature compatible
+
+This build fix is independent of CVE-2026-59869. It was discovered while
+validating the CVE backport in Konflux builds.
+
+Some buildroots provide a c-ares header where ares_host_callback takes
+`const struct hostent*`, while others use `struct hostent*`. Provide both
+callback overloads and route both through a shared helper to keep
+compatibility.
+---
+ src/cares_wrap.h | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/src/cares_wrap.h b/src/cares_wrap.h
+index b3548e3b..6ebca9bb 100644
+--- a/src/cares_wrap.h
++++ b/src/cares_wrap.h
+@@ -348,11 +348,10 @@ class QueryWrap final : public AsyncWrap {
+     wrap->QueueResponseCallback(status);
+   }
+ 
+-  static void Callback(
++  static void HandleHostCallback(
+       void* arg,
+       int status,
+-      int timeouts,
+-      struct hostent* host) {
++      const struct hostent* host) {
+     QueryWrap<Traits>* wrap = FromCallbackPointer(arg);
+     if (wrap == nullptr) return;
+ 
+@@ -371,6 +370,22 @@ class QueryWrap final : public AsyncWrap {
+     wrap->QueueResponseCallback(status);
+   }
+ 
++  static void Callback(
++      void* arg,
++      int status,
++      int timeouts,
++      struct hostent* host) {
++    HandleHostCallback(arg, status, host);
++  }
++
++  static void Callback(
++      void* arg,
++      int status,
++      int timeouts,
++      const struct hostent* host) {
++    HandleHostCallback(arg, status, host);
++  }
++
+   void QueuePermissionModelResponseCallback(const char* resource) {
+     BaseObjectPtr<QueryWrap<Traits>> strong_ref{this};
+     const std::string res{resource};
