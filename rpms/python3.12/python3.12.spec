@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3.3%{?dist}
+Release: 3.4%{?dist}
 License: Python-2.0.1
 
 
@@ -519,6 +519,12 @@ Patch489: 00489-cve-2026-6019.patch
 #
 # gh-151981: Make tarfile._Stream.seek break at EOF
 Patch490: 00490-cve-2026-11972.patch
+
+# 00491 # bcf98ddbc40ec9b3ee87da0124a5660b19b7e606
+# CVE-2026-15308
+#
+# gh-153030: Fix quadratic complexity in incremental parsing in HTMLParser
+Patch491: 00491-cve-2026-15308.patch
 
 # (New patches go here ^^^)
 #
