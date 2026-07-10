@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "a347988357a1f8932306f41a8e42a64d5a028def",
+  "release": "4",
+  "sha": "73a5e5a8f038d9812daefaea6ddf0aa0bad9dc8b",
   "source": "https://src.fedoraproject.org/rpms/python-setuptools.git",
   "upstream_repo": "https://github.com/pypa/setuptools",
-  "version": "82.0.1"
+  "version": "83.0.0"
 }
