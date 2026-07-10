@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3.4%{?dist}
+Release: 3.5%{?dist}
 License: Python-2.0.1
 
 
@@ -525,6 +525,12 @@ Patch490: 00490-cve-2026-11972.patch
 #
 # gh-153030: Fix quadratic complexity in incremental parsing in HTMLParser
 Patch491: 00491-cve-2026-15308.patch
+
+# 00492 # d0ba16dce6df2f68e8968699d5c247eddeef9960
+# CVE-2026-11940
+#
+# gh-151558: Fix symlink escape via tarfile hardlink-extraction fallback
+Patch492: 00492-cve-2026-11940.patch
 
 # (New patches go here ^^^)
 #
