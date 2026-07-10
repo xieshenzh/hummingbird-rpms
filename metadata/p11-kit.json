@@ -3,8 +3,8 @@
   "modification_reason": "backport fix for CVE-2026-13757",
   "modification_status": "modified",
   "release": "1",
-  "sha": "266c61fa31abc2948be66f7b473be7b4966c1419",
+  "sha": "e4539bf601b745cced5d8ab467bc5943da320fd6",
   "source": "https://src.fedoraproject.org/rpms/p11-kit.git",
   "upstream_repo": "https://github.com/p11-glue/p11-kit",
-  "version": "0.26.2"
+  "version": "0.26.4"
 }
