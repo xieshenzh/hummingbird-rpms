@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1.2%{?dist}
+Release: 1.3%{?dist}
 License: Python-2.0.1
 
 
@@ -438,6 +438,12 @@ Patch487: 00487-cve-2026-8723.patch
 # tarfile: Denial of Service via improper EOF handling in streaming mode
 # Upstream fix: https://github.com/python/cpython/commit/e86666c9dd256d52d0fbef6feb1ea4a51768fdec
 Patch488: 00488-cve-2026-11972.patch
+
+# 00489 # CVE-2026-15308
+# Python: CPU Denial of Service in HTML parser via repeated unterminated
+# markup declarations
+# Upstream fix: https://github.com/python/cpython/commit/07efb08123ba9367a7107325adb9d5626dca1ca9
+Patch489: 00489-cve-2026-15308.patch
 
 # (New patches go here ^^^)
 #
