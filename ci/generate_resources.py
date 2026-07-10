@@ -134,7 +134,7 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
                 upstream_name = dname
             elif is_hummingbird:
                 # Hummingbird lookaside cache: Use directory name
-                # Examples: golang-fips1.25, nss-fips
+                # Examples: nss-fips
                 upstream_name = dname
             elif metadata and "source" in metadata:
                 # Fedora/CentOS packages: Extract from source URL to handle renamed packages
