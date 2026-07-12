@@ -1,0 +1,26 @@
+# Download source tarball and generate per-submodule Go vendor tarballs.
+# etcd is a multi-module repo: server, etcdctl, and etcdutl each have their
+# own go.mod and need separate vendor directories.
+download_sources: |
+  set -euo pipefail
+  version="${UPDATE_NEW_VERSION}"
+  cd "${UPDATE_PACKAGE_DIR}"
+
+  curl -fSL -o "etcd-${version}.tar.gz" \
+    "https://github.com/etcd-io/etcd/archive/v${version}/etcd-${version}.tar.gz" >&2
+
+  tar xf "etcd-${version}.tar.gz" >&2
+
+  for submod in server etcdctl etcdutl; do
+    go_vendor_archive create \
+      --config go-vendor-tools.toml \
+      -O "etcd-${submod}-${version}-vendor.tar.bz2" \
+      "etcd-${version}/${submod}" >&2
+  done
+
+  rm -rf "etcd-${version}"
+
+  echo "etcd-${version}.tar.gz"
+  echo "etcd-server-${version}-vendor.tar.bz2"
+  echo "etcd-etcdctl-${version}-vendor.tar.bz2"
+  echo "etcd-etcdutl-${version}-vendor.tar.bz2"
