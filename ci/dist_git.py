@@ -19,7 +19,9 @@ import subprocess
 import sys
 import tempfile
 import time
+import urllib.error
 import urllib.parse
+import urllib.request
 import xmlrpc.client
 import yaml
 from packaging.version import InvalidVersion, Version
@@ -34,6 +36,10 @@ RELEASES_JSON = ROOT_DIR / 'upstream-releases.json'
 PACKAGE_OVERRIDES_YAML = ROOT_DIR / 'ci' / 'package-overrides.yaml'
 RENAMED_PACKAGES_JSON = ROOT_DIR / 'ci' / 'renamed_packages.json'
 UPDATE_STATE_FILE = ROOT_DIR / '.dist_git_update_state.json'
+
+# release-monitoring.org (Anitya) API base URL and search URL
+ANITYA_API_BASE = "https://release-monitoring.org/api"
+ANITYA_SEARCH_URL = "https://release-monitoring.org/projects/?pattern={package}&distro=Fedora"
 
 # Match %autorelease in spec files (possibly with braces/options like -b, -e, etc.)
 # Can be anywhere, not just in the Release: line, as some packages like nodejs* use
@@ -113,6 +119,30 @@ def query_autorelease_from_mdapi(package_name: str, branch: str, fallback_releas
         return release
     else:
         logging.warning("No MDAPI build found for %s, keeping %%autorelease", package_name)
+        return None
+
+
+def lookup_anitya_project_id(package_name: str) -> int | None:
+    """Look up the Anitya (release-monitoring.org) project ID for a Fedora package.
+
+    Returns the integer project ID if found, or None if the package is not
+    listed under Fedora in Anitya or if the request fails.
+    """
+    url = f"{ANITYA_API_BASE}/project/Fedora/{package_name}"
+    req = urllib.request.Request(
+        url, headers={"User-Agent": "hummingbird-rpms/1.0"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read().decode("utf-8"))
+            return int(data["id"])
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return None
+        logging.warning("Anitya lookup for %s returned HTTP %d", package_name, e.code)
+        return None
+    except (urllib.error.URLError, OSError, KeyError, ValueError) as e:
+        logging.warning("Anitya lookup for %s failed: %s", package_name, e)
         return None
 
 
@@ -930,6 +960,22 @@ def import_(url: str, branch: str, ref: str | None = None, directory: str | None
         metadata['modification_status'] = 'native'
     else:
         metadata['modification_status'] = 'clean'
+
+    # Look up Anitya (release-monitoring.org) project ID for the package
+    logging.info("Looking up release-monitoring.org project ID for %s...", package_name)
+    anitya_id = lookup_anitya_project_id(package_name)
+    if anitya_id is not None:
+        metadata['release_monitoring_project_id'] = anitya_id
+        logging.info("Found release-monitoring.org project ID %d for %s", anitya_id, package_name)
+    else:
+        search_url = ANITYA_SEARCH_URL.format(package=package_name)
+        logging.warning(
+            "Could not find release-monitoring.org project ID for %s.\n"
+            "       To set it manually after finding the correct project:\n"
+            "         ./ci/dist_git.py set-upstream %s --project-id <ID>\n"
+            "       Search for the project at: %s",
+            package_name, dir_name, search_url,
+        )
 
     save_package_metadata(dir_name, metadata)
     # Update global imports dict

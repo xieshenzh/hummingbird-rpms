@@ -408,6 +408,34 @@ def test_import_autorelease(workdir: Path, upstream_repos: dict[str, Path], dist
     assert metadata['release'] == '5'
 
 
+def test_import_anitya_found(workdir: Path, upstream_repos: dict[str, Path], dist_git_module) -> None:
+    """Import stores release_monitoring_project_id when Anitya lookup succeeds."""
+    with patch.object(dist_git_module, 'lookup_anitya_project_id', return_value=12345):
+        run_dist_git(dist_git_module, workdir, 'import', f'file://{upstream_repos["vanilla"]}')
+
+    with open(workdir / 'metadata' / 'vanilla.json') as f:
+        metadata = json.load(f)
+    assert metadata['release_monitoring_project_id'] == 12345
+
+
+def test_import_anitya_not_found(workdir: Path, upstream_repos: dict[str, Path], dist_git_module,
+                                  caplog) -> None:
+    """Import warns with set-upstream instructions when Anitya lookup returns None."""
+    import logging
+    with patch.object(dist_git_module, 'lookup_anitya_project_id', return_value=None):
+        with caplog.at_level(logging.WARNING, logger='root'):
+            run_dist_git(dist_git_module, workdir, 'import', f'file://{upstream_repos["vanilla"]}')
+
+    with open(workdir / 'metadata' / 'vanilla.json') as f:
+        metadata = json.load(f)
+    assert 'release_monitoring_project_id' not in metadata
+
+    warning_text = ' '.join(caplog.messages)
+    assert 'set-upstream' in warning_text
+    assert '--project-id' in warning_text
+    assert 'release-monitoring.org' in warning_text
+
+
 def test_update(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     """update command"""
     # Case 1: Import vanilla (unmodified, current)
