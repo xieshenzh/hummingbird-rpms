@@ -19,8 +19,6 @@ Source2:        https://p11-glue.github.io/p11-glue/p11-kit/p11-kit-release-keyr
 Source3:        trust-extract-compat
 Source4:        p11-kit-client.service
 
-Patch0:         CVE-2026-13757-rpc-recursion-depth-limit.patch
-
 BuildRequires:  gcc
 BuildRequires:  libtasn1-devel >= 2.3
 BuildRequires:  libffi-devel
