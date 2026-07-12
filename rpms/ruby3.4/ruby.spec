@@ -300,14 +300,6 @@ Patch10: ruby-3.4.2-openssl-Fix-SHA-1-PSS-tests.patch
 # The test expects IO::TimeoutError but gets Errno::ENETUNREACH when network
 # is unreachable.
 Patch11: ruby-3.4.8-Skip-Socket-connect-timeout-test.patch
-# Backport net-imap 0.5.8 -> 0.5.14 security fixes:
-# CVE-2026-42246: Net::IMAP info disclosure via MitM bypassing TLS (Important)
-# CVE-2026-42245: Net::IMAP DoS via crafted IMAP responses (Moderate)
-# CVE-2026-42256: Net::IMAP DoS via large SCRAM iteration count (Moderate)
-Patch12: ruby-3.4.8-net-imap-0.5.14-security-fixes.patch
-# Backport net-imap 0.5.14 -> 0.5.15 security fixes:
-# CVE-2026-47242: Net::IMAP arbitrary command injection via CRLF (Important)
-Patch13: ruby-3.4.8-net-imap-0.5.15-security-fixes.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -650,9 +642,7 @@ Provides:   bundled(rubygem-getoptlong) = %{getoptlong_version}
 Provides:   bundled(rubygem-matrix) = %{matrix_version}
 Provides:   bundled(rubygem-mutex_m) = %{mutex_m_version}
 Provides:   bundled(rubygem-net-ftp) = %{net_ftp_version}
-# net-imap lib/ backported to 0.5.15 for CVE fixes; gem dir remains 0.5.8
 Provides:   bundled(rubygem-net-imap) = %{net_imap_version}
-Provides:   bundled(rubygem-net-imap) = 0.5.15
 Provides:   bundled(rubygem-net-pop) = %{net_pop_version}
 Provides:   bundled(rubygem-net-smtp) = %{net_smtp_version}
 Provides:   bundled(rubygem-nkf) = %{nkf_version}
@@ -831,8 +821,6 @@ analysis result in RBS format, a standard type description format for Ruby
 %patch 9 -p1
 %patch 10 -p1
 %patch 11 -p1
-%patch 12 -p1 -d .bundle/gems/net-imap-%{net_imap_version}
-%patch 13 -p1 -d .bundle/gems/net-imap-%{net_imap_version}
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
