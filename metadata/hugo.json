@@ -1,12 +1,12 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to 0.163.3 (ahead of Fedora); fixes CVE-2026-58402 and CVE-2026-58403",
+  "modification_reason": "Update to upstream version 0.164.0",
   "modification_status": "modified",
-  "release": "1",
+  "release": "0.1",
   "release_monitoring_project_id": 12959,
   "sha": "948282631868ca0a00f8a41baf4f01d99fb732bf",
   "source": "https://src.fedoraproject.org/rpms/hugo.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/gohugoio/hugo",
-  "version": "0.163.3"
+  "version": "0.164.0"
 }
