@@ -1,6 +1,6 @@
 # https://github.com/etcd-io/etcd
 %global goipath         github.com/etcd-io/etcd
-Version:                3.6.13
+Version:                3.7.0
 
 %gometa -L -f
 
@@ -38,7 +38,7 @@ pushd server > /dev/null
 popd > /dev/null
 
 %build
-%global gomodulesmode GO111MODULE=on
+%global gomodulesmode GO111MODULE=on GOWORK=off
 export GO_LDFLAGS="-X go.etcd.io/etcd/api/v3/version.GitSHA=%{version}"
 cd server
 %gobuild -o %{gobuilddir}/bin/etcd .
