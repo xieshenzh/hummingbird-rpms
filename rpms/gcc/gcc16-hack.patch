@@ -64,7 +64,7 @@
 +				infodir="$(infodir)" \
  				GOCFLAGS="$(GOCFLAGS) $${flags}" \
  				GDCFLAGS="$(GDCFLAGS) $${flags}" \
- 				CXXFLAGS="$(CXXFLAGS) $${flags}" \
+ 				A68FLAGS="$(A68FLAGS) $${flags}" \
 --- libcpp/macro.cc.jj	2019-01-09 13:01:21.420552123 +0100
 +++ libcpp/macro.cc	2024-11-30 13:16:41.163056391 +0100
 @@ -3680,8 +3680,6 @@ static cpp_macro *
