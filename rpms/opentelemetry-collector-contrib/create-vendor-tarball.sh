@@ -25,10 +25,36 @@ chmod +x ocb
 ocb_path="${PWD}/ocb"
 
 workdir=$(mktemp -d)
-trap "rm -rf '${workdir}' ocb" EXIT
+trap 'rm -rf "${workdir}" ocb' EXIT
 
-tar -xzf "${releases_tarball}" -C "${workdir}"
-srcdir="${workdir}/opentelemetry-collector-releases-${version}"
+# Extract one level deeper so that OCB's relative replace directives resolve
+# inside the workdir.  The otelcol-contrib manifest at
+# distributions/otelcol-contrib/manifest.yaml uses ../../../internal/ to
+# reach the repo root.  OCB copies this verbatim into _build/go.mod, so from
+# _build/ the path ../../../internal/ must land inside our tree.
+#
+# Layout:  workdir/nest/opentelemetry-collector-releases-<ver>/
+#   _build/ is at depth 3 below workdir, so ../../../ reaches workdir/ itself.
+mkdir -p "${workdir}/nest"
+tar -xzf "${releases_tarball}" -C "${workdir}/nest"
+srcdir="${workdir}/nest/opentelemetry-collector-releases-${version}"
+
+# otelcol-contrib 0.156.0+ includes OBI (eBPF instrumentation) which uses a
+# local replace directive pointing to internal/obi-src.  The upstream
+# prepare-obi.sh fetches the pre-generated source tarball into that path.
+if [[ -f "${srcdir}/scripts/prepare-obi.sh" ]]; then
+    echo "Preparing OBI source..." >&2
+    (cd "${srcdir}" && bash scripts/prepare-obi.sh otelcol-contrib) >&2
+fi
+
+# _build/ sits at srcdir/_build/ = workdir/nest/<repo>/_build/.  The replace
+# ../../../internal/ resolves to workdir/internal/.  Symlink the prepared OBI
+# source there so `go mod tidy` can find it.
+if [[ -d "${srcdir}/internal/obi-src" ]]; then
+    echo "Symlinking OBI source for _build/go.mod resolution..." >&2
+    mkdir -p "${workdir}/internal"
+    ln -sfn "${srcdir}/internal/obi-src" "${workdir}/internal/obi-src"
+fi
 
 echo "Running OCB with otelcol-contrib manifest..." >&2
 (cd "${srcdir}" && "${ocb_path}" --skip-compilation \
