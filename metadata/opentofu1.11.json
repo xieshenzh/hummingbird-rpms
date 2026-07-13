@@ -4,5 +4,5 @@
   "release_monitoring_project_id": 371292,
   "track_upstream": "1.11",
   "upstream_repo": "https://github.com/opentofu/opentofu",
-  "version": "1.11.11"
+  "version": "1.11.12"
 }
