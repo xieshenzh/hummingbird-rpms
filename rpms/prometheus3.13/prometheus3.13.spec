@@ -3,12 +3,12 @@
 # https://github.com/prometheus/prometheus
 %global goipath         github.com/prometheus/prometheus
 %global forgeurl        https://github.com/prometheus/prometheus
-Version:                3.13.0
+Version:                3.13.1
 
 %gometa -L -f
 
 Name:           prometheus3.13
-Release:        1%{?dist}
+Release:        0.1%{?dist}
 Summary:        Monitoring system and time series database
 License:        Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL:            %{gourl}

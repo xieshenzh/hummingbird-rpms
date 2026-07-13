@@ -1,0 +1,27 @@
+# Prometheus ships a go.work file that pulls in extra workspace modules
+# (compliance, internal/tools, etc.).  GOWORK=off ensures only the root
+# module's go.mod is used when generating the vendor archive.
+download_sources: |
+  set -euo pipefail
+  version="${UPDATE_NEW_VERSION}"
+  cd "${UPDATE_PACKAGE_DIR}"
+
+  archive="prometheus-${version}.tar.gz"
+  vendor="prometheus-${version}-vendor.tar.bz2"
+  webui="prometheus-web-ui-${version}.tar.gz"
+
+  curl -fSL -o "${archive}" \
+    "https://github.com/prometheus/prometheus/archive/v${version}/${archive}" >&2
+
+  curl -fSL -o "${webui}" \
+    "https://github.com/prometheus/prometheus/releases/download/v${version}/${webui}" >&2
+
+  export GOWORK=off
+  go_vendor_archive create \
+    -c go-vendor-tools.toml \
+    -O "${vendor}" \
+    "${UPDATE_SPEC_FILE}" >&2
+
+  echo "${archive}"
+  echo "${vendor}"
+  echo "${webui}"
