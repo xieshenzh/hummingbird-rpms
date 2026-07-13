@@ -221,6 +221,12 @@ nats-server2.12:
 nats-server2.14:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+prometheus3.13:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+prometheus3.5:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 oras:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

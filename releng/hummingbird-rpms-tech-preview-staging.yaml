@@ -780,6 +780,10 @@ spec:
           contentType: rpm
         - name: procps-ng-main
           contentType: rpm
+        - name: prometheus3-13-main
+          contentType: rpm
+        - name: prometheus3-5-main
+          contentType: rpm
         - name: protobuf-c-main
           contentType: rpm
         - name: psmisc-main

@@ -1,0 +1,5 @@
+---
+# Runtime checks shared by Prometheus LTS RPMs.  Version comes from TEST_RPM.
+prometheus-functionality:
+  command: |
+    bash "${CI_DIR}/../test/rpms/prometheus/functionality.sh"
