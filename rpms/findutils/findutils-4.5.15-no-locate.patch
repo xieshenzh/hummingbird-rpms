@@ -1,4 +1,4 @@
-From 3e5e311d23ac0a5bd5930ddb4094f7555b886329 Mon Sep 17 00:00:00 2001
+From a26d8c03efa9a2e6e372e3700e119030780b568f Mon Sep 17 00:00:00 2001
 From: Kamil Dudka <kdudka@redhat.com>
 Date: Sat, 19 Dec 2015 22:56:40 +0100
 Subject: [PATCH 1/2] Revert "Don't include dblocation.texi from original spot,
@@ -10,7 +10,7 @@ This reverts commit f59d88e456553dfe0b5185caf75e4041285fd595.
  1 file changed, 1 insertion(+), 6 deletions(-)
 
 diff --git a/doc/Makefile.am b/doc/Makefile.am
-index f6f7443..6fbf57b 100644
+index 0af544c..1193db6 100644
 --- a/doc/Makefile.am
 +++ b/doc/Makefile.am
 @@ -16,11 +16,9 @@ AM_CFLAGS = $(WARN_CFLAGS)
@@ -26,7 +26,7 @@ index f6f7443..6fbf57b 100644
  	find_mono.html findutils.texi_html_node.tar.gz \
  	find-info.tar.gz find.texi.tar.gz \
  	find.txt  tmp-doc-install find_mono.html.gz
-@@ -73,9 +71,6 @@ findutils.texi_html_node.tar.gz: find.html
+@@ -81,9 +79,6 @@ findutils.texi_html_node.tar.gz: find.html
  	tar zcf $@ find.html
  
  
@@ -37,10 +37,9 @@ index f6f7443..6fbf57b 100644
  	$(MKDIR_P) tmp-doc-install/info
  	$(MAKE) $(AM_MAKEFLAGS) \
 -- 
-2.5.0
+2.55.0
 
-
-From d5473caa86f689ebcadacc593f5a71781c99e829 Mon Sep 17 00:00:00 2001
+From 9dba711cc323233f7718e730c0875cf4d80ccaf1 Mon Sep 17 00:00:00 2001
 From: Kamil Dudka <kdudka@redhat.com>
 Date: Wed, 11 May 2011 16:46:13 +0200
 Subject: [PATCH 2/2] findutils-4.4.0-no-locate.patch
@@ -53,7 +52,7 @@ Subject: [PATCH 2/2] findutils-4.4.0-no-locate.patch
  4 files changed, 10 insertions(+), 20 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index af82d54..6ad453b 100644
+index 33806e1..f521f44 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -35,7 +35,7 @@ DISTCLEANFILES = tool-versions.txt
@@ -66,10 +65,10 @@ index af82d54..6ad453b 100644
  ALL_RECURSIVE_TARGETS =
  
 diff --git a/configure.ac b/configure.ac
-index ce0e768..521e665 100644
+index a14c238..f038899 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -309,8 +309,6 @@ find/testsuite/Makefile
+@@ -320,8 +320,6 @@ find/testsuite/Makefile
  gl/Makefile
  gl/lib/Makefile
  lib/Makefile
@@ -79,7 +78,7 @@ index ce0e768..521e665 100644
  po/Makefile.in
  po/Makefile
 diff --git a/doc/find.texi b/doc/find.texi
-index c2714dd..01367a4 100644
+index eaa3dc3..ca5e89e 100644
 --- a/doc/find.texi
 +++ b/doc/find.texi
 @@ -7,7 +7,6 @@
@@ -90,7 +89,7 @@ index c2714dd..01367a4 100644
  
  @iftex
  @finalout
-@@ -661,8 +660,7 @@ the databases are updated, and the directories for which they contain
+@@ -689,8 +688,7 @@ the databases are updated, and the directories for which they contain
  entries.
  
  Here is how to select which file name databases @code{locate}
@@ -100,7 +99,7 @@ index c2714dd..01367a4 100644
  
  @table @code
  @item --database=@var{path}
-@@ -3112,13 +3110,9 @@ thrashing the network.
+@@ -3234,13 +3232,9 @@ thrashing the network.
  directories are indexed by each database file.
  
  The default location for the locate database depends on how findutils
@@ -117,7 +116,7 @@ index c2714dd..01367a4 100644
  
  @node Database Formats
  @section Database Formats
-@@ -3627,8 +3621,7 @@ present.
+@@ -3764,8 +3758,7 @@ present.
  
  @item --database=@var{path}
  @itemx -d @var{path}
@@ -127,7 +126,7 @@ index c2714dd..01367a4 100644
  name databases in @var{path}, which is a colon-separated list of
  database file names.  You can also use the environment variable
  @env{LOCATE_PATH} to set the list of database files to search.  The
-@@ -3803,8 +3796,7 @@ The environment variable @env{PRUNEFS} also sets this value.  Default
+@@ -3940,8 +3933,7 @@ The environment variable @env{PRUNEFS} also sets this value.  Default
  is @file{nfs NFS proc}.
  
  @item --output=@var{dbfile}
@@ -137,7 +136,7 @@ index c2714dd..01367a4 100644
  
  @item --localuser=@var{user}
  The user to search the non-network directories as, using @code{su}.
-@@ -5828,7 +5820,7 @@ See the manual of the system call @code{dup2(2)}.
+@@ -5964,7 +5956,7 @@ See the manual of the system call @code{dup2(2)}.
  @section Error Messages From @code{locate}
  
  @table @samp
@@ -146,7 +145,7 @@ index c2714dd..01367a4 100644
  The @code{locate} program relies on a database which is periodically
  built by the @code{updatedb} program.  That hasn't happened in a long
  time.  To fix this problem, run @code{updatedb} manually.  This can
-@@ -5836,7 +5828,7 @@ often happen on systems that are generally not left on, so the
+@@ -5972,7 +5964,7 @@ often happen on systems that are generally not left on, so the
  periodic ``cron'' task which normally does this doesn't get a chance
  to run.
  
@@ -156,7 +155,7 @@ index c2714dd..01367a4 100644
  @code{locate} still produces this error, run @code{locate --version}
  and @code{updatedb --version}.  These should produce the same output.
 diff --git a/tests/local.mk b/tests/local.mk
-index 7e52a04..ae08a56 100644
+index bb575c1..078cb2e 100644
 --- a/tests/local.mk
 +++ b/tests/local.mk
 @@ -15,7 +15,7 @@
@@ -166,8 +165,8 @@ index 7e52a04..ae08a56 100644
 -built_programs = find xargs frcode locate updatedb
 +built_programs = find xargs
  
- # Indirections required so that we'll still be able to know the
- # complete list of our tests even if the user overrides TESTS
+ AM_CPPFLAGS = -I$(top_srcdir)/gl/lib
+ LDADD = $(top_builddir)/gl/lib/libgnulib.a
 -- 
-2.5.0
+2.55.0
 
