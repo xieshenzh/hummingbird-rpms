@@ -1,0 +1,12 @@
+{
+  "branch": "rawhide",
+  "modification_reason": "Rename package to helm4, install binary as helm, add Provides: helm",
+  "modification_status": "modified",
+  "release": "1",
+  "release_monitoring_project_id": 15046,
+  "sha": "a53b20b924c7a3361f827227cac644b63e783df2",
+  "source": "https://src.fedoraproject.org/rpms/helm.git",
+  "track_upstream": "4",
+  "upstream_repo": "https://github.com/helm/helm",
+  "version": "4.2.2"
+}

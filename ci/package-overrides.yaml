@@ -108,6 +108,12 @@ haproxy:
 hello:
   private_product: example
 
+helm3:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+helm4:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 httpd:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
