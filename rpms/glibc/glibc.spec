@@ -1403,9 +1403,11 @@ build()
 %ifarch x86_64
 # Build for the glibc32 package.
 # There is no libatomic.so.1, so for robustness ensure it is not used.
+# TEMPORARY: -fno-link-libatomic removed for bootstrap (requires GCC 16).
+# Restore once GCC 16 is published to Pulp.
 build build-%{target}-32 \
-  CC="gcc -m32 -fno-link-libatomic" \
-  CXX="g++ -m32 -fno-link-libatomic" \
+  CC="gcc -m32" \
+  CXX="g++ -m32" \
   CFLAGS="${glibc_flags_cflags/-m64/-m32}" \
   --host=i686-linux-gnu \
 %dnl There is no libgcc_s.so.1, but building support/ requires it.
