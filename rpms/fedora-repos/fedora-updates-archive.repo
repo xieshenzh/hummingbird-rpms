@@ -10,13 +10,13 @@
 # yum repositories, which means only packages that can't be found
 # elsewhere will be downloaded from here.
 [updates-archive]
-name=Fedora 43 - $basearch - Updates Archive
-baseurl=https://fedoraproject-updates-archive.fedoraproject.org/fedora/43/$basearch/
+name=Fedora 44 - $basearch - Updates Archive
+baseurl=https://fedoraproject-updates-archive.fedoraproject.org/fedora/44/$basearch/
 enabled=AUTO_VALUE
 metadata_expire=6h
 repo_gpgcheck=0
 type=rpm
 gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-$basearch
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-$basearch
 skip_if_unavailable=True
 cost=10000 # default is 1000
