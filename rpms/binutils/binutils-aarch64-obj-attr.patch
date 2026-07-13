@@ -1,0 +1,167 @@
+diff -rup binutils-with-gold-2.45.90/bfd/elf-attrs.c /work/sources/binutils/upstream/2.46/bfd/elf-attrs.c
+--- binutils-with-gold-2.45.90/bfd/elf-attrs.c	2026-01-25 09:30:41.000000000 +0000
++++ /work/sources/binutils/upstream/2.46/bfd/elf-attrs.c	2026-01-27 08:04:23.387789745 +0000
+@@ -3192,7 +3192,7 @@ _bfd_elf_obj_attr_v2_cmp (const obj_attr
+    This allows an early return if we find a higher numbered tag.  */
+ 
+ obj_attr_v2_t *
+-_bfd_obj_attr_v2_find_by_tag (const obj_attr_subsection_v2_t *subsec,
++bfd_obj_attr_v2_find_by_tag (const obj_attr_subsection_v2_t *subsec,
+ 			      obj_attr_tag_t tag,
+ 			      bool sorted)
+ {
+@@ -3218,6 +3218,14 @@ LINKED_LIST_MUTATIVE_OPS_DECL (obj_attr_
+ LINKED_LIST_MERGE_SORT_DECL (obj_attr_subsection_v2_t,
+ 			     obj_attr_v2_t, /* extern */)
+ 
++/* Public API wrapper for LINKED_LIST_APPEND (obj_attr_v2_t).  */
++
++void bfd_obj_attr_subsection_v2_append (obj_attr_subsection_v2_t *subsec,
++					obj_attr_v2_t *attr)
++{
++  LINKED_LIST_APPEND (obj_attr_v2_t) (subsec, attr);
++}
++
+ /* Create a new object attribute subsection with the following properties:
+    - NAME: the name of the subsection.  Note: this parameter never holds a
+      string literal, so the value has to be freeable.
+@@ -3364,6 +3372,24 @@ LINKED_LIST_MUTATIVE_OPS_DECL (obj_attr_
+ LINKED_LIST_MERGE_SORT_DECL (obj_attr_subsection_list_t,
+ 			     obj_attr_subsection_v2_t, /* extern */)
+ 
++/* Public API wrapper for LINKED_LIST_APPEND (obj_attr_subsection_v2_t).  */
++
++void
++bfd_obj_attr_subsection_v2_list_append (obj_attr_subsection_list_t *l,
++					obj_attr_subsection_v2_t *subsec)
++{
++  LINKED_LIST_APPEND (obj_attr_subsection_v2_t) (l, subsec);
++}
++
++/* Public API wrapper for LINKED_LIST_REMOVE (obj_attr_subsection_v2_t).  */
++
++obj_attr_subsection_v2_t *
++bfd_obj_attr_subsection_v2_list_remove (obj_attr_subsection_list_t *l,
++					obj_attr_subsection_v2_t *subsec)
++{
++  return LINKED_LIST_REMOVE (obj_attr_subsection_v2_t) (l, subsec);
++}
++
+ /* Serialize the object attributes in ABFD into the vendor section of
+    OUTPUT_BFD.  */
+ 
+diff -rup binutils-with-gold-2.45.90/bfd/elf-bfd.h /work/sources/binutils/upstream/2.46/bfd/elf-bfd.h
+--- binutils-with-gold-2.45.90/bfd/elf-bfd.h	2026-01-25 09:30:41.000000000 +0000
++++ /work/sources/binutils/upstream/2.46/bfd/elf-bfd.h	2026-01-27 08:04:23.387789745 +0000
+@@ -3216,15 +3216,17 @@ extern bool _bfd_elf_read_notes
+   (bfd *, file_ptr, bfd_size_type, size_t) ATTRIBUTE_HIDDEN;
+ 
+ extern obj_attr_v2_t *bfd_elf_obj_attr_v2_init (obj_attr_tag_t,
+-  union obj_attr_value_v2) ATTRIBUTE_HIDDEN;
++  union obj_attr_value_v2);
+ extern void _bfd_elf_obj_attr_v2_free (obj_attr_v2_t *, obj_attr_encoding_v2_t)
+   ATTRIBUTE_HIDDEN;
+ extern obj_attr_v2_t *_bfd_elf_obj_attr_v2_copy (const obj_attr_v2_t *,
+   obj_attr_encoding_v2_t) ATTRIBUTE_HIDDEN;
+ extern int _bfd_elf_obj_attr_v2_cmp (const obj_attr_v2_t *,
+   const obj_attr_v2_t *) ATTRIBUTE_HIDDEN;
+-extern obj_attr_v2_t * _bfd_obj_attr_v2_find_by_tag
+-  (const obj_attr_subsection_v2_t *, obj_attr_tag_t, bool) ATTRIBUTE_HIDDEN;
++extern obj_attr_v2_t *bfd_obj_attr_v2_find_by_tag
++  (const obj_attr_subsection_v2_t *, obj_attr_tag_t, bool);
++extern void bfd_obj_attr_subsection_v2_append
++  (obj_attr_subsection_v2_t *, obj_attr_v2_t *);
+ LINKED_LIST_MUTATIVE_OPS_PROTOTYPE (obj_attr_subsection_v2_t,
+ 				    obj_attr_v2_t, ATTRIBUTE_HIDDEN);
+ LINKED_LIST_MERGE_SORT_PROTOTYPE_ (obj_attr_v2_t, ATTRIBUTE_HIDDEN);
+@@ -3241,6 +3243,10 @@ extern obj_attr_subsection_v2_t *bfd_obj
+   (obj_attr_subsection_v2_t *, const char *, bool);
+ extern obj_attr_subsection_scope_v2_t bfd_elf_obj_attr_subsection_v2_scope
+   (const bfd *, const char *);
++extern void bfd_obj_attr_subsection_v2_list_append
++  (obj_attr_subsection_list_t *, obj_attr_subsection_v2_t *);
++extern obj_attr_subsection_v2_t *bfd_obj_attr_subsection_v2_list_remove
++  (obj_attr_subsection_list_t *, obj_attr_subsection_v2_t *);
+ LINKED_LIST_MUTATIVE_OPS_PROTOTYPE (obj_attr_subsection_list_t,
+ 				    obj_attr_subsection_v2_t,
+ 				    ATTRIBUTE_HIDDEN);
+diff -rup binutils-with-gold-2.45.90/bfd/elfnn-aarch64.c /work/sources/binutils/upstream/2.46/bfd/elfnn-aarch64.c
+--- binutils-with-gold-2.45.90/bfd/elfnn-aarch64.c	2026-01-25 09:30:41.000000000 +0000
++++ /work/sources/binutils/upstream/2.46/bfd/elfnn-aarch64.c	2026-01-27 08:04:23.388789835 +0000
+@@ -10632,7 +10632,7 @@ elfNN_aarch64_link_setup_object_attribut
+   if (aeabi_feature_and_bits_subsec != NULL)
+     {
+       const obj_attr_v2_t *attr_bti
+-	= _bfd_obj_attr_v2_find_by_tag (aeabi_feature_and_bits_subsec,
++	= bfd_obj_attr_v2_find_by_tag (aeabi_feature_and_bits_subsec,
+ 					Tag_Feature_BTI, true);
+       if (attr_bti && attr_bti->val.uint == 1)
+ 	tdata->sw_protections.plt_type |= PLT_BTI;
+diff -rup binutils-with-gold-2.45.90/bfd/elfxx-aarch64.c /work/sources/binutils/upstream/2.46/bfd/elfxx-aarch64.c
+--- binutils-with-gold-2.45.90/bfd/elfxx-aarch64.c	2026-01-25 09:30:41.000000000 +0000
++++ /work/sources/binutils/upstream/2.46/bfd/elfxx-aarch64.c	2026-01-27 08:04:23.388789835 +0000
+@@ -956,7 +956,7 @@ obj_attr_v2_record_tag_value (obj_attr_s
+ 			      bool value)
+ {
+   obj_attr_v2_t *attr;
+-  attr = _bfd_obj_attr_v2_find_by_tag (subsec, tag, false);
++  attr = bfd_obj_attr_v2_find_by_tag (subsec, tag, false);
+   if (attr != NULL)
+     {
+       if (attr->val.uint != value)
+@@ -1175,11 +1175,11 @@ aarch64_check_pauthabi_attributes (const
+   int version_id = 0;
+ 
+   const obj_attr_v2_t *attr
+-    = _bfd_obj_attr_v2_find_by_tag (subsec, Tag_PAuth_Platform, true);
++    = bfd_obj_attr_v2_find_by_tag (subsec, Tag_PAuth_Platform, true);
+   if (attr != NULL)
+     platform_id = attr->val.uint;
+ 
+-  attr = _bfd_obj_attr_v2_find_by_tag (subsec, Tag_PAuth_Schema, true);
++  attr = bfd_obj_attr_v2_find_by_tag (subsec, Tag_PAuth_Schema, true);
+   if (attr != NULL)
+     version_id = attr->val.uint;
+ 
+diff -rup binutils-with-gold-2.45.90/gas/config/obj-elf-attr.c /work/sources/binutils/upstream/2.46/gas/config/obj-elf-attr.c
+--- binutils-with-gold-2.45.90/gas/config/obj-elf-attr.c	2026-01-25 09:30:41.000000000 +0000
++++ /work/sources/binutils/upstream/2.46/gas/config/obj-elf-attr.c	2026-01-27 08:04:23.388789835 +0000
+@@ -1063,7 +1063,7 @@ obj_attr_v2_record (obj_attr_tag_t key,
+   /* Go over the list of already recorded attributes and check for
+      redefinitions (which are forbidden).  */
+   bool skip_recording = false;
+-  obj_attr_v2_t *recorded_attr = _bfd_obj_attr_v2_find_by_tag
++  obj_attr_v2_t *recorded_attr = bfd_obj_attr_v2_find_by_tag
+     (elf_obj_attr_subsections (stdoutput).last, obj_attr->tag, false);
+   if (recorded_attr != NULL)
+     {
+@@ -1084,7 +1084,7 @@ obj_attr_v2_record (obj_attr_tag_t key,
+       return;
+     }
+ 
+-  LINKED_LIST_APPEND (obj_attr_v2_t)
++  bfd_obj_attr_subsection_v2_append
+     (elf_obj_attr_subsections (stdoutput).last, obj_attr);
+ }
+ 
+@@ -1133,9 +1133,9 @@ obj_attr_v2_subsection_record (const cha
+ 	}
+ 
+       /* Move the existing subsection to the last position.  */
+-      LINKED_LIST_REMOVE (obj_attr_subsection_v2_t)
++      bfd_obj_attr_subsection_v2_list_remove
+ 	(&elf_obj_attr_subsections (stdoutput), already_recorded_subsec);
+-      LINKED_LIST_APPEND (obj_attr_subsection_v2_t)
++      bfd_obj_attr_subsection_v2_list_append
+ 	(&elf_obj_attr_subsections (stdoutput), already_recorded_subsec);
+       /* Note: 'name' was unused, and will be freed on exit.  */
+     }
+@@ -1158,7 +1158,7 @@ obj_attr_v2_subsection_record (const cha
+ 	= bfd_elf_obj_attr_subsection_v2_init (name, scope,
+ 					       comprehension_optional,
+ 					       encoding);
+-      LINKED_LIST_APPEND (obj_attr_subsection_v2_t)
++      bfd_obj_attr_subsection_v2_list_append
+ 	(&elf_obj_attr_subsections (stdoutput), new_subsection);
+       return;
+     }
