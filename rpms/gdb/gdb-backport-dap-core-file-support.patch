@@ -18,7 +18,7 @@ within GDB's DAP protocol implementation:
 
 The commit messages for each individual commit follow:
 
---- 0a481bb9a6d:
+~~~ 0a481bb9a6d:
 
 gdb/dap: add support for opening core files
 
@@ -67,7 +67,7 @@ fail, I think we're OK.
 
 Approved-By: Tom Tromey <tom@tromey.com>
 
----  4ecaac39c26:
+~~~  4ecaac39c26:
 
 gdb/python: new events.corefile_changed event
 
@@ -90,7 +90,7 @@ and a single exited event.
 
 Reviewed-By: Eli Zaretskii <eliz@gnu.org>
 
---- ecac42af735:
+~~~ ecac42af735:
 
 Always propagate exceptions in DAP
 
@@ -104,7 +104,7 @@ done at the point of call.
 
 Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=33346
 
---- fc8e5a565b3:
+~~~ fc8e5a565b3:
 
 gdb: make structured core file mappings processing global
 
@@ -138,7 +138,7 @@ Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=32844
 
 Approved-By: Tom Tromey <tom@tromey.com>
 
---- f69c1d03c4d:
+~~~ f69c1d03c4d:
 
 gdb/python: add Corefile.mapped_files method
 
@@ -171,7 +171,7 @@ Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=32844
 
 Approved-By: Tom Tromey <tom@tromey.com>
 
---- 7862554bcf4:
+~~~ 7862554bcf4:
 
 gdb/python: introduce gdb.Corefile API
 

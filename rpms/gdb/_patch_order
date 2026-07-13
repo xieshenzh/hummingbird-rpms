@@ -14,3 +14,5 @@ gdb-rhbz2366461-bad-solib-entry-addr.patch
 gdb-rhbz2467251-computed-location-synthetic-pointers.patch
 gdb-tcl9-utf8-encoding-fix.patch
 gdb-backport-dap-core-file-support.patch
+gdb-backport-libiberty-sync.patch
+gdb-backport-corefile-use-after-free-fix.patch

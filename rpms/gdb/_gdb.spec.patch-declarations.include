@@ -86,3 +86,19 @@ Patch015: gdb-tcl9-utf8-encoding-fix.patch
 # gdb: backport DAP core file support
 Patch016: gdb-backport-dap-core-file-support.patch
 
+# Backport of upstream commit be3a9405ceb4d6d6 to fix RHBZ 2368350, an
+# out of memory issue with the D demangler.
+#
+# The commit being pulled in here is a commit that syncs multiple
+# commits to libiberty from gcc to binutils-gdb.  Most of these commits
+# are spelling and white space fixes, which should have no real impact.
+# The only commit we actually care about is gcc commit bc4d9b6aeb3,
+# which fixes the D demangler issue.
+#
+# This commit will not be needed once we rebase to GDB 18.
+Patch017: gdb-backport-libiberty-sync.patch
+
+# Backport of upstream commit 93f536d813c41527e8c939a5f8a90a4 to fix
+# RHBZ2498034.
+Patch018: gdb-backport-corefile-use-after-free-fix.patch
+
