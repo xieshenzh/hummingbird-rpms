@@ -258,8 +258,6 @@ spec:
           contentType: rpm
         - name: forge-srpm-macros-main
           contentType: rpm
-        - name: foundationdb-main
-          contentType: rpm
         - name: fpc-srpm-macros-main
           contentType: rpm
         - name: freetype-main
