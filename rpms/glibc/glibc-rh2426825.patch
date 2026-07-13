@@ -1,0 +1,17 @@
+Work around GCC problem that makes diagnostics pragmas ineffective,
+by moving the error suppression to the command line.
+
+diff --git a/sysdeps/unix/sysv/linux/s390/Makefile b/sysdeps/unix/sysv/linux/s390/Makefile
+index d5433f1dd9a434d5..605f77e7332b52ed 100644
+--- a/sysdeps/unix/sysv/linux/s390/Makefile
++++ b/sysdeps/unix/sysv/linux/s390/Makefile
+@@ -14,3 +14,9 @@ endif
+ ifeq ($(subdir),misc)
+ tests += tst-ptrace-singleblock
+ endif
++
++ifeq ($(subdir),benchtests)
++CFLAGS-bench-memcpy.c += -Wno-error=maybe-uninitialized
++CFLAGS-bench-memmove.c += -Wno-error=maybe-uninitialized
++CFLAGS-bench-mempcpy.c += -Wno-error=maybe-uninitialized
++endif

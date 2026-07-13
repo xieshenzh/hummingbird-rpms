@@ -1,5 +1,5 @@
-%global glibcsrcdir glibc-2.42-74-g0be5a6a72a
-%global glibcversion 2.42
+%global glibcsrcdir glibc-2.43-45-gdae425b554
+%global glibcversion 2.43
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -152,7 +152,7 @@ Version: %{glibcversion}
 # - It allows using the Release number without the %%dist tag in the dependency
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
-%global baserelease 15
+%global baserelease 7
 Release: %{baserelease}%{?dist}
 
 # Licenses:
@@ -170,6 +170,14 @@ Release: %{baserelease}%{?dist}
 # * GPLv2+ with exceptions is used for parts of the Arm unwinder.
 #
 # * GFDL is used for the documentation.
+#
+# * GPLv3+ is used for scripts/move-if-change.
+#
+# * Autoconf-related files are licensed as GPL-3.0-or-later WITH
+#   Autoconf-exception-generic-3.0.
+#
+# * Texinfo-related files are licensed as GPL-3.0-or-later WITH
+#   Texinfo-exception.
 #
 # * UNICODE v3 is used for the Unicode data files.
 #
@@ -205,7 +213,7 @@ Release: %{baserelease}%{?dist}
 # SPDX license string based on evaluation of glibc-2.39 sources by
 # ScanCode toolkit (https://github.com/nexB/scancode-toolkit),
 # and accounting for exceptions listed above:
-License: LGPL-2.1-or-later AND SunPro AND LGPL-2.1-or-later WITH GCC-exception-2.0 AND BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.1-or-later WITH GNU-compiler-exception AND GPL-2.0-only AND ISC AND LicenseRef-Fedora-Public-Domain AND HPND AND CMU-Mach AND LGPL-2.0-or-later AND Unicode-3.0 AND GFDL-1.1-or-later AND GPL-1.0-or-later AND FSFUL AND MIT AND Inner-Net-2.0 AND X11 AND GPL-2.0-or-later WITH GCC-exception-2.0 AND GFDL-1.3-only AND GFDL-1.1-only
+License: LGPL-2.1-or-later AND SunPro AND LGPL-2.1-or-later WITH GCC-exception-2.0 AND BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.1-or-later WITH GNU-compiler-exception AND GPL-2.0-only AND ISC AND LicenseRef-Fedora-Public-Domain AND HPND AND CMU-Mach AND LGPL-2.0-or-later AND Unicode-3.0 AND GFDL-1.1-or-later AND GPL-1.0-or-later AND FSFUL AND MIT AND Inner-Net-2.0 AND X11 AND GPL-2.0-or-later WITH GCC-exception-2.0 AND GFDL-1.3-only AND GFDL-1.1-only AND GPL-3.0-or-later AND GPL-3.0-or-later WITH Autoconf-exception-generic-3.0 AND GPL-3.0-or-later WITH Texinfo-exception
 
 URL: http://www.gnu.org/software/glibc/
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.xz
@@ -339,11 +347,7 @@ rpm.define("__debug_install_post bash " .. wrapper
 Patch13: glibc-fedora-localedata-rh61908.patch
 Patch17: glibc-cs-path.patch
 Patch23: glibc-python3.patch
-Patch24: glibc-rh2432405.patch
-Patch26: glibc-RHEL-172425-1.patch
-Patch27: glibc-RHEL-172425-2.patch
-Patch28: glibc-RHEL-172425-3.patch
-Patch29: glibc-RHEL-172425-4.patch
+Patch24: glibc-rh2426825.patch
 # https://bugs.winehq.org/show_bug.cgi?id=58523
 # revert 3d3572f59059e2b19b8541ea648a6172136ec42e to fix wine build
 # applied with PP powers as we really need to build wine to fix scriptlet problems
@@ -368,8 +372,6 @@ Provides: rtld(GNU_HASH)
 
 # We need libgcc for cancellation support in POSIX threads.
 Requires: libgcc%{_isa}
-# Preserve the historic installation order.
-Requires(pre): libgcc%{_isa}
 
 Requires: glibc-common = %{version}-%{release}
 
@@ -639,6 +641,9 @@ Summary: The sources for the locales
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-common = %{version}-%{release}
 
+# This subpackage contains gzip compressed charmaps
+Requires: gzip
+
 %description locale-source
 The sources for all locales provided in the language packs.
 If you are building custom locales you will most likely use
@@ -754,6 +759,7 @@ local locales =  {
       "NZ",
       "PH",
       "SC",
+      "SE",
       "SG",
       "US",
       "ZA",
@@ -1396,6 +1402,9 @@ build()
 
 %ifarch x86_64
 # Build for the glibc32 package.
+# There is no libatomic.so.1, so for robustness ensure it is not used.
+# TEMPORARY: -fno-link-libatomic removed for bootstrap (requires GCC 16).
+# Restore once GCC 16 is published to Pulp.
 build build-%{target}-32 \
   CC="gcc -m32" \
   CXX="g++ -m32" \
@@ -2254,7 +2263,7 @@ update_gconv_modules_cache ()
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/gai.conf
 # If rpm doesn't support %license, then use %doc instead.
 %{!?_licensedir:%global license %%doc}
-%license COPYING COPYING.LIB LICENSES
+%license COPYINGv2 COPYINGv3 COPYING.LESSERv2 COPYING.LIB LICENSES
 
 %files common
 %{_bindir}/gencat
@@ -2392,132 +2401,834 @@ update_gconv_modules_cache ()
 %endif
 
 %changelog
-* Tue Jul 07 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-15
-- Auto-sync with upstream branch release/2.42/master,
-  commit 0be5a6a72a4a3132bc211720d2b6949a84f54dc3:
+* Tue Jul 07 2026 Frédéric Bérat <fberat@redhat.com> - 2.43-7
+- Auto-sync with upstream branch release/2.43/master,
+  commit dae425b554207f7c4599c7fac707ad4c08545674:
+- posix: Fix stack overflow in wordexp tilde expansion (BZ 34091, CVE-2026-6791) (Adhemerval Zanella)
+- resolv: Add test case tst-ns_sprintrr (bug 34033, bug 34069) (Florian Weimer)
+- resolv: Fix buffer overreads in ns_sprintrrf (CVE-2026-6238) (Florian Weimer)
+- resolv: More types as unknown in ns_sprintrrf (CVE-2026-5435) (Florian Weimer)
+- resolv: Check for inet_ntop failure in ns_sprintrrf (Florian Weimer)
+- resolv: Improve formatting of unknown records in ns_sprintrrf (Florian Weimer)
+- resolv: Fix ns_sprintrrf formatting of class, type values (bug 34289) (Florian Weimer)
+- resolv: Declare __p_class_syms, __p_type_syms for internal use (Florian Weimer)
 - hppa: Fix missing call to __feraiseexcept (BZ 34306) (John David Anglin)
 - arm: Save/restore VFP registers in PLT trampolines (BZ 34144, BZ 15792) (Adhemerval Zanella)
 - iconv: Suppress intermediate errors with //TRANSLIT (bug 34236) (Florian Weimer)
+- Hurd: restore some SIOC ioctls (Samuel Thibault)
+- Hurd: comment ioctls which cannot currently compile (Samuel Thibault)
+- Hurd: comment PF_ROUTE/AF_ROUTE defines (Samuel Thibault)
+- Hurd: comment PF_LINK/AF_LINK defines (Pino Toscano)
 - elf: don't clobber ld.so.conf in tst-glibc-hwcaps-prepend-cache [BZ #34210] (Sam James)
-- stdio-common: Allow partially-filled %mc buffers [BZ #12701] (DJ Delorie)
-- stdio-common: Reject insufficient character data in scanf [BZ #12701] (Maciej W. Rozycki)
-- support: Implement 'xfmemopen' for seamless 'fmemopen' use (Maciej W. Rozycki)
+- Remove applied or redundant patches:
+  - glibc-RHEL-172425-1.patch
+  - glibc-RHEL-172425-2.patch
+  - glibc-RHEL-172425-3.patch
+  - glibc-RHEL-172425-4.patch
 
-* Thu Jun 04 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-14
-- Auto-sync with upstream branch release/2.42/master,
-  commit 6cebb0b80fd783e442a8ad27c3f52cde52a9cac7:
-- stdio-common: Allow partially-filled %mc buffers [BZ #12701] (DJ Delorie)
-- stdio-common: Reject insufficient character data in scanf [BZ #12701] (Maciej W. Rozycki)
-- support: Implement 'xfmemopen' for seamless 'fmemopen' use (Maciej W. Rozycki)
+* Wed Jun 03 2026 Frédéric Bérat <fberat@redhat.com> - 2.43-6
+- Auto-sync with upstream branch release/2.43/master,
+  commit 18b97b03b7442d8ba0860e43145f8724c9e77b17:
+- Rename __unused fields to __glibc_reserved. (Jakub Jelinek)
+- math: Fix fma alignment when exponent difference is exactly 64 (BZ 34183) (Adhemerval Zanella)
 
-- stdio-common: Allow partially-filled %mc buffers [BZ #12701] (DJ Delorie)
-- stdio-common: Reject insufficient character data in scanf [BZ #12701] (Maciej W. Rozycki)
-- support: Implement 'xfmemopen' for seamless 'fmemopen' use (Maciej W. Rozycki)
-
-* Tue May 12 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-13
-- Auto-sync with upstream branch release/2.42/master,
-  commit 4ebd33dd77eabe8d4c45232bed4b42a31d2f9edc:
+* Tue May 12 2026 Frédéric Bérat <fberat@redhat.com> - 2.43-5
+- Auto-sync with upstream branch release/2.43/master,
+  commit 4070d808bea1c077eb7e7d52b52b91cae98205d5:
 - stdio-common: Fix buffer overflow in scanf %mc [BZ #34008] (Rocket Ma)
 - libio: Fix ungetwc operating on byte stream [BZ #33998] (Rocket Ma)
 - abilist.awk: Handle weak unversioned defined symbols (H.J. Lu)
 - Linux: Only define OPEN_TREE_* macros in <sys/mount.h> if undefined (bug 33921) (Florian Weimer)
 - include: isolate __O_CLOEXEC flag for sys/mount.h and fcntl.h (DJ Delorie)
+- Use pending character state in IBM1390, IBM1399 character sets (CVE-2026-4046) (Florian Weimer)
 - Remove applied or redundant patches:
   - glibc-RHEL-172420.patch
   - glibc-RHEL-172421.patch
 
-* Thu Apr 30 2026 Florian Weimer <fweimer@redhat.com> - 2.42-12
+* Thu Apr 30 2026 Florian Weimer  <fweimer@redhat.com> - 2.43-4
 - Add downstream patches with fixes for vulnerabilities.
 - Fix buffer overflow in scanf %%mc (CVE-2026-5450)
 - Fix ns_sprintrrf buffer overreads (CVE-2026-6238)
 - Fix ns_sprintrrf buffer overflow in TSIG record processing (CVE-2026-5435)
 - Fix memory corruption in ungetwc (CVE-2026-5928)
-- Auto-sync with upstream branch release/2.42/master,
-  commit f13c1bb0f97fbc12a6ba1ab5669ce561ea32b80a:
+- Auto-sync with upstream branch release/2.43/master,
+  commit 8362e8ce10b24068bacc19552c128dd10e082fd9:
 - iconv: Use pending character state in IBM1390, IBM1399 character sets
   (CVE-2026-4046)
 
-* Tue Apr 07 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-11
-- Auto-sync with upstream branch release/2.42/master,
-  commit a56a2943d2ce541102c630142c2eae0fbfc5886b:
+* Tue Apr 07 2026 Frédéric Bérat <fberat@redhat.com> - 2.43-3
+- Auto-sync with upstream branch release/2.43/master,
+  commit ce1013a197eb4a3b8ff2b07e0672f4d0b976ce7c:
 - tests: fix tst-rseq with Linux 7.0 (Michael Jeanson)
+- riscv: Resolve calls to memcpy using memcpy-generic in early startup (Adhemerval Zanella Netto)
+- elf: Use dl-symbol-redir-ifunc.h instead _dl_strlen (Adhemerval Zanella)
 - elf: parse /proc/self/maps as the last resort to find the gap for tst-link-map-contiguous-ldso (Xi Ruoyao)
 - resolv: Check hostname for validity (CVE-2026-4438) (Carlos O'Donell)
 - resolv: Count records correctly (CVE-2026-4437) (Carlos O'Donell)
 - posix: Run tst-wordexp-reuse-mem test (Florian Weimer)
-- iconvdata: Fix invalid pointer arithmetic in ANSI_X3.110 module (Florian Weimer)
+- aarch64: Tests for locking GCS (Yury Khrustalev)
+- aarch64: Lock GCS status at startup (Yury Khrustalev)
+- tests: aarch64: fix makefile dependencies for dlopen tests for BTI (Yury Khrustalev)
+- malloc: Avoid accessing /sys/kernel/mm files (Wilco Dijkstra)
+- Add BZ 33904 entry to NEWS (Adhemerval Zanella)
+- debug: Fix build with --enable-fortify-source=1 (BZ 33904) (Adhemerval Zanella)
 
-* Wed Feb 18 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-10
-- Auto-sync with upstream branch release/2.42/master,
-  commit ebd45473f5421e0fced5ba2cde0f1aaa36e79b61:
+* Thu Feb 19 2026 Frédéric Bérat <fberat@redhat.com> - 2.43-2
+- Auto-sync with upstream branch release/2.43/master,
+  commit 48f5a05a7a1eeb9e0567ab429f654648f831307f:
 - nss: Missing checks in __nss_configure_lookup, __nss_database_get (bug 28940) (Florian Weimer)
 - Linux: In getlogin_r, use utmp fallback only for specific errors (Florian Weimer)
 - nss: Introduce dedicated struct nss_database_for_fork type (Florian Weimer)
+- Don't include <bits/openat2.h> directly (bug 33848) (Andreas Schwab)
+
+* Mon Jan 26 2026 Frédéric Bérat <fberat@redhat.com> - 2.43-1
+- Auto-sync with upstream branch master,
+  commit 144ba302089cff5a2f2e1c9e1280faea9da9f8cc:
+- po: Incorporate translatins (nl updated, ar new) (Andreas K. Hüttel)
+- Fix ldbl-128ibm ceill, floorl, roundl and truncl zero-sign handling (Aurelien Jarno)
+- NEWS: add new section 2.43.1 (Andreas K. Hüttel)
+- Replace advisories directory with file ADVISORIES (Andreas K. Hüttel)
+- Create ChangeLog.old/ChangeLog.32 (Andreas K. Hüttel)
+- version.h, include/features.h: Increase version number (Andreas K. Hüttel)
+- contrib.texi: Add missing accent (Andreas K. Hüttel)
+- tst-cond23: add <support/test-driver.h> include (Aurelien Jarno)
+- install.texi, INSTALL: update versions (Andreas K. Hüttel)
+- contrib.texi: Updates (Andreas K. Hüttel)
+- NEWS: Insert list of fixed security advisories (Andreas K. Hüttel)
+- NEWS: Mention build issues due to const-preserving macros (Andreas K. Hüttel)
+- NEWS: Insert list of fixed bugs (Andreas K. Hüttel)
+- NEWS: Editorial changes (Andreas K. Hüttel)
+- NEWS: Additional items and minor consolidation (Andreas K. Hüttel)
+- NEWS: Group ISO C23 related changes (Andreas K. Hüttel)
+- po: Incorporate translations (Andreas K. Hüttel)
+- Update advisory text for GLIBC-SA-2026-0003 (Adhemerval Zanella)
+- Add advisory text for CVE-2025-15281 (Carlos O'Donell)
+- posix: Reset wordexp_t fields with WRDE_REUSE (CVE-2025-15281 / BZ 33814) (Adhemerval Zanella)
+- libc.pot: regenerate (Andreas K. Hüttel)
+- Linux: fix tst-copy_file_range-large failure in 32-bit glibc build on 64-bit kernel [BZ 33790] (Xi Ruoyao)
+
+* Mon Jan 19 2026 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-25
+- Auto-sync with upstream branch master,
+  commit 7b543dcdf97d07fd4346feb17916e08fe83ad0ae:
+- elf: Ignore LD_PROFILE if LD_PROFILE_OUTPUT is not set (bug 33797) (Florian Weimer)
+- hurd: make __thread_set_pcsptp align stack (Samuel Thibault)
+- Update advisory text for CVE-2026-0951 (Carlos O'Donell)
+- Add advisory text for CVE-2026-0951 (Carlos O'Donell)
+- Add advisory text for CVE-2026-0861 (Siddhesh Poyarekar)
+- resolv: Fix NSS DNS backend for getnetbyaddr (CVE-2026-0915) (Carlos O'Donell)
+- memalign: reinstate alignment overflow check (CVE-2026-0861) (Siddhesh Poyarekar)
+- malloc: Add tst-mallocfork to tests-exclude-threaded exception list (Arjun Shankar)
+- aarch64: Fix LD_AUDIT with GCS in permissive mode (Adhemerval Zanella)
+- aarch64: Add LD_PRELOAD tests for GCS handling (Adhemerval Zanella)
+- aarch64: Add LD_AUDIT tests for BTI handling (Adhemerval Zanella)
+- aarch64: Add LD_PRELOAD tests for BTI handling (Adhemerval Zanella)
+- Revert "x86: Do not use __builtin_fpclassify for _Float64x/long double" (Adhemerval Zanella)
+- Revert "x86: Do not use __builtin_isinf_sign for _Float64x/long double" (Adhemerval Zanella)
+- aarch64: update NEWS for 2.43 release (Yury Khrustalev)
+- aarch64: Add LD_DEBUG=security to log BTI and GCS warnings (Yury Khrustalev)
+- tst-if_nameindex.c: Fix minimum buffer size (Samuel Thibault)
+- ldbl-128ibm-compat: Add local aliases for printf family symbols (Sachin Monga)
+- math: Fix powerpc64le -Os build after 6b7067460f (Adhemerval Zanella)
+- x86: Fix x86_64 build failure with -Os (BZ 33367) (Adhemerval Zanella)
+- math: Sync acosh from CORE-MATH (Adhemerval Zanella)
+- math: Sync atanh from CORE-MATH (Adhemerval Zanella)
+- math: Sync asinh from CORE-MATH (Adhemerval Zanella)
+- aarch64: Fix error messages for GCS and BTI incompatible modules (Yury Khrustalev)
+
+* Mon Jan 19 2026 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-24
+- Removed previously added reverts as they were committed upstream
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.42.9000-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 13 2026 Florian Weimer  <fweimer@redhat.com> - 2.42.9000-22
+- Revert <math.h> changes for fpclassify et al. because of C++ bugs (#2428799)
+
+* Mon Jan 12 2026 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-21
+- Auto-sync with upstream branch master,
+  commit e539a269990dac3ff4d2432c0eb6966a5ee4f274:
+- hurd: Fix sigreturn clobbering some xmm registers (Samuel Thibault)
+- Linux: test sizes larger than UINT_MAX for copy_file_range (Xi Ruoyao)
+- Update the bundled <linux/fuse.h> userspace header from Linux 6.18 (Xi Ruoyao)
+- Linux: fix copy_file_range test on Linux >= 6.18 (Xi Ruoyao)
 - Switch currency symbol for the bg_BG locale to euro (Florian Weimer)
-- Remove patches already applied upstream:
-  - glibc-rh2429016.patch
 
-* Fri Jan 23 2026 Florian Weimer  <fweimer@redhat.com> - 2.42-9
-- Ignore LD_PROFILE if LD_PROFILE_OUTPUT is not set (#2432405)
+* Fri Jan 09 2026 Florian Weimer  <fweimer@redhat.com> - 2.42.9000-20
+- Work around GCC problem that makes diagnostics pragmas ineffective (#2426825)
 
-* Fri Jan 23 2026 Florian Weimer <fweimer@redhat.com> - 2.42-8
-- Auto-sync with upstream branch release/2.42/master,
-  commit cbf39c26b25801e9bc88499b4fd361ac172d4125:
-- posix: Reset wordexp_t fields with WRDE_REUSE (CVE-2025-15281)
-- resolv: Fix NSS DNS backend for getnetbyaddr (CVE-2026-0915)
-- memalign: reinstate alignment overflow check (CVE-2026-0861)
-
-* Tue Jan 13 2026 Florian Weimer  <fweimer@redhat.com> - 2.42-7
-- Switch currency symbol for the bg_BG locale to euro (#2429016)
-
-* Mon Jan 12 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-6
+* Thu Jan 08 2026 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-19
 - Auto-sync with upstream branch master,
-  commit f122d0b4d145814869bf10c56db1d971bcba55c5:
+  commit 755798985d0dc2438c546851f926087158955614:
+- aarch64: Fix PT_GNU_PROPERTY checks for static exe (BZ 33713)
+- tst-sig-redzone: Decorate assembly function
+- hurd: check that signal processing does not hurt the x86_64 redzone
+- hurd: also test mmx state restoration
+- mach/hurd: add `bits/in.h`
+- Better terminology for ‘long double’ in manual
+- Update copyright dates not handled by scripts/update-copyrights
+- Update copyright dates with scripts/update-copyrights
+- Pass glibc pre-commit checks
+- malloc_info: fix closing </sizes> tag typo
+- LoongArch: Use generic __builtin_trap in abort.
+- malloc: Fix clang build after 1c588a2187
+- elf: Fix elf/tst-decorate-maps on aarch64 after 321e1fc73f
+- misc: Enable tst-atomic for clang
+- math: Use math_opt_barrier on ldbl-128 powl underflow/overflow handling
+- stdio: Fix tst-vfprintf-user-type on clang
+- x86: Do not use __builtin_isinf_sign for _Float64x/long double
+- x86: Do not use __builtin_fpclassify for _Float64x/long double
+- resolv: Add test for NOERROR/NODATA handling [BZ #14308]
+
+* Wed Jan  7 2026 DJ Delorie <dj@redhat.com> - 2.42.9000-18
+- Improve robustness of glibc32 build. (#2427390)
+
+* Mon Dec 22 2025 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-17
+- Auto-sync with upstream branch master,
+  commit 0b8a996f44b5f4c02991f02cd12bf05b17db4576:
+- riscv: Add RVV memset for both multiarch and non-multiarch builds (Yao Zihong)
+- stdlib: Avoid strlen plt with clang (Adhemerval Zanella)
+- math: Do not use __builtin_isgreater* and __builtin_isless* on clang (Adhemerval Zanella)
+- elf: Support vDSO with more than one PT_LOAD with v_addr starting at 0 (BZ 32583) (Adhemerval Zanella)
+- nptl: Make pthread_{clock, timed}join{_np} act on all cancellation (BZ 33717) (Adhemerval Zanella)
+- support: Add support_thread_state_wait (Adhemerval Zanella)
+- nptl: Remove INVALID_TD_P (Adhemerval Zanella)
+- nptl: Do not use pthread set_tid_address as state synchronization (BZ #19951) (Adhemerval Zanella)
+- nptl: Set cancellation type and state on pthread_exit (BZ #28267) (Adhemerval Zanella)
+- nptl: Use __futex_abstimed_wait64 on pthread_create (BZ 33715) (Adhemerval Zanella)
+- build-many-glibcs.py: Fix s390x-linux-gnu. (Stefan Liebler)
+- hurd/i386: Remove stale __GNUC_PREREQ (6, 0) test from tls.h (Uros Bizjak)
 - nptl: Optimize trylock for high cache contention workloads (BZ #33704) (Sunil K Pandey)
-- support: Exit on consistency check failure in resolv_response_add_name (Florian Weimer)
-- support: Fix FILE * leak in check_for_unshare_hints in test-container (Florian Weimer)
-- sprof: fix -Wformat warnings on 32-bit hosts (Collin Funk)
-- sprof: check pread size and offset for overflow (DJ Delorie)
+- Regenerate sysdeps/x86_64/configure (Adhemerval Zanella)
+- x86_64: Fix mark-plt configure test (Adhemerval Zanella)
+- math: Fix potential underflow on ldbl-128 erfl (Adhemerval Zanella)
+- atomic: Reinstate HAVE_64B_ATOMICS configure check (Wilco Dijkstra)
+- malloc: Improve thp_init (Wilco Dijkstra)
+- linux: Update kernel version to 6.17 in tst-openat2-consts.py (Adhemerval Zanella)
+- Updates struct tcp_info and TCP_AO_XX corresponding struct from 6.17 to netinet/tcp.h (Jiayuan Chen)
+- malloc: set default tcache fill count to 16 (Dev Jain)
+- malloc: Remove fastbin comments (Dev Jain)
+- malloc: Remove fastbin infrastructure (Dev Jain)
+- malloc: Remove do_check_remalloced_chunk (Dev Jain)
+- malloc: remove fastbin code from malloc_info (Dev Jain)
+- malloc: remove fastbin code from do_check_malloc_state (Dev Jain)
+- malloc: remove mallopt fastbin stats (Dev Jain)
+- malloc: remove allocation from fastbin, and trim_fastbins (Dev Jain)
+- malloc: remove malloc_consolidate (Dev Jain)
+- malloc: remove fastbin tests (Dev Jain)
+- Deprecate s390-linux-gnu (31bit) (Stefan Liebler)
+- benchtests: Add pthread mutex trylock recursive throughput test (BZ #33704) (Sunil K Pandey)
+- benchtests: Refactor pthread trylock throughput test (BZ #33704) (Sunil K Pandey)
 
-* Mon Dec 15 2025 Frédéric Bérat <fberat@redhat.com> - 2.42-5
+* Mon Dec 15 2025 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-16
 - Auto-sync with upstream branch master,
-  commit b11411fe2ee7a8f3c3a2c1ee99c1729adb9a0efe:
-- posix: Fix invalid flags test for p{write,read}v2 (Yury Khrustalev)
-- ppc64le: Power 10 rawmemchr clobbers v20 (bug #33091) (Sachin Monga)
-- ppc64le: Restore optimized strncmp for power10 (Sachin Monga)
-- ppc64le: Restore optimized strcmp for power10 (Sachin Monga)
+  commit ded9c1e525f2d69a81e61c34c29077fed7df658c:
+- benchtests: Add pthread mutex trylock throughput test (BZ #33704) (Sunil K Pandey)
+- posix: Fix getconf symbolic constants defined in limits.h (BZ# 29147) (Adhemerval Zanella Netto)
+- configure: use TEST_CC to check for --depaudit (Adhemerval Zanella)
+- configure: use TEST_CC to check for --no-error-execstack (Adhemerval Zanella)
+- manual: Fix madvise typo in mseal documentation (Florian Weimer)
+- malloc: Enable 2MB THP by default on Aarch64 (Dev Jain)
+- malloc: Enable 2MB THP by default on Aarch64 (Dev Jain)
+- malloc: Do not make out-of-bounds madvise call on non-aligned heap (Dev Jain)
+- linux: Add openat2 (BZ 31664) (Adhemerval Zanella)
+- malloc: Extend malloc function hiding to tst-reallocarray (BZ #32366) (Adhemerval Zanella)
+- malloc: Extend malloc function hiding to tst-pvalloc (BZ #32366) (Adhemerval Zanella)
+- configure: Enable experimental support for clang (Adhemerval Zanella)
+- configure: Only use -Wno-discarded-qualifiers iff compiler supports it (Adhemerval Zanella)
+- Handle clang -Wignored-attributes on weak aliases (Adhemerval Zanella)
+- build-many-glibcs.py: Include URL in download exception (Florian Weimer)
+- x32: Implement prctl in assembly (H.J. Lu)
+- build-many-glibcs.py: Switch Git URLs to https:// (Florian Weimer)
+
+* Mon Dec 08 2025 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-15
+- Auto-sync with upstream branch master,
+  commit 866fa41ef8521ce94ffdacfd6f1f67737899d5c9:
+- libio: null terminate the buffer upon initial allocation in getdelim (Collin Funk)
+- aarch64: Implement AdvSIMD and SVE rsqrt(f) routines (James Chesterman)
+- benchtests: Add benchtests for rsqrt (James Chesterman)
+- benchtests: Add benchtests for rsqrtf (James Chesterman)
+- i386: Fix fmod/fmodf/remainder/remainderf for gcc-12 (Adhemerval Zanella)
+- nptl: Check alignment of pthread structs (Wilco Dijkstra)
+- aarch64: Optimise AdvSIMD atanhf (James Chesterman)
+- aarch64: Optimise AdvSIMD asinhf (James Chesterman)
+- aarch64: Optimise AdvSIMD acoshf (James Chesterman)
+- aarch64: Add tests for glibc.cpu.aarch64_bti behaviour (Yury Khrustalev)
+- aarch64: Support enforcing BTI on dependencies (Yury Khrustalev)
+- aarch64: Add configure checks for BTI support (Yury Khrustalev)
+- aarch64: fix makefile formatting (Yury Khrustalev)
+- aarch64: Optimise AdvSIMD log10 (James Chesterman)
+- aarch64: Optimise AdvSIMD log2 (James Chesterman)
+- aarch64: Optimise AdvSIMD log (James Chesterman)
+- aarch64: Optimise AdvSIMD log1p (James Chesterman)
+- aarch64: Optimise AdvSIMD log10f (James Chesterman)
+- aarch64: Optimise AdvSIMD log2f (James Chesterman)
+- aarch64: Optimise AdvSIMD logf (James Chesterman)
+- aarch64: Optimise AdvSIMD log1pf (James Chesterman)
+- int128: Check BITS_PER_MP_LIMB == 32 instead of __WORDSIZE == 32 (H.J. Lu)
+- time: Add TIME_MONOTONIC, TIME_ACTIVE, and TIME_THREAD_ACTIVE (Adhemerval Zanella)
+- Use Linux 6.18 in build-many-glibcs.py (Joseph Myers)
+- misc: fix some typos (Yury Khrustalev)
+- Use 64-bit atomic on sem_t with 8-byte alignment [BZ #33632] (H.J. Lu)
+- scripts: Support custom Git URLs in build-many-glibcs.py (Yury Khrustalev)
+- scripts: Support custom FTP mirror URL in build-many-glibcs.py (Yury Khrustalev)
+- strops: use strlen instead of strchr for string length (Kacper Piwiński)
+- nptl: tests: Fix test-wrapper use in tst-dl-debug-tid.sh (Yury Khrustalev)
+- Fix allocation_index increment in malloc_internal (Osama Abdelkader)
+
+* Mon Dec 01 2025 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-14
+- Auto-sync with upstream branch master,
+  commit f9e61cd446d45016e20b6fe85ab87364ebdbec1b:
+- NEWS: Add new generic fma/fmaf note (Adhemerval Zanella)
+- iconvdata: Fix invalid pointer arithmetic in ANSI_X3.110 module (Florian Weimer)
+- Define C23 header version macros (Joseph Myers)
+- math: New generic fmaf implementation (Adhemerval Zanella)
+- Linux: Ignore PIDFD_GET_INFO in tst-pidfd-consts (Florian Weimer)
+- math: Sync atanh from CORE-MATH (Adhemerval Zanella)
+- aarch64: make GCS configure checks aarch64-only (Yury Khrustalev)
+- math: New generic fma implementation (Adhemerval Zanella)
+- stdlib: Remove longlong.h (Adhemerval Zanella)
+- Add umul_ppmm to gmp-arch.hdoc (Adhemerval Zanella)
+- Add add_ssaaaa and sub_ssaaaa to gmp-arch.h (Adhemerval Zanella)
+- Add gmp-arch and udiv_qrnnd (Adhemerval Zanella)
+- Add new math improvemenst to NEWS (Adhemerval Zanella)
+- scripts: Fix minor lint warnings in build-many-glibcs.py (Yury Khrustalev)
+- malloc: Add threaded variants of single-threaded malloc tests (Arjun Shankar)
+- support: Add support for running tests in a multi-threaded environment (Arjun Shankar)
+
+* Mon Nov 24 2025 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-13
+- Auto-sync with upstream branch master,
+  commit 0f7b73f2ed70e783cd02ab77503645b03ee1d332:
+- htl: Fix conditions for thread list variables (Samuel Thibault)
+- pthread: Simplify condition for hidden proto (Samuel Thibault)
+- htl: move c11 symbols into libc. (gfleury)
+- htl: Also use __libc_thread_freeres to clean TLS state (Samuel Thibault)
+- benchtests: Fix bench-build after cd748a63ab (Adhemerval Zanella)
+- linux: Handle EINVAL as unsupported on tst-pidfd_getinfo (Adhemerval Zanella)
+- bench-malloc-thread: Add libm for powf (Adhemerval Zanella)
+- benchtests: Remove clang warnings (Adhemerval Zanella)
+- benchtests: Add attribute_optimize (Adhemerval Zanella)
+- benchtests: Use __f128 on ilogbf128-inputs constants (Adhemerval Zanella)
+- Enable --enable-fortify-source with clang (Adhemerval Zanella)
+- configure: Only use -fno-fp-int-builtin-inexact if compiler supports it (Adhemerval Zanella)
+- benchtests: Add fmaf benchtests (Adhemerval Zanella)
+- math: Remove ldbl-96 fma implementation (Adhemerval Zanella)
+- benchtests: Add fma benchtests (Adhemerval Zanella)
+- htl: Move pthread_atfork compatibility symbol to libc (Samuel Thibault)
+- htl: move pthread_spin_{destroy, lock, init, trylock, unlock) and remove _pthread_spin_lock, into libc. (gfleury)
+- Implement C23 const-preserving standard library macros (Joseph Myers)
+- Check if linker supports -Wl,--undefined-version (Adhemerval Zanella)
+- nptl: Replace FALLTHROUGH with [[fallthrough]] (Adhemerval Zanella)
+- hurd: Add missing free_sized and free_aligned_sized (Samuel Thibault)
+- Use __fstat64_time64 in __fts64_children_time64 (bug 33653) (Andreas Schwab)
+- malloc: Use _int_free_chunk in tcache_thread_shutdown (Wilco Dijkstra)
+- math: Sync atanh from CORE-MATH (Adhemerval Zanella)
+- malloc: add free_sized and free_aligned_sized from C23 (Justin King)
+- math: Sync acosh from CORE-MATH (Adhemerval Zanella)
+- linux/termios: test the kernel-side termios canonicalization (H. Peter Anvin)
+- nss: Remove effectively unused __nss_*_database variables (Florian Weimer)
+- AArch64: Remove WANT_SIMD_EXCEPT from aarch64 AdvSIMD math routines (Dylan Fleming)
 - AArch64: Fix and improve SVE pow(f) special cases (Pierre Blanchard)
 - AArch64: fix SVE tanpi(f) [BZ #33642] (Pierre Blanchard)
-- AArch64: Fix instability in AdvSIMD sinh (Joe Ramsay)
-- AArch64: Fix instability in AdvSIMD tan (Joe Ramsay)
-- AArch64: Optimise SVE scalar callbacks (Joe Ramsay)
-- aarch64: fix includes in SME tests (Yury Khrustalev)
-- aarch64: fix cfi directives around __libc_arm_za_disable (Yury Khrustalev)
-- x86: fix wmemset ifunc stray '!' (bug 33542) (Jiamei Xie)
-- aarch64: tests for SME (Yury Khrustalev)
-- aarch64: clear ZA state of SME before clone and clone3 syscalls (Yury Khrustalev)
-- aarch64: define macro for calling __libc_arm_za_disable (Yury Khrustalev)
-- x86: Detect Intel Nova Lake Processor (Sunil K Pandey)
-- x86: Detect Intel Wildcat Lake Processor (Sunil K Pandey)
-- nptl: Fix MADV_GUARD_INSTALL logic for thread without guard page (BZ 33356) (Adhemerval Zanella)
-- nss: Group merge does not react to ERANGE during merge (bug 33361) (Florian Weimer)
-- libio: Define AT_RENAME_* with the same tokens as Linux (Florian Weimer)
-- AArch64: Fix SVE powf routine [BZ #33299] (Pierre Blanchard)
-- i386: Also add GLIBC_ABI_GNU2_TLS version [BZ #33129] (H.J. Lu)
+- htl: move pthread_hurd_cond_timedwait_np, pthread_hurd_cond_wait_np into libc. (gfleury)
+- htl: move pthread_getname_np/setname_np into libc. (gfleury)
+- htl: fix compatibility (gfleury)
+- Add new AArch64 HWCAP3 definitions from Linux 6.17 to bits/hwcap.h (Adhemerval Zanella)
+- malloc: Simplify tst-free-errno munmap failure test (Arjun Shankar)
+- Remove support for lock elision. (Stefan Liebler)
+- nss: Remove effectively unused struct nss_database_default_cache (Florian Weimer)
+- nss: Clean up function pointer/void * unions (Florian Weimer)
+- linux/termios: factor out the kernel interface from termios_internal.h (H. Peter Anvin)
+- linux/termios: clear k_termios.c_cflag & CIBAUD for non-split speed [BZ 33340] (H. Peter Anvin)
+- manual: don't use the FSF's old address in license text. (Collin Funk)
+- posix: execvpe: fix UMR with file > NAME_MAX [BZ #33627] (Pádraig Brady)
+- configure: Remove for redirection of built-in functions (Adhemerval Zanella)
+- math: Handle fabsf128 !__USE_EXTERN_INLINES (Adhemerval Zanella)
+- x86: Fix strstr ifunc on clang (Adhemerval Zanella)
+- x86: Use -mavx instead of -msse2avx (Adhemerval Zanella)
+- math: Don't redirect inlined builtin math functions (Adhemerval Zanella)
+- Update COPYING, COPYING.LIB from gnulib, using gnulib file names (Florian Weimer)
+- Add COPYINGv3 with the GPL version 3 text (Florian Weimer)
+- Reference COPYING.LIB in <sframe.h> copyright header (Florian Weimer)
+- htl: move pthread_create to into libc (Samuel Thibault)
+- htl: Move __pthread_enable/disable_asynccancel into libc (Samuel Thibault)
+- hurd: Fix getting rlimit in _hurd_alloc_fd (Samuel Thibault)
 
-* Tue Aug 19 2025 Florian Weimer <fweimer@redhat.com> - 2.42-4
-- Add marker symbol versions GLIBC_ABI_DT_X86_64_PLT, GLIBC_ABI_GNU2_TLS,
-  GLIBC_ABI_GNU_TLS, following upstream.
-- Auto-sync with upstream branch release/2.42/master,
-  commit 7a8f3c6ee4b565a02da4ba0dad9aaeaeed4639ce:
+* Mon Nov 17 2025 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-12
+- Auto-sync with upstream branch master,
+  commit c7d699b55b4e2f5644495a156b0d778105a5e4e3:
+- htl: Add missing include (Samuel Thibault)
+- loongarch: Remove TLS_TCB_ALIGN (Samuel Thibault)
+- hurd: Fix restoring SSE state on signal (Samuel Thibault)
+- Remove TLS_TCB_ALIGN and TLS_INIT_TCB_ALIGN (Samuel Thibault)
+- math: Optimize frexpl (intel96) with fast path for normal numbers (Osama Abdelkader)
+- Revert __HAVE_64B_ATOMICS configure check (Adhemerval Zanella)
+- x86: Increase allowable TSX abort rate to 6%. (Carlos O'Donell)
+- htl: Remove errno and herrno from libpthread (Samuel Thibault)
+- htl: Drop pthread-functions infrastructure (Samuel Thibault)
+- htl: Move __pthread_cleanup_stack out of libc_pthread_init.c (Samuel Thibault)
+- htl: move {,_IO_}f{,un,try}lockfile implementation into libc (Samuel Thibault)
+- linux: Add mseal to mips32 nofpu abilist (Adhemerval Zanella)
+- hppa: Consistently reference LGPL in copyright header (Florian Weimer)
+
+* Thu Nov 13 2025 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-11
+- Auto-sync with upstream branch master,
+  commit 1f79bc48382cc204a9cb0eae1d3cca2515af1f3c:
+- Change fromfp functions to return floating types following C23 (bug 28327) (Joseph Myers)
+- math: Remove float_t and double_t [BZ #33563] (Wilco Dijkstra)
+- math: Remove ldbl-128/s_fma.c (Wilco Dijkstra)
+- linux: Add mseal syscall support (Adhemerval Zanella)
+- aarch64: fix includes in SME tests (Yury Khrustalev)
+- LoongArch: Call elf_ifunc_invoke for R_LARCH_IRELATIVE in elf_machine_rela (Xi Ruoyao)
+- hurd: Drop remnants of cthreads (Samuel Thibault)
+- cdefs: Fix some typos in comments. (Bruno Haible)
+- stdlib: Do not define once_flag, ONCE_FLAG_INIT for C++ (Florian Weimer)
+- x86-64: Fix a typo in fesetenv.c [BZ #33619] (H.J. Lu)
+- Set Prefer_No_AVX512 flag for hygon platform (Xie jiamei)
+- math: Optimize frexpl (binary128) with fast path for normal numbers (Osama Abdelkader)
+- math: Optimize frexp (binary64) with fast path for normal numbers (Osama Abdelkader)
+- math: Optimize frexpf (binary32) with fast path for normal numbers (Osama Abdelkader)
+- benchtests: Add benchmarks for frexp functions (Osama Abdelkader)
+- math: Sync acosh from CORE-MATH (Adhemerval Zanella)
+- Filter out internal abort during ld.so build (Adhemerval Zanella)
+- x86: Fix THREAD_GSCOPE_RESET_FLAG build on clang (Adhemerval Zanella)
+- x86: Adapt "%v" usage on clang to emit VEX enconding (Adhemerval Zanella)
+- x86: math: Use of __libgcc_cmp_return__ iff compiler supports it (Adhemerval Zanella)
+- string: Check if attribute can declared after function declaration (Adhemerval Zanella)
+- nss: Suppress clang -Wstring-plus-int on __nss_shlib_revision definition (Adhemerval Zanella)
+- stdlib: Remove mp_clz_tab.c (Adhemerval Zanella)
+- hurd: make setpriority clamp nice values to 0..2*NZERO-1 [BZ #33614] (Samuel Thibault)
+- Revert "hurd: Make rename refuse trailing slashes [BZ #32570]" (Samuel Thibault)
+- Add missing $(rpath-link) to elf/ld.so --library-path (Samuel Thibault)
+- Add missing $(rpath-link) to /elf/ld.so --library-path (Samuel Thibault)
+- nss: Add ERANGE testing to tst-nss-test4 (bug 33361) (Carlos O'Donell)
+- aarch64: Remove $(aarch64-bti) check (Florian Weimer)
+
+* Mon Nov 10 2025 Florian Weimer  <fweimer@redhat.com> - 2.42.9000-10
+- Do not define once_flag in <stdlib.h> for C++ (#2413097)
+
+* Fri Nov 07 2025 Arjun Shankar <arjun@redhat.com> - 2.42.9000-9
+- Auto-sync with upstream branch master,
+  commit 58a31b4316f1f687184eb147ffa1c676bc6a190e:
+- posix: Fix invalid flags test for p{write,read}v2
+- support: Exit on consistency check failure in resolv_response_add_name
+- AArch64: Fix instability in AdvSIMD sinh
+- AArch64: Fix instability in AdvSIMD tan
+- AArch64: Optimise SVE scalar callbacks
+- support: Fix FILE * leak in check_for_unshare_hints in test-container
+- i386: Simplify powl computation for small integral y [BZ #33586]
+- math: Remove the SVID error handling from tgammaf
+- math: Remove the SVID error handling from lgammaf/lgammaf_r
+- Add FD_PIDFS_ROOT from Linux 6.17 to bits/fcntl-linux.h
+- Add AT_EXECVE_CHECK from Linux 6.14 to bits/fcntl-linux.h
+- Add AT_HANDLE_CONNECTABLE from Linux 6.13 to bits/fcntl-linux.h
+- linux: Update statx-generic.h with linux 6.16
+- linux: Update statx-generic.h with linux 6.14
+- linux: Add STATX_WRITE_ATOMIC/STATX_ATTR_WRITE_ATOMIC definitions to generic statx
+- linux: Add STATX_SUBVOL definition to generic statx
+- linux: Add STATX_DOALIGN definition to generic statx
+- linux: Add STATX_MNT_ID_UNIQUE definition to generic statx
+- Update syscall lists for Linux 6.17
+- Update PIDFD_* constants for Linux 6.17
+- Update kernel version to 6.17 in header constant tests
+- math: Remove the SVID error handling from atan2f
+- Add feature test macros for POSIX.1-2024.
+- Rename fromfp files in preparation for changing types for C23
+- Add C23 long_double_t, _FloatN_t
+- riscv: Add vector registers to __SYSCALL_CLOBBERS
+- Regenerate charmap-kw.h and locfile-kw.h with gperf 3.3
+- math: Remove the SVID error handling wrapper from sqrt
+- math: Remove the SVID error handling from sinhf
+- math: Remove the SVID error handling from remainder
+- math: Remove the SVID error handling from remainderf
+- nptl: Remove ATOMIC_EXCHANGE_USES_CAS usage
+- Define __HAVE_64B_ATOMICS from compiler support
+- atomic: Consolidate atomic_write_barrier implementation
+- atomic: Consolidate atomic_read_barrier implementation
+- atomic: Consolidate atomic_full_barrier implementation
+- microblaze: Remove USE_ATOMIC_COMPILER_BUILTINS definition
+- alpha: Remove USE_ATOMIC_COMPILER_BUILTINS definition
+- sh: Move atomic-machine to generic sysdep
+- riscv: Consolidade atomic-machine.h and remove ununsed atomic macros
+- powerpc: Consolidate atomic-machine.h
+- loongarch: Consolidate atomic-machine.h and remove ununsed atomic macros
+- m68k: Consolidade atomic-machine.h and Remove ununsed atomic macros
+- hppa: Move atomic-machine to generic sysdep
+- arm: Consolidate atomic-machine.h and Remove ununsed atomic macros
+- x86: Remove ununsed atomic macros
+- sparc: Remove ununsed atomic macros
+- s390: Remove ununsed atomic macros
+- or1k: Remove ununsed atomic macros
+- mips: Remove ununsed atomic macros
+- csky: Remove ununsed atomic macros
+- arc: Remove ununsed atomic macros
+- aarch64: Remove ununsed atomic macros
+- Build programs in $(others-noinstall) like tests if libgcc_s is available
+- Support assert as a variadic macro for C23
+- docs: Add dynamic linker environment variable docs
+- tls: Add debug logging for TLS and TCB management
+- riscv: Add Zbkb optimized repeat_bytes helper
+- math: Remove xfail from pow test [BZ #33563]
+- math: Fix pow special case [BZ #33563]
+- math: Fix powf special case [BZ #33563]
+- debug: mark __libc_message_wrapper as always inline
+- aarch64: fix cfi directives around __libc_arm_za_disable
+- cdefs: allow __attribute__ on tcc
+- Cleanup some recently added whitespace.
+- riscv: memcpy_noalignment: Reorder to store via a3, then bump a3
+- riscv: memcpy_noalignment: Fold SZREG/BLOCK_SIZE alignment to single andi
+- riscv: memcpy_noalignment: Make register allocation Zca-friendly
+- math: Remove the SVID error handling wrapper from yn/jn
+- math: Remove the SVID error handling wrapper from y1/j1
+- math: Remove the SVID error handling wrapper from y0/j0
+- math: Remove the SVID error handling from coshf
+- math: Remove the SVID error handling from atanhf
+- math: Remove the SVID error handling from acoshf
+- math: Remove the SVID error handling from asinf
+- math: Remove the SVID error handling from acosf
+- math: Remove the SVID error handling from log10f
+- m68k: Remove SVID error handling on fmod
+- m68k: Avoid include e_fmod.c on fmod/remainder implementation
+- m68k: Remove the SVID error handling from fmodf
+- i386: Remove the SVID error handling from fmodf
+- i386: Remove the SVID error handling from fmod
+- x86: fix wmemset ifunc stray '!' (bug 33542)
+- Updates struct tcp_zerocopy_receive from 5.11 to netinet/tcp.h.
+- aarch64: Fix tst-ifunc-arg-4 on clang-18
+- Enable --no-undefined-version by default
+- Supress unused command arguments warning with clang
+- Annotate swtich fall-through
+- argp: Move attribute_hidden to argp-fmtstream.h
+- argp: Expand argp_usage, _option_is_short, and _option_is_end
+- Replace count_leading_zeros with stdc_leading_zeros
+- malloc: Remove unused tcache_set_inactive
+- include: Sync gnulib intprops
+- i386: Build s_erf_common.c with -fexcess-precision=standard
+- Build programs in $(others-noinstall) like tests
+- Fix incorrect setrlimit return value checks in tests
+- Rename uimaxabs to umaxabs (bug 33325)
+
+* Mon Oct 27 2025 Patsy Griffin <patsy@redhat.com> - 2.42.9000-8
+- Auto-sync with upstream branch master,
+  commit 013f5167b9c091dc78779841c3ca1c6c2f218ff2.
+- math: Consolidate CORE-MATH double-double routines
+- math: Consolidate erf/erfc definitions
+- math: Consolidate internal erf/erfc tables
+- math: Use erfc from CORE-MATH
+- math: Use erf from CORE-MATH
+- math: Use tgamma from CORE-MATH
+- math: Use lgamma from CORE-MATH
+- math: Move atanh internal data to separate file
+- math: Consolidate acosh and asinh internal table
+- math: Use atanh from CORE-MATH
+- math: Use asinh from CORE-MATH
+- math: Use acosh from CORE-MATH
+- Linux: fix tst-copy_file_range-large test on 32-bit platforms.
+- x86: Disable AVX Fast Unaligned Load on Hygon 1/2/3
+- ppc64le: Power 10 rawmemchr clobbers v20 (bug #33091)
+- malloc: fix large tcache code to check for exact size match
+- Fix configure from ab22e5ec37396f6c6f29d3e3306f6fcc2ebe9d49
+- misc: Fix clang -Wstring-plus-int warnings on syslog
+- sprof: fix -Wformat warnings on 32-bit hosts
+- various fixes detected with -Wdouble-promotion
+- posix: Fix memory leak a memory leak in glob.
+- plot_strings.py: Replace np.complex with complex
+- malloc: avoid need for tcache == NULL checks
+- sprof: check pread size and offset for overflow
+- Simplify powl computation for small integral y [BZ #33411]
+- sunrpc: Fix clang build
+- math: Fix compare sort function on compoundn
+- gmon: Only used -fno-tree-loop-distribute-patterns if compiler supports it
+- termios: Suppress clang -Winitializer-overrider on ___cbaud_to_speed
+- stdio: Only use __va_arg_pack if compiler supports it
+- elf: Fix tunable handing with clang
+- elf: Suppress unused function clang warning for __ifunc_resolver
+- support: Handle clang support/dtotimespec.c on dtotimespec
+- stdio: Fix -Wtautological-constant-out-of-range-compare on clang
+- math: Suppress more aliases builtin type conflicts
+- support: Use CHAR_MAX as maximum value
+- math: Suppress clang -Wincompatible-library-redeclaration on s_llround
+- math: use fabs on __ieee754_lgamma_r
+- math: Suppress clang -Wabsolute-value warning on math_check_force_underflow
+- catgets: Remove catgets/config.h
+- iconvdata: Fix clang -Wstring-plus-int clang warning
+- elf: Fix clang -Wstring-plus-int on rtld.c
+- sunrpc: Suppress clang -Wgnu-variable-sized-type-not-at-end warning on struct cmessage
+- nptl: Fix Wincompatible-pointer-types on clang
+- Suppress -Wmaybe-uninitialized only for gcc
+- configure: Use -Wno-maybe-uninitialized iff compiler supports it
+- Disable __USE_EXTERN_INLINES for clang
+- malloc: Do not call madvise if heap's oldsize >= THP size
+- microblaze: fix __syscall_cancel_arch (BZ 33547)
+- locale: Fix implicit conversion on collate_finish
+- posix: Only enable -Wmaybe-uninitialized suppression on gcc
+- malloc: Use INT_ADD_OVERFLOW instead of __builtin_add_overflow_p
+- Adjust stdint for clang-20
+- Build glibc with -ftrapping-math
+- linux: Fix function point cast on vDSO handling
+- elf: Only define _dl_tls_allocate_active for SHARED
+- Fix -Wno-ignored-attributes configure check
+- aarch64: Fix gcs linker flags
+- posix: Defined _POSIX_VDISABLE as integer literal
+- iconvdata: Remove use of GNU old-style field designator extension
+- sunrpc: Remove extra parenthesis on comparison
+- stdlib: Remove -Wmaybe-uninitialized supression on setenv.c
+- Make <inttypes.h> printf macros narrow arguments (bug 31470)
+
+* Mon Oct 20 2025 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-7
+- Auto-sync with upstream branch master,
+  commit 0375e6e2336a779cdddb4d11442126d366b1efc2:
+- AArch64: Use math-use-builtins for roundeven(f)/lrint(f)/lround(f)
+- math: Add builtin support for (l)lround(f)
+- malloc: Cleanup _int_memalign
+- Implement C23 memalignment
+
+* Fri Oct 17 2025 Florian Weimer <fweimer@redhat.com> - 2.42.9000-6
+- Auto-sync with upstream branch master,
+  commit 850d93f514ebc3c8b62603e70586edd38a18f46b:
+- math: Use binary search on lgammaf slow path
+- math: Use stdbit.h instead of builtin in math_config.h
+- math: Optimize fma call on log2pf1
+- math: Optimize fma call on asinpif
+- math: Remove erfcf fma usage
+- math: Remove asinhf fma usage
+- math: Optimize fma call on acospif
+- math: Remove acoshf fma usage
+- math: Update auto-libm-test-out-log2p1
+- aarch64: clear ZA state of SME before clone and clone3 syscalls
+- replace use of double by float [BZ#29326]
+- posix: Avoid a stack overflow when glob is given many slashes [BZ #30635]
+- i386: Use __seg_gs qualifiers in PTR_{MANGLE,DEMANGLE}() macros
+- x86_64: Use __seg_fs qualifiers in PTR_{MANGLE,DEMANGLE}() macros
+- libio: Add terminating NUL when the first character is EOF in getdelim [BZ #28038]
+- elf: Report when found libraries are rejected [BZ #25669]
+- malloc: Do not call madvise if oldsize >= THP size
+- malloc: Improve mmap interface
+- nss: use C locale for parsing nsswitch.conf (bug 33519)
+- x86: Use typeof_member style in RSEQ area access expressions
+- x86: Simplify RSEQ area access expressions
+- x86: Simplify stack and pointer guard macros
+- x86: Simplify TCB access expressions
+- x86: Detect Intel Nova Lake Processor
+- x86: Detect Intel Wildcat Lake Processor
+- ppc64le: Restore optimized strncmp for power10
+- ppc64le: Restore optimized strcmp for power10
+- math: Optimize flt-32 remainder implementation
+- math: Optimize dbl-64 remainder implementation
+- malloc: Cleanup macros, asserts and sysmalloc_mmap_fallback
+- shm-directory: Truncated struct member name length
+- Add once_flag, ONCE_FLAG_INIT and call_once to stdlib.h for C23
+- Implement C23 memset_explicit (bug 32378)
+- AArch64: Implement AdvSIMD and SVE log10p1(f) routines
+- AArch64: Implement AdvSIMD and SVE log2p1(f) routines
+- x86: Restore "*&" GCC asm memory operand workaround to installed fpu-control.h
+- benchtests: Add workload for tgammaf-inputs
+- assert: Refactor assert/assert_perror
+- nptl: Fix MADV_GUARD_INSTALL logic for thread without guard page (BZ 33356)
+- x86_64: Fix number of operands mismatch for vdivss
+- x86: Use "%v" to emit VEX encoded instructions for AVX targets
+- x86: Remove obsolete "*&" GCC asm memory operand workaround
+- malloc: Remove dumped heap support
+- AArch64: Update math-vector-fortran.h
+- malloc: Hoist common unlock out of if-else control block
+- x86: Don't use asm statement for trunc/truncf
+- i686: Compile .op files and gmon tests with -mfentry
+- i386: Use __seg_gs qualifier to cast access to TCB in THREAD_GSCOPE_RESET_FLAG()
+- x86_64: Use __seg_fs qualifier to cast access to TCB in THREAD_GSCOPE_RESET_FLAG()
+- nss: Group merge does not react to ERANGE during merge (bug 33361)
+- math: Remove clz_uint64/ctz_uint64 and use stdbit.h
+- math: Split erf and erfc
+- math: Use internal fesetround alias on fma
+- math: Use internal fetestexcept alias on fma
+- math: Add fetestexcept internal alias
+- math: Use internal feholdexcept alias on fma
+- math: Use internal feupdateenv alias on fma
+- math: Use internal feholdexcept alias on fma
+- math: Add feclearexcept internal alias
+- Update to Unicode 17.0.0 [BZ #33289]
+- AArch64: add optimised strspn/strcspn
+- i386: Use __seg_gs qualifiers in {STACK, POINTER}_CHK_GUARD macros
+- x86_64: Use __seg_fs qualifiers in {STACK, POINTER}_CHK_GUARD macros
+- x86: Remove x86 version of thread_pointer.h
+- x86: Remove stale __GNUC_PREREQ (11, 1) test from __thread_pointer()
+- malloc: Cleanup libc_realloc
+- malloc: check "negative" tcache_key values by hand
+- x86: Define atomic_compare_and_exchange_{val, bool}_acq using __atomic_compare_exchange_n
+- x86: Define atomic_exchange_acq using __atomic_exchange_n
+- x86: Define atomic_full_barrier using __sync_synchronize
+- x86: Remove catomic_* locking primitives
+- atomic: Switch atomic.h to builtin atomics
+- atomic: Switch power to builtin atomics
+- atomic: Use builtin atomics with USE_ATOMIC_COMPILER_BUILTINS
+- x86: Include <bits/stdlib-bsearch.h> in dl-cacheinfo.h
+- Linux: Add missing si_code constants from Linux kernel
+- Remove futex_supports_pshared
+- misc: Add support for Linux uio.h RWF_DONTCACHE flag
+- malloc: Fix Os build on some ABIs
+
+* Mon Sep 08 2025 Frédéric Bérat <fberat@redhat.com> - 2.42.9000-5
+- Auto-sync with upstream branch master,
+  commit b173557da978a04ac3bdfc0bd3b0e7ac583b44d5:
+- libio: Define AT_RENAME_* with the same tokens as Linux
+- testsuite: Update tests for 'xfclose' use
+- testsuite: Update tests for 'xfmemopen' use
+- support: Implement 'xfmemopen' for seamless 'fmemopen' use
+- x86_64: Unconditionally run test elf/check-dt-x86-64-plt
+- Fix sysdeps/mips/dl-machine-reject-phdr.h build with GCC 16
+- AArch64: Implement exp2m1 and exp10m1 routines
+- Tests: Create files with mode 0666, not 0777 (bug 33171)
+- nptl: Fix "Arch-sepecific" typo in comment
+
+
+* Mon Sep 01 2025 Florian Weimer <fweimer@redhat.com> - 2.42.9000-4
+- Auto-sync with upstream branch master,
+  commit 0c6cb5285bc90b35dfdb476f47fe9bad721abf8b:
+- nptl: Provide __pthread_rwlock_unlock compat symbol for versions before 2.43
+- nptl: Drop IS_IN (libpthread) around hidden_proto (__pthread_rwlock_unlock)
+- login: fix ut_line comparison logic
+- malloc: add tst-mxfast to hugetlb exclusion list
+- x86: Use flag output operands for inline asm in atomic-machine.h
+- x32: Fix, optimize and cleanup RSEQ_* accessors
+- x86/configure: Improve portability of isa level check
+- elf: early conversion of elf p_flags to mprotect flags
+- malloc: Support hugepages in mremap_chunk
+- malloc: Change mmap chunk layout
+- added benchmark inputs for rsqrtf and rsqrt
+- add missing benchmark files for several C23 binary64 functions
+- manual: Refer to libc-alpha instead of a dead mailing list.
+
+* Tue Aug 26 2025 DJ Delorie <dj@redhat.com> - 2.42.9000-3
+- Auto-sync with upstream branch master,
+  commit 027505a07b2fdef09749300b531623b12f4d5afe.
+- Don't pass -c to LIBC_TRY_TEST_CC_OPTION
+- Remove test-have-mamx-tile from Makefile.in
+- Don't use -Wfree-labels/-Wmissing-parameter-name if unsupported
+- Undef __INT64_C/__UINT64_C for glibc build and test
+- Revert "Don't use -Wfree-labels/-Wmissing-parameter-name if unsupported"
+- Don't use -Wfree-labels/-Wmissing-parameter-name if unsupported
+- x86: Set have-protected-data to no if unsupported
+- stdio-common: Convert macros across scanf input specifier tests
+- stdio-common: Adjust header inclusion in scanf input specifier tests
+- stdio-common: Include correct skeleton in scanf input specifier tests
+- stdio-common: Fix NaN input data for scanf input specifier tests [BZ #32857]
+- stdio-common: Fix bad NaN crash in scanf input specifier tests [BZ #32857]
+- stdio-common: Fix a crash in scanf input specifier tests [BZ #32857]
+- stdio-common: Fix error reporting in scanf input specifier tests
+- stdio-common: Reject insufficient character data in scanf [BZ #12701]
+- Disable -Wimplicit-fallthrough when clang is in use
+- libio: Properly link in libio functions in static binaries
+- x86_64: Use __seg_fs qualifiers in NPTL accessors
+- x86: Remove an extra space before THREAD_SELF
+- x86_64: Remove stalled __GNUC_PREREQ (6, 0) test in THREAD_SELF()
+- i386: Use __seg_gs qualifiers in NPTL accessors
+- i386: Remove stalled __GNUC_PREREQ (6, 0) test in THREAD_SELF()
+- i386: Use TESTB instead of TESTL in ____longjmp_chk()
+- x86_64: Use TESTB instead of TESTL in CHECK_INVALID_LONGJMP
+- AArch64: Fix SVE powf routine [BZ #33299]
+- support: Handle FUSE_GETXATTR during FUSE FS mount
+- malloc: Fix tst bug in malloc/tst-free-errno-malloc-hugetlb1.
+- i386: Also add GLIBC_ABI_GNU2_TLS version [BZ #33129]
+- htl: move sem_unlink into libc.
+- htl: move sem_{clockwait, timedwait, wait, trywait} into libc.
+- htl: move sem_post into libc.
+- htl: move sem_open, sem_close into libc.
+- htl: move sem_init into libc.
+- htl: move sem_getvalue into libc.
+- htl: move sem_destroy into libc.
+- htl: move __pthread_startup into libc.
+- htl: move __pthread_setup into libc.
+- htl: move pthread_{join, clockjoin_np, timedjoin_np, tryjoin_np} into libc.
+- htl: move pthread_exit into libc.
+- htl: move pthread_detach into libc.
+- htl: move __pthread_sigstate_init into libc.
+- htl: move pthread_mutex_transfer_np into libc.
+- htl: move pthread_getattr_np into libc.
+- htl: move pthread_testcancel into libc.
+- htl: move pthread_kill into libc.
+- htl: move pthread_cancel, __pthread_do_cancel into libc.
+- htl: move __thread_set_pcsptp into libc.
+- htl: move pthread_yield into libc.
+- htl: move pthread_getcpuclockid into libc.
+- htl: move __pthread_thread_{alloc, start, terminate} into libc.
+- htl: move __pthread_stack_alloc into libc.
+- htl: move __pthread_init_{specific, static_tls}, __pthread_{alloc}, dealloc} into libc.
+- htl: move pthread_get/setconcurrency into libc.
+- htl: move pthread_setschedprio into libc.
+
+* Tue Aug 26 2025 Arjun Shankar <arjun@redhat.com> - 2.42.9000-2
+- glibc-locale-source: Require gzip to handle compressed charmaps
+
+* Fri Aug 15 2025 Patsy Griffin <pfrankli@redhat.com> - 2.42.9000-1
+- Auto-sync with upstream branch master,
+  commit 399384e0c8193e31aea014220ccfa24300ae5938.
 - x86-64: Add GLIBC_ABI_DT_X86_64_PLT [BZ #33212]
-- x86-64: Add GLIBC_ABI_GNU2_TLS version [BZ #33129]
 - i386: Add GLIBC_ABI_GNU_TLS version [BZ #33221]
-- Use TLS initial-exec model for __libc_tsd_CTYPE_* thread variables [BZ #33234]
+- x86-64: Add GLIBC_ABI_GNU2_TLS version [BZ #33129]
+- LoongArch: Fix build failure for loongarch64-linux-gnusf toolchain. [BZ #32776]
+- benchtests: Avoid truncation in random memcpy/memset benchmarks
+- stdio-common: Fix macro parameter shadowing in scanf input specifier tests
+- stdio-common: Add 'f' conversion tests for . scanf input [BZ #12701]
+- stdio-common: Add 'e' conversion tests for . scanf input [BZ #12701]
+- stdio-common: Add 'a', 'g' conversion tests for 0x. scanf input [BZ #12701]
+- stdio-common: Reject significands w/o digits in scanf [BZ #12701]
+- stdio-common: Don't read real input beyond the field width in scanf
 - malloc: Fix checking for small negative values of tcache_key
 - malloc: Make sure tcache_key is odd enough
+- localedata: Add en_SE for ISO8601 dates
+- malloc: Fix MALLOC_DEBUG
+- malloc: Support THP in arenas
+- malloc: Remove use of __curbrk
+- Filter machine compiler flags into Assembler Flags
+- tst-freopen4: Remove temporary directory from warning message
+- Revert "tst-freopen4-main.c: Call support_capture_subprocess with chroot"
+- iconv: Fix iconv functions not following symlinks [BZ #32339]
+- Linux: Add test case for bug 33245
+- Use TLS initial-exec model for __libc_tsd_CTYPE_* thread variables [BZ #33234]
+- iconv: use bswap_32 instead of __builtin_bswap32
+- tst-env-setuid: Delete LD_DEBUG_OUTPUT output
+- tst-freopen4-main.c: Call support_capture_subprocess with chroot
+- tst-fopen-threaded.c: Delete temporary file
+- Delete temporary files in support_subprocess
+- Revert "Remove use of __curbrk."
+- Revert "Improve MALLOC_DEBUG"
+- Revert "Enable THP on arenas"
+- Revert "benchtests: Avoid overflow in random memcpy/memset benchmarks"
+- Revert "Use _int_free_chunk in tcache_thread_shutdown"
+- Revert "Remove dumped heap support"
+- Revert "malloc: Cleanup libc_realloc"
+- Revert "Change mmap representation"
+- Remove use of __curbrk.
+- Improve MALLOC_DEBUG
+- Enable THP on arenas
+- benchtests: Avoid overflow in random memcpy/memset benchmarks
+- Use _int_free_chunk in tcache_thread_shutdown
+- Remove dumped heap support
+- malloc: Cleanup libc_realloc
+- Change mmap representation
+- manual: Adjust documentation to standardization of select
+- manual: Use sys/select.h instead of sys/time.h for select example.
+- manual: document getsubopt standardization.
+- errlist: add missing entries for MIPS/SPARC
+- hurd: support: Fix running SGID tests
+- support: Handle COPY_FILE_RANGE events with FUSE
+- malloc: Cleanup sysmalloc_mmap
+- malloc: Improve checked_request2size
+- malloc: Cleanup madvise defines
+- benchtests: Cleanup bench-malloc-thread
 - malloc: Fix MAX_TCACHE_SMALL_SIZE
+- nptl: Fix SYSCALL_CANCEL for return values larger than INT_MAX (BZ 33245)
+- i386: Consolidate subdirectory check on elf and csu
+- x86-64: Consolidate subdirectory check on elf and csu
+- elf: Handle ld.so with LOAD segment gaps in _dl_find_object (bug 31943)
+- elf: Extract rtld_setup_phdr function from dl_main
+- stdlib: resolve a double lock init issue after fork [BZ #32994]
+- Use Linux 6.16, GCC 15, binutils 2.45 in build-many-glibcs.py
+- malloc: Enable THP always support on hugetlb tunable
 - malloc: Remove redundant NULL check
+- replace atan2-inputs with more meaningful inputs
+- inet-fortified: fix namespace violation (bug 33227)
+- tst-cond23: return EXIT_UNSUPPORTED on missing clock selection
+- NEWS: Add 2.43 section
+- Bump version to 2.42.9000
 
 * Fri Aug 08 2025 Frédéric Bérat <fberat@redhat.com> - 2.42-3
 - Auto-sync with upstream branch release/2.42/master,
