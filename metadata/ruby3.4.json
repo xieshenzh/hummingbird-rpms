@@ -3,10 +3,10 @@
   "cve_product": "ruby-lang / ruby",
   "modification_reason": "Backport net-imap 0.5.14 security fixes for CVE-2026-42245, CVE-2026-42246, CVE-2026-42256; backport fix for CVE-2026-47242",
   "modification_status": "modified",
-  "release": "30",
-  "sha": "f7476cd215086d3132f7600b84552b8681dee027",
+  "release": "31",
+  "sha": "13ec45290ca2daff61ce739ade287a78e753a2d0",
   "source": "https://src.fedoraproject.org/rpms/ruby.git",
   "upstream_branch": "ruby_3_4",
   "upstream_repo": "https://github.com/ruby/ruby",
-  "version": "3.4.9"
+  "version": "3.4.10"
 }
