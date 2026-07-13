@@ -65,3 +65,5 @@ stamp-*
 /isl*
 /binutils-2.19.50.0.1-output-format.sed
 /binutils-2.44.50-13.fc43.src.rpm
+/binutils-with-gold-2.45.50-be970c68891.tar.gz
+/binutils-with-gold-2.45.50-ba5838a98fb.tar.gz

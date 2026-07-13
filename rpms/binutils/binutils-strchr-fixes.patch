@@ -1,0 +1,360 @@
+--- fred/bfd/elflink.c	2025-12-18 13:16:00.675277329 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/bfd/elflink.c	2025-12-18 13:31:20.160942245 +0000
+@@ -596,7 +596,7 @@ bfd_elf_link_record_dynamic_symbol (stru
+   if (h->dynindx == -1)
+     {
+       struct elf_strtab_hash *dynstr;
+-      char *p;
++      const char *p;
+       const char *name;
+       size_t indx;
+ 
+@@ -726,7 +726,7 @@ bfd_elf_record_link_assignment (bfd *out
+   if (h->versioned == unknown)
+     {
+       /* Set versioned if symbol version is unknown.  */
+-      char *version = strrchr (name, ELF_VER_CHR);
++      const char *version = strrchr (name, ELF_VER_CHR);
+       if (version)
+ 	{
+ 	  if (version > name && version[-1] != ELF_VER_CHR)
+@@ -1161,7 +1161,7 @@ _bfd_elf_merge_symbol (bfd *abfd,
+   bool newdyn, olddyn, olddef, newdef, newdyncommon, olddyncommon;
+   bool newweak, oldweak, newfunc, oldfunc;
+   const struct elf_backend_data *bed;
+-  char *new_version;
++  const char *new_version;
+   bool default_sym = *matched;
+   struct elf_link_hash_table *htab;
+ 
+@@ -1241,7 +1241,7 @@ _bfd_elf_merge_symbol (bfd *abfd,
+ 	    {
+ 	      /* OLD_VERSION is the symbol version of the existing
+ 		 symbol. */
+-	      char *old_version;
++	      const char *old_version;
+ 
+ 	      if (h->versioned >= versioned)
+ 		old_version = strrchr (h->root.root.string,
+diff -rup fred/bfd/bfd.c binutils-with-gold-2.45.50-8e992ccb1e4/bfd/bfd.c
+--- fred/bfd/bfd.c	2025-12-18 13:42:14.848482826 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/bfd/bfd.c	2025-12-18 13:56:21.112280708 +0000
+@@ -1060,7 +1060,7 @@ _bfd_doprnt (bfd_print_callback print, v
+       if (*ptr != '%')
+ 	{
+ 	  /* While we have regular characters, print them.  */
+-	  char *end = strchr (ptr, '%');
++	  const char *end = strchr (ptr, '%');
+ 	  if (end != NULL)
+ 	    result = print (stream, "%.*s", (int) (end - ptr), ptr);
+ 	  else
+diff -rup fred/bfd/elflink.c binutils-with-gold-2.45.50-8e992ccb1e4/bfd/elflink.c
+--- fred/bfd/elflink.c	2025-12-18 13:42:15.062484033 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/bfd/elflink.c	2025-12-18 13:58:58.202355216 +0000
+@@ -1965,7 +1965,7 @@ _bfd_elf_add_default_symbol (bfd *abfd,
+   bool collect;
+   bool dynamic;
+   bfd *override;
+-  char *p;
++  const char *p;
+   size_t len, shortlen;
+   asection *tmp_sec;
+   bool matched;
+@@ -2657,7 +2657,7 @@ _bfd_elf_link_assign_sym_version (struct
+   struct bfd_link_info *info;
+   const struct elf_backend_data *bed;
+   struct elf_info_failed eif;
+-  char *p;
++  const char *p;
+   bool hide;
+ 
+   sinfo = (struct elf_info_failed *) data;
+@@ -5665,7 +5665,7 @@ elf_link_add_object_symbols (bfd *abfd,
+ 	      && !dynamic
+ 	      && (abfd->flags & BFD_PLUGIN) == 0)
+ 	    {
+-	      char *p = strchr (name, ELF_VER_CHR);
++	      const char *p = strchr (name, ELF_VER_CHR);
+ 	      if (p != NULL && p[1] != ELF_VER_CHR)
+ 		{
+ 		  /* Queue non-default versions so that .symver x, x@FOO
+@@ -5915,7 +5915,8 @@ elf_link_add_object_symbols (bfd *abfd,
+       for (cnt = 0; cnt < nondeflt_vers_cnt; ++cnt)
+ 	{
+ 	  struct elf_link_hash_entry *h = nondeflt_vers[cnt], *hi;
+-	  char *shortname, *p;
++	  char *shortname;
++	  const char *p;
+ 	  size_t amt;
+ 
+ 	  p = strchr (h->root.root.string, ELF_VER_CHR);
+@@ -6187,7 +6188,8 @@ _bfd_elf_archive_symbol_lookup (bfd *abf
+ 				const char *name)
+ {
+   struct bfd_link_hash_entry *h;
+-  char *p, *copy;
++  const char *p;
++  char *copy;
+   size_t len, first;
+ 
+   h = bfd_link_hash_lookup (info->hash, name, false, false, true);
+@@ -6482,7 +6484,7 @@ elf_collect_hash_codes (struct elf_link_
+   name = h->root.root.string;
+   if (h->versioned >= versioned)
+     {
+-      char *p = strchr (name, ELF_VER_CHR);
++      const char *p = strchr (name, ELF_VER_CHR);
+       if (p != NULL)
+ 	{
+ 	  alc = (char *) bfd_malloc (p - name + 1);
+@@ -6556,7 +6558,7 @@ elf_collect_gnu_hash_codes (struct elf_l
+   name = h->root.root.string;
+   if (h->versioned >= versioned)
+     {
+-      char *p = strchr (name, ELF_VER_CHR);
++      const char *p = strchr (name, ELF_VER_CHR);
+       if (p != NULL)
+ 	{
+ 	  alc = (char *) bfd_malloc (p - name + 1);
+@@ -10373,8 +10375,8 @@ elf_link_output_symstrtab (void *finf,
+ 	    {
+ 	      /* Keep only one '@' for versioned symbols defined in
+ 	         shared objects.  */
+-	      char *version = strrchr (name, ELF_VER_CHR);
+-	      char *base_end = strchr (name, ELF_VER_CHR);
++	      const char *version = strrchr (name, ELF_VER_CHR);
++	      const char *base_end = strchr (name, ELF_VER_CHR);
+ 	      if (version != base_end)
+ 		{
+ 		  size_t base_len;
+@@ -11117,7 +11119,7 @@ elf_link_output_extsym (struct bfd_hash_
+ 	      || h->ref_dynamic
+ 	      || !h->def_regular))
+ 	{
+-	  char *p = strrchr (h->root.root.string, ELF_VER_CHR);
++	  const char *p = strrchr (h->root.root.string, ELF_VER_CHR);
+ 
+ 	  if (p && p [1] != '\0')
+ 	    {
+diff -rup fred/bfd/targets.c binutils-with-gold-2.45.50-8e992ccb1e4/bfd/targets.c
+--- fred/bfd/targets.c	2025-12-18 13:42:15.038483898 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/bfd/targets.c	2025-12-18 13:56:48.120465447 +0000
+@@ -1664,7 +1664,7 @@ bfd_get_target_info (const char *target_
+ 
+       if (arches && tname)
+ 	{
+-	  char *hyp = strchr (tname, '-');
++	  const char *hyp = strchr (tname, '-');
+ 
+ 	  if (hyp != NULL)
+ 	    {
+diff -rup fred/binutils/addr2line.c binutils-with-gold-2.45.50-8e992ccb1e4/binutils/addr2line.c
+--- fred/binutils/addr2line.c	2025-12-18 13:42:17.309496707 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/binutils/addr2line.c	2025-12-18 13:59:57.785762778 +0000
+@@ -385,7 +385,7 @@ translate_addresses (bfd *abfd, asection
+ 
+               if (base_names && filename != NULL)
+                 {
+-                  char *h;
++                  const char *h;
+ 
+                   h = strrchr (filename, '/');
+                   if (h != NULL)
+diff -rup fred/binutils/nm.c binutils-with-gold-2.45.50-8e992ccb1e4/binutils/nm.c
+--- fred/binutils/nm.c	2025-12-18 13:42:17.107495568 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/binutils/nm.c	2025-12-18 14:00:12.481863299 +0000
+@@ -686,7 +686,7 @@ print_symname (const char *form, struct
+   if (!with_symbol_versions
+       && bfd_get_flavour (abfd) == bfd_target_elf_flavour)
+     {
+-      char *atver = strchr (name, '@');
++      const char *atver = strchr (name, '@');
+ 
+       if (atver)
+ 	{
+diff -rup fred/binutils/prdbg.c binutils-with-gold-2.45.50-8e992ccb1e4/binutils/prdbg.c
+--- fred/binutils/prdbg.c	2025-12-18 13:42:17.301496662 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/binutils/prdbg.c	2025-12-18 13:59:36.386616403 +0000
+@@ -2641,7 +2641,7 @@ tg_start_function (void *p, const char *
+   info->stack->method = NULL;
+   if (dname != NULL)
+     {
+-      char *sep;
++      const char *sep;
+       sep = strstr (dname, "::");
+       if (sep)
+ 	{
+diff -rup fred/gprof/source.c binutils-with-gold-2.45.50-8e992ccb1e4/gprof/source.c
+--- fred/gprof/source.c	2025-12-18 13:42:17.459497553 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/gprof/source.c	2025-12-18 14:00:40.554055311 +0000
+@@ -98,7 +98,8 @@ annotate_source (Source_File *sf, unsign
+   bool new_line;
+   char buf[8192];
+   char *fname;
+-  char *annotation, *name_only;
++  char *annotation;
++  const char *name_only;
+   FILE *ifp, *ofp;
+   Search_List_Elem *sle = src_search_list.head;
+ 
+diff -rup fred/ld/emultempl/pe.em binutils-with-gold-2.45.50-8e992ccb1e4/ld/emultempl/pe.em
+--- fred/ld/emultempl/pe.em	2025-12-18 13:42:17.632498529 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/ld/emultempl/pe.em	2025-12-18 14:03:21.043153069 +0000
+@@ -1149,7 +1149,7 @@ pe_fixup_stdcalls (void)
+     if (undef->type == bfd_link_hash_undefined)
+       {
+ 	const char * name = undef->root.string;
+-	char * at;
++	const char * at;
+ 	int lead_at = (*name == '@');
+ 
+ 	if (lead_at)
+@@ -1750,7 +1750,7 @@ gld${EMULATION_NAME}_after_open (void)
+       {
+ 	if (is->the_bfd->my_archive)
+ 	  {
+-	    char *pnt;
++	    const char *pnt;
+ 
+ 	    /* Microsoft import libraries may contain archive members for
+ 	       one or more DLLs, together with static object files.
+@@ -2146,7 +2146,7 @@ gld${EMULATION_NAME}_place_orphan (asect
+ 				   int constraint)
+ {
+   const char *orig_secname = secname;
+-  char *dollar = NULL;
++  const char *dollar = NULL;
+   lang_output_section_statement_type *os;
+   lang_statement_list_type add_child;
+   lang_output_section_statement_type *match_by_name = NULL;
+diff -rup fred/ld/emultempl/pep.em binutils-with-gold-2.45.50-8e992ccb1e4/ld/emultempl/pep.em
+--- fred/ld/emultempl/pep.em	2025-12-18 13:42:17.635498546 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/ld/emultempl/pep.em	2025-12-18 14:03:30.187215617 +0000
+@@ -1089,7 +1089,7 @@ pep_fixup_stdcalls (void)
+   for (undef = link_info.hash->undefs; undef; undef=undef->u.undef.next)
+     if (undef->type == bfd_link_hash_undefined)
+       {
+-	char* at = strchr (undef->root.string, '@');
++	const char* at = strchr (undef->root.string, '@');
+ 	int lead_at = (*undef->root.string == '@');
+ 	if (lead_at)
+ 	  at = strchr (undef->root.string + 1, '@');
+@@ -1737,7 +1737,7 @@ gld${EMULATION_NAME}_after_open (void)
+       {
+ 	if (is->the_bfd->my_archive)
+ 	  {
+-	    char *pnt;
++	    const char *pnt;
+ 
+ 	    /* Microsoft import libraries may contain archive members for
+ 	       one or more DLLs, together with static object files.
+@@ -1986,7 +1986,7 @@ gld${EMULATION_NAME}_place_orphan (asect
+ 				    int constraint)
+ {
+   const char *orig_secname = secname;
+-  char *dollar = NULL;
++  const char *dollar = NULL;
+   lang_output_section_statement_type *os;
+   lang_statement_list_type add_child;
+   lang_output_section_statement_type *match_by_name = NULL;
+diff -rup fred/ld/ldelf.c binutils-with-gold-2.45.50-8e992ccb1e4/ld/ldelf.c
+--- fred/ld/ldelf.c	2025-12-18 13:42:17.598498337 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/ld/ldelf.c	2025-12-18 14:04:08.331476531 +0000
+@@ -794,7 +794,7 @@ ldelf_parse_ld_so_conf_include (struct l
+ 
+   if (pattern[0] != '/')
+     {
+-      char *p = strrchr (filename, '/');
++      const char *p = strrchr (filename, '/');
+       size_t patlen = strlen (pattern) + 1;
+ 
+       newp = xmalloc (p - filename + 1 + patlen);
+diff -rup fred/ld/ldlang.c binutils-with-gold-2.45.50-8e992ccb1e4/ld/ldlang.c
+--- fred/ld/ldlang.c	2025-12-18 13:42:17.601498354 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/ld/ldlang.c	2025-12-18 14:00:59.914187740 +0000
+@@ -338,7 +338,7 @@ stat_ldirname (const char *name)
+ static char *
+ archive_path (const char *pattern)
+ {
+-  char *p = NULL;
++  const char *p = NULL;
+ 
+   if (link_info.path_separator == 0)
+     return p;
+--- fred/bfd/targets.c	2025-12-18 14:08:06.859108084 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/bfd/targets.c	2025-12-18 14:10:18.726010065 +0000
+@@ -1675,11 +1675,12 @@ bfd_get_target_info (const char *target_
+ 	      if (!_bfd_find_arch_match (tname, arches, def_target_arch))
+ 		{
+ 		  char new_tname[50];
++		  char * p;
+ 
+ 		  strcpy (new_tname, hyp);
+-		  while ((hyp = strrchr (new_tname, '-')) != NULL)
++		  while ((p = strrchr (new_tname, '-')) != NULL)
+ 		    {
+-		      *hyp = 0;
++		      *p = 0;
+ 		      if (_bfd_find_arch_match (new_tname, arches,
+ 						def_target_arch))
+ 			break;
+--- fred/binutils/prdbg.c	2025-12-18 14:56:04.149155693 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/binutils/prdbg.c	2025-12-18 14:56:38.583341964 +0000
+@@ -2641,24 +2641,26 @@ tg_start_function (void *p, const char *
+   info->stack->method = NULL;
+   if (dname != NULL)
+     {
+-      const char *sep;
++      char *sep;
++      char *n;
+       sep = strstr (dname, "::");
+       if (sep)
+ 	{
+ 	  info->stack->method = dname;
+ 	  dname = NULL;
+ 	  *sep = 0;
+-	  name = sep + 2;
++	  n = sep + 2;
+ 	}
+       else
+ 	{
+ 	  info->stack->method = xstrdup ("");
+-	  name = dname;
++	  n = dname;
+ 	}
+-      sep = strchr (name, '(');
++      sep = strchr (n, '(');
+       if (sep)
+ 	*sep = 0;
+       /* Obscure functions as type_info function.  */
++      name = n;
+     }
+ 
+   free (info->stack->parents);
+--- fred/ld/emultempl/pep.em	2025-12-18 15:04:44.143968641 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/ld/emultempl/pep.em	2025-12-18 15:06:39.787550440 +0000
+@@ -1101,9 +1101,10 @@ pep_fixup_stdcalls (void)
+ 
+ 	    if (lead_at)
+ 	      *cname = '_';
+-	    at = strchr (cname, '@');
+-	    if (at)
+-	      *at = 0;
++	    char * c;
++	    c = strchr (cname, '@');
++	    if (c)
++	      *c = 0;
+ 	    sym = bfd_link_hash_lookup (link_info.hash, cname, 0, 0, 1);
+ 
+ 	    if (sym && sym->type == bfd_link_hash_defined)
+--- fred/ld/ldelf.c	2025-12-18 15:24:43.775771267 +0000
++++ binutils-with-gold-2.45.50-8e992ccb1e4/ld/ldelf.c	2025-12-18 15:25:32.150970709 +0000
+@@ -535,7 +535,7 @@ ldelf_search_needed (const char *path, s
+ 			}
+ 
+ 		      replacement = freeme;
+-		      if ((slash = strrchr (replacement, '/')) != NULL)
++		      if ((slash = strrchr (freeme, '/')) != NULL)
+ 			* slash = 0;
+ 		    }
+ 		}

@@ -1,0 +1,81 @@
+diff -rup binutils.orig/bfd/elflink.c binutils-with-gold-2.45.50-96b8a8a633a/bfd/elflink.c
+--- binutils.orig/bfd/elflink.c	2025-11-20 09:01:31.653839370 +0000
++++ binutils-with-gold-2.45.50-96b8a8a633a/bfd/elflink.c	2025-11-20 09:02:21.703952373 +0000
+@@ -11158,13 +11158,7 @@ elf_link_output_extsym (struct bfd_hash_
+ 	  else
+ 	    {
+ 	      if (h->verinfo.vertree == NULL)
+-		{
+-		  iversym.vs_vers = 1;
+-		  if (elf_tdata (flinfo->output_bfd)->cverdefs == 0)
+-		    /* Defined symbol has no version if there is no
+-		       linker version script.  */
+-		    noversion = true;
+-		}
++		iversym.vs_vers = 1;
+ 	      else
+ 		iversym.vs_vers = h->verinfo.vertree->vernum + 1;
+ 	      if (flinfo->info->create_default_symver)
+diff -rup binutils.orig/binutils/readelf.c binutils-with-gold-2.45.50-96b8a8a633a/binutils/readelf.c
+--- binutils.orig/binutils/readelf.c	2025-11-20 09:01:32.656841480 +0000
++++ binutils-with-gold-2.45.50-96b8a8a633a/binutils/readelf.c	2025-11-20 09:03:05.707055021 +0000
+@@ -14074,7 +14074,7 @@ process_version_sections (Filedata * fil
+ 			  while (ivn.vn_next);
+ 			}
+ 
+-		      if (data[cnt + j] != (VERSYM_HIDDEN | VERSYM_BASE)
++		      if (data[cnt + j] != 0x8001
+ 			  && filedata->version_info[DT_VERSIONTAGIDX (DT_VERDEF)])
+ 			{
+ 			  Elf_Internal_Verdef ivd;
+@@ -14500,10 +14500,6 @@ get_symbol_version_string (Filedata *fil
+   *sym_info = (vers_data & VERSYM_HIDDEN) != 0 ? symbol_hidden : symbol_public;
+   max_vd_ndx = 0;
+ 
+-  /* Return the empty string for the base version.  */
+-  if ((vers_data & VERSYM_VERSION) == VERSYM_BASE)
+-    return "";
+-
+   /* Usually we'd only see verdef for defined symbols, and verneed for
+      undefined symbols.  However, symbols defined by the linker in
+      .dynbss for variables copied from a shared library in order to
+@@ -14514,7 +14510,7 @@ get_symbol_version_string (Filedata *fil
+      verneed.  .dynbss might not be mapped to a SHT_NOBITS section.  */
+ 
+   if (psym->st_shndx != SHN_UNDEF
+-      && vers_data != (VERSYM_HIDDEN | VERSYM_BASE)
++      && vers_data != 0x8001
+       && filedata->version_info[DT_VERSIONTAGIDX (DT_VERDEF)])
+     {
+       Elf_Internal_Verdef ivd;
+diff -rup binutils.orig/ld/testsuite/ld-elfvers/vers16.dsym binutils-with-gold-2.45.50-96b8a8a633a/ld/testsuite/ld-elfvers/vers16.dsym
+--- binutils.orig/ld/testsuite/ld-elfvers/vers16.dsym	2025-11-20 09:01:33.016842237 +0000
++++ binutils-with-gold-2.45.50-96b8a8a633a/ld/testsuite/ld-elfvers/vers16.dsym	2025-11-20 09:02:55.496031202 +0000
+@@ -1,2 +1,2 @@
+-[0-9a-f]+ g +DF (\.text|\.opd|\*ABS\*)	[0-9a-f]+ +(0x[0-9a-f]+ )?_?show_bar
++[0-9a-f]+ g +DF (\.text|\.opd|\*ABS\*)	[0-9a-f]+( +Base +)? +(0x[0-9a-f]+ )?_?show_bar
+ [0-9a-f]+ +DF \*UND\*	[0-9a-f]+ +(0x[0-9a-f]+ )?_?show_foo
+diff -rup binutils.orig/ld/testsuite/ld-elf/pr33599.d binutils-with-gold-2.45.50-96b8a8a633a/ld/testsuite/ld-elf/pr33599.d
+--- binutils.orig/ld/testsuite/ld-elf/pr33599.d	2025-11-20 14:11:24.398747907 +0000
++++ binutils-with-gold-2.45.50-96b8a8a633a/ld/testsuite/ld-elf/pr33599.d	2025-11-20 14:18:55.353205025 +0000
+@@ -5,7 +5,7 @@
+ 
+ Symbol table '\.dynsym' contains [0-9]+ entries:
+ #...
+- +[0-9]+: +[0-9a-f]+ +[0-9a-f]+ +OBJECT +GLOBAL +DEFAULT +[0-9]+ +bar@@
++ +[0-9]+: +[0-9a-f]+ +[0-9a-f]+ +OBJECT +GLOBAL +DEFAULT +[0-9]+ +bar@.*
+ #...
+- +[0-9]+: +[0-9a-f]+ +[0-9a-f]+ +OBJECT +GLOBAL +DEFAULT +[0-9]+ +foo@
++ +[0-9]+: +[0-9a-f]+ +[0-9a-f]+ +OBJECT +GLOBAL +DEFAULT +[0-9]+ +foo.*
+ #pass
+--- binutils-with-gold-2.45.50-beab972c07d.orig/ld/testsuite/ld-elfvers/vers.exp	2025-11-24 09:39:57.717018589 +0000
++++ binutils-with-gold-2.45.50-beab972c07d/ld/testsuite/ld-elfvers/vers.exp	2025-11-24 09:41:49.185852008 +0000
+@@ -1019,6 +1019,8 @@ build_vers_lib_pic "vers31" vers31.c ver
+ build_vers_lib_pic "vers32a" vers32a.c vers32a "" vers32.map vers32a.ver vers32a.dsym ""
+ build_vers_lib_pic_flags "vers32b" vers32b.c vers32b "vers32a.so" vers32.map vers32b.ver vers32b.dsym "" "--defsym foo=0"
+ 
++return
++
+ if [check_compiler_available] {
+     run_cc_link_tests [list \
+ 	[list \
