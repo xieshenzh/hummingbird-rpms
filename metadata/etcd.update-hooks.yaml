@@ -11,6 +11,9 @@ download_sources: |
 
   tar xf "etcd-${version}.tar.gz" >&2
 
+  # etcd 3.7+ ships a go.work file; per-submodule vendoring requires GOWORK=off
+  export GOWORK=off
+
   for submod in server etcdctl etcdutl; do
     go_vendor_archive create \
       --config go-vendor-tools.toml \
