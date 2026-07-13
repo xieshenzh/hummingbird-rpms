@@ -1,0 +1,8 @@
+{
+  "modification_status": "native",
+  "release": "0.1",
+  "release_monitoring_project_id": 391002,
+  "track_upstream": "1.15",
+  "upstream_repo": "https://github.com/spiffe/spire",
+  "version": "1.15.1"
+}

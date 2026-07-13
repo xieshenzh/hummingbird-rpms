@@ -1,0 +1,99 @@
+---
+# Integration test for spire1.15: installs all three subpackages, boots a
+# self-signed spire-server with the shipped default config, joins a
+# spire-agent to it with a generated join token, issues a real X509-SVID to
+# a registered workload over the Workload API, and confirms the OIDC
+# discovery provider serves a JWKS backed by the server's signing keys.
+
+spire-server-agent-oidc-integration:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "spire1.15-server" ]]; then
+      echo "Skipping: only runs once, triggered by spire1.15-server (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y spire1.15-server spire1.15-agent spire1.15-oidc-discovery-provider
+
+        server_sock=/var/lib/spire/server/private/api.sock
+        agent_sock=/var/lib/spire/agent/public/api.sock
+        oidc_sock=/var/lib/spire/oidc-discovery-provider/oidc-discovery-provider.sock
+
+        wait_for() {
+          local desc=$1; shift
+          for _ in $(seq 1 30); do
+            if "$@" >/dev/null 2>&1; then return 0; fi
+            sleep 1
+          done
+          echo "FAIL: timed out waiting for ${desc}"
+          exit 1
+        }
+
+        # 0. Version is embedded correctly via ldflags (no stray "v" prefix,
+        # which previously crashed spire-server at startup: blang/semver
+        # panics parsing a "v"-prefixed version in sqlstore migration init)
+        for bin in spire-server spire-agent; do
+          version_output=$("${bin}" --version 2>&1)
+          if [[ "${version_output}" != *"1.15."* ]]; then
+            echo "FAIL: ${bin} --version reported unexpected output: ${version_output}"
+            exit 1
+          fi
+          echo "PASS: ${bin} reports correct 1.15.x version"
+        done
+
+        # 1. Server boots and self-signs with the shipped default config
+        spire-server run -config /etc/spire/server/server.conf &
+        server_pid=$!
+        wait_for "spire-server healthcheck" spire-server healthcheck -socketPath "${server_sock}"
+        echo "PASS: spire-server boots and reports healthy with the shipped default config"
+
+        # 2. Agent joins the server using a generated join token
+        token=$(spire-server token generate -socketPath "${server_sock}" -spiffeID spiffe://example.org/agent | sed -n "s/^Token: //p")
+        spire-server bundle show -socketPath "${server_sock}" > /tmp/bootstrap.crt
+
+        spire-agent run -config /etc/spire/agent/agent.conf -joinToken "${token}" -trustBundle /tmp/bootstrap.crt &
+        agent_pid=$!
+        wait_for "spire-agent healthcheck" spire-agent healthcheck -socketPath "${agent_sock}"
+        echo "PASS: spire-agent joins the server with a join token and the shipped default config"
+
+        # 3. A registered workload can fetch a real X509-SVID over the Workload API
+        agent_id="spiffe://example.org/spire/agent/join_token/${token}"
+        spire-server entry create -socketPath "${server_sock}" \
+          -parentID "${agent_id}" -spiffeID spiffe://example.org/workload -selector unix:uid:0
+        wait_for "workload SVID issuance" spire-agent api fetch -socketPath "${agent_sock}"
+        echo "PASS: registered workload fetches an X509-SVID over the Workload API"
+
+        # 4. OIDC discovery provider serves a JWKS backed by the servers keys
+        oidc-discovery-provider -config /etc/spire/oidc-discovery-provider/oidc-discovery-provider.conf &
+        oidc_pid=$!
+        wait_for "oidc-discovery-provider socket" test -S "${oidc_sock}"
+        jwks=$(curl -s --unix-socket "${oidc_sock}" http://localhost/keys)
+        echo "${jwks}" | jq -e ".keys | type == \"array\" and length > 0" >/dev/null || {
+          echo "FAIL: unexpected JWKS output: ${jwks}"
+          exit 1
+        }
+        echo "PASS: oidc-discovery-provider serves a JWKS derived from the server keys"
+
+        kill "${oidc_pid}" "${agent_pid}" "${server_pid}" 2>/dev/null || true
+      '
