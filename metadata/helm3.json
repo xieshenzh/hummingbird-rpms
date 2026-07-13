@@ -1,12 +1,12 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Install binary as helm, add Provides: helm",
+  "modification_reason": "Update to upstream version 3.21.3",
   "modification_status": "modified",
-  "release": "3",
+  "release": "0.1",
   "release_monitoring_project_id": 15046,
   "sha": "4a8b81b991bfa730a1f51e240f980ed120c1a809",
   "source": "https://src.fedoraproject.org/rpms/helm3.git",
   "track_upstream": "3",
   "upstream_repo": "https://github.com/helm/helm",
-  "version": "3.19.3"
+  "version": "3.21.3"
 }
