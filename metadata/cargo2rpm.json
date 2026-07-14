@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "dbc0335d1302e772a57ace1bb1b0ece5423480a1",
+  "release": "1",
+  "sha": "e456d8e3d6ad06ea09d4b6139c3779e489ba0500",
   "source": "https://src.fedoraproject.org/rpms/cargo2rpm.git",
   "upstream_repo": "https://codeberg.org/rust2rpm/cargo2rpm",
-  "version": "0.3.3"
+  "version": "0.3.4"
 }
