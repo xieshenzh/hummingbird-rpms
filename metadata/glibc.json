@@ -1,7 +1,6 @@
 {
   "branch": "f44",
-  "modification_reason": "Temporary: removed -fno-link-libatomic for GCC 15 bootstrap",
-  "modification_status": "modified",
+  "modification_status": "clean",
   "release": "7",
   "sha": "cead358d7bd8ac3df6c29d5ddce86d5bec4771fc",
   "source": "https://src.fedoraproject.org/rpms/glibc.git",
