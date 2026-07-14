@@ -20,7 +20,7 @@
  
    expandargv (&argc, &argv);
  
-+  toplev_main_argv = CONST_CAST2 (const char **, char **, argv);
++  toplev_main_argv = const_cast <const char **> (argv);
 +
    /* Initialization of GCC's environment, and diagnostics.  */
    general_init (argv[0], m_init_signals, std::move (original_argv));

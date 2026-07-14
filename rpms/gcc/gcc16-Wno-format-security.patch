@@ -32,14 +32,16 @@
  fi
 --- Makefile.tpl.jj	2023-11-29 13:21:41.680292662 +0100
 +++ Makefile.tpl	2024-11-30 13:35:29.303196246 +0100
-@@ -450,9 +450,9 @@ LDFLAGS = @LDFLAGS@
+@@ -450,10 +450,10 @@ LDFLAGS = @LDFLAGS@
  LIBCFLAGS = $(CFLAGS)
  CXXFLAGS = @CXXFLAGS@
  LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates
 -GOCFLAGS = $(CFLAGS)
+-A68FLAGS = @A68FLAGS@
 -GDCFLAGS = @GDCFLAGS@
 -GM2FLAGS = $(CFLAGS)
 +GOCFLAGS = $(filter-out -Wformat-security,$(CFLAGS))
++A68FLAGS = $(filter-out -Wformat-security,@A68FLAGS@)
 +GDCFLAGS = $(filter-out -Wformat-security,@GDCFLAGS@)
 +GM2FLAGS = $(filter-out -Wformat-security,$(CFLAGS))
  
@@ -47,14 +49,16 @@
  
 --- Makefile.in.jj	2023-11-29 13:21:41.691292507 +0100
 +++ Makefile.in	2024-11-30 13:36:12.113594079 +0100
-@@ -447,9 +447,9 @@ LDFLAGS = @LDFLAGS@
+@@ -447,10 +447,10 @@ LDFLAGS = @LDFLAGS@
  LIBCFLAGS = $(CFLAGS)
  CXXFLAGS = @CXXFLAGS@
  LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates
 -GOCFLAGS = $(CFLAGS)
+-A68FLAGS = @A68FLAGS@
 -GDCFLAGS = @GDCFLAGS@
 -GM2FLAGS = $(CFLAGS)
 +GOCFLAGS = $(filter-out -Wformat-security,$(CFLAGS))
++A68FLAGS = $(filter-out -Wformat-security,@A68FLAGS@)
 +GDCFLAGS = $(filter-out -Wformat-security,@GDCFLAGS@)
 +GM2FLAGS = $(filter-out -Wformat-security,$(CFLAGS))
  

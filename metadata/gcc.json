@@ -1,10 +1,10 @@
 {
-  "branch": "f43",
+  "branch": "f44",
   "modification_reason": "Disable non-essential language frontends",
   "modification_status": "modified",
-  "release": "7",
-  "sha": "fef47e540ee170873511546e35fc912cceed23f1",
+  "release": "2",
+  "sha": "54c6cf64388c0ea9696049a0571a76895aa611fa",
   "source": "https://src.fedoraproject.org/rpms/gcc.git",
   "upstream_repo": "https://gcc.gnu.org/git/gcc.git",
-  "version": "15.2.1"
+  "version": "16.1.1"
 }
