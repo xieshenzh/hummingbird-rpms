@@ -2,8 +2,9 @@
 
 # See ~/.config/mock/<CONFIG>.cfg or /etc/mock/<CONFIG>.cfg
 # Tweak this to centos-stream-9-x86_64 to build for CentOS
-MOCK_CHROOT?=fedora-rawhide-x86_64
+MOCK_CHROOT?=fedora-rawhide-$(shell uname -m)
 MOCK_OPTS?=
+MOCK_OPTS_COMMON=--root $(MOCK_CHROOT) --no-clean $(shell [[ -e /usr/bin/copr-builder ]] && echo "--enable-plugin tmpfs --plugin-option tmpfs:keep_mounted=True")
 MOCK_OPTS_RELEASE?=--no-clean --no-cleanup-after --without lto_build --without pgo --define "debug_package %{nil}" $(MOCK_OPTS)
 MOCK_OPTS_SNAPSHOT?=$(MOCK_OPTS_RELEASE) --with snapshot_build $(MOCK_OPTS)
 YYYYMMDD?=$(shell date +%Y%m%d)
@@ -36,6 +37,15 @@ endif
 get-sources-release:
 	spectool -g --define "_sourcedir $(SOURCEDIR)" $(SPEC)
 
+######### Show various logs
+
+show-build.log show-hw_info.log show-installed_pkgs.log show-root.log show-state.log:
+	$(eval log_file:=$(subst show-,,$@))
+	less /var/lib/mock/$(MOCK_CHROOT)/result/$(log_file)
+
+show-main.log:
+	less /var/lib/copr-rpmbuild/main.log
+
 ######### Build SRPM
 
 .PHONY: srpm-release
@@ -66,19 +76,19 @@ srpm-snapshot: get-sources-snapshot
 .PHONY: scrub-chroot
 ## Completely remove the fedora chroot and cache.
 scrub-chroot:
-	mock -r $(MOCK_CHROOT) --scrub all
+	mock $(MOCK_OPTS_COMMON) --scrub all
 
 ######### Do a mock build
 
 .PHONY: mockbuild-release
 ## Start a mock build of the release SRPM.
 mockbuild-release: srpm-release get-srpm-release
-	mock -r $(MOCK_CHROOT) $(MOCK_OPTS_RELEASE) $(srpm_path)
+	mock $(MOCK_OPTS_COMMON) $(MOCK_OPTS_RELEASE) $(srpm_path)
 
 .PHONY: mockbuild-snapshot
 ## Start a mock build of the snapshot SRPM.
 mockbuild-snapshot: srpm-snapshot get-srpm-snapshot
-	mock -r $(MOCK_CHROOT) $(MOCK_OPTS_SNAPSHOT) $(srpm_path)
+	mock $(MOCK_OPTS_COMMON) $(MOCK_OPTS_SNAPSHOT) $(srpm_path)
 
 ######### Edit-last-failing-script
 
@@ -101,23 +111,23 @@ edit-last-failing-script: get-last-run-script
 .PHONY: mockbuild-rerun-last-script
 ## Re-runs the last failing or running script of your release/snapshot mock mockbuild.
 mockbuild-rerun-last-script: get-last-run-script
-	mock --root=$(MOCK_CHROOT) --shell 'sh -e $(last_run_script)'
+	mock $(MOCK_OPTS_COMMON) --shell 'sh -e $(last_run_script)'
 
 .PHONY: mock-shell
 ## Run an interactive mock shell with bash
 mock-shell:
-	mock --root=$(MOCK_CHROOT) --shell bash
+	mock $(MOCK_OPTS_COMMON) --shell bash
 
 ######### Help debug inside mock environment
 
 .PHONY: mock-install-debugging-tools
-## This will install gdb, gdb-dashboard, vim, valgrind, lldb and
-## other tools into your mock environment for you to debug any
-## problems.
+## This will install gdb, vim, valgrind, lldb and other tools
+## into your mock environment for you to debug any problems.
+# TODO(kkleine): gdb-dashboard doesn't currently work in mock
 mock-install-debugging-tools:
-	mock --root=$(MOCK_CHROOT) --install python3-pygments vim gdb lldb python3-rpm valgrind
-	curl -sLO https://github.com/cyrus-and/gdb-dashboard/raw/master/.gdbinit
-	mock --root=$(MOCK_CHROOT) --copyin .gdbinit /builddir/.gdbinit
+	mock $(MOCK_OPTS_COMMON) --install python3-pygments vim gdb lldb python3-rpm valgrind cvise creduce valgrind-scripts
+	#curl -sLO https://github.com/cyrus-and/gdb-dashboard/raw/master/.gdbinit
+	#mock $(MOCK_OPTS_COMMON) --copyin .gdbinit /builddir/.gdbinit
 
 .PHONY: help
 # Based on https://gist.github.com/rcmachado/af3db315e31383502660
@@ -204,3 +214,15 @@ else
 endif
 	$(info LLVM SRPM Snapshot: $(srpm_path))
 	@echo > /dev/null
+
+.PHONY: prepare-copr
+## `prepare-copr IP=<COPR_IP>` will rsync the current directory
+## to <COPR_IP>:~/llvm and run the the `prepare-copr.sh` script there.
+## You can then login with `ssh root@<COPR_IP>` and run all make
+## commands like you normally would locally.
+prepare-copr:
+ifeq ($(IP),)
+	$(error Usage: make prepare-copr IP=<COPR_IP>)
+endif
+	rsync -av --include '.git/config' --exclude '.git/*' "$(PWD)" "root@$(IP):~/llvm"
+	ssh root@$(IP) -t '~/llvm/$(shell basename $(PWD))/prepare-copr.sh'

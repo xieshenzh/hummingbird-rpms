@@ -13,6 +13,10 @@ upstream_tag_template: llvmorg-{version}
 downstream_package_name: llvm
 prerelease_suffix_pattern: "([.\\-_]?)(a(lpha)?|b(eta)?|r?c|pre(view)?)([.\\-_]?\\d+)?"
 prerelease_suffix_macro: prerel
+parse_time_macros:
+  # Workaround for https://github.com/packit/specfile/issues/498
+  with_flang: "1"
+  with_mlir: "1"
 
 # Do not create README.packit.
 create_sync_note: false

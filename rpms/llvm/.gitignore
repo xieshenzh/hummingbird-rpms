@@ -12,3 +12,4 @@
 /BUILDROOT
 /out
 /version.spec.inc
+/.gdbinit

@@ -1,0 +1,130 @@
+From be4fa19ecf95d94d3ef46be183d3d4b4ebb6bb47 Mon Sep 17 00:00:00 2001
+From: yonghong-song <yhs@fb.com>
+Date: Mon, 3 Nov 2025 11:11:47 -0800
+Subject: [PATCH] [BPF] Remove unused weak symbol __bpf_trap (#166003)
+
+Nikita Popov reported an issue ([1]) where a dangling weak symbol
+__bpf_trap is in the final binary and this caused libbpf failing like
+below:
+
+  $ veristat -v ./t.o
+  Processing 't.o'...
+  libbpf: elf: skipping unrecognized data section(4) .eh_frame
+  libbpf: elf: skipping relo section(5) .rel.eh_frame for section(4) .eh_frame
+  libbpf: failed to find BTF for extern '__bpf_trap': -3
+  Failed to open './t.o': -3
+
+In llvm, the dag selection phase generates __bpf_trap in code. Later the
+UnreachableBlockElim pass removed __bpf_trap from the code, but
+__bpf_trap symbol survives in the symbol table.
+
+Having a dangling __bpf_trap weak symbol is not good for old kernels as
+seen in the above veristat failure. Although users could use compiler
+flag `-mllvm -bpf-disable-trap-unreachable` to workaround the issue,
+this patch fixed the issue by removing the dangling __bpf_trap.
+
+  [1] https://github.com/llvm/llvm-project/issues/165696
+
+(cherry picked from commit 8fd1bf2f8c9e6e7c4bc5f6915a9d52bb3672601b)
+---
+ llvm/lib/Target/BPF/BPFAsmPrinter.cpp | 24 ++++++++++++++++++++
+ llvm/lib/Target/BPF/BPFAsmPrinter.h   |  1 +
+ llvm/test/CodeGen/BPF/bpf_trap.ll     | 32 +++++++++++++++++++++++++++
+ 3 files changed, 57 insertions(+)
+ create mode 100644 llvm/test/CodeGen/BPF/bpf_trap.ll
+
+diff --git a/llvm/lib/Target/BPF/BPFAsmPrinter.cpp b/llvm/lib/Target/BPF/BPFAsmPrinter.cpp
+index 77dc4a75a7d6..b2a82040ee82 100644
+--- a/llvm/lib/Target/BPF/BPFAsmPrinter.cpp
++++ b/llvm/lib/Target/BPF/BPFAsmPrinter.cpp
+@@ -88,6 +88,16 @@ bool BPFAsmPrinter::doFinalization(Module &M) {
+     }
+   }
+ 
++  for (GlobalObject &GO : M.global_objects()) {
++    if (!GO.hasExternalWeakLinkage())
++      continue;
++
++    if (!SawTrapCall && GO.getName() == BPF_TRAP) {
++      GO.eraseFromParent();
++      break;
++    }
++  }
++
+   return AsmPrinter::doFinalization(M);
+ }
+ 
+@@ -160,6 +170,20 @@ bool BPFAsmPrinter::PrintAsmMemoryOperand(const MachineInstr *MI,
+ }
+ 
+ void BPFAsmPrinter::emitInstruction(const MachineInstr *MI) {
++  if (MI->isCall()) {
++    for (const MachineOperand &Op : MI->operands()) {
++      if (Op.isGlobal()) {
++        if (const GlobalValue *GV = Op.getGlobal())
++          if (GV->getName() == BPF_TRAP)
++            SawTrapCall = true;
++      } else if (Op.isSymbol()) {
++        if (const MCSymbol *Sym = Op.getMCSymbol())
++          if (Sym->getName() == BPF_TRAP)
++            SawTrapCall = true;
++      }
++    }
++  }
++
+   BPF_MC::verifyInstructionPredicates(MI->getOpcode(),
+                                       getSubtargetInfo().getFeatureBits());
+ 
+diff --git a/llvm/lib/Target/BPF/BPFAsmPrinter.h b/llvm/lib/Target/BPF/BPFAsmPrinter.h
+index 0cfb2839c8ff..60a285ea2b7d 100644
+--- a/llvm/lib/Target/BPF/BPFAsmPrinter.h
++++ b/llvm/lib/Target/BPF/BPFAsmPrinter.h
+@@ -39,6 +39,7 @@ public:
+ private:
+   BTFDebug *BTF;
+   TargetMachine &TM;
++  bool SawTrapCall = false;
+ 
+   const BPFTargetMachine &getBTM() const;
+ };
+diff --git a/llvm/test/CodeGen/BPF/bpf_trap.ll b/llvm/test/CodeGen/BPF/bpf_trap.ll
+new file mode 100644
+index 000000000000..ab8df5ff7cb0
+--- /dev/null
++++ b/llvm/test/CodeGen/BPF/bpf_trap.ll
+@@ -0,0 +1,32 @@
++; RUN: llc < %s | FileCheck %s
++;
++target triple = "bpf"
++
++define i32 @test(i8 %x) {
++entry:
++  %0 = and i8 %x, 3
++  switch i8 %0, label %default.unreachable4 [
++    i8 0, label %return
++    i8 1, label %sw.bb1
++    i8 2, label %sw.bb2
++    i8 3, label %sw.bb3
++  ]
++
++sw.bb1:                                           ; preds = %entry
++  br label %return
++
++sw.bb2:                                           ; preds = %entry
++  br label %return
++
++sw.bb3:                                           ; preds = %entry
++  br label %return
++
++default.unreachable4:                             ; preds = %entry
++  unreachable
++
++return:                                           ; preds = %entry, %sw.bb3, %sw.bb2, %sw.bb1
++  %retval.0 = phi i32 [ 12, %sw.bb1 ], [ 43, %sw.bb2 ], [ 54, %sw.bb3 ], [ 32, %entry ]
++  ret i32 %retval.0
++}
++
++; CHECK-NOT: __bpf_trap
+-- 
+2.50.1
+
