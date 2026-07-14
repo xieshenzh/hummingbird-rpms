@@ -117,7 +117,7 @@ License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        524.1%{?dist}
+Release:        524.2%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
@@ -191,6 +191,9 @@ Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.pa
 
 # If optimizing -O is used, add the definition to .ph files, bug #2152012
 Patch202:       perl-5.36.0-Add-definition-of-OPTIMIZE-to-.ph-files.patch
+
+# Backport upstream fix for CVE-2026-13221 (GH#23388)
+Patch203:       perl-5.42.2-regcomp_study-avoid-trie-overflow.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -4227,6 +4230,7 @@ you're not running VMS, this module does nothing.
 %patch -P200 -p1
 %patch -P201 -p1
 %patch -P202 -p1
+%patch -P203 -p1
 
 %if !%{defined perl_bootstrap}
 # Local patch tracking
@@ -4248,6 +4252,7 @@ perl -x patchlevel.h \
     'Fedora Patch200: Link XS modules to libperl.so with EU::CBuilder on Linux' \
     'Fedora Patch201: Link XS modules to libperl.so with EU::MM on Linux' \
     'Fedora Patch202: Add definition of OPTIMIZE to .ph files' \
+    'Fedora Patch203: Backport fix for CVE-2026-13221 trie overflow handling' \
     %{nil}
 %endif
 
