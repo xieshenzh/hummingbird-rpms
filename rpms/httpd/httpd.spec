@@ -15,6 +15,7 @@
 %bcond pcre %{without pcre2}
 %bcond engine %[0%{?fedora} < 41 && 0%{?rhel} < 10]
 %bcond worker %[0%{?fedora} < 44 && 0%{?rhel} < 11]
+%bcond wstunnel %[0%{?fedora} < 45 && 0%{?rhel} < 11]
 
 %if %{with worker}
 %global mpms event prefork worker
@@ -28,7 +29,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.68
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -100,6 +101,7 @@ Patch30: httpd-2.4.64-separate-systemd-fns.patch
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch60: httpd-2.4.43-enable-sslv3.patch
+Patch61: httpd-2.4.68-proxyhtml.patch
 
 # Security fixes
 # Patch200: ...
@@ -315,6 +317,13 @@ if echo %{mpms} | grep -q -v worker; then
 fi
 touch -r $RPM_SOURCE_DIR/00-mpm.conf 00-mpm.conf
 
+# Remove mod_proxy_wstunnel if not needed
+cp $RPM_SOURCE_DIR/00-proxy.conf 00-proxy.conf
+%if %{without wstunnel}
+sed -i /proxy_wstunnel_module/d 00-proxy.conf
+%endif
+touch -r $RPM_SOURCE_DIR/00-proxy.conf 00-proxy.conf
+
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa}
 : Default MPM is %{mpm}, MPM list: %{mpms}
 : Vendor string is '%{vstring}'
@@ -380,7 +389,10 @@ autoheader && autoconf || exit 1
         --disable-http2 \
         --disable-md \
         --disable-dav-lock \
-        $*
+%if %{without wstunnel}
+        --disable-proxy-wstunnel \
+%endif
+            $*
 
 if grep -q ac_cv_have_threadsafe_pollset=no config.log; then
    cat config.log
@@ -411,15 +423,17 @@ install -m 644 $RPM_SOURCE_DIR/README.confd \
 install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
-         00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
+         00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
          01-ldap.conf 00-systemd.conf 01-session.conf 00-optional.conf \
          00-brotli.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
 
-install -m 644 -p 00-mpm.conf \
-        $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
+for f in 00-mpm.conf 00-proxy.conf; do
+    install -m 644 -p $f \
+            $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
+done
 
 # install systemd override drop directory
 # Web application packages can drop snippets into this location if
@@ -850,6 +864,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Jul 14 2026 Joe Orton  <jorton@redhat.com> - 2.4.68-3
+- for F45+ remove mod_proxy_wstunnel, deprecated upstream since 2.4.47
+- mod_proxy_html: fix comment handling (#2496888)
+
 * Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 2.4.68-2
 - Rebuilt for openssl 4.0
 
