@@ -193,6 +193,10 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     # incorporated upstream in Fedora's 10.3p1-3 release.
     bad_commits = [line for line in bad_commits if not line.startswith('f0c23ce5ebcfd6a2b9bb0c4ff359e34059a7a724 ')]
 
+    # glibc temporary bootstrap: removed -fno-link-libatomic while GCC 16 was unavailable.
+    # Reverted once GCC 16 published to Pulp.
+    bad_commits = [line for line in bad_commits if not line.startswith('5c111d84c07cc9ca1e8ae714f19687f47a5d4051 ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)
