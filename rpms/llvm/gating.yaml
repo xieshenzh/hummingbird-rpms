@@ -13,7 +13,7 @@ rules:
 --- !Policy
 product_versions:
   # The version number here should match the current rawhide release.
-  - fedora-44
+  - fedora-45
 decision_contexts:
   - bodhi_update_push_stable
   - bodhi_update_push_stable_critpath

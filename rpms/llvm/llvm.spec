@@ -1,6 +1,6 @@
 #region globals
 #region version
-%global maj_ver 21
+%global maj_ver 22
 %global min_ver 1
 %global patch_ver 8
 #global rc_ver rc3
@@ -19,6 +19,24 @@
   %bcond_with gold
 %endif
 
+# Enable this in order to disable a lot of features and get to clang as fast
+# as possible. This is useful in order to bisect issues affecting LLVM, clang
+# or LLD.
+%bcond_with fastclang
+%if %{with fastclang}
+%define bcond_override_default_lldb 0
+%define bcond_override_default_offload 0
+%define bcond_override_default_mlir 0
+%define bcond_override_default_flang 0
+%define bcond_override_default_libclc 0
+%define bcond_override_default_build_bolt 0
+%define bcond_override_default_polly 0
+%define bcond_override_default_pgo 0
+%define bcond_override_default_libcxx 0
+%define bcond_override_default_lto_build 0
+%define bcond_override_default_check 0
+%endif
+
 # Build compat packages llvmN instead of main package for the current LLVM
 # version. Used on Fedora.
 %bcond_with compat_build
@@ -28,8 +46,8 @@
 %bcond_without check
 
 %if %{with bundle_compat_lib}
-%global compat_maj_ver 19
-%global compat_ver %{compat_maj_ver}.1.7
+%global compat_maj_ver 21
+%global compat_ver %{compat_maj_ver}.1.8
 %endif
 
 # Compat builds do not include python-lit
@@ -42,21 +60,25 @@
 %bcond_without lldb
 
 %ifarch ppc64le
-%if %{defined rhel} && 0%{?rhel} < 10 && %{maj_ver} >= 21
+%if %{defined rhel} && 0%{?rhel} < 10
 # RHEL <= 9 use the IBM long double format, which is not supported by libc.
 # Since LLVM 21, parts of libc are required in order to build offload.
 %bcond_with offload
 %else
 %bcond_without offload
 %endif
-%elifarch %{ix86}
+%else
+%ifarch %{ix86}
 # libomptarget is not supported on 32-bit systems.
 %bcond_with offload
 %else
 %bcond_without offload
 %endif
+%endif
 
-%if %{without compat_build} && 0%{?fedora} >= 41
+# MLIR version 22 started to require nanobind >= 2.9, which is only available
+# on Fedora >= 44.
+%if %{without compat_build} && %{defined fedora} && 0%{?fedora} >= 44
 %ifarch %{ix86}
 %bcond_with mlir
 %else
@@ -66,10 +88,70 @@
 %bcond_with mlir
 %endif
 
+#region flang
+%if %{without compat_build} && %{defined fedora} && 0%{?fedora} >= 44
+# Link error on i686.
+# s390x is not supported upstream yet.
+%ifarch i686 s390x
+%bcond_with flang
+%else
+%bcond_without flang
+%endif
+%endif
+
+%if %{with flang}
+
+# Sanity check for flang
+# flang depends on mlir, clang, flang, openmp.
+# Make sure those are being built.
+%if %{without mlir}
+%{error:flang must be built --with=mlir}
+%endif
+
+# Set Fortran build flags to nil because they contain flags that don't apply to flang.
+%global build_fflags %{nil}
+%endif
+#endregion flang
+
+%{lua:
+
+-- Return the maximum number of parallel jobs a build can run based on the
+-- amount of maximum memory used per process (per_proc_mem).
+function print_max_procs(per_proc_mem)
+    local f = io.open("/proc/meminfo", "r")
+    local mem = 0
+    local nproc_str = nil
+    for line in f:lines() do
+        _, _, mem = string.find(line, "MemTotal:%s+(%d+)%s+kB")
+        if mem then
+           break
+        end
+    end
+    f:close()
+
+    local proc_handle = io.popen("nproc")
+    _, _, nproc_str = string.find(proc_handle:read("*a"), "(%d+)")
+    proc_handle:close()
+    local nproc = tonumber(nproc_str)
+    if nproc < 1 then
+        nproc = 1
+    end
+    local mem_mb = mem / 1024
+    local cpu = math.floor(mem_mb / per_proc_mem)
+    if cpu < 1 then
+        cpu = 1
+    end
+
+    if cpu > nproc then
+        cpu = nproc
+    end
+    print(cpu)
+end
+}
+
+
 # The libcxx build condition also enables libcxxabi and libunwind.
-# Fedora 41 is the first version that enabled FatLTO for clang-built files.
-# Without FatLTO, we can't enable ThinLTO and link using GNU LD.
-%if %{without compat_build} && 0%{?fedora} >= 41
+%if %{without compat_build} && %{defined fedora}
 %bcond_without libcxx
 %else
 %bcond_with libcxx
@@ -77,7 +159,7 @@
 
 # I've called the build condition "build_bolt" to indicate that this does not
 # necessarily "use" BOLT in order to build LLVM.
-%if %{without compat_build} && 0%{?fedora} >= 41
+%if %{without compat_build} && %{defined fedora}
 # BOLT only supports aarch64 and x86_64
 %ifarch aarch64 x86_64
 %bcond_without build_bolt
@@ -88,7 +170,7 @@
 %bcond_with build_bolt
 %endif
 
-%if %{without compat_build} && 0%{?fedora} >= 41
+%if %{without compat_build} && %{defined fedora}
 %bcond_without polly
 %else
 %bcond_with polly
@@ -98,21 +180,11 @@
 %ifarch %{ix86}
 %bcond_with pgo
 %else
-%if 0%{?fedora} >= 43 || (0%{?rhel} >= 9 && %{maj_ver} >= 21)
+%if 0%{?fedora} >= 43 || 0%{?rhel} >= 9
 %bcond_without pgo
 %else
 %bcond_with pgo
 %endif
-%endif
-
-# We only want to run the performance comparison on snapshot builds.
-# centos-streams/RHEL do not have all the requirements. We tried to use pip,
-# but we've seen issues on some architectures. We're now restricting this
-# to Fedora.
-%if %{with pgo} && %{with snapshot_build} && %{defined fedora}
-%global run_pgo_perf_comparison 1
-%else
-%global run_pgo_perf_comparison %{nil}
 %endif
 
 # Sanity checks for PGO and bootstrapping
@@ -129,7 +201,24 @@
 %ifarch %ix86 riscv64
 %bcond_with lto_build
 %else
+%if %{defined rhel} && 0%{?rhel} <= 8
+# LTO builds got enabled on Fedora and RHEL >= 9 only.
+%bcond_with lto_build
+%else
 %bcond_without lto_build
+%endif
+%endif
+
+
+%if 0%{?rhel} == 8
+# RHEL8 still builds with gcc + ld.bfd.
+%bcond_with use_lld
+%else
+%bcond_without use_lld
+%endif
+
+%if %{with pgo} && %{without use_lld}
+%{error:PGO requires --with=lld}
 %endif
 
 # For PGO Disable LTO for now because of LLVMgold.so not found error
@@ -138,8 +227,16 @@
 %global _lto_cflags %nil
 %endif
 
+%if %{maj_ver} >= 23 && 0%{undefined rhel} && %{without compat_build} && %{with snapshot_build}
+# TODO(kkleine): Re-enable once build failures are fixed.
+%bcond_with libclc
+%else
+%bcond_with libclc
+%endif
+
 # We are building with clang for faster/lower memory LTO builds.
 # See https://docs.fedoraproject.org/en-US/packaging-guidelines/#_compiler_macros
+# Reminder: This only works on Fedora and RHEL >= 9.
 %global toolchain clang
 
 # Make sure that we are not building with a newer compiler than the targeted
@@ -156,8 +253,10 @@
 %global __cxx /usr/bin/clang++-%{host_clang_maj_ver}
 %endif
 
-%if %{defined rhel} && 0%{?rhel} < 10
-%global gts_version 14
+# The upper bound must remain and never exceed the latest RHEL version with GTS,
+# so that this does not apply to ELN or a brand new RHEL version.
+%if %{defined rhel} && 0%{?rhel} <= 10
+%global gts_version 15
 %endif
 
 %if %{defined rhel} && 0%{?rhel} <= 8
@@ -184,13 +283,6 @@
 %global src_tarball_dir llvm-project-%{llvm_snapshot_git_revision}
 %else
 %global src_tarball_dir llvm-project-%{maj_ver}.%{min_ver}.%{patch_ver}%{?rc_ver:-%{rc_ver}}.src
-%endif
-
-%global has_crtobjs 1
-%if %{maj_ver} < 21
-%ifarch s390x
-%global has_crtobjs 0
-%endif
 %endif
 
 # LLD uses "fast" as the algortithm for generating build-id
@@ -235,6 +327,12 @@
 %endif
 
 %global build_install_prefix %{buildroot}%{install_prefix}
+
+%if %{with compat_build}
+%global install_pythondir %{install_prefix}/lib/python%{python3_version}/site-packages
+%else
+%global install_pythondir %{python3_sitelib}/
+%endif
 
 # Lower memory usage of dwz on s390x
 %global _dwz_low_mem_die_limit_s390x 1
@@ -313,11 +411,15 @@
 %global pkg_name_polly polly%{pkg_suffix}
 #endregion polly globals
 
-#region PGO globals
-%if 0%{run_pgo_perf_comparison}
-%global llvm_test_suite_dir %{_datadir}/llvm-test-suite
+#region flang globals
+%global pkg_name_flang flang%{pkg_suffix}
+#endregion flang globals
+
+#region libclc globals
+%if %{with libclc}
+%global pkg_name_libclc libclc%{pkg_suffix}
 %endif
-#endregion PGO globals
+#endregion libclc globals
 
 #endregion globals
 
@@ -326,9 +428,9 @@
 Name:		%{pkg_name_llvm}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}%{?rc_ver:~%{rc_ver}}%{?llvm_snapshot_version_suffix:~%{llvm_snapshot_version_suffix}}
 %if 0%{?rhel} == 8
-Release:	1.1%{?dist}
+Release:	1%{?dist}
 %else
-Release:	1.1%{?dist}
+Release:	1%{?dist}
 %endif
 Summary:	The Low Level Virtual Machine
 
@@ -387,9 +489,10 @@ Source1001: changelog
 # behind the latest packaged LLVM version.
 
 #region CLANG patches
-Patch101: 0001-PATCH-clang-Make-funwind-tables-the-default-on-all-a.patch
+Patch2100: 0001-PATCH-clang-Make-funwind-tables-the-default-on-all-a.patch
+Patch2200: 0001-PATCH-clang-Make-funwind-tables-the-default-on-all-a.patch
+Patch2300: 0001-23-PATCH-clang-Make-funwind-tables-the-default-on-all-a.patch
 Patch102: 0003-PATCH-clang-Don-t-install-static-libraries.patch
-Patch2002: 20-131099.patch
 
 # Workaround a bug in ORC on ppc64le.
 # More info is available here: https://reviews.llvm.org/D159115#4641826
@@ -400,10 +503,8 @@ Patch103: 0001-Workaround-a-bug-in-ORC-on-ppc64le.patch
 Patch104: 0001-Driver-Give-devtoolset-path-precedence-over-Installe.patch
 #endregion CLANG patches
 
-# Fix LLVMConfig.cmake when symlinks are used.
-# (https://github.com/llvm/llvm-project/pull/124743 landed in LLVM 21)
-Patch1902: 0001-cmake-Resolve-symlink-when-finding-install-prefix.patch
-Patch2003: 0001-cmake-Resolve-symlink-when-finding-install-prefix.patch
+# s390x fix for unaligned memory access performance regressions.
+Patch2210: 0001-SystemZ-Avoid-unaligned-VL-VST-s-with-memcpy-memmove.patch
 
 #region LLD patches
 Patch106: 0001-19-Always-build-shared-libs-for-LLD.patch
@@ -411,31 +512,22 @@ Patch2103: 0001-lld-Adjust-compressed-debug-level-test-for-s390x-wit.patch
 #endregion LLD patches
 
 #region polly patches
-Patch107: 0001-20-polly-shared-libs.patch
+Patch2102: 0001-20-polly-shared-libs.patch
+Patch2202: 0001-22-polly-shared-libs.patch
+Patch2302: 0001-22-polly-shared-libs.patch
 #endregion polly patches
 
 #region RHEL patches
 # RHEL 8 only
 Patch501: 0001-Fix-page-size-constant-on-aarch64-and-ppc64le.patch
+# Backport a fix for https://github.com/llvm/llvm-project/issues/165696 from
+# LLVM 22. The first patch is a requirement of the second patch.
+# Apply the fix to RHEL8 only because the other distros do not need this fix
+# because they already support kfunc __bpf_trap.
+Patch502: 0001-BPF-Support-Jump-Table-149715.patch
+Patch503: 0002-BPF-Remove-unused-weak-symbol-__bpf_trap-166003.patch
+Patch504: 0003-BPF-Remove-dead-code-related-to-__bpf_trap-global-va.patch
 #endregion RHEL patches
-
-# Fix an isel error triggered by Rust 1.85 on s390x
-# https://github.com/llvm/llvm-project/issues/124001
-Patch1901: 0001-SystemZ-Fix-ICE-with-i128-i64-uaddo-carry-chain.patch
-
-# Fix a pgo miscompilation triggered by building Rust 1.87 with pgo on ppc64le.
-# https://github.com/llvm/llvm-project/issues/138208
-Patch2004: 0001-CodeGenPrepare-Make-sure-instruction-get-from-SunkAd.patch
-# Related CGP fix for domination, rhbz#2388223
-Patch2008: 0001-CGP-Bail-out-if-Base-Scaled-Reg-does-not-dominate-in.patch
-
-# Fix Power9/Power10 crbit spilling
-# https://github.com/llvm/llvm-project/pull/146424
-Patch2007: 21-146424.patch
-
-# Fix for highway package build on ppc64le
-Patch2005: 0001-PowerPC-Fix-handling-of-undefs-in-the-PPC-isSplatShu.patch
-Patch2006: 0001-Add-REQUIRES-asserts-to-test-added-in-145149-because.patch
 
 # Fix for offload builds: The DeviceRTL libraries target device code and
 # don't support the mtls-dialect flag, so we need to patch the clang driver
@@ -457,6 +549,13 @@ Patch2106: 0001-SystemZ-Fix-code-in-widening-vector-multiplication-1.patch
 %global __python3 /usr/bin/python3.12
 %endif
 
+%if %{with fastclang}
+# fastclang depends on overriding default conditionals via
+# bcond_override_default which is only available on RPM 4.20 and newer.
+# More info:
+# https://rpm-software-management.github.io/rpm/manual/conditionalbuilds.html#overriding-defaults
+BuildRequires:	rpm >= 4.20
+%endif
 %if %{defined gts_version}
 # Required for 64-bit atomics on i686.
 BuildRequires: gcc-toolset-%{gts_version}-libatomic-devel
@@ -488,30 +587,18 @@ BuildRequires:	compiler-rt
 BuildRequires:	llvm
 %endif
 
-%if 0%{run_pgo_perf_comparison}
-BuildRequires:	llvm-test-suite
-BuildRequires:	tcl-devel
-BuildRequires:	which
-# pandas and scipy are needed for running llvm-test-suite/utils/compare.py
-# For RHEL we have to install it from pip and for fedora we take the RPM package.
-%if 0%{?rhel}
-BuildRequires:	python3-pip
 %else
-BuildRequires:	python3-pandas
-BuildRequires:	python3-scipy
+%if %{with use_lld}
+BuildRequires:	lld
 %endif
-%endif
-
 %endif
 
 # This intentionally does not use python3_pkgversion. RHEL 8 does not have
 # python3.12-sphinx, and we are only using it as a binary anyway.
 BuildRequires:	python3-sphinx
 %if 0%{?rhel} != 8
-# RHEL 8 does not have these packages for python3.12. However, they are only
-# needed for LLDB tests.
-BuildRequires:	python%{python3_pkgversion}-psutil
-BuildRequires:	python%{python3_pkgversion}-pexpect
+# RHEL 8 does not have these packages for python3.12.
+BuildRequires: python%{python3_pkgversion}-psutil
 %endif
 %if %{undefined rhel}
 BuildRequires:	python%{python3_pkgversion}-myst-parser
@@ -534,8 +621,8 @@ BuildRequires:	libedit-devel
 %endif
 # We need python3-devel for %%py3_shebang_fix
 BuildRequires:	python%{python3_pkgversion}-devel
-BuildRequires:	python%{python3_pkgversion}-setuptools
 %if 0%{?rhel} == 8
+BuildRequires:	python%{python3_pkgversion}-setuptools
 BuildRequires:	python%{python3_pkgversion}-rpm-macros
 %endif
 
@@ -544,20 +631,17 @@ BuildRequires:	gnupg2
 
 BuildRequires:	swig
 BuildRequires:	libxml2-devel
-BuildRequires:	doxygen
 
 # For clang-offload-packager
 BuildRequires: elfutils-libelf-devel
-BuildRequires: perl
-BuildRequires: perl-Data-Dumper
-BuildRequires: perl-Encode
 BuildRequires: libffi-devel
 
+# For scan-build
+BuildRequires: perl-interpreter
 BuildRequires:	perl-generators
 
-# According to https://fedoraproject.org/wiki/Packaging:Emacs a package
-# should BuildRequires: emacs if it packages emacs integration files.
-BuildRequires:	emacs
+# We only need the emacs packaging macros, which are part of emacs-common.
+BuildRequires:	emacs-common
 
 BuildRequires:	libatomic
 
@@ -582,15 +666,13 @@ BuildRequires: python%{python3_pkgversion}-pyyaml
 BuildRequires: python%{python3_pkgversion}-nanobind-devel
 %endif
 
-BuildRequires:	graphviz
-
 # This is required because we need "ps" when running LLDB tests
 BuildRequires: procps-ng
 
 # For reproducible pyc file generation
 # See https://docs.fedoraproject.org/en-US/packaging-guidelines/Python_Appendix/#_byte_compilation_reproducibility
 # Since Fedora 41 this happens automatically, and RHEL 8 does not support this.
-%if %{without compat_build} && ((%{defined fedora} && 0%{?fedora} < 41) || 0%{?rhel} == 9 || 0%{?rhel} == 10)
+%if %{without compat_build} && (0%{?rhel} == 9 || 0%{?rhel} == 10)
 BuildRequires: /usr/bin/marshalparser
 %global py_reproducible_pyc_path %{buildroot}%{python3_sitelib}
 %endif
@@ -631,6 +713,9 @@ lit is a tool used by the LLVM project for executing its test suites.
 Summary: Filesystem package that owns the versioned llvm prefix
 # Was renamed immediately after introduction.
 Obsoletes: %{pkg_name_llvm}-resource-filesystem < 20
+%if %{with compat_build}
+Conflicts: llvm-filesystem < %{maj_ver}.99
+%endif
 
 %description -n %{pkg_name_llvm}-filesystem
 This packages owns the versioned llvm prefix directory: $libdir/llvm$version
@@ -765,7 +850,11 @@ Requires: gcc-toolset-%{gts_version}-gcc-c++
 Recommends: %{pkg_name_compiler_rt}%{?_isa} = %{version}-%{release}
 Requires: %{pkg_name_llvm}-libs = %{version}-%{release}
 # atomic support is not part of compiler-rt
+%if %{defined gts_version}
+Recommends: gcc-toolset-%{gts_version}-libatomic-devel
+%else
 Recommends: libatomic%{?_isa}
+%endif
 # libomp-devel is required, so clang can find the omp.h header when compiling
 # with -fopenmp.
 Recommends: %{pkg_name_libomp}-devel%{_isa} = %{version}-%{release}
@@ -797,6 +886,9 @@ Development header files for clang.
 %package -n %{pkg_name_clang}-resource-filesystem
 Summary: Filesystem package that owns the clang resource directory
 Provides: clang-resource-filesystem(major) = %{maj_ver}
+%if %{with compat_build}
+Conflicts: clang-resource-filesystem < %{maj_ver}.99
+%endif
 
 %description -n %{pkg_name_clang}-resource-filesystem
 This package owns the clang resouce directory: $libdir/clang/$version/
@@ -839,20 +931,19 @@ Requires:	python%{python3_pkgversion}
 %description -n git-clang-format%{pkg_suffix}
 clang-format integration for git.
 
-%if %{without compat_build}
-%package -n python%{python3_pkgversion}-clang
+%package -n python%{python3_pkgversion}-%{pkg_name_clang}
 Summary:       Python3 bindings for clang
 Requires:      %{pkg_name_clang}-devel%{?_isa} = %{version}-%{release}
-Requires:      python%{python3_pkgversion}
+%if "%{?python3_version}" != ""
+Requires:      python(abi) = %{python3_version}
+%endif
+Provides:      python%{python3_pkgversion}-clang(major) = %{maj_ver}
 %if 0%{?rhel} == 8
 # Became python3.12-clang in LLVM 19
 Obsoletes: python3-clang < 18.9
 %endif
-%description -n python%{python3_pkgversion}-clang
+%description -n python%{python3_pkgversion}-%{pkg_name_clang}
 Python3 bindings for clang.
-
-
-%endif
 
 #endregion CLANG packages
 
@@ -983,7 +1074,6 @@ The package contains header files for the LLDB debugger.
 
 %if %{without compat_build}
 %package -n python%{python3_pkgversion}-lldb
-%{?python_provide:%python_provide python%{python3_pkgversion}-lldb}
 Summary:	Python module for LLDB
 
 Requires:	%{pkg_name_lldb}%{?_isa} = %{version}-%{release}
@@ -1030,7 +1120,6 @@ Requires: %{pkg_name_mlir}-static%{?_isa} = %{version}-%{release}
 MLIR development files.
 
 %package -n python%{python3_pkgversion}-mlir
-%{?python_provide:%python_provide python%{python3_pkgversion}-mlir}
 Summary:	MLIR python bindings
 
 Requires: python%{python3_pkgversion}
@@ -1161,6 +1250,86 @@ Polly header files.
 %endif
 #endregion polly packages
 
+#region flang packages
+%if %{with flang}
+%package -n %{pkg_name_flang}
+Summary: a Fortran language front-end designed for integration with LLVM
+Requires: %{pkg_name_flang}-runtime%{?_isa} = %{version}-%{release}
+# flang installs headers in the clang resource directory
+Requires: %{pkg_name_clang}-resource-filesystem%{?_isa} = %{version}-%{release}
+# flang implicitly calls ld.bfd when linking and depends on the gcc runtime objects.
+Requires: binutils
+Requires: gcc
+# Up to version 17.0.6-1, flang used to provide a flang-devel package.
+# This changed in 17.0.6-2 and all development-related files are now
+# distributed in the main flang package.
+Obsoletes: %{pkg_name_flang}-devel < 17.0.6-2
+
+# We no longer ship flang-doc.
+Obsoletes: %{pkg_name_flang}-doc < 22
+
+License: Apache-2.0 WITH LLVM-exception
+URL:     https://flang.llvm.org
+
+%description -n %{pkg_name_flang}
+
+Flang is a ground-up implementation of a Fortran front end written in modern
+C++.
+
+%package -n %{pkg_name_flang}-runtime
+Summary: Flang runtime libraries
+Conflicts: %{pkg_name_flang} < 17.0.6-2
+
+%description -n %{pkg_name_flang}-runtime
+Flang runtime libraries.
+
+%endif
+#endregion flang packages
+
+#region libclc packages
+%if %{with libclc}
+%package -n %{pkg_name_libclc}
+Summary: An open source implementation of the OpenCL 1.1 library requirements
+
+License: Apache-2.0 WITH LLVM-exception OR NCSA OR MIT
+URL: https://libclc.llvm.org
+Obsoletes: %{pkg_name_libclc}-devel < 23
+
+%description -n %{pkg_name_libclc}
+libclc is an open source, BSD licensed implementation of the library
+requirements of the OpenCL C programming language, as specified by the
+OpenCL 1.1 Specification. The following sections of the specification
+impose library requirements:
+
+  * 6.1: Supported Data Types
+  * 6.2.3: Explicit Conversions
+  * 6.2.4.2: Reinterpreting Types Using as_type() and as_typen()
+  * 6.9: Preprocessor Directives and Macros
+  * 6.11: Built-in Functionsj
+  * 9.3: Double Precision Floating-Point
+  * 9.4: 64-bit Atomics
+  * 9.5: Writing to 3D image memory objects
+  * 9.6: Half Precision Floating-Point
+
+libclc is intended to be used with the Clang compiler's OpenCL frontend.
+
+libclc is designed to be portable and extensible. To this end, it provides
+generic implementations of most library requirements, allowing the target
+to override the generic implementation at the granularity of individual
+functions.
+
+libclc currently only supports the PTX target, but support for more
+targets is welcome.
+
+%package        -n %{pkg_name_libclc}-spirv
+Summary:        Spirv subset of %{name}
+
+%description    -n %{pkg_name_libclc}-spirv
+The %{pkg_name_libclc}-spirv package contains the spirv*-mesa3d-.spv files only,
+which are the subset required for upstream Mesa OpenCL support with RustiCL.
+
+%endif
+#endregion libclc packages
 #endregion packages
 
 #region prep
@@ -1180,6 +1349,13 @@ Polly header files.
 
 # automatically apply patches based on LLVM version
 %autopatch -m%{compat_maj_ver}00 -M%{compat_maj_ver}99 -p1
+
+%if 0%{?rhel} == 8 && %{compat_maj_ver} < 22
+# The following patches have been backported from LLVM 22.
+%patch -p1 -P502
+%patch -p1 -P503
+%patch -p1 -P504
+%endif
 
 %endif
 
@@ -1204,9 +1380,7 @@ Polly header files.
 #region LLVM preparation
 
 %py3_shebang_fix \
-	llvm/test/BugPoint/compile-custom.ll.py \
-	llvm/tools/opt-viewer/*.py \
-	llvm/utils/update_cc_test_checks.py
+	llvm/tools/opt-viewer/*.py
 
 #endregion LLVM preparation
 
@@ -1249,6 +1423,17 @@ sed -i 's/LLDB_ENABLE_PYTHON/TRUE/' lldb/docs/CMakeLists.txt
 
 #endregion prep
 
+#region python buildrequires
+%if %{with python_lit}
+%if 0%{?rhel} != 8
+%generate_buildrequires
+
+cd llvm/utils/lit
+%pyproject_buildrequires
+%endif
+%endif
+#endregion python buildrequires
+
 #region build
 %build
 # TODO(kkleine): In clang we had this %ifarch s390 s390x aarch64 %ix86 ppc64le
@@ -1257,7 +1442,7 @@ sed -i 's/LLDB_ENABLE_PYTHON/TRUE/' lldb/docs/CMakeLists.txt
 %ifarch %ix86
 %global reduce_debuginfo 1
 %endif
-%if 0%{?rhel} == 8
+%if 0%{?rhel} == 8 || %{with fastclang}
 %global reduce_debuginfo 1
 %endif
 
@@ -1285,6 +1470,11 @@ sed -i 's/LLDB_ENABLE_PYTHON/TRUE/' lldb/docs/CMakeLists.txt
 %global projects %{projects};polly
 %endif
 
+%if %{with flang}
+%global projects %{projects};flang
+%global runtimes %{runtimes};flang-rt
+%endif
+
 %if %{with libcxx}
 %global runtimes %{runtimes};libcxx;libcxxabi;libunwind
 %endif
@@ -1293,7 +1483,14 @@ sed -i 's/LLDB_ENABLE_PYTHON/TRUE/' lldb/docs/CMakeLists.txt
 %global runtimes %{runtimes};offload
 %endif
 
-%global cfg_file_content --gcc-triple=%{_target_cpu}-redhat-linux
+%if %{with libclc}
+%global runtimes %{runtimes};libclc
+%endif
+
+%global gcc_triple --gcc-triple=%{_target_cpu}-redhat-linux
+
+%global cfg_file_content %{gcc_triple}
+%global cfg_file_content_flang %{gcc_triple}
 
 # We want to use DWARF-5 on all snapshot builds.
 %if %{without snapshot_build} && %{defined rhel} && 0%{?rhel} < 10
@@ -1319,11 +1516,9 @@ export ASMFLAGS="%{build_cflags}"
 # We set CLANG_DEFAULT_PIE_ON_LINUX=OFF and PPC_LINUX_DEFAULT_IEEELONGDOUBLE=ON to match the
 # defaults used by Fedora's GCC.
 
-# Disable dwz on aarch64, because it takes a huge amount of time to decide not to optimize things.
-# This is copied from clang.
-%ifarch aarch64
+# Disable dwz because it takes a huge amount of time to decide not to
+# optimize things.
 %define _find_debuginfo_dwz_opts %{nil}
-%endif
 
 cd llvm
 
@@ -1333,15 +1528,15 @@ OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 OLD_CWD="$PWD"
 
 %global builddir_instrumented $RPM_BUILD_DIR/instrumented-llvm
-%if 0%{run_pgo_perf_comparison}
-%global builddir_perf_pgo $RPM_BUILD_DIR/performance-of-pgoed-clang
-%global builddir_perf_system $RPM_BUILD_DIR/performance-of-system-clang
-%endif
 
 #region LLVM lit
 %if %{with python_lit}
 pushd utils/lit
+%if 0%{?rhel} == 8
 %py3_build
+%else
+%pyproject_wheel
+%endif
 popd
 %endif
 #endregion LLVM lit
@@ -1356,7 +1551,6 @@ popd
 # Any ABI-affecting flags should be in here.
 %global cmake_common_args \\\
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \\\
-    -DLLVM_ENABLE_EH=ON \\\
     -DLLVM_ENABLE_RTTI=ON \\\
     -DLLVM_USE_PERF=ON \\\
     -DLLVM_TARGETS_TO_BUILD=%{targets_to_build} \\\
@@ -1364,7 +1558,39 @@ popd
     -DLLVM_BUILD_LLVM_DYLIB=ON \\\
     -DLLVM_LINK_LLVM_DYLIB=ON \\\
     -DCLANG_LINK_CLANG_DYLIB=ON \\\
-    -DLLVM_ENABLE_FFI:BOOL=ON
+    -DLLVM_ENABLE_FFI:BOOL=ON \\\
+    -DLLVM_ENABLE_EH=OFF
+
+%if 0%{?rhel} == 8
+# On RHEL 8 we build with gcc, but the runtimes are built with the just built
+# clang, so we need to pass clang supported compiler flags to the runtimes
+# build.  If we pass the gcc flags, some of the cmake feature checkes will
+# fail, because they use -Werror and emit an error when passed gcc specific
+# compiler flags like -specs.
+# Specifically, this is required in order to fix the libomptest.so build.
+
+function strip_specs {
+  echo $1 | sed -e 's/-specs=[^ ]\+//g'
+}
+
+CLANG_CC_CONFIG=$(pwd)/redhat-hardened-clang.cfg
+CLANG_LD_CONFIG=$(pwd)/redhat-hardened-clang-ld.cfg
+echo "-fPIE" >> $CLANG_CC_CONFIG
+echo "-pie" >> $CLANG_LD_CONFIG
+CLANG_CCFLAGS_EXTRA=--config=$CLANG_CC_CONFIG
+CLANG_LDFLAGS_EXTRA=--config=$CLANG_LD_CONFIG
+
+CLANG_CXXFLAGS=$(strip_specs "$CXXFLAGS $CLANG_CCFLAGS_EXTRA")
+CLANG_CFLAGS=$(strip_specs "$CFLAGS $CLANG_CCFLAGS_EXTRA")
+CLANG_LDFLAGS=$(strip_specs "$LDFLAGS $CLANG_LDFLAGS_EXTRA")
+%global cmake_common_args %{cmake_common_args} \\\
+    -DRUNTIMES_CMAKE_ARGS="-DCMAKE_C_FLAGS=$CLANG_C_FLAGS;-DCMAKE_CXX_FLAGS=$CLANG_CXX_FLAGS;-DCMAKE_SHARED_LINKER_FLAGS=$CLANG_LD_FLAGS"
+%endif
+
+%if %reduce_debuginfo == 1
+	%global cmake_common_args %{cmake_common_args} -DCMAKE_C_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG"
+	%global cmake_common_args %{cmake_common_args} -DCMAKE_CXX_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG"
+%endif
 
 %global cmake_config_args %{cmake_common_args}
 
@@ -1394,7 +1620,8 @@ popd
 #region compiler-rt options
 %global cmake_config_args %{cmake_config_args} \\\
 	-DCOMPILER_RT_INCLUDE_TESTS:BOOL=OFF \\\
-	-DCOMPILER_RT_INSTALL_PATH=%{_prefix}/lib/clang/%{maj_ver}
+	-DCOMPILER_RT_INSTALL_PATH=%{_prefix}/lib/clang/%{maj_ver} \\\
+	-DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON
 #endregion compiler-rt options
 
 #region docs options
@@ -1422,11 +1649,7 @@ popd
 %ifarch ppc64le
 	%global cmake_config_args %{cmake_config_args} -DLLDB_TEST_USER_ARGS=--skip-category=watchpoint
 %endif
-%if 0%{?rhel} == 8
-	%global cmake_config_args %{cmake_config_args} -DLLDB_INCLUDE_TESTS:BOOL=OFF
-%else
-	%global cmake_config_args %{cmake_config_args} -DLLDB_ENFORCE_STRICT_TEST_REQUIREMENTS:BOOL=ON
-%endif
+%global cmake_config_args %{cmake_config_args} -DLLDB_INCLUDE_TESTS:BOOL=OFF
 %endif
 #endregion lldb options
 
@@ -1462,7 +1685,6 @@ popd
 %global cmake_config_args %{cmake_config_args}  \\\
 	-DLLVM_APPEND_VC_REV:BOOL=OFF \\\
 	-DLLVM_BUILD_EXAMPLES:BOOL=OFF \\\
-	-DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON \\\
 	-DLLVM_BUILD_RUNTIME:BOOL=ON \\\
 	-DLLVM_BUILD_TOOLS:BOOL=ON \\\
 	-DLLVM_BUILD_UTILS:BOOL=ON \\\
@@ -1495,6 +1717,7 @@ popd
         -DMLIR_INSTALL_AGGREGATE_OBJECTS=OFF \\\
         -DMLIR_BUILD_MLIR_C_DYLIB=ON \\\
         -DMLIR_ENABLE_BINDINGS_PYTHON:BOOL=ON
+
 %endif
 #endregion mlir options
 
@@ -1502,6 +1725,26 @@ popd
 %global cmake_config_args %{cmake_config_args} \\\
 	-DOPENMP_INSTALL_LIBDIR=%{unprefixed_libdir} \\\
 	-DLIBOMP_INSTALL_ALIASES=OFF
+
+%if %{with offload}
+# We reset the cxxflags to "" here because this is compiling for a GPU
+# target, where our cflags are either questionable or actively wrong.
+%global cmake_config_args %{cmake_config_args} \\\
+	-DLLVM_RUNTIME_TARGETS='default;amdgcn-amd-amdhsa;nvptx64-nvidia-cuda' \\\
+	-DRUNTIMES_nvptx64-nvidia-cuda_LLVM_ENABLE_RUNTIMES=openmp \\\
+	-DRUNTIMES_amdgcn-amd-amdhsa_LLVM_ENABLE_RUNTIMES=openmp \\\
+	-DRUNTIMES_amdgcn-amd-amdhsa_CMAKE_CXX_FLAGS="" \\\
+	-DRUNTIMES_nvptx64-nvidia-cuda_CMAKE_CXX_FLAGS=""
+
+%if 0%{?__isa_bits} == 64
+# The following shouldn't be required, but due to a bug, we have to be
+# explicit about LLVM_LIBDIR_SUFFIX for nvptx64-nvidia-cuda.
+# TODO: Remove this after fixing
+# https://github.com/llvm/llvm-project/issues/159762
+%global cmake_config_args %{cmake_config_args} \\\
+	-DRUNTIMES_nvptx64-nvidia-cuda_LLVM_LIBDIR_SUFFIX=64
+%endif
+%endif
 #endregion openmp options
 
 #region polly options
@@ -1511,6 +1754,30 @@ popd
 %endif
 #endregion polly options
 
+#region flang options
+%if %{with flang}
+%global cmake_config_args %{cmake_config_args} \\\
+  -DFLANG_INCLUDE_DOCS:BOOL=ON
+# Build both, shared and static flang runtime objects.
+# See also https://llvm.org/devmtg/2025-04/slides/quick_talk/kruse_flang-rt.pdf
+%global cmake_config_args %{cmake_config_args} \\\
+  -DFLANG_RT_ENABLE_SHARED:BOOL=ON \\\
+  -DFLANG_RT_ENABLE_STATIC:BOOL=ON
+# The amount of RAM used per process has been set by trial and error.
+# This number may increase/decrease from time to time and may require changes.
+# We prefer to be on the safe side in order to avoid spurious errors.
+%global cmake_config_args %{cmake_config_args} \\\
+  -DFLANG_PARALLEL_COMPILE_JOBS=%{lua: print_max_procs(3072)}
+%endif
+#endregion flang options
+
+#region libclc options
+%if %{with libclc}
+# Build SPIR-V targets with the SPIR-V backend.
+%global cmake_config_args %{cmake_config_args} \\\
+  -DLIBCLC_USE_SPIRV_BACKEND:BOOL=ON
+%endif
+#endregion libclc options
 
 #region test options
 %global cmake_config_args %{cmake_config_args} \\\
@@ -1520,11 +1787,7 @@ popd
 	-DLLVM_LIT_ARGS="-vv"
 
 %if %{with lto_build}
-%if 0%{?fedora} >= 41
 	%global cmake_config_args %{cmake_config_args} -DLLVM_UNITTEST_LINK_FLAGS="-fno-lto"
-%else
-	%global cmake_config_args %{cmake_config_args} -DLLVM_UNITTEST_LINK_FLAGS="-Wl,-plugin-opt=O0"
-%endif
 %endif
 #endregion test options
 
@@ -1552,11 +1815,6 @@ popd
 	%global cmake_config_args %{cmake_config_args} -DPPC_LINUX_DEFAULT_IEEELONGDOUBLE=ON
 %endif
 
-%if %reduce_debuginfo == 1
-	%global cmake_config_args %{cmake_config_args} -DCMAKE_C_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG"
-	%global cmake_config_args %{cmake_config_args} -DCMAKE_CXX_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG"
-%endif
-
 %if 0%{?__isa_bits} == 64
 	%global cmake_config_args %{cmake_config_args} -DLLVM_LIBDIR_SUFFIX=64
 %endif
@@ -1582,7 +1840,11 @@ popd
 	# This option uses the NUMBER_OF_LOGICAL_CORES query in CMake which doesn't
 	# work on s390x.
 	# https://gitlab.kitware.com/cmake/cmake/-/issues/26619
-	%global cmake_config_args %{cmake_config_args} -DLLVM_RAM_PER_COMPILE_JOB=2048
+	# The value 4096 was used after we've seen cases of memory exhaustion on a
+	# system with 64GiB RAM and 16 jobs. It worked a few times after applied,
+	# but we can't guarantee it's enough. It's important to remember that RHEL8
+	# uses GCC. This value should not be applied to a build using clang.
+	%global cmake_config_args %{cmake_config_args} -DLLVM_RAM_PER_COMPILE_JOB=4096
 %endif
 %endif
 #endregion misc options
@@ -1639,12 +1901,14 @@ fi
   -DLLVM_VP_COUNTERS_PER_SITE=8
 
 %if %{defined host_clang_maj_ver}
-%global cmake_config_args_instrumented %{cmake_config_args_instrumented} \\\
-  -DLLVM_PROFDATA=%{_bindir}/llvm-profdata-%{host_clang_maj_ver}
+%global profdata %{_bindir}/llvm-profdata-%{host_clang_maj_ver}
+%global cxxfilt %{_bindir}/llvm-cxxfilt-%{host_clang_maj_ver}
 %else
-%global cmake_config_args_instrumented %{cmake_config_args_instrumented} \\\
-  -DLLVM_PROFDATA=%{_bindir}/llvm-profdata
+%global profdata %{_bindir}/llvm-profdata
+%global cxxfilt %{_bindir}/llvm-cxxfilt
 %endif
+%global cmake_config_args_instrumented %{cmake_config_args_instrumented} \\\
+  -DLLVM_PROFDATA=%{profdata}
 
 # TODO(kkleine): Should we see warnings like:
 # "function control flow change detected (hash mismatch)"
@@ -1663,9 +1927,13 @@ fi
 %cmake_build --target generate-profdata
 
 # Show top 10 functions in the profile
-llvm-profdata show --topn=10 %{builddir_instrumented}/tools/clang/utils/perf-training/clang.profdata | llvm-cxxfilt
+%{profdata} show --topn=10 %{builddir_instrumented}/tools/clang/utils/perf-training/clang.profdata | %{cxxfilt}
 
 cp %{builddir_instrumented}/tools/clang/utils/perf-training/clang.profdata $RPM_BUILD_DIR/result.profdata
+
+# The instrumented files are not needed anymore.
+# Remove them in order to free disk space (~10GiB).
+rm -rf %{builddir_instrumented}
 
 #endregion Perf training
 %endif
@@ -1704,11 +1972,15 @@ cd $OLD_CWD
   # LLVM_VP_COUNTERS_PER_SITE instead of adding it, hence the
   # -DLLVM_VP_COUNTERS_PER_SITE=8.
   %global extra_cmake_opts %{extra_cmake_opts} -DLLVM_VP_COUNTERS_PER_SITE=8
+%endif
+
 %if 0%{with lto_build}
   %global extra_cmake_opts %{extra_cmake_opts} -DLLVM_ENABLE_LTO:BOOL=Thin
   %global extra_cmake_opts %{extra_cmake_opts} -DLLVM_ENABLE_FATLTO=ON
 %endif
-  %global extra_cmake_opts %{extra_cmake_opts} -DLLVM_USE_LINKER=lld
+
+%if 0%{with use_lld}
+%global extra_cmake_opts %{extra_cmake_opts} -DLLVM_USE_LINKER=lld
 %endif
 
 %cmake -G Ninja %{cmake_config_args} %{extra_cmake_opts} $extra_cmake_args
@@ -1740,76 +2012,29 @@ cd $OLD_CWD
 %cmake_build --target runtimes
 #endregion Final stage
 
-#region Performance comparison
-%if 0%{run_pgo_perf_comparison}
-
-function run_perf_test {
-	local build_dir=$1
-
-	cd %{llvm_test_suite_dir}
-	%__cmake -G Ninja \
-		-S "%{llvm_test_suite_dir}" \
-		-B "${build_dir}" \
-		-DCMAKE_GENERATOR=Ninja \
-		-DCMAKE_C_COMPILER=clang \
-		-DCMAKE_CXX_COMPILER=clang++ \
-		-DTEST_SUITE_BENCHMARKING_ONLY=ON \
-		-DTEST_SUITE_COLLECT_STATS=ON \
-		-DTEST_SUITE_USE_PERF=OFF \
-		-DTEST_SUITE_SUBDIRS=CTMark \
-		-DTEST_SUITE_RUN_BENCHMARKS=OFF \
-		-DTEST_SUITE_COLLECT_CODE_SIZE=OFF \
-		-C%{llvm_test_suite_dir}/cmake/caches/O3.cmake
-
-	# Build the test-suite
-	%__cmake --build "${build_dir}" -j1 --verbose
-
-	# Run the tests with lit:
-	%{builddir_instrumented}/bin/llvm-lit -v -o ${build_dir}/results.json ${build_dir} || true
-	cd $OLD_CWD
-}
-
-# Run performance test for system clang
-reset_paths
-run_perf_test %{builddir_perf_system}
-
-# Run performance test for PGOed clang
-reset_paths
-FINAL_BUILD_DIR=`pwd`/%{_vpath_builddir}
-export LD_LIBRARY_PATH="${FINAL_BUILD_DIR}/lib:${FINAL_BUILD_DIR}/lib64:${LD_LIBRARY_PATH}"
-export PATH="${FINAL_BUILD_DIR}/bin:${OLD_PATH}"
-run_perf_test %{builddir_perf_pgo}
-
-# Compare the performance of system and PGOed clang
-%if 0%{?rhel}
-python3 -m venv compare-env
-source ./compare-env/bin/activate
-pip install "pandas>=2.2.3"
-pip install "scipy>=1.13.1"
-MY_PYTHON_BIN=./compare-env/bin/python3
+%if %{with lto_build}
+# The LTO cache is not needed anymore.
+# Remove it in order to free disk space.
+rm -rfv %{_vpath_builddir}/lto.cache
 %endif
 
-system_llvm_release=$(/usr/bin/clang --version | grep -Po '[0-9]+\.[0-9]+\.[0-9]' | head -n1)
-${MY_PYTHON_BIN} %{llvm_test_suite_dir}/utils/compare.py \
-    --metric compile_time \
-    --lhs-name ${system_llvm_release} \
-    --rhs-name pgo-%{version} \
-    %{builddir_perf_system}/results.json vs %{builddir_perf_pgo}/results.json > %{builddir_perf_pgo}/results-system-vs-pgo.txt || true
-
-echo "Result of Performance comparison between system and PGOed clang"
-cat %{builddir_perf_pgo}/results-system-vs-pgo.txt
-
-%if 0%{?rhel}
-# Deactivate virtual python environment created ealier
-deactivate
-%endif
-%endif
-#endregion Performance comparison
+# Strip debug info from static libraries before the install phase because
+# LLVM already consumes a lot of disk space (i.e. > 150GiB).
+# The install phase duplicates files on disk, causing errors if the disk is
+# too small.
+RPM_BUILD_ROOT=$(realpath ..)/%{build_libdir} %__brp_strip_static_archive
 
 #region compat lib
 cd ..
 
 %if %{with bundle_compat_lib}
+
+%if %{compat_maj_ver} >= 22
+%global compat_lib_cmake_args -DLLVM_ENABLE_EH=OFF
+%else
+%global compat_lib_cmake_args -DLLVM_ENABLE_EH=ON
+%endif
+
 # MIPS and Arm targets were disabled in LLVM 20, but we still need them
 # enabled for the compat libraries.
 %cmake -S ../llvm-project-%{compat_ver}.src/llvm -B ../llvm-compat-libs -G Ninja \
@@ -1819,10 +2044,9 @@ cd ..
     -DLLVM_INCLUDE_BENCHMARKS=OFF \
     -DLLVM_INCLUDE_TESTS=OFF \
     %{cmake_common_args} \
-%if %{compat_maj_ver} <= 19
-    -DLLVM_TARGETS_TO_BUILD="$(echo %{targets_to_build});Mips;ARM" \
-%endif
-    %{nil}
+    %{compat_lib_cmake_args}
+
+
 
 %ninja_build -C ../llvm-compat-libs LLVM
 %ninja_build -C ../llvm-compat-libs libclang.so
@@ -1841,7 +2065,11 @@ pushd llvm
 
 %if %{with python_lit}
 pushd utils/lit
+%if 0%{?rhel} == 8
 %py3_install
+%else
+%pyproject_install
+%endif
 
 # Strip out #!/usr/bin/env python
 sed -i -e '1{\@^#!/usr/bin/env python@d}' %{buildroot}%{python3_sitelib}/lit/*.py
@@ -1849,6 +2077,14 @@ popd
 %endif
 
 %cmake_install
+
+%if %{with flang}
+# Create ld.so.conf.d entry
+mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d
+cat >> %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{pkg_name_flang}-%{_arch}.conf << EOF
+%{_prefix}/lib/clang/%{maj_ver}/lib/%{llvm_triple}/
+EOF
+%endif
 
 popd
 
@@ -1930,9 +2166,6 @@ ln -s ../share/clang/clang-format-diff.py %{buildroot}%{install_bindir}/clang-fo
 # Install the PGO profile that was used to build this LLVM into the clang package
 %if 0%{with pgo}
 cp -v $RPM_BUILD_DIR/result.profdata %{buildroot}%{install_datadir}/llvm-pgo.profdata
-%if 0%{run_pgo_perf_comparison}
-cp -v %{builddir_perf_pgo}/results-system-vs-pgo.txt %{buildroot}%{install_datadir}/results-system-vs-pgo.txt
-%endif
 %endif
 
 # File in the macros file for other packages to use.  We are not doing this
@@ -1944,15 +2177,6 @@ sed -i -e "s|@@CLANG_MAJOR_VERSION@@|%{maj_ver}|" \
        -e "s|@@CLANG_MINOR_VERSION@@|%{min_ver}|" \
        -e "s|@@CLANG_PATCH_VERSION@@|%{patch_ver}|" \
        %{buildroot}%{_rpmmacrodir}/macros.%{pkg_name_clang}
-
-# install clang python bindings
-mkdir -p %{buildroot}%{python3_sitelib}/clang/
-# If we don't default to true here, we'll see this error:
-# install: omitting directory 'bindings/python/clang/__pycache__'
-# NOTE: this only happens if we include the gdb plugin of libomp.
-# Remove the plugin with command and we're good: rm -rf %{buildroot}/%{_datarootdir}/gdb
-install -p -m644 clang/bindings/python/clang/* %{buildroot}%{python3_sitelib}/clang/
-%py_byte_compile %{__python3} %{buildroot}%{python3_sitelib}/clang
 
 # install scanbuild-py to python sitelib.
 mv %{buildroot}%{install_prefix}/lib/{libear,libscanbuild} %{buildroot}%{python3_sitelib}
@@ -1977,6 +2201,15 @@ rm -Rf %{buildroot}%{install_datadir}/clang/*.el
 
 %endif
 
+# install clang python bindings
+mkdir -p %{buildroot}%{install_pythondir}/clang/
+# If we don't default to true here, we'll see this error:
+# install: omitting directory 'bindings/python/clang/__pycache__'
+# NOTE: this only happens if we include the gdb plugin of libomp.
+# Remove the plugin with command and we're good: rm -rf %{buildroot}/%{_datarootdir}/gdb
+install -p -m644 clang/bindings/python/clang/* %{buildroot}%{install_pythondir}/clang/
+%py_byte_compile %{__python3} %{buildroot}%{install_pythondir}/clang/
+
 # Create manpage symlink for clang++
 ln -s clang-%{maj_ver}.1 %{buildroot}%{install_mandir}/man1/clang++.1
 
@@ -1989,9 +2222,6 @@ chmod a+x %{buildroot}%{install_datadir}/scan-view/{Reporter.py,startfile.py}
 # remove editor integrations (bbedit, sublime, emacs, vim)
 rm -vf %{buildroot}%{install_datadir}/clang/clang-format-bbedit.applescript
 rm -vf %{buildroot}%{install_datadir}/clang/clang-format-sublime.py*
-
-# Remove unpackaged files
-rm -Rvf %{buildroot}%{install_datadir}/clang-doc
 
 # TODO: What are the Fedora guidelines for packaging bash autocomplete files?
 rm -vf %{buildroot}%{install_datadir}/clang/bash-autocomplete.sh
@@ -2029,7 +2259,8 @@ echo " %{cfg_file_content}" >> %{buildroot}%{_sysconfdir}/%{pkg_name_clang}/i386
 %ifarch ppc64le
 # Fix install path on ppc64le so that the directory name matches the triple used
 # by clang.
-mv %{buildroot}%{_prefix}/lib/clang/%{maj_ver}/lib/powerpc64le-redhat-linux-gnu %{buildroot}%{_prefix}/lib/clang/%{maj_ver}/lib/%{llvm_triple}
+mkdir -pv %{buildroot}%{_prefix}/lib/clang/%{maj_ver}/lib/%{llvm_triple}
+mv %{buildroot}%{_prefix}/lib/clang/%{maj_ver}/lib/powerpc64le-redhat-linux-gnu/* %{buildroot}%{_prefix}/lib/clang/%{maj_ver}/lib/%{llvm_triple}
 %endif
 
 %ifarch %{ix86}
@@ -2104,6 +2335,60 @@ rm -rf %{buildroot}%{install_prefix}/src/python
 %endif
 #endregion mlir installation
 
+#region flang installation
+%if %{with flang}
+# Remove unnecessary files.
+rm -rfv %{buildroot}%{install_libdir}/cmake/flang
+
+# Remove runtime development headers (see https://github.com/llvm/llvm-project/pull/165610)
+rm -rfv %{buildroot}%{install_includedir}/flang-rt
+
+rm -v %{buildroot}%{install_libdir}/libFIRAnalysis.a \
+      %{buildroot}%{install_libdir}/libFIRBuilder.a \
+      %{buildroot}%{install_libdir}/libFIRCodeGen.a \
+      %{buildroot}%{install_libdir}/libFIRCodeGenDialect.a \
+      %{buildroot}%{install_libdir}/libFIRDialect.a \
+      %{buildroot}%{install_libdir}/libFIRDialectSupport.a \
+      %{buildroot}%{install_libdir}/libFIROpenACCSupport.a \
+      %{buildroot}%{install_libdir}/libFIROpenMPSupport.a \
+      %{buildroot}%{install_libdir}/libFIRSupport.a \
+      %{buildroot}%{install_libdir}/libFIRTestAnalysis.a \
+      %{buildroot}%{install_libdir}/libFIRTestOpenACCInterfaces.a \
+      %{buildroot}%{install_libdir}/libFIRTransforms.a \
+      %{buildroot}%{install_libdir}/libflangFrontend.a \
+      %{buildroot}%{install_libdir}/libflangFrontendTool.a \
+      %{buildroot}%{install_libdir}/libflangPasses.a \
+      %{buildroot}%{install_libdir}/libFlangOpenMPTransforms.a \
+      %{buildroot}%{install_libdir}/libFortranEvaluate.a \
+      %{buildroot}%{install_libdir}/libFortranLower.a \
+      %{buildroot}%{install_libdir}/libFortranParser.a \
+      %{buildroot}%{install_libdir}/libFortranSemantics.a \
+      %{buildroot}%{install_libdir}/libFortranSupport.a \
+      %{buildroot}%{install_libdir}/libHLFIRDialect.a \
+      %{buildroot}%{install_libdir}/libHLFIRTransforms.a \
+      %{buildroot}%{install_libdir}/libCUFAttrs.a \
+      %{buildroot}%{install_libdir}/libCUFDialect.a \
+      %{buildroot}%{install_libdir}/libFortranDecimal.a \
+      %{buildroot}%{install_libdir}/libFortranUtils.a \
+      %{buildroot}%{install_libdir}/libFIROpenACCAnalysis.a \
+      %{buildroot}%{install_libdir}/libFIROpenACCTransforms.a \
+      %{buildroot}%{install_libdir}/libMIFDialect.a
+
+find %{buildroot}%{install_includedir}/flang -type f -a ! -iname '*.mod' -delete
+
+# this is a test binary
+rm -v %{buildroot}%{install_bindir}/f18-parse-demo
+
+# Probably this directory already existed before
+mkdir -pv %{buildroot}%{_sysconfdir}/%{pkg_name_clang}/
+echo " %{cfg_file_content_flang}" >> %{buildroot}%{_sysconfdir}/%{pkg_name_clang}/%{_target_platform}-flang.cfg
+%ifarch x86_64
+# On x86_64, install an additional config file.
+echo " %{cfg_file_content_flang}" >> %{buildroot}%{_sysconfdir}/%{pkg_name_clang}/i386-redhat-linux-gnu-flang.cfg
+%endif
+%endif
+#endregion flang installation
+
 #region libcxx installation
 %if %{with libcxx}
 # We can't install the unversionned path on default location because that would conflict with
@@ -2158,14 +2443,14 @@ move_and_replace_with_symlinks %{buildroot}%{install_datadir} %{buildroot}%{_dat
 mkdir -p %{buildroot}%{_bindir}
 for f in %{buildroot}%{install_bindir}/*; do
   filename=`basename $f`
-  if [[ "$filename" =~ ^(lit|ld|clang-%{maj_ver})$ ]]; then
+  if [[ "$filename" =~ ^(lit|ld|clang-%{maj_ver}|flang-%{maj_ver})$ ]]; then
     continue
   fi
   %if %{with compat_build}
     ln -s ../../%{install_bindir}/$filename %{buildroot}/%{_bindir}/$filename-%{maj_ver}
   %else
-    # clang-NN is already created by the build system.
-    if [[ "$filename" == "clang" ]]; then
+    # clang-NN and flang-NN are already created by the build system.
+    if [[ "$filename" =~ ^(clang|flang)$ ]]; then
       continue
     fi
     ln -s $filename %{buildroot}/%{_bindir}/$filename-%{maj_ver}
@@ -2212,6 +2497,22 @@ install -m 0755 ../llvm-compat-libs/lib/liblldb.so.%{compat_maj_ver}* %{buildroo
 # TODO(kkleine): Instead of deleting test files we should mark them as expected
 # to fail. See https://llvm.org/docs/CommandGuide/lit.html#cmdoption-lit-xfail
 
+# Tell if the GTS version used by the newly built clang is equal to the
+# expected version.
+function is_gts_equal {
+    local gts_used=$(`pwd`/%{_vpath_builddir}/bin/clang -v 2>&1 | grep "Selected GCC installation" | sed 's|.*/\([0-9]\+\)$|\1|')
+    if [[ -z "%{gts_version}" ]]; then
+      return 0
+    fi
+    test "x$gts_used" = "x%{gts_version}"
+    return $?
+}
+
+# Increase open file limit while running tests.
+if [[ $(ulimit -n) -lt 10000 ]]; then
+  ulimit -n 10000
+fi
+
 %ifarch ppc64le
 # TODO: Re-enable when ld.gold fixed its internal error.
 rm llvm/test/tools/gold/PowerPC/mtriple.ll
@@ -2239,6 +2540,7 @@ function reset_test_opts()
     # Set to mark tests as expected to fail.
     # See https://llvm.org/docs/CommandGuide/lit.html#cmdoption-lit-xfail
     unset LIT_XFAIL
+    unset LIT_XFAIL_NOT
 
     # Set to mark tests to not even run.
     # See https://llvm.org/docs/CommandGuide/lit.html#cmdoption-lit-filter-out
@@ -2256,6 +2558,9 @@ function reset_test_opts()
 
     # Some test (e.g. mlir) require this to be set.
     unset PYTHONPATH
+
+    # We use them in some cases.
+    unset LIT_NUM_SHARDS LIT_RUN_SHARD
 }
 
 # Convert array of test names into a regex.
@@ -2309,12 +2614,14 @@ reset_test_opts
 reset_test_opts
 # Xfail testing of update utility tools
 export LIT_XFAIL="tools/UpdateTestChecks"
+
 %cmake_build --target check-llvm
 #endregion Test LLVM
 
 #region Test CLANG
 reset_test_opts
 export LIT_XFAIL="$LIT_XFAIL;clang/test/CodeGen/profile-filter.c"
+
 %cmake_build --target check-clang
 #endregion Test Clang
 
@@ -2380,30 +2687,9 @@ test_list_filter_out+=("libomp :: worksharing/for/omp_collapse_many_GTGEGT_int.c
 test_list_filter_out+=("libomp :: worksharing/for/omp_collapse_many_LTLEGE_int.c")
 test_list_filter_out+=("libomp :: worksharing/for/omp_collapse_one_int.c")
 
-%if %{maj_ver} < 21
-# The following test is flaky and we'll filter it out
-test_list_filter_out+=("libomp :: parallel/bug63197.c")
-test_list_filter_out+=("libomp :: tasking/issue-69733.c")
-test_list_filter_out+=("libarcher :: races/task-taskgroup-unrelated.c")
-
-# The following tests have been failing intermittently.
-# Issue upstream: https://github.com/llvm/llvm-project/issues/127796
-test_list_filter_out+=("libarcher :: races/task-two.c")
-test_list_filter_out+=("libarcher :: races/lock-nested-unrelated.c")
-%endif
-
 %ifarch s390x
 test_list_filter_out+=("libomp :: flush/omp_flush.c")
 test_list_filter_out+=("libomp :: worksharing/for/omp_for_schedule_guided.c")
-%endif
-
-%if %{maj_ver} < 21
-%ifarch aarch64 s390x
-# The following test has been failing intermittently on aarch64 and s390x.
-# Re-enable it after https://github.com/llvm/llvm-project/issues/117773
-# gets fixed.
-test_list_filter_out+=("libarcher :: races/taskwait-depend.c")
-%endif
 %endif
 
 # The following libarcher tests fail due to setrlimit limitations in the build environment
@@ -2541,7 +2827,6 @@ export LIT_XFAIL="$LIT_XFAIL;offloading/thread_state_2.c"
 
 adjust_lit_filter_out test_list_filter_out
 
-%if %{maj_ver} >= 21
 # This allows openmp tests to be re-run 4 times. Once they pass
 # after being re-run, they are marked as FLAKYPASS.
 # See https://github.com/llvm/llvm-project/pull/141851 for the
@@ -2552,12 +2837,27 @@ adjust_lit_filter_out test_list_filter_out
 # we can see the exact number of attempts the tests needed
 # to pass. And then we can adapt this number.
 export LIT_OPTS="$LIT_OPTS --max-retries-per-test=4"
+
+%if %{with flang}
+# Without this we run into a libflang_rt.runtime.so not found error.
+# See https://github.com/llvm/llvm-project/pull/150722 for why this only
+# happens when flang is found.
+export LD_LIBRARY_PATH=%{buildroot}%{_prefix}/lib/clang/%{maj_ver}/lib/%{llvm_triple}
 %endif
 
 %if 0%{?rhel}
 # libomp tests are often very slow on s390x brew builders
 %ifnarch s390x riscv64
-%cmake_build --target check-openmp
+# Rarely, the system clang uses a GCC installation directory that is
+# different from what we'd like to build with.
+# Our newly built clang ends up using that old GCC because of the config
+# files under /etc/clang pointing to the old GCC. We won't be able to run all
+# tests because the installed libatomic cannot be found due to our newly built
+# clang using the wrong GCC directory, e.g. we installed the libatomic from
+# the latest GTS, but the installed GCC is 1 version earlier.
+if is_gts_equal; then
+    %cmake_build --target check-openmp
+fi
 %endif
 %else
 %cmake_build --target check-openmp
@@ -2616,6 +2916,13 @@ test_list_filter_out+=("MLIR :: python/execution_engine.py")
 # if ! LD_SHOW_AUXV=1 /bin/true | grep -q arch_3_00; then
 test_list_filter_out+=("MLIR :: python/execution_engine.py")
 test_list_filter_out+=("MLIR :: python/multithreaded_tests.py")
+test_list_filter_out+=("MLIR :: python/global_constructors.py")
+%endif
+
+%if %{with flang}
+# TODO(kkleine): This test needs to be re-enabled. I currently only fails when building with flang.
+# Here's the test failure: https://gist.github.com/kwk/5d551e27a28dfc1b34a09dca781f91df
+test_list_filter_out+=("MLIR :: mlir-pdll-lsp-server/view-output.test")
 %endif
 
 adjust_lit_filter_out test_list_filter_out
@@ -2653,6 +2960,8 @@ if ! grep -q atomics /proc/cpuinfo; then
 fi
 %endif
 
+adjust_lit_filter_out test_list_filter_out
+
 %cmake_build --target check-bolt
 %endif
 #endregion BOLT tests
@@ -2664,6 +2973,25 @@ reset_test_opts
 %endif
 #endregion polly tests
 
+#region flang tests
+%if %{with flang}
+reset_test_opts
+
+# https://github.com/llvm/llvm-project/issues/126051
+test_list_filter_out+=("Flang :: Driver/linker-flags.f90")
+
+# We filter our the location.f90 test for now because with LTO+PGO enabled,
+# We miss the location.f90 entry in the loc_kind_array[ base, inclusion] entry.
+# https://github.com/llvm/llvm-project/issues/156629
+test_list_filter_out+=("Flang :: Lower/location.f90")
+
+adjust_lit_filter_out test_list_filter_out
+
+%cmake_build --target check-flang
+%cmake_build --target check-flang-rt
+
+%endif
+#endregion flang tests
 
 %endif
 
@@ -2797,7 +3125,6 @@ fi
 %license llvm/LICENSE.TXT
 
 %{expand_bins %{expand:
-    bugpoint
     dsymutil
     FileCheck
     llc
@@ -2808,6 +3135,7 @@ fi
     llvm-bcanalyzer
     llvm-bitcode-strip
     llvm-c-test
+    llvm-cas
     llvm-cat
     llvm-cfi-verify
     llvm-cgdata
@@ -2831,6 +3159,7 @@ fi
     llvm-gsymutil
     llvm-ifs
     llvm-install-name-tool
+    llvm-ir2vec
     llvm-jitlink
     llvm-jitlink-executor
     llvm-lib
@@ -2842,11 +3171,14 @@ fi
     llvm-mc
     llvm-mca
     llvm-ml
+    llvm-ml64
     llvm-modextract
     llvm-mt
     llvm-nm
     llvm-objcopy
     llvm-objdump
+    llvm-offload-wrapper
+    llvm-offload-binary
     llvm-opt-report
     llvm-otool
     llvm-pdbutil
@@ -2884,21 +3216,18 @@ fi
     yaml2obj
 }}
 
-%if %{maj_ver} >= 21
+%if %{maj_ver} >= 23
 %{expand_bins %{expand:
-    llvm-ml64
+    llubi
+    llvm-gpu-loader
 }}
-%endif
-
-%if %{maj_ver} >= 22
+%else
 %{expand_bins %{expand:
-    llvm-ir2vec
-    llvm-offload-wrapper
+    bugpoint
 }}
 %endif
 
 %{expand_mans %{expand:
-    bugpoint
     clang-tblgen
     dsymutil
     FileCheck
@@ -2923,6 +3252,7 @@ fi
     llvm-extract
     llvm-ifs
     llvm-install-name-tool
+    llvm-ir2vec
     llvm-lib
     llvm-libtool-darwin
     llvm-link
@@ -2933,6 +3263,7 @@ fi
     llvm-nm
     llvm-objcopy
     llvm-objdump
+    llvm-offload-binary
     llvm-opt-report
     llvm-otool
     llvm-pdbutil
@@ -2955,9 +3286,13 @@ fi
     tblgen
 }}
 
-%if %{maj_ver} >= 22
+%if %{maj_ver} >= 23
 %{expand_mans %{expand:
-    llvm-ir2vec
+    llubi
+}}
+%else
+%{expand_mans %{expand:
+    bugpoint
 }}
 %endif
 
@@ -3028,15 +3363,11 @@ fi
     lli-child-target
     llvm-isel-fuzzer
     llvm-opt-fuzzer
-}}
-%if %{maj_ver} >= 21
-%{expand_bins %{expand:
     llvm-test-mustache-spec
 }}
 %{expand_mans %{expand:
     llvm-test-mustache-spec
 }}
-%endif
 
 %files -n %{pkg_name_llvm}-googletest
 %license llvm/LICENSE.TXT
@@ -3078,9 +3409,6 @@ fi
 
 %if 0%{with pgo}
 %{expand_datas %{expand: llvm-pgo.profdata }}
-%if 0%{run_pgo_perf_comparison}
-%{expand_datas %{expand: results-system-vs-pgo.txt }}
-%endif
 %endif
 
 
@@ -3185,10 +3513,13 @@ fi
     modularize
     clang-format-diff
     run-clang-tidy
-}}
-%if %{maj_ver} >= 21
-%{expand_bins %{expand:
     offload-arch
+}}
+
+%if %{maj_ver} >= 23
+%{expand_bins %{expand:
+    clang-ssaf-format
+    clang-ssaf-linker
 }}
 %endif
 
@@ -3203,6 +3534,7 @@ fi
     clang/clang-include-fixer.py*
     clang/clang-tidy-diff.py*
     clang/run-find-all-symbols.py*
+    clang-doc/*
 }}
 
 %files -n %{pkg_name_clang}-tools-extra-devel
@@ -3213,12 +3545,9 @@ fi
 %license clang/LICENSE.TXT
 %expand_bins git-clang-format
 
-%if %{without compat_build}
-%files -n python%{python3_pkgversion}-clang
+%files -n python%{python3_pkgversion}-%{pkg_name_clang}
 %license clang/LICENSE.TXT
-%{python3_sitelib}/clang/
-%endif
-
+%{install_pythondir}/clang/
 #endregion CLANG files
 
 #region COMPILER-RT files
@@ -3238,13 +3567,10 @@ fi
 
 # Files that appear on all targets
 %{_prefix}/lib/clang/%{maj_ver}/lib/%{compiler_rt_triple}/libclang_rt.*
-
-%if %{has_crtobjs}
 %{_prefix}/lib/clang/%{maj_ver}/lib/%{compiler_rt_triple}/clang_rt.crtbegin.o
 %{_prefix}/lib/clang/%{maj_ver}/lib/%{compiler_rt_triple}/clang_rt.crtend.o
-%endif
 
-%ifnarch %{ix86} s390x riscv64
+%ifnarch %{ix86} riscv64
 %{_prefix}/lib/clang/%{maj_ver}/lib/%{compiler_rt_triple}/liborc_rt.a
 %endif
 
@@ -3283,20 +3609,12 @@ fi
     libLLVMOffload.so
 }}
 
-%if %{maj_ver} < 21
-%{expand_libs %{expand:
-    libomptarget.devicertl.a
-    libomptarget-amdgpu*.bc
-    libomptarget-nvptx*.bc
-}}
-%else
 %{expand_libs %{expand:
     amdgcn-amd-amdhsa/libompdevice.a
     amdgcn-amd-amdhsa/libomptarget-amdgpu.bc
     nvptx64-nvidia-cuda/libompdevice.a
     nvptx64-nvidia-cuda/libomptarget-nvptx.bc
 }}
-%endif
 
 %expand_includes offload
 %endif
@@ -3358,6 +3676,7 @@ fi
     lldb-argdumper
     lldb-dap
     lldb-instr
+    lldb-mcp
     lldb-server
 }}
 # Usually, *.so symlinks are kept in devel subpackages. However, the python
@@ -3374,6 +3693,10 @@ fi
 
 %files -n %{pkg_name_lldb}-devel
 %expand_includes lldb
+%{expand_bins %{expand:
+    lldb-tblgen
+    yaml2macho-core
+}}
 
 %if %{without compat_build}
 %files -n python%{python3_pkgversion}-lldb
@@ -3388,6 +3711,7 @@ fi
 %files -n %{pkg_name_mlir}
 %license LICENSE.TXT
 %{expand_libs %{expand:
+    libmlir_apfloat_wrappers.so.%{maj_ver}*
     libmlir_arm_runner_utils.so.%{maj_ver}*
     libmlir_arm_sme_abi_stubs.so.%{maj_ver}*
     libmlir_async_runtime.so.%{maj_ver}*
@@ -3419,6 +3743,7 @@ fi
 %expand_includes mlir mlir-c
 %{expand_libs %{expand:
     cmake/mlir
+    libmlir_apfloat_wrappers.so
     libmlir_arm_runner_utils.so
     libmlir_arm_sme_abi_stubs.so
     libmlir_async_runtime.so
@@ -3432,6 +3757,59 @@ fi
 %{python3_sitearch}/mlir/
 %endif
 #endregion MLIR files
+
+#region flang files
+%if %{with flang}
+%files -n %{pkg_name_flang}
+%license flang/LICENSE.TXT
+%{expand_mans flang}
+%{expand_bins %{expand:
+    tco
+    bbc
+    fir-opt
+    fir-lsp-server
+    flang
+    flang-new
+}}
+%{install_bindir}/flang-%{maj_ver}
+%{expand_includes %{expand:
+    flang/*.mod
+}}
+
+%{_sysconfdir}/%{pkg_name_clang}/%{_target_platform}-flang.cfg
+%ifarch x86_64
+%{_sysconfdir}/%{pkg_name_clang}/i386-redhat-linux-gnu-flang.cfg
+%endif
+
+%{_prefix}/lib/clang/%{maj_ver}/include/ISO_Fortran_binding.h
+
+%files -n %{pkg_name_flang}-runtime
+%{_prefix}/lib/clang/%{maj_ver}/lib/%{llvm_triple}/libflang_rt.runtime.a
+%{_prefix}/lib/clang/%{maj_ver}/lib/%{llvm_triple}/libflang_rt.runtime.so
+%config(noreplace) %{_sysconfdir}/ld.so.conf.d/%{pkg_name_flang}-%{_arch}.conf
+
+%endif
+#region flang files
+
+#region libclc files
+%if %{with libclc}
+%files -n %{pkg_name_libclc}
+%license libclc/LICENSE.TXT
+%doc libclc/README.md libclc/CREDITS.TXT
+%{_prefix}/lib/clang/%{maj_ver}/lib/amdgcn-amd-amdhsa-llvm/libclc.bc
+%{_prefix}/lib/clang/%{maj_ver}/lib/nvptx64--/libclc.bc
+%{_prefix}/lib/clang/%{maj_ver}/lib/nvptx64--nvidiacl/libclc.bc
+%{_prefix}/lib/clang/%{maj_ver}/lib/nvptx64-nvidia-cuda/libclc.bc
+%{_prefix}/lib/clang/%{maj_ver}/lib/spir--/libclc.bc
+%{_prefix}/lib/clang/%{maj_ver}/lib/spir64--/libclc.bc
+
+%files -n %{pkg_name_libclc}-spirv
+%license libclc/LICENSE.TXT
+%doc libclc/README.md libclc/CREDITS.TXT
+%{_prefix}/lib/clang/%{maj_ver}/lib/spirv32--/libclc.spv
+%{_prefix}/lib/clang/%{maj_ver}/lib/spirv64--/libclc.spv
+%endif
+#endregion libclc files
 
 #region libcxx files
 %if %{with libcxx}
