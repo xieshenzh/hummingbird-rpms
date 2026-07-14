@@ -3,7 +3,7 @@
 # https://github.com/spiffe/spire
 %global goipath         github.com/spiffe/spire
 %global forgeurl        https://github.com/spiffe/spire
-Version:                1.15.1
+Version:                1.15.2
 
 %gometa -L
 %forgemeta
