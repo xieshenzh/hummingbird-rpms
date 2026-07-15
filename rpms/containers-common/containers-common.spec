@@ -26,7 +26,7 @@ Epoch: 5
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
 Version: 0.68.1
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: Apache-2.0
 BuildArch: noarch
 # for BuildRequires: go-md2man
