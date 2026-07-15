@@ -2,7 +2,7 @@
 
 Name:           chunkah
 Version:        0.6.0
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        OCI building tool for content-based container image layers
 
 # (MIT OR Apache-2.0) AND Unicode-3.0
