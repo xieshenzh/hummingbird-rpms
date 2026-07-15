@@ -47,7 +47,7 @@
 Name:             gawk
 Summary:          The GNU version of the AWK text processing utility
 Version:          5.4.0
-Release:          3%{?dist}
+Release:          3.1%{?dist}
 
 License:          GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND BSD-3-Clause
 
@@ -121,6 +121,10 @@ BuildRequires: make
 Patch001: gawk-5.4.0-pma_performance.patch
 Patch002: gawk-5.4.0-back_references.patch
 Patch003: gawk-5.4.0-charset.patch
+Patch004: gawk-5.4.0-CVE-2026-40553.patch
+Patch005: gawk-5.4.0-CVE-2026-40468.patch
+Patch006: gawk-5.4.0-CVE-2026-40467.patch
+Patch007: gawk-5.4.0-CVE-2026-40469.patch
 
 
 # Downstream patches -- these should be always included when doing rebase:
