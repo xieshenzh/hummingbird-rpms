@@ -18,7 +18,7 @@ Summary: A documentation system for C/C++
 Name:    doxygen
 Epoch:   2
 Version: 1.17.0
-Release: 2%{?dist}
+Release: 2.1%{?dist}
 # No version is specified.
 License: GPL-2.0-or-later
 Url: https://github.com/doxygen
