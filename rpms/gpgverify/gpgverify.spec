@@ -1,6 +1,6 @@
 Name:           gpgverify
 Version:        2.2
-Release:        4.1%{?dist}
+Release:        4.2%{?dist}
 Summary:        Signature verifier for easy and safe scripting
 
 License:        Boehm-GC
