@@ -10,7 +10,7 @@ Version:                2.11.4
 
 
 Name:           caddy
-Release:        0.1%{?dist}
+Release:        0.2%{?dist}
 Summary:        Web server with automatic HTTPS
 
 # main source code is Apache-2.0
