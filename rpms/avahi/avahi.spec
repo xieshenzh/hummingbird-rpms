@@ -60,7 +60,7 @@
 
 Name:             avahi
 Version:          0.9%{?rc:~%{rc}}
-Release:          0.1%{?dist}
+Release:          0.1.1%{?dist}
 Summary:          Local network service discovery
 License:          LGPL-2.1-or-later AND LGPL-2.0-or-later AND BSD-2-Clause-Views AND MIT
 URL:              http://avahi.org
