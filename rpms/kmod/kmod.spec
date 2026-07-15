@@ -16,7 +16,7 @@
 
 Name:		kmod
 Version:	34.2
-Release:	5%{?dist}
+Release:	5.1%{?dist}
 Summary:	Linux kernel module management utilities
 
 # https://docs.fedoraproject.org/en-US/legal/license-field/#_no_effective_license_analysis
