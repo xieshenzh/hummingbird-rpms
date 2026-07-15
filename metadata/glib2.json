@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Removed GLib built-in HMAC backend for FIPS compliance",
+  "modification_reason": "Removed GLib built-in HMAC backend for FIPS compliance; backport fix for CVE-2026-15588",
   "modification_status": "modified",
   "release": "1",
   "sha": "eeb6161decf15017f3eb8af9493fe0f046042372",

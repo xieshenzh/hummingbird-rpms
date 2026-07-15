@@ -1,6 +1,6 @@
 Name:           glib2
 Version:        2.89.1
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        A library of handy utility functions
 
 License:        LGPL-2.1-or-later
@@ -14,6 +14,9 @@ Patch:          fips-disable-ghmac.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=2192204
 Patch:          default-terminal.patch
+
+# https://gitlab.gnome.org/GNOME/glib/-/issues/3985
+Patch:          CVE-2026-15588-gdbusauth-line-limit.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
