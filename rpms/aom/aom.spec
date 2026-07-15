@@ -14,7 +14,7 @@
 
 Name:       aom
 Version:    3.14.0
-Release:    0.1%{?dist}
+Release:    0.1.1%{?dist}
 Summary:    Royalty-free next-generation video format
 
 License:    BSD-3-Clause
