@@ -1,13 +1,13 @@
 {
   "branch": "rawhide",
   "cve_product": "Microsoft / .NET 8.0",
-  "modification_reason": "Pre-existing modification - requires review; backport fixes for CVE-2026-59869 and CVE-2026-59725; backport fix for CVE-2026-53486",
+  "modification_reason": "update to SDK 8.0.129 / Runtime 8.0.29 for July 2026 security fixes (CVE-2026-47304 and others)",
   "modification_status": "modified",
   "release": "1",
   "sha": "2f8686bc7c3e953e482b2fbc9bc331eefb8de07d",
   "source": "https://src.fedoraproject.org/rpms/dotnet8.0.git",
   "upstream_branch": "release/8.0",
   "upstream_repo": "https://github.com/dotnet/runtime",
-  "version": "8.0.128",
+  "version": "8.0.129",
   "version_transform": "dotnet_sdk_to_runtime"
 }
