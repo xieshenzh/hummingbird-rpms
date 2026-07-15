@@ -5,7 +5,7 @@
 
 Name:           libeconf
 Version:        0.7.9
-Release:        3.1%{?dist}
+Release:        3.2%{?dist}
 Summary:        Enhanced config file parser library
 
 License:        MIT
