@@ -1,6 +1,6 @@
 Name: debugedit
 Version: 5.3
-Release: 2.1%{?dist}
+Release: 2.2%{?dist}
 Summary: Tools and scripts for creating debuginfo and source file distributions, collect build-ids and rewrite source paths in DWARF data for debugging, tracing and profiling.
 License: GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.0-or-later
 URL: https://sourceware.org/debugedit/
