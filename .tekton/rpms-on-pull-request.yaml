@@ -4716,8 +4716,8 @@ spec:
         - x86_64
     - name: build-platforms
       value:
-        - "linux/x86_64"
-        - "linux/arm64"
+        - "linux-d160-c8xlarge/arm64"
+        - "linux-d160-c8xlarge/amd64"
     - name: specfile
       value: "dotnet10.0.spec"
     - name: monorepo-subdir
@@ -4786,8 +4786,8 @@ spec:
         - x86_64
     - name: build-platforms
       value:
-        - "linux/x86_64"
-        - "linux/arm64"
+        - "linux-d160-c8xlarge/arm64"
+        - "linux-d160-c8xlarge/amd64"
     - name: specfile
       value: "dotnet8.0.spec"
     - name: monorepo-subdir
@@ -4856,8 +4856,8 @@ spec:
         - x86_64
     - name: build-platforms
       value:
-        - "linux/x86_64"
-        - "linux/arm64"
+        - "linux-d160-c8xlarge/arm64"
+        - "linux-d160-c8xlarge/amd64"
     - name: specfile
       value: "dotnet9.0.spec"
     - name: monorepo-subdir
