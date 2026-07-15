@@ -4,7 +4,7 @@
 
 Name: freetype
 Version: 2.14.3
-Release: 1.2%{?dist}
+Release: 1.3%{?dist}
 Summary: A free and portable font rendering engine
 License: (FTL OR GPL-2.0-or-later) AND BSD-3-Clause AND MIT AND MIT-Modern-Variant AND LicenseRef-Fedora-Public-Domain AND Zlib
 URL: http://www.freetype.org
