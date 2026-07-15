@@ -1,5 +1,5 @@
 Version: 0.301
-Release: 17.1%{?dist}
+Release: 17.2%{?dist}
 URL: https://gitlab.gnome.org/GNOME/cantarell-fonts/
 
 %global	common_description	%{expand:
