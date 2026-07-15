@@ -10,7 +10,7 @@
 # `/opt/{namespace}/{versioned name}`.
 Name:       autoconf
 Version:    2.73
-Release:    3%{?dist}
+Release:    3.1%{?dist}
 
 # To help future rebase, the following licenses were seen in the following files/folders:
 # '*' is anything that was not explicitly listed earlier in the folder
