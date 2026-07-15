@@ -88,7 +88,7 @@
 
 Name:           git
 Version:        2.55.0
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        Fast Version Control System
 License:        BSD-3-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT
 URL:            https://git-scm.com/
