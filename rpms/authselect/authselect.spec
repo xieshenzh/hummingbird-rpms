@@ -3,7 +3,7 @@
 
 Name:           authselect
 Version:        1.7.1
-Release:        1.1%{?dist}
+Release:        1.2%{?dist}
 Summary:        Configures authentication and identity sources from supported profiles
 URL:            https://github.com/authselect/authselect
 
