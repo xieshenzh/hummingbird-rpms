@@ -25,7 +25,7 @@ Version:   3.8.0
 %global gopath          %{_datadir}/gocode
 
 Name:      go-rpm-macros
-Release:   2.1%{?dist}
+Release:   2.2%{?dist}
 Summary:   Build-stage rpm automation for Go packages
 
 License:   GPL-3.0-or-later
