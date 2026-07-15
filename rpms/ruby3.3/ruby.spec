@@ -188,7 +188,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 23.3%{?dist}
+Release: 23.4%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -311,6 +311,9 @@ Patch14: ruby-3.3.10-net-imap-0.4.24-security-fixes.patch
 # CVE-2026-47241: Net::IMAP denial of service via malformed command input
 # CVE-2026-47242: Net::IMAP command injection via improper input validation
 Patch15: ruby-3.3.10-net-imap-0.4.25-security-fixes.patch
+# Backport upstream test fix for implementation-defined lgamma sign at poles.
+# https://bugs.ruby-lang.org/issues/21666
+Patch16: ruby-3.3.10-lgamma-unspecified-sign-tests.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -822,6 +825,7 @@ analysis result in RBS format, a standard type description format for Ruby
 %patch 13 -p1
 %patch 14 -p1 -d .bundle/gems/net-imap-0.4.21
 %patch 15 -p1 -d .bundle/gems/net-imap-0.4.21
+%patch 16 -p1
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
