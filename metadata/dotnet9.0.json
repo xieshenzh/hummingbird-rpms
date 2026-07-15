@@ -3,10 +3,10 @@
   "cve_product": "Microsoft / .NET 9.0",
   "modification_status": "clean",
   "release": "1",
-  "sha": "8c60f0a701507fa4aea170fec0b1f54afdf18840",
+  "sha": "c927dd7d5dead9564fb2f7413f57c1145f420730",
   "source": "https://src.fedoraproject.org/rpms/dotnet9.0.git",
   "upstream_branch": "release/9.0",
   "upstream_repo": "https://github.com/dotnet/runtime",
-  "version": "9.0.118",
+  "version": "9.0.119",
   "version_transform": "dotnet_sdk_to_runtime"
 }
