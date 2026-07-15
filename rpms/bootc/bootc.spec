@@ -24,7 +24,7 @@
 Name:           bootc
 # Ensure this local build overrides anything else.
 Version:        1.16.3
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        Bootable container system
 
 # Apache-2.0
