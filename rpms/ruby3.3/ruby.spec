@@ -188,7 +188,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 23.2%{?dist}
+Release: 23.3%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -306,6 +306,11 @@ Patch13: ruby-3.4.0-openssl-respect-crypto-policies-tls-min.patch
 # CVE-2026-42245: Net::IMAP DoS via crafted IMAP responses (Moderate)
 # CVE-2026-42256: Net::IMAP DoS via large SCRAM iteration count (Moderate)
 Patch14: ruby-3.3.10-net-imap-0.4.24-security-fixes.patch
+# Backport net-imap 0.4.24 -> 0.4.25 security fixes:
+# CVE-2026-47240: Net::IMAP command injection via non-synchronizing literals
+# CVE-2026-47241: Net::IMAP denial of service via malformed command input
+# CVE-2026-47242: Net::IMAP command injection via improper input validation
+Patch15: ruby-3.3.10-net-imap-0.4.25-security-fixes.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -645,9 +650,9 @@ Provides:   ruby-bundled-gems = %{version}-%{release}
 Provides:   bundled(rubygem-debug) = %{debug_version}
 Provides:   bundled(rubygem-matrix) = %{matrix_version}
 Provides:   bundled(rubygem-net-ftp) = %{net_ftp_version}
-# net-imap lib/ backported to 0.4.24 for CVE fixes; gem dir remains 0.4.21
+# net-imap lib/ backported to 0.4.25 for CVE fixes; gem dir remains 0.4.21
 Provides:   bundled(rubygem-net-imap) = %{net_imap_version}
-Provides:   bundled(rubygem-net-imap) = 0.4.24
+Provides:   bundled(rubygem-net-imap) = 0.4.25
 Provides:   bundled(rubygem-net-pop) = %{net_pop_version}
 Provides:   bundled(rubygem-net-smtp) = %{net_smtp_version}
 Provides:   bundled(rubygem-prime) = %{prime_version}
@@ -816,6 +821,7 @@ analysis result in RBS format, a standard type description format for Ruby
 %patch 12 -p1
 %patch 13 -p1
 %patch 14 -p1 -d .bundle/gems/net-imap-0.4.21
+%patch 15 -p1 -d .bundle/gems/net-imap-0.4.21
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
