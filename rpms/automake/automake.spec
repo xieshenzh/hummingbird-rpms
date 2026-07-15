@@ -20,7 +20,7 @@ Summary:    A GNU tool for automatically creating Makefiles
 Name:       automake
 # Any bump here requires libtool rebuild, rhbz#1813010
 Version:    %{api_version}.1
-Release:    4.1%{?dist}
+Release:    4.2%{?dist}
 
 # To help future rebase, the following licenses were seen in the following files/folders:
 # usr/bin/* - GPL-2.0-or-later
