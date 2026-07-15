@@ -1,7 +1,7 @@
 {
   "branch": "rawhide",
   "cve_product": "Microsoft / .NET 8.0",
-  "modification_reason": "Pre-existing modification - requires review; backport fixes for CVE-2026-59869 and CVE-2026-59725",
+  "modification_reason": "Pre-existing modification - requires review; backport fixes for CVE-2026-59869 and CVE-2026-59725; backport fix for CVE-2026-53486",
   "modification_status": "modified",
   "release": "1",
   "sha": "2f8686bc7c3e953e482b2fbc9bc331eefb8de07d",
