@@ -1,0 +1,4 @@
+
+
+# Yes expected.
+addFilter('python3-gitlab.noarch: W: no-manual-page-for-binary gitlab')
