@@ -1,7 +1,7 @@
 Summary: Access control list utilities
 Name: acl
 Version: 2.4.0
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 
 BuildRequires: gawk
 BuildRequires: gcc
