@@ -6,7 +6,7 @@
 Summary:	The NetBSD Editline library
 Name:		libedit
 Version:	3.1
-Release:	59.%{snap}cvs%{?dist}
+Release:	59.%{snap}cvs.1%{?dist}
 
 # The project as a whole is BSD-3-Clause.
 # These files are BSD-2-Clause:
