@@ -117,7 +117,7 @@ License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        524.2%{?dist}
+Release:        524.3%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
@@ -194,6 +194,11 @@ Patch202:       perl-5.36.0-Add-definition-of-OPTIMIZE-to-.ph-files.patch
 
 # Backport upstream fix for CVE-2026-13221 (GH#23388)
 Patch203:       perl-5.42.2-regcomp_study-avoid-trie-overflow.patch
+
+# https://github.com/Perl/perl5/commit/5f7eb6bbbe05
+Patch204:       CVE-2026-57432-pack-overflow-1.patch
+# https://github.com/Perl/perl5/commit/40754edc72dd
+Patch205:       CVE-2026-57432-pack-overflow-2.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -4231,6 +4236,8 @@ you're not running VMS, this module does nothing.
 %patch -P201 -p1
 %patch -P202 -p1
 %patch -P203 -p1
+%patch -P204 -p1
+%patch -P205 -p1
 
 %if !%{defined perl_bootstrap}
 # Local patch tracking
