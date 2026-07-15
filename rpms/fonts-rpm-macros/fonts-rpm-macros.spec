@@ -18,7 +18,7 @@ Version: 5.0.0
 BuildArch: noarch
 
 Name:      fonts-rpm-macros
-Release:   3.1%{?dist}
+Release:   3.2%{?dist}
 Summary:   Build-stage rpm automation for fonts packages
 
 License:   GPL-3.0-or-later
