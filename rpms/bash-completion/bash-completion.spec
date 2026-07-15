@@ -6,7 +6,7 @@
 
 Name:           bash-completion
 Version:        2.17
-Release:        2.1%{?dist}
+Release:        2.2%{?dist}
 Epoch:          1
 Summary:        Programmable completion for Bash
 
