@@ -10,7 +10,7 @@
 
 Name:		fuse3
 Version:	%{xyz_version}
-Release:	1%{?dist}
+Release:	1.1%{?dist}
 Summary:	File System in Userspace (FUSE) v3 utilities
 License:	GPL-1.0-or-later
 URL:		https://github.com/libfuse/libfuse/
