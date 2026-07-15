@@ -56,8 +56,8 @@ diff --git a/ruby.c b/ruby.c
 index b00fc1502d..32b88f7496 100644
 --- a/ruby.c
 +++ b/ruby.c
-@@ -1773,10 +1773,14 @@ proc_options(long argc, char **argv, ruby_cmdline_options_t *opt, int envopt)
- 
+@@ -1793,10 +1793,14 @@ proc_options(long argc, char **argv, ruby_cmdline_options_t *opt, int envopt)
+ VALUE rb_define_gem_modules(VALUE, VALUE);
  void Init_builtin_features(void);
  
 +/* abrt.c */

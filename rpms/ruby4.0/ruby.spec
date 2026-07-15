@@ -1,6 +1,6 @@
 %global major_version 4
 %global minor_version 0
-%global teeny_version 5
+%global teeny_version 6
 %global major_minor_version %{major_version}.%{minor_version}
 %global ruby_major_minor %{major_version}.%{minor_version}
 %global _rubygem_pkg rubygem%{ruby_major_minor}
@@ -45,7 +45,7 @@
 ## BUNDLED_GEMS_VERSIONS
 
 # Bundled libraries versions
-%global rubygems_version 4.0.10
+%global rubygems_version 4.0.16
 %global rubygems_molinillo_version 0.8.0
 %global rubygems_net_http_version 0.7.0
 %global rubygems_net_protocol_version 0.2.2
@@ -57,14 +57,13 @@
 %global rubygems_uri_version 1.1.1
 
 # Default gems.
-%global bundler_version 4.0.10
+%global bundler_version 4.0.16
 %global bundler_connection_pool_version 2.5.4
 %global bundler_fileutils_version 1.8.0
 %global bundler_net_http_persistent_version 4.0.6
 %global bundler_pub_grub_version 0.5.0
 %global bundler_securerandom_version 0.4.1
 %global bundler_thor_version 1.4.0
-%global bundler_tsort_version 0.2.0
 %global bundler_uri_version 1.1.1
 
 %global date_version 3.5.1
@@ -73,7 +72,7 @@
 %global digest_version 3.2.1
 %global english_version 0.8.1
 %global erb_version 6.0.1.1
-%global error_highlight_version 0.7.1
+%global error_highlight_version 0.7.2
 %global etc_version 1.4.6
 %global fcntl_version 1.3.0
 %global fileutils_version 1.8.0
@@ -130,7 +129,7 @@
 %global minitest_version 6.0.0
 %global mutex_m_version 0.3.0
 %global net_ftp_version 0.3.9
-%global net_imap_version 0.6.2
+%global net_imap_version 0.6.4.1
 %global net_pop_version 0.1.2
 %global net_smtp_version 0.5.1
 %global nkf_version 0.2.0
@@ -205,7 +204,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 35%{?dist}
+Release: 36%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -314,17 +313,6 @@ Patch8: ruby-4.0.1-Support-customizable-rustc_flags-for-rustc-builds.patch
 # Fix error with `gem install --document=rdoc,ri`
 # Fixed in rdoc 7.1.0 but not in 7.0.4
 Patch9: rdoc-pr1531-fix-mutilple-document-installation.patch
-# https://bugs.ruby-lang.org/issues/22069
-# https://github.com/ruby/ruby/pull/16947
-# Backport ruby/openssl 4.0.2 from ruby 4.0 branch to support openssl 4.0
-Patch10: ruby-pr16947-openssl-4_0_2-from-ruby_4_0.patch
-# Backport net-imap lib/ changes from v0.6.2 to v0.6.4.1 to fix five CVEs:
-# CVE-2026-42246: Information disclosure via MitM bypassing TLS
-# CVE-2026-42245: DoS via crafted IMAP responses (quadratic complexity)
-# CVE-2026-42256: DoS via large SCRAM iteration count
-# CVE-2026-47240: Command injection via non-synchronizing literals
-# CVE-2026-47242: Arbitrary IMAP command injection via improper input validation
-Patch11: ruby-4.0.0-net-imap-0.6.4.1-security-fixes.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -632,7 +620,6 @@ Provides:   rubygem-bundler = %{bundler_version}-%{release}
 Version:    %{bundler_version}
 # BSD-2-Clause OR Ruby:
 #   lib/bundler/vendor/fileutils
-#   lib/bundler/vendor/tsort
 #   lib/bundler/vendor/uri
 # MIT:
 #   lib/bundler/vendor/connection_pool
@@ -650,7 +637,6 @@ Provides:   bundled(rubygem-net-http-persistent) = %{bundler_net_http_persistent
 Provides:   bundled(rubygem-pub_grub) = %{bundler_pub_grub_version}
 Provides:   bundled(rubygem-securerandom) = %{bundler_securerandom_version}
 Provides:   bundled(rubygem-thor) = %{bundler_thor_version}
-Provides:   bundled(rubygem-tsort) = %{bundler_tsort_version}
 Provides:   bundled(rubygem-uri) = %{bundler_uri_version}
 BuildArch:  noarch
 
@@ -864,9 +850,6 @@ popd
 %patch 6 -p1
 %patch 7 -p1
 %patch 8 -p1
-%patch 10 -p1
-
-%patch 11 -p1 -d .bundle/gems/net-imap-%{net_imap_version}
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
@@ -991,11 +974,6 @@ mv %{buildroot}%{ruby_libdir}/gems %{buildroot}%{gem_dir}
 # since noarch package cannot provide arch dependent subpackages?
 # http://rpm.org/ticket/78
 mkdir -p %{buildroot}%{_exec_prefix}/lib{,64}/gems/%{basepackagename}
-
-# Install net-imap bundled gem (make install does not place it in BUILDROOT)
-cp -a .bundle/gems/net-imap-%{net_imap_version} %{buildroot}%{gem_dir}/gems/
-rm %{buildroot}%{gem_dir}/gems/net-imap-%{net_imap_version}/net-imap.gemspec
-cp -a .bundle/specifications/net-imap-%{net_imap_version}.gemspec %{buildroot}%{gem_dir}/specifications/
 
 # Move bundled rubygems to %%gem_dir and %%gem_extdir_mri
 # make symlinks for io-console, which is considered to be part of stdlib by other Gems
@@ -1234,15 +1212,6 @@ make -C %{_vpath_builddir} -s runruby TESTRUN_SCRIPT="-e \" \
   puts '%%{bundler_thor_version}: %{bundler_thor_version}'; \
   puts %Q[Bundler::Thor::VERSION: #{Bundler::Thor::VERSION}]; \
   exit 1 if Bundler::Thor::VERSION != '%{bundler_thor_version}'; \
-\""
-
-# TSort
-make -C %{_vpath_builddir} -s runruby TESTRUN_SCRIPT="-e \" \
-  module Bundler; end; \
-  require 'bundler/vendor/tsort/lib/tsort'; \
-  puts '%%{bundler_tsort_version}: %{bundler_tsort_version}'; \
-  puts %Q[Bundler::TSort::VERSION: #{Bundler::TSort::VERSION}]; \
-  exit 1 if Bundler::TSort::VERSION != '%{bundler_tsort_version}'; \
 \""
 
 # URI.
@@ -2047,14 +2016,27 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 
 
 %changelog
+* Tue Jul 14 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 4.0.6-36
+- Update to Ruby 4.0.6
+  Resolves: rhbz#2499884
+- Resolves: CVE-2026-42245 (rhbz#2484324)
+- Resolves: CVE-2026-42246 (rhbz#2492090)
+- Resolves: CVE-2026-42256
+- Resolves: CVE-2026-42257
+- Resolves: CVE-2026-42258 (rhbz#2487319)
+- Resolves: CVE-2026-47240 (rhbz#2498917)
+- Resolves: CVE-2026-47241
+- Resolves: CVE-2026-47242
+
 * Sun Jun 14 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 4.0.5-35
 - Backport ruby/openssl 4.0.2 from ruby 4.0 branch to support openssl 4.0
 
 * Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com>
 - Rebuilt for openssl 4.0
 
-* Mon Jun 08 2026 Mamoru TASAKA <mtasaka@fedoraproject.org>- 4.0.5-33
+* Mon Jun 08 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 4.0.5-33
 - Update to Ruby 4.0.5
+- Resolves: CVE-2026-41316 (rhbz#2463216)
 
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org>
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
