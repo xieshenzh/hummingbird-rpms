@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "595400355666d60c7c3f0477d1b6575afabeee3d",
+  "release": "3",
+  "sha": "ef20b09b1d5de1f9cd2356c5a38692e2d8e18732",
   "source": "https://src.fedoraproject.org/rpms/doxygen.git",
   "upstream_repo": "https://github.com/doxygen/doxygen",
   "version": "1.17.0"

@@ -38,7 +38,7 @@ Name: ca-certificates
 Version: 2025.2.80_v9.0.304
 # for Rawhide, please always use release >= 2
 # for Fedora release branches, please use release < 2 (1.0, 1.1, ...)
-Release: 8.1%{?dist}
+Release: 9%{?dist}
 License: MIT AND GPL-2.0-or-later
 
 URL: https://fedoraproject.org/wiki/CA-Certificates
@@ -532,6 +532,9 @@ fi
 %{pkidir}/%{java_bundle}
 
 %changelog
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2025.2.80_v9.0.304-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 2025.2.80_v9.0.304-8
 - Rebuilt for openssl 4.0
 

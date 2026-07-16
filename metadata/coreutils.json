@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "3fe6b4c7d23959466a603e3a0746e934394c1778",
+  "release": "5",
+  "sha": "b5e9df03cf9093cb645833a859e31181dbd27547",
   "source": "https://src.fedoraproject.org/rpms/coreutils.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/coreutils.git",
   "version": "9.11"

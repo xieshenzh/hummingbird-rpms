@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Update to 2.4.0 (CVE-2026-54369, CVE-2026-54370)",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "079decdc8f7728cc4c1a23106b9e7b0ad5fdee45",
+  "release": "2",
+  "sha": "72c7ac055af541b35a87c32fa84d9d815e4fe432",
   "source": "https://src.fedoraproject.org/rpms/acl.git",
   "upstream_repo": "https://git.savannah.nongnu.org/git/acl.git",
   "version": "2.4.0"

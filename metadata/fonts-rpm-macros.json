@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "98223712887d290b1d558d2493aa4a5999e40ac4",
+  "release": "4",
+  "sha": "3b55ba3659c55926526ecff22b7164d5f73b614b",
   "source": "https://src.fedoraproject.org/rpms/fonts-rpm-macros.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/fonts-rpm-macros",
   "version": "5.0.0"

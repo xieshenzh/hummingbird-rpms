@@ -2,7 +2,7 @@ Name: catatonit
 Version: 0.2.1
 Summary: A signal-forwarding process manager for containers
 License: GPL-3.0-or-later
-Release: 5.1%{?dist}
+Release: 5.2%{?dist}
 %if %{defined copr_username}
 # Set copr rpm build epoch to a very high value
 Epoch: 101

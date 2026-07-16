@@ -1,6 +1,6 @@
 Name:           java-rpm-macros
 Version:        1
-Release:        1.2%{?dist}
+Release:        1.3%{?dist}
 Summary:        Common Java RPM macros
 License:        MIT-0
 BuildArch:      noarch

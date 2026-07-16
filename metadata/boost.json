@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Add cxxstd=20 to b2 build/install to fix boost-cobalt build with GCC 15",
   "modification_status": "modified",
-  "release": "11",
-  "sha": "796de58f53cffaa15c220cc48076a3ad9ebc37fc",
+  "release": "12",
+  "sha": "1d636bc2b1f2b24f5c89de3234d97abbee2d57a2",
   "source": "https://src.fedoraproject.org/rpms/boost.git",
   "upstream_repo": "https://github.com/boostorg/boost",
   "version": "1.90.0"

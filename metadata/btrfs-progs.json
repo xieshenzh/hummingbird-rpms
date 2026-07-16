@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "4a54b4d23ff7898bb1e84215219422a96fc0325a",
+  "release": "3",
+  "sha": "e64eaf6e3877c14bd550081079799a519ea2a4ee",
   "source": "https://src.fedoraproject.org/rpms/btrfs-progs.git",
   "upstream_repo": "https://github.com/kdave/btrfs-progs",
   "version": "7.0"

@@ -1,7 +1,7 @@
 Summary:            Advanced IP routing and network device configuration tools
 Name:               iproute
 Version:            7.0.0
-Release:            1%{?dist}
+Release:            1.1%{?dist}
 URL:                https://kernel.org/pub/linux/utils/net/%{name}2/
 Source0:            https://kernel.org/pub/linux/utils/net/%{name}2/%{name}2-%{version}.tar.xz
 %if 0%{?rhel}

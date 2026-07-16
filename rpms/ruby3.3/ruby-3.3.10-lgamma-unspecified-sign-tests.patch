@@ -1,0 +1,63 @@
+commit c4b88915540eb4603cbd8a3f72733ece85ad1799
+Author: nagachika <nagachika@ruby-lang.org>
+Date:   Sat Nov 29 12:31:08 2025 +0900
+
+    merge revision(s) c5bd4acd30320a8e180ce9fcb24acdab4e10c73a: [Backport #21666]
+    
+            [PATCH] [Bug #21666] Get rid of use of unspecified values
+
+diff --git a/spec/ruby/core/math/lgamma_spec.rb b/spec/ruby/core/math/lgamma_spec.rb
+index 33e78364488c..2bf350993e57 100644
+--- a/spec/ruby/core/math/lgamma_spec.rb
++++ b/spec/ruby/core/math/lgamma_spec.rb
+@@ -5,10 +5,8 @@
+     Math.lgamma(0).should == [infinity_value, 1]
+   end
+ 
+-  platform_is_not :windows do
+-    it "returns [Infinity, 1] when passed -1" do
+-      Math.lgamma(-1).should == [infinity_value, 1]
+-    end
++  it "returns [Infinity, ...] when passed -1" do
++    Math.lgamma(-1)[0].should == infinity_value
+   end
+ 
+   it "returns [Infinity, -1] when passed -0.0" do
+@@ -47,8 +45,7 @@
+     Math.lgamma(infinity_value).should == [infinity_value, 1]
+   end
+ 
+-  it "returns [NaN, 1] when passed NaN" do
+-    Math.lgamma(nan_value)[0].nan?.should be_true
+-    Math.lgamma(nan_value)[1].should == 1
++  it "returns [NaN, ...] when passed NaN" do
++    Math.lgamma(nan_value)[0].should.nan?
+   end
+ end
+diff --git a/test/ruby/test_math.rb b/test/ruby/test_math.rb
+index 6e67099c6b06..3fd382b055a1 100644
+--- a/test/ruby/test_math.rb
++++ b/test/ruby/test_math.rb
+@@ -301,11 +301,21 @@ def test_lgamma
+     assert_float_and_int([Math.log(6),                1], Math.lgamma(4))
+ 
+     assert_raise_with_message(Math::DomainError, /\blgamma\b/) { Math.lgamma(-Float::INFINITY) }
++
++    x, sign = Math.lgamma(+0.0)
++    mesg = "Math.lgamma(+0.0) should be [INF, +1]"
++    assert_infinity(x, mesg)
++    assert_equal(+1, sign, mesg)
++
+     x, sign = Math.lgamma(-0.0)
+     mesg = "Math.lgamma(-0.0) should be [INF, -1]"
+     assert_infinity(x, mesg)
+     assert_equal(-1, sign, mesg)
+-    x, sign = Math.lgamma(Float::NAN)
++
++    x, = Math.lgamma(-1)
++    assert_infinity(x, "Math.lgamma(-1) should be +INF")
++
++    x, = Math.lgamma(Float::NAN)
+     assert_nan(x)
+   end
+ 
