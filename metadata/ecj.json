@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "15",
-  "sha": "47c16d0866bac0f3dfb77b05b7e2f931b8f6b9d8",
+  "release": "16",
+  "sha": "c86fdc7d2feb415f60b87323b419de3ce0d85d58",
   "source": "https://src.fedoraproject.org/rpms/ecj.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/ecj",
   "version": "4.23"
