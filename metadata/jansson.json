@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "b262562c9795b9fa9d78f7aa73e3c085eb6845b0",
+  "release": "5",
+  "sha": "41c8cb98cf0349e94e229d01d965977646f91b41",
   "source": "https://src.fedoraproject.org/rpms/jansson.git",
   "upstream_repo": "https://github.com/akheron/jansson",
   "version": "2.14"
