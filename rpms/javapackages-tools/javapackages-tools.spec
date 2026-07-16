@@ -13,7 +13,7 @@
 
 Name:           javapackages-tools
 Version:        6.5.1
-Release:        5%{?dist}
+Release:        5.1%{?dist}
 Summary:        Macros and scripts for Java packaging support
 License:        BSD-3-Clause
 URL:            https://github.com/fedora-java/javapackages
