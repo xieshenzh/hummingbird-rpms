@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "990654f736abb3fcf644a642fe374abdc0e8a5c9",
+  "release": "2",
+  "sha": "6bad9f1fea81d10dd5513bd12af521e8c87e669f",
   "source": "https://src.fedoraproject.org/rpms/kbd.git",
   "upstream_repo": "https://git.kernel.org/pub/scm/linux/kernel/git/legion/kbd.git",
   "version": "2.10.0"
