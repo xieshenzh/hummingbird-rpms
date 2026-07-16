@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "c518a0eb265410f2a730b614cdd4304d0b6fa038",
+  "release": "2",
+  "sha": "d01ec036f455a099cbce078f68e65d9e505b4d4d",
   "source": "https://src.fedoraproject.org/rpms/gperftools.git",
   "upstream_repo": "https://github.com/gperftools/gperftools",
   "version": "2.18.1"
