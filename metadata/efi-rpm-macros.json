@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "6",
-  "sha": "2cab7e7b6325c467f7f8e556b5d07149f84f9ffa",
+  "release": "8",
+  "sha": "d5e53b1b5fdb62754f655bb90ae7c62e82c234b6",
   "source": "https://src.fedoraproject.org/rpms/efi-rpm-macros.git",
   "upstream_repo": "https://github.com/rhboot/efi-rpm-macros",
   "version": "6"
