@@ -246,6 +246,10 @@ printf "1801\n" >>tests/data/DISABLED
 # temporary disable test 1085 it passes on Fedora but fails on ELN
 printf "1085\n" >>tests/data/DISABLED
 
+# test 1701 (HTTP/2 POST with Upgrade) fails because our nghttpx has the
+# CVE-2026-58055 patch that rejects request bodies in Upgrade requests
+printf "1701\n" >>tests/data/DISABLED
+
 # test 303: raise timeout from 8s to 20s so it doesn't expire during TLS
 # handshake under valgrind
 %ifarch x86_64
