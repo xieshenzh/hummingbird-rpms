@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "547682c271665d9df4fa75aa5b42d1bf44097985",
+  "release": "5",
+  "sha": "4062550b61657c90a178cd403be9cce5a52a9f1e",
   "source": "https://src.fedoraproject.org/rpms/brotli.git",
   "upstream_repo": "https://github.com/google/brotli",
   "version": "1.2.0"
