@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "82ca3220d7baa0fc31a7f7aedb6058478d9aea49",
+  "release": "3",
+  "sha": "05b2db3e94a36c92cf4ae55ac1272e5e1ea4068b",
   "source": "https://src.fedoraproject.org/rpms/debugedit.git",
   "upstream_repo": "https://sourceware.org/git/debugedit.git",
   "version": "5.3"
