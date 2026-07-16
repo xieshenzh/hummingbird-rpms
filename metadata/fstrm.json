@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "14",
-  "sha": "21bdfd2f52e71e791c25a41a4839da5733af749b",
+  "release": "15",
+  "sha": "33e0dd6efba41a5695f76b24772f1148ceb1fb90",
   "source": "https://src.fedoraproject.org/rpms/fstrm.git",
   "upstream_repo": "https://github.com/farsightsec/fstrm",
   "version": "0.6.1"
