@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "9",
-  "sha": "db19d6f0b40cbdfac3b19bdc922f3cea7d9567f5",
+  "release": "10",
+  "sha": "71eb8b05f5018ca52f1e6d25d54b9d54f93349cd",
   "source": "https://src.fedoraproject.org/rpms/cpio.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/cpio.git",
   "version": "2.15"
