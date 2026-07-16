@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "a25b015033f2d8c4e88e4674c78d18ae12750372",
+  "release": "2",
+  "sha": "2768211b5135c7169f513965d79e9f89e0ca6124",
   "source": "https://src.fedoraproject.org/rpms/bash.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/bash.git",
   "version": "5.3.15"
