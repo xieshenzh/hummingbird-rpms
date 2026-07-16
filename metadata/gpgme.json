@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "add swig BuildReq until moving to Fedora 44",
   "modification_status": "modified",
-  "release": "5",
-  "sha": "660ba4dfee527e3b2fb447697701cc359781db48",
+  "release": "6",
+  "sha": "337dfcf085592c5fccaba70a72fa6151a1f85b2c",
   "source": "https://src.fedoraproject.org/rpms/gpgme.git",
   "upstream_repo": "https://dev.gnupg.org/source/gpgme.git",
   "version": "2.0.1"
