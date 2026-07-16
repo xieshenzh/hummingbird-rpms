@@ -1,0 +1,5 @@
+summary: gpgverify testcase, only the first signature matches
+
+environment:
+    test_kind:       "negative"
+    required_output: "gpgverify: Signature verification failed."
