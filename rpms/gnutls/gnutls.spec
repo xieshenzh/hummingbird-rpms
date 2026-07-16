@@ -40,7 +40,7 @@ Patch: gnutls-3.8.8-tests-ktls-skip-tls12-chachapoly.patch
 %bcond_with srp
 %endif
 
-%if 0%{?fedora}
+%if 0%{?fedora} && !0%{?hummingbird}
 %bcond_without mingw
 %else
 %bcond_with mingw
