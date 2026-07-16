@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "5",
-  "sha": "a0c81e3ab0ca3dad70115d72210323142943b40a",
+  "release": "6",
+  "sha": "6e97331e645640e11c142823554b9b90dc850955",
   "source": "https://src.fedoraproject.org/rpms/apr.git",
   "upstream_repo": "https://github.com/apache/apr",
   "version": "1.7.6"
