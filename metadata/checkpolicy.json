@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "5cca26b8bd5a3fed5e40d12ea60a5b913ec08732",
+  "release": "2",
+  "sha": "e2f1b6d731e0516c903a7f5543fe67d528ebe3f9",
   "source": "https://src.fedoraproject.org/rpms/checkpolicy.git",
   "upstream_repo": "https://github.com/SELinuxProject/selinux",
   "version": "3.11"
