@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "420e145b9f0d811fa35befd8324ba18d8647ae86",
+  "release": "2",
+  "sha": "5b0c98a85661c8d8c087807d1656fa2f9456761e",
   "source": "https://src.fedoraproject.org/rpms/c-ares.git",
   "upstream_repo": "https://github.com/c-ares/c-ares",
   "version": "1.34.8"
