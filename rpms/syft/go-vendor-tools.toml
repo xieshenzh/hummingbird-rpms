@@ -65,3 +65,8 @@ expression = "(Apache-2.0 OR GPL-2.0-or-later) AND Apache-2.0 AND GPL-2.0-only"
 path = "vendor/github.com/xi2/xz/LICENSE"
 sha256sum = "5c640056d513f276d56635af7a0bed81cb7eac02a31b6e56d40c416557a8d8ce"
 expression = "LicenseRef-scancode-public-domain-disclaimer"
+
+[[licensing.licenses]]
+path = "vendor/howett.net/plist/LICENSE"
+sha256sum = "20d9b7d9372369484ecadae229d3e3efee8029b259e11c9a1b07d2e0a3c82e39"
+expression = "BSD-2-Clause AND BSD-3-Clause"
