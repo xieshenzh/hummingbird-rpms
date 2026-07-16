@@ -1,6 +1,6 @@
 Name:		libcbor
 Version:	0.14.0
-Release:	2%{?dist}
+Release:	2.1%{?dist}
 Summary:	A CBOR parsing library
 
 License:	MIT
