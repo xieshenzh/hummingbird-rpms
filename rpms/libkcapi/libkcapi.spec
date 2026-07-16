@@ -118,7 +118,7 @@ lib_path=%{buildroot}%{_libdir}                                  \
 
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        10%{?dist}
+Release:        10.1%{?dist}
 Summary:        User space interface to the Linux Kernel Crypto API
 
 License:        BSD-3-Clause OR GPL-2.0-only
