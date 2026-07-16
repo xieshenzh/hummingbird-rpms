@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "backport fixes for CVE-2026-40553, CVE-2026-40468, CVE-2026-40467, CVE-2026-40469",
   "modification_status": "modified",
-  "release": "3",
-  "sha": "39eaf079ad40154e0fd6a96c09aee7f658e326db",
+  "release": "4",
+  "sha": "1a50414f690585645577c9c19258130af860e9ee",
   "source": "https://src.fedoraproject.org/rpms/gawk.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/gawk.git",
   "version": "5.4.0"
