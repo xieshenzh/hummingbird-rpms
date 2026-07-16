@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "6",
-  "sha": "c12011c38f12556cce548341338cf18d0eead0c7",
+  "release": "7",
+  "sha": "1a4ddae43166534edc7fe50e74984f70989b7fe1",
   "source": "https://src.fedoraproject.org/rpms/composefs.git",
   "upstream_repo": "https://github.com/composefs/composefs",
   "version": "1.0.8"
