@@ -1,7 +1,7 @@
 {
   "branch": "rawhide",
   "cve_product": "vda-linux / busybox_mirror",
-  "modification_reason": "backport upstream security fixes",
+  "modification_reason": "backport upstream security fixes; backport fixes for CVE-2026-38753 and CVE-2026-38754",
   "modification_status": "modified",
   "release": "8",
   "sha": "00ceac4ab68eab1129181a82e484fba928dc8f8b",
