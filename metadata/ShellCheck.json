@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "b5bca03c143924b9767a56c454068d3030a5ded2",
+  "release": "5",
+  "sha": "f12d365e25f66e11bb67b010cbd2b32145bd788c",
   "source": "https://src.fedoraproject.org/rpms/ShellCheck.git",
   "upstream_repo": "https://github.com/koalaman/shellcheck",
   "version": "0.11.0"
