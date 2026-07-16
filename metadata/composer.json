@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "716c2d10b73ebd84cb494df40fc8df674604e54b",
+  "release": "2",
+  "sha": "397ca7ec1967ee35546ef5fbe6e625210042ed4b",
   "source": "https://src.fedoraproject.org/rpms/composer.git",
   "upstream_repo": "https://github.com/composer/composer",
   "version": "2.10.2"
