@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "8e07da1b0284684dd34d6f01a02522e9a8922923",
+  "release": "2",
+  "sha": "a3411f67974029abeb9521305b83e89c30be4efb",
   "source": "https://src.fedoraproject.org/rpms/alsa-lib.git",
   "upstream_repo": "https://github.com/alsa-project/alsa-lib",
   "version": "1.2.16.1"
