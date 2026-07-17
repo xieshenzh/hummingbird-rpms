@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "18",
-  "sha": "957022cc0915b94cf6cd04633b95df7fa49a8a57",
+  "release": "19",
+  "sha": "9bea0a432865e43d1699099a1175d783ab296b7d",
   "source": "https://src.fedoraproject.org/rpms/libyaml.git",
   "upstream_repo": "https://github.com/yaml/libyaml",
   "version": "0.2.5"
