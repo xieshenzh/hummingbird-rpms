@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "21",
-  "sha": "f810e5f277fbc316cb7716472ab5186f78ad0ba9",
+  "release": "22",
+  "sha": "4b67e4bbd598128815521ca2b4ad343f3779a0bc",
   "source": "https://src.fedoraproject.org/rpms/openblas-srpm-macros.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/openblas-srpm-macros",
   "version": "2"
