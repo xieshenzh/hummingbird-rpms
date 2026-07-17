@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "3",
-  "sha": "f0961612e2f11e6546950984359983d79a32a9fd",
+  "sha": "bf7972b9abd56fb2e9433bd305148da74751891a",
   "source": "https://src.fedoraproject.org/rpms/nettle.git",
   "upstream_repo": "https://git.lysator.liu.se/nettle/nettle",
-  "version": "3.10.1"
+  "version": "4.0"
 }
