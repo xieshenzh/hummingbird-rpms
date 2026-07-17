@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "6.20260302",
-  "sha": "fc7c270570179d9d6338b3443e8c9c721271782d",
+  "release": "8.20260302",
+  "sha": "902e3a977818aa4cfb363897a0fcd5deef697809",
   "source": "https://src.fedoraproject.org/rpms/mawk.git",
   "upstream_repo": "https://github.com/ThomasDickey/mawk-snapshots",
   "version": "1.3.4"
