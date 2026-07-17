@@ -1,7 +1,7 @@
 Name:		perl-parent
 Epoch:		1
 Version:	0.244
-Release:	521.1%{?dist}
+Release:	521.2%{?dist}
 Summary:	Establish an ISA relationship with base classes at compile time
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/parent
