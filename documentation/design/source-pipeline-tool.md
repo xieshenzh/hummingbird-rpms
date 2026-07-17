@@ -320,6 +320,25 @@ patches:
   classify: true                         # attempt to classify by origin
   upstream-repo: "https://github.com/curl/curl"
   fail-on-unverified: false              # warn-only by default
+
+  # Patch lifecycle rules (optional)
+  # Declares version-scoped applicability for patches. The pipeline tool reads
+  # these rules from patch headers (preferred) or from this YAML, and enforces
+  # them during updates: patches outside their valid range are flagged or dropped.
+  lifecycle:
+    - file: "fix-memory-leak.patch"
+      applies-to: "< 1.5.0"             # drop this patch at version 1.5.0+
+      reason: "Fixed upstream in 1.5.0 (commit abc123)"
+      action: drop                       # drop | warn (default: warn)
+
+    - file: "cve-2024-45337.patch"
+      applies-to: "< 0.31.0"
+      reason: "CVE-2024-45337 — fixed upstream in golang.org/x/crypto 0.31.0"
+      action: drop
+
+    - file: "hummingbird-branding.patch"
+      applies-to: "*"                    # carry forward unconditionally
+      reason: "Hummingbird-specific branding, always required"
 ```
 
 ### Variable substitution
@@ -626,6 +645,47 @@ The pipeline tool can optionally verify patches when invoked with `--verify-patc
 5. **Reporting.** Output classification and verification results in `report.json`. Optionally fail
    on unverified patches (controlled by `patches.fail-on-unverified` in the pipeline YAML).
 
+### Patch lifecycle enforcement
+
+Patches have version-scoped lifetimes. A CVE backport is only valid until the upstream version that
+includes the fix. A build system workaround may only apply to a specific major version. Today,
+nothing enforces these rules — a patch that should have been dropped at version 2.0 silently
+persists, and a patch that must be carried forward can be accidentally removed during an update.
+
+The pipeline tool enforces patch lifecycle rules declared either in patch headers or in the pipeline
+YAML's `patches.lifecycle` section.
+
+**Header-based declaration (preferred).** Patch authors add structured keywords to the patch header:
+
+```
+From: Scott Hebert <shebert@redhat.com>
+Subject: Backport fix for CVE-2024-45337
+Applies-To: < 0.31.0
+Lifecycle-Action: drop
+Lifecycle-Reason: Fixed upstream in golang.org/x/crypto 0.31.0
+---
+```
+
+**YAML-based declaration (fallback).** For patches from Fedora or upstream that cannot have headers
+modified, rules are declared in `patches.lifecycle` in the pipeline YAML (see schema above).
+
+**Enforcement behavior:**
+
+1. During an update to version `${VERSION}`, the tool evaluates each patch's `applies-to` range
+   against the new version.
+2. If a patch is outside its valid range:
+   - `action: drop` — the patch is removed from the package directory and dropped from the spec.
+     The tool reports the removal in `report.json`.
+   - `action: warn` (default) — the patch is flagged in `report.json` but not removed. The update
+     proceeds.
+3. If a patch has `applies-to: *`, it is always carried forward.
+4. Patches without any lifecycle declaration are treated as having no version constraint (equivalent
+   to `applies-to: *`, `action: warn`).
+
+**Carry-forward enforcement.** The inverse case is also important: some patches (branding,
+Hummingbird-specific integration) must never be dropped. If a patch marked `applies-to: *` is
+missing after an update (e.g., removed by a Fedora dist-git sync), the tool flags it as an error.
+
 ### Example report output
 
 ```json
@@ -640,7 +700,22 @@ The pipeline tool can optionally verify patches when invoked with `--verify-patc
       }
     ],
     "removed": ["old-workaround.patch"],
-    "unchanged": ["fedora-paths.patch"]
+    "unchanged": ["fedora-paths.patch"],
+    "lifecycle": [
+      {
+        "file": "cve-2024-45337.patch",
+        "applies_to": "< 0.31.0",
+        "current_version": "0.31.0",
+        "action": "drop",
+        "result": "removed — version 0.31.0 is outside applies-to range"
+      },
+      {
+        "file": "hummingbird-branding.patch",
+        "applies_to": "*",
+        "action": "carry-forward",
+        "result": "present"
+      }
+    ]
   }
 }
 ```
@@ -742,3 +817,14 @@ fail-on-unverified for high-risk packages.
      thin driver interprets it by calling shell functions. Packages that can't be expressed this way
      keep their shell scripts and `download_sources` hooks. This preserves the attestation value of
      the YAML without building a workflow engine.
+
+9. **Patch lifecycle rule authority.** Should lifecycle rules live in patch headers (closer to the
+   patch, self-documenting), in the pipeline YAML (centralized, works for patches we don't control),
+   or both? If both, which takes precedence when they conflict? Header-based rules are preferred for
+   patches we author; YAML-based rules are needed for Fedora-originated patches whose headers we
+   cannot modify.
+
+10. **Patch lifecycle integration with `dist_git.py update`.** When a patch is auto-dropped by a
+    lifecycle rule during an update, should the tool also remove the corresponding `Patch:` and
+    `%patch` directives from the spec? This requires spec-editing capability in the pipeline tool,
+    which may overlap with `update_spec` hooks.
