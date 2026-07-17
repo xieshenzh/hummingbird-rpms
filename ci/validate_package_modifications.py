@@ -197,6 +197,11 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     # Reverted once GCC 16 published to Pulp.
     bad_commits = [line for line in bad_commits if not line.startswith('5c111d84c07cc9ca1e8ae714f19687f47a5d4051 ')]
 
+    # attr HUM-2789 CVE fix (update to 2.6.0) and GPG key cleanup were both superseded by
+    # Fedora update a44cbf54, which restored the original Fedora spec; current spec matches Fedora.
+    bad_commits = [line for line in bad_commits if not line.startswith('2cf72f98ca36af5376b55db3f543fa3d434b98bd ')]
+    bad_commits = [line for line in bad_commits if not line.startswith('e2fb14572622cca265c32ec43ac40886fc0fd562 ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)
