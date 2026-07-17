@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "16",
-  "sha": "60bf1fbbae61abe17766c15b24a38135327af3f7",
+  "release": "17",
+  "sha": "6140c5562662ccdfbdccb619ea5e06a1535c9807",
   "source": "https://src.fedoraproject.org/rpms/libpwquality.git",
   "upstream_repo": "https://github.com/libpwquality/libpwquality",
   "version": "1.4.5"
