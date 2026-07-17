@@ -3,7 +3,7 @@
 Name:           perl-Time-HiRes
 Epoch:          4
 Version:        1.9780
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        High resolution alarm, sleep, gettimeofday, interval timers
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Time-HiRes
