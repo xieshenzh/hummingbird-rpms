@@ -243,6 +243,21 @@ Packages without a pipeline definition use a built-in default that fetches sourc
 ```yaml
 # metadata/<package>.source-pipeline.yaml
 
+# Spec preparation (optional, replaces update_spec hooks)
+# Runs before fetch — fixes version macros that the specfile library cannot
+# trace, so Source URLs resolve correctly.
+spec-update:
+  # Macro substitutions applied via sed before Source URL resolution
+  macros:
+    - name: go_patch                     # %global go_patch <new-value>
+      value: "${VERSION_PATCH}"          # extracted from VERSION (e.g., 1.25.3 → 3)
+
+    - name: k8s_ver                      # %global k8s_ver <new-value>
+      value: "${VERSION}"
+
+  # Reset Release to 0.1%{?dist} on version bump (common for versioned packages)
+  reset-release: true
+
 # Source fetching
 fetch:
   sources:
@@ -339,6 +354,19 @@ patches:
     - file: "hummingbird-branding.patch"
       applies-to: "*"                    # carry forward unconditionally
       reason: "Hummingbird-specific branding, always required"
+
+# Post-update spec modifications (optional, replaces post_update hooks)
+# Runs after fetch/transform — extracts metadata from downloaded sources and
+# patches it into the spec.
+post:
+  # Extract bundled dependency versions and splice into spec between markers
+  - bundled-provides:
+      modules-txt: "vendor/modules.txt"  # Go modules.txt path inside extracted source
+      start-marker: "# --- bundled-deps.sh ---"
+      end-marker: "# --- end bundled-deps.sh ---"
+
+  # Run a custom command (escape hatch for complex metadata extraction)
+  - run: "./packaging/fill-versions.sh ${SPEC_FILE} node-v${VERSION}-stripped.tar.gz"
 ```
 
 ### Variable substitution
@@ -347,7 +375,10 @@ The following variables are available in all string values:
 
 | Variable | Value |
 |----------|-------|
-| `${VERSION}` | New upstream version |
+| `${VERSION}` | New upstream version (e.g., `1.25.3`) |
+| `${VERSION_MAJOR}` | Major version component (e.g., `1`) |
+| `${VERSION_MINOR}` | Minor version component (e.g., `25`) |
+| `${VERSION_PATCH}` | Patch version component (e.g., `3`) |
 | `${OLD_VERSION}` | Previous version |
 | `${PACKAGE}` | Package name (directory name) |
 | `${SPEC_FILE}` | Path to the spec file |
@@ -455,10 +486,17 @@ verify:
 
 ### Example: nodejs25 (transformed package)
 
-This replaces the existing `packaging/make-nodejs-tarball.sh` with built-in primitives:
+This replaces `packaging/make-nodejs-tarball.sh`, the `update_spec` hook, and the `post_update`
+hook — all three update-hooks phases consolidated into one file:
 
 ```yaml
 # metadata/nodejs25.source-pipeline.yaml
+
+spec-update:
+  macros:
+    - name: nodejs_define_version node
+      value: "${VERSION}"
+  reset-release: true
 
 fetch:
   sources:
@@ -475,11 +513,10 @@ verify:
   checksums:
     url: "https://nodejs.org/dist/v${VERSION}/SHASUMS256.txt"
     algorithm: sha256
-```
 
-Note: `fill-versions.sh` (which extracts bundled dependency versions into the spec) is a spec
-metadata operation, not a source transform. It remains as a `post_update` hook in
-`metadata/nodejs25.update-hooks.yaml`.
+post:
+  - run: "./packaging/fill-versions.sh ${SPEC_FILE} node-v${VERSION}-stripped.tar.gz"
+```
 
 ### Example: etcd (multi-submodule Go vendor)
 
@@ -567,23 +604,29 @@ Implementation:
 
 ### Integration with `check_upstream_versions.py`
 
-The pipeline tool replaces the `download_sources` hook phase:
+The pipeline tool replaces all three hook phases from `*.update-hooks.yaml`, consolidating
+per-package update behavior into a single `*.source-pipeline.yaml` file:
 
 ```
 Current:
-  1. update_spec hook/default
-  2. download_sources hook/default        ← per-package shell scripts or URL download
-  3. post_update hook/default
+  1. update_spec hook/default             ← *.update-hooks.yaml
+  2. download_sources hook/default        ← *.update-hooks.yaml
+  3. post_update hook/default             ← *.update-hooks.yaml
 
 Proposed:
-  1. update_spec hook/default             ← unchanged
-  2. Run source-pipeline tool             ← replaces download_sources
-  3. post_update hook/default             ← unchanged (may be absorbed into pipeline later)
+  1. spec-update (pipeline YAML)          ← replaces update_spec hooks
+  2. fetch + transform (pipeline YAML)    ← replaces download_sources hooks
+  3. post (pipeline YAML)                 ← replaces post_update hooks
 ```
 
-Existing `download_sources` hooks in `*.update-hooks.yaml` are migrated to
-`*.source-pipeline.yaml` definitions. The `download_sources` hook phase remains as a legacy
-fallback: if a package has a `download_sources` hook but no pipeline YAML, the hook runs as before.
+This reduces per-package metadata from three files (`metadata/<package>.json`,
+`*.update-hooks.yaml`, `*.source-pipeline.yaml`) to two (`metadata/<package>.json` for
+identity/tracking, `*.source-pipeline.yaml` for all update behavior).
+
+Existing `*.update-hooks.yaml` files are migrated to `*.source-pipeline.yaml` definitions. During
+migration, the hook system remains as a legacy fallback: if a package has a `*.update-hooks.yaml`
+but no pipeline YAML, the hooks run as before. Once all 12 hook files are migrated, the hook system
+is removed.
 
 ### Integration with Konflux
 
@@ -790,19 +833,10 @@ fail-on-unverified for high-risk packages.
    artifacts (same version, different content). How should the tool handle this? Fail? Warn? Record
    both checksums?
 
-5. **`post_update` hook absorption.** Should the `post_update` hook phase from
-   `check_upstream_versions.py` be absorbed into the pipeline as another transform stage, or remain
-   separate?
-
-6. **Conflict with `update_spec` hooks.** Some `update_spec` hooks modify the spec in ways that
-   affect Source URLs (e.g., kubernetes version macros). The pipeline tool needs the resolved Source
-   URLs. Should the tool run after `update_spec`, or should `update_spec` logic also move into the
-   pipeline?
-
-7. **Rollback strategy.** If the pipeline tool fails for a package during a bulk update, should the
+5. **Rollback strategy.** If the pipeline tool fails for a package during a bulk update, should the
    update fall back to Fedora sources, or should the package be skipped entirely?
 
-8. **Custom pipeline engine vs. existing tooling.** The pipeline YAML schema (ordered transform
+6. **Custom pipeline engine vs. existing tooling.** The pipeline YAML schema (ordered transform
    stages, `run:` escape hatches, variable substitution) resembles a bespoke Ansible without the
    ecosystem. Are we reinventing the wheel? Alternatives to consider:
    - **Ansible** — mature, has modules for git, archives, shell. But heavy for the common case and
@@ -818,13 +852,13 @@ fail-on-unverified for high-risk packages.
      keep their shell scripts and `download_sources` hooks. This preserves the attestation value of
      the YAML without building a workflow engine.
 
-9. **Patch lifecycle rule authority.** Should lifecycle rules live in patch headers (closer to the
+7. **Patch lifecycle rule authority.** Should lifecycle rules live in patch headers (closer to the
    patch, self-documenting), in the pipeline YAML (centralized, works for patches we don't control),
    or both? If both, which takes precedence when they conflict? Header-based rules are preferred for
    patches we author; YAML-based rules are needed for Fedora-originated patches whose headers we
    cannot modify.
 
-10. **Patch lifecycle integration with `dist_git.py update`.** When a patch is auto-dropped by a
-    lifecycle rule during an update, should the tool also remove the corresponding `Patch:` and
-    `%patch` directives from the spec? This requires spec-editing capability in the pipeline tool,
-    which may overlap with `update_spec` hooks.
+8. **Patch lifecycle integration with `dist_git.py update`.** When a patch is auto-dropped by a
+   lifecycle rule during an update, should the tool also remove the corresponding `Patch:` and
+   `%patch` directives from the spec? The `spec-update` stage already has spec-editing capability,
+   so this may be a natural extension.
