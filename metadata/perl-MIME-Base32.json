@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "25",
-  "sha": "acb153bc086a699ca715884e584b002bd75d3a25",
+  "release": "26",
+  "sha": "79f574e7a739571b917a601ac5b4b7e8a4433e2f",
   "source": "https://src.fedoraproject.org/rpms/perl-MIME-Base32.git",
   "upstream_repo": "https://github.com/perl5-utils/MIME-Base32",
   "version": "1.303"
