@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "5",
-  "sha": "a330ab929f6496beb403f4524e8b7bf2ca881eaf",
+  "release": "6",
+  "sha": "d09a74c5b3d7017ad5aeaf7d7b9c67bd34a06de1",
   "source": "https://src.fedoraproject.org/rpms/libnsl2.git",
   "upstream_repo": "https://github.com/thkukuk/libnsl",
   "version": "2.0.1"
