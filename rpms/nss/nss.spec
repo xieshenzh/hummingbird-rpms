@@ -63,7 +63,7 @@ rpm.define(string.format("nss_release_tag NSS_%s_RTM",
 Summary:          Network Security Services
 Name:             nss
 Version:          %{nss_version}
-Release:          %{nss_release}%{?dist}
+Release:          %{nss_release}.1%{?dist}
 License:          MPL-2.0
 URL:              http://www.mozilla.org/projects/security/pki/nss/
 Requires:         nspr >= %{nspr_version}
@@ -279,7 +279,7 @@ Header and library files for doing development with Network Security Services.
 %package -n nspr
 Summary:        Netscape Portable Runtime
 Version:        %{nspr_version}
-Release:        %{nspr_release}%{?dist}
+Release:        %{nss_release}.1%{?dist}
 License:        MPL-2.0
 URL:            http://www.mozilla.org/projects/nspr/
 Conflicts:      filesystem < 3
@@ -294,7 +294,7 @@ memory management (malloc and free) and shared library linking.
 %package -n nspr-devel
 Summary:        Development libraries for the Netscape Portable Runtime
 Version:        %{nspr_version}
-Release:        %{nspr_release}%{?dist}
+Release:        %{nss_release}.1%{?dist}
 Requires:       nspr%{?_isa} = %{nspr_version}-%{nspr_release}%{?dist}
 Requires:       pkgconfig
 BuildRequires:  xmlto
