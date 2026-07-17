@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "9",
-  "sha": "13fb9aee68b781a29ad5ae4e7a825a0eab20c355",
+  "release": "10",
+  "sha": "f34edd610c7701eb7958c0440d028a8070bd043a",
   "source": "https://src.fedoraproject.org/rpms/libssh2.git",
   "upstream_repo": "https://github.com/libssh2/libssh2",
   "version": "1.11.1"
