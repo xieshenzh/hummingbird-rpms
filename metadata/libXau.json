@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "9a1ce3347610e851acec29c200b99ccf29f01369",
+  "release": "5",
+  "sha": "26b19948012efe452a102729068d9ca02ceadf1c",
   "source": "https://src.fedoraproject.org/rpms/libXau.git",
   "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libxau",
   "version": "1.0.12"
