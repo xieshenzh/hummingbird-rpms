@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "e9955031f28334b8de91604b1ca8778fb04b3072",
+  "release": "4",
+  "sha": "f44d467c0fc3e8b5900a8ef3ca5dd64a7f993d7e",
   "source": "https://src.fedoraproject.org/rpms/php-pecl-zip.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/php-pecl-zip",
   "version": "1.22.8"
