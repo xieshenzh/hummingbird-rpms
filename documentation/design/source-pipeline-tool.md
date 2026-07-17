@@ -10,7 +10,7 @@ related:
   - "[HUM-3299] Build RPM UI assets in Konflux"
 ---
 
-# Source Pipeline Tool
+## Source Pipeline Tool
 
 **Codename: Gorget** — the iridescent throat patch that makes hummingbirds distinctive. In
 ornithology, the gorget is the defining feature used to identify species; in this project, it
@@ -47,7 +47,7 @@ A **containerized pipeline tool** that reads a declarative per-package YAML defi
 source tarballs directly from upstream, applies transforms, verifies integrity, enforces policies,
 and emits artifacts ready for a lookaside cache.
 
-```
+```text
                           ┌──────────────────────────────┐
                           │     source-pipeline tool     │
                           │      (container image)       │
@@ -86,7 +86,7 @@ and emits artifacts ready for a lookaside cache.
 
 ### Container interface
 
-```
+```bash
 podman run --rm \
   -v ./<package-dir>:/package:ro \
   -v ./pipeline.yaml:/pipeline.yaml:ro \
@@ -99,16 +99,19 @@ podman run --rm \
 ```
 
 **Inputs (mounted read-only):**
+
 - `/package` — the package directory (spec file, patches, existing `sources` file)
 - `/pipeline.yaml` — the declarative pipeline definition
 - `/gpg-keys` — centralized GPG keyring directory
 
 **Outputs (written to `/output`):**
+
 - Source tarballs (ready for lookaside upload)
 - `sources` — updated sources manifest with checksums
 - `report.json` — verification and policy results (pass/fail per check, patch classifications)
 
 **Exit codes:**
+
 - `0` — success, all checks passed
 - `1` — error (download failure, tool error)
 - `2` — policy violation (verification or constraint failure)
@@ -427,7 +430,7 @@ YAML's `patches.lifecycle` section.
 
 **Header-based declaration (preferred).** Patch authors add structured keywords to the patch header:
 
-```
+```text
 From: maintainer@example.com
 Subject: Backport fix for CVE-2024-45337
 Applies-To: < 0.31.0
@@ -675,7 +678,7 @@ primitives to maintain the declarative contract.
 
 ---
 
-# Hummingbird Integration
+## Hummingbird Integration
 
 This section describes how the source pipeline tool integrates with Hummingbird's existing
 infrastructure. The tool itself is distribution-agnostic; this section covers the
@@ -759,7 +762,7 @@ stdout, automation uploads them to the Hummingbird lookaside cache.
 The current flow copies everything from Fedora dist-git (including the `sources` file) via
 `shutil.copytree`. The pipeline tool inserts after this step:
 
-```
+```text
 Current:
   1. Clone Fedora dist-git
   2. copytree into rpms/<package>/        ← sources file points to Fedora lookaside
@@ -789,7 +792,7 @@ Implementation:
 The pipeline tool replaces all three hook phases from `*.update-hooks.yaml`, consolidating
 per-package update behavior into a single `*.source-pipeline.yaml` file:
 
-```
+```text
 Current:
   1. update_spec hook/default             ← *.update-hooks.yaml
   2. download_sources hook/default        ← *.update-hooks.yaml
@@ -869,10 +872,12 @@ Enable the default pipeline behavior (fetch from spec URLs) for the ~351 clean p
 Fedora's tarball is identical to upstream. This is the highest-impact, lowest-effort phase.
 
 **Prerequisites:**
+
 - Audit to classify packages as trivial vs. transformed (HUM-4620)
 - `dist_git.py update` integration complete (HUM-4621)
 
 **Per-package steps:**
+
 1. Run the pipeline tool, compare output against existing Fedora-sourced tarball
 2. If identical: add `forked_from: hummingbird` to `package-overrides.yaml`
 3. If different: flag for Phase 3
