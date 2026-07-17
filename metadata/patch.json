@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "backport fix for CVE-2026-56289; backport fix for CVE-2026-56288",
   "modification_status": "modified",
-  "release": "4",
-  "sha": "6d2250b65a3a2ab8022db08c32a65af6363b1e35",
+  "release": "5",
+  "sha": "1335832a81ce85f2c6820a82a4ab3628b2bd3782",
   "source": "https://src.fedoraproject.org/rpms/patch.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/patch.git",
   "version": "2.8"
