@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "12",
-  "sha": "f591c53cfb99b0696c1a11a394d2cb6889c99abd",
+  "release": "13",
+  "sha": "a0608cb9b4dce89d16b8bde3dc494afc165c8e78",
   "source": "https://src.fedoraproject.org/rpms/make.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/make.git",
   "version": "4.4.1"
