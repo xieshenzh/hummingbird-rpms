@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "cfa9c18e40b655064e70dd6092d398c925180be1",
+  "release": "2",
+  "sha": "4c226fb50229469b31cbfd9dc4482e2c9cf7e557",
   "source": "https://src.fedoraproject.org/rpms/perl-Time-HiRes.git",
   "upstream_repo": "https://github.com/Perl/perl5",
   "version": "1.9780"
