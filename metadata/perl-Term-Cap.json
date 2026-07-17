@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "521",
-  "sha": "006a33b01fcc07fb938ce6b6f0748b2cebd928e0",
+  "release": "522",
+  "sha": "d6e6d558177e253578cba3d09680983eae17f9c1",
   "source": "https://src.fedoraproject.org/rpms/perl-Term-Cap.git",
   "upstream_repo": "https://github.com/jonathanstowe/Term-Cap",
   "version": "1.18"
