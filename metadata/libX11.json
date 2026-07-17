@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "01b7542be6e51f3f04503978c00cca4b3e237aae",
+  "release": "2",
+  "sha": "b6a63dd4b16621e52a78422c5c4691e3a328f55e",
   "source": "https://src.fedoraproject.org/rpms/libX11.git",
   "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libx11",
   "version": "1.8.13"
