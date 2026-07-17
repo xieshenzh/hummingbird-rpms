@@ -1,6 +1,6 @@
 Name:           lmdb
 Version:        0.9.34
-Release:        2.1%{?dist}
+Release:        2.2%{?dist}
 Summary:        Memory-mapped key-value database
 License:        OLDAP-2.8
 URL:            https://www.symas.com/lmdb
