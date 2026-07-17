@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "7",
-  "sha": "bef7942eea5eebdeeddd903210d512a5e76511a0",
+  "release": "8",
+  "sha": "d03a4959a189b216e6eff4bbd14108291f27ecc9",
   "source": "https://src.fedoraproject.org/rpms/libXcomposite.git",
   "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libxcomposite",
   "version": "0.4.6"
