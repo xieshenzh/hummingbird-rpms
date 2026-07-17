@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "d781c2c5a3054ecae6c8b10bad46bd62077fdb78",
+  "release": "4",
+  "sha": "7b6f6c730000153a3a009c09c40bad79725ab27d",
   "source": "https://src.fedoraproject.org/rpms/libwebp.git",
   "upstream_repo": "https://github.com/webmproject/libwebp",
   "version": "1.6.0"
