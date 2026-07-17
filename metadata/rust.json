@@ -3,8 +3,8 @@
   "modification_reason": "Disable libssh2 for FIPS compliance, following RHEL; backport fixes for CVE-2026-58494, CVE-2026-59869, CVE-2026-59887",
   "modification_status": "modified",
   "release": "1",
-  "sha": "0597721405e9f8eef01db0910b388f6a9c7f7f88",
+  "sha": "6db9ffbb21ee77e2c6c7df4d9312fd5112e237b0",
   "source": "https://src.fedoraproject.org/rpms/rust.git",
   "upstream_repo": "https://github.com/rust-lang/rust",
-  "version": "1.97.0"
+  "version": "1.97.1"
 }
