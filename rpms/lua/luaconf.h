@@ -54,6 +54,8 @@
 #include "luaconf-mips.h"
 #elif defined(__riscv)
 #include "luaconf-riscv64.h"
+#elif defined(__loongarch_lp64)
+#include "luaconf-loongarch64.h"
 #else
 #error "The lua-devel package is not usable with the architecture."
 #endif
