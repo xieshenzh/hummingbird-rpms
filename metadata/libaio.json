@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "23",
-  "sha": "74b7c207c49584138a893031fd8ed7a54a0975bc",
+  "release": "24",
+  "sha": "c363b3e05edc02782ee372178ca720bced60907c",
   "source": "https://src.fedoraproject.org/rpms/libaio.git",
   "upstream_repo": "https://pagure.io/libaio",
   "version": "0.3.111"
