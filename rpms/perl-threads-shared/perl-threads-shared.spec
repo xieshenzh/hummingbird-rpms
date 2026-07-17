@@ -2,7 +2,7 @@
 
 Name:           perl-threads-shared
 Version:        1.73
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        Perl extension for sharing data structures between threads
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/threads-shared
