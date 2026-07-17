@@ -25,7 +25,7 @@
 
 Name:		oniguruma
 Version:	%{mainver}%{?postver:.%postver}%{?gitversion:^%{?gitversion}}
-Release:	%{?prerelease:0.}%{baserelease}.1%{?dist}
+Release:	%{?prerelease:0.}%{baserelease}.2%{?dist}
 Summary:	Regular expressions library
 
 # SPDX confirmed
