@@ -1,3 +1,20 @@
+* Fri Jul 17 2026 Zdenek Pytela <zpytela@redhat.com>
+- Allow init_t nnp domain transition to postgresql_t
+- Move bootupd systemd interface to 2 optional blocks
+- Allow net_admin to the nfsd_t domain
+- Allow kernel write to unconfined and sysadm users' keys
+- Allow staff user ioctl cockpit-session stream sockets
+- Allow the staff user mount on tmpfs directories
+- Allow staff user the dac_override capability in the user namespace
+- Allow aide get attributes of all filesystems
+- Make insights_client_t accessible from the system cronjob
+- Support systemtap on a UEFI+SecureBoot system
+- Allow systemd-coredump signull spc container
+- Allow dhcpcd hook scripts read generic files in /proc
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org>
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Tue Jun 30 2026 Zdenek Pytela <zpytela@redhat.com> - 45.8-1
 - Include key_socket in socket_class_set
 - Remove 14 permissive domains
