@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "173d80c1f000032070941bd8b951cf9b08804755",
+  "release": "4",
+  "sha": "c924b8e4181adbe701f7ed3da6b07cfc1e069416",
   "source": "https://src.fedoraproject.org/rpms/perl-Error.git",
   "upstream_repo": "https://github.com/shlomif/perl-error.pm",
   "version": "0.17030"
