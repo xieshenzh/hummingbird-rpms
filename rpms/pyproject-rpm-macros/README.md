@@ -190,11 +190,14 @@ Is roughly equivalent to:
 
 If you use `%pyproject_wheel` to build multiple wheels, for example like this:
 
-    %pyproject_wheel -d project_a
-    %pyproject_wheel -d project_b
+    %pyproject_wheel --directory directory1/
+    %pyproject_wheel --directory directory2/
 
 You still only call `%pyproject_install` once and it will install all such wheels.
-Support for `%pyproject_save_files` with multiple wheels is not implemented.
+To use `%pyproject_save_files` (and optionally `%pyproject_check_import`) with multiple wheels,
+use the `-D`/`--dist-name` option to select a specific package,
+for details, see *Generating the %files section*
+(and *Performing an import check on all importable modules*).
 
 If you use `%pyproject_buildrequires -d ...` for multiple co-dependent packages
 in one spec file, it will create one or more build time dependencies
@@ -413,6 +416,17 @@ If you wish to rename, remove or otherwise change the installed files of a packa
 If possible, remove/rename such files in `%prep`.
 If not possible, avoid using `%pyproject_save_files` or edit/replace `%{pyproject_files}`.
 
+When processing files from multiple Python packages
+(most likely as a result of multiple `%pyproject_wheel` invocations),
+use the `-D`/`--dist-name` option to select a specific package
+in `%pyproject_save_files` and `%{pyproject_files}`:
+
+    %pyproject_save_files --dist-name package_a module_glob_a...
+    %pyproject_save_files --dist-name package_b module_glob_b...
+
+    %files -n python3-package-a -f %{pyproject_files -D package_a}
+    %files -n python3-package-b -f %{pyproject_files -D package_b}
+
 
 Performing an import check on all importable modules
 ----------------------------------------------------
@@ -460,6 +474,15 @@ The `%pyproject_check_import` macro also accepts positional arguments with
 additional qualified module names to check, useful for example if some modules are installed manually.
 Note that filtering by `-t`/`--top-level-only`/`-e`/`--exclude` also applies to the positional arguments.
 
+When listing files from multiple Python packages via `%pyproject_save_files -D`/`--dist-name`,
+pass `-D`/`--dist-name` to `%pyproject_check_import` as well.
+
+    %pyproject_save_files --dist-name package_a module_glob_a...
+    %pyproject_save_files --dist-name package_b module_glob_b...
+
+    %pyproject_check_import --dist-name package_a
+    %pyproject_check_import --dist-name package_b
+
 Another macro, `%_pyproject_check_import_allow_no_modules` allows to pass the import check,
 even if no Python modules are detected in the package.
 This may be a valid case for packages containing e.g. typing stubs.
@@ -495,6 +518,13 @@ These arguments are still required:
 * -n: name of the “base” package (e.g. python3-requests)
 * Positional arguments: the extra name(s).
   Multiple subpackages are generated when multiple names are provided.
+
+When processing files from multiple Python packages
+(see *Generating the %files section* for details),
+pass `-D` to `%pyproject_extras_subpkg` as well:
+
+    %pyproject_extras_subpkg -n python3-package-a -D package_a extra1
+    %pyproject_extras_subpkg -n python3-package-b -D package_b extra2
 
 
 Provisional: Declarative Buildsystem (RPM 4.20+)
@@ -603,19 +633,21 @@ Here is a complete reference of all options:
 
 ### `%pyproject_save_files`
 
-| Short | Long                  | Description                                     |
-|-------|-----------------------|-------------------------------------------------|
-| `-l`  | `--assert-license`    | Fail when no License-File (PEP 639) is found    |
-| `-L`  | `--no-assert-license` | Don't fail on missing License-File (default)    |
-| `-M`  | `--allow-no-modules`  | Allow no module globs                           |
-| `-a`  | `--auto`              | Include non-module files (same as `+auto`)      |
+| Short      | Long                   | Description                                                  |
+|------------|------------------------|--------------------------------------------------------------|
+| `-l`       | `--assert-license`     | Fail when no License-File (PEP 639) is found                 |
+| `-L`       | `--no-assert-license`  | Don't fail on missing License-File (default)                 |
+| `-M`       | `--allow-no-modules`   | Allow no module globs                                        |
+| `-D NAME`  | `--dist-name NAME`     | Save files for a specific distribution package (multi-wheel) |
+| `-a`       | `--auto`               | Include non-module files (same as `+auto`)                   |
 
 ### `%pyproject_check_import`
 
-| Short     | Long               | Description                        |
-|-----------|--------------------|------------------------------------|
-| `-e GLOB` | `--exclude GLOB`   | Exclude module names matching glob |
-| `-t`      | `--top-level-only` | Only check top-level modules       |
+| Short     | Long                  | Description                                       |
+|-----------|-----------------------|---------------------------------------------------|
+| `-e GLOB` | `--exclude GLOB`      | Exclude module names matching glob                |
+| `-D NAME` | `--dist-name NAME`    | Check imports for a specific distribution package |
+| `-t`      | `--top-level-only`    | Only check top-level modules                      |
 
 ### `%tox`
 

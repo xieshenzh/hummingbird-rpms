@@ -22,15 +22,8 @@ from pyproject_wheel import parse_config_settings_args
 # Allow only the forms we know we can handle.
 VERSION_RE = re.compile(r'[a-zA-Z0-9.-]+(\.\*)?')
 
-# To avoid breakage on Fedora 40-42,
-# we don't assert tox configuration there.
-# This can be removed when Fedora 42 goes EOL.
-# Note that %tox still uses --assert-config
-# because %tox without config is dangerous (false sense of tests).
-# Running %pyproject_buildrequires -t/-e without tox config is wrong, but not dangerous.
 FEDORA = int(os.getenv('FEDORA') or 0)
 RHEL = int(os.getenv('RHEL') or 0)
-TOX_ASSERT_CONFIG_OPTS = () if 40 <= FEDORA < 43 else ('--assert-config',)
 
 # To avoid breakage on Fedora < 45 and RHEL < 11
 # we don't compare extras listed in %pyproject_buildrequires -x
@@ -521,7 +514,7 @@ def generate_tox_requirements(toxenv, requirements):
              '--print-deps-to', deps.name,
              '--print-extras-to', extras.name,
              '--no-provision', provision.name,
-             *TOX_ASSERT_CONFIG_OPTS,
+             '--assert-config',
              '-q', '-r', '-e', toxenv],
             check=False,
             encoding='utf-8',

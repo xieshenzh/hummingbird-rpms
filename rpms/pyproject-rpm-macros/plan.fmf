@@ -133,3 +133,7 @@ prepare:
   - name: Update packages
     how: shell
     script: dnf upgrade -y
+  - name: rpm_qa
+    order: 100
+    how: shell
+    script: rpm -qa | sort | tee $TMT_PLAN_DATA/rpmqa.txt

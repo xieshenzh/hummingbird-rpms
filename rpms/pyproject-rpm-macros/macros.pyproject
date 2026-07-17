@@ -20,9 +20,28 @@
 
 # %%_pyproject_files_prefix defined in srpm macros
 
-%pyproject_files %{_builddir}/%{_pyproject_files_prefix}-pyproject-files
-%_pyproject_modules %{_builddir}/%{_pyproject_files_prefix}-pyproject-modules
-%_pyproject_ghost_distinfo %{_builddir}/%{_pyproject_files_prefix}-pyproject-ghost-distinfo
+# PEP 503 name normalization: lowercase, one or more [-_.] → single -
+%__pyproject_normalize_name(-) %{lua:print((rpm.expand("%1"):lower():gsub("[%-_.]+", "-")))}
+
+%_pyproject_files_base %{_builddir}/%{_pyproject_files_prefix}-pyproject-files
+%_pyproject_modules_base %{_builddir}/%{_pyproject_files_prefix}-pyproject-modules
+%_pyproject_ghost_distinfo_base %{_builddir}/%{_pyproject_files_prefix}-pyproject-ghost-distinfo
+
+%pyproject_files(-) %{lua:
+require("fedora.rpm.pyproject_getopt").getopt({
+    {short="D", long="dist-name", value=true},
+})}%{_pyproject_files_base}%{?__pyproject_opt_D:-%{__pyproject_normalize_name %{__pyproject_opt_D}}}
+
+%_pyproject_modules(-) %{lua:
+require("fedora.rpm.pyproject_getopt").getopt({
+    {short="D", long="dist-name", value=true},
+})}%{_pyproject_modules_base}%{?__pyproject_opt_D:-%{__pyproject_normalize_name %{__pyproject_opt_D}}}
+
+%_pyproject_ghost_distinfo(-) %{lua:
+require("fedora.rpm.pyproject_getopt").getopt({
+    {short="D", long="dist-name", value=true},
+})}%{_pyproject_ghost_distinfo_base}%{?__pyproject_opt_D:-%{__pyproject_normalize_name %{__pyproject_opt_D}}}
+
 %_pyproject_record %{_builddir}/%{_pyproject_files_prefix}-pyproject-record
 %_pyproject_buildrequires %{_builddir}/%{_pyproject_files_prefix}-pyproject-buildrequires
 # %%_pyproject_dep_overrides defined in srpm macros
@@ -95,7 +114,7 @@ if [ -d %{buildroot}%{_bindir} ]; then
   %py3_shebang_fix %{buildroot}%{_bindir}/*
   rm -rfv %{buildroot}%{_bindir}/__pycache__
 fi
-rm -f %{_pyproject_ghost_distinfo}
+rm -f %{_pyproject_ghost_distinfo_base}
 site_dirs=()
 # Process %%{python3_sitelib} if exists
 if [ -d %{buildroot}%{python3_sitelib} ]; then
@@ -108,7 +127,12 @@ fi
 # Process all *.dist-info dirs in sitelib/sitearch
 for site_dir in ${site_dirs[@]}; do
   for distinfo in %{buildroot}$site_dir/*.dist-info; do
-    echo "%ghost %dir ${distinfo#%{buildroot}}" >> %{_pyproject_ghost_distinfo}
+    echo "%ghost %dir ${distinfo#%{buildroot}}" >> %{_pyproject_ghost_distinfo_base}
+    _normalized=$(PYTHONPATH=%{_rpmconfigdir}/redhat \\
+      %{__python3} -sBc \\
+      "import sys; from pyproject_save_files import canonical_name_from_distinfo; print(canonical_name_from_distinfo(sys.argv[1]))" \\
+      "$(basename ${distinfo})")
+    echo "%ghost %dir ${distinfo#%{buildroot}}" >> "%{_pyproject_ghost_distinfo_base}-${_normalized}"
     sed -i 's/pip/rpm/' ${distinfo}/INSTALLER
     PYTHONPATH=%{_rpmconfigdir}/redhat \\
       %{__python3} -B %{_rpmconfigdir}/redhat/pyproject_preprocess_record.py \\
@@ -122,16 +146,17 @@ for site_dir in ${site_dirs[@]}; do
     fi
   done
 done
-lines=$(wc -l %{_pyproject_ghost_distinfo} | cut -f1 -d" ")
+lines=$(wc -l %{_pyproject_ghost_distinfo_base} | cut -f1 -d" ")
 if [ $lines -ne 1 ]; then
-  echo -e "\\n\\nWARNING: %%%%pyproject_extras_subpkg won't work without explicit -i or -F, found $lines dist-info directories.\\n\\n" >&2
-  rm %{_pyproject_ghost_distinfo}  # any attempt to use this will fail
+  echo -e "%%%%pyproject_extras_subpkg will require -D <name> or explicit -i/-F with multiple dist-info directories (found $lines)." >&2
+  rm %{_pyproject_ghost_distinfo_base}  # any attempt to use this will fail
 fi
 }
 
 
 # Note: the three times nested questionmarked -i -f -F pattern means: If none of those options was used -- in that case, we inject our own -f
-%pyproject_extras_subpkg(n:i:f:FaA) %{expand:%{?python_extras_subpkg:%{python_extras_subpkg%{!?-i:%{!?-f:%{!?-F: -f %{_pyproject_ghost_distinfo}}}} %**}}}
+# -D selects the per-package ghost distinfo file for multi-wheel installs
+%pyproject_extras_subpkg(n:i:f:FaAD:) %{expand:%{?python_extras_subpkg:%{python_extras_subpkg%{!?-i:%{!?-f:%{!?-F: -f %{_pyproject_ghost_distinfo %{?-D}}}}} %{?-n} %{?-i} %{?-f} %{?-F} %{?-a} %{?-A} %*}}}
 
 
 # Escaping shell-globs, percentage signs and spaces was reworked in RPM 4.19+
@@ -144,12 +169,13 @@ fi
     {short="L", long="no-assert-license"},
     {short="M", long="allow-no-modules"},
     {short="a", long="auto"},
+    {short="D", long="dist-name", value=true},
 })}\
 %{expand:\\\
 %{expr:v"0%{?rpmversion}" >= v"4.18.90" ? "RPM_FILES_ESCAPE=4.19" : "RPM_FILES_ESCAPE=4.18" } \\
 %{__python3} %{_rpmconfigdir}/redhat/pyproject_save_files.py \\
-  --output-files "%{pyproject_files}" \\
-  --output-modules "%{_pyproject_modules}" \\
+  --output-files "%{pyproject_files %{?__pyproject_optflag_D}}" \\
+  --output-modules "%{_pyproject_modules %{?__pyproject_optflag_D}}" \\
   --buildroot "%{buildroot}" \\
   --sitelib "%{python3_sitelib}" \\
   --sitearch "%{python3_sitearch}" \\
@@ -162,19 +188,32 @@ fi
 %pyproject_check_import(-) \
 %{lua:require("fedora.rpm.pyproject_getopt").getopt({
     {short="e", long="exclude", value=true, separator=" -e "},
+    {short="D", long="dist-name", value=true},
     {short="t", long="top-level-only"},
 })}\
 %{expand:\\\
-if [ ! -f "%{_pyproject_modules}" ]; then
-  echo 'ERROR: %%%%pyproject_check_import only works when %%%%pyproject_save_files is used' >&2
+if [ ! -f "%{_pyproject_modules %{?__pyproject_optflag_D}}" ]; then
+  _modules_glob=( %{_pyproject_modules_base}-* )
+  if [ -e "${_modules_glob[0]}" ]; then
+    _available=$(printf '%%s\n' "${_modules_glob[@]}" | sed 's|.*-pyproject-modules-||' | tr '\n' ' ')
+    echo "ERROR: %%%%pyproject_check_import requires -D <name> when %%%%pyproject_save_files was called with -D" >&2
+    echo "Available -D values: ${_available}" >&2
+  else
+    echo 'ERROR: %%%%pyproject_check_import only works when %%%%pyproject_save_files is used' >&2
+  fi
   exit 1
 fi
-%py3_check_import -f "%{_pyproject_modules}" %{?__pyproject_opt_e:-e %{__pyproject_opt_e}} %{?__pyproject_opt_t:-t} %{?__pyproject_positional_args}
+%py3_check_import -f "%{_pyproject_modules %{?__pyproject_optflag_D}}" %{?__pyproject_optflag_e} %{?__pyproject_optflag_t} %{?__pyproject_positional_args}
 }
 
 
 %_pyproject_check_import_allow_no_modules(-) \
-if [ -z "$(cat %{_pyproject_modules})" ]; then\
+%{lua:require("fedora.rpm.pyproject_getopt").getopt({
+    {short="e", long="exclude", value=true, separator=" -e "},
+    {short="D", long="dist-name", value=true},
+    {short="t", long="top-level-only"},
+})}\
+if [ -z "$(cat %{_pyproject_modules %{?__pyproject_optflag_D}})" ]; then\
   echo "No modules to check found, exiting check"\
 else\
   %pyproject_check_import %{?**}\
