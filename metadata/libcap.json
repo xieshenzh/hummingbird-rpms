@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "b9b71a7af9315905b2c728e5fc4fc455685da0a4",
+  "release": "2",
+  "sha": "e0b09e4b0b953cf5d9ed93905a8116d5b09ae2e7",
   "source": "https://src.fedoraproject.org/rpms/libcap.git",
   "upstream_repo": "https://git.kernel.org/pub/scm/libs/libcap/libcap.git",
   "version": "2.78"
