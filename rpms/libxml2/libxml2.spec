@@ -3,7 +3,7 @@
 
 Name:           libxml2
 Version:        2.15.3
-Release:        0.1.1%{?dist}
+Release:        0.1.2%{?dist}
 Summary:        Library providing XML and HTML support
 
 # list.c, dict.c and few others use ISC-Veillard
