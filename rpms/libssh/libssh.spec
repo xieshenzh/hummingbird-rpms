@@ -1,6 +1,6 @@
 Name:           libssh
 Version:        0.12.0
-Release:        3%{?dist}
+Release:        3.1%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPL-2.1-or-later
 URL:            http://www.libssh.org
