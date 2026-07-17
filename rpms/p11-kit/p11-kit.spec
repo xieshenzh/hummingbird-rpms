@@ -7,7 +7,7 @@
 
 
 Version:        0.26.4
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Name:           p11-kit
 Summary:        Library for loading and sharing PKCS#11 modules
 
