@@ -4,7 +4,7 @@
 Summary: System and process monitoring utilities
 Name: procps-ng
 Version: 4.0.6
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.0-or-later AND LGPL-2.1-or-later
 URL: https://sourceforge.net/projects/procps-ng/
 
