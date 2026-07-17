@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "backport fix for CVE-2026-15028",
   "modification_status": "modified",
-  "release": "2",
-  "sha": "75c8e1a2e50deea1c6da610d5af530119e11406f",
+  "release": "3",
+  "sha": "35e971bb56819854f42c7f1b04215c5ef3aaf15d",
   "source": "https://src.fedoraproject.org/rpms/libarchive.git",
   "upstream_repo": "https://github.com/libarchive/libarchive",
   "version": "3.8.8"
