@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "27",
-  "sha": "a9867ebc18aecd16fbd366e42d05bea3ddd779d6",
+  "release": "28",
+  "sha": "924fdce6878aed923b40b5635dd83892c38211c1",
   "source": "https://src.fedoraproject.org/rpms/perl-TermReadKey.git",
   "upstream_repo": "https://github.com/jonathanstowe/TermReadKey",
   "version": "2.38"
