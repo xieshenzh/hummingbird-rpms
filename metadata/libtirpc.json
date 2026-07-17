@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "1585f0d08486dcee89db72d5ed72d3f3e665a4d1",
+  "release": "3",
+  "sha": "9f6a3bf2ab0a7893579833c7688fb68f8ae19251",
   "source": "https://src.fedoraproject.org/rpms/libtirpc.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/libtirpc",
   "version": "1.3.7"
