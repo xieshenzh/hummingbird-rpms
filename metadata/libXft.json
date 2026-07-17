@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "10",
-  "sha": "1111a1b12a2f66c6f904bafef3e41dd57f603bbc",
+  "release": "11",
+  "sha": "19d20fb518dc5ddd7f6805fb6e7359875cf0b9b6",
   "source": "https://src.fedoraproject.org/rpms/libXft.git",
   "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libxft",
   "version": "2.3.8"
