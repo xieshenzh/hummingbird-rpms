@@ -197,6 +197,12 @@ Applies per-package source modifications.
 
 - **Vendor archive generation** — runs ecosystem-specific tooling (e.g., `go_vendor_archive` for
   Go, `npm pack` for Node.js, `cargo vendor` for Rust)
+- **Vendor dependency pinning** — modifies lockfiles (`go.mod`/`go.sum`, `package-lock.json`,
+  `Cargo.lock`) to bump specific dependencies to required versions before vendoring. This is the
+  enforcement counterpart to policy's validation: pins are applied during transform, then policy
+  confirms the result. Solves the non-durable security transforms problem (§1.3) — a declarative
+  pin is re-applied on every source generation, so upstream updates cannot silently revert a CVE
+  fix.
 - **Source stripping** — removes content that cannot be distributed (crypto, bundled pre-built
   binaries, non-free assets)
 - **UI asset builds** — builds JavaScript/TypeScript UI assets from source (for packages like
@@ -215,7 +221,8 @@ Validates integrity and authenticity of fetched sources.
 
 #### 4. Enforce policy
 
-Checks per-package constraints on the generated artifacts.
+Validates the final artifacts. Acts as a safety net for `vendor-pin` (confirms pins took effect)
+and catches violations in packages that don't use `vendor-pin`.
 
 - **Vendor dependency constraints** — ensures vendored dependencies meet version requirements
   (e.g., `sanitize-html >= 2.17.5` for a CVE fix)
@@ -296,6 +303,28 @@ transform:
         - "deps/ngtcp2/ngtcp2/crypto/"
       output: "node-v${VERSION}-stripped.tar.gz"
 
+  # Pin vendored dependency versions before vendor archive generation.
+  # Modifies lockfiles (go.mod/go.sum, package-lock.json, Cargo.lock) to
+  # bump specific dependencies, then re-resolves the dependency graph.
+  # Runs before the vendor stage so the pinned versions are included in
+  # the vendor archive. Re-applied on every source generation, so upstream
+  # updates cannot silently revert a security fix.
+  - vendor-pin:
+      - package: golang.org/x/crypto
+        ecosystem: go
+        version: ">= 0.31.0"
+        reason: "CVE-2024-45337"
+
+      - package: sanitize-html
+        ecosystem: npm
+        version: ">= 2.17.5"
+        reason: "CVE-2024-XXXXX"
+
+      - package: tokio
+        ecosystem: cargo
+        version: ">= 1.38.1"
+        reason: "CVE-2024-YYYYY"
+
   # Custom command (escape hatch)
   - run: "./packaging/make-nodejs-tarball.sh ${VERSION}"
     outputs:
@@ -317,6 +346,9 @@ verify:
     algorithm: sha256
 
 # Policy enforcement (optional)
+# Validates the final artifacts. vendor-constraints acts as a safety net:
+# if vendor-pin (above) is used, policy confirms the pin took effect; if
+# vendor-pin is not used, policy catches violations that need manual action.
 policy:
   vendor-constraints:
     - package: sanitize-html
