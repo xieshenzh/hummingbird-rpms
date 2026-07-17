@@ -1,6 +1,6 @@
 Name:       mkfontscale
 Version:    1.2.4
-Release:    3%{?dist}
+Release:    3.1%{?dist}
 Summary:    Tool to generate legacy X11 font system index files
 
 License:    MIT-open-group AND X11 AND MIT AND HPND-sell-variant
