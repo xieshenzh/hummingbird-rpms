@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "12",
-  "sha": "d03f089442bcde00e7a0b1db8c62114663b41d5d",
+  "release": "13",
+  "sha": "1039dfcfd68d06cddf0e046b080db19ee218e88b",
   "source": "https://src.fedoraproject.org/rpms/libverto.git",
   "upstream_repo": "https://github.com/latchset/libverto",
   "version": "0.3.2"
