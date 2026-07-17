@@ -3,7 +3,7 @@
 Summary:        Library for accessing USB devices
 Name:           libusb1
 Version:        1.0.30
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Source0:        https://github.com/libusb/libusb/releases/download/v%{version}/libusb-%{version}.tar.bz2
 Source1:        https://github.com/libusb/libusb/releases/download/v%{version}/libusb-%{version}.tar.bz2.asc
 Source2:        https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xc68187379b23de9efc46651e2c80ff56c6830a0e#/%{name}.keyring
