@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "b5b5a2e4541e028ec243ad7a08c5b183d92340df",
+  "release": "5",
+  "sha": "7c3bdaf82808bcbe2d2bb5caf6be77beb82663d3",
   "source": "https://src.fedoraproject.org/rpms/openscap.git",
   "upstream_repo": "https://github.com/OpenSCAP/openscap",
   "version": "1.4.4"
