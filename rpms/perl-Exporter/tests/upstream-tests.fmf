@@ -2,3 +2,10 @@ summary: Upstream tests
 component: perl-Exporter
 require: perl-Exporter-tests
 test: /usr/libexec/perl-Exporter/test
+enabled: true
+tag:
+  - rhel-buildroot
+adjust:
+  - enabled: false
+    when: distro < rhel-10 or distro < centos-stream-10
+    continue: false
