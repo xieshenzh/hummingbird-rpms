@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "369e10f40a252d63704d33b64d13dc36d10e2a9d",
+  "release": "3",
+  "sha": "b2310702e7f62c3fc284bb4da2b5f17834028b0e",
   "source": "https://src.fedoraproject.org/rpms/ncurses.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/ncurses",
   "version": "6.6"
