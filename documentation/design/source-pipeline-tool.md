@@ -12,6 +12,11 @@ related:
 
 # Source Pipeline Tool
 
+**Codename: Gorget** — the iridescent throat patch that makes hummingbirds distinctive. In
+ornithology, the gorget is the defining feature used to identify species; in this project, it
+represents the verification layer that distinguishes independently-sourced packages from
+unverified ones.
+
 ## Problem Statement
 
 RPM-based distributions that derive packages from upstream sources face a common set of supply chain
