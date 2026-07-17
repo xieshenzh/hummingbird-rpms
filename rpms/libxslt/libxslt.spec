@@ -1,7 +1,7 @@
 Name:           libxslt
 Summary:        Library providing the Gnome XSLT engine
 Version:        1.1.45
-Release:        0.1%{?dist}
+Release:        0.1.1%{?dist}
 
 License:        MIT
 URL:            https://gitlab.gnome.org/GNOME/libxslt
