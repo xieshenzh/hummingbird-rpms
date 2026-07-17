@@ -179,6 +179,12 @@ podman run --rm \
 - `1` — error (download failure, tool error)
 - `2` — policy violation (verification or constraint failure)
 
+On any non-zero exit, `report.json` is still written with the failure details (stage, error type,
+message). The calling automation (`dist_git.py update` or `check_upstream_versions.py`) uses this
+to log the failure and skip the package — no commit is created, the package stays at its current
+version, and the automation continues to the next package. Transient failures (exit 1) self-heal
+on the next scheduled run; verification and policy failures (exit 2) require human intervention.
+
 ### Pipeline stages
 
 #### 1. Fetch
@@ -214,10 +220,20 @@ Applies per-package source modifications.
 Validates integrity and authenticity of fetched sources.
 
 - **GPG signature verification** — downloads signature files (`.asc`, `.sig`) declared in the spec
-  and verifies against known upstream keys
+  and verifies against upstream keys stored in a centralized keyring at `metadata/gpg-keys/`. Keys
+  are organized by upstream project (e.g., `metadata/gpg-keys/curl.gpg`). Centralized storage
+  means the full set of trusted keys is auditable in one directory, and key rotation or revocation
+  is a single-commit operation.
 - **Checksum verification** — compares against published checksums where available
 - **Reproducibility check** — for packages with existing Fedora tarballs, optionally compares the
   independently-fetched tarball against Fedora's to identify divergences
+- **Re-publication detection** — if a previously committed checksum exists in the `sources` file
+  for the same version and the freshly downloaded artifact does not match, the pipeline fails
+  (exit code 2). This catches upstream projects that silently re-publish release artifacts under
+  the same version. The pipeline will continue to fail on automated retries until a human
+  explicitly updates an `accepted-checksums` entry in the pipeline YAML with the new hash and a
+  reason. This forces investigation, prevents automated retries from silently accepting changed
+  content, and provides a committed audit trail of what changed and why.
 
 #### 4. Enforce policy
 
@@ -340,10 +356,19 @@ transform:
 verify:
   gpg:
     signature-source: 1                  # spec Source index containing the .asc/.sig
-    keyring: "keys/upstream.gpg"         # GPG keyring file in the package dir
+    keyring: "curl.gpg"                  # key name in metadata/gpg-keys/
   checksums:
     url: "https://example.com/SHA256SUMS"
     algorithm: sha256
+
+  # Override for upstream re-publications. Required when upstream re-publishes
+  # a release artifact with different content under the same version. The
+  # pipeline refuses to accept changed content automatically — a human must
+  # add the new checksum here after investigation.
+  accepted-checksums:
+    - file: "example-1.2.3.tar.gz"
+      sha512: "abc123..."
+      reason: "Upstream re-published with corrected LICENSE file (verified via upstream issue #456)"
 
 # Policy enforcement (optional)
 # Validates the final artifacts. vendor-constraints acts as a safety net:
@@ -513,7 +538,7 @@ fetch:
 verify:
   gpg:
     signature-source: 1
-    keyring: "mykey.asc"
+    keyring: "curl.gpg"
 ```
 
 ### Example: nodejs25 (transformed package)
@@ -749,8 +774,10 @@ modified, rules are declared in `patches.lifecycle` in the pipeline YAML (see sc
 1. During an update to version `${VERSION}`, the tool evaluates each patch's `applies-to` range
    against the new version.
 2. If a patch is outside its valid range:
-   - `action: drop` — the patch is removed from the package directory and dropped from the spec.
-     The tool reports the removal in `report.json`.
+   - `action: drop` — the patch file is deleted from the package directory and the corresponding
+     `Patch:` declaration and `%patch` / `%autopatch` application directives are removed from the
+     spec. If the patch is applied inside a conditional block (`%if`), the tool flags it for manual
+     intervention instead of attempting removal. The tool reports all actions in `report.json`.
    - `action: warn` (default) — the patch is flagged in `report.json` but not removed. The update
      proceeds.
 3. If a patch has `applies-to: *`, it is always carried forward.
@@ -851,28 +878,12 @@ fail-on-unverified for high-risk packages.
 
 ## Open Questions
 
-1. **Pipeline tool language/framework.** What should the tool be written in? Python (consistent with
-   existing tooling), Go (single binary, easy to containerize), or a combination?
-
-2. **Ecosystem tooling in the container.** The container image needs Go, npm, cargo, and other
-   ecosystem tools for vendor archive generation. Should this be a single fat image or a base image
-   with ecosystem-specific layers/plugins?
-
-3. **Upstream GPG key management.** Where do upstream GPG keys live? In the package directory? In a
-   centralized keyring? How are they updated?
-
-4. **Handling upstream re-publications.** Some upstream projects silently re-publish release
-   artifacts (same version, different content). How should the tool handle this? Fail? Warn? Record
-   both checksums?
-
-5. **Rollback strategy.** If the pipeline tool fails for a package during a bulk update, should the
-   update fall back to Fedora sources, or should the package be skipped entirely?
-
-6. **Custom pipeline engine vs. existing tooling.** The pipeline YAML schema (ordered transform
-   stages, `run:` escape hatches, variable substitution) resembles a bespoke Ansible without the
-   ecosystem. Are we reinventing the wheel? Alternatives to consider:
-   - **Ansible** — mature, has modules for git, archives, shell. But heavy for the common case and
-     bloats the container image.
+1. **Implementation approach.** The pipeline YAML schema (ordered transform stages, `run:` escape
+   hatches, variable substitution) resembles a bespoke Ansible without the ecosystem. The
+   implementation choice also determines the language. Alternatives to consider:
+   - **Custom tool (Python or Go)** — Python is consistent with existing tooling (`dist_git.py`,
+     `check_upstream_versions.py`); Go produces a single static binary. Either way we own the
+     full stack.
    - **Tekton StepActions** — already in the Konflux build ecosystem. Source generation could be a
      parameterized Tekton pipeline rather than a custom tool. Downside: harder to run locally.
    - **Shared shell function library** — the majority of scripts decompose into 3–4 operations
@@ -884,13 +895,3 @@ fail-on-unverified for high-risk packages.
      keep their shell scripts and `download_sources` hooks. This preserves the attestation value of
      the YAML without building a workflow engine.
 
-7. **Patch lifecycle rule authority.** Should lifecycle rules live in patch headers (closer to the
-   patch, self-documenting), in the pipeline YAML (centralized, works for patches we don't control),
-   or both? If both, which takes precedence when they conflict? Header-based rules are preferred for
-   patches we author; YAML-based rules are needed for Fedora-originated patches whose headers we
-   cannot modify.
-
-8. **Patch lifecycle integration with `dist_git.py update`.** When a patch is auto-dropped by a
-   lifecycle rule during an update, should the tool also remove the corresponding `Patch:` and
-   `%patch` directives from the spec? The `spec-update` stage already has spec-editing capability,
-   so this may be a natural extension.
