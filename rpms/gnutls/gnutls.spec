@@ -13,7 +13,7 @@ print(string.sub(hash, 0, 16))
 }
 
 Version: 3.8.13
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 Patch: gnutls-3.2.7-rpath.patch
 
 # follow https://gitlab.com/gnutls/gnutls/-/issues/1443
@@ -40,7 +40,7 @@ Patch: gnutls-3.8.8-tests-ktls-skip-tls12-chachapoly.patch
 %bcond_with srp
 %endif
 
-%if 0%{?fedora}
+%if 0%{?fedora} && !0%{?hummingbird}
 %bcond_without mingw
 %else
 %bcond_with mingw
