@@ -1,6 +1,6 @@
 Name:           libtommath
 Version:        1.3.0
-Release:        7%{?dist}
+Release:        7.1%{?dist}
 Summary:        A portable number theoretic multiple-precision integer library
 License:        Public Domain
 URL:            http://www.libtom.net/
