@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "522",
-  "sha": "a827f0914ac279af1a8763b1d6324ec8bb8ccbce",
+  "release": "523",
+  "sha": "88c2c4de697ee946f8227469ec7601b6a8ec47ff",
   "source": "https://src.fedoraproject.org/rpms/perl-File-Path.git",
   "upstream_repo": "https://github.com/jkeenan/File-Path",
   "version": "2.18"
