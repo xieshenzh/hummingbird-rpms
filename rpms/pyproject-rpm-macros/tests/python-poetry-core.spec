@@ -1,11 +1,11 @@
 Name:           python-poetry-core
-Version:        1.1.0
+Version:        1.4.0
 Release:        0%{?dist}
 Summary:        Poetry PEP 517 Build Backend
 
 License:        MIT
 URL:            https://pypi.org/project/poetry-core/
-Source0:        %{pypi_source poetry-core}
+Source0:        %{pypi_source poetry_core}
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
@@ -24,7 +24,7 @@ Summary:        %{summary}
 
 
 %prep
-%autosetup -p1 -n poetry-core-%{version}
+%autosetup -p1 -n poetry_core-%{version}
 
 
 %generate_buildrequires

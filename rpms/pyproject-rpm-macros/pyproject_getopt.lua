@@ -211,6 +211,7 @@ end
 local function cleanup_macros(opt_spec)
     for _, spec in ipairs(opt_spec) do
         rpm.undefine("__pyproject_opt_" .. spec.short)
+        rpm.undefine("__pyproject_optflag_" .. spec.short)
     end
 end
 
@@ -241,18 +242,22 @@ local function quote_values(values)
     return parts
 end
 
--- Define %__pyproject_opt_{short} for each found option.
--- Flags get %{nil} (defined but empty), value options get each individual
--- value joined by separator.
+-- Define %__pyproject_opt_{short} and %__pyproject_optflag_{short} for each found option.
+-- opt: Flags get %{nil} (defined but empty), value options get each individual
+--      value joined by separator.
+-- optflag: Ready-to-forward form: "-X" for flags, "-X value" for value options.
 -- See the quote_value function about how values are quoted.
 local function define_macros(found, opt_spec)
     for _, spec in ipairs(opt_spec) do
         if found[spec.short] then
             if spec.value then
                 local parts = quote_values(found[spec.short])
-                rpm.define("__pyproject_opt_" .. spec.short .. " " .. table.concat(parts, spec.separator))
+                local value = table.concat(parts, spec.separator)
+                rpm.define("__pyproject_opt_" .. spec.short .. " " .. value)
+                rpm.define("__pyproject_optflag_" .. spec.short .. " -" .. spec.short .. " " .. value)
             else
                 rpm.define("__pyproject_opt_" .. spec.short .. " %{nil}")
+                rpm.define("__pyproject_optflag_" .. spec.short .. " -" .. spec.short)
             end
         end
     end

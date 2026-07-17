@@ -27,6 +27,21 @@ local function assert_value(name, expected)
     )
 end
 
+local function assert_optflag(name, expected)
+    local actual = rpm.expand("%{?__pyproject_optflag_" .. name .. "}")
+    assert(
+        actual == expected,
+        "expected __pyproject_optflag_" .. name .. "=" .. expected .. ", got " .. actual
+    )
+end
+
+local function assert_optflag_undefined(name)
+    assert(
+        rpm.expand("%{undefined __pyproject_optflag_" .. name .. "}") == "1",
+        "expected __pyproject_optflag_" .. name .. " to be undefined"
+    )
+end
+
 local function assert_positional(expected)
     local actual = rpm.expand("%{?__pyproject_positional_args}")
     assert(
@@ -403,6 +418,33 @@ function M.test_repeated_long_without_separator_errors()
     assert_errors(function()
         pg.getopt(WHEEL_SPEC, nil, {"--directory", "foo", "--directory", "bar"}, "test")
     end)
+end
+
+
+-- Optflag macros
+
+function M.test_optflag_for_flag()
+    pg.getopt(SAVE_FILES_SPEC, nil, {"-l"}, "test")
+    assert_optflag("l", "-l")
+    assert_optflag_undefined("M")
+end
+
+function M.test_optflag_for_value()
+    pg.getopt(WHEEL_SPEC, nil, {"-d", "foo"}, "test")
+    assert_optflag("d", "-d foo")
+end
+
+function M.test_optflag_for_repeated_value()
+    pg.getopt(CHECK_IMPORT_SPEC, nil, {"--exclude", "a", "--exclude", "b"}, "test")
+    assert_optflag("e", "-e a -e b")
+end
+
+function M.test_optflag_cleanup_between_calls()
+    pg.getopt(WHEEL_SPEC, nil, {"-d", "foo"}, "test")
+    assert_optflag("d", "-d foo")
+    pg.getopt(WHEEL_SPEC, nil, {"-C", "bar"}, "test")
+    assert_optflag_undefined("d")
+    assert_optflag("C", "-C bar")
 end
 
 

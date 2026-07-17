@@ -1,5 +1,5 @@
 Name:           python-ipykernel
-Version:        6.11.0
+Version:        6.30.0
 Release:        0%{?dist}
 Summary:        IPython Kernel for Jupyter
 License:        BSD-3-Clause
@@ -10,7 +10,6 @@ BuildArch:      noarch
 
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
-BuildRequires:  python3-pkg-resources
 
 %description
 This package contains data files.
