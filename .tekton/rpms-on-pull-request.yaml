@@ -31571,8 +31571,8 @@ spec:
         - x86_64
     - name: build-platforms
       value:
-        - "linux/x86_64"
-        - "linux/arm64"
+        - "linux-d160-c8xlarge/arm64"
+        - "linux-d160-c8xlarge/amd64"
     - name: specfile
       value: "swift-lang.spec"
     - name: monorepo-subdir
@@ -31588,11 +31588,28 @@ spec:
         value: pipeline
       - name: bundle
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+  taskRunSpecs:
+    - pipelineTaskName: rpmbuild-x86-64
+      stepSpecs:
+        - name: run-syft
+          computeResources:
+            requests:
+              memory: 10Gi
+            limits:
+              memory: 10Gi
+    - pipelineTaskName: rpmbuild-aarch64
+      stepSpecs:
+        - name: run-syft
+          computeResources:
+            requests:
+              memory: 10Gi
+            limits:
+              memory: 10Gi
   taskRunTemplate:
     serviceAccountName: build-pipeline-swift-lang-main
   timeouts:
-    pipeline: 4h
-    tasks: 4h
+    pipeline: 24h
+    tasks: 24h
   workspaces:
     - name: git-auth
       secret:

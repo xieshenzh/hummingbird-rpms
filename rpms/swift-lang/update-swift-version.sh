@@ -3,8 +3,9 @@
 set -e
 
 SWIFT_VERSION="${1:-}"
-# Only shorten the version if it contains two dots.
-if [[ "${SWIFT_VERSION}" =~ \.\. ]]; then
+# Patch releases use the major.minor release branch (for example, 6.3.2
+# is described by the release/6.3 branch scheme).
+if [[ "${SWIFT_VERSION}" =~ ^[^.]+\.[^.]+\. ]]; then
     SHORT_SWIFT_VERSION="${SWIFT_VERSION%.*}"
 else
     SHORT_SWIFT_VERSION="${SWIFT_VERSION}"
@@ -40,24 +41,17 @@ echo "Parsing repository versions..."
 # Collect all the projects included in the desired branch scheme
 PROJECTS=$(jq -r --arg scheme "release/${SHORT_SWIFT_VERSION}" '.["branch-schemes"][$scheme]["repos"]|keys[]' "${TEMP_CONFIG}")
 
-# Associate each project with the ref used by the desired branch scheme
-declare -A PROJECT_REFS
-for PROJECT in ${PROJECTS}; do
-    PROJECT_REF=$(jq -r --arg scheme "release/${SHORT_SWIFT_VERSION}" --arg project "$PROJECT" '.["branch-schemes"][$scheme]["repos"][$project]' "${TEMP_CONFIG}")
-    PROJECT_REFS["${PROJECT}"]="${PROJECT_REF}"
-done
-
 # Remove all existing sources between the lines "Begin forge sources" and "End forge sources"
 sed -i "/Begin forge sources/,/End forge sources/{//!d;}" "${SPEC_FILE}"
 
 IDX=1
 # Get each project's "ID" (Github repo org/proj URL fragment)
-for PROJECT in "${!PROJECT_REFS[@]}"; do
+for PROJECT in ${PROJECTS}; do
     if [ "${PROJECT}" == "swift" ]; then
         continue
     fi
 
-    PROJECT_REF=${PROJECT_REFS[${PROJECT}]}
+    PROJECT_REF=$(jq -r --arg scheme "release/${SHORT_SWIFT_VERSION}" --arg project "$PROJECT" '.["branch-schemes"][$scheme]["repos"][$project]' "${TEMP_CONFIG}")
     PROJECT_ID=$(jq -r --arg project "${PROJECT}" '.["repos"][$project].remote.id' "${TEMP_CONFIG}")
     FORGEURL="https://github.com/${PROJECT_ID}"
 

@@ -302,6 +302,22 @@ spire1.14:
 spire1.15:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+swift-lang:
+  timeout_hours: 24
+  build_platforms:
+    - "linux-d160-c8xlarge/arm64"
+    - "linux-d160-c8xlarge/amd64"
+  # Required to prevent Syft OOMing during SBOM generation
+  task_run_specs:
+    - pipelineTaskName: rpmbuild
+      stepSpecs:
+        - name: run-syft
+          computeResources:
+            requests:
+              memory: 10Gi
+            limits:
+              memory: 10Gi
+
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
