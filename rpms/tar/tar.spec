@@ -10,7 +10,7 @@ Summary: GNU file archiving program
 Name: tar
 Epoch: 2
 Version: 1.35
-Release: 8.1%{?dist}
+Release: 9%{?dist}
 License: GPL-3.0-or-later
 URL: https://www.gnu.org/software/tar/
 
@@ -58,6 +58,9 @@ Patch22: tar-1.35-no-overwrite-dir-no-overwrite-even-temporarily.patch
 # d1aeb7388926e045bdec0f7934c5522c4745f02c
 # 45b6e6898d1f931bfca41d961289bd6ac33238e5
 Patch23: tar-1.35-CVE-2025-45582.patch
+# Source: https://cgit.git.savannah.gnu.org/cgit/tar.git/commit/?id=08c3fc2e9337094aff01a511170fd35fdb8f1ee3
+# Fixes build with acl 2.4.0
+Patch25: tar-1.35-Avoid-acl_-prefix-for-functions.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -156,6 +159,9 @@ make check || (
 
 
 %changelog
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.35-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Wed Jan 21 2026 Pavel Cahyna <pcahyna@redhat.com> - 2:1.35-8
 - Backport upstream fix for savannah bug 65838, commit 1e6ce98e (fedora#2427654)
 - added "padding with zeros" info message (#2089298)
