@@ -778,7 +778,7 @@ def test_download_new_sources_download_failure(cuv_module, workdir: Path) -> Non
 
 
 def test_download_new_sources_no_version_in_filename(cuv_module, workdir: Path) -> None:
-    """Skips sources where filename does not contain the version."""
+    """Skips sources whose filename already appears in the sources file."""
     _create_package(
         workdir, 'pkg', '2.0',
         sources={'static-data.tar.gz': 'somehash'},
@@ -791,6 +791,70 @@ def test_download_new_sources_no_version_in_filename(cuv_module, workdir: Path) 
         downloaded = cuv_module.download_new_sources('pkg', '1.0', '2.0')
 
     assert downloaded == []
+
+
+def test_download_new_sources_independent_version_bump(
+    cuv_module, workdir: Path
+) -> None:
+    """Downloads sources whose version changed independently of the main package."""
+    pkg_dir = _create_package(
+        workdir, 'pkg', '2.0',
+        sources={
+            'pkg-1.0.tar.gz': 'oldhash_main',
+            'dep-3.0.tar.gz': 'oldhash_dep',
+        },
+    )
+
+    with patch.object(cuv_module, '_download_file') as mock_dl, \
+         patch.object(cuv_module, '_upload_to_lookaside') as mock_ul, \
+         patch.object(cuv_module, '_compute_file_hash', return_value='newhash'), \
+         patch.object(cuv_module, '_get_spec_source_urls',
+                      return_value={
+                          0: 'https://example.com/pkg-2.0.tar.gz',
+                          1: 'https://example.com/dep-4.0.tar.gz',
+                      }):
+
+        cuv_module.RPMS_DIR = workdir / 'rpms'
+        downloaded = cuv_module.download_new_sources('pkg', '1.0', '2.0')
+
+    assert sorted(downloaded) == ['dep-4.0.tar.gz', 'pkg-2.0.tar.gz']
+    assert mock_dl.call_count == 2
+    assert mock_ul.call_count == 2
+
+    entries = cuv_module._parse_sources_file(pkg_dir / 'sources')
+    filenames = {e['filename'] for e in entries}
+    assert filenames == {'pkg-2.0.tar.gz', 'dep-4.0.tar.gz'}
+
+
+def test_download_new_sources_removes_stale_entries(
+    cuv_module, workdir: Path
+) -> None:
+    """Removes sources entries that no longer appear in the spec."""
+    pkg_dir = _create_package(
+        workdir, 'pkg', '2.0',
+        sources={
+            'pkg-1.0.tar.gz': 'oldhash',
+            'removed-dep-1.0.tar.gz': 'oldhash_removed',
+        },
+    )
+
+    with patch.object(cuv_module, '_download_file'), \
+         patch.object(cuv_module, '_upload_to_lookaside'), \
+         patch.object(cuv_module, '_compute_file_hash', return_value='newhash'), \
+         patch.object(cuv_module, '_get_spec_source_urls',
+                      return_value={
+                          0: 'https://example.com/pkg-2.0.tar.gz',
+                      }):
+
+        cuv_module.RPMS_DIR = workdir / 'rpms'
+        downloaded = cuv_module.download_new_sources('pkg', '1.0', '2.0')
+
+    assert downloaded == ['pkg-2.0.tar.gz']
+
+    entries = cuv_module._parse_sources_file(pkg_dir / 'sources')
+    filenames = {e['filename'] for e in entries}
+    assert 'removed-dep-1.0.tar.gz' not in filenames
+    assert 'pkg-2.0.tar.gz' in filenames
 
 
 #
