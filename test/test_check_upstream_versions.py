@@ -685,6 +685,55 @@ def test_check_package_version_project_id_string_without_track_version(cuv_modul
     assert result.has_update is True
 
 
+def test_check_package_version_strips_version_suffix(cuv_module, workdir: Path) -> None:
+    """Strips configured suffix from upstream versions before comparing."""
+    _create_package(workdir, 'swift-lang', '6.3.2',
+                    metadata={'version': '6.3.2', 'release': '5',
+                              'release_monitoring_project_id': 21267,
+                              'version_suffix_strip': '-RELEASE'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'version': '6.3.3-RELEASE',
+        'stable_versions': ['6.3.3-RELEASE', '6.3.2-RELEASE'],
+        'id': 21267,
+    }
+
+    with patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response):
+        result = cuv_module.check_package_version('swift-lang')
+
+    assert result.has_update is True
+    assert result.upstream_version == '6.3.3'
+    assert result.current_version == '6.3.2'
+
+
+def test_check_package_version_suffix_strip_no_update(cuv_module, workdir: Path) -> None:
+    """No update when stripped version matches current."""
+    _create_package(workdir, 'swift-lang', '6.3.2',
+                    metadata={'version': '6.3.2', 'release': '5',
+                              'release_monitoring_project_id': 21267,
+                              'version_suffix_strip': '-RELEASE'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'version': '6.3.2-RELEASE',
+        'stable_versions': ['6.3.2-RELEASE'],
+        'id': 21267,
+    }
+
+    with patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response):
+        result = cuv_module.check_package_version('swift-lang')
+
+    assert result.has_update is False
+    assert result.upstream_version == '6.3.2'
+
+
 def test_matches_track_version(cuv_module) -> None:
     """_matches_track_version correctly handles prefix matching."""
     matches = cuv_module._matches_track_version

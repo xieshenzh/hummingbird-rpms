@@ -937,11 +937,13 @@ def check_package_version(
     meta = get_package_metadata(package)
     track_version = None
     project_id = None
+    version_suffix_strip = None
     if meta:
         track_upstream = meta.get("track_upstream")
         if track_upstream and track_upstream != "latest":
             track_version = track_upstream
         project_id = meta.get("release_monitoring_project_id")
+        version_suffix_strip = meta.get("version_suffix_strip")
 
     # Query release-monitoring.org
     try:
@@ -958,6 +960,19 @@ def check_package_version(
             has_update=False,
             error=str(e),
         )
+
+    # Strip a known suffix from upstream versions if configured
+    # (e.g., swift-lang reports "6.3.3-RELEASE" from Anitya).
+    if version_suffix_strip:
+        def _strip_suffix(v: str) -> str:
+            return v.removesuffix(version_suffix_strip) if v else v
+
+        if anitya_data.get("stable_versions"):
+            anitya_data["stable_versions"] = [
+                _strip_suffix(v) for v in anitya_data["stable_versions"]
+            ]
+        if anitya_data.get("version"):
+            anitya_data["version"] = _strip_suffix(anitya_data["version"])
 
     # Prefer stable_versions[0] over version field, as version can sometimes
     # contain incorrect data (e.g., development tags that aren't real releases)
