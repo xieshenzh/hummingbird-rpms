@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "483e4d30c584bd7a05c6ea0724a837c0b6f2b4ba",
+  "release": "5",
+  "sha": "239ea46d2ee1bea877da35f4ad30ce3da19b8313",
   "source": "https://src.fedoraproject.org/rpms/readline.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/readline.git",
   "version": "8.3"
