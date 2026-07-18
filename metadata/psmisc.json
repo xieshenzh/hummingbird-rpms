@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "7",
-  "sha": "f2f01b04b64fe203dddfcd42b5f967b00b768937",
+  "release": "9",
+  "sha": "6b4432812deace66acbb3f74984253ad43468880",
   "source": "https://src.fedoraproject.org/rpms/psmisc.git",
   "upstream_repo": "https://gitlab.com/psmisc/psmisc",
   "version": "23.7"
