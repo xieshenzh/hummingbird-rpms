@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "5",
-  "sha": "7b6ede5c5bb776f958fe2065c35c6c2fd58d0d47",
+  "release": "6",
+  "sha": "efe3715ae2af861bbd41fc4c529be2c9da1f2d37",
   "source": "https://src.fedoraproject.org/rpms/zstd.git",
   "upstream_repo": "https://github.com/facebook/zstd",
   "version": "1.5.7"
