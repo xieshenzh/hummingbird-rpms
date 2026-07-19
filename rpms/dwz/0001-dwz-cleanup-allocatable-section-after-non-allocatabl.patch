@@ -1,0 +1,33 @@
+From 4d8f3bb6cabf28d7b4842971e8c117a4beebf720 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Sun, 19 Jul 2026 18:45:56 +0200
+Subject: [PATCH] dwz: cleanup allocatable section after non-allocatable error
+
+In dso_write all errors, except the allocatable section one, unlink
+the (temp) output file, end the elf and close the fd.
+
+	* dwz.c (write_dso): Always unlink, elf_end and close after
+	error.
+
+Signed-off-by: Mark Wielaard <mark@klomp.org>
+---
+ dwz.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/dwz.c b/dwz.c
+index a5ce8f867a05..4fe960d5d39e 100644
+--- a/dwz.c
++++ b/dwz.c
+@@ -14492,6 +14492,9 @@ write_dso (DSO *dso, const char *file, struct stat *st, bool save_to_temp)
+ 		{
+ 		  error (0, 0, "Allocatable section in %s after "
+ 			 "non-allocatable ones", dso->filename);
++		  unlink (file);
++		  elf_end (elf);
++		  close (fd);
+ 		  return 1;
+ 		}
+ 	      else
+-- 
+2.55.0
+
