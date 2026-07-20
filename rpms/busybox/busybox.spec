@@ -54,7 +54,7 @@
 
 Name:		busybox
 Version:	1.37.0
-Release:	8.1%{?dist}
+Release:	8.2%{?dist}
 Epoch:		1
 Summary:	Statically linked binary providing simplified versions of system commands
 License:	GPL-2.0-only
@@ -90,6 +90,10 @@ Patch5:		busybox-1.37.0-CVE-2026-29004-check-IAPREFIX-size.patch
 Patch6:		busybox-1.37.0-CVE-2026-38753-awk_sub-use-after-free.patch
 # CVE-2026-38754: out-of-bounds read in ifsbreakup()
 Patch7:		busybox-1.37.0-CVE-2026-38754-ifsbreakup-bounds.patch
+# CVE-2026-38752: stack overflow in awk evaluate()
+Patch8:		busybox-1.37.0-CVE-2026-38752-awk-evaluate-recursion-limit.patch
+# CVE-2026-38755: stack overflow in ash evalfun()
+Patch9:		busybox-1.37.0-CVE-2026-38755-ash-evalfun-recursion-limit.patch
 BuildRequires:	gcc
 BuildRequires:	libselinux-devel >= 1.27.7-2
 BuildRequires:	libsepol-devel
@@ -151,6 +155,8 @@ package is build against shared libraries, most notably glibc.
 %patch -P5 -p1 -b .dhcpv6-iaprefix-fix
 %patch -P6 -p1 -b .awk-sub-uaf-fix
 %patch -P7 -p1 -b .ifsbreakup-bounds-fix
+%patch -P8 -p1 -b .awk-evaluate-recursion-fix
+%patch -P9 -p1 -b .ash-evalfun-recursion-fix
 
 %build
 # Fix architecture name maps
