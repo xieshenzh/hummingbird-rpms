@@ -1,0 +1,40 @@
+From: Hummingbird RPM maintainers
+Subject: [PATCH] tests: use explicit loopback addresses
+
+Isolated RPM builders do not guarantee a usable address on conventional
+network interfaces. These unit tests only need a local address, so avoid
+interface-based address discovery.
+
+diff --git a/modules/backendworker/backendworker_test.go b/modules/backendworker/backendworker_test.go
+--- a/modules/backendworker/backendworker_test.go
++++ b/modules/backendworker/backendworker_test.go
+@@ -91,6 +91,7 @@ func TestWorkerDoesNotRace(t *testing.T) {
+ 		netWorkInteraces[i] = iface.Name
+ 	}
+ 	workerConfig.Ring.InstanceInterfaceNames = netWorkInteraces
++	workerConfig.Ring.InstanceAddr = "127.0.0.1"
+ 
+ 	overrides, err := overrides.NewOverrides(limits, nil, prometheus.DefaultRegisterer)
+ 	require.NoError(t, err)
+diff --git a/modules/distributor/distributor_test.go b/modules/distributor/distributor_test.go
+--- a/modules/distributor/distributor_test.go
++++ b/modules/distributor/distributor_test.go
+@@ -1865,6 +1865,7 @@ func prepare(t *testing.T, cfg Config, limits *validation.Limits, ingesters map[
+ 	distributorConfig.DistributorRing.InstanceID = strconv.Itoa(rand.Int())
+ 	distributorConfig.DistributorRing.KVStore.Mock = nil
+ 	distributorConfig.DistributorRing.InstanceInterfaceNames = []string{"eth0", "en0", "lo0"}
++	distributorConfig.DistributorRing.InstanceAddr = "127.0.0.1"
+ 
+ 	l := dslog.Level{}
+ 	_ = l.Set("error")
+diff --git a/modules/generator/generator_test.go b/modules/generator/generator_test.go
+--- a/modules/generator/generator_test.go
++++ b/modules/generator/generator_test.go
+@@ -72,6 +72,7 @@ func TestGeneratorDoesNotRace(t *testing.T) {
+ 		netWorkInteraces[i] = iface.Name
+ 	}
+ 	generatorConfig.Ring.InstanceInterfaceNames = netWorkInteraces
++	generatorConfig.Ring.InstanceAddr = "127.0.0.1"
+ 	g, err := New(generatorConfig, o, prometheus.NewRegistry(), nil, newTestLogger(t))
+ 	require.NoError(t, err)
+ 	require.NoError(t, services.StartAndAwaitRunning(context.Background(), g))

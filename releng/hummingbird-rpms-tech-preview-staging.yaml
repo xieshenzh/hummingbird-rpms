@@ -978,6 +978,10 @@ spec:
           contentType: rpm
         - name: tcl-main
           contentType: rpm
+        - name: tempo2-10-main
+          contentType: rpm
+        - name: tempo3-0-main
+          contentType: rpm
         - name: tinysparql-main
           contentType: rpm
         - name: tk-main

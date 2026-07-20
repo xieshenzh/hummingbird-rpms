@@ -317,6 +317,12 @@ spire1.15:
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+tempo2.10:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+tempo3.0:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 tomcat11:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

@@ -1,0 +1,8 @@
+{
+  "modification_status": "native",
+  "release": "0.1",
+  "release_monitoring_project_id": 381994,
+  "track_upstream": "2.10",
+  "upstream_repo": "https://github.com/grafana/tempo",
+  "version": "2.10.7"
+}

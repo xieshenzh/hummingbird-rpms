@@ -1,0 +1,22 @@
+From: Hummingbird RPM maintainers
+Subject: [PATCH] livestore: treat canceled initial offset fetch as stop
+
+Shutdown may cancel the partition reader before its initial Kafka offset
+lookup completes. Match the later polling path by treating cancellation as a
+clean stop instead of failing the service. This behavior is present in Tempo
+3.0 and is backported here for the 2.10 stream.
+
+diff --git a/modules/livestore/partition_reader.go b/modules/livestore/partition_reader.go
+--- a/modules/livestore/partition_reader.go
++++ b/modules/livestore/partition_reader.go
+@@ -82,5 +82,10 @@ func (r *PartitionReader) running(ctx context.Context) error {
+ 	offset, err := r.fetchLastCommittedOffsetWithRetries(ctx)
+ 	if err != nil {
++		// Shutdown can cancel the reader before the initial offset lookup completes.
++		// Treat that as a clean stop instead of failing the service.
++		if ctx.Err() != nil {
++			return nil
++		}
+ 		return fmt.Errorf("failed to fetch last committed offset: %w", err)
+ 	}
+ 
