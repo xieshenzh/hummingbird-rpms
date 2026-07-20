@@ -1,0 +1,53 @@
+From: Hummingbird RPM maintainers
+Subject: [PATCH] tests: use explicit loopback addresses
+
+Isolated RPM builders do not guarantee a usable address on conventional
+network interfaces. These unit tests only need a local address, so avoid
+interface-based address discovery.
+
+diff --git a/pkg/limits/frontend/frontend_test.go b/pkg/limits/frontend/frontend_test.go
+--- a/pkg/limits/frontend/frontend_test.go
++++ b/pkg/limits/frontend/frontend_test.go
+@@ -160,6 +160,7 @@ func TestFrontend_ExceedsLimits(t *testing.T) {
+ 			readRing, _ := newMockRingWithClientPool(t, "test", nil, nil)
+ 			f, err := New(Config{
+ 				LifecyclerConfig: ring.LifecyclerConfig{
++					Addr: "127.0.0.1",
+ 					RingConfig: ring.Config{
+ 						KVStore: kv.Config{
+ 							Store: "inmemory",
+diff --git a/pkg/limits/frontend/http_test.go b/pkg/limits/frontend/http_test.go
+--- a/pkg/limits/frontend/http_test.go
++++ b/pkg/limits/frontend/http_test.go
+@@ -79,6 +79,7 @@ func TestFrontend_ServeHTTP(t *testing.T) {
+ 			readRing, _ := newMockRingWithClientPool(t, "test", nil, nil)
+ 			f, err := New(Config{
+ 				LifecyclerConfig: ring.LifecyclerConfig{
++					Addr: "127.0.0.1",
+ 					RingConfig: ring.Config{
+ 						KVStore: kv.Config{
+ 							Store: "inmemory",
+diff --git a/pkg/loki/modules_test.go b/pkg/loki/modules_test.go
+--- a/pkg/loki/modules_test.go
++++ b/pkg/loki/modules_test.go
+@@ -376,6 +376,7 @@ func TestUIServiceInitialization(t *testing.T) {
+ 	t.Run("UI is initialized when enabled", func(t *testing.T) {
+ 		cfg := minimalWorkingConfig(t, dir, All, func(cfg *Config) {
+ 			cfg.UI.Enabled = true
++			cfg.UI.Ring.InstanceAddr = "127.0.0.1"
+ 		})
+		c, err := New(cfg)
+		require.NoError(t, err)
+diff --git a/pkg/pattern/ingester_test.go b/pkg/pattern/ingester_test.go
+--- a/pkg/pattern/ingester_test.go
++++ b/pkg/pattern/ingester_test.go
+@@ -636,0 +637 @@
++		cfg.LifecyclerConfig.Addr = "127.0.0.1"
+@@ -662,0 +664 @@
++		cfg.LifecyclerConfig.Addr = "127.0.0.1"
+@@ -688,0 +691 @@
++		cfg.LifecyclerConfig.Addr = "127.0.0.1"
+@@ -717,0 +721 @@
++		cfg.LifecyclerConfig.Addr = "127.0.0.1"
+@@ -748,0 +753 @@
++		cfg.LifecyclerConfig.Addr = "127.0.0.1"

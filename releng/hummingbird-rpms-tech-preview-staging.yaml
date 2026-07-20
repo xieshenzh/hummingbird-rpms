@@ -558,6 +558,10 @@ spec:
           contentType: rpm
         - name: logrotate-main
           contentType: rpm
+        - name: loki3-6-main
+          contentType: rpm
+        - name: loki3-7-main
+          contentType: rpm
         - name: lua-main
           contentType: rpm
         - name: lua-rpm-macros-main

@@ -171,6 +171,12 @@ llvm21:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+loki3.6:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+loki3.7:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 memcached:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
