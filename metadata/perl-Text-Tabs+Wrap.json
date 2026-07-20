@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "521",
-  "sha": "f9768bcab93e705405eedb4dda8557114197a308",
+  "release": "522",
+  "sha": "8fd41b2ec7c0b3b378401e984315b5f74bc83f7e",
   "source": "https://src.fedoraproject.org/rpms/perl-Text-Tabs+Wrap.git",
   "upstream_repo": "https://github.com/ap/Text-Tabs",
   "version": "2024.001"
