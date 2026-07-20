@@ -24,11 +24,28 @@ For a high-level overview, use `/cve-status`.
 If the user provides bare numbers (e.g. "2875" or "/cve 2875"),
 treat them as HUM tickets by prepending `HUM-`.
 
-Show the Jira ticket to get its details (summary, status,
-labels, comments).
+```bash
+python .cursor/skills/cve/cve_helper.py HUM-XXXX
+```
 
-When the user provides multiple ticket keys (e.g. "let's look at
-HUM-1234 1235 1236"), fetch them in parallel.
+For multiple tickets, pass them in one call:
+
+```bash
+python .cursor/skills/cve/cve_helper.py HUM-1234 1235 1236 \
+  --json-out /tmp/cve-triage.json
+```
+
+Use the script output as the primary source for:
+
+- CVE IDs and package guess
+- Status, severity, labels, fixed-in-build
+- Linked HUM tickets and linked task MR URLs
+- cve_analysis `{noformat}` excerpt
+- `suggested_chat_title` (deterministic title for `rename_chat`)
+
+Do not run raw `rhjira show`/`rhjira dump` for Step 1 when the helper succeeds.
+If helper output is missing required detail or the helper fails, report the helper
+failure to the user and ask whether to proceed with manual fallback commands.
 
 **EMBARGO CHECK:** If the ticket summary starts with `EMBARGOED`,
 stop immediately and output:
@@ -40,7 +57,7 @@ discussed, analyzed, or acted upon in this tool. Stopping.
 
 Do not proceed with any analysis, comments, or code changes.
 
-Extract from each ticket:
+Extract from each ticket (mostly from `cve_helper.py` output):
 
 - CVE ID and package name (from summary)
 - Status, severity, labels
@@ -75,11 +92,11 @@ rather than re-doing the work.
 
 Present a concise summary to the user and wait for direction.
 
-After showing the ticket(s), rename the chat using the ticket
-key(s) and package name. Format: `HUM-XXXX <package>` (e.g.
-`HUM-2820 yarnpkg`). For multiple tickets on the same package:
-`HUM-2820 HUM-2821 yarnpkg`. For tickets across packages:
-`HUM-2820 yarnpkg, HUM-2821 gzip`.
+After showing the ticket(s), rename the chat using
+`suggested_chat_title` from `cve_helper.py`. This value is
+deterministic and already follows the required naming format.
+Only construct the title manually if `suggested_chat_title` is
+empty.
 
 ```text
 CallMcpTool: cursor-app-control / rename_chat
@@ -168,8 +185,10 @@ When the fix is confirmed present in the shipped SRPM:
    version comparison, upstream commit dates)
 1. Set Fixed in Build:
 
-   Set the Jira "Fixed in Build" field to
-   `<name>-<version>-<release>.src.rpm`.
+   ```bash
+   rhjira edit HUM-XXXX --noeditor \
+     --fixedinbuild "<name>-<version>-<release>.src.rpm"
+   ```
 
 1. **Do NOT close the ticket.** The cve_analysis automation will
    close it as Done-Errata automatically. The user has consistently
@@ -180,26 +199,46 @@ When the fix is confirmed present in the shipped SRPM:
 When the CVE does not apply (wrong product, component not present,
 disputed):
 
-1. Write a closing comment explaining why
-1. Post the comment to the Jira ticket
-1. **Ask the user for approval before closing.** Then close the
-   ticket in Jira with:
-   - **Status:** Closed
-   - **Resolution:** Not a Bug
-   - **VEX Justification:** use `Component not Present` when the
-     CVE product is not in Hummingbird at all, or
-     `Vulnerable Code not Present` when the CVE targets a
-     different product or is disputed
-   - **Assignee:** the current user
-1. Verify the ticket status shows `Closed (Not a Bug)`
+1. Write a closing comment to a temp file explaining why
+1. Post the comment:
+
+   ```bash
+   rhjira comment HUM-XXXX --noeditor -f /tmp/close-comment.txt
+   ```
+
+1. **Ask the user for approval before closing.** Then use the
+   appropriate VEX justification:
+
+   ```bash
+   # If the CVE product is not in Hummingbird at all:
+   rhjira edit HUM-XXXX --noeditor \
+     --assignee <user>@redhat.com \
+     --status Closed \
+     --resolution "Not a Bug" \
+     --vexjustification "Component not Present"
+
+   # If the CVE targets a different product or is disputed:
+   rhjira edit HUM-XXXX --noeditor \
+     --assignee <user>@redhat.com \
+     --status Closed \
+     --resolution "Not a Bug" \
+     --vexjustification "Vulnerable Code not Present"
+   ```
+
+1. Verify: `rhjira show HUM-XXXX 2>&1 | grep "^Status:"`
 
 #### 3c: Duplicate (unversioned package)
 
 When a ticket is filed against an unversioned base name (e.g.
 `ruby`) but versioned SRPMs exist (e.g. `ruby3.3`, `ruby4.0`):
 
-1. Search Jira for tickets matching the CVE ID to find
-   versioned counterparts
+1. Search for versioned tickets:
+
+   ```bash
+   rhjira list "project = HUM and summary ~ CVE-YYYY-NNNNN" \
+     --rawoutput --numentries 10 --fields key,summary,status
+   ```
+
 1. If versioned tickets exist, recommend closing as Duplicate
 
 #### 3d: Needs version bump (preferred)
@@ -213,11 +252,23 @@ is too risky (e.g. glibc, binutils).
 When the package is affected and a newer upstream release
 contains the fix:
 
-1. **Create a HUM task ticket** in Jira (type: Task, project:
-   HUM) with a summary like `<package>: Update to <version> for <CVE-ID>`.
-   Assign it to the current user, set status to "In Progress",
-   and add a blocks/is-blocked-by link to the CVE tracker
-   ticket(s).
+1. **Create a HUM task ticket** and link it to the CVE tracker(s):
+
+   ```bash
+   rhjira create --noeditor --project HUM --tickettype Task \
+     --summary "<package>: Update to <version> for <CVE-ID>" \
+     --assignee <user>@redhat.com
+   ```
+
+   Then link and activate (one `--blocks` per edit call):
+
+   ```bash
+   rhjira edit HUM-YYYY --noeditor --blocks HUM-XXXX
+   rhjira edit HUM-YYYY --noeditor --status "In Progress"
+   ```
+
+   Either `--blocks` or `--isblockedby` works for linking;
+   both patterns appear in practice.
 
 1. **Create a worktree** for the task. This keeps each CVE
    fix isolated so multiple can be in flight at once:
@@ -315,8 +366,8 @@ contains the fix:
    ./ci/build_rpms.sh <package>
    ```
 
-   Push the branch and create a GitLab MR. The MR
-   description must include:
+   Push the branch and create a draft MR. The MR description
+   must include:
    - A 1-3 sentence summary of what was changed and why
    - `Closes: HUM-YYYY` (the task ticket -- **never** the CVE
      tracker ticket)
@@ -325,13 +376,44 @@ contains the fix:
    - `CVE: CVE-YYYY-NNNNN, CVE-YYYY-MMMMM` (comma-separated
      CVE IDs)
 
-   After creating the MR, add the MR link as a comment on the
-   HUM task ticket in Jira so future lookups can see the work is
-   already in review.
+   Use `-F` with a file because `-m` does not support multiple
+   paragraphs:
 
-   Once the MR pipeline has started, post a comment on the MR
-   with `/hummingbird code-review` to trigger the automated code
-   review.
+   ```bash
+   git push -u origin HUM-YYYY
+   cat > /tmp/mr-description.txt << 'EOF'
+   HUM-YYYY: <package>: <short title>
+
+   <1-3 sentence description of the change: what was backported
+   or updated, where the fix came from, and why>
+
+   Closes: HUM-YYYY
+   Ref: HUM-XXXX, HUM-ZZZZ
+   CVE: CVE-YYYY-NNNNN, CVE-YYYY-MMMMM
+   EOF
+   lab mr create --draft -F /tmp/mr-description.txt
+   ```
+
+   Add the MR link as a comment on the HUM task ticket so
+   future lookups can see the work is already in review:
+
+   ```bash
+   rhjira comment HUM-YYYY --noeditor \
+     -m "MR: https://gitlab.com/redhat/hummingbird/rpms/-/merge_requests/NNNN"
+   ```
+
+   After the MR pipeline has started, trigger the automated code
+   review. Check the pipeline status first:
+
+   ```bash
+   lab ci status !NNNN
+   ```
+
+   Once the pipeline is running, trigger the review:
+
+   ```bash
+   lab mr comment !NNNN -m "/hummingbird code-review"
+   ```
 
 1. **Close the task ticket.** After the MR is created (do not
    wait for it to merge), transition the HUM task ticket to
@@ -418,8 +500,12 @@ include whichever of the following apply:
 Use Jira wiki markup in comments (`{noformat}`, `*bold*`,
 `{{monospace}}`).
 
-Post the comment to the Jira ticket using wiki markup
-formatting.
+```bash
+cat > /tmp/cve-comment.txt << 'EOF'
+<comment text>
+EOF
+rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
+```
 
 ## Resolution and VEX justification reference
 
@@ -448,12 +534,11 @@ formatting.
 1. **Create HUM tasks** for any backport or update work. Link them
    to the CVE tracker(s) with blockers.
 
-1. **Use the Jira CLI** for all Jira operations. Do not use the
-   Atlassian MCP or other tools.
+1. **Use rhjira** for all Jira operations. Do not use the Atlassian
+   MCP or other tools.
 
-1. **Jira CLI tools may not support label changes.** Label
-   additions or removals may need to be done manually in the
-   Jira web UI.
+1. **rhjira edit does NOT support label changes.** Label additions
+   or removals must be done manually in the Jira web UI.
 
 1. **Comment first, then act.** Always document analysis before
    changing ticket state or fields.
