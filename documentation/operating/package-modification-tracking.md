@@ -171,10 +171,11 @@ together).
 
 **Metadata fields:**
 
-| Field                           | Description                                       | Example              |
-| ------------------------------- | ------------------------------------------------- | -------------------- |
-| `track_upstream`                | `"latest"` or version prefix to constrain updates | `"latest"`, `"1.26"` |
-| `release_monitoring_project_id` | Anitya project ID (int) or upstream name (str)    | `13254`, `"golang"`  |
+| Field                           | Description                                       | Example                |
+| ------------------------------- | ------------------------------------------------- | ---------------------- |
+| `track_upstream`                | `"latest"` or version prefix to constrain updates | `"latest"`, `"1.26"`   |
+| `release_monitoring_project_id` | Anitya project ID (int) or upstream name (str)    | `13254`, `"golang"`    |
+| `version_suffix_strip`          | Suffix to strip from Anitya-reported versions     | `"-RELEASE"`           |
 
 These fields affect two systems:
 
@@ -197,6 +198,18 @@ lookup:
 {
   "release_monitoring_project_id": 13254,
   "track_upstream": "3.11"
+}
+```
+
+Some upstream projects tag releases with a suffix that is not part of the RPM version (e.g.,
+`swift-6.3.3-RELEASE`). After Anitya strips the version prefix, the reported version still contains
+the suffix (`6.3.3-RELEASE`), which is incompatible with RPM's `Version:` field (hyphens are not
+allowed). Use `version_suffix_strip` to remove it before comparison and update:
+
+```json
+{
+  "release_monitoring_project_id": 21267,
+  "version_suffix_strip": "-RELEASE"
 }
 ```
 

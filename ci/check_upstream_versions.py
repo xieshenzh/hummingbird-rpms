@@ -434,11 +434,11 @@ def download_new_sources(
     """
     Download new source archives after a version update.
 
-    For each Source/Source0/... in the spec that is a URL containing the
-    old version, check if its filename appears in the 'sources' file.
-    If it does, construct the new URL (by re-reading the spec after the
-    version update), download the new source, compute its hash, and
-    update the 'sources' file.
+    Compares the source URLs in the updated spec against the existing
+    ``sources`` file.  Any source whose filename is not already present
+    is downloaded and uploaded to the lookaside cache.  Stale entries
+    (filenames in ``sources`` that no longer appear in the spec) are
+    removed.
 
     Args:
         package: Package name
@@ -460,60 +460,54 @@ def download_new_sources(
     # The spec has already been updated to new_version at this point.
     # Get the new expanded source URLs from the updated spec.
     new_source_urls = _get_spec_source_urls(str(spec_files[0]), str(package_dir))
+    spec_filenames = {os.path.basename(url) for url in new_source_urls.values()}
 
-    # Build old filename -> new URL mapping.
-    # For each source URL that contains the new version, derive what the
-    # old filename would have been and check if it was in the sources file.
     downloaded = []
     for src_num, new_url in new_source_urls.items():
         new_filename = os.path.basename(new_url)
 
-        # Derive what the old filename was by replacing new_version
-        # with old_version in the filename
-        old_filename = new_filename.replace(new_version, old_version)
-
-        # Only process if the old filename was in the sources file
-        # and the filename actually changed (contains the version)
-        if old_filename == new_filename:
-            continue
-        if old_filename not in sources_filenames:
+        if new_filename in sources_filenames:
             continue
 
-        logger.debug(f"{package}: Source{src_num}: {old_filename} -> {new_filename}")
+        logger.debug(f"{package}: Source{src_num}: new source {new_filename}")
 
-        # Download the new source
         dest = package_dir / new_filename
         logger.info(f"{package}: downloading {new_url}")
         _download_file(new_url, dest)
 
-        # Upload to lookaside cache
-        old_entry = next(e for e in sources_entries if e["filename"] == old_filename)
-        algo = old_entry["algo"]
-        _upload_to_lookaside(dest, package, algo)
+        _upload_to_lookaside(dest, package, "SHA512")
 
-        # Compute hash and update the sources entry
-        new_hash = _compute_file_hash(dest, algo)
-        old_entry["filename"] = new_filename
-        old_entry["hash"] = new_hash
-
+        new_hash = _compute_file_hash(dest, "SHA512")
+        sources_entries.append(
+            {"algo": "SHA512", "filename": new_filename, "hash": new_hash}
+        )
         downloaded.append(new_filename)
 
-        # Remove old source file if it exists and is different
-        if old_filename != new_filename:
-            old_file = package_dir / old_filename
-            if old_file.exists():
-                old_file.unlink()
-                logger.debug(f"{package}: removed old source {old_filename}")
-
-    # Regenerate vendor archive for go-vendor-tools packages
+    # Regenerate vendor archive for go-vendor-tools packages (must run
+    # before stale-entry removal so the old vendor entry is still present).
     vendor_file = _regenerate_vendor_archive(
         package, old_version, new_version, sources_entries,
     )
     if vendor_file:
         downloaded.append(vendor_file)
 
-    # Write updated sources file if anything changed
-    if downloaded:
+    # Remove stale entries whose filenames no longer appear in the spec
+    # or as a current vendor archive.
+    current_filenames = spec_filenames | {
+        e["filename"] for e in sources_entries if "-vendor.tar." in e["filename"]
+    }
+    stale = sources_filenames - current_filenames
+    if stale:
+        for filename in sorted(stale):
+            logger.debug(f"{package}: removing stale source entry {filename}")
+            old_file = package_dir / filename
+            if old_file.exists():
+                old_file.unlink()
+        sources_entries = [
+            e for e in sources_entries if e["filename"] not in stale
+        ]
+
+    if downloaded or stale:
         _write_sources_file(sources_path, sources_entries)
 
     return downloaded
@@ -943,11 +937,13 @@ def check_package_version(
     meta = get_package_metadata(package)
     track_version = None
     project_id = None
+    version_suffix_strip = None
     if meta:
         track_upstream = meta.get("track_upstream")
         if track_upstream and track_upstream != "latest":
             track_version = track_upstream
         project_id = meta.get("release_monitoring_project_id")
+        version_suffix_strip = meta.get("version_suffix_strip")
 
     # Query release-monitoring.org
     try:
@@ -964,6 +960,19 @@ def check_package_version(
             has_update=False,
             error=str(e),
         )
+
+    # Strip a known suffix from upstream versions if configured
+    # (e.g., swift-lang reports "6.3.3-RELEASE" from Anitya).
+    if version_suffix_strip:
+        def _strip_suffix(v: str) -> str:
+            return v.removesuffix(version_suffix_strip) if v else v
+
+        if anitya_data.get("stable_versions"):
+            anitya_data["stable_versions"] = [
+                _strip_suffix(v) for v in anitya_data["stable_versions"]
+            ]
+        if anitya_data.get("version"):
+            anitya_data["version"] = _strip_suffix(anitya_data["version"])
 
     # Prefer stable_versions[0] over version field, as version can sometimes
     # contain incorrect data (e.g., development tags that aren't real releases)

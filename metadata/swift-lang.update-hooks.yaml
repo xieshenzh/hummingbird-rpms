@@ -1,0 +1,10 @@
+# Swift releases coordinate the revisions of all toolchain repositories in
+# update-checkout-config.json. Regenerate the complete forge source list from
+# that configuration instead of changing Version alone.
+update_spec: |
+  ./update-swift-version.sh "${UPDATE_NEW_VERSION}"
+  sed -Ei 's/^Release:.*/Release:        0.1%{?dist}/' "${UPDATE_SPEC_FILE}"
+
+# The default download_sources phase expands the regenerated %forge sources,
+# uploads new archives to the Hummingbird lookaside cache, refreshes SHA-512
+# entries, and removes stale entries.

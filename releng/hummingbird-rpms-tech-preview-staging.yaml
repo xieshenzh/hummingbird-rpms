@@ -958,6 +958,8 @@ spec:
           contentType: rpm
         - name: svt-av1-main
           contentType: rpm
+        - name: swift-lang-main
+          contentType: rpm
         - name: syft-main
           contentType: rpm
         - name: sysprof-main

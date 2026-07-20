@@ -685,6 +685,55 @@ def test_check_package_version_project_id_string_without_track_version(cuv_modul
     assert result.has_update is True
 
 
+def test_check_package_version_strips_version_suffix(cuv_module, workdir: Path) -> None:
+    """Strips configured suffix from upstream versions before comparing."""
+    _create_package(workdir, 'swift-lang', '6.3.2',
+                    metadata={'version': '6.3.2', 'release': '5',
+                              'release_monitoring_project_id': 21267,
+                              'version_suffix_strip': '-RELEASE'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'version': '6.3.3-RELEASE',
+        'stable_versions': ['6.3.3-RELEASE', '6.3.2-RELEASE'],
+        'id': 21267,
+    }
+
+    with patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response):
+        result = cuv_module.check_package_version('swift-lang')
+
+    assert result.has_update is True
+    assert result.upstream_version == '6.3.3'
+    assert result.current_version == '6.3.2'
+
+
+def test_check_package_version_suffix_strip_no_update(cuv_module, workdir: Path) -> None:
+    """No update when stripped version matches current."""
+    _create_package(workdir, 'swift-lang', '6.3.2',
+                    metadata={'version': '6.3.2', 'release': '5',
+                              'release_monitoring_project_id': 21267,
+                              'version_suffix_strip': '-RELEASE'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'version': '6.3.2-RELEASE',
+        'stable_versions': ['6.3.2-RELEASE'],
+        'id': 21267,
+    }
+
+    with patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response):
+        result = cuv_module.check_package_version('swift-lang')
+
+    assert result.has_update is False
+    assert result.upstream_version == '6.3.2'
+
+
 def test_matches_track_version(cuv_module) -> None:
     """_matches_track_version correctly handles prefix matching."""
     matches = cuv_module._matches_track_version
@@ -778,7 +827,7 @@ def test_download_new_sources_download_failure(cuv_module, workdir: Path) -> Non
 
 
 def test_download_new_sources_no_version_in_filename(cuv_module, workdir: Path) -> None:
-    """Skips sources where filename does not contain the version."""
+    """Skips sources whose filename already appears in the sources file."""
     _create_package(
         workdir, 'pkg', '2.0',
         sources={'static-data.tar.gz': 'somehash'},
@@ -791,6 +840,70 @@ def test_download_new_sources_no_version_in_filename(cuv_module, workdir: Path) 
         downloaded = cuv_module.download_new_sources('pkg', '1.0', '2.0')
 
     assert downloaded == []
+
+
+def test_download_new_sources_independent_version_bump(
+    cuv_module, workdir: Path
+) -> None:
+    """Downloads sources whose version changed independently of the main package."""
+    pkg_dir = _create_package(
+        workdir, 'pkg', '2.0',
+        sources={
+            'pkg-1.0.tar.gz': 'oldhash_main',
+            'dep-3.0.tar.gz': 'oldhash_dep',
+        },
+    )
+
+    with patch.object(cuv_module, '_download_file') as mock_dl, \
+         patch.object(cuv_module, '_upload_to_lookaside') as mock_ul, \
+         patch.object(cuv_module, '_compute_file_hash', return_value='newhash'), \
+         patch.object(cuv_module, '_get_spec_source_urls',
+                      return_value={
+                          0: 'https://example.com/pkg-2.0.tar.gz',
+                          1: 'https://example.com/dep-4.0.tar.gz',
+                      }):
+
+        cuv_module.RPMS_DIR = workdir / 'rpms'
+        downloaded = cuv_module.download_new_sources('pkg', '1.0', '2.0')
+
+    assert sorted(downloaded) == ['dep-4.0.tar.gz', 'pkg-2.0.tar.gz']
+    assert mock_dl.call_count == 2
+    assert mock_ul.call_count == 2
+
+    entries = cuv_module._parse_sources_file(pkg_dir / 'sources')
+    filenames = {e['filename'] for e in entries}
+    assert filenames == {'pkg-2.0.tar.gz', 'dep-4.0.tar.gz'}
+
+
+def test_download_new_sources_removes_stale_entries(
+    cuv_module, workdir: Path
+) -> None:
+    """Removes sources entries that no longer appear in the spec."""
+    pkg_dir = _create_package(
+        workdir, 'pkg', '2.0',
+        sources={
+            'pkg-1.0.tar.gz': 'oldhash',
+            'removed-dep-1.0.tar.gz': 'oldhash_removed',
+        },
+    )
+
+    with patch.object(cuv_module, '_download_file'), \
+         patch.object(cuv_module, '_upload_to_lookaside'), \
+         patch.object(cuv_module, '_compute_file_hash', return_value='newhash'), \
+         patch.object(cuv_module, '_get_spec_source_urls',
+                      return_value={
+                          0: 'https://example.com/pkg-2.0.tar.gz',
+                      }):
+
+        cuv_module.RPMS_DIR = workdir / 'rpms'
+        downloaded = cuv_module.download_new_sources('pkg', '1.0', '2.0')
+
+    assert downloaded == ['pkg-2.0.tar.gz']
+
+    entries = cuv_module._parse_sources_file(pkg_dir / 'sources')
+    filenames = {e['filename'] for e in entries}
+    assert 'removed-dep-1.0.tar.gz' not in filenames
+    assert 'pkg-2.0.tar.gz' in filenames
 
 
 #

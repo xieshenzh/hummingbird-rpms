@@ -1,0 +1,5 @@
+summary: Basic swift-lang functionality tests
+discover:
+  how: fmf
+execute:
+  how: tmt

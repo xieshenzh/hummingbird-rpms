@@ -1,0 +1,5 @@
+summary: Compile and run a basic Swift program and test SPM
+test: ./test.sh
+require:
+  - swift-lang
+framework: shell
