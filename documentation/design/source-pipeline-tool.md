@@ -95,7 +95,8 @@ podman run --rm \
   source-pipeline:latest \
   --version <new-version> \
   [--old-version <old-version>] \
-  [--verify-patches /patches-from-upstream]
+  [--verify-patches /patches-from-upstream] \
+  [--dry-run]
 ```
 
 **Inputs (mounted read-only):**
@@ -115,6 +116,10 @@ podman run --rm \
 - `0` — success, all checks passed
 - `1` — error (download failure, tool error)
 - `2` — policy violation (verification or constraint failure)
+
+`--dry-run` runs all stages through Verify and Policy but skips Emit — no tarballs are written to
+`/output`. Exit codes and `report.json` behave identically, so developers can preview what would
+happen without producing artifacts. Useful for validating a new pipeline YAML before committing.
 
 On any non-zero exit, `report.json` is still written with the failure details (stage, error type,
 message). The calling automation uses this to log the failure and skip the package — no commit is
@@ -151,6 +156,10 @@ Applies per-package source modifications.
 - **UI asset builds** — builds JavaScript/TypeScript UI assets from source (for packages like
   Prometheus, Jaeger, Grafana that currently vendor pre-built UI)
 - **Custom transforms** — escape hatch for arbitrary commands when built-in stages are insufficient
+- **Toolchain versioning** — packages can declare required toolchain versions (Node.js, Go, Rust,
+  etc.) via a `toolchain:` section. The container ships defaults; per-package overrides ensure
+  that `build-ui`, `vendor`, and `run:` steps use the correct toolchain without requiring
+  separate container images per package
 
 ### 3. Verify
 
@@ -260,20 +269,27 @@ transform:
   # Runs before the vendor stage so the pinned versions are included in
   # the vendor archive. Re-applied on every source generation, so upstream
   # updates cannot silently revert a security fix.
+  #
+  # Version constraints are always minimum versions — the version field
+  # means "at least this version." The tool translates to ecosystem-native
+  # operations:
+  #   Go:    go get <package>@v<version> (minimum version selection)
+  #   npm:   npm install <package>@">= <version>"
+  #   Cargo: set dependency requirement to ">= <version>" in Cargo.toml
   - vendor-pin:
       - package: golang.org/x/crypto
         ecosystem: go
-        version: ">= 0.31.0"
+        version: "0.31.0"
         reason: "CVE-2024-45337"
 
       - package: sanitize-html
         ecosystem: npm
-        version: ">= 2.17.5"
+        version: "2.17.5"
         reason: "CVE-2024-XXXXX"
 
       - package: tokio
         ecosystem: cargo
-        version: ">= 1.38.1"
+        version: "1.38.1"
         reason: "CVE-2024-YYYYY"
 
   # Custom command (escape hatch)
@@ -286,6 +302,21 @@ transform:
       ecosystem: npm                     # npm | yarn
       source-dir: "web/ui"
       output: "${PACKAGE}-${VERSION}-ui.tar.gz"
+
+# Toolchain requirements (optional)
+# Declares the toolchain versions a package needs during source generation.
+# The container ships default toolchain versions; this section overrides them
+# when a package requires something different. Any primitive that invokes a
+# toolchain (vendor, build-ui, run) uses the versions declared here.
+#
+# Packages that don't declare a toolchain section get the container defaults.
+# If a required toolchain is not available in the container image, the pipeline
+# fails with exit code 1 and a clear message naming the missing tool.
+toolchain:
+  node: "20"                             # Node.js version for build-ui / npm vendor
+  go: "1.23"                             # Go version for go vendor
+  rust: "1.80"                           # Rust version for cargo vendor
+  python: "3.12"                         # Python version for custom transforms
 
 # Integrity verification (optional)
 verify:
@@ -309,16 +340,17 @@ verify:
 # Validates the final artifacts. vendor-constraints acts as a safety net:
 # if vendor-pin (above) is used, policy confirms the pin took effect; if
 # vendor-pin is not used, policy catches violations that need manual action.
+# Uses the same minimum version semantics as vendor-pin.
 policy:
   vendor-constraints:
     - package: sanitize-html
       ecosystem: npm
-      version: ">= 2.17.5"
+      version: "2.17.5"
       reason: "CVE-2024-XXXXX"
 
     - package: golang.org/x/crypto
       ecosystem: go
-      version: ">= 0.31.0"
+      version: "0.31.0"
       reason: "CVE-2024-45337"
 
 # Patch verification (optional)
@@ -485,6 +517,13 @@ error.
         "current_version": "0.31.0",
         "action": "drop",
         "result": "removed — version 0.31.0 is outside applies-to range"
+      },
+      {
+        "file": "cve-2024-99999.patch",
+        "applies_to": "< 2.0.0",
+        "current_version": "2.0.0",
+        "action": "drop",
+        "result": "flagged — patch is applied inside a conditional %if block; manual removal required"
       },
       {
         "file": "distro-branding.patch",
@@ -849,6 +888,22 @@ podman run --rm \
 #   curl-8.21.0.tar.xz.asc
 #   sources
 #   report.json
+```
+
+To preview without producing artifacts:
+
+```bash
+podman run --rm \
+  -v ./rpms/curl:/package:ro \
+  -v ./metadata/curl.source-pipeline.yaml:/pipeline.yaml:ro \
+  -v ./metadata/gpg-keys:/gpg-keys:ro \
+  quay.io/hummingbird-ci/source-pipeline:latest \
+  --version 8.21.0 \
+  --dry-run
+
+# Runs Fetch → Transform → Verify → Policy but skips Emit.
+# Exit code and report.json reflect what would happen.
+# No /output mount needed.
 ```
 
 ## Migration Path
