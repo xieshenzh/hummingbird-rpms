@@ -313,10 +313,10 @@ transform:
 # If a required toolchain is not available in the container image, the pipeline
 # fails with exit code 1 and a clear message naming the missing tool.
 toolchain:
-  node: "20"                             # Node.js version for build-ui / npm vendor
-  go: "1.23"                             # Go version for go vendor
-  rust: "1.80"                           # Rust version for cargo vendor
-  python: "3.12"                         # Python version for custom transforms
+  node: "20"                             # Node.js version for build-ui, npm vendor, and run: steps
+  go: "1.23"                             # Go version for go vendor and run: steps
+  rust: "1.80"                           # Rust version for cargo vendor and run: steps
+  python: "3.12"                         # Python version for run: steps
 
 # Integrity verification (optional)
 verify:
@@ -647,6 +647,8 @@ fetch:
 transform:
   - run: |
       curl -fSL -o ocb "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/cmd%2Fbuilder%2Fv${VERSION}/ocb_${VERSION}_linux_amd64"
+      curl -fSL -o ocb_checksums.txt "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/cmd%2Fbuilder%2Fv${VERSION}/ocb_${VERSION}_checksums.txt"
+      sha256sum -c --ignore-missing ocb_checksums.txt
       chmod +x ocb
       tar -xzf "opentelemetry-collector-releases-${VERSION}.tar.gz"
       cd "opentelemetry-collector-releases-${VERSION}"
