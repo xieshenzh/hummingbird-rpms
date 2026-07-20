@@ -782,6 +782,61 @@ def test_get_all_packages_ignores_hidden(cuv_module, workdir: Path) -> None:
 #
 
 
+def test_get_spec_source_urls_includes_lua_generated_source(
+    cuv_module, tmp_path: Path
+) -> None:
+    """Reads Source tags emitted by Lua during RPM parsing."""
+    spec = tmp_path / 'dynamic.spec'
+    spec.write_text(r'''Version: 1.0
+%{lua:
+print("Source7: https://example.com/generated-1.0.tar.gz\n")
+}
+Name: dynamic
+Release: 1
+Summary: Dynamic source test
+License: MIT
+Source99: local.conf
+
+%description
+Dynamic source test
+
+%files
+''')
+
+    sources = cuv_module._get_spec_source_urls(str(spec), str(tmp_path))
+
+    assert sources == {
+        7: 'https://example.com/generated-1.0.tar.gz',
+    }
+
+
+def test_get_spec_source_urls_includes_sourcelist(
+    cuv_module, tmp_path: Path
+) -> None:
+    """Preserves support for sources declared in a sourcelist section."""
+    spec = tmp_path / 'sourcelist.spec'
+    spec.write_text('''Name: sourcelist-test
+Version: 1.0
+Release: 1
+Summary: Sourcelist test
+License: MIT
+
+%sourcelist
+https://example.com/sourcelist-test-1.0.tar.gz
+
+%description
+Sourcelist test
+
+%files
+''')
+
+    sources = cuv_module._get_spec_source_urls(str(spec), str(tmp_path))
+
+    assert sources == {
+        0: 'https://example.com/sourcelist-test-1.0.tar.gz',
+    }
+
+
 def test_download_new_sources(cuv_module, workdir: Path) -> None:
     """Downloads new source, updates sources file, uploads to lookaside."""
     pkg_dir = _create_package(
@@ -824,6 +879,54 @@ def test_download_new_sources_download_failure(cuv_module, workdir: Path) -> Non
         cuv_module.RPMS_DIR = workdir / 'rpms'
         with pytest.raises(Exception, match='network error'):
             cuv_module.download_new_sources('pkg', '1.0', '2.0')
+
+
+def test_download_new_sources_refuses_empty_source_discovery(
+    cuv_module, workdir: Path
+) -> None:
+    """Does not erase sources when source discovery unexpectedly returns nothing."""
+    pkg_dir = _create_package(
+        workdir, 'pkg', '2.0',
+        sources={'pkg-1.0.tar.gz': 'oldhash'},
+    )
+    original_sources = (pkg_dir / 'sources').read_text()
+
+    with patch.object(cuv_module, '_get_spec_source_urls', return_value={}), \
+         patch.object(cuv_module, '_get_spec_sources', return_value={}):
+        cuv_module.RPMS_DIR = workdir / 'rpms'
+        with pytest.raises(RuntimeError, match='refusing to remove 1 existing'):
+            cuv_module.download_new_sources('pkg', '1.0', '2.0')
+
+    assert (pkg_dir / 'sources').read_text() == original_sources
+
+
+def test_download_new_sources_allows_local_only_sources(
+    cuv_module, workdir: Path
+) -> None:
+    """Preserves lookaside entries declared as local-only spec sources."""
+    pkg_dir = _create_package(
+        workdir, 'pkg', '2.0',
+        sources={'local-data.tar.gz': 'oldhash'},
+    )
+    (pkg_dir / 'pkg.spec').write_text('''Name: pkg
+Version: 2.0
+Release: 1
+Summary: Local source test
+License: MIT
+Source0: local-data.tar.gz
+
+%description
+Local source test
+
+%files
+''')
+    original_sources = (pkg_dir / 'sources').read_text()
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    downloaded = cuv_module.download_new_sources('pkg', '1.0', '2.0')
+
+    assert downloaded == []
+    assert (pkg_dir / 'sources').read_text() == original_sources
 
 
 def test_download_new_sources_no_version_in_filename(cuv_module, workdir: Path) -> None:
