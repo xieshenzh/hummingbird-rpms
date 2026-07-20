@@ -159,6 +159,9 @@ libxml2:
 libxslt:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+libyuv:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 llvm:
   timeout_hours: 12
   build_platforms:

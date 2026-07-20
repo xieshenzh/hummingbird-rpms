@@ -1,7 +1,8 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "0.62.20260213git6067afd",
+  "modification_reason": "update to 20260714 snapshot for CVE-2026-15767",
+  "modification_status": "modified",
+  "release": "0.63.20260714gitafff0cf",
   "sha": "10ae99a60fa82e911d04df30760d4b9be52797c4",
   "source": "https://src.fedoraproject.org/rpms/libyuv.git",
   "upstream_repo": "https://chromium.googlesource.com/libyuv/libyuv",

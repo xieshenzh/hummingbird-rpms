@@ -333,6 +333,14 @@ contains the fix:
    with `/hummingbird code-review` to trigger the automated code
    review.
 
+1. **Close the task ticket.** After the MR is created (do not
+   wait for it to merge), transition the HUM task ticket to
+   Closed:
+
+   ```bash
+   jira issue move HUM-YYYY "Closed"
+   ```
+
 If multiple CVE trackers are fixed by the same version bump,
 create one task and link all CVE trackers to it. Close any
 duplicate tasks as "Won't Do".

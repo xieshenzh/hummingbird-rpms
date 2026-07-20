@@ -1,10 +1,13 @@
-%global git_commit 6067afde563c3946eebd94f146b3824ab7a97a9c
-%global git_date 20260213
+%global git_commit afff0cf68bdd2d713c81040a4bd1b7c7fe69e39c
+%global git_date 20260714
+
+# LTO causes OOM kills during unit test compilation on build hosts
+%define _lto_cflags %{nil}
 
 Name:		libyuv
 Summary:	YUV conversion and scaling functionality library
 Version:	0
-Release:	0.62.20260213git6067afd.1%{?dist}
+Release:	0.63.20260714gitafff0cf.1%{?dist}
 License:	BSD-3-Clause
 Url:		https://chromium.googlesource.com/libyuv/libyuv
 VCS:		git:%{url}
