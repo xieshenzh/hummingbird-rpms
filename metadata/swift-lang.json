@@ -1,13 +1,13 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Fix Swift patch-release branch selection for automated updates",
+  "modification_reason": "Update to upstream version 6.3.3",
   "modification_status": "modified",
-  "release": "5",
+  "release": "0.1",
   "release_monitoring_project_id": 21267,
-  "version_suffix_strip": "-RELEASE",
   "sha": "001d0b1d64b260f62eefac7b70566b5905a59afe",
   "source": "https://src.fedoraproject.org/rpms/swift-lang.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/swiftlang/swift",
-  "version": "6.3.2"
+  "version": "6.3.3",
+  "version_suffix_strip": "-RELEASE"
 }
