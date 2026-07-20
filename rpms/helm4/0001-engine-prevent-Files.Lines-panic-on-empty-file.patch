@@ -1,0 +1,33 @@
+From ba6c9a29efa7bf9198dad6a5ec12b4fb30c96017 Mon Sep 17 00:00:00 2001
+From: Mahesh Sadupalli <mahesh.sadupalli@gmail.com>
+Date: Fri, 3 Jul 2026 20:28:01 +0200
+Subject: [PATCH] fix(engine): prevent Files.Lines panic on empty file
+
+Files.Lines guards against a nil entry but an empty file inside a
+chart is stored as a non-nil zero-length byte slice, so the trailing
+newline check indexes s[-1] and panics. The engine recovers the panic
+into a render error, making template/install/upgrade/lint operations
+that reference the file fail.
+
+Backport only the runtime fix for helm4 v4.2.3.
+
+---
+ pkg/engine/files.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pkg/engine/files.go b/pkg/engine/files.go
+index 7834cac2c19..eeb04d76c74 100644
+--- a/pkg/engine/files.go
++++ b/pkg/engine/files.go
+@@ -154,7 +154,7 @@ func (f files) AsSecrets() string {
+ // {{ range .Files.Lines "foo/bar.html" }}
+ // {{ . }}{{ end }}
+ func (f files) Lines(path string) []string {
+-	if f == nil || f[path] == nil {
++	if f == nil || len(f[path]) == 0 {
+ 		return []string{}
+ 	}
+ 	s := string(f[path])
+-- 
+2.50.1
+
