@@ -1,0 +1,65 @@
+execute:
+  how: tmt
+
+provision:
+  hardware:
+    memory: '>= 3 GB'
+
+environment:
+  pybasever: '3.10'
+
+discover:
+  - name: tests_python
+    how: shell
+    url: https://src.fedoraproject.org/tests/python.git
+    tests:
+    - name: smoke
+      path: /smoke
+      test: "VERSION=${pybasever} ./venv.sh"
+    - name: smoke_virtualenv
+      path: /smoke
+      test: "VERSION=${pybasever} METHOD=virtualenv ./venv.sh"
+    - name: debugsmoke
+      path: /smoke
+      test: "PYTHON=python${pybasever}d TOX=false VERSION=${pybasever} ./venv.sh"
+    - name: selftest
+      path: /selftest
+      test: "VERSION=${pybasever} X='' ./parallel.sh"
+    - name: debugtest
+      path: /selftest
+      test: "VERSION=${pybasever} PYTHON=python${pybasever}d X='' ./parallel.sh"
+    - name: debugflags
+      path: /flags
+      test: "python${pybasever}d ./assertflags.py -O0"
+    - name: marshalparser
+      path: /marshalparser
+      test: "VERSION=${pybasever} SAMPLE=10 ./test_marshalparser_compatibility.sh"
+    - name: required_symbols
+      path: /required-symbols
+      test: "VERSION=${pybasever} ./check.sh"
+
+prepare:
+  - name: Install dependencies
+    how: install
+    package:
+    - gcc  # for extension building in venv and selftest
+    - gdb  # for test_gdb
+    - "python${pybasever}"  # the test subject
+    - "python${pybasever}-debug"  # for leak testing
+    - "python${pybasever}-devel"  # for extension building in venv and selftest
+    - "python${pybasever}-tkinter"  # for selftest
+    - "python${pybasever}-test"  # for selftest
+    - tox  # for venv tests
+    - virtualenv  # for virtualenv tests
+    - glibc-all-langpacks # for locale tests
+    - marshalparser  # for testing compatibility (magic numbers) with marshalparser
+    - binutils  # for nm (symbol inspection)
+    - rpm  # for debugging
+    - dnf  # for upgrade and downgrade
+  - name: Update packages
+    how: shell
+    script: dnf upgrade -y
+  - name: rpm_qa
+    order: 100
+    how: shell
+    script: rpm -qa | sort | tee $TMT_PLAN_DATA/rpmqa.txt

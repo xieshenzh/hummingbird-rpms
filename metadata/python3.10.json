@@ -1,0 +1,10 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "3",
+  "sha": "c30eb404789121d3ed86e736ccdf5952df55279a",
+  "source": "https://src.fedoraproject.org/rpms/python3.10.git",
+  "upstream_branch": "3.10",
+  "upstream_repo": "https://github.com/python/cpython",
+  "version": "3.10.20"
+}
