@@ -366,7 +366,7 @@ post:
 The following variables are available in all string values:
 
 | Variable | Value |
-|----------|-------|
+| -------- | ----- |
 | `${VERSION}` | New upstream version (e.g., `1.25.3`) |
 | `${VERSION_MAJOR}` | Major version component (e.g., `1`) |
 | `${VERSION_MINOR}` | Minor version component (e.g., `25`) |
@@ -627,7 +627,7 @@ coverage:
 **Fully declarative (no `run:` needed) — ~30 script files (15 unique patterns):**
 
 | Built-in primitive | Packages covered |
-|--------------------|------------------|
+| ------------------ | ---------------- |
 | `vendor: {ecosystem: go}` | caddy, nats-server×2, oauth2-proxy |
 | `vendor: {ecosystem: go, submodules: [...]}` | etcd (3 submodules) |
 | `strip-tarball: {remove: [...]}` | nodejs×5, cyrus-sasl, perl-libnet, java in-tree libs×2 |
@@ -638,7 +638,7 @@ coverage:
 **Partially declarative (generic primitives + 1–2 `run:` steps):**
 
 | Package | Generic part | Custom `run:` step |
-|---------|-------------|-------------------|
+| ------- | ------------ | ------------------ |
 | otel-collector, otel-collector-contrib | `vendor: {ecosystem: go}` | OCB binary code generation |
 | java-openjdk×2 | `strip-tarball`, `fetch: {git}` | `./configure` + `make store-source-revision` (needs boot JDK) |
 | selinux-policy | `fetch: {git}` (×3 repos) | Multi-repo selective archiving |
@@ -646,7 +646,7 @@ coverage:
 **Genuinely custom (`run:` required) — 7 packages:**
 
 | Package | Why it can't be declarative |
-|---------|----------------------------|
+| ------- | --------------------------- |
 | nss-fips | Container-based RPM download with subscription-manager credentials + QEMU cross-arch |
 | openssl-fips-provider | Container-based SRPM download + nested RPM extraction |
 | ca-certificates | Interactive multi-source crypto trust data merging |
@@ -689,9 +689,9 @@ Hummingbird-specific wiring.
 ### Two update systems
 
 | System | Packages | Source of tarballs | Hook system |
-|--------|----------|--------------------|-------------|
+| ------ | -------- | ------------------ | ----------- |
 | `dist_git.py update` | 450 (clean + modified) | Fedora lookaside cache (via `sources` file copied from Fedora dist-git) | None |
-| `check_upstream_versions.py` | 22 (native) | Upstream URLs (via `download_sources` hooks or default spec URL download) | Yes — `update_spec`, `download_sources`, `post_update` |
+| `check_upstream_versions.py` | 22 (native) | Upstream URLs (via `download_sources` hooks or default spec URL download) | Yes: `update_spec`, `download_sources`, `post_update` |
 
 **`dist_git.py update` flow:**
 
@@ -723,7 +723,7 @@ Hooks are defined in `metadata/<package>.update-hooks.yaml`. 12 packages current
 Configured in `mock/dist-git-client.ini`:
 
 | Backend | URL pattern | Used by |
-|---------|-------------|---------|
+| ------- | ----------- | ------- |
 | Fedora | `src.fedoraproject.org/repo/pkgs/rpms/{name}/{filename}/{hashtype}/{hash}/{filename}` | ~410 packages (default) |
 | CentOS Stream | `sources.stream.centos.org/sources/rpms/{name}/...` | 1 package (`rust-rpm-sequoia`) |
 | Hummingbird | `d1766whheab9hg.cloudfront.net/rpms/{name}/...` (S3: `arr-hummingbird-prod-dist-git-cache`) | ~40 packages (native + forked) |
@@ -906,3 +906,43 @@ Initially driven by CVE fixes that need to survive upstream updates.
 Enable `patches.verify` and `patches.classify` for packages. Start with warn-only
 (`fail-on-unverified: false`), gather data on classification accuracy, then selectively enable
 fail-on-unverified for high-risk packages.
+
+## Operational Health
+
+### Escape hatch ratio
+
+The primary health metric for the source pipeline is the **escape hatch ratio**: the
+percentage of pipeline YAML definitions that contain `run:` blocks (in `transform` or `post`
+sections) relative to the total number of pipeline YAML definitions.
+
+A `run:` block means the package needs custom shell commands that the built-in primitives
+cannot express. Every concern that accumulates over time -- ecosystem coverage gaps, upstream
+behavioral drift, lock file format churn, new language ecosystems -- ultimately manifests the
+same way: a package that cannot be expressed declaratively gets a `run:` block. This makes the
+ratio a single number that aggregates all pressures on the declarative model.
+
+**Interpretation:**
+
+| Ratio | Signal |
+| ----- | ------ |
+| < 15% | Healthy. The primitive set covers real-world needs. |
+| 15-25% | Watch. Look for repeated patterns in `run:` blocks that should become primitives. |
+| > 25% | Action needed. The YAML is becoming a workflow engine. Either expand the primitive set or reconsider the abstraction. |
+
+**When the ratio climbs,** examine the `run:` blocks for repeated patterns. If three or more
+packages use `run:` to do the same thing (e.g. a new vendoring ecosystem, a common tarball
+repack operation), that pattern should become a built-in primitive. The ratio climbing is not
+inherently bad -- it is bad only if the response is to keep adding one-off scripts instead of
+investing in the primitive set.
+
+### CI enforcement
+
+The `ci/validate_pipeline_health.py` script scans all `metadata/*.source-pipeline.yaml` files,
+calculates the escape hatch ratio, and reports the result. It runs as part of `make check`.
+
+- **During migration (Phases 1-3):** warn mode. The script prints the ratio and flags if it
+  exceeds 25%, but does not fail CI. This avoids blocking legitimate migration work where
+  some packages temporarily need `run:` blocks before new primitives are added.
+- **After Phase 3:** enable `--fail` mode. Once the primitive set is established and migration
+  is complete, exceeding 25% is a hard CI failure that forces a conversation before a `run:`
+  block is added.
