@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "b6555fe72d034e46b14ab6acd9b0907e5ab949ba",
+  "release": "2",
+  "sha": "832a2ffbffbcdb75d2f7ab05e9df696878b3e3ea",
   "source": "https://src.fedoraproject.org/rpms/libipt.git",
   "upstream_repo": "https://github.com/intel/libipt",
   "version": "2.2"
