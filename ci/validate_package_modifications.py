@@ -202,6 +202,10 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     bad_commits = [line for line in bad_commits if not line.startswith('2cf72f98ca36af5376b55db3f543fa3d434b98bd ')]
     bad_commits = [line for line in bad_commits if not line.startswith('e2fb14572622cca265c32ec43ac40886fc0fd562 ')]
 
+    # libpng CVE-2026-34757 update to 1.6.57-0 was committed without the Upstream: trailer.
+    # Superseded by Fedora update 626c31b9 (1.6.58-1).
+    bad_commits = [line for line in bad_commits if not line.startswith('f1c05ee76df178ca4df227e372670ee21e2828ec ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)
