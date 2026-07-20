@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "a60cf65fd1e8d4835eeeb682638e3269d1b37a2e",
+  "release": "3",
+  "sha": "49f6d140b44082ff0ece25bf484fba9af6106363",
   "source": "https://src.fedoraproject.org/rpms/openldap.git",
   "upstream_repo": "https://git.openldap.org/openldap/openldap",
   "version": "2.6.13"
