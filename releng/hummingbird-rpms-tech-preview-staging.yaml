@@ -382,6 +382,10 @@ spec:
           contentType: rpm
         - name: json-c-main
           contentType: rpm
+        - name: k6v1-main
+          contentType: rpm
+        - name: k6v2-main
+          contentType: rpm
         - name: kbd-main
           contentType: rpm
         - name: kernel-headers-main
