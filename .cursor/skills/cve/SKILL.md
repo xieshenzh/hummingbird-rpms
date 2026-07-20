@@ -19,6 +19,64 @@ For a high-level overview, use `/cve-status`.
 
 ## Procedure
 
+### Step 0: Run Jira commands reliably (HUM-4821)
+
+Use `rhjira` directly for all Jira reads and writes. Do not wrap
+routine `/cve` Jira operations in Python subprocess wrappers,
+background polling workers, or long-running retry loops.
+
+Use this bounded retry helper for transient Jira/proxy failures:
+
+```bash
+rhjira_retry() {
+  local max_attempts=3
+  local backoff=2
+  local attempt output rc
+
+  for attempt in 1 2 3; do
+    output="$(rhjira "$@" 2>&1)"
+    rc=$?
+    if [ "$rc" -eq 0 ]; then
+      printf '%s\n' "$output"
+      return 0
+    fi
+
+    if ! printf '%s\n' "$output" | rg -qi \
+      "proxy|tunnel|timed out|timeout|temporar|502|503|504|connection reset|eof"; then
+      printf '%s\n' "$output" >&2
+      return "$rc"
+    fi
+
+    if [ "$attempt" -eq "$max_attempts" ]; then
+      printf 'ERROR: rhjira failed after %s attempts: rhjira %s\n' "$max_attempts" "$*" >&2
+      printf '%s\n' "$output" >&2
+      return "$rc"
+    fi
+
+    printf 'WARN: transient Jira/proxy error (attempt %s/%s); retrying in %ss\n' \
+      "$attempt" "$max_attempts" "$backoff" >&2
+    sleep "$backoff"
+    backoff=$((backoff + 2))
+  done
+}
+```
+
+Rules for using the helper:
+
+1. Use `rhjira_retry` for direct Jira calls.
+1. For write operations (comment, status/resolution changes, field
+   updates), always pass `--noeditor`.
+1. Avoid long polling loops (`while ... sleep 30`). After a write,
+   do at most one verify read through `rhjira_retry`; if Jira is
+   still unavailable, fail fast.
+1. Report per-ticket Jira status clearly before stopping, for
+   example:
+
+   ```text
+   HUM-1234: jira_unavailable (proxy tunnel 403 after 3 attempts; no changes applied)
+   HUM-1235: read_ok
+   ```
+
 ### Step 1: Show the ticket(s)
 
 If the user provides bare numbers (e.g. "2875" or "/cve 2875"),
@@ -534,11 +592,19 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
 1. **Create HUM tasks** for any backport or update work. Link them
    to the CVE tracker(s) with blockers.
 
-1. **Use rhjira** for all Jira operations. Do not use the Atlassian
-   MCP or other tools.
+1. **Use `rhjira` directly** for all Jira operations. Do not use the
+   Atlassian MCP or Python subprocess wrappers for routine `/cve`
+   ticket work.
+
+1. **Use bounded retries only for transient failures.** Use
+   `rhjira_retry` with short backoff (2s, 4s) and a 3-attempt cap.
+   Do not use unbounded retries or long sleep/poll loops.
 
 1. **rhjira edit does NOT support label changes.** Label additions
    or removals must be done manually in the Jira web UI.
+
+1. **Always pass `--noeditor` on Jira writes.** This includes comment,
+   transition, and field-update operations.
 
 1. **Comment first, then act.** Always document analysis before
    changing ticket state or fields.
