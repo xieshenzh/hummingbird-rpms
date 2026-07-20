@@ -407,6 +407,16 @@ The following variables are available in all string values:
 | `${PACKAGE}` | Package name (directory name) |
 | `${SPEC_FILE}` | Path to the spec file |
 
+### Version constraint semantics
+
+All `version:` fields in `vendor-pin` and `policy.vendor-constraints` use minimum-version
+semantics: the value means "at least this version." The tool translates this into
+ecosystem-native operations:
+
+- **Go**: `go get <package>@v<version>` (minimum version selection via MVS)
+- **npm**: `npm install <package>@">= <version>"`
+- **Cargo**: sets the dependency requirement to `>= <version>` in `Cargo.toml`
+
 ### Default behavior (no pipeline YAML)
 
 When no pipeline YAML is provided, the tool applies a built-in default:
@@ -565,6 +575,9 @@ spec-update:
     - name: nodejs_define_version node
       value: "${VERSION}"
   reset-release: true
+
+toolchain:
+  node: "22"
 
 fetch:
   sources:
