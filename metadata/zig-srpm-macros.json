@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "8",
-  "sha": "6b87bf3d634981f9a985586d3cef8a7ec0422809",
+  "release": "9",
+  "sha": "e6cc026ca16720d8982f31b8070b34984bfbf15b",
   "source": "https://src.fedoraproject.org/rpms/zig-srpm-macros.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/zig-srpm-macros",
   "version": "1"
