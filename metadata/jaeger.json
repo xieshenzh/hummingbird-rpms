@@ -1,9 +1,9 @@
 {
-  "modification_reason": "backport fix for CVE-2026-59884, CVE-2026-59885; backport fix for CVE-2026-49852",
+  "modification_reason": "Update to upstream version 2.20.0",
   "modification_status": "modified",
-  "release": "1",
+  "release": "0.1",
   "release_monitoring_project_id": 371233,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/jaegertracing/jaeger",
-  "version": "2.19.0"
+  "version": "2.20.0"
 }

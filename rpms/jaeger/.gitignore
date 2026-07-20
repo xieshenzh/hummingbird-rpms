@@ -1,2 +1,4 @@
 /jaeger-*.tar.gz
 /jaeger-*-vendor.tar.bz2
+jaeger-2.20.0.tar.gz
+jaeger-2.20.0-vendor.tar.bz2
