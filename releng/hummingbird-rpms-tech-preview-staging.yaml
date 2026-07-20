@@ -868,6 +868,8 @@ spec:
           contentType: rpm
         - name: python3-mypy-main
           contentType: rpm
+        - name: python3-10-main
+          contentType: rpm
         - name: python3-11-main
           contentType: rpm
         - name: python3-12-main
