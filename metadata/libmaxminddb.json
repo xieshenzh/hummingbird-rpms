@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "1e14124707c10abf9ce6b47619133158e82ae8aa",
+  "release": "2",
+  "sha": "369dca014387bd2f5f59110db95bc5649e3961ea",
   "source": "https://src.fedoraproject.org/rpms/libmaxminddb.git",
   "upstream_repo": "https://github.com/maxmind/libmaxminddb",
   "version": "1.13.3"
