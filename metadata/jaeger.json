@@ -1,5 +1,5 @@
 {
-  "modification_reason": "Update to upstream version 2.20.0",
+  "modification_reason": "bump ai-sidecar dependency pyasn1 to 0.6.4 for CVE fixes",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 371233,

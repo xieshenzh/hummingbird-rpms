@@ -20,10 +20,8 @@ Source0:        %{gosource}
 Source1:        %{archivename}-vendor.tar.bz2
 Source2:        go-vendor-tools.toml
 
-# MCP extension tests bind to hardcoded port 16687; use localhost:0 instead
-Patch0:         fix-mcp-test-port-binding.patch
 # Bump ai-sidecar dependency pyasn1 to 0.6.4 for CVE fixes
-Patch1:         fix-ai-sidecar-pyasn1-0.6.4.patch
+Patch0:         fix-ai-sidecar-pyasn1-0.6.4.patch
 
 BuildRequires:  go-vendor-tools
 
