@@ -1,9 +1,9 @@
 ---
 # Integration test for spire1.14: installs all three subpackages, boots a
-# self-signed spire-server with the shipped default config, joins a
-# spire-agent to it with a generated join token, issues a real X509-SVID to
-# a registered workload over the Workload API, and confirms the OIDC
-# discovery provider serves a JWKS backed by the server's signing keys.
+# self-signed spire-server with a test config, joins a spire-agent to it with
+# a generated join token, issues a real X509-SVID to a registered workload
+# over the Workload API, and confirms the OIDC discovery provider serves a
+# JWKS backed by the server's signing keys.
 
 spire-server-agent-oidc-integration:
   command: |
@@ -23,12 +23,53 @@ spire-server-agent-oidc-integration:
     else
       cp "${TEST_RPM}" "${build_dir}/local-repo/"
     fi
+    mkdir -p "${build_dir}/config"
+    cat > "${build_dir}/config/server.conf" <<'EOF'
+    server {
+      bind_address = "127.0.0.1"
+      bind_port = "8081"
+      socket_path = "/var/lib/spire/server/private/api.sock"
+      trust_domain = "example.org"
+      data_dir = "/var/lib/spire/server"
+    }
+    plugins {
+      DataStore "sql" { plugin_data { database_type = "sqlite3" connection_string = "/var/lib/spire/server/datastore.sqlite3" } }
+      NodeAttestor "join_token" { plugin_data {} }
+      KeyManager "disk" { plugin_data { keys_path = "/var/lib/spire/server/keys.json" } }
+    }
+    EOF
+    cat > "${build_dir}/config/agent.conf" <<'EOF'
+    agent {
+      data_dir = "/var/lib/spire/agent"
+      server_address = "127.0.0.1"
+      server_port = "8081"
+      socket_path = "/var/lib/spire/agent/public/api.sock"
+      trust_domain = "example.org"
+    }
+    plugins {
+      NodeAttestor "join_token" { plugin_data {} }
+      KeyManager "disk" { plugin_data { directory = "/var/lib/spire/agent" } }
+      WorkloadAttestor "unix" { plugin_data {} }
+    }
+    EOF
+    cat > "${build_dir}/config/oidc-discovery-provider.conf" <<'EOF'
+    log_level = "info"
+    domains = ["example.org"]
+    listen_socket_path = "/var/lib/spire/oidc-discovery-provider/oidc-discovery-provider.sock"
+    allow_insecure_scheme = true
+    server_api {
+      address = "unix:///var/lib/spire/server/private/api.sock"
+    }
+    EOF
+    chmod a+r "${build_dir}/config/"*.conf
+
     createrepo_c "${build_dir}/local-repo" || \
       "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
         quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
 
     "${TEST_ENGINE}" run --rm \
       -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      -v "${build_dir}/config:/tmp/spire-test-config:ro,z" \
       quay.io/hummingbird-ci/hummingbird-builder:latest \
       bash -c '
         set -euo pipefail
@@ -39,6 +80,7 @@ spire-server-agent-oidc-integration:
         server_sock=/var/lib/spire/server/private/api.sock
         agent_sock=/var/lib/spire/agent/public/api.sock
         oidc_sock=/var/lib/spire/oidc-discovery-provider/oidc-discovery-provider.sock
+        config_dir=/tmp/spire-test-config
 
         wait_for() {
           local desc=$1; shift
@@ -62,20 +104,20 @@ spire-server-agent-oidc-integration:
           echo "PASS: ${bin} reports correct 1.14.x version"
         done
 
-        # 1. Server boots and self-signs with the shipped default config
-        spire-server run -config /etc/spire/server/server.conf &
+        # 1. Server boots and self-signs with the integration test config
+        spire-server run -config "${config_dir}/server.conf" &
         server_pid=$!
         wait_for "spire-server healthcheck" spire-server healthcheck -socketPath "${server_sock}"
-        echo "PASS: spire-server boots and reports healthy with the shipped default config"
+        echo "PASS: spire-server boots and reports healthy with the integration test config"
 
         # 2. Agent joins the server using a generated join token
         token=$(spire-server token generate -socketPath "${server_sock}" -spiffeID spiffe://example.org/agent | sed -n "s/^Token: //p")
         spire-server bundle show -socketPath "${server_sock}" > /tmp/bootstrap.crt
 
-        spire-agent run -config /etc/spire/agent/agent.conf -joinToken "${token}" -trustBundle /tmp/bootstrap.crt &
+        spire-agent run -config "${config_dir}/agent.conf" -joinToken "${token}" -trustBundle /tmp/bootstrap.crt &
         agent_pid=$!
         wait_for "spire-agent healthcheck" spire-agent healthcheck -socketPath "${agent_sock}"
-        echo "PASS: spire-agent joins the server with a join token and the shipped default config"
+        echo "PASS: spire-agent joins the server with a join token and the integration test config"
 
         # 3. A registered workload can fetch a real X509-SVID over the Workload API
         agent_id="spiffe://example.org/spire/agent/join_token/${token}"
@@ -85,7 +127,7 @@ spire-server-agent-oidc-integration:
         echo "PASS: registered workload fetches an X509-SVID over the Workload API"
 
         # 4. OIDC discovery provider serves a JWKS backed by the servers keys
-        oidc-discovery-provider -config /etc/spire/oidc-discovery-provider/oidc-discovery-provider.conf &
+        oidc-discovery-provider -config "${config_dir}/oidc-discovery-provider.conf" &
         oidc_pid=$!
         wait_for "oidc-discovery-provider socket" test -S "${oidc_sock}"
         jwks=$(curl -s --unix-socket "${oidc_sock}" http://localhost/keys)
