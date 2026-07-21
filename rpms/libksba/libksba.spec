@@ -3,7 +3,7 @@
 Summary: CMS and X.509 library
 Name:    libksba
 Version: 1.8.0
-Release: 1.1%{?dist}
+Release: 3%{?dist}
 
 # The library is licensed under LGPLv3+ or GPLv2+,
 # the rest of the package under GPLv3+
@@ -22,7 +22,6 @@ BuildRequires: gawk
 BuildRequires: gnupg2
 %endif
 BuildRequires: libgpg-error-devel >= 1.8
-BuildRequires: libgcrypt-devel >= 1.2.0
 BuildRequires: make
 
 %description
