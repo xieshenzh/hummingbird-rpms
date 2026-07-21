@@ -65,12 +65,12 @@ rhjira_retry() {
 Rules for using the helper:
 
 1. Use `rhjira_retry` for direct Jira calls.
-1. For write operations (comment, status/resolution changes, field
+2. For write operations (comment, status/resolution changes, field
    updates), always pass `--noeditor`.
-1. Avoid long polling loops (`while ... sleep 30`). After a write,
+3. Avoid long polling loops (`while ... sleep 30`). After a write,
    do at most one verify read through `rhjira_retry`; if Jira is
    still unavailable, fail fast.
-1. Report per-ticket Jira status clearly before stopping, for
+4. Report per-ticket Jira status clearly before stopping, for
    example:
 
    ```text
@@ -250,8 +250,8 @@ Hummingbird SRPM's release tag.
 When recommending Done-Errata:
 
 1. Identify the upstream fix commit
-1. Compare its date against the SRPM's upstream release tag date
-1. Only confirm fixed if the fix commit predates the release tag
+2. Compare its date against the SRPM's upstream release tag date
+3. Only confirm fixed if the fix commit predates the release tag
 
 #### 2f: Known version-scheme issues
 
@@ -274,14 +274,14 @@ When the fix is confirmed present in the shipped SRPM:
 
 1. Add a comment documenting the evidence (patches applied,
    version comparison, upstream commit dates)
-1. Set Fixed in Build:
+2. Set Fixed in Build:
 
    ```bash
    rhjira edit HUM-XXXX --noeditor \
      --fixedinbuild "<name>-<version>-<release>.src.rpm"
    ```
 
-1. **Do NOT close the ticket.** The cve_analysis automation will
+3. **Do NOT close the ticket.** The cve_analysis automation will
    close it as Done-Errata automatically. The user has consistently
    said "we can wait for the automation to pick this up."
 
@@ -293,14 +293,14 @@ disputed):
 1. For product-mismatch or component-absence cases, perform SBOM
    verification first (Step 2d) and capture runtime-vs-build-time
    evidence for binary RPM installation status.
-1. Write a closing comment to a temp file explaining why
-1. Post the comment:
+2. Write a closing comment to a temp file explaining why
+3. Post the comment:
 
    ```bash
    rhjira comment HUM-XXXX --noeditor -f /tmp/close-comment.txt
    ```
 
-1. **Ask the user for approval before closing.** Then use the
+4. **Ask the user for approval before closing.** Then use the
    appropriate VEX justification:
 
    ```bash
@@ -319,7 +319,7 @@ disputed):
      --vexjustification "Vulnerable Code not Present"
    ```
 
-1. Verify: `rhjira show HUM-XXXX 2>&1 | grep "^Status:"`
+5. Verify: `rhjira show HUM-XXXX 2>&1 | grep "^Status:"`
 
 If SBOM retrieval is unavailable (network/policy/tooling), do not
 close as `Component not Present` yet. Document the blocker in a
@@ -337,7 +337,7 @@ When a ticket is filed against an unversioned base name (e.g.
      --rawoutput --numentries 10 --fields key,summary,status
    ```
 
-1. If versioned tickets exist, recommend closing as Duplicate
+2. If versioned tickets exist, recommend closing as Duplicate
 
 #### 3d: Needs version bump (preferred)
 
@@ -368,7 +368,7 @@ contains the fix:
    Either `--blocks` or `--isblockedby` works for linking;
    both patterns appear in practice.
 
-1. **Create a worktree** for the task. This keeps each CVE
+2. **Create a worktree** for the task. This keeps each CVE
    fix isolated so multiple can be in flight at once:
 
    ```bash
@@ -388,17 +388,17 @@ contains the fix:
    All subsequent file operations (spec edits, tarball downloads,
    `mark-modified`, `build_rpms.sh`) happen inside the worktree.
 
-1. **Download and verify the new tarball** -- download the
+3. **Download and verify the new tarball** -- download the
    tarball and signature, then verify the GPG signature. If
    the signing key changed between releases, update `Source2:`
    in the spec and `git rm` the old key file.
 
-1. **Check existing patches** -- for each `PatchN:` in the
+4. **Check existing patches** -- for each `PatchN:` in the
    spec, try `patch --dry-run -p1` against the extracted new
    source. Drop patches that were upstreamed: remove the
    `PatchN:` line from the spec and `git rm` the patch file.
 
-1. **Update the spec file:**
+5. **Update the spec file:**
    - `Version:` to the new version
    - `Release:` -- use `0.1%{?dist}` when ahead of Fedora
      (sorts below Fedora's eventual `1%{?dist}`). If Fedora
@@ -406,7 +406,7 @@ contains the fix:
      release number instead.
    - Update `Source2:` if the GPG signing key changed
 
-1. **Update supporting files:**
+6. **Update supporting files:**
    - `sources` -- SHA512 checksums for the new tarball and
      signature (see `documentation/operating/lookaside-cache-access.md`)
    - `.gitignore` -- update the version glob pattern if the
@@ -414,7 +414,7 @@ contains the fix:
    - `metadata/<package>.json` -- update `version` and
      `release` to match the spec
 
-1. **Lookaside and build pipeline setup (when ahead of
+7. **Lookaside and build pipeline setup (when ahead of
    Fedora):** When Fedora has not yet released this version,
    the tarball must be served from the Hummingbird lookaside
    cache instead of Fedora's. Three things are required:
@@ -444,7 +444,7 @@ contains the fix:
    - Include `.tekton/` and `package-overrides.yaml` in the
      commit.
 
-1. **Mark the package as modified.** If the metadata already has
+8. **Mark the package as modified.** If the metadata already has
    a `modification_reason`, read it first and **append** to it
    rather than replacing it.
 
@@ -453,7 +453,7 @@ contains the fix:
      --reason "<existing reason>; update to <version> for CVE-YYYY-NNNNN"
    ```
 
-1. **Commit, validate, build, push, MR.** Commit with a
+9. **Commit, validate, build, push, MR.** Commit with a
    descriptive message, then:
 
    ```bash
@@ -513,7 +513,7 @@ contains the fix:
    lab mr comment !NNNN -m "/hummingbird code-review"
    ```
 
-1. **Close the task ticket.** After the MR is created (do not
+10. **Close the task ticket.** After the MR is created (do not
    wait for it to merge), transition the HUM task ticket to
    Closed:
 
@@ -537,7 +537,7 @@ version bump is not appropriate:
 1. **Create a HUM task ticket and worktree** (same as 3d
    steps 1-2).
 
-1. **Backport the patch** following the process in
+2. **Backport the patch** following the process in
    `documentation/operating/rebuilding-packages.md`:
    - Download the patch from upstream (`curl`, `git format-patch`,
      or `git diff tag1..tag2`)
@@ -562,7 +562,7 @@ version bump is not appropriate:
    - If the spec uses `%patch N -p1`, use that form; if
      `%autosetup -p1`, patches apply automatically
 
-1. **Mark the package as modified.** If the metadata already has
+3. **Mark the package as modified.** If the metadata already has
    a `modification_reason`, read it first and **append** to it
    rather than replacing it.
 
@@ -576,7 +576,7 @@ version bump is not appropriate:
    If `mark-modified` changes the release field, revert that
    change before committing.
 
-1. **Commit, validate, build, push, MR** (same as 3d step 9).
+4. **Commit, validate, build, push, MR** (same as 3d step 9).
 
 #### 3f: No upstream fix yet
 
@@ -625,42 +625,42 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
    and let the automation close them. The user has been clear about
    this pattern across many sessions.
 
-1. **Always ask before closing any ticket.** Closing requires
+2. **Always ask before closing any ticket.** Closing requires
    explicit user approval.
 
-1. **Use `--status Closed`, not `--close`.** The `--close` flag
+3. **Use `--status Closed`, not `--close`.** The `--close` flag
    does not reliably transition ticket status.
 
-1. **Create HUM tasks** for any backport or update work. Link them
+4. **Create HUM tasks** for any backport or update work. Link them
    to the CVE tracker(s) with blockers.
 
-1. **Use `rhjira` directly** for all Jira operations. Do not use the
+5. **Use `rhjira` directly** for all Jira operations. Do not use the
    Atlassian MCP or Python subprocess wrappers for routine `/cve`
    ticket work.
 
-1. **Use bounded retries only for transient failures.** Use
+6. **Use bounded retries only for transient failures.** Use
    `rhjira_retry` with short backoff (2s, 4s) and a 3-attempt cap.
    Do not use unbounded retries or long sleep/poll loops.
 
-1. **rhjira edit does NOT support label changes.** Label additions
+7. **rhjira edit does NOT support label changes.** Label additions
    or removals must be done manually in the Jira web UI.
 
-1. **Always pass `--noeditor` on Jira writes.** This includes comment,
+8. **Always pass `--noeditor` on Jira writes.** This includes comment,
    transition, and field-update operations.
 
-1. **Do not close mismatch tickets without SBOM evidence.** For
+9. **Do not close mismatch tickets without SBOM evidence.** For
    `Component not Present` or related mismatch decisions, verify
    component presence in SBOM and determine runtime-installed vs
    build-time-only before closing (unless the user explicitly
    approves an SBOM-unavailable override).
 
-1. **Comment first, then act.** Always document analysis before
+10. **Comment first, then act.** Always document analysis before
    changing ticket state or fields.
 
-1. **Do NOT add `%changelog` entries to spec files.** The CI
+11. **Do NOT add `%changelog` entries to spec files.** The CI
    validation rejects local changelog entries.
 
-1. When the user provides the package name and multiple HUM ticket
+12. When the user provides the package name and multiple HUM ticket
    keys together (e.g. "let's look at ruby4.0 HUM-2648 HUM-2645"),
    investigate all tickets for that package as a batch.
 
