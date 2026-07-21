@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "05f7439bf543f0d4bad829b092b93f8af63d884c",
+  "release": "2",
+  "sha": "90df3b20f0f4c1cdf30a5e8894aba71b54078131",
   "source": "https://src.fedoraproject.org/rpms/libtasn1.git",
   "upstream_repo": "https://gitlab.com/gnutls/libtasn1",
   "version": "4.21.0"
