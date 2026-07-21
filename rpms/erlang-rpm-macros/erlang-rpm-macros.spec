@@ -1,6 +1,6 @@
 Name:		erlang-rpm-macros
 Version:	0.3.11
-Release:	1.1%{?dist}
+Release:	2%{?dist}
 Summary:	Macros for simplifying building of Erlang packages
 License:	MIT
 URL:		https://github.com/fedora-erlang/erlang-rpm-macros
