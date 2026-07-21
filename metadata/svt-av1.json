@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "ddbb8c55c86f84b3d96da423a0c60d5e0719837d",
+  "release": "3",
+  "sha": "3bd2f2956b03ad829ad31360c1ea282a100c6d4c",
   "source": "https://src.fedoraproject.org/rpms/svt-av1.git",
   "upstream_repo": "https://gitlab.com/AOMediaCodec/SVT-AV1",
   "version": "3.1.2"
