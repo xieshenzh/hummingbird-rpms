@@ -1,7 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to 1.6.57 to fix CVE-2026-34757 (use-after-free in png_set_PLTE/png_set_tRNS/png_set_hIST)",
-  "modification_status": "modified",
+  "modification_status": "clean",
   "release": "1",
   "sha": "fb294ff5110f7d873d8bf982f5089559e819ee0a",
   "source": "https://src.fedoraproject.org/rpms/libpng.git",
