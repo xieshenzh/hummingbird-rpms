@@ -37,7 +37,7 @@ tar -xf %{S:1}
 
 %build
 %global gomodulesmode GO111MODULE=on
-export LDFLAGS="-X github.com/jaegertracing/jaeger/internal/version.latestVersion=v%{version} "
+export LDFLAGS="-X github.com/jaegertracing/jaeger/internal/version.latestVersion=v%{version} -X github.com/jaegertracing/jaeger/internal/version.date=$(date -u +%%Y-%%m-%%dT%%H:%%M:%%SZ) "
 %gobuild -o %{gobuilddir}/bin/jaeger %{goipath}/cmd/jaeger
 
 %install
