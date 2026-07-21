@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "11",
-  "sha": "924a284041afab6792e72ef6e388dd2f2d19f601",
+  "release": "12",
+  "sha": "3512b9276e2c9a0e7b9c07003a386bd73128d27c",
   "source": "https://src.fedoraproject.org/rpms/libunistring.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/libunistring.git",
   "version": "1.1"
