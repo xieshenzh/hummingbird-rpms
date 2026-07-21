@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "8",
-  "sha": "d3961dcd1cb4ec104fe930b330d0ff54f9d4159e",
+  "release": "9",
+  "sha": "6bc917f4c9916aa888ba42d878d6ac00714e3452",
   "source": "https://src.fedoraproject.org/rpms/python-markupsafe.git",
   "upstream_repo": "https://github.com/pallets/markupsafe",
   "version": "3.0.2"
