@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "36bd945787f1e6df98426fc544aebb349a1f765d",
+  "release": "3",
+  "sha": "3904fb372f44f924ad30c5baf80344928ee68c6c",
   "source": "https://src.fedoraproject.org/rpms/lmdb.git",
   "upstream_repo": "https://github.com/LMDB/lmdb",
   "version": "0.9.34"
