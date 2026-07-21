@@ -25,7 +25,7 @@ Epoch: 2
 Version: 2.0.0
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND MIT AND Zlib
-Release: 1.1%{?dist}
+Release: 2%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
