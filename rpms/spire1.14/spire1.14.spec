@@ -21,6 +21,13 @@ Source0:        %{gosource}
 Source1:        %{archivename}-vendor.tar.bz2
 Source2:        go-vendor-tools.toml
 
+# example configs, authored for FHS paths (upstream conf/{server,agent} are
+# dev fixtures with /tmp paths and dummy CA files, not shippable as-is)
+Source10:       server.conf
+Source11:       agent.conf
+Source12:       oidc-discovery-provider.conf
+Source20:       CVE-2026-56852-golang-x-text-invalid-utf8.patch
+
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.26
 
@@ -67,6 +74,7 @@ document.
 %prep
 %goprep -p1
 tar -xf %{S:1}
+patch -p1 < %{SOURCE20}
 
 %generate_buildrequires
 %go_vendor_license_buildrequires -c %{S:2}
