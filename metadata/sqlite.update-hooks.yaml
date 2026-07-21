@@ -1,0 +1,67 @@
+# SQLite derives Version and its source archive names from custom macros.
+# Resolve the release year from the upstream archive so updates around a
+# calendar-year boundary remain autonomous.
+update_spec: |
+  if [[ ! "${UPDATE_NEW_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+    echo "Unsupported SQLite version: ${UPDATE_NEW_VERSION}" >&2
+    exit 1
+  fi
+
+  IFS=. read -r major minor patch suffix <<< "${UPDATE_NEW_VERSION}"
+  archive_version="$(printf '%d%02d%02d%02d' \
+    "$((10#${major}))" "$((10#${minor}))" "$((10#${patch}))" \
+    "$((10#${suffix:-0}))")"
+
+  current_year="$(date -u +%Y)"
+  release_year=""
+  for ((candidate = current_year; candidate >= current_year - 1; candidate--)); do
+    source_url="https://www.sqlite.org/${candidate}/sqlite-src-${archive_version}.zip"
+    if curl --fail --silent --show-error --location --head "${source_url}" >/dev/null; then
+      release_year="${candidate}"
+      break
+    fi
+  done
+  if [[ -z "${release_year}" ]]; then
+    echo "Could not find SQLite ${UPDATE_NEW_VERSION} source archive" >&2
+    exit 1
+  fi
+
+  sed -Ei \
+    -e 's/^(%define majorver[[:space:]]+)[^[:space:]]+/\1'"${major}"'/' \
+    -e 's/^(%define realver[[:space:]]+)[^[:space:]]+/\1'"${archive_version}"'/' \
+    -e 's/^(%define docver[[:space:]]+)[^[:space:]]+/\1'"${archive_version}"'/' \
+    -e 's/^(%define rpmver[[:space:]]+)[^[:space:]]+/\1'"${UPDATE_NEW_VERSION}"'/' \
+    -e 's/^(%define year[[:space:]]+)[^[:space:]]+/\1'"${release_year}"'/' \
+    -e 's/^(Release:[[:space:]]+)[^[:space:]]+/\10.1%{?dist}/' \
+    "${UPDATE_SPEC_FILE}"
+
+# The generic downloader cannot map dotted SQLite versions to encoded archive
+# filenames, so download both source archives explicitly.
+download_sources: |
+  archive_version="$(sed -nE \
+    's/^%define realver[[:space:]]+([^[:space:]]+).*/\1/p' \
+    "${UPDATE_SPEC_FILE}")"
+  release_year="$(sed -nE \
+    's/^%define year[[:space:]]+([^[:space:]]+).*/\1/p' \
+    "${UPDATE_SPEC_FILE}")"
+
+  for archive in src doc; do
+    filename="sqlite-${archive}-${archive_version}.zip"
+    curl --fail --show-error --location --retry 3 \
+      --output "${filename}" \
+      "https://www.sqlite.org/${release_year}/${filename}" >&2
+    echo "${filename}"
+  done
+
+# The hook framework cannot infer the old encoded filenames from a dotted
+# version. Remove superseded SQLite archive entries after adding the new ones.
+post_update: |
+  archive_version="$(sed -nE \
+    's/^%define realver[[:space:]]+([^[:space:]]+).*/\1/p' \
+    "${UPDATE_SPEC_FILE}")"
+  awk -v version="${archive_version}" '
+    /^SHA512 \(sqlite-(src|doc)-[0-9]+\.zip\)/ &&
+      $0 !~ "sqlite-(src|doc)-" version "\\.zip" { next }
+    { print }
+  ' "${UPDATE_SOURCES_FILE}" > "${UPDATE_SOURCES_FILE}.tmp"
+  mv "${UPDATE_SOURCES_FILE}.tmp" "${UPDATE_SOURCES_FILE}"
