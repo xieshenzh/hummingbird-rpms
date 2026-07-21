@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "16",
-  "sha": "48f624d8b452a2f422a23d44401ff500076fd08b",
+  "release": "17",
+  "sha": "e69f6f7c79c37c6cce49687f6f3a72b027af0ead",
   "source": "https://src.fedoraproject.org/rpms/fpc-srpm-macros.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/fpc-srpm-macros",
   "version": "1.3"
