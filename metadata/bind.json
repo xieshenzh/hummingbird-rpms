@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "15",
-  "sha": "c42426f28997b5b1b80e0a72b4a0082559c68d99",
+  "release": "22",
+  "sha": "55c3f8e6d3577eeeaa80d74ddf2c872ce213e86d",
   "source": "https://src.fedoraproject.org/rpms/bind.git",
   "upstream_repo": "https://gitlab.isc.org/isc-projects/bind9",
   "version": "9.18.50"
