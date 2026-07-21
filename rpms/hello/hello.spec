@@ -1,6 +1,6 @@
 Name:           hello
 Version:        2.12.3
-Release:        1.1%{?dist}
+Release:        2%{?dist}
 Summary:        Prints a familiar, friendly greeting
 # All code is GPLv3+.
 # Parts of the documentation are under GFDL
