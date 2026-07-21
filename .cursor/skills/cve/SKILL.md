@@ -31,9 +31,9 @@ Use this bounded retry helper for transient Jira/proxy failures:
 rhjira_retry() {
   local max_attempts=3
   local backoff=2
-  local attempt output rc
+  local attempt=1 output rc
 
-  for attempt in 1 2 3; do
+  while [ "$attempt" -le "$max_attempts" ]; do
     output="$(rhjira "$@" 2>&1)"
     rc=$?
     if [ "$rc" -eq 0 ]; then
@@ -41,7 +41,7 @@ rhjira_retry() {
       return 0
     fi
 
-    if ! printf '%s\n' "$output" | rg -qi \
+    if ! printf '%s\n' "$output" | grep -qiE \
       "proxy|tunnel|timed out|timeout|temporar|502|503|504|connection reset|eof"; then
       printf '%s\n' "$output" >&2
       return "$rc"
@@ -57,6 +57,7 @@ rhjira_retry() {
       "$attempt" "$max_attempts" "$backoff" >&2
     sleep "$backoff"
     backoff=$((backoff + 2))
+    attempt=$((attempt + 1))
   done
 }
 ```
