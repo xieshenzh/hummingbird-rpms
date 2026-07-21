@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "9c2c7e5c65f40b791c7bf120583fc12005f6fc96",
+  "release": "4",
+  "sha": "41fb0c45aa9abbb0d1374a5ff50dd9d3c246c93f",
   "source": "https://src.fedoraproject.org/rpms/autoconf.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/autoconf.git",
   "version": "2.73"
