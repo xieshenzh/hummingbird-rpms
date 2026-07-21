@@ -6,7 +6,7 @@
 
 Name:           rust-rpds
 Version:        1.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Persistent data structures with structural sharing
 
 License:        MIT
