@@ -4,7 +4,7 @@
 
 Name:           dns-root-data
 Version:        2026260100
-Release:        4.1%{?dist}
+Release:        5%{?dist}
 Summary:        DNS root hints and DNSSEC trust anchor
 
 License:        BSD-2-Clause and CC0-1.0
