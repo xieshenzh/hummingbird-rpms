@@ -1,0 +1,322 @@
+From 155760e37acbe24bf82444f21e805006ef0b58c8 Mon Sep 17 00:00:00 2001
+From: Henry Schreiner <HenrySchreinerIII@gmail.com>
+Date: Sun, 14 Jun 2026 21:45:41 -0400
+Subject: [PATCH] test: make test suite compatible with pytest 9.1.0 (#1260)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* test: wrap parametrize argvalues in list for pytest compatibility
+
+A recent pytest release escalated PytestRemovedIn10Warning ("Passing a
+non-Collection iterable to parametrize is deprecated") to a warning that,
+under this repo's filterwarnings=error, fails collection. The comparison
+tests in test_specifiers.py and test_version.py passed
+itertools.chain.from_iterable(...) — a lazy chain iterator — directly as
+the parametrize argvalues.
+
+Wrap each in list() so a concrete Collection is passed. No test behavior
+changes; this only affects how the cases are materialized at collection.
+
+Assisted-by: ClaudeCode:claude-opus-4.8
+
+* test(downstream): pin pytest<9.1.0 for downstream suites
+
+pytest 9.1.0 turns the pinned downstream releases' parametrize usage into
+collection errors (non-Collection iterable in packaging_legacy/setuptools,
+duplicate parametrization in build). These suites were green on the last
+pre-9.1.0 run. Install pytest<9.1.0 before each project's test deps so a
+compatible version is kept; the pin downgrades the 9.1.0 that the deps
+would otherwise pull.
+
+Verified locally: packaging_legacy downstream collects and passes on 9.0.3.
+
+Assisted-by: ClaudeCode:claude-opus-4.8
+---
+ noxfile.py               |   5 ++
+ tests/test_specifiers.py |  80 ++++++++++++-----------
+ tests/test_version.py    | 136 ++++++++++++++++++++-------------------
+ 3 files changed, 119 insertions(+), 102 deletions(-)
+
+diff --git a/noxfile.py b/noxfile.py
+index d6bd816f0..e99d9168a 100644
+--- a/noxfile.py
++++ b/noxfile.py
+@@ -135,6 +135,11 @@ def downstream(session: nox.Session, project: str) -> None:
+ 
+     pip_cmd = ["uv", "pip"] if session.venv_backend == "uv" else ["pip"]
+ 
++    # These pinned downstream releases predate pytest 9.1.0, which turns their
++    # parametrize usage into collection errors. Install a compatible pytest
++    # before the project's test deps so it is kept (pip won't upgrade it).
++    session.install("pytest<9.1.0")
++
+     if project == "packaging_legacy":
+         session.install("-r", "tests/requirements.txt")
+         session.install("-e.")
+diff --git a/tests/test_specifiers.py b/tests/test_specifiers.py
+index 6d435aca0..456110b65 100644
+--- a/tests/test_specifiers.py
++++ b/tests/test_specifiers.py
+@@ -248,15 +248,17 @@ def test_specifiers_hash(self, specifier: str) -> None:
+ 
+     @pytest.mark.parametrize(
+         ("left", "right", "op"),
+-        itertools.chain.from_iterable(
+-            # Verify that the equal (==) operator works correctly
+-            [[(x, x, operator.eq) for x in SPECIFIERS]]
+-            +
+-            # Verify that the not equal (!=) operator works correctly
+-            [
+-                [(x, y, operator.ne) for j, y in enumerate(SPECIFIERS) if i != j]
+-                for i, x in enumerate(SPECIFIERS)
+-            ]
++        list(
++            itertools.chain.from_iterable(
++                # Verify that the equal (==) operator works correctly
++                [[(x, x, operator.eq) for x in SPECIFIERS]]
++                +
++                # Verify that the not equal (!=) operator works correctly
++                [
++                    [(x, y, operator.ne) for j, y in enumerate(SPECIFIERS) if i != j]
++                    for i, x in enumerate(SPECIFIERS)
++                ]
++            )
+         ),
+     )
+     def test_comparison_true(
+@@ -277,15 +279,17 @@ def test_comparison_canonicalizes(self, left: str, right: str) -> None:
+ 
+     @pytest.mark.parametrize(
+         ("left", "right", "op"),
+-        itertools.chain.from_iterable(
+-            # Verify that the equal (==) operator works correctly
+-            [[(x, x, operator.ne) for x in SPECIFIERS]]
+-            +
+-            # Verify that the not equal (!=) operator works correctly
+-            [
+-                [(x, y, operator.eq) for j, y in enumerate(SPECIFIERS) if i != j]
+-                for i, x in enumerate(SPECIFIERS)
+-            ]
++        list(
++            itertools.chain.from_iterable(
++                # Verify that the equal (==) operator works correctly
++                [[(x, x, operator.ne) for x in SPECIFIERS]]
++                +
++                # Verify that the not equal (!=) operator works correctly
++                [
++                    [(x, y, operator.eq) for j, y in enumerate(SPECIFIERS) if i != j]
++                    for i, x in enumerate(SPECIFIERS)
++                ]
++            )
+         ),
+     )
+     def test_comparison_false(
+@@ -2297,15 +2301,17 @@ def test_specifiers_combine_not_implemented(self) -> None:
+ 
+     @pytest.mark.parametrize(
+         ("left", "right", "op"),
+-        itertools.chain.from_iterable(
+-            # Verify that the equal (==) operator works correctly
+-            [[(x, x, operator.eq) for x in SPECIFIERS]]
+-            +
+-            # Verify that the not equal (!=) operator works correctly
+-            [
+-                [(x, y, operator.ne) for j, y in enumerate(SPECIFIERS) if i != j]
+-                for i, x in enumerate(SPECIFIERS)
+-            ]
++        list(
++            itertools.chain.from_iterable(
++                # Verify that the equal (==) operator works correctly
++                [[(x, x, operator.eq) for x in SPECIFIERS]]
++                +
++                # Verify that the not equal (!=) operator works correctly
++                [
++                    [(x, y, operator.ne) for j, y in enumerate(SPECIFIERS) if i != j]
++                    for i, x in enumerate(SPECIFIERS)
++                ]
++            )
+         ),
+     )
+     def test_comparison_true(
+@@ -2319,15 +2325,17 @@ def test_comparison_true(
+ 
+     @pytest.mark.parametrize(
+         ("left", "right", "op"),
+-        itertools.chain.from_iterable(
+-            # Verify that the equal (==) operator works correctly
+-            [[(x, x, operator.ne) for x in SPECIFIERS]]
+-            +
+-            # Verify that the not equal (!=) operator works correctly
+-            [
+-                [(x, y, operator.eq) for j, y in enumerate(SPECIFIERS) if i != j]
+-                for i, x in enumerate(SPECIFIERS)
+-            ]
++        list(
++            itertools.chain.from_iterable(
++                # Verify that the equal (==) operator works correctly
++                [[(x, x, operator.ne) for x in SPECIFIERS]]
++                +
++                # Verify that the not equal (!=) operator works correctly
++                [
++                    [(x, y, operator.eq) for j, y in enumerate(SPECIFIERS) if i != j]
++                    for i, x in enumerate(SPECIFIERS)
++                ]
++            )
+         ),
+     )
+     def test_comparison_false(
+diff --git a/tests/test_version.py b/tests/test_version.py
+index 9729298be..b3bf3394e 100644
+--- a/tests/test_version.py
++++ b/tests/test_version.py
+@@ -805,39 +805,41 @@ def test_version_is_postrelease(self, version: str, expected: bool) -> None:
+         ("left", "right", "op"),
+         # Below we'll generate every possible combination of VERSIONS that
+         # should be True for the given operator
+-        itertools.chain.from_iterable(
+-            # Verify that the less than (<) operator works correctly
+-            [
+-                [(x, y, operator.lt) for y in VERSIONS[i + 1 :]]
+-                for i, x in enumerate(VERSIONS)
+-            ]
+-            +
+-            # Verify that the less than equal (<=) operator works correctly
+-            [
+-                [(x, y, operator.le) for y in VERSIONS[i:]]
+-                for i, x in enumerate(VERSIONS)
+-            ]
+-            +
+-            # Verify that the equal (==) operator works correctly
+-            [[(x, x, operator.eq) for x in VERSIONS]]
+-            +
+-            # Verify that the not equal (!=) operator works correctly
+-            [
+-                [(x, y, operator.ne) for j, y in enumerate(VERSIONS) if i != j]
+-                for i, x in enumerate(VERSIONS)
+-            ]
+-            +
+-            # Verify that the greater than equal (>=) operator works correctly
+-            [
+-                [(x, y, operator.ge) for y in VERSIONS[: i + 1]]
+-                for i, x in enumerate(VERSIONS)
+-            ]
+-            +
+-            # Verify that the greater than (>) operator works correctly
+-            [
+-                [(x, y, operator.gt) for y in VERSIONS[:i]]
+-                for i, x in enumerate(VERSIONS)
+-            ]
++        list(
++            itertools.chain.from_iterable(
++                # Verify that the less than (<) operator works correctly
++                [
++                    [(x, y, operator.lt) for y in VERSIONS[i + 1 :]]
++                    for i, x in enumerate(VERSIONS)
++                ]
++                +
++                # Verify that the less than equal (<=) operator works correctly
++                [
++                    [(x, y, operator.le) for y in VERSIONS[i:]]
++                    for i, x in enumerate(VERSIONS)
++                ]
++                +
++                # Verify that the equal (==) operator works correctly
++                [[(x, x, operator.eq) for x in VERSIONS]]
++                +
++                # Verify that the not equal (!=) operator works correctly
++                [
++                    [(x, y, operator.ne) for j, y in enumerate(VERSIONS) if i != j]
++                    for i, x in enumerate(VERSIONS)
++                ]
++                +
++                # Verify that the greater than equal (>=) operator works correctly
++                [
++                    [(x, y, operator.ge) for y in VERSIONS[: i + 1]]
++                    for i, x in enumerate(VERSIONS)
++                ]
++                +
++                # Verify that the greater than (>) operator works correctly
++                [
++                    [(x, y, operator.gt) for y in VERSIONS[:i]]
++                    for i, x in enumerate(VERSIONS)
++                ]
++            )
+         ),
+     )
+     def test_comparison_true(
+@@ -849,39 +851,41 @@ def test_comparison_true(
+         ("left", "right", "op"),
+         # Below we'll generate every possible combination of VERSIONS that
+         # should be False for the given operator
+-        itertools.chain.from_iterable(
+-            # Verify that the less than (<) operator works correctly
+-            [
+-                [(x, y, operator.lt) for y in VERSIONS[: i + 1]]
+-                for i, x in enumerate(VERSIONS)
+-            ]
+-            +
+-            # Verify that the less than equal (<=) operator works correctly
+-            [
+-                [(x, y, operator.le) for y in VERSIONS[:i]]
+-                for i, x in enumerate(VERSIONS)
+-            ]
+-            +
+-            # Verify that the equal (==) operator works correctly
+-            [
+-                [(x, y, operator.eq) for j, y in enumerate(VERSIONS) if i != j]
+-                for i, x in enumerate(VERSIONS)
+-            ]
+-            +
+-            # Verify that the not equal (!=) operator works correctly
+-            [[(x, x, operator.ne) for x in VERSIONS]]
+-            +
+-            # Verify that the greater than equal (>=) operator works correctly
+-            [
+-                [(x, y, operator.ge) for y in VERSIONS[i + 1 :]]
+-                for i, x in enumerate(VERSIONS)
+-            ]
+-            +
+-            # Verify that the greater than (>) operator works correctly
+-            [
+-                [(x, y, operator.gt) for y in VERSIONS[i:]]
+-                for i, x in enumerate(VERSIONS)
+-            ]
++        list(
++            itertools.chain.from_iterable(
++                # Verify that the less than (<) operator works correctly
++                [
++                    [(x, y, operator.lt) for y in VERSIONS[: i + 1]]
++                    for i, x in enumerate(VERSIONS)
++                ]
++                +
++                # Verify that the less than equal (<=) operator works correctly
++                [
++                    [(x, y, operator.le) for y in VERSIONS[:i]]
++                    for i, x in enumerate(VERSIONS)
++                ]
++                +
++                # Verify that the equal (==) operator works correctly
++                [
++                    [(x, y, operator.eq) for j, y in enumerate(VERSIONS) if i != j]
++                    for i, x in enumerate(VERSIONS)
++                ]
++                +
++                # Verify that the not equal (!=) operator works correctly
++                [[(x, x, operator.ne) for x in VERSIONS]]
++                +
++                # Verify that the greater than equal (>=) operator works correctly
++                [
++                    [(x, y, operator.ge) for y in VERSIONS[i + 1 :]]
++                    for i, x in enumerate(VERSIONS)
++                ]
++                +
++                # Verify that the greater than (>) operator works correctly
++                [
++                    [(x, y, operator.gt) for y in VERSIONS[i:]]
++                    for i, x in enumerate(VERSIONS)
++                ]
++            )
+         ),
+     )
+     def test_comparison_false(
