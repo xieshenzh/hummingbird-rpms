@@ -6,7 +6,7 @@
 
 Name:           cloud-init
 Version:        26.1
-Release:        3.1%{?dist}
+Release:        5%{?dist}
 Summary:        Cloud instance init scripts
 License:        Apache-2.0 OR GPL-3.0-only
 URL:            https://github.com/canonical/cloud-init
@@ -18,7 +18,10 @@ Source1:        cloud-init-tmpfiles.conf
 # Fixes systemd dependency cycle on Fedora by adding DefaultDependencies=no
 # and including Fedora in distribution-specific conditional blocks
 Patch0:         0001-fix-avoid-dependency-cycle-on-Fedora.patch
-Patch1:         0002-fix-force-fedora-variant-for-template-rendering.patch
+# https://github.com/canonical/cloud-init/pull/6922
+# feat: add ELN support to distros
+Patch1:         0002-feat-add-ELN-support-to-distros.patch
+Patch2:         0002-fix-force-fedora-variant-for-template-rendering.patch
 
 BuildArch:      noarch
 
