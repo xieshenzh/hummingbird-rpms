@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "087aa939f8392f8fd8b4d35b98894154f288027a",
+  "release": "3",
+  "sha": "b22cb188cde86a2d5c3618eef57695e210833c4f",
   "source": "https://src.fedoraproject.org/rpms/R-rpm-macros.git",
   "upstream_repo": "https://github.com/rpm-software-management/R-rpm-macros",
   "version": "1.3.7"
