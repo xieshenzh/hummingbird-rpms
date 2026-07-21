@@ -366,7 +366,7 @@ contains the fix:
    ./ci/build_rpms.sh <package>
    ```
 
-   Push the branch and create a draft MR. The MR description
+   Push the branch and create an MR. The MR description
    must include:
    - A 1-3 sentence summary of what was changed and why
    - `Closes: HUM-YYYY` (the task ticket -- **never** the CVE
@@ -379,8 +379,23 @@ contains the fix:
    Use `-F` with a file because `-m` does not support multiple
    paragraphs:
 
+   Detect the user's fork remote and derive the GitLab project
+   path for `--head` (do not hardcode `origin` or a username):
+
    ```bash
-   git push -u origin HUM-YYYY
+   FORK_REMOTE=$(git remote -v | grep '(push)' | grep -v "redhat/hummingbird/rpms" | head -1 | awk '{print $1}')
+   if [ -z "$FORK_REMOTE" ]; then
+     echo "ERROR: Could not detect fork remote. Check 'git remote -v'." >&2
+     exit 1
+   fi
+   FORK_URL=$(git remote get-url "$FORK_REMOTE")
+   FORK_PROJECT=$(echo "$FORK_URL" | sed 's|.*gitlab\.com[:/]||; s|\.git$||; s|/$||')
+   git push -u "$FORK_REMOTE" HUM-YYYY
+   ```
+
+   Then create the MR using `glab`:
+
+   ```bash
    cat > /tmp/mr-description.txt << 'EOF'
    HUM-YYYY: <package>: <short title>
 
@@ -391,7 +406,14 @@ contains the fix:
    Ref: HUM-XXXX, HUM-ZZZZ
    CVE: CVE-YYYY-NNNNN, CVE-YYYY-MMMMM
    EOF
-   lab mr create --draft -F /tmp/mr-description.txt
+   MR_URL=$(glab mr create \
+     --source-branch HUM-YYYY \
+     --target-branch main \
+     --head "$FORK_PROJECT" \
+     --repo redhat/hummingbird/rpms \
+     --title "HUM-YYYY: <package>: <short title>" \
+     --description "$(tail -n +3 /tmp/mr-description.txt)")
+   MR_IID=$(echo "$MR_URL" | tail -1 | grep -oE '[0-9]+$')
    ```
 
    Add the MR link as a comment on the HUM task ticket so
@@ -399,20 +421,20 @@ contains the fix:
 
    ```bash
    rhjira comment HUM-YYYY --noeditor \
-     -m "MR: https://gitlab.com/redhat/hummingbird/rpms/-/merge_requests/NNNN"
+     -m "MR: https://gitlab.com/redhat/hummingbird/rpms/-/merge_requests/${MR_IID}"
    ```
 
    After the MR pipeline has started, trigger the automated code
    review. Check the pipeline status first:
 
    ```bash
-   lab ci status !NNNN
+   glab ci status --branch HUM-YYYY --repo redhat/hummingbird/rpms
    ```
 
    Once the pipeline is running, trigger the review:
 
    ```bash
-   lab mr comment !NNNN -m "/hummingbird code-review"
+   glab mr note "$MR_IID" --repo redhat/hummingbird/rpms -m "/hummingbird code-review"
    ```
 
 1. **Close the task ticket.** After the MR is created (do not
