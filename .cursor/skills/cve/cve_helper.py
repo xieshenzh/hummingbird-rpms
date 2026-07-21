@@ -63,7 +63,24 @@ def normalize_hum_key(value: str) -> str:
 
 def extract_field(text: str, field_name: str) -> str:
     match = re.search(
-        rf"^{re.escape(field_name)}:\s*(.*)$",
+        # Keep matching on the same line only. Using \s* here allows newline
+        # consumption when a field is empty and can leak into the next section.
+        rf"^{re.escape(field_name)}:[ \t]*(.*)$",
+        text,
+        flags=re.MULTILINE,
+    )
+    return match.group(1).strip() if match else ""
+
+
+def extract_summary(text: str, ticket_key: str) -> str:
+    summary = extract_field(text, "Summary")
+    if summary:
+        return summary
+
+    # Newer rhjira show output places summary in the banner header:
+    #   HUM-XXXX: <summary text>
+    match = re.search(
+        rf"^{re.escape(ticket_key)}:\s*(.+)$",
         text,
         flags=re.MULTILINE,
     )
@@ -84,9 +101,11 @@ def extract_cve_analysis_block(text: str) -> str:
     # NOTE: This heuristic may pick a comment {noformat} block instead of the
     # canonical cve_analysis block if comments include matching keywords.
     noformat_blocks = re.findall(r"\{noformat\}(.*?)\{noformat\}", text, flags=re.DOTALL)
-    for block in noformat_blocks:
+    for block in reversed(noformat_blocks):
         lowered = block.lower()
         if "hummingbird srpm version" in lowered or "affected version range" in lowered:
+            return block.strip()
+        if "assessment:" in lowered and "next steps:" in lowered and "cve-" in lowered:
             return block.strip()
     return ""
 
@@ -132,7 +151,7 @@ def parse_linked_keys(text: str) -> list[str]:
 
 
 def parse_ticket_blob(ticket_key: str, text: str) -> dict[str, Any]:
-    summary = extract_field(text, "Summary")
+    summary = extract_summary(text, ticket_key)
     labels = extract_field(text, "Labels")
     fixed_in_build = extract_field(text, "Fixed in Build")
     status = extract_field(text, "Status")
