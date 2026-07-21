@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "e78d480e1cdccc96da9241c302c2393f85312bb2",
+  "release": "2",
+  "sha": "90e889c88019c1db083bdacf00d28a32218e3408",
   "source": "https://src.fedoraproject.org/rpms/erlang-rpm-macros.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/erlang-rpm-macros",
   "version": "0.3.11"
