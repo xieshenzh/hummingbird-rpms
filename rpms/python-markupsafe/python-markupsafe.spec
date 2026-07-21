@@ -1,6 +1,6 @@
 Name:           python-markupsafe
 Version:        3.0.2
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Implements a XML/HTML/XHTML Markup safe string for Python
 License:        BSD-3-Clause
 URL:            https://palletsprojects.com/p/markupsafe/
