@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "410fb14cb0eaf6584384803ba94687bfcbaaafbb",
+  "release": "2",
+  "sha": "e6466c251f8655ce653aca3387a6ec42afcc5934",
   "source": "https://src.fedoraproject.org/rpms/go-fdo-client.git",
   "upstream_repo": "https://github.com/fido-device-onboard/go-fdo-client",
   "version": "1.0.0"
