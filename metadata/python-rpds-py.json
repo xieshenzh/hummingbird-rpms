@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "a789dfb1f750e1aff6677a1e8f2ee3335a418c97",
+  "release": "2",
+  "sha": "bc6f5bdcccbda33298e769fe12415e7c9c561a00",
   "source": "https://src.fedoraproject.org/rpms/python-rpds-py.git",
   "upstream_repo": "https://github.com/crate-py/rpds",
   "version": "2026.6.3"
