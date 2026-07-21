@@ -43,7 +43,7 @@
 Summary: Validating, recursive, and caching DNS(SEC) resolver
 Name: unbound
 Version: 1.25.1
-Release: 3%{?dist}
+Release: 5%{?dist}
 License: BSD-3-Clause
 Url: https://nlnetlabs.nl/projects/unbound/
 VCS: git:%{forgeurl0}
@@ -101,6 +101,7 @@ BuildRequires: bison
 BuildRequires: flex
 BuildRequires: byacc
 BuildRequires: dns-root-data >= 2026260100
+BuildRequires: gzip
 
 %if 0%{?fedora} || 0%{?rhel} >= 9
 BuildRequires: gnupg2
@@ -330,6 +331,7 @@ pushd %{dir_secondary}
 popd
 %endif
 
+gzip --best -k doc/Changelog
 
 %install
 install -p -m 0644 %{SOURCE16} .
@@ -464,6 +466,7 @@ popd
 
 %files
 %doc doc/CREDITS doc/FEATURES
+%doc doc/Changelog.*
 %{_unitdir}/%{name}.service
 %{_unitdir}/%{name}-keygen.service
 %attr(0775,unbound,root) %dir %{_rundir}/%{name}
