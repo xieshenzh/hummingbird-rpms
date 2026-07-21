@@ -50,7 +50,7 @@ install -d %{buildroot}%{fish_completions_dir}
 %go_vendor_license_check -c %{S:2}
 [[ "$(./cosign version 2>&1)" == *"v%{version}"* ]] || exit 1
 %if %{with check}
-%gocheck2 -s TestGetRekorPubKeys -s TestVerifyEmbeddedSCT -s TestValidateAndUnpackCertWithSCT -s TestLoadCertsKeylessVerification -s TestGetCTLogPubKeys
+%gocheck2 -s TestGetRekorPubKeys -s TestVerifyEmbeddedSCT -s TestValidateAndUnpackCertWithSCT -s TestLoadCertsKeylessVerification -s TestGetCTLogPubKeys -s TestVerifySkWithoutIdentities -s TestVerifyAttestationSkWithoutIdentities
 %endif
 
 %files -f %{go_vendor_license_filelist}
