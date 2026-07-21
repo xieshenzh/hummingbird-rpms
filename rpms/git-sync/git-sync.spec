@@ -1,7 +1,7 @@
 # https://github.com/kubernetes/git-sync
 %global goipath         k8s.io/git-sync
 %global forgeurl        https://github.com/kubernetes/git-sync
-Version:                4.4.0
+Version:                4.7.1
 
 %gometa -L
 %forgemeta
