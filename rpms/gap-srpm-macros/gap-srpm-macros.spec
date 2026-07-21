@@ -1,6 +1,6 @@
 Name:           gap-srpm-macros
 Version:        2
-Release:        2.2%{?dist}
+Release:        3%{?dist}
 Summary:        Macros for building GAP source RPMs
 
 License:        MIT
