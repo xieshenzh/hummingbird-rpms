@@ -6,7 +6,7 @@
 
 Name:           rust-archery
 Version:        1.2.2
-Release:        2.1%{?dist}
+Release:        3%{?dist}
 Summary:        Abstract over the atomicity of reference-counting pointers
 
 License:        MIT
