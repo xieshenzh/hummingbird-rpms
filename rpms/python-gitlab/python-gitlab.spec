@@ -3,7 +3,7 @@
 
 Name:           python-%{pypi_name}
 Version:        8.4.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Interact with GitLab API
 
 License:        LGPL-3.0-only
