@@ -1,0 +1,41 @@
+diff --git a/go.mod b/go.mod
+index 22bce738f1da..60f787d7b96a 100644
+--- a/go.mod
++++ b/go.mod
+@@ -15,7 +15,7 @@ require (
+ 	github.com/fsouza/go-dockerclient v1.13.1
+ 	github.com/hashicorp/go-multierror v1.1.1
+ 	github.com/mattn/go-shellwords v1.0.13
+-	github.com/moby/buildkit v0.30.0
++	github.com/moby/buildkit v0.31.2
+ 	github.com/moby/moby/client v0.4.1
+ 	github.com/moby/sys/capability v0.4.0
+ 	github.com/moby/sys/devices v0.1.0
+diff --git a/go.sum b/go.sum
+index e705d16c2cfc..e9052f9ddea5 100644
+--- a/go.sum
++++ b/go.sum
+@@ -149,8 +149,8 @@ github.com/miekg/pkcs11 v1.1.1 h1:Ugu9pdy6vAYku5DEpVWVFPYnzV+bxB+iRdbuFSu7TvU=
+ github.com/miekg/pkcs11 v1.1.1/go.mod h1:XsNlhZGX73bx86s2hdc/FuaLm2CPZJemRLMA+WTFxgs=
+ github.com/mistifyio/go-zfs/v4 v4.0.0 h1:sU0+5dX45tdDK5xNZ3HBi95nxUc48FS92qbIZEvpAg4=
+ github.com/mistifyio/go-zfs/v4 v4.0.0/go.mod h1:weotFtXTHvBwhr9Mv96KYnDkTPBOHFUbm9cBmQpesL0=
+-github.com/moby/buildkit v0.30.0 h1:OsK8T3BaYH52UNStpKd7gytDtHWWt2Fawak/lAPWatU=
+-github.com/moby/buildkit v0.30.0/go.mod h1:k2wuw5ddaOqzh58RLt+mBn2XhK34gi6+gd0faONQ1xU=
++github.com/moby/buildkit v0.31.2 h1:UsaoSa0z45ycj+8DqWwmiXKnszDSNvv3wYPGLVtcEKE=
++github.com/moby/buildkit v0.31.2/go.mod h1:q1QO35x5YryiXLONScL2IybwMIziz6Rq3FBznz8fmGc=
+ github.com/moby/docker-image-spec v1.3.1 h1:jMKff3w6PgbfSa69GfNg+zN/XLhfXJGnEx3Nl2EsFP0=
+ github.com/moby/docker-image-spec v1.3.1/go.mod h1:eKmb5VW8vQEh/BAr2yvVNvuiJuY6UIocYsFu/DxxRpo=
+ github.com/moby/go-archive v0.2.0 h1:zg5QDUM2mi0JIM9fdQZWC7U8+2ZfixfTYoHL7rWUcP8=
+diff --git a/vendor/modules.txt b/vendor/modules.txt
+index 70db16f8f71d..0a6a4383fbc4 100644
+--- a/vendor/modules.txt
++++ b/vendor/modules.txt
+@@ -222,7 +222,7 @@ github.com/miekg/pkcs11
+ # github.com/mistifyio/go-zfs/v4 v4.0.0
+ ## explicit; go 1.14
+ github.com/mistifyio/go-zfs/v4
+-# github.com/moby/buildkit v0.30.0
++# github.com/moby/buildkit v0.31.2
+ ## explicit; go 1.25.5
+ github.com/moby/buildkit/frontend/dockerfile/command
+ github.com/moby/buildkit/frontend/dockerfile/parser
