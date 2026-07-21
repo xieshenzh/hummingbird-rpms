@@ -275,6 +275,8 @@ date and hash against the fix, not the version number.
 
 Based on the analysis, one of these paths applies:
 
+<!-- markdownlint-disable MD029 -->
+
 #### 3a: Already fixed -- set Fixed in Build
 
 When the fix is confirmed present in the shipped SRPM:
@@ -288,7 +290,18 @@ When the fix is confirmed present in the shipped SRPM:
      --fixedinbuild "<name>-<version>-<release>.src.rpm"
    ```
 
-3. **Do NOT close the ticket.** The cve_analysis automation will
+3. Rename the chat title to indicate FIB was set:
+
+   ```bash
+   FIB_TITLE=$(python .cursor/skills/cve/cve_helper.py HUM-XXXX --title-only --title-prefix "FIB")
+   ```
+
+   ```text
+   CallMcpTool: cursor-app-control / rename_chat
+     title: "<value from FIB_TITLE, e.g. FIB HUM-6789 foo>"
+   ```
+
+4. **Do NOT close the ticket.** The cve_analysis automation will
    close it as Done-Errata automatically. The user has consistently
    said "we can wait for the automation to pick this up."
 
@@ -326,7 +339,18 @@ disputed):
      --vexjustification "Vulnerable Code not Present"
    ```
 
-5. Verify: `rhjira show HUM-XXXX 2>&1 | grep "^Status:"`
+5. Rename the chat title to indicate Not a Bug closure:
+
+   ```bash
+   NAB_TITLE=$(python .cursor/skills/cve/cve_helper.py HUM-XXXX --title-only --title-prefix "NAB")
+   ```
+
+   ```text
+   CallMcpTool: cursor-app-control / rename_chat
+     title: "<value from NAB_TITLE, e.g. NAB HUM-6789 foo>"
+   ```
+
+6. Verify: `rhjira show HUM-XXXX 2>&1 | grep "^Status:"`
 
 If SBOM retrieval is unavailable (network/policy/tooling), do not
 close as `Component not Present` yet. Document the blocker in a
@@ -521,6 +545,17 @@ contains the fix:
    MR_IID=$(echo "$MR_URL" | tail -1 | grep -oE '[0-9]+$')
    ```
 
+  After creating the MR, rename the chat title to include the MR ID:
+
+  ```bash
+  MR_TITLE=$(python .cursor/skills/cve/cve_helper.py HUM-XXXX --title-only --title-prefix "!${MR_IID}")
+  ```
+
+  ```text
+  CallMcpTool: cursor-app-control / rename_chat
+    title: "<value from MR_TITLE, e.g. !1234 HUM-6789 foo>"
+  ```
+
    Add the MR link as a comment on the HUM task ticket so
    future lookups can see the work is already in review:
 
@@ -612,6 +647,8 @@ version bump is not appropriate:
 When no fix exists upstream, add a comment noting the current
 status and leave the ticket in its current state. Create a HUM
 task only if active investigation or a custom patch is planned.
+
+<!-- markdownlint-enable MD029 -->
 
 ### Step 4: Comment in the ticket
 
