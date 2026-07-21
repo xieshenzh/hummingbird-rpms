@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "1e417689deb66a73dce7d332b98073e33a6dfa39",
+  "release": "2",
+  "sha": "f2a5285f11f16c469940d9bafd35dc0ee9b5f091",
   "source": "https://src.fedoraproject.org/rpms/yq.git",
   "upstream_repo": "https://github.com/mikefarah/yq",
   "version": "4.53.3"
