@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "ce6c61444e0a622c480a5200ce717d47fd363c18",
+  "release": "2",
+  "sha": "74713b2e86e957fa394bcfa1b4e0c472f39a60c8",
   "source": "https://src.fedoraproject.org/rpms/ostree.git",
   "upstream_repo": "https://github.com/ostreedev/ostree",
   "version": "2026.2"
