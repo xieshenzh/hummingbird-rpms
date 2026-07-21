@@ -1,0 +1,11 @@
+[fedora-44]
+name=Fedora 44 - $basearch
+baseurl=https://koji-s3-cache.hummingbird-project.io/download-ib01.fedoraproject.org/pub/fedora/linux/releases/44/Everything/$basearch/os/
+enabled=1
+gpgcheck=0
+
+[fedora-44-updates]
+name=Fedora 44 - $basearch - Updates
+baseurl=https://koji-s3-cache.hummingbird-project.io/download-ib01.fedoraproject.org/pub/fedora/linux/updates/44/Everything/$basearch/
+enabled=1
+gpgcheck=0

@@ -48,7 +48,7 @@ config-subpackages:
         DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs --setopt=install_weak_deps=True"
         
         mkdir -p "${NEWROOT}"
-        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-primary --root "${NEWROOT}"
         
         # Install crypto-policies (Suggests pulls in config-default) + gnutls + dnf for swap
         ${DNF} install filesystem

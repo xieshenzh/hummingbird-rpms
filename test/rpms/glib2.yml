@@ -104,7 +104,7 @@ ghmac-returns-null:
         set -e
 
         # Set up repos
-        cp /tmp/repos/fedora-43.repo /etc/yum.repos.d/
+        cp /tmp/repos/fedora-44.repo /etc/yum.repos.d/
         cp /tmp/repos/hummingbird.repo /etc/yum.repos.d/
 
         printf "%s\n" \

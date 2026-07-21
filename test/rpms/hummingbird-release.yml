@@ -35,7 +35,7 @@ gpg-signature-verification:
 
         # Setup repos - use local repo (gpgcheck=0) only for installing
         # our own hummingbird-release packages
-        cp /tmp/repos/fedora-43.repo /etc/yum.repos.d/
+        cp /tmp/repos/fedora-44.repo /etc/yum.repos.d/
         printf "%s\n" \
           "[local-repo]" \
           "name=Local Repository" \
