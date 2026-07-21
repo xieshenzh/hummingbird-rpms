@@ -25,6 +25,13 @@ Use `rhjira` directly for all Jira reads and writes. Do not wrap
 routine `/cve` Jira operations in Python subprocess wrappers,
 background polling workers, or long-running retry loops.
 
+`/cve` workflows require outbound internet access for tools like
+`rhjira`, `glab`, and `curl` (Jira/GitLab/SBOM endpoints). Running
+these commands in a sandboxed/no-network context can produce false
+failures (auth/proxy/timeout/connection errors) and block ticket
+automation. Use an internet-enabled execution context for these tool
+calls.
+
 Use this bounded retry helper for transient Jira/proxy failures:
 
 ```bash
