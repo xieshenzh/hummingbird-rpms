@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "7f020ff62d5ef23c596b746190dcdc1084994483",
+  "release": "2",
+  "sha": "3f7d03dcfcf49bd58f36b49e32536120f848efd6",
   "source": "https://src.fedoraproject.org/rpms/tree-sitter-srpm-macros.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/tree-sitter-srpm-macros",
   "version": "0.4.6"
