@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "a18983d24a32abcb11053369e066f9087c2cdd3d",
+  "release": "6",
+  "sha": "b8eaa1d17dc1c8d61ba112a4f4f2bdf38015a971",
   "source": "https://src.fedoraproject.org/rpms/catatonit.git",
   "upstream_repo": "https://github.com/openSUSE/catatonit",
   "version": "0.2.1"
