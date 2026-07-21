@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "18e8594d98e822024cc5302af6a4b6b88e431d3c",
+  "release": "4",
+  "sha": "cdbfcc366df25bf87482f54686434ce037fc7625",
   "source": "https://src.fedoraproject.org/rpms/fsverity-utils.git",
   "upstream_repo": "https://github.com/ebiggers/fsverity-utils",
   "version": "1.7"
