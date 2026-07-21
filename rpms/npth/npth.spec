@@ -1,6 +1,6 @@
 Name:           npth
 Version:        1.8
-Release:        4.2%{?dist}
+Release:        5%{?dist}
 Summary:        The New GNU Portable Threads library
 License:        LGPL-2.1-or-later
 URL:            https://git.gnupg.org/cgi-bin/gitweb.cgi?p=npth.git
