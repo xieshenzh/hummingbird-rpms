@@ -1,7 +1,7 @@
 Summary: Utility to set/show the host name or domain name
 Name: hostname
 Version: 3.25
-Release: 4.2%{?dist}
+Release: 5%{?dist}
 License: GPL-2.0-or-later
 URL: https://tracker.debian.org/pkg/hostname
 Source0: https://ftp.debian.org/debian/pool/main/h/hostname/hostname_%{version}.tar.xz
