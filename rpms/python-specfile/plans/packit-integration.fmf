@@ -2,7 +2,7 @@ discover:
     how: fmf
     url: https://github.com/packit/packit
     filter: tag:full
-    ref: 8a0482385de8c0d3d7b233786a412c0b3240ca57
+    ref: f84fe2d5b3b33bf3d659411e67b754453f1a2635
 prepare:
   - how: install
     copr: packit/packit-dev
