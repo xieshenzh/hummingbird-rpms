@@ -199,14 +199,46 @@ If not vendored by any package, the ticket is misfiled.
 #### 2d: SBOM verification
 
 When the CVE product differs from the Hummingbird package name,
-download the SBOM to confirm whether the component is present:
+download and inspect the SBOM to determine:
+
+- whether the CVE product/component is present at all
+- whether it is runtime-installed in shipped binary RPMs
+- or only a build-time/test-time dependency
 
 ```bash
-curl -sL "https://packages.redhat.com/api/pulp-content/public-hummingbird/metadata/sboms/<package>-main/" \
-  | grep -oP 'href="(sha256-[^"]+\.sbom)"' | tail -1
+SBOM_BASE="https://packages.redhat.com/api/pulp-content/public-hummingbird/metadata/sboms/<package>-main/"
+SBOM_FILE=$(curl -fsSL "$SBOM_BASE" | rg -o 'sha256-[^"]+\.sbom' | sort -u | tail -1)
+curl -fsSL "${SBOM_BASE}${SBOM_FILE}" -o /tmp/<package>.sbom.json
 ```
 
-Then download and search for the CVE product in the SBOM JSON.
+Then inspect SBOM contents for the CVE product/component:
+
+```bash
+rg -ni "<cve-product>|<module>|<library-name>" /tmp/<package>.sbom.json
+```
+
+When the component is found, determine whether it is actually
+installed in shipped binary RPMs vs only used during build/test.
+Use SBOM fields such as `type`, `scope`, `purl`, `properties`,
+`metadata.component`, and package relationships.
+
+Decision guidance:
+
+- If component is present in runtime binary package contents,
+  treat as potentially affected.
+- If component appears only in build/test toolchain paths and is
+  not present in installed runtime binary RPM contents, treat as
+  not runtime-affected.
+- If SBOM evidence is ambiguous, do not close the ticket based on
+  component absence alone; continue manual investigation.
+
+For any `Not a Bug` recommendation based on product mismatch,
+include SBOM evidence in the Jira comment:
+
+- SBOM URL/file used
+- exact match/no-match terms
+- runtime-installed vs build-time-only conclusion
+- why that supports the chosen VEX justification
 
 #### 2e: Upstream fix verification
 
@@ -258,6 +290,9 @@ When the fix is confirmed present in the shipped SRPM:
 When the CVE does not apply (wrong product, component not present,
 disputed):
 
+1. For product-mismatch or component-absence cases, perform SBOM
+   verification first (Step 2d) and capture runtime-vs-build-time
+   evidence for binary RPM installation status.
 1. Write a closing comment to a temp file explaining why
 1. Post the comment:
 
@@ -285,6 +320,10 @@ disputed):
    ```
 
 1. Verify: `rhjira show HUM-XXXX 2>&1 | grep "^Status:"`
+
+If SBOM retrieval is unavailable (network/policy/tooling), do not
+close as `Component not Present` yet. Document the blocker in a
+comment and ask the user whether to proceed with a manual override.
 
 #### 3c: Duplicate (unversioned package)
 
@@ -554,6 +593,8 @@ include whichever of the following apply:
 - Version details (CVE range, Hummingbird SRPM version, comparison)
 - Upstream fix commit verification (hash, URL, date, release tag)
 - Vendored dependency check results
+- SBOM evidence (URL/file, match terms, runtime vs build-time
+  determination)
 - Version-scheme notes for dotnet/Go packages
 
 Use Jira wiki markup in comments (`{noformat}`, `*bold*`,
@@ -606,6 +647,12 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
 
 1. **Always pass `--noeditor` on Jira writes.** This includes comment,
    transition, and field-update operations.
+
+1. **Do not close mismatch tickets without SBOM evidence.** For
+   `Component not Present` or related mismatch decisions, verify
+   component presence in SBOM and determine runtime-installed vs
+   build-time-only before closing (unless the user explicitly
+   approves an SBOM-unavailable override).
 
 1. **Comment first, then act.** Always document analysis before
    changing ticket state or fields.
