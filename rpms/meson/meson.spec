@@ -5,7 +5,7 @@
 
 Name:           meson
 Version:        1.11.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        High productivity build system
 
 License:        Apache-2.0
