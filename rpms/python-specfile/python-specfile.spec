@@ -7,7 +7,7 @@ Main focus is on modifying existing spec files, any change should result
 in a minimal diff.}
 
 
-%global base_version 0.41.0
+%global base_version 0.41.1
 #global prerelease   rc1
 
 %global package_version %{base_version}%{?prerelease:~%{prerelease}}
@@ -16,7 +16,7 @@ in a minimal diff.}
 
 Name:           python-specfile
 Version:        %{package_version}
-Release:        2%{?dist}
+Release:        1%{?dist}
 
 Summary:        A library for parsing and manipulating RPM spec files
 License:        MIT
@@ -81,6 +81,12 @@ sed -i 's/setuptools_scm\[toml\]>=7/setuptools_scm[toml]/' pyproject.toml
 
 
 %changelog
+* Mon Jul 20 2026 Packit <hello@packit.dev> - 0.41.1-1
+- Sanitize multi-pipe shell expansion. (#542)
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.41.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 0.41.0-2
 - Rebuilt for Python 3.15
 
@@ -89,7 +95,7 @@ sed -i 's/setuptools_scm\[toml\]>=7/setuptools_scm[toml]/' pyproject.toml
 ```
 %%global release 12
 %%global release_string %%{release}%%{?dist}
-Release: %%{release_string}.1
+Release: %%{release_string}.2
 ```
 In this case, with `dist` being `.fc44`, `Specfile.expanded_release` returned `12.fc44.fc44` instead of `12.fc44`. (#539)
 
@@ -277,7 +283,7 @@ In this case, with `dist` being `.fc44`, `Specfile.expanded_release` returned `1
 - The `Specfile.add_changelog_entry()` method now uses dates based on UTC instead of the local timezone. (#223)
 
 * Thu Apr 20 2023 Packit <hello@packit.dev> - 0.16.0-1
-- Added `Specfile.has_autorelease` property to detect if a spec file uses the `%2%{?dist}
+- Added `Specfile.has_autorelease` property to detect if a spec file uses the `%1%{?dist}
 
 * Fri Mar 10 2023 Packit <hello@packit.dev> - 0.15.0-1
 - Parsing the spec file by RPM is now performed only if really necessary, greatly improving performance in certain scenarios. (#212)
