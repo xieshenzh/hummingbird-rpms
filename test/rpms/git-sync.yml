@@ -1,0 +1,34 @@
+---
+# Tests for git-sync: verify binary installs correctly and version is
+# embedded via ldflags.
+
+git-sync-version:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "git-sync" ]]; then
+      echo "Skipping: only runs on git-sync (got: ${rpm_name})"
+      exit 0
+    fi
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${TEST_RPM}:/tmp/test.rpm:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        dnf install -y /tmp/test.rpm
+
+        rpm_version=$(rpm -q --queryformat "%{VERSION}" git-sync)
+        version=$(git-sync --version 2>&1 | tr -d "[:space:]")
+
+        if [[ -z "${version}" ]]; then
+          echo "FAIL: Version field is empty"
+          exit 1
+        fi
+
+        if [[ "${version}" != "v${rpm_version}" ]]; then
+          echo "FAIL: git-sync reports \"${version}\", expected \"v${rpm_version}\""
+          exit 1
+        fi
+
+        echo "PASS: git-sync version ${version}"
+      '
