@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "19",
-  "sha": "92ee093000087645d82de7118d27fb8e52a22972",
+  "release": "20",
+  "sha": "2ca4556a45f585e24e91bd68f0bf4db23ec542ce",
   "source": "https://src.fedoraproject.org/rpms/python-types-pyyaml.git",
   "upstream_repo": "https://github.com/python/typeshed",
   "version": "6.0.1"
