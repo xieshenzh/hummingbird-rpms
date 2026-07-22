@@ -4,5 +4,5 @@
   "release_monitoring_project_id": 390561,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/open-telemetry/opentelemetry-collector-releases",
-  "version": "0.156.0"
+  "version": "0.157.0"
 }
