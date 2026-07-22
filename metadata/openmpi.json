@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "4",
+  "release_monitoring_project_id": 2554,
+  "sha": "e3e1783aa51a9010acaaddb72f4da229b2b6cdb7",
+  "source": "https://src.fedoraproject.org/rpms/openmpi.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/open-mpi/ompi",
+  "version": "5.0.10"
+}

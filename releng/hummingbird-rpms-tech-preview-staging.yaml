@@ -650,6 +650,8 @@ spec:
           contentType: rpm
         - name: openldap-main
           contentType: rpm
+        - name: openmpi-main
+          contentType: rpm
         - name: openscap-main
           contentType: rpm
         - name: openssh-main
