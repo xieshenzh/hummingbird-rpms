@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "522",
-  "sha": "23d21420539142fdcd8a57d64a675baa18d8da67",
+  "release": "527",
+  "sha": "97f174d75e34634440448f62c561adce73c1f012",
   "source": "https://src.fedoraproject.org/rpms/perl-Pod-Usage.git",
   "upstream_repo": "https://github.com/Dual-Life/Pod-Usage",
   "version": "2.05"
