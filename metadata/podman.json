@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "b0afcf974741b580e40b07046fa39a64159750f9",
+  "release": "2",
+  "sha": "0b0ff01de6a5507b5f97cbf7881ea044fd6118db",
   "source": "https://src.fedoraproject.org/rpms/podman.git",
   "upstream_repo": "https://github.com/containers/podman",
   "version": "6.0.1"
