@@ -2,9 +2,11 @@
 
 source "`dirname ${BASH_SOURCE[0]}`/mariadb-scripts-common"
 
-upgrade_info_file="$datadir/mysql_upgrade_info"
+upgrade_info_file="$datadir/mariadb_upgrade_info"
+if [ ! -f "$upgrade_info_file" ] ; then
+    upgrade_info_file="$datadir/mysql_upgrade_info"
+fi
 version=0
-# get version as integer from mysql_upgrade_info file
 if [ -f "$upgrade_info_file" ] && [ -r "$upgrade_info_file" ] ; then
     version_major=$(cat "$upgrade_info_file" | head -n 1 | sed -e 's/\([0-9]*\)\.\([0-9]*\)\..*$/\1/')
     version_minor=$(cat "$upgrade_info_file" | head -n 1 | sed -e 's/\([0-9]*\)\.\([0-9]*\)\..*$/\2/')

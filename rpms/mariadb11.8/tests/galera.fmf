@@ -1,9 +1,12 @@
 summary: centos stream tests for galera
 
+environment:
+  BUILD_PACKAGE: mariadb11.8-server
+
 prepare:
   how: shell
   script: |
-    dnf install -y mariadb-server-galera wireshark-cli
+    dnf install -y mariadb11.8-server-galera wireshark-cli
 
 discover:
   how: fmf

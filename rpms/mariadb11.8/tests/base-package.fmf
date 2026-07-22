@@ -1,7 +1,7 @@
 summary: centos stream tests for mariadb11.8
 
 environment:
-  BUILD_PACKAGE: mariadb-server
+  BUILD_PACKAGE: mariadb11.8-server
 
 prepare:
   how: shell
