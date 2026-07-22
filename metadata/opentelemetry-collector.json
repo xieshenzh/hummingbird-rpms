@@ -1,7 +1,8 @@
 {
-  "modification_status": "native",
-  "release": "1",
+  "modification_reason": "update to 0.157.0 for CVE-2026-56852",
+  "modification_status": "modified",
+  "release": "0.1",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/open-telemetry/opentelemetry-collector-releases",
-  "version": "0.153.0"
+  "version": "0.157.0"
 }
