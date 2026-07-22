@@ -22,7 +22,7 @@
 
 Name:           python-%{pypi_name}
 Version:        26.2
-Release:        4%{?dist}
+Release:        4.1%{?dist}
 Summary:        Core utilities for Python packages
 
 License:        BSD-2-Clause OR Apache-2.0
