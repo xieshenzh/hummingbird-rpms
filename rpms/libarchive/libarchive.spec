@@ -2,7 +2,7 @@
 
 Name:           libarchive
 Version:        3.8.8
-Release:        3%{?dist}
+Release:        3.1%{?dist}
 Summary:        A library for handling streaming archive formats
 
 # Licenses:
@@ -45,6 +45,7 @@ BuildRequires: make
 # support explicitly.
 Patch0001: 0001-Drop-rmd160-from-OpenSSL.patch
 Patch0002: libarchive-3.8.8-fix-oob-read-tar-number-parsing.patch
+Patch0003: 3228.patch
 
 %description
 Libarchive is a programming library that can create and read several different
