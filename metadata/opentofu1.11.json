@@ -1,4 +1,5 @@
 {
+  "modification_reason": "backport fix for CVE-2026-56852",
   "modification_status": "native",
   "release": "0.1",
   "release_monitoring_project_id": 371292,
