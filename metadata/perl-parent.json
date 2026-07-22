@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "522",
-  "sha": "f4866822b59c9a224c43340d384cfa0988123513",
+  "release": "527",
+  "sha": "186b52bfcd70387d1b76c11bfea2c839a4e51a4b",
   "source": "https://src.fedoraproject.org/rpms/perl-parent.git",
   "upstream_repo": "https://github.com/Corion/parent",
   "version": "0.244"
