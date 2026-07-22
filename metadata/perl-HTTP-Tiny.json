@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "b9a8d023b01c5a173c06da4360c8e2c3ae7fcf6d",
+  "release": "527",
+  "sha": "5a4ffb2459dc1cc8be39a72588ca67fc93508b85",
   "source": "https://src.fedoraproject.org/rpms/perl-HTTP-Tiny.git",
   "upstream_repo": "https://github.com/Perl-Toolchain-Gang/HTTP-Tiny",
   "version": "0.096"
