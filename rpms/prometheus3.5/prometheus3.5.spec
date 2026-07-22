@@ -8,7 +8,7 @@ Version:                3.5.5
 %gometa -L -f
 
 Name:           prometheus3.5
-Release:        0.2%{?dist}
+Release:        0.3%{?dist}
 Summary:        Monitoring system and time series database
 License:        Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL:            %{gourl}
@@ -19,6 +19,7 @@ Source1:        %{archivename}-vendor.tar.bz2
 Source2:        https://github.com/prometheus/prometheus/releases/download/v%{version}/prometheus-web-ui-%{version}.tar.gz
 Source3:        go-vendor-tools.toml
 Patch0:         0001-Disable-pprof-debug-endpoints.patch
+Patch1:         0002-Backport-x-text-security-update.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.23
