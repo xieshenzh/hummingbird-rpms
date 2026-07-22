@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "f8309fd237968f8ce93f2f0b2460bd878fb17b17",
+  "release": "527",
+  "sha": "a22b65304681584db045bf613d9b71d4cfb77807",
   "source": "https://src.fedoraproject.org/rpms/perl-threads-shared.git",
   "upstream_repo": "https://github.com/Perl/perl5",
   "version": "1.73"
