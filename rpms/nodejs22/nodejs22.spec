@@ -3,7 +3,7 @@
 %{load:%{_sourcedir}/nodejs.srpm.macros}
 
 # === Versions of any software shipped in the main nodejs tarball
-%nodejs_define_version node 1:22.23.1-2.1%{?dist} -p
+%nodejs_define_version node 1:22.23.1-2.2%{?dist} -p
 
 # Special release for sub-packages with their own version string.
 # The complex release string ensures that the subpackage release is always increasing,
@@ -102,6 +102,7 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  %{py3_dist setuptools jinja2}
 # Additional libraries, either system or vendored ones
 BuildRequires:  pkgconfig(openssl) >= 3.0.2
+BuildRequires: (pkgconfig(openssl) >= 3.0.2 with pkgconfig(openssl) < 4.0)
 %nodejs_declare_bundled -a  ada
 %nodejs_declare_bundled -a  brotli      -plibbrotlidec,libbrotlienc
 %nodejs_declare_bundled -a  c-ares      -plibcares
@@ -165,6 +166,7 @@ Source101:      nodejs.srpm.macros
 0001-Remove-unused-OpenSSL-config.patch
 0001-fips-disable-options.patch
 0001-CVE-2026-13149-brace-expansion-fix-exponential-time.patch
+0002-CVE-2026-42338-ip-address-security-fix.patch
 CVE-2026-59869-js-yaml-merge-keys.patch
 
 %description
@@ -297,7 +299,7 @@ Binary symlinks for Node.js Package Manager.
 readonly -a devendored_paths=(
     deps/v8/third_party/jinja2 tools/inspector_protocol/jinja2
     %{?!with_bundled_brotli:deps/brotli}
-    %{?!with_bundled_c_ares:deps/cares}
+    #%{?!with_bundled_c_ares:deps/cares}
     %{?!with_bundled_libuv:deps/uv}
     %{?!with_bundled_nodejs_cjs_module_lexer:deps/cjs-module-lexer}
     %{?!with_bundled_nodejs_undici:deps/undici}
@@ -344,7 +346,10 @@ readonly -a configure_flags=(
     --openssl-use-def-ca-store
     # Link with system libraries where appropriate
     %{?!with_bundled_brotli:--shared-brotli}
-    %{?!with_bundled_c_ares:--shared-cares}
+    # Switching to bundled c-ares for 22.23.1
+    # Due to:
+    # ../../src/cares_wrap.cc:1730:21: error: no matches converting function ‘Callback’ to type ‘ares_host_callback’
+    #%{?!with_bundled_c_ares:--shared-cares}
     %{?!with_bundled_libuv:--shared-libuv}
     %{?!with_bundled_sqlite:--shared-sqlite}
     %{?!with_bundled_zlib:--shared-zlib}
