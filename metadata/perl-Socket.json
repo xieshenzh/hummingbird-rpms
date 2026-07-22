@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "51e7d4ef4cc28d1145421a3423eb5edf67a7595f",
+  "release": "527",
+  "sha": "95861ae424997e8f55fcf9ea62110c45314d8809",
   "source": "https://src.fedoraproject.org/rpms/perl-Socket.git",
   "upstream_repo": "https://github.com/Perl/perl5",
   "version": "2.041"
