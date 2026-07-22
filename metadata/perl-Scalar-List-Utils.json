@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "8b8a96ebd08f88a8af32e8594f2e7b0bb5fac252",
+  "release": "527",
+  "sha": "da316ac8a4b298fc7cca8ba06c7af3c7f3c489dd",
   "source": "https://src.fedoraproject.org/rpms/perl-Scalar-List-Utils.git",
   "upstream_repo": "https://github.com/Dual-Life/Scalar-List-Utils",
   "version": "1.70"
