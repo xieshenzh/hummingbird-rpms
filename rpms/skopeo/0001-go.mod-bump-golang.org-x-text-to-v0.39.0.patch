@@ -1,0 +1,35 @@
+--- a/go.mod
++++ b/go.mod
+@@ -102,7 +102,7 @@
+ 	golang.org/x/oauth2 v0.36.0 // indirect
+ 	golang.org/x/sync v0.20.0 // indirect
+ 	golang.org/x/sys v0.44.0 // indirect
+-	golang.org/x/text v0.37.0 // indirect
++	golang.org/x/text v0.39.0 // indirect
+ 	google.golang.org/genproto/googleapis/api v0.0.0-20260401024825-9d38bb4040a9 // indirect
+ 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260401024825-9d38bb4040a9 // indirect
+ 	google.golang.org/grpc v1.80.0 // indirect
+--- a/go.sum
++++ b/go.sum
+@@ -311,8 +311,8 @@
+ golang.org/x/text v0.14.0/go.mod h1:18ZOQIKpY8NJVqYksKHtTdi31H5itFRjB5/qKTNYzSU=
+ golang.org/x/text v0.15.0/go.mod h1:18ZOQIKpY8NJVqYksKHtTdi31H5itFRjB5/qKTNYzSU=
+ golang.org/x/text v0.21.0/go.mod h1:4IBbMaMmOPCJ8SecivzSH54+73PCFmPWxNTLm+vZkEQ=
+-golang.org/x/text v0.37.0 h1:Cqjiwd9eSg8e0QAkyCaQTNHFIIzWtidPahFWR83rTrc=
+-golang.org/x/text v0.37.0/go.mod h1:a5sjxXGs9hsn/AJVwuElvCAo9v8QYLzvavO5z2PiM38=
++golang.org/x/text v0.39.0 h1:UbZz4pLOvn600D6Oh6GGEI6VAmndrEBLv8/6BEXzyus=
++golang.org/x/text v0.39.0/go.mod h1:3UwRclnC2g0TU9x8PZiyfOajCd1zaUNHF9cvqcQZ+ZM=
+ golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+ golang.org/x/tools v0.0.0-20191119224855-298f0cb1881e/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
+ golang.org/x/tools v0.1.12/go.mod h1:hNGJHUnrk76NpqgfD5Aqm5Crs+Hm0VOH/i9J2+nxYbc=
+--- a/vendor/modules.txt
++++ b/vendor/modules.txt
+@@ -541,7 +541,7 @@
+ # golang.org/x/term v0.43.0
+ ## explicit; go 1.25.0
+ golang.org/x/term
+-# golang.org/x/text v0.37.0
++# golang.org/x/text v0.39.0
+ ## explicit; go 1.25.0
+ golang.org/x/text/feature/plural
+ golang.org/x/text/internal
