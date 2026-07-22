@@ -2,7 +2,7 @@
 
 Name:           cargo2rpm
 Version:        0.3.4
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        Translation layer between cargo and RPM
 License:        MIT
 
