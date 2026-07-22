@@ -243,7 +243,7 @@ rg -ni "<cve-product>|<module>|<library-name>" /tmp/<package>.sbom.json
 When the component is found, determine whether it is actually
 installed in shipped binary RPMs vs only used during build/test.
 Use SBOM fields such as `type`, `scope`, `purl`, `properties`,
-`metadata.component`, and package relationships. 
+`metadata.component`, and package relationships.
 
 If the component's role is unclear from SBOM metadata, search to clarify its purpose.
 
