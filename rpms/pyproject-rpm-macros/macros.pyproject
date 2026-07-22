@@ -191,6 +191,14 @@ fi
     {short="D", long="dist-name", value=true},
     {short="t", long="top-level-only"},
 })}\
+%{lua:
+local __pci_pos = rpm.expand("%{?__pyproject_positional_args}")
+-- Always undefine first so a prior invocation's value can't leak into this
+-- one (mirrors how getopt() itself resets __pyproject_positional_args).
+rpm.undefine("__pyproject_check_import_saved_positional_args")
+if __pci_pos ~= "" then
+  rpm.define("__pyproject_check_import_saved_positional_args " .. __pci_pos)
+end}\
 %{expand:\\\
 if [ ! -f "%{_pyproject_modules %{?__pyproject_optflag_D}}" ]; then
   _modules_glob=( %{_pyproject_modules_base}-* )
@@ -203,7 +211,7 @@ if [ ! -f "%{_pyproject_modules %{?__pyproject_optflag_D}}" ]; then
   fi
   exit 1
 fi
-%py3_check_import -f "%{_pyproject_modules %{?__pyproject_optflag_D}}" %{?__pyproject_optflag_e} %{?__pyproject_optflag_t} %{?__pyproject_positional_args}
+%py3_check_import -f "%{_pyproject_modules %{?__pyproject_optflag_D}}" %{?__pyproject_optflag_e} %{?__pyproject_optflag_t} %{?__pyproject_check_import_saved_positional_args}
 }
 
 

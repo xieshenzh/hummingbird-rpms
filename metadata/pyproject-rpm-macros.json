@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Patch %pyproject_check_import to fix positional-args (shell-variable exclusion lists) being silently dropped: 1.23.0 made %_pyproject_modules/%pyproject_files getopt-based (for new -D multi-wheel support), and every getopt() call unconditionally undefines __pyproject_positional_args, so the nested %_pyproject_modules call inside %pyproject_check_import's own body clobbers the outer call's captured positional args before they're used. Affects any spec building its exclusion list via a shell variable (e.g. python-sentry-sdk's %check). Fix saves positional args to a private macro name before the nested call can clobber them. Reported upstream to Fedora; revisit once fixed there.",
+  "modification_status": "modified",
   "release": "2",
   "sha": "edd9e9893b3821af377bef5929b9db4ee79bfb7f",
   "source": "https://src.fedoraproject.org/rpms/pyproject-rpm-macros.git",
