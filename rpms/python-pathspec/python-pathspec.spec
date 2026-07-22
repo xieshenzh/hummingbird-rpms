@@ -1,6 +1,6 @@
 Name:           python-pathspec
 Version:        1.1.1
-Release:        4%{?dist}
+Release:        4.1%{?dist}
 Summary:        Utility library for gitignore style pattern matching of file paths
 
 License:        MPL-2.0
