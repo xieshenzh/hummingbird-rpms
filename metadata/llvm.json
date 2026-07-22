@@ -2,8 +2,8 @@
   "branch": "f44",
   "modification_reason": "Exclude 34 libarcher tests that fail due to setrlimit limitations in build environment",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "d35050bbe29a2794f71af232de40cd5a7744995f",
+  "release": "4",
+  "sha": "67eee1a7054c88abcfee0260268f7c0aece4d536",
   "source": "https://src.fedoraproject.org/rpms/llvm.git",
   "upstream_repo": "https://github.com/llvm/llvm-project",
   "version": "22.1.8"

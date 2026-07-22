@@ -1,0 +1,416 @@
+From 8d590969badd9f3fed18a99fffbd9afdf3a975c6 Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Fri, 10 Jul 2026 09:09:08 +0200
+Subject: [PATCH] [LLD][AArch64] Make adrp+ldr relaxation per-symbol
+ all-or-nothing (#208396)
+
+We can't relax only some adrp+ldr pairs for a symbol, because there may
+be a branch target between the adrp and ldr of this form:
+
+        adrp    x1, :got:sym
+    .Lfoo:
+        ldr     x1, [x1, :got_lo12:sym]
+        # ...
+
+        adrp    x1, :got:sym
+        ldr     x2, [x1, :got_lo12:sym]
+        b       .Lfoo
+
+Relaxing the first adrp+ldr here would be invalid. This was clarified in
+the ARM ABI in:
+https://github.com/ARM-software/abi-aa/commit/11fb4ef42898060189d6a34ee96966e696ecbd20.
+
+The implementation already performed a pre-scan to check that the
+relevant relocations occur in pairs. Change this scan to a) check all
+the preconditions for the relaxation and b) make the decision per
+symbol.
+
+Fixes https://github.com/llvm/llvm-project/issues/138254.
+---
+ bolt/test/AArch64/got-load-symbolization.s | 11 ++-
+ bolt/test/AArch64/lite-mode.s              | 17 +++--
+ lld/ELF/Arch/AArch64.cpp                   | 83 +++++++++++++--------
+ lld/test/ELF/aarch64-adrp-ldr-got.s        | 84 +++++++++++++++++++---
+ 4 files changed, 149 insertions(+), 46 deletions(-)
+
+diff --git a/bolt/test/AArch64/got-load-symbolization.s b/bolt/test/AArch64/got-load-symbolization.s
+index b4d682688758..399859fd7bfd 100644
+--- a/bolt/test/AArch64/got-load-symbolization.s
++++ b/bolt/test/AArch64/got-load-symbolization.s
+@@ -38,9 +38,9 @@ _start:
+ # CHECK-NEXT: adrp x2, __BOLT_got_zero
+ # CHECK-NEXT: nop
+ # CHECK-NEXT: ldr  x2, [x2, :lo12:__BOLT_got_zero{{.*}}]
+-	adrp    x2, :got:near
++	adrp    x2, :got:near2
+ 	nop
+-	ldr     x2, [x2, :got_lo12:near]
++	ldr     x2, [x2, :got_lo12:near2]
+ 
+ ## Load data object with local visibility. Relaxable into adrp+add.
+ # CHECK-NEXT: adrp x3, "local_far_data/1"
+@@ -58,6 +58,7 @@ _start:
+ 	.size _start, .-_start
+ 
+ .weak near
++.weak near2
+ .weak far
+ .weak far_data
+ 
+@@ -77,6 +78,12 @@ near:
+   ret
+ .size   near, .-near
+ 
++	.globl near2
++	.type near2, @function
++near2:
++  ret
++.size   near2, .-near2
++
+ #--- far.s
+ 
+   .text
+diff --git a/bolt/test/AArch64/lite-mode.s b/bolt/test/AArch64/lite-mode.s
+index f2d06219f7a2..24c31772b847 100644
+--- a/bolt/test/AArch64/lite-mode.s
++++ b/bolt/test/AArch64/lite-mode.s
+@@ -24,12 +24,12 @@
+ # CHECK-COMPACT-NOT: <_start.org.0>
+ 
+ ## Verify that the number of FDEs matches the number of functions in the output
+-## binary. There are three original functions and two optimized.
++## binary. There are four original functions and three optimized.
+ ## NOTE: at the moment we are emitting extra FDEs for patched functions, thus
+ ## there is one more FDE for _start.
+ # RUN: llvm-readelf -u %t.bolt | grep -wc FDE \
+ # RUN:   | FileCheck --check-prefix=CHECK-FDE %s
+-# CHECK-FDE: 6
++# CHECK-FDE: 8
+ 
+ ## In lite mode, optimized code will be separated from the original .text by
+ ## over 128MB, making it impossible for call/bl instructions in cold functions
+@@ -106,9 +106,9 @@ cold_function:
+ # CHECK-NEXT:       add  x4
+ 
+ ## Check that non-relaxable GOT load is left intact.
+-  adrp    x5, :got:far_func
++  adrp    x5, :got:far_func2
+   nop
+-  ldr     x5, [x5, #:got_lo12:far_func]
++  ldr     x5, [x5, #:got_lo12:far_func2]
+ # CHECK-INPUT-NEXT: adrp x5
+ # CHECK-INPUT-NEXT: nop
+ # CHECK-INPUT-NEXT: ldr x5
+@@ -155,3 +155,12 @@ far_func:
+   ret  x30
+   .cfi_endproc
+   .size far_func, .-far_func
++
++  .globl far_func2
++  .type far_func2, %function
++far_func2:
++# FDATA: 0 [unknown] 0 1 far_func2 0 0 100
++  .cfi_startproc
++  ret  x30
++  .cfi_endproc
++  .size far_func2, .-far_func2
+diff --git a/lld/ELF/Arch/AArch64.cpp b/lld/ELF/Arch/AArch64.cpp
+index ed6d42fd4c05..11c3dca1a358 100644
+--- a/lld/ELF/Arch/AArch64.cpp
++++ b/lld/ELF/Arch/AArch64.cpp
+@@ -106,13 +106,17 @@ private:
+ 
+ struct AArch64Relaxer {
+   Ctx &ctx;
+-  bool safeToRelaxAdrpLdr = false;
++  SmallPtrSet<Symbol *, 32> unsafeToRelaxAdrpLdr;
+ 
+-  AArch64Relaxer(Ctx &ctx, ArrayRef<Relocation> relocs);
++  AArch64Relaxer(Ctx &ctx, ArrayRef<Relocation> relocs, uint64_t secAddr,
++                 uint8_t *buf);
+   bool tryRelaxAdrpAdd(const Relocation &adrpRel, const Relocation &addRel,
+                        uint64_t secAddr, uint8_t *buf) const;
+   bool tryRelaxAdrpLdr(const Relocation &adrpRel, const Relocation &ldrRel,
+                        uint64_t secAddr, uint8_t *buf) const;
++  bool isLegalAdrpLdrRelaxationCandidate(const Relocation &adrpRel,
++                                         const Relocation &ldrRel,
++                                         uint64_t secAddr, uint8_t *buf) const;
+ };
+ } // namespace
+ 
+@@ -896,26 +900,30 @@ void AArch64::relaxTlsIeToLe(uint8_t *loc, const Relocation &rel,
+   llvm_unreachable("invalid relocation for TLS IE to LE relaxation");
+ }
+ 
+-AArch64Relaxer::AArch64Relaxer(Ctx &ctx, ArrayRef<Relocation> relocs)
++AArch64Relaxer::AArch64Relaxer(Ctx &ctx, ArrayRef<Relocation> relocs,
++                               uint64_t secAddr, uint8_t *buf)
+     : ctx(ctx) {
+   if (!ctx.arg.relax)
+     return;
+-  // Check if R_AARCH64_ADR_GOT_PAGE and R_AARCH64_LD64_GOT_LO12_NC
+-  // always appear in pairs.
++  // For a given symbol R_AARCH64_ADR_GOT_PAGE and R_AARCH64_LD64_GOT_LO12_NC
++  // relaxation is all-or-nothing. We can't relax only some of them, as there
++  // may be a jump destination between the two relocations.
+   size_t i = 0;
+   const size_t size = relocs.size();
+   for (; i != size; ++i) {
+     if (relocs[i].type == R_AARCH64_ADR_GOT_PAGE) {
+-      if (i + 1 < size && relocs[i + 1].type == R_AARCH64_LD64_GOT_LO12_NC) {
++      if (i + 1 < size && relocs[i + 1].type == R_AARCH64_LD64_GOT_LO12_NC &&
++          !unsafeToRelaxAdrpLdr.contains(relocs[i].sym) &&
++          isLegalAdrpLdrRelaxationCandidate(relocs[i], relocs[i + 1], secAddr,
++                                            buf)) {
+         ++i;
+         continue;
+       }
+-      break;
++      unsafeToRelaxAdrpLdr.insert(relocs[i].sym);
+     } else if (relocs[i].type == R_AARCH64_LD64_GOT_LO12_NC) {
+-      break;
++      unsafeToRelaxAdrpLdr.insert(relocs[i].sym);
+     }
+   }
+-  safeToRelaxAdrpLdr = i == size;
+ }
+ 
+ bool AArch64Relaxer::tryRelaxAdrpAdd(const Relocation &adrpRel,
+@@ -966,23 +974,9 @@ bool AArch64Relaxer::tryRelaxAdrpAdd(const Relocation &adrpRel,
+   return true;
+ }
+ 
+-bool AArch64Relaxer::tryRelaxAdrpLdr(const Relocation &adrpRel,
+-                                     const Relocation &ldrRel, uint64_t secAddr,
+-                                     uint8_t *buf) const {
+-  if (!safeToRelaxAdrpLdr)
+-    return false;
+-
+-  // When the definition of sym is not preemptible then we may
+-  // be able to relax
+-  // ADRP xn, :got: sym
+-  // LDR xn, [ xn :got_lo12: sym]
+-  // to
+-  // ADRP xn, sym
+-  // ADD xn, xn, :lo_12: sym
+-
+-  if (adrpRel.type != R_AARCH64_ADR_GOT_PAGE ||
+-      ldrRel.type != R_AARCH64_LD64_GOT_LO12_NC)
+-    return false;
++bool AArch64Relaxer::isLegalAdrpLdrRelaxationCandidate(
++    const Relocation &adrpRel, const Relocation &ldrRel, uint64_t secAddr,
++    uint8_t *buf) const {
+   // Check if the relocations apply to consecutive instructions.
+   if (adrpRel.offset + 4 != ldrRel.offset)
+     return false;
+@@ -1022,10 +1016,37 @@ bool AArch64Relaxer::tryRelaxAdrpLdr(const Relocation &adrpRel,
+   if (val != llvm::SignExtend64(val, 33))
+     return false;
+ 
++  return true;
++}
++
++bool AArch64Relaxer::tryRelaxAdrpLdr(const Relocation &adrpRel,
++                                     const Relocation &ldrRel, uint64_t secAddr,
++                                     uint8_t *buf) const {
++  // When the definition of sym is not preemptible then we may
++  // be able to relax
++  // ADRP xn, :got: sym
++  // LDR xn, [ xn :got_lo12: sym]
++  // to
++  // ADRP xn, sym
++  // ADD xn, xn, :lo_12: sym
++
++  if (!ctx.arg.relax || adrpRel.type != R_AARCH64_ADR_GOT_PAGE ||
++      ldrRel.type != R_AARCH64_LD64_GOT_LO12_NC)
++    return false;
++
++  Symbol *sym = adrpRel.sym;
++  if (unsafeToRelaxAdrpLdr.contains(sym))
++    return false;
++
++  assert(isLegalAdrpLdrRelaxationCandidate(adrpRel, ldrRel, secAddr, buf) &&
++         "Should have been marked as unsafe");
++
++  uint32_t adrpInstr = read32le(buf + adrpRel.offset);
++  uint32_t adrpDestReg = adrpInstr & 0x1f;
+   Relocation adrpSymRel = {RE_AARCH64_PAGE_PC, R_AARCH64_ADR_PREL_PG_HI21,
+-                           adrpRel.offset, /*addend=*/0, &sym};
++                           adrpRel.offset, /*addend=*/0, sym};
+   Relocation addRel = {R_ABS, R_AARCH64_ADD_ABS_LO12_NC, ldrRel.offset,
+-                       /*addend=*/0, &sym};
++                       /*addend=*/0, sym};
+ 
+   // adrp x_<dest_reg>
+   write32le(buf + adrpSymRel.offset, 0x90000000 | adrpDestReg);
+@@ -1034,11 +1055,11 @@ bool AArch64Relaxer::tryRelaxAdrpLdr(const Relocation &adrpRel,
+ 
+   ctx.target->relocate(
+       buf + adrpSymRel.offset, adrpSymRel,
+-      SignExtend64(getAArch64Page(sym.getVA(ctx)) -
++      SignExtend64(getAArch64Page(sym->getVA(ctx)) -
+                        getAArch64Page(secAddr + adrpSymRel.offset),
+                    64));
+   ctx.target->relocate(buf + addRel.offset, addRel,
+-                       SignExtend64(sym.getVA(ctx), 64));
++                       SignExtend64(sym->getVA(ctx), 64));
+   tryRelaxAdrpAdd(adrpSymRel, addRel, secAddr, buf);
+   return true;
+ }
+@@ -1052,7 +1073,7 @@ static bool needsGotForMemtag(const Relocation &rel) {
+ void AArch64::relocateAlloc(InputSection &sec, uint8_t *buf) const {
+   uint64_t secAddr = sec.getOutputSection()->addr + sec.outSecOff;
+   const ArrayRef<Relocation> relocs = sec.relocs();
+-  AArch64Relaxer relaxer(ctx, relocs);
++  AArch64Relaxer relaxer(ctx, relocs, secAddr, buf);
+   for (size_t i = 0, size = relocs.size(); i != size; ++i) {
+     const Relocation &rel = relocs[i];
+     if (rel.expr == R_NONE) // See finalizeAddressDependentContent()
+diff --git a/lld/test/ELF/aarch64-adrp-ldr-got.s b/lld/test/ELF/aarch64-adrp-ldr-got.s
+index 56a90aac3876..a8216da9f20c 100644
+--- a/lld/test/ELF/aarch64-adrp-ldr-got.s
++++ b/lld/test/ELF/aarch64-adrp-ldr-got.s
+@@ -4,6 +4,7 @@
+ # RUN: llvm-mc -filetype=obj -triple=aarch64 %t/a.s -o %t/a.o
+ # RUN: llvm-mc -filetype=obj -triple=aarch64 %t/unpaired.s -o %t/unpaired.o
+ # RUN: llvm-mc -filetype=obj -triple=aarch64 %t/lone-ldr.s -o %t/lone-ldr.o
++# RUN: llvm-mc -filetype=obj -triple=aarch64 %t/all-or-nothing.s -o %t/all-or-nothing.o
+ 
+ # RUN: ld.lld %t/a.o -T %t/out-of-adr-range.t -o %t/a
+ # RUN: llvm-objdump --no-show-raw-insn -d %t/a | FileCheck %s
+@@ -49,7 +50,8 @@
+ # RUN: llvm-objdump --no-show-raw-insn -d %t/out-of-range | \
+ # RUN:   FileCheck --check-prefix=X1-NO-RELAX %s
+ 
+-## Relocations do not appear in pairs, no relaxations should be applied.
++## Relocations do not appear in pairs, no relaxations should be applied for
++## that symbol. We can still relax other symbols.
+ # RUN: ld.lld %t/unpaired.o -o %t/unpaired
+ # RUN: llvm-objdump --no-show-raw-insn -d %t/unpaired | \
+ # RUN:   FileCheck --check-prefix=UNPAIRED %s
+@@ -58,6 +60,9 @@
+ # UNPAIRED-NEXT:    b
+ # UNPAIRED-NEXT:    adrp   x0
+ # UNPAIRED:         ldr	   x0
++## This is a different symbol.
++# UNPAIRED:         nop
++# UNPAIRED:         adr    x1
+ 
+ ## Relocations do not appear in pairs, no relaxations should be applied.
+ # RUN: ld.lld %t/lone-ldr.o -o %t/lone-ldr
+@@ -66,6 +71,26 @@
+ 
+ # LONE-LDR:         ldr	   x0
+ 
++## Make sure that relaxation is not applied if not all adrp+ldr pairs for
++## a given symbol can be relaxed. This is not legal, because there may be
++## a branch destination between the adrp and ldr instructions. We can still
++## perform the relaxation for other symbols, or the same symbol in a different
++## section.
++# RUN: ld.lld %t/all-or-nothing.o -o %t/all-or-nothing
++# RUN: llvm-objdump --no-show-raw-insn -d %t/all-or-nothing | \
++# RUN:   FileCheck --check-prefix=ALL-OR-NOTHING %s
++
++# ALL-OR-NOTHING-LABEL: <_start>:
++# ALL-OR-NOTHING: adrp   x1
++# ALL-OR-NOTHING: ldr    x1
++# ALL-OR-NOTHING: adrp   x1
++# ALL-OR-NOTHING: ldr    x2
++# ALL-OR-NOTHING: nop
++# ALL-OR-NOTHING: adr    x1
++# ALL-OR-NOTHING-LABEL: <foo>:
++# ALL-OR-NOTHING: nop
++# ALL-OR-NOTHING: adr    x1
++
+ ## This linker script ensures that .rodata and .text are sufficiently (>1M)
+ ## far apart so that the adrp + ldr pair cannot be relaxed to adr + nop.
+ #--- out-of-adr-range.t
+@@ -95,25 +120,40 @@ SECTIONS {
+ .hidden x
+ x:
+ .word 10
++.hidden y
++y:
++.word 10
++.hidden z
++z:
++.word 10
++.hidden u
++u:
++.word 10
++.hidden v
++v:
++.word 10
+ .text
+ .global _start
+ _start:
+   adrp    x1, :got:x
+   ldr     x1, [x1, #:got_lo12:x]
+-  adrp    x2, :got:x+1
+-  ldr     x2, [x2, #:got_lo12:x]
+-  adrp    x3, :got:x
+-  ldr     x3, [x3, #:got_lo12:x+8]
+-  adrp    x4, :got:x
+-  ldr     x5, [x4, #:got_lo12:x]
+-  adrp    x6, :got:x
+-  ldr     x6, [x0, #:got_lo12:x]
++  adrp    x2, :got:y+1
++  ldr     x2, [x2, #:got_lo12:y]
++  adrp    x3, :got:z
++  ldr     x3, [x3, #:got_lo12:z+8]
++  adrp    x4, :got:u
++  ldr     x5, [x4, #:got_lo12:u]
++  adrp    x6, :got:v
++  ldr     x6, [x0, #:got_lo12:v]
+ 
+ #--- unpaired.s
+ .text
+ .hidden x
+ x:
+   nop
++.hidden y
++y:
++  nop
+ .global _start
+ _start:
+   adrp    x0, :got:x
+@@ -121,6 +161,8 @@ _start:
+   adrp    x0, :got:x
+ L:
+   ldr     x0, [x0, #:got_lo12:x]
++  adrp    x1, :got:y
++  ldr     x1, [x1, #:got_lo12:y]
+ 
+ #--- lone-ldr.s
+ .text
+@@ -130,3 +172,27 @@ x:
+ .global _start
+ _start:
+   ldr     x0, [x0, #:got_lo12:x]
++
++#--- all-or-nothing.s
++.rodata
++.hidden x
++x:
++.word 10
++.hidden y
++y:
++.word 10
++.text
++.global _start
++_start:
++  adrp    x1, :got:x
++  ldr     x1, [x1, #:got_lo12:x]
++  adrp    x1, :got:x
++  ldr     x2, [x1, #:got_lo12:x]
++  adrp    x1, :got:y
++  ldr     x1, [x1, #:got_lo12:y]
++
++.section .text.foo
++.global foo
++foo:
++  adrp    x1, :got:x
++  ldr     x1, [x1, #:got_lo12:x]
+-- 
+2.50.1
+
