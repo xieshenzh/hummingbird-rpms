@@ -181,6 +181,7 @@ sub-component; extract it early (`rhjira dump`) as it often
 resolves mismatch cases without any web search.
 
 When you do search:
+
 - **Product mismatch** (CVE vendor/product differs from Hummingbird package):
   Search for architectural/implementation differences between the products,
   not CVE details. Example: `"<packageA> vs <packageB>" <component> differences`
@@ -242,8 +243,9 @@ rg -ni "<cve-product>|<module>|<library-name>" /tmp/<package>.sbom.json
 When the component is found, determine whether it is actually
 installed in shipped binary RPMs vs only used during build/test.
 Use SBOM fields such as `type`, `scope`, `purl`, `properties`,
-`metadata.component`, and package relationships. If the component's
-role is unclear from SBOM metadata, search to clarify its purpose.
+`metadata.component`, and package relationships. 
+
+If the component's role is unclear from SBOM metadata, search to clarify its purpose.
 
 Decision guidance:
 
