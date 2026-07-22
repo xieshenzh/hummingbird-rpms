@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "18878b45cf41ec99f6a15ee287f7f8b5fdb9468f",
+  "release": "527",
+  "sha": "30ba7e64ffed514a3779fd4ea6c793ac4e927487",
   "source": "https://src.fedoraproject.org/rpms/perl-Storable.git",
   "upstream_repo": "https://github.com/Perl/perl5",
   "version": "3.41"
