@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "39a18c1a07321ccae0a89ad2ce739ac312450543",
+  "release": "3",
+  "sha": "6a23b186edd24318213c4e765e7a1dd2b13aa2c0",
   "source": "https://src.fedoraproject.org/rpms/graphviz.git",
   "upstream_repo": "https://gitlab.com/graphviz/graphviz",
   "version": "15.1.0"
