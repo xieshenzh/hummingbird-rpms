@@ -1,0 +1,8 @@
+summary: CI plan, picks Tier1 tests, runs in beakerlib.
+discover:
+  - name: fedora
+    how: fmf
+    filter: 'tier: 1'
+    url: https://src.fedoraproject.org/tests/openblas.git
+execute:
+    how: tmt

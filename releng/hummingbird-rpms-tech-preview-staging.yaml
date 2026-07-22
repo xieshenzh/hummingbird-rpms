@@ -634,17 +634,23 @@ spec:
           contentType: rpm
         - name: nss-fips-main
           contentType: rpm
+        - name: numactl-main
+          contentType: rpm
         - name: oauth2-proxy-main
           contentType: rpm
         - name: ocaml-srpm-macros-main
           contentType: rpm
         - name: oniguruma-main
           contentType: rpm
+        - name: openblas-main
+          contentType: rpm
         - name: openblas-srpm-macros-main
           contentType: rpm
         - name: opendbx-main
           contentType: rpm
         - name: openldap-main
+          contentType: rpm
+        - name: openmpi-main
           contentType: rpm
         - name: openscap-main
           contentType: rpm

@@ -11140,6 +11140,45 @@ spec:
     title: SBOM-event-to-Bombino
 # --- nss_wrapper ---
 # PENDING
+# --- numactl ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: numactl-main
+spec:
+  application: rpms-main
+  componentName: numactl-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/numactl-main
+  source:
+    git:
+      context: rpms/numactl
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: numactl-main
+  name: numactl-main
+spec:
+  image:
+    name: hummingbird-tenant/numactl-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- numpy ---
 # PENDING
 # --- oauth2-proxy ---
@@ -11252,6 +11291,45 @@ metadata:
 spec:
   image:
     name: hummingbird-tenant/oniguruma-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
+# --- openblas ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: openblas-main
+spec:
+  application: rpms-main
+  componentName: openblas-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/openblas-main
+  source:
+    git:
+      context: rpms/openblas
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: openblas-main
+  name: openblas-main
+spec:
+  image:
+    name: hummingbird-tenant/openblas-main
     visibility: public
   notifications:
   - config:
@@ -11377,7 +11455,44 @@ spec:
     method: webhook
     title: SBOM-event-to-Bombino
 # --- openmpi ---
-# PENDING
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: openmpi-main
+spec:
+  application: rpms-main
+  componentName: openmpi-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/openmpi-main
+  source:
+    git:
+      context: rpms/openmpi
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: openmpi-main
+  name: openmpi-main
+spec:
+  image:
+    name: hummingbird-tenant/openmpi-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- opensc ---
 # PENDING
 # --- openscap ---
