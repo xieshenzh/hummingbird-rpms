@@ -40,8 +40,9 @@ jaeger-functionality:
 
         # 1. Version reports correctly (ldflags injected)
         version_output=$(jaeger version 2>&1 || true)
-        if [[ "${version_output}" == *"2.19."* ]]; then
-          echo "PASS: jaeger reports correct 2.19.x version"
+        rpm_version=$(rpm -q --queryformat '%{VERSION}' jaeger)
+        if [[ "${version_output}" == *"${rpm_version}"* ]]; then
+          echo "PASS: jaeger reports correct version (${rpm_version})"
         else
           echo "FAIL: unexpected version output: ${version_output}"
           failed=1

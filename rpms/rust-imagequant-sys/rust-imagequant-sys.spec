@@ -7,7 +7,7 @@
 
 Name:           rust-imagequant-sys
 Version:        4.1.0
-Release:        2.1%{?dist}
+Release:        3%{?dist}
 Summary:        Convert 24/32-bit images to 8-bit palette with alpha channel
 
 License:        GPL-3.0-or-later

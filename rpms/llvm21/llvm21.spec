@@ -414,7 +414,7 @@ Version:	%{maj_ver}.%{min_ver}.%{patch_ver}%{?rc_ver:~%{rc_ver}}%{?llvm_snapshot
 %if 0%{?rhel} == 8
 Release:	1%{?dist}
 %else
-Release:	6%{?dist}
+Release:	7%{?dist}
 %endif
 Summary:	The Low Level Virtual Machine
 

@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "a04046fc93722dccb7822d2bdef8bbc6ed49c9bc",
+  "release": "2",
+  "sha": "f8b4ca412364e5c150ddb65b154fa74339b9c6a8",
   "source": "https://src.fedoraproject.org/rpms/perl-PathTools.git",
   "upstream_repo": "https://github.com/Perl/perl5",
   "version": "3.95"

@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "5",
-  "sha": "c317cb2db7117bbca97f5dfeee1f61e78df9552b",
+  "release": "6",
+  "sha": "4024f7cebb32c4ffecf608f500e12fb885e645f1",
   "source": "https://src.fedoraproject.org/rpms/zlib-ng.git",
   "upstream_repo": "https://github.com/zlib-ng/zlib-ng",
   "version": "2.3.3"

@@ -28,7 +28,7 @@ Epoch: 102
 Epoch: 2
 %endif
 Version: 2.0.0
-Release: 1.1%{?dist}
+Release: 3%{?dist}
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-3-Clause AND MIT
 %if %{defined golang_arches_future}
@@ -48,7 +48,6 @@ Requires: aardvark-dns >=  %{epoch}:%{major_minor}
 Provides: container-network-stack = 2
 Requires: nftables
 BuildRequires: make
-BuildRequires: protobuf-c
 BuildRequires: protobuf-compiler
 %if %{defined rhel}
 # rust-toolset requires the `local` repo enabled on non-koji ELN build environments

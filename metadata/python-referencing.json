@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "4407f0ba8048cdcf49a2829ce8078eaee3051a86",
+  "release": "4",
+  "sha": "1ffa7ecc4a2c65987075b12eb477df5cfef58ed7",
   "source": "https://src.fedoraproject.org/rpms/python-referencing.git",
   "upstream_repo": "https://github.com/python-jsonschema/referencing",
   "version": "0.37.0"

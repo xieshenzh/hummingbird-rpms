@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "a851f4dc8e93294cefcc8614a33f837c47268c89",
+  "release": "4",
+  "sha": "012124a9dbc68f7c01df499bd48d3f46526d4e4e",
   "source": "https://src.fedoraproject.org/rpms/lujavrite.git",
   "upstream_repo": "https://github.com/mizdebsk/lujavrite",
   "version": "1.2.3"

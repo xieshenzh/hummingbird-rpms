@@ -3,7 +3,7 @@
 
 Name:           python-trustme
 Version:        1.2.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        #1 quality TLS certs while you wait, for the discerning tester
 License:        MIT OR Apache-2.0
 URL:            https://github.com/python-trio/trustme

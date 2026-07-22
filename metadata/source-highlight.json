@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "27",
-  "sha": "59404ea34ee0af8b432d5a5dd6ac6e3e534217d3",
+  "release": "28",
+  "sha": "dda039de728ffdc7b7b3054b224685daa2f7b7c1",
   "source": "https://src.fedoraproject.org/rpms/source-highlight.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/src-highlite.git",
   "version": "3.1.9"

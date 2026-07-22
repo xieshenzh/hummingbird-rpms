@@ -173,7 +173,7 @@ dnf-default-install-gets-upstream:
         DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs"
 
         mkdir -p "${NEWROOT}"
-        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-primary --root "${NEWROOT}"
 
         ${DNF} install filesystem
         ${DNF} install openssl
@@ -240,7 +240,7 @@ dnf-no-weak-deps-install-gets-upstream:
         DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs --setopt=install_weak_deps=False"
 
         mkdir -p "${NEWROOT}"
-        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-primary --root "${NEWROOT}"
 
         ${DNF} install filesystem
         ${DNF} install openssl
@@ -299,7 +299,7 @@ dnf-config-fips-gets-validated:
         DNF="dnf-installroot ${NEWROOT} -y --use-host-config --nodocs"
 
         mkdir -p "${NEWROOT}"
-        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-primary --root "${NEWROOT}"
 
         ${DNF} install filesystem
         ${DNF} install openssl openssl-config-fips

@@ -1,6 +1,6 @@
 Name:           PyYAML
 Version:        6.0.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        YAML parser and emitter for Python
 
 # SPDX

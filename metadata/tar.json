@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "8",
-  "sha": "9b8709a75091d2fa82d667a4f37d37e9b9b1c74c",
+  "release": "9",
+  "sha": "56aba219a0aa641dec2e4932c721eb6b6379ebec",
   "source": "https://src.fedoraproject.org/rpms/tar.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/tar.git",
   "version": "1.35"

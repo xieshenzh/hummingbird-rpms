@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "3dcac1edbeb4d9f3a6a6519778aa9ec58bf4eeeb",
+  "release": "2",
+  "sha": "d0e69299935c280ffa8b963132ec9079251f08f9",
   "source": "https://src.fedoraproject.org/rpms/cracklib.git",
   "upstream_repo": "https://github.com/cracklib/cracklib",
   "version": "2.10.3"

@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "0ba24488a59dabc0e2a6e12422d3194e23e90ba2",
+  "release": "4",
+  "sha": "9b34a4a1bf05734ac0142e372407938ed6b8229b",
   "source": "https://src.fedoraproject.org/rpms/mpdecimal.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/mpdecimal",
   "version": "4.0.1"

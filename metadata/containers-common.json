@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Add sigstore signing keys",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "5bc81e5a2a11345bca5edb7a7b8b5d04b26c5260",
+  "release": "2",
+  "sha": "74269e08298d7de93e02f61a5e818018c72d6e57",
   "source": "https://src.fedoraproject.org/rpms/containers-common.git",
   "upstream_repo": "https://github.com/containers/common",
   "version": "0.68.1"

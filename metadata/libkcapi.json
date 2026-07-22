@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "10",
-  "sha": "75fa4aea8f3bb80e213a9f3b3adaf293f0991ac0",
+  "release": "11",
+  "sha": "56ef731769887813f4a98bce920f2ed480c25382",
   "source": "https://src.fedoraproject.org/rpms/libkcapi.git",
   "upstream_repo": "https://github.com/smuellerDD/libkcapi",
   "version": "1.5.0"

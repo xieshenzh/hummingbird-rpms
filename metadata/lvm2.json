@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Disable sanlock - sanlock-devel >= 5.0.0 only available in rawhide",
   "modification_status": "modified",
-  "release": "2",
-  "sha": "5e777814ea39121b1e0db0ee57b9a4110b5e3f66",
+  "release": "3",
+  "sha": "2de4aecce1353f5d516d2897a95294ecee71f886",
   "source": "https://src.fedoraproject.org/rpms/lvm2.git",
   "upstream_repo": "https://gitlab.com/lvmteam/lvm2",
   "version": "2.03.41"

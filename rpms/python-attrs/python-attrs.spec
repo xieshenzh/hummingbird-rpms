@@ -4,7 +4,7 @@
 
 Name:           python-attrs
 Version:        26.1.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Python attributes without boilerplate
 
 # SPDX

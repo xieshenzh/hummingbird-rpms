@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "5b87988380c265c477a8e4bf5f40251c2ebe448d",
+  "release": "2",
+  "sha": "6c959cb2a7cab7c5c403e4acc28c231934438dfe",
   "source": "https://src.fedoraproject.org/rpms/which.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/which.git",
   "version": "2.25"

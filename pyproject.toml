@@ -1,3 +1,8 @@
+[dependency-groups]
+dev = [
+  "rhjira",
+]
+
 [[tool.mypy.overrides]]
 module = "cki_lib.*"
 ignore_missing_imports = true

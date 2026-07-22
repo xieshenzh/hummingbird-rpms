@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Pre-existing modification - requires review",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "3cf1dca4b42cccf6e126f95d256949810eb63691",
+  "release": "2",
+  "sha": "b1ae59d326997934ddf40a9e262e7bd118fad637",
   "source": "https://src.fedoraproject.org/rpms/python-requests.git",
   "upstream_repo": "https://github.com/psf/requests",
   "version": "2.34.2"

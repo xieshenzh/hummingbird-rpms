@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "45",
-  "sha": "249d2942a96a1ef840e0316ed2dd6d8c06b18c40",
+  "release": "46",
+  "sha": "4046c210d122112880062571f20bb5d127fdabca",
   "source": "https://src.fedoraproject.org/rpms/zip.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/zip",
   "version": "3.0"

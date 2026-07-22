@@ -9,8 +9,8 @@
 
 
 Name: rabbitmq-server4.2
-Version: 4.2.8
-Release: 1%{?dist}
+Version: 4.2.9
+Release: 0.1%{?dist}
 Summary: The RabbitMQ server
 License: MPL-2.0
 Source0: https://github.com/rabbitmq/rabbitmq-server/releases/download/v%{version}/%{srcname}_%{version}.orig.tar.xz

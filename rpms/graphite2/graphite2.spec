@@ -1,6 +1,6 @@
 Name:           graphite2
 Version:        1.3.14
-Release:        20.2%{?dist}
+Release:        22%{?dist}
 Summary:        Font rendering capabilities for complex non-Roman writing systems
 
 # As per COPYING file this library is tri-licensed
@@ -44,8 +44,6 @@ Includes and definitions for developing with graphite2.
 
 
 %build
-# Upstream cmake_minimum_required is below 3.5; CMake 4.0 dropped that compat.
-# https://fedoraproject.org/wiki/Changes/CMake4.0
 %cmake -DGRAPHITE2_COMPARE_RENDERER=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 %cmake_build
 
@@ -81,6 +79,12 @@ find %{buildroot} -type f -name "*.la" -print -delete
 
 
 %changelog
+* Mon Jul 20 2026 Parag Nemade <panemade AT redhat DOT com> - 1.3.14-22
+- Set CMAKE_POLICY_VERSION_MINIMUM to 3.5 which fixes rawhide FTBFS
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.14-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.14-20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

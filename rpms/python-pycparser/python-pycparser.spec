@@ -3,7 +3,7 @@
 Name:           python-pycparser
 Summary:        C parser and AST generator written in Python
 Version:        3.00
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 
 URL:            https://github.com/eliben/pycparser

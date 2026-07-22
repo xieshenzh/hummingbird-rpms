@@ -1,0 +1,8 @@
+{
+  "modification_status": "native",
+  "release": "0.1",
+  "release_monitoring_project_id": 390998,
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/kubernetes/git-sync",
+  "version": "4.7.1"
+}

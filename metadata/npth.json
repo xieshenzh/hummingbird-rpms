@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "cf9fe3ec7187a4c0507f6be0f896d32bc27b97ba",
+  "release": "5",
+  "sha": "519d0f4ab5bdb099c15d96af7fe58eb7d02995d3",
   "source": "https://src.fedoraproject.org/rpms/npth.git",
   "upstream_repo": "https://dev.gnupg.org/source/npth.git",
   "version": "1.8"

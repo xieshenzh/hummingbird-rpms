@@ -79,7 +79,7 @@ rpm-install:
         set -e  # Exit immediately on any error
 
         # Copy repo configurations
-        cp /tmp/repos/fedora-43.repo /etc/yum.repos.d/
+        cp /tmp/repos/fedora-44.repo /etc/yum.repos.d/
         cp /tmp/repos/hummingbird.repo /etc/yum.repos.d/
 
         # Create local.repo config
@@ -101,7 +101,7 @@ rpm-install:
         mkdir -p "${NEWROOT}"
 
         # Import GPG key
-        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-43-primary --root "${NEWROOT}"
+        rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-primary --root "${NEWROOT}"
 
         # Install filesystem first, then the test package
         dnf-installroot "${NEWROOT}" ${DNF_FLAGS} install filesystem

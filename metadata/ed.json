@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "7772de949f84c7e43c6aae7894d825734b599dc0",
+  "release": "3",
+  "sha": "58502bf023030f5dbca384b4a41e38eb43627870",
   "source": "https://src.fedoraproject.org/rpms/ed.git",
   "upstream_repo": "https://git.savannah.gnu.org/git/ed.git",
   "version": "1.22.5"

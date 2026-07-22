@@ -2,7 +2,7 @@
 
 Name:           cargo-rpm-macros
 Version:        28.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        RPM macros and generators for building Rust packages with cargo
 License:        MIT
 

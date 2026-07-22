@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "8e1d9f6cd3ed0d5021000b11976662820d3ba7a8",
+  "release": "2",
+  "sha": "c5ab8a8e2ed69786e981f6d883bad5c014135b78",
   "source": "https://src.fedoraproject.org/rpms/cargo-rpm-macros.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/cargo-rpm-macros",
   "version": "28.5"

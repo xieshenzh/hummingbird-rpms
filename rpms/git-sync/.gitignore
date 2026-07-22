@@ -1,0 +1,4 @@
+*.tar.gz
+*-vendor.tar.bz2
+git-sync-4.7.1.tar.gz
+git-sync-4.7.1-vendor.tar.bz2

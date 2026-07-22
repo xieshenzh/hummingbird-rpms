@@ -2,7 +2,7 @@
 
 Name:                 dbus-broker
 Version:              37
-Release:              8.2%{?dist}
+Release:              9%{?dist}
 Summary:              Linux D-Bus Message Broker
 License:              Apache-2.0 AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND (Apache-2.0 OR LGPL-2.1-or-later)
 URL:                  https://github.com/bus1/dbus-broker

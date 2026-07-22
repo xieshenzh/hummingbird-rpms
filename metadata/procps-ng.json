@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "e6a407ac8a45e2ee7b1bc28cca439217852afefc",
+  "release": "2",
+  "sha": "56cd47281d5f13b9dcd8e38e92aff65bdae15b49",
   "source": "https://src.fedoraproject.org/rpms/procps-ng.git",
   "upstream_repo": "https://gitlab.com/procps-ng/procps",
   "version": "4.0.6"

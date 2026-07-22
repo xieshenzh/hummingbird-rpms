@@ -11,7 +11,7 @@
 Name:           python-setuptools
 # When updating, update the bundled libraries versions bellow!
 Version:        83.0.0
-Release:        4%{?dist}
+Release:        2%{?dist}
 Summary:        Easily build and distribute Python packages
 # setuptools is MIT
 # autocommand is LGPL-3.0-only

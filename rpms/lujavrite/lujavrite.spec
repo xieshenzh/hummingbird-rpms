@@ -1,6 +1,6 @@
 Name:           lujavrite
 Version:        1.2.3
-Release:        3.1%{?dist}
+Release:        4%{?dist}
 Summary:        Lua library for calling Java code
 License:        Apache-2.0
 URL:            https://github.com/mizdebsk/lujavrite
