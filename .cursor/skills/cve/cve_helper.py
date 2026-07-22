@@ -307,6 +307,16 @@ def build_suggested_chat_title(reports: list[dict[str, Any]]) -> str:
     return ", ".join(parts)
 
 
+def apply_title_prefix(title: str, prefix: str) -> str:
+    cleaned_prefix = prefix.strip()
+    cleaned_title = title.strip()
+    if not cleaned_prefix:
+        return cleaned_title
+    if not cleaned_title:
+        return cleaned_prefix
+    return f"{cleaned_prefix} {cleaned_title}"
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Summarize HUM CVE ticket details for /cve workflow.",
@@ -336,6 +346,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--title-only",
         action="store_true",
         help="Print only deterministic suggested chat title.",
+    )
+    parser.add_argument(
+        "--title-prefix",
+        default="",
+        help="Optional prefix to prepend to suggested chat title (e.g. 'FIB' or '!1234').",
     )
     return parser
 
@@ -371,6 +386,7 @@ def main() -> int:
         reports.append(report)
 
     suggested_chat_title = build_suggested_chat_title(reports)
+    suggested_chat_title = apply_title_prefix(suggested_chat_title, args.title_prefix)
     payload: dict[str, Any] = {
         "suggested_chat_title": suggested_chat_title,
         "tickets": reports,
