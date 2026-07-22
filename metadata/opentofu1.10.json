@@ -1,5 +1,6 @@
 {
-  "modification_status": "native",
+  "modification_reason": "backport fix for CVE-2026-56852",
+  "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 371292,
   "track_upstream": "1.10",
