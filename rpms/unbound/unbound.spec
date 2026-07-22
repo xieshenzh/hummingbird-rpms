@@ -42,8 +42,8 @@
 
 Summary: Validating, recursive, and caching DNS(SEC) resolver
 Name: unbound
-Version: 1.25.1
-Release: 5%{?dist}
+Version: 1.25.2
+Release: 0.1%{?dist}
 License: BSD-3-Clause
 Url: https://nlnetlabs.nl/projects/unbound/
 VCS: git:%{forgeurl0}
