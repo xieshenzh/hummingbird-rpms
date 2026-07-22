@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Drop texlive/PDF/HTML from gdb-doc: not needed in Hummingbird; gdb-doc ships info pages only",
   "modification_status": "modified",
-  "release": "3",
-  "sha": "876ca41f50de02a0e849baf9aa3d3c278ec3e307",
+  "release": "4",
+  "sha": "b739e3c503d418aa51d92356f99a0286f7ea58d2",
   "source": "https://src.fedoraproject.org/rpms/gdb.git",
   "upstream_repo": "https://sourceware.org/git/binutils-gdb.git",
   "version": "17.2"
