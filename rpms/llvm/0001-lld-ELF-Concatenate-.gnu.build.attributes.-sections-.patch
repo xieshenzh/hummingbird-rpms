@@ -1,0 +1,87 @@
+From 2119e359b1f968da94ff27a4078d569e18903aef Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Mon, 13 Jul 2026 09:08:54 +0200
+Subject: [PATCH] [lld][ELF] Concatenate .gnu.build.attributes.* sections
+ (#208737)
+
+ld.bfd/ld.gold have been concatenating the GNU build attribute sections
+since 2018:
+
+https://gitlab.com/gnutools/binutils-gdb/-/commit/7d8a31665739412395f6dd370d2279acd322e78e
+
+Do the same in LLD. These do not have a dedicated section type or flags,
+so this is handled by the name-based logic. (Peculiarly, there used to
+be SHF_GNU_BUILD_NOTE, but it was removed again.)
+
+Not concatenating these results in a huge number of sections, which
+breaks tools like `file`.
+---
+ lld/ELF/LinkerScript.cpp            |  2 +-
+ lld/test/ELF/gnu-build-attributes.s | 42 +++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+), 1 deletion(-)
+ create mode 100644 lld/test/ELF/gnu-build-attributes.s
+
+diff --git a/lld/ELF/LinkerScript.cpp b/lld/ELF/LinkerScript.cpp
+index 1c0a49a73962..64fb717e17d9 100644
+--- a/lld/ELF/LinkerScript.cpp
++++ b/lld/ELF/LinkerScript.cpp
+@@ -119,7 +119,7 @@ StringRef LinkerScript::getOutputSectionName(const InputSectionBase *s) const {
+                       ".init_array",  ".fini_array", ".tbss",
+                       ".tdata",       ".ARM.exidx",  ".ARM.extab",
+                       ".ctors",       ".dtors",      ".sbss",
+-                      ".sdata",       ".srodata"})
++                      ".sdata",       ".srodata",    ".gnu.build.attributes"})
+     if (isSectionPrefix(v, s->name))
+       return v;
+ 
+diff --git a/lld/test/ELF/gnu-build-attributes.s b/lld/test/ELF/gnu-build-attributes.s
+new file mode 100644
+index 000000000000..79ad6c40ae50
+--- /dev/null
++++ b/lld/test/ELF/gnu-build-attributes.s
+@@ -0,0 +1,42 @@
++# REQUIRES: x86
++
++## Check that .gnu.build.attributes.* sections are concatenated into a single
++## .gnu.build.attributes section.
++
++# RUN: llvm-mc -filetype=obj -triple=x86_64-linux-gnu %s -o %t.o
++# RUN: ld.lld %t.o -o %t
++# RUN: llvm-readobj -n %t | FileCheck %s
++
++# CHECK:      NoteSections [
++# CHECK-NEXT:   NoteSection {
++# CHECK-NEXT:     Name: .gnu.build.attributes
++# CHECK-NEXT:     Offset: 0x120
++# CHECK-NEXT:     Size: 0x28
++# CHECK-NEXT:     Notes [
++# CHECK-NEXT:       {
++# CHECK-NEXT:         Owner: GA${{.*}}:a1
++# CHECK-NEXT:         Data size: 0x0
++# CHECK-NEXT:         Type: OPEN
++# CHECK-NEXT:       }
++# CHECK-NEXT:       {
++# CHECK-NEXT:         Owner: GA${{.*}}:b1
++# CHECK-NEXT:         Data size: 0x0
++# CHECK-NEXT:         Type: OPEN
++# CHECK-NEXT:       }
++# CHECK-NEXT:     ]
++# CHECK-NEXT:   }
++# CHECK-NEXT: ]
++
++.section ".gnu.build.attributes.text.foo", "", @note
++.balign 4
++.long	8
++.long	0
++.long	0x100
++.asciz	"GA$\x03:a1"
++
++.section ".gnu.build.attributes.text.bar", "", @note
++.balign 4
++.long	8
++.long	0
++.long	0x100
++.asciz	"GA$\x03:b1"
+-- 
+2.50.1
+

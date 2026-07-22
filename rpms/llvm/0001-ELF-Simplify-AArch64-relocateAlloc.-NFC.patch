@@ -1,0 +1,47 @@
+From e710ff28456c1accbeb3a7e503163233bc615b16 Mon Sep 17 00:00:00 2001
+From: Fangrui Song <i@maskray.me>
+Date: Wed, 11 Feb 2026 21:23:34 -0800
+Subject: [PATCH] [ELF] Simplify AArch64::relocateAlloc. NFC
+
+---
+ lld/ELF/Arch/AArch64.cpp | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/lld/ELF/Arch/AArch64.cpp b/lld/ELF/Arch/AArch64.cpp
+index 55434ae2151c..3c0d4ca64555 100644
+--- a/lld/ELF/Arch/AArch64.cpp
++++ b/lld/ELF/Arch/AArch64.cpp
+@@ -931,9 +931,10 @@ static bool needsGotForMemtag(const Relocation &rel) {
+ 
+ void AArch64::relocateAlloc(InputSection &sec, uint8_t *buf) const {
+   uint64_t secAddr = sec.getOutputSection()->addr + sec.outSecOff;
+-  AArch64Relaxer relaxer(ctx, sec.relocs());
+-  for (size_t i = 0, size = sec.relocs().size(); i != size; ++i) {
+-    const Relocation &rel = sec.relocs()[i];
++  const ArrayRef<Relocation> relocs = sec.relocs();
++  AArch64Relaxer relaxer(ctx, relocs);
++  for (size_t i = 0, size = relocs.size(); i != size; ++i) {
++    const Relocation &rel = relocs[i];
+     if (rel.expr == R_NONE) // See finalizeAddressDependentContent()
+       continue;
+     uint8_t *loc = buf + rel.offset;
+@@ -947,14 +948,14 @@ void AArch64::relocateAlloc(InputSection &sec, uint8_t *buf) const {
+     switch (rel.expr) {
+     case RE_AARCH64_GOT_PAGE_PC:
+       if (i + 1 < size &&
+-          relaxer.tryRelaxAdrpLdr(rel, sec.relocs()[i + 1], secAddr, buf)) {
++          relaxer.tryRelaxAdrpLdr(rel, relocs[i + 1], secAddr, buf)) {
+         ++i;
+         continue;
+       }
+       break;
+     case RE_AARCH64_PAGE_PC:
+       if (i + 1 < size &&
+-          relaxer.tryRelaxAdrpAdd(rel, sec.relocs()[i + 1], secAddr, buf)) {
++          relaxer.tryRelaxAdrpAdd(rel, relocs[i + 1], secAddr, buf)) {
+         ++i;
+         continue;
+       }
+-- 
+2.50.1
+

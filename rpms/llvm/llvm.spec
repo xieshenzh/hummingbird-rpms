@@ -430,7 +430,7 @@ Version:	%{maj_ver}.%{min_ver}.%{patch_ver}%{?rc_ver:~%{rc_ver}}%{?llvm_snapshot
 %if 0%{?rhel} == 8
 Release:	1%{?dist}
 %else
-Release:	1%{?dist}
+Release:	4%{?dist}
 %endif
 Summary:	The Low Level Virtual Machine
 
@@ -506,9 +506,22 @@ Patch104: 0001-Driver-Give-devtoolset-path-precedence-over-Installe.patch
 # s390x fix for unaligned memory access performance regressions.
 Patch2210: 0001-SystemZ-Avoid-unaligned-VL-VST-s-with-memcpy-memmove.patch
 
+# Fix a heap buffer overflow.
+# https://bugzilla.redhat.com/show_bug.cgi?id=2496390
+Patch2211: 0001-LLVM-Verifier-Fix-buffer-overflow-when-verifying-gc..patch
+
+# Fix miscompilation.
+# https://bugzilla.redhat.com/show_bug.cgi?id=2499684
+Patch2212: 0001-SDAG-Freeze-condition-in-select-of-load-fold-208683.patch
+# Fix a vector miscompilation
+Patch2213: 0001-X86-Fix-EVEX-compression-for-VPMOV-2M-KMOV-with-tied.patch
+
 #region LLD patches
 Patch106: 0001-19-Always-build-shared-libs-for-LLD.patch
 Patch2103: 0001-lld-Adjust-compressed-debug-level-test-for-s390x-wit.patch
+Patch2214: 0001-ELF-Simplify-AArch64-relocateAlloc.-NFC.patch
+Patch2215: 0001-LLD-AArch64-Make-adrp-ldr-relaxation-per-symbol-all-.patch
+Patch2216: 0001-lld-ELF-Concatenate-.gnu.build.attributes.-sections-.patch
 #endregion LLD patches
 
 #region polly patches
