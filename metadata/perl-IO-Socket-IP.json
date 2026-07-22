@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "45eff6df9f4dfc5432ba34814595d2ddb48bfbab",
+  "release": "527",
+  "sha": "7ba1d42ed7ccc47217997a9a7333b30fd36db12a",
   "source": "https://src.fedoraproject.org/rpms/perl-IO-Socket-IP.git",
   "upstream_repo": "https://github.com/Perl/perl5",
   "version": "0.44"
