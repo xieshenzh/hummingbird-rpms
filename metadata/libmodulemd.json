@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "ed41e36c8c2052a2447f75c1ba1aaf46b48791fb",
+  "release": "3",
+  "sha": "83ec358d581e40d27e8237fa8fb14e5c3e90eaba",
   "source": "https://src.fedoraproject.org/rpms/libmodulemd.git",
   "upstream_repo": "https://github.com/fedora-modularity/libmodulemd",
   "version": "2.15.3"
