@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "522",
-  "sha": "bfde668b22726654d9d9a2e5003ce21ce6d04b9d",
+  "release": "527",
+  "sha": "f6c44bf95e1eeebb1f18e24b4dd3985eda5d552a",
   "source": "https://src.fedoraproject.org/rpms/perl-MIME-Base64.git",
   "upstream_repo": "https://github.com/Dual-Life/mime-base64",
   "version": "3.16"
