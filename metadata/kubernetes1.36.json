@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Patch TestParallel deadlock: raise -test.parallel minimum for 3-goroutine barrier",
+  "modification_reason": "Patch TestParallel deadlock: raise -test.parallel minimum for 3-goroutine barrier; backport fix for CVE-2026-56852",
   "modification_status": "modified",
   "release": "6",
   "release_monitoring_project_id": 10954,
