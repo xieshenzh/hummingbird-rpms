@@ -10,7 +10,7 @@ Version:                2.11.4
 
 
 Name:           caddy
-Release:        0.2%{?dist}
+Release:        0.3%{?dist}
 Summary:        Web server with automatic HTTPS
 
 # main source code is Apache-2.0
@@ -33,6 +33,8 @@ Source31:       poweredby-black.png
 
 # downstream only patch to disable commands that can alter the binary
 Patch1:         0001-Disable-commands-that-can-alter-the-binary.patch
+# backport security update for CVE-2026-56852
+Patch2:         0002-bump-golang.org-x-text-to-v0.39.0.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  systemd-rpm-macros
