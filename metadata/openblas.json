@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "4",
+  "release_monitoring_project_id": 2540,
+  "sha": "01b6761a291c71ad2756836f065e28633249c458",
+  "source": "https://src.fedoraproject.org/rpms/openblas.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/OpenMathLib/OpenBLAS",
+  "version": "0.3.29"
+}

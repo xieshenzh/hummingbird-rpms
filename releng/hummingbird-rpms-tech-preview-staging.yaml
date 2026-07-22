@@ -642,6 +642,8 @@ spec:
           contentType: rpm
         - name: oniguruma-main
           contentType: rpm
+        - name: openblas-main
+          contentType: rpm
         - name: openblas-srpm-macros-main
           contentType: rpm
         - name: opendbx-main
