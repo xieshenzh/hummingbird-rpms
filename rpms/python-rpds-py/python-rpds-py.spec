@@ -3,7 +3,7 @@
 
 Name:           python-rpds-py
 Version:        2026.6.3
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        Python bindings to the Rust rpds crate
 # The package is MIT; statically-linked Rust dependencies are (from
 # %%{cargo_license_summary}):
