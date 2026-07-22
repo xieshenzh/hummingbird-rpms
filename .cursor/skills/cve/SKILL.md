@@ -174,6 +174,32 @@ CallMcpTool: cursor-app-control / rename_chat
 The user will typically ask to investigate. Use whichever of these
 approaches fits the situation:
 
+**Web search efficiency:** Check local sources first—ticket
+description, cve_analysis comment, local code, SBOM, metadata.
+The Jira `Description` field usually names the specific vulnerable
+sub-component; extract it early (`rhjira dump`) as it often
+resolves mismatch cases without any web search.
+
+When you do search:
+
+- **Product mismatch** (CVE vendor/product differs from Hummingbird package):
+  1. **First: Search official documentation** for feature/component support
+     Example: `"<HummingbirdPkg>" "<CVE_component>" support documentation`
+  2. **For forks**: Go directly to compatibility/feature-difference documentation
+     Example: `"<fork>" "<upstream>" compatibility differences documentation`
+  3. **Then: Search architectural differences** if docs unclear
+     Example: `"<packageA> vs <packageB>" <component> differences`
+  4. **Prioritize:** Official project docs > vendor comparisons > blog posts
+  
+- **Component presence**: Search whether the package implements the vulnerable
+  component, not the CVE ID itself
+  
+- **Avoid CVE ID searches**: Recent CVEs are often not yet indexed in
+  NVD/CVE.org; search product/component relationships instead
+  
+- **Avoid over-specific quoted searches**: If a quoted search returns no results,
+  immediately fall back to fewer quotes/broader terms rather than trying variations
+
 #### 2a: Version comparison
 
 Compare the Hummingbird SRPM version against the CVE affected range.
@@ -228,6 +254,8 @@ When the component is found, determine whether it is actually
 installed in shipped binary RPMs vs only used during build/test.
 Use SBOM fields such as `type`, `scope`, `purl`, `properties`,
 `metadata.component`, and package relationships.
+
+If the component's role is unclear from SBOM metadata, search to clarify its purpose.
 
 Decision guidance:
 
