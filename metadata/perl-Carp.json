@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "522",
-  "sha": "c17c5bf60861543b2f38ae826f85f66df27381a8",
+  "release": "527",
+  "sha": "2ecfe4e4eab201e29a60352882c4e418c59fd437",
   "source": "https://src.fedoraproject.org/rpms/perl-Carp.git",
   "upstream_repo": "https://github.com/Perl/perl5",
   "version": "1.54"
