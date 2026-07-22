@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "5",
+  "release_monitoring_project_id": 2507,
+  "sha": "5c188bec40baf813c0ef756eb1fd469ebb987ad3",
+  "source": "https://src.fedoraproject.org/rpms/numactl.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/numactl/numactl",
+  "version": "2.0.19"
+}

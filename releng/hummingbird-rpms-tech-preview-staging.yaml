@@ -634,6 +634,8 @@ spec:
           contentType: rpm
         - name: nss-fips-main
           contentType: rpm
+        - name: numactl-main
+          contentType: rpm
         - name: oauth2-proxy-main
           contentType: rpm
         - name: ocaml-srpm-macros-main
