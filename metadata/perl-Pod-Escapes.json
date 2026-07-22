@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "522",
-  "sha": "a3d6d348792d62acc0e4884ce71bc82762cda818",
+  "release": "527",
+  "sha": "af65a49907c5670ce2c3417d34a5f3d32e340318",
   "source": "https://src.fedoraproject.org/rpms/perl-Pod-Escapes.git",
   "upstream_repo": "https://github.com/neilbowers/Pod-Escapes",
   "version": "1.07"
