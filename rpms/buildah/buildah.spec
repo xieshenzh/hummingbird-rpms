@@ -40,7 +40,7 @@ Epoch: 2
 Version: 1.44.0
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 3.1%{?dist}
+Release: 3.2%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -50,6 +50,7 @@ Summary: A command line tool used for creating OCI Images
 URL: https://%{name}.io
 # Tarball fetched from upstream
 Source: %{git0}/archive/v%{version}.tar.gz
+Patch0: 0001-buildah-bump-moby-buildkit-to-v0.31.2.patch
 BuildRequires: device-mapper-devel
 BuildRequires: git-core
 BuildRequires: golang >= 1.16.6
