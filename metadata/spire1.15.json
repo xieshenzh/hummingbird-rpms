@@ -1,5 +1,6 @@
 {
-  "modification_status": "native",
+  "modification_reason": "backport golang.org/x/text v0.39.0 for CVE-2026-56852",
+  "modification_status": "modified",
   "release": "0.2",
   "release_monitoring_project_id": 391002,
   "track_upstream": "1.15",
