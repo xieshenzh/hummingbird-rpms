@@ -119,7 +119,7 @@ if should_initialize "$datadir" ; then
         exit $ret
     fi
     # upgrade does not need to be run on a fresh datadir
-    echo "@VERSION@-MariaDB" >"$datadir/mysql_upgrade_info"
+    echo "@VERSION@-MariaDB" >"$datadir/mariadb_upgrade_info"
 else
     if [ -d "$datadir/mysql/" ] ; then
         # mysql dir exists, it seems data are initialized properly
