@@ -3,7 +3,7 @@
   "cve_product": "MIT / Kerberos 5",
   "modification_status": "clean",
   "release": "9",
-  "sha": "3e2338cdf08b491b18c8cbd59711d19faffd1e61",
+  "sha": "c292c4f6eb4813aff0726416cbf90f94d1e51f8a",
   "source": "https://src.fedoraproject.org/rpms/krb5.git",
   "upstream_repo": "https://github.com/krb5/krb5",
   "version": "1.22.2"
