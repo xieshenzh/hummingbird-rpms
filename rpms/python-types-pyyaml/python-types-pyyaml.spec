@@ -4,7 +4,7 @@
 
 Name:           python-%{srcname}
 Version:        6.0.1
-Release:        20%{?dist}
+Release:        20.1%{?dist}
 Summary:        Typing stubs for PyYAML
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0
