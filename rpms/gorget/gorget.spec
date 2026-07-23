@@ -32,7 +32,7 @@ exactly how its sources are produced. When no pipeline YAML exists, gorget
 falls back to fetching every Source URL declared in the package's spec file.
 
 %prep
-%autosetup -n gorget-%{version} -p1
+%autosetup -n gorget-%{version}
 
 %generate_buildrequires
 %pyproject_buildrequires
