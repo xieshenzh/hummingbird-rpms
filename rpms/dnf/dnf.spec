@@ -51,7 +51,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.24.0
-Release:        5%{?dist}
+Release:        5.1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPL-2.0-or-later AND GPL-1.0-only
