@@ -5,6 +5,9 @@ post_commands = [
   ["curl", "-fSL", "-o", "vendor/github.com/gogo/googleapis/LICENSE", "https://raw.githubusercontent.com/gogo/googleapis/master/LICENSE"],
 ]
 
+[archive.dependency_overrides]
+"golang.org/x/text" = "v0.39.0"
+
 [licensing]
 detector = "askalono"
 
