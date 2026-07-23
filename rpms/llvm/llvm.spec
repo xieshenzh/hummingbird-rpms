@@ -428,9 +428,9 @@ end
 Name:		%{pkg_name_llvm}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}%{?rc_ver:~%{rc_ver}}%{?llvm_snapshot_version_suffix:~%{llvm_snapshot_version_suffix}}
 %if 0%{?rhel} == 8
-Release:	1%{?dist}
+Release:	4.1%{?dist}
 %else
-Release:	4%{?dist}
+Release:	4.1%{?dist}
 %endif
 Summary:	The Low Level Virtual Machine
 
