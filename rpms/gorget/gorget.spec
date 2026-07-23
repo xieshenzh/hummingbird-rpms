@@ -7,7 +7,11 @@ Summary:        Containerized source-pipeline tool for RPM package supply-chain 
 License:        MIT
 
 URL:            https://github.com/gorget-project/gorget
-Source:         %{url}/archive/v%{version}.tar.gz
+# GitHub's archive URL basename (v0.1.0.tar.gz) doesn't match the
+# gorget-0.1.0.tar.gz name dist-git-client/the lookaside cache use --
+# the #/ fragment tells rpmbuild the local filename to expect instead of
+# deriving it from the URL, matching what's actually in "sources".
+Source:         %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
