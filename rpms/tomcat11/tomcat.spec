@@ -108,7 +108,7 @@ which can be started and stopped using scripts inside the instance directory.
 
 %package common
 Summary: Apache Tomcat - Common files for Tomcat packages
-Requires: (java-25-headless or java-25)
+Requires: (java-headless >= 1:17 or java >= 1:17)
 Requires: %{name}-lib = %{epoch}:%{version}-%{release}
 
 %description common
