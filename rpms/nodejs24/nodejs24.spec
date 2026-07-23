@@ -1,7 +1,7 @@
 Name:           nodejs24
 Epoch:          1
 Version:        24.18.0
-Release:        0.4%{?dist}
+Release:        0.5%{?dist}
 
 Summary:        JavaScript runtime
 License:        Apache-2.0 AND Artistic-2.0 AND BSD-2-Clause AND BSD-3-Clause AND BlueOak-1.0.0 AND CC-BY-3.0 AND CC0-1.0 AND ISC AND MIT
@@ -161,6 +161,7 @@ Source101:      nodejs.srpm.macros
 0001-Remove-unused-OpenSSL-config.patch
 0002-Disable-FIPS-options.patch
 0003-CVE-2026-13149-brace-expansion-fix-exponential-time.patch
+0004-CVE-2026-14257-brace-expansion-bound-expansion-length.patch
 CVE-2026-59869-js-yaml-merge-keys.patch
 
 %description
