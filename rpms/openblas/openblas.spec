@@ -14,8 +14,8 @@
 # "obsoleted" features are still kept in the spec.
 
 Name:           openblas
-Version:        0.3.29
-Release:        4%{?dist}
+Version:        0.3.34
+Release:        0.2%{?dist}
 Summary:        An optimized BLAS library based on GotoBLAS2
 
 License:        BSD-3-Clause
@@ -30,6 +30,8 @@ Patch1:         openblas-0.2.5-libname.patch
 Patch2:         openblas-0.2.15-constructor.patch
 # Supply the proper flags to the test makefile
 Patch3:         openblas-0.3.11-tests.patch
+# Guard C11 atomics against C++ compilation (upstream 52f05725)
+Patch4:         openblas-0.3.34-guard-c11-atomics-cpp.patch
 
 BuildRequires: make
 BuildRequires:  gcc
@@ -243,6 +245,7 @@ cd OpenBLAS-%{version}
 %patch 2 -p1 -b .constructor
 %endif
 %patch 3 -p1 -b .tests
+%patch 4 -p1 -b .guard_c11_atomics_cpp
 
 # Fix source permissions
 find -name \*.f -exec chmod 644 {} \;
