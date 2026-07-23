@@ -1,13 +1,13 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Rename template spec to .spec.in to avoid CI multi-specfile detection; backport fix for CVE-2026-56852",
+  "modification_reason": "Update to upstream version 1.35.7",
   "modification_status": "modified",
-  "release": "2",
+  "release": "0.1",
   "release_monitoring_project_id": 10954,
   "sha": "482f17ebb762f5431df1c34599fdab7ad3e515b7",
   "source": "https://src.fedoraproject.org/rpms/kubernetes1.35.git",
   "track_upstream": "1.35",
   "upstream_branch": "release-1.35",
   "upstream_repo": "https://github.com/kubernetes/kubernetes",
-  "version": "1.35.6"
+  "version": "1.35.7"
 }

@@ -159,6 +159,9 @@ java-25-openjdk-portable:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+kubernetes1.35:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 libpng:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
