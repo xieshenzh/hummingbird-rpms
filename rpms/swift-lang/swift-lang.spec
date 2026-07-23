@@ -230,7 +230,7 @@ Version: 6.3.3
 # End forge sources
 
 Name:           swift-lang
-Release:        0.1%{?dist}
+Release:        0.1.1%{?dist}
 %forgemeta -a
 
 Summary:        The Swift programming language
@@ -258,6 +258,7 @@ Patch7:         swiftpm.patch
 Patch13:        swift-foundation.patch
 Patch25:        swift-corelibs-libdispatch.patch
 Patch9:         cmake.patch
+Patch23:        swift-crypto-CVE-2026-43823.patch
 
 BuildRequires:  clang
 BuildRequires:  swig
@@ -349,6 +350,7 @@ end
 %patch 13
 %patch 25
 %patch 9
+%patch 23
 
 # Install custom Fedora preset
 cp %{SOURCE100} swift/utils/fedora-presets.ini
