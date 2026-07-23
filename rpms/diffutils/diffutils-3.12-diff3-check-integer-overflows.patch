@@ -1,0 +1,31 @@
+From 73ed7ce85cc78effb94daf028c9af6b4e5252e50 Mon Sep 17 00:00:00 2001
+From: Collin Funk <collin.funk1@gmail.com>
+Date: Mon, 20 Apr 2026 23:43:51 -0700
+Subject: [PATCH] diff3: check for integer overflows when reading line numbers
+ from diff
+
+Reported by Michał Majchrowicz.
+* src/diff3.c (readnum): Return nullptr if the line number would
+overflow.
+
+Backported for CVE-2026-53910 (NEWS/THANKS hunks omitted).
+---
+ src/diff3.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/diff3.c b/src/diff3.c
+index 1dfba3770fd1..1a74407aeca5 100644
+--- a/src/diff3.c
++++ b/src/diff3.c
+@@ -1019,7 +1019,8 @@ readnum (char *s, lin *pnum)
+ 
+   do
+     {
+-      num = c - '0' + num * 10;
++      if (ckd_mul (&num, num, 10) || ckd_add (&num, num, c - '0'))
++        return nullptr;
+       c = *++s;
+     }
+   while (c_isdigit (c));
+-- 
+2.55.0

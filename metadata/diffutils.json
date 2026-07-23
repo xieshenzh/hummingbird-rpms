@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "backport fix for CVE-2026-53910",
+  "modification_status": "modified",
   "release": "6",
   "sha": "f5bfb31c883d73fddbe99dc5ac8d254f700af008",
   "source": "https://src.fedoraproject.org/rpms/diffutils.git",
