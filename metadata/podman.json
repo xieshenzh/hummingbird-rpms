@@ -1,9 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "backport fix for CVE-2026-15792, CVE-2026-56852",
+  "modification_status": "modified",
   "release": "2",
-  "sha": "0b0ff01de6a5507b5f97cbf7881ea044fd6118db",
+  "sha": "50f4a114c0905dbaaf2e740f3582d9f28f3ad006",
   "source": "https://src.fedoraproject.org/rpms/podman.git",
   "upstream_repo": "https://github.com/containers/podman",
-  "version": "6.0.1"
+  "version": "6.0.2"
 }
