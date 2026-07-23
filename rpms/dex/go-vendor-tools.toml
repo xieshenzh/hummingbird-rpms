@@ -1,0 +1,24 @@
+[archive]
+
+[licensing]
+detector = "askalono"
+
+[[licensing.licenses]]
+path = "vendor/github.com/apparentlymart/go-textseg/v15/LICENSE"
+sha256sum = "59e80949c14925f65181757d837ed93dea3783f62b031f642281d9e5b1936917"
+expression = "MIT AND Apache-2.0 AND Unicode-DFS-2016"
+
+[[licensing.licenses]]
+path = "vendor/github.com/ghodss/yaml/LICENSE"
+sha256sum = "24653fd8a39354396da1a265d68316399edc39b1df48c5866d55f9f06484fa9a"
+expression = "MIT AND BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shopspring/decimal/LICENSE"
+sha256sum = "b92ba0f6ee02f2309628bfdadb123668a17c016e475ba477b857d33470d9d625"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND Apache-2.0"

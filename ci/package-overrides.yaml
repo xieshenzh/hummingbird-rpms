@@ -64,6 +64,9 @@ curl:
     - "linux-c2xlarge/amd64"
     - "linux-c2xlarge/arm64"
 
+dex:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 dotnet8.0:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
   timeout_hours: 12

@@ -198,6 +198,8 @@ spec:
           contentType: rpm
         - name: debugedit-main
           contentType: rpm
+        - name: dex-main
+          contentType: rpm
         - name: diffutils-main
           contentType: rpm
         - name: dnf-main
