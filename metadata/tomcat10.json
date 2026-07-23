@@ -1,7 +1,7 @@
 {
   "branch": "rawhide",
   "cve_product": "Apache Software Foundation / Apache Tomcat",
-  "modification_reason": "Local changes in commit 2273cfe5; remove runtime dependency on systemd",
+  "modification_reason": "Allow supported Java runtime selection; retain systemd weak ordering",
   "modification_status": "modified",
   "release": "3",
   "sha": "c864b5c4695bbe8bc9fb4d67dbf7eca2b7ea9fd5",

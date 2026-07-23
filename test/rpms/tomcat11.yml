@@ -18,3 +18,19 @@ no-systemd-runtime-dependency:
     else
       echo "PASS: tomcat11 does not require systemd at runtime"
     fi
+
+supports-multiple-java-runtime-versions:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "tomcat11-common" ]]; then
+      echo "Skipping: This test only runs on tomcat11-common (got: ${rpm_name})"
+      exit 0
+    fi
+
+    expected="(java-headless >= 1:17 or java >= 1:17)"
+    requires=$(rpm -qRp "${TEST_RPM}")
+    if echo "${requires}" | grep -qxF "${expected}"; then
+      echo "PASS: tomcat11 supports any Java 17 or later runtime"
+    else
+      TEST_FAIL "tomcat11 must require '${expected}' without pinning a Java feature release"
+    fi

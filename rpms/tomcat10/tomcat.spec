@@ -30,7 +30,7 @@
 Name:          tomcat10
 Epoch:         1
 Version:       %{major_version}.%{minor_version}.%{micro_version}
-Release:       3%{?dist}
+Release:       3.1%{?dist}
 Summary:       Apache Tomcat - Servlet and JSP engine for system-wide deployment
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
@@ -112,7 +112,7 @@ which can be started and stopped using scripts inside the instance directory.
 
 %package common
 Summary: Apache Tomcat - Common files for Tomcat packages
-Requires: (java-25-headless or java-25)
+Requires: (java-headless >= 1:11 or java >= 1:11)
 Requires: %{name}-lib = %{epoch}:%{version}-%{release}
 
 %description common
