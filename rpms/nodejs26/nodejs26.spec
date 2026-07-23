@@ -164,6 +164,7 @@ CVE-2026-13149-brace-expansion-dos.patch
 CVE-2026-14257-brace-expansion-bound-expansion-length.patch
 CVE-2026-59869-js-yaml-merge-keys.patch
 0002-cares-host-callback-compat.patch
+0001-v8-memcopy-include-climits.patch
 
 %description
 Node.js is a platform built on Chrome's JavaScript runtime
