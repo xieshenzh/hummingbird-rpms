@@ -162,6 +162,9 @@ java-25-openjdk-portable:
 kubernetes1.35:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+kubernetes1.36:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 libpng:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
