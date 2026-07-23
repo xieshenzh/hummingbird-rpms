@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "d59a5c85f426f14895123a268e9bbe2469a39c83",
+  "release": "5",
+  "sha": "0b682b92e316198786e1eb2f6523e6d3ee55f99e",
   "source": "https://src.fedoraproject.org/rpms/perl-Net-SSLeay.git",
   "upstream_repo": "https://github.com/radiator-software/p5-net-ssleay",
   "version": "1.96"
