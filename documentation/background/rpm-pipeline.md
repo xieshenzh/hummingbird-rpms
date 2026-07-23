@@ -80,14 +80,17 @@ Key fields:
 | ------- | --------- |
 | `modification_status` | `clean` (auto-updates enabled), `modified` (auto-updates blocked), or `native` (no upstream) |
 | `modification_reason` | Explanation of local modifications (when `modified`) |
+| `release` | Upstream Fedora release at last import/update (not the spec `Release:`) |
 | `upstream_repo` | Canonical upstream git repository URL |
 | `track_upstream` | Version prefix constraint (e.g., `"1.26"` for golang1.26) |
 | `version_transform` | Version mapping rule for CVE analysis (e.g., `dotnet_sdk_to_runtime`) |
 | `cve_product` | CVE vendor/product override (e.g., `"Oracle Corporation / Oracle Java SE"`) |
 
-See [Package Modification Tracking][mod-tracking] for details on managing
-modification status.
+See [Package Metadata Fields][metadata-fields] for `modification_status` and `release`
+configuration, and [Package Modification Tracking][mod-tracking] for managing modification
+status day to day.
 
+[metadata-fields]: /l/package-metadata-fields
 [mod-tracking]: /l/package-modification-tracking
 
 ## Stage 2: Merge Request & Validation
@@ -300,6 +303,8 @@ documentation in the containers repo for the full container lifecycle.
 - [Rebuilding Packages][rebuilding] - No-change rebuilds, reverse dependency
   rebuilds, and patch backports
 - [Updating Dist-git Packages][updating] - Automated Fedora sync workflow
+- [Package Metadata Fields][metadata-fields] - `modification_status` and
+  `release` configuration
 - [Package Modification Tracking][mod-tracking] - Managing modification status
   and version constraints
 - [Konflux Resource Deployment][konflux-deploy] - How Konflux resources are

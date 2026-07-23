@@ -265,8 +265,9 @@ The diff should show only the Release line change:
 > fixes or trailing newline modifications. If the diff shows additional changes, reset and retry
 > with `sed`.
 >
-> **Important:** The release field in `metadata/<package>.json` tracks the upstream Fedora release
-> and should not be modified during local changes like backports or rebuilds.
+> **Important:** Do not change the `release` field in `metadata/<package>.json` during local
+> rebuilds or backports. That field tracks the upstream Fedora release; see
+> [Package Metadata Fields](package-metadata-fields.md).
 
 #### 4. Verify the bump is correct
 
@@ -317,16 +318,13 @@ If the commit shows more changes, amend or reset and redo the change using `sed`
 
 #### Modification status
 
-Rebuilds **do not** change a package's `modification_status`. Release-only changes are ephemeral and
-don't affect whether a package is considered `modified` vs `clean`:
+Rebuilds **do not** change a package's `modification_status`. Spec `Release:` bumps are ephemeral
+and do not make a package `modified` versus `clean`. See
+[Package Metadata Fields](package-metadata-fields.md) for how `modification_status` and metadata
+`release` relate to rebuilds.
 
-- **Release fields are temporary**: When updating from Fedora later, the Release gets replaced
-  anyway
-- **Merges normalize Release**: During updates, Release lines are normalized to avoid conflicts
-- **No source changes**: Rebuilds don't modify sources, patches, or spec logic
-
-The automation already ignores Release-only changes, so automatic Fedora updates will continue
-normally after a rebuild.
+During updates, Release lines are normalized to avoid conflicts, and the automation ignores
+Release-only changes, so automatic Fedora updates continue normally after a rebuild.
 
 If you want to explicitly prevent automatic updates (e.g., you're investigating an issue), you can
 manually mark the package as modified:

@@ -50,7 +50,7 @@ Create `metadata/<package-name>.json`:
 ```json
 {
   "modification_status": "native",
-  "release": "1.hum1",
+  "release": "1",
   "upstream_repo": "https://github.com/example/project",
   "version": "1.3.0"
 }
@@ -58,11 +58,14 @@ Create `metadata/<package-name>.json`:
 
 Fields:
 
-- **`modification_status`**: Must be `"native"` for packages not imported from Fedora
+- **`modification_status`**: Must be `"native"` for packages not imported from Fedora (see
+  [Package Metadata Fields](package-metadata-fields.md))
 - **`upstream_repo`**: Canonical upstream git repository URL (required — CI enforces this). If no
   upstream repo exists, use `https://src.fedoraproject.org/rpms/<name>` as a fallback.
 - **`version`**: Package version (must match spec file)
-- **`release`**: Base release number (typically `1.hum1` for new packages)
+- **`release`**: Base release number without dist tag (typically `1` or `0.1`; the `.hum1`
+  suffix comes from `%{?dist}` in the spec `Release:` line — see
+  [Package Metadata Fields](package-metadata-fields.md))
 
 ### 5. Generate Konflux Resources
 
@@ -112,7 +115,7 @@ sha512sum --tag oras-1.3.0.tar.gz oras-1.3.0-vendor.tar.bz2 > sources
 cat > ../../metadata/oras.json << 'EOF'
 {
   "modification_status": "native",
-  "release": "1.hum1",
+  "release": "1",
   "upstream_repo": "https://github.com/oras-project/oras",
   "version": "1.3.0"
 }
@@ -128,6 +131,8 @@ git commit -m "Add oras-1.3.0-1.hum1"
 
 ## See Also
 
+- [Package Metadata Fields](package-metadata-fields.md) - `modification_status` and `release`
+  configuration
 - [Package Modification Tracking](package-modification-tracking.md) - Marking packages as modified
   vs clean
 - [Rebuilding Packages](rebuilding-packages.md) - Rebuilding existing packages
