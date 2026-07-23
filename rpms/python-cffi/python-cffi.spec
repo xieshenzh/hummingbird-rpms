@@ -1,6 +1,6 @@
 Name:           python-cffi
 Version:        2.0.0
-Release:        6%{?dist}
+Release:        6.1%{?dist}
 Summary:        Foreign Function Interface for Python to call C code
 # cffi is MIT
 # cffi/_imp_emulation.py has bits copied from CPython (PSF-2.0)
