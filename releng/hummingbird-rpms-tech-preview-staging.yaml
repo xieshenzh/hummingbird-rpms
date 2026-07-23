@@ -318,6 +318,8 @@ spec:
           contentType: rpm
         - name: google-noto-fonts-main
           contentType: rpm
+        - name: gorget-main
+          contentType: rpm
         - name: gperftools-main
           contentType: rpm
         - name: gpgme-main
