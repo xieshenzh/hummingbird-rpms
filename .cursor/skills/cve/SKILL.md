@@ -101,6 +101,23 @@ python .cursor/skills/cve/cve_helper.py HUM-1234 1235 1236 \
   --json-out /tmp/cve-triage.json
 ```
 
+**Finding Related Tickets:** `cve_helper.py` automatically discovers all open
+HUM tickets with the same CVE IDs — this is on by default so you get the full
+set in one invocation. Use `--no-find-related` to opt out:
+
+```bash
+# Default: shows HUM-1234 + any open tickets sharing its CVEs
+python .cursor/skills/cve/cve_helper.py HUM-1234
+
+# Opt out: show only HUM-1234
+python .cursor/skills/cve/cve_helper.py HUM-1234 --no-find-related
+```
+
+This is especially useful for batch resolution across versioned packages
+(e.g., ruby3.3, ruby4.0, llvm, llvm21) — investigate once, apply to all.
+The related tickets are fetched during the initial show so there's no need for
+a second invocation.
+
 Use the script output as the primary source for:
 
 - CVE IDs and package guess
@@ -109,9 +126,19 @@ Use the script output as the primary source for:
 - cve_analysis `{noformat}` excerpt
 - `suggested_chat_title` (deterministic title for `rename_chat`)
 
-Do not run raw `rhjira show`/`rhjira dump` for Step 1 when the helper succeeds.
-If helper output is missing required detail or the helper fails, report the helper
-failure to the user and ask whether to proceed with manual fallback commands.
+**Discovered vs initial tickets:** User-provided tickets get full detail
+(severity, FIB, linked tickets, comments, cve_analysis). Discovered
+related tickets are batch-fetched with lightweight fields only (summary,
+status, type, assignee, labels) — severity, FIB, linked tickets, and
+cve_analysis are absent. When you need full detail on a discovered
+ticket (e.g., to set FIB or check its cve_analysis), run `rhjira show`
+on that specific ticket.
+
+Also inspect comments for: Hummingbird SRPM version, CVE affected range,
+upstream fix info (commits, PRs), and blocking Task tickets with MRs (work
+already in progress). Review all comments for prior analysis, decisions, or
+FIB values already set. Summarize relevant context — if it's already been
+resolved, say so rather than re-doing the work.
 
 **EMBARGO CHECK:** If the ticket summary starts with `EMBARGOED`,
 stop immediately and output:
@@ -123,50 +150,29 @@ discussed, analyzed, or acted upon in this tool. Stopping.
 
 Do not proceed with any analysis, comments, or code changes.
 
-Extract from each ticket (mostly from `cve_helper.py` output):
+**Batch Resolution:** When multiple tickets share a CVE (e.g., ruby3.3/ruby4.0,
+llvm/llvm21), investigate once but **verify each package individually**:
 
-- CVE ID and package name (from summary)
-- Status, severity, labels
-- Automated analysis comment (the `{noformat}` block from the
-  cve_analysis bot -- see the `/analyse-cve-needs-attention` skill
-  for parsing details)
-- Hummingbird SRPM version
-- CVE affected version range
-- Upstream fix info (commits, PRs)
-- Fixed-in-build field (if already set)
-- Issue links (look for blocking Task tickets with MR links in
-  their comments -- this means work is already in progress or
-  under review)
+1. Verify each package's versions, config, and role (runtime vs test-only vs
+   vendored) using Step 2 methods per-package. Do not assume uniformity.
+2. Collect the outcome for each ticket (resolution path 3a–3g).
+3. **If all have the same resolution:**
+   - Comment once, post to all with a shell loop.
+   - Create one task ticket, link it as blocker to each tracker.
+   - Set FIB on each tracker if applicable.
+4. **If outcomes are mixed:** handle each independently. The task blocks only
+   the trackers that need the fix. Close unaffected ones directly.
 
-If a linked Task ticket already has an MR posted, tell the user
-the work is already done and point them to the MR. Do not
-duplicate the effort.
+> IMPORTANT: If a patch is required, handle each ticket separately.
 
-**Review all comments** on the ticket (not just the cve_analysis
-bot comment). Previous human or agent comments may contain:
+Do not run raw `rhjira show`/`rhjira dump` when the helper succeeds.
 
-- Prior analysis or investigation results
-- Upstream fix status updates
-- Decisions about whether to backport or wait
-- Fixed in Build values already set
-- Links to related MRs or upstream PRs
+After showing the ticket(s), rename the chat using `suggested_chat_title`
+from `cve_helper.py`. Use `--title-prefix` for resolution-specific labels
+(e.g. `"FIB"`, `"NAB"`, `"!${MR_IID}"`):
 
-Summarize any relevant prior comments so the user has full
-context before deciding next steps. If previous analysis already
-resolved the question (e.g. "already fixed in build X"), say so
-rather than re-doing the work.
-
-Present a concise summary to the user and wait for direction.
-
-After showing the ticket(s), rename the chat using
-`suggested_chat_title` from `cve_helper.py`. This value is
-deterministic and already follows the required naming format.
-Only construct the title manually if `suggested_chat_title` is
-empty.
-
-```text
-CallMcpTool: cursor-app-control / rename_chat
-  title: "HUM-XXXX <package>"
+```bash
+python .cursor/skills/cve/cve_helper.py HUM-XXXX --title-only --title-prefix "FIB"
 ```
 
 ### Step 2: Determine if Hummingbird is affected
@@ -318,17 +324,7 @@ When the fix is confirmed present in the shipped SRPM:
      --fixedinbuild "<name>-<version>-<release>.src.rpm"
    ```
 
-3. Rename the chat title to indicate FIB was set:
-
-   ```bash
-   FIB_TITLE=$(python .cursor/skills/cve/cve_helper.py HUM-XXXX --title-only --title-prefix "FIB")
-   ```
-
-   ```text
-   CallMcpTool: cursor-app-control / rename_chat
-     title: "<value from FIB_TITLE, e.g. FIB HUM-6789 foo>"
-   ```
-
+3. Rename the chat (see Step 1) with `--title-prefix "FIB"`.
 4. **Do NOT close the ticket.** The cve_analysis automation will
    close it as Done-Errata automatically. The user has consistently
    said "we can wait for the automation to pick this up."
@@ -367,17 +363,7 @@ disputed):
      --vexjustification "Vulnerable Code not Present"
    ```
 
-5. Rename the chat title to indicate Not a Bug closure:
-
-   ```bash
-   NAB_TITLE=$(python .cursor/skills/cve/cve_helper.py HUM-XXXX --title-only --title-prefix "NAB")
-   ```
-
-   ```text
-   CallMcpTool: cursor-app-control / rename_chat
-     title: "<value from NAB_TITLE, e.g. NAB HUM-6789 foo>"
-   ```
-
+5. Rename the chat (see Step 1) with `--title-prefix "NAB"`.
 6. Verify: `rhjira show HUM-XXXX 2>&1 | grep "^Status:"`
 
 If SBOM retrieval is unavailable (network/policy/tooling), do not

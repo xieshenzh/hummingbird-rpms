@@ -14,16 +14,48 @@ import re
 import shutil
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
-
 
 CVE_RE = re.compile(r"CVE-\d{4}-\d{4,8}")
 HUM_RE = re.compile(r"HUM-\d{3,6}")
 MR_URL_RE = re.compile(
     r"https://gitlab\.com/redhat/hummingbird/rpms/-/merge_requests/\d+"
 )
+
+### Dataclasses ###
+
+
+@dataclass
+class LinkedTicket:
+    ticket: str
+    summary: str = ""
+    status: str = ""
+    ticket_type: str = ""
+    error: str = ""
+
+
+@dataclass
+class TicketReport:
+    ticket: str
+    summary: str
+    status: str
+    severity: str
+    assignee: str
+    ticket_type: str
+    labels: str
+    fixed_in_build: str
+    cve_ids: list[str]
+    package_guess: str
+    linked_keys: list[str]
+    mr_links_in_ticket: list[str]
+    linked_ticket_details: list[LinkedTicket] | None = None
+    embargoed: bool = False
+    assessment: str = ""
+    affected_range: str = ""
+    fixed_version: str = ""
+    cve_analysis_block: str = ""
 
 
 @dataclass
@@ -33,8 +65,10 @@ class CommandResult:
     returncode: int
 
 
+### Utilities ###
+
+
 def run_command(args: list[str]) -> CommandResult:
-    """Run a command and return captured output."""
     try:
         completed = subprocess.run(
             args,
@@ -55,10 +89,27 @@ def normalize_hum_key(value: str) -> str:
     trimmed = value.strip().upper()
     if trimmed.startswith("HUM-"):
         return trimmed
-    # Accept only bare positive integer ticket numbers (e.g. "3120").
     if re.fullmatch(r"\d+", trimmed):
         return f"HUM-{trimmed}"
     raise ValueError(f"Invalid ticket key: {value}")
+
+
+_raw_cache: dict[str, str] = {}
+
+
+def fetch_raw(key: str) -> str:
+    if key in _raw_cache:
+        return _raw_cache[key]
+    result = run_command(["rhjira", "show", key])
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"rhjira show {key} failed: {result.stderr.strip() or result.stdout.strip()}"
+        )
+    _raw_cache[key] = result.stdout
+    return result.stdout
+
+
+### Extraction ###
 
 
 def extract_field(text: str, field_name: str) -> str:
@@ -100,7 +151,9 @@ def extract_field_block(text: str, field_name: str) -> str:
 def extract_cve_analysis_block(text: str) -> str:
     # NOTE: This heuristic may pick a comment {noformat} block instead of the
     # canonical cve_analysis block if comments include matching keywords.
-    noformat_blocks = re.findall(r"\{noformat\}(.*?)\{noformat\}", text, flags=re.DOTALL)
+    noformat_blocks = re.findall(
+        r"\{noformat\}(.*?)\{noformat\}", text, flags=re.DOTALL
+    )
     for block in reversed(noformat_blocks):
         lowered = block.lower()
         if "hummingbird srpm version" in lowered or "affected version range" in lowered:
@@ -108,6 +161,16 @@ def extract_cve_analysis_block(text: str) -> str:
         if "assessment:" in lowered and "next steps:" in lowered and "cve-" in lowered:
             return block.strip()
     return ""
+
+
+def extract_assessment(block: str) -> str:
+    m = re.search(r"^ASSESSMENT:\s*(.+)$", block, re.MULTILINE)
+    return m.group(1).strip() if m else ""
+
+
+def extract_vendor_field(block: str, field: str) -> str:
+    m = re.search(rf"^\s{{2}}{re.escape(field)}:\s*(.+)$", block, re.MULTILINE)
+    return m.group(1).strip() if m else ""
 
 
 def extract_package_guess(summary: str, labels: str, fixed_in_build: str) -> str:
@@ -140,17 +203,17 @@ def parse_linked_keys(text: str) -> list[str]:
         "Blocks",
         "Issue Links",
     ]
-    linked_text = "\n".join(extract_field_block(text, field_name) for field_name in linked_fields)
+    linked_text = "\n".join(
+        extract_field_block(text, field_name) for field_name in linked_fields
+    )
     keys = HUM_RE.findall(linked_text)
-    # Preserve order while deduplicating.
-    ordered: list[str] = []
-    for key in keys:
-        if key not in ordered:
-            ordered.append(key)
-    return ordered
+    return list(dict.fromkeys(keys))
 
 
-def parse_ticket_blob(ticket_key: str, text: str) -> dict[str, Any]:
+### Parsing ###
+
+
+def parse_ticket_blob(ticket_key: str, text: str) -> TicketReport:
     summary = extract_summary(text, ticket_key)
     labels = extract_field(text, "Labels")
     fixed_in_build = extract_field(text, "Fixed in Build")
@@ -161,141 +224,196 @@ def parse_ticket_blob(ticket_key: str, text: str) -> dict[str, Any]:
     cve_ids = sorted(set(CVE_RE.findall(text)))
     linked_keys = parse_linked_keys(text)
     cve_analysis = extract_cve_analysis_block(text)
+    assessment = extract_assessment(cve_analysis) if cve_analysis else ""
+    affected_range = (
+        extract_vendor_field(cve_analysis, "Affected") if cve_analysis else ""
+    )
+    fixed_version = (
+        extract_vendor_field(cve_analysis, "Fixed in") if cve_analysis else ""
+    )
     mr_links = sorted(set(MR_URL_RE.findall(text)))
     package_guess = extract_package_guess(summary, labels, fixed_in_build)
     embargoed = summary.upper().startswith("EMBARGOED")
 
-    return {
-        "ticket": ticket_key,
-        "summary": summary,
-        "status": status,
-        "severity": severity,
-        "assignee": assignee,
-        "ticket_type": ticket_type,
-        "labels": labels,
-        "fixed_in_build": fixed_in_build,
-        "cve_ids": cve_ids,
-        "package_guess": package_guess,
-        "linked_keys": linked_keys,
-        "mr_links_in_ticket": mr_links,
-        "embargoed": embargoed,
-        "cve_analysis_block": cve_analysis,
-    }
+    return TicketReport(
+        ticket=ticket_key,
+        summary=summary,
+        status=status,
+        severity=severity,
+        assignee=assignee,
+        ticket_type=ticket_type,
+        labels=labels,
+        fixed_in_build=fixed_in_build,
+        cve_ids=cve_ids,
+        package_guess=package_guess,
+        linked_keys=linked_keys,
+        mr_links_in_ticket=mr_links,
+        embargoed=embargoed,
+        assessment=assessment,
+        affected_range=affected_range,
+        fixed_version=fixed_version,
+        cve_analysis_block=cve_analysis,
+    )
+
+
+def _parse_list_output(stdout: str, field_count: int) -> list[list[str]]:
+    """Parse pipe-delimited rhjira list --rawoutput output.
+
+    *field_count* is the number of --fields requested (excluding the leading
+    line-number column that --rawoutput always prepends).
+    Returns a list of rows, each row being the field values as a list.
+    """
+    rows: list[list[str]] = []
+    for line in stdout.strip().splitlines():
+        parts = line.split("|")
+        if len(parts) < 1 + field_count:
+            continue
+        rows.append([parts[i + 1].strip() for i in range(field_count)])
+    return rows
+
+
+def batch_fetch_linked(keys: list[str]) -> dict[str, LinkedTicket]:
+    """Fetch multiple linked tickets in a single rhjira list call."""
+    if not keys:
+        return {}
+
+    key_list = ", ".join(keys)
+    jql = f"key in ({key_list})"
+    result = run_command([
+        "rhjira", "list", jql,
+        "--fields", "key,summary,status,issuetype",
+        "--rawoutput", "--noheader", "--summarylength", "0",
+    ])
+
+    if result.returncode != 0:
+        return {}
+
+    fetched: dict[str, LinkedTicket] = {}
+    for row in _parse_list_output(result.stdout, 4):
+        fetched[row[0]] = LinkedTicket(
+            ticket=row[0],
+            summary=row[1],
+            status=row[2],
+            ticket_type=row[3],
+        )
+    return fetched
+
+
+def batch_fetch_tickets(keys: list[str]) -> dict[str, TicketReport]:
+    """Fetch multiple tickets in a single rhjira list call.
+
+    Returns TicketReport objects with structured fields populated.
+    Custom fields (severity, fixed_in_build) and issuelinks are not
+    available via rhjira list, so those fields are left empty.
+    """
+    if not keys:
+        return {}
+
+    key_list = ", ".join(keys)
+    jql = f"key in ({key_list})"
+    result = run_command([
+        "rhjira", "list", jql,
+        "--fields", "key,summary,status,issuetype,assignee,labels",
+        "--rawoutput", "--noheader", "--summarylength", "0",
+    ])
+
+    if result.returncode != 0:
+        return {}
+
+    reports: dict[str, TicketReport] = {}
+    for row in _parse_list_output(result.stdout, 6):
+        ticket, summary, status, ticket_type, assignee, labels = row
+        cve_ids = sorted(set(CVE_RE.findall(summary)))
+        package_guess = extract_package_guess(summary, labels, "")
+        embargoed = summary.upper().startswith("EMBARGOED")
+
+        reports[ticket] = TicketReport(
+            ticket=ticket,
+            summary=summary,
+            status=status,
+            severity="",
+            assignee=assignee,
+            ticket_type=ticket_type,
+            labels=labels,
+            fixed_in_build="",
+            cve_ids=cve_ids,
+            package_guess=package_guess,
+            linked_keys=[],
+            mr_links_in_ticket=[],
+            embargoed=embargoed,
+        )
+    return reports
 
 
 def inspect_linked_tickets(
     current_ticket: str,
     linked_keys: list[str],
     max_linked: int,
-) -> list[dict[str, Any]]:
-    linked_info: list[dict[str, Any]] = []
-    inspected = 0
+) -> list[LinkedTicket]:
+    keys_to_fetch = [
+        k for k in linked_keys if k != current_ticket
+    ][:max_linked]
 
-    for key in linked_keys:
-        if key == current_ticket:
-            continue
-        if inspected >= max_linked:
-            break
+    if not keys_to_fetch:
+        return []
 
-        result = run_command(["rhjira", "show", key])
-        inspected += 1
-        if result.returncode != 0:
-            linked_info.append(
-                {
-                    "ticket": key,
-                    "error": result.stderr.strip() or result.stdout.strip() or "rhjira show failed",
-                }
-            )
-            continue
+    fetched = batch_fetch_linked(keys_to_fetch)
 
-        blob = parse_ticket_blob(key, result.stdout)
-        linked_info.append(
-            {
-                "ticket": key,
-                "summary": blob["summary"],
-                "status": blob["status"],
-                "ticket_type": blob["ticket_type"],
-                "mr_links": blob["mr_links_in_ticket"],
-            }
-        )
+    linked_info: list[LinkedTicket] = []
+    for key in keys_to_fetch:
+        if key in fetched:
+            linked_info.append(fetched[key])
+        else:
+            linked_info.append(LinkedTicket(ticket=key, error="not found in batch fetch"))
 
     return linked_info
 
 
-def triage_ticket(ticket_key: str, max_linked: int) -> dict[str, Any]:
-    result = run_command(["rhjira", "show", ticket_key])
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"rhjira show {ticket_key} failed: {result.stderr.strip() or result.stdout.strip()}"
+### Output ###
+
+
+def print_ticket(report: TicketReport) -> None:
+    if report.embargoed:
+        print(f"*** EMBARGOED: {report.ticket} — do not analyze or act. ***")
+        return
+    pkg = report.package_guess or "?"
+    sev = report.severity or "-"
+    fib = "set" if report.fixed_in_build else "-"
+    mr_ids = []
+    for u in report.mr_links_in_ticket:
+        m = re.search(r"/merge_requests/(\d+)", u)
+        if m:
+            mr_ids.append(m.group(1))
+    mr = ",".join(mr_ids) if mr_ids else "-"
+    cvs = ",".join(report.cve_ids) if report.cve_ids else "-"
+    assessment = report.assessment or "-"
+    print(
+        f"{report.ticket} | {pkg} | {report.status} | {sev} | {report.assignee} | FIB:{fib} | MR:{mr} | {cvs} | {assessment}"
+    )
+    for u in report.mr_links_in_ticket:
+        print(f"  MR: {u}")
+    if report.affected_range:
+        print(f"  Affected: {report.affected_range}")
+    if report.fixed_version:
+        print(f"  Fixed in: {report.fixed_version}")
+    for linked in report.linked_ticket_details or []:
+        if linked.error:
+            print(f"  LINK: {linked.ticket} ERROR {linked.error}")
+            continue
+        print(
+            f"  LINK: {linked.ticket} [{linked.ticket_type}] {linked.status} - {linked.summary}"
         )
 
-    parsed = parse_ticket_blob(ticket_key, result.stdout)
-    linked_details = inspect_linked_tickets(
-        current_ticket=ticket_key,
-        linked_keys=parsed["linked_keys"],
-        max_linked=max_linked,
-    )
-    parsed["linked_ticket_details"] = linked_details
-    parsed["raw_output_available"] = True
-    return parsed
 
-
-def print_human_report(report: dict[str, Any]) -> None:
-    print(f"Ticket: {report['ticket']}")
-    print(f"Summary: {report['summary']}")
-    print(f"Status: {report['status']} | Severity: {report['severity']} | Assignee: {report['assignee']}")
-    print(f"Package guess: {report['package_guess'] or '(unknown)'}")
-    print(f"CVE IDs: {', '.join(report['cve_ids']) if report['cve_ids'] else '(none found)'}")
-    print(f"Fixed in Build: {report['fixed_in_build'] or '(not set)'}")
-    print(f"Embargoed: {'YES' if report['embargoed'] else 'no'}")
-
-    if report["mr_links_in_ticket"]:
-        print("MR links on ticket:")
-        for url in report["mr_links_in_ticket"]:
-            print(f"  - {url}")
-
-    if report["linked_keys"]:
-        print(f"Linked tickets: {', '.join(report['linked_keys'])}")
-    else:
-        print("Linked tickets: (none)")
-
-    if report["linked_ticket_details"]:
-        print("Linked ticket details:")
-        for linked in report["linked_ticket_details"]:
-            if "error" in linked:
-                print(f"  - {linked['ticket']}: ERROR {linked['error']}")
-                continue
-            mr_part = f" | MR: {', '.join(linked['mr_links'])}" if linked["mr_links"] else ""
-            print(
-                "  - "
-                f"{linked['ticket']} [{linked['ticket_type']}] {linked['status']} - {linked['summary']}{mr_part}"
-            )
-
-    if report["cve_analysis_block"]:
-        print("\n---- cve_analysis {noformat} excerpt ----")
-        print(report["cve_analysis_block"])
-        print("---- end excerpt ----")
-    else:
-        print("\nNo cve_analysis {noformat} block found.")
-
-
-def build_suggested_chat_title(reports: list[dict[str, Any]]) -> str:
-    """Build a deterministic chat title from helper output.
-
-    Format matches the skill convention:
-    - single ticket: HUM-XXXX <package>
-    - same package, multiple tickets: HUM-XXXX HUM-YYYY <package>
-    - mixed packages: HUM-XXXX <package>, HUM-YYYY <package2>
-    """
+def build_suggested_chat_title(reports: list[TicketReport]) -> str:
     if not reports:
         return ""
 
-    tickets = [str(report.get("ticket", "")).strip() for report in reports]
-    packages = [str(report.get("package_guess", "")).strip() for report in reports]
+    tickets = [r.ticket for r in reports]
+    packages = [r.package_guess for r in reports]
 
     if len(reports) == 1:
-        package = packages[0]
-        return f"{tickets[0]} {package}" if package else tickets[0]
+        return f"{tickets[0]} {packages[0]}" if packages[0] else tickets[0]
 
     all_have_package = all(packages)
     if all_have_package and len(set(packages)) == 1:
@@ -317,6 +435,9 @@ def apply_title_prefix(title: str, prefix: str) -> str:
     return f"{cleaned_prefix} {cleaned_title}"
 
 
+### CLI ###
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Summarize HUM CVE ticket details for /cve workflow.",
@@ -324,7 +445,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "tickets",
         nargs="+",
-        help="HUM ticket key(s), e.g. HUM-3120 or 3120",
+        help="HUM ticket key(s), e.g. HUM-3120 or 3120. Related tickets with the same CVEs are discovered automatically.",
     )
     parser.add_argument(
         "--json",
@@ -352,6 +473,17 @@ def build_parser() -> argparse.ArgumentParser:
         default="",
         help="Optional prefix to prepend to suggested chat title (e.g. 'FIB' or '!1234').",
     )
+    parser.add_argument(
+        "--no-find-related",
+        action="store_false",
+        dest="find_related",
+        default=True,
+        help=(
+            "Skip automatic discovery of related tickets with the same CVE IDs. "
+            "By default, related tickets are included to enable batch resolution "
+            "in a single invocation."
+        ),
+    )
     return parser
 
 
@@ -368,6 +500,39 @@ def ensure_rhjira_available() -> bool:
     return False
 
 
+def find_related_tickets(initial_cve_ids: list[str]) -> list[str]:
+    """Search for all open HUM tickets that reference the given CVE IDs.
+
+    Returns a list of unique ticket keys (e.g., HUM-3120).
+    """
+    if not initial_cve_ids:
+        return []
+
+    all_tickets: set[str] = set()
+
+    for cve_id in initial_cve_ids:
+        jql = f'project = HUM AND status not in (Closed, "CLOSED (invalid)", Done, Resolved, "Won\'t Fix") AND text ~ "{cve_id}"'
+        result = run_command(
+            ["rhjira", "list", jql, "--fields", "key", "--rawoutput", "--noheader"]
+        )
+
+        if result.returncode != 0:
+            print(
+                f"Warning: Failed to search for tickets with {cve_id}: {result.stderr}",
+                file=sys.stderr,
+            )
+            continue
+
+        for line in result.stdout.strip().splitlines():
+            parts = line.split("|")
+            if len(parts) >= 2:
+                candidate = parts[1].strip()
+                if HUM_RE.fullmatch(candidate):
+                    all_tickets.add(candidate)
+
+    return sorted(all_tickets)
+
+
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
@@ -379,21 +544,87 @@ def main() -> int:
     if not ensure_rhjira_available():
         return 1
 
-    reports: list[dict[str, Any]] = []
-    for key in args.tickets:
-        normalized = normalize_hum_key(key)
-        report = triage_ticket(normalized, max_linked=args.max_linked)
-        reports.append(report)
+    initial_keys: list[str] = [normalize_hum_key(key) for key in args.tickets]
+    ticket_keys: list[str] = list(initial_keys)
+    initial_set = set(initial_keys)
+
+    if args.find_related:
+        print("Finding related tickets...", file=sys.stderr)
+        initial_cve_ids: set[str] = set()
+        for key in initial_keys:
+            try:
+                text = fetch_raw(key)
+            except RuntimeError:
+                print(f"Warning: Failed to fetch {key}, skipping", file=sys.stderr)
+                continue
+            cve_ids = CVE_RE.findall(text)
+            initial_cve_ids.update(cve_ids)
+
+        if initial_cve_ids:
+            related_keys = find_related_tickets(sorted(initial_cve_ids))
+            new_keys = set(related_keys) - initial_set
+            ticket_keys = list(dict.fromkeys(ticket_keys + related_keys))
+            print(
+                f"Found {len(ticket_keys)} total tickets ({len(new_keys)} newly discovered)\n",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                "Warning: Could not extract any CVE IDs from initial tickets; "
+                "--find-related had no effect.",
+                file=sys.stderr,
+            )
+
+    reports: list[TicketReport] = []
+
+    # Full fetch for user-provided tickets (need custom fields, comments)
+    initial_reports: dict[str, TicketReport] = {}
+    for key in initial_keys:
+        try:
+            text = fetch_raw(key)
+        except RuntimeError as e:
+            print(f"Warning: failed to fetch {key}: {e}", file=sys.stderr)
+            continue
+        print(f"Processing {key}...", file=sys.stderr, end="\r")
+        initial_reports[key] = parse_ticket_blob(key, text)
+
+    # Batch fetch discovered tickets
+    discovered_keys = [k for k in ticket_keys if k not in initial_set]
+    discovered_reports: dict[str, TicketReport] = {}
+    if discovered_keys:
+        print(
+            f"Batch-fetching {len(discovered_keys)} discovered tickets...",
+            file=sys.stderr,
+        )
+        discovered_reports = batch_fetch_tickets(discovered_keys)
+
+    # Merge and attach linked ticket details
+    all_reports: dict[str, TicketReport] = {}
+    for key in ticket_keys:
+        if key in initial_reports:
+            all_reports[key] = initial_reports[key]
+        elif key in discovered_reports:
+            all_reports[key] = discovered_reports[key]
+
+    for key, parsed in all_reports.items():
+        parsed.linked_ticket_details = inspect_linked_tickets(
+            current_ticket=key,
+            linked_keys=parsed.linked_keys,
+            max_linked=args.max_linked,
+        )
+        reports.append(parsed)
 
     suggested_chat_title = build_suggested_chat_title(reports)
     suggested_chat_title = apply_title_prefix(suggested_chat_title, args.title_prefix)
     payload: dict[str, Any] = {
         "suggested_chat_title": suggested_chat_title,
-        "tickets": reports,
+        "tickets": [asdict(r) for r in reports],
     }
 
     if args.json_out:
-        args.json_out.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+        args.json_out.write_text(
+            json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
+        )
 
     if args.title_only:
         print(suggested_chat_title)
@@ -402,8 +633,8 @@ def main() -> int:
     else:
         for idx, report in enumerate(reports):
             if idx:
-                print("\n" + "=" * 72 + "\n")
-            print_human_report(report)
+                print()
+            print_ticket(report)
         print(f"\nSuggested chat title: {suggested_chat_title}")
 
     return 0
