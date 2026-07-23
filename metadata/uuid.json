@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Pre-existing modification - requires review",
   "modification_status": "modified",
-  "release": "69",
-  "sha": "43b3960babe61bb4fd13ddc982c18e467d69b2b7",
+  "release": "70",
+  "sha": "fe96fe5d020bb9d9bc3a8076730cdd36544ec8bb",
   "source": "https://src.fedoraproject.org/rpms/uuid.git",
   "upstream_repo": "https://src.fedoraproject.org/rpms/uuid",
   "version": "1.6.2"
