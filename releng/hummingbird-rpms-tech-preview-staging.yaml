@@ -384,6 +384,10 @@ spec:
           contentType: rpm
         - name: json-c-main
           contentType: rpm
+        - name: k6v1-main
+          contentType: rpm
+        - name: k6v2-main
+          contentType: rpm
         - name: kbd-main
           contentType: rpm
         - name: kernel-headers-main
@@ -559,6 +563,10 @@ spec:
         - name: lmdb-main
           contentType: rpm
         - name: logrotate-main
+          contentType: rpm
+        - name: loki3-6-main
+          contentType: rpm
+        - name: loki3-7-main
           contentType: rpm
         - name: lua-main
           contentType: rpm
@@ -981,6 +989,10 @@ spec:
         - name: tar-main
           contentType: rpm
         - name: tcl-main
+          contentType: rpm
+        - name: tempo2-10-main
+          contentType: rpm
+        - name: tempo3-0-main
           contentType: rpm
         - name: tinysparql-main
           contentType: rpm

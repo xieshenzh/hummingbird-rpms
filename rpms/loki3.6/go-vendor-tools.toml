@@ -1,0 +1,64 @@
+[archive]
+
+[licensing]
+detector = "askalono"
+exclude_files = [
+  "vendor/github.com/DataDog/sketches-go/LICENSE-3rdparty.csv",
+  "vendor/modernc.org/memory/LICENSE-LOGO",
+]
+
+# Manually resolved entries that askalono cannot identify reliably.
+[[licensing.licenses]]
+path = "vendor/github.com/digitalocean/godo/LICENSE.txt"
+sha256sum = "946d0e939f736a9d7061ea06591818107fb12d3cddad70ee81667b85f7f24c22"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/efficientgo/core/COPYRIGHT"
+sha256sum = "e32bd42e3ae91caf3eb5cfee2d65ce27456ec78a5b2b8b74c4eaf91c5173f908"
+expression = "Apache-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/grpc-ecosystem/go-grpc-middleware/v2/COPYRIGHT"
+sha256sum = "8befb41eac649775143c81fddaf84b7d7e1197899d968b8b51cfec405f2ff72f"
+expression = "Apache-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shopspring/decimal/LICENSE"
+sha256sum = "b92ba0f6ee02f2309628bfdadb123668a17c016e475ba477b857d33470d9d625"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/thanos-io/objstore/COPYRIGHT"
+sha256sum = "c40d671057607ff59039a681ac1cd02a2965c689b95a1a73ca495cb3d40ddaed"
+expression = "Apache-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/miekg/dns/COPYRIGHT"
+sha256sum = "66550c0ad5ca7ec1e08683e5f872cc45c741f311eee3b8ee484206ecbf9c740d"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/sean-/seed/LICENSE"
+sha256sum = "a9acefe76ede3dc382f2b449f968571f796a3bedc8eb0ef53dd4ef41083f3fd3"
+expression = "MIT AND BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shirou/gopsutil/v4/LICENSE"
+sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+
+[[licensing.licenses]]
+path = "vendor/modernc.org/libc/COPYRIGHT-MUSL"
+sha256sum = "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+expression = "MIT"

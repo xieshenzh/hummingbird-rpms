@@ -189,6 +189,18 @@ llvm21:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+k6v1:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+k6v2:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+loki3.6:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+loki3.7:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 memcached:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
@@ -343,6 +355,12 @@ swift-lang:
               memory: 10Gi
 
 syft:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+tempo2.10:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+tempo3.0:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 tomcat11:

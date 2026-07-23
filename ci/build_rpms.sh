@@ -13,7 +13,9 @@ show_help() {
 Build RPMs for a given package using mock in a containerized environment.
 
 This script:
-- Builds the RPM using mock in the upstream RPM Build Pipeline container
+- Calculates build dependencies using mock
+- Materializes the hermetic buildroot repository
+- Builds the RPM without network access, matching the upstream RPM pipeline
 - Outputs binary RPMs to builds/PACKAGE_NAME/RPMS/
 - Outputs source RPMs to builds/PACKAGE_NAME/SRPMS/
 
@@ -23,6 +25,7 @@ Usage: ./ci/build_rpms.sh [OPTIONS] PACKAGE_NAME
   --build-dir DIR    - Custom build directory (default: builds/PACKAGE_NAME)
   --local-rpms-dir DIR - Directory containing local RPMs to use as an additional
                        high-priority repo (useful for testing build compatibility)
+  --hermetic         - Match CI: materialize dependencies, then build offline
   --nocheck          - Skip running %check tests during the build
   --shell-before     - Drop into interactive shell instead of running mock
                        (displays the mock command that would be executed)
@@ -31,9 +34,9 @@ Usage: ./ci/build_rpms.sh [OPTIONS] PACKAGE_NAME
 
 The built RPMs can be found in: builds/PACKAGE_NAME/RPMS/ and builds/PACKAGE_NAME/SRPMS/
 
-Note: This performs a non-hermetic package build in the same container
-environment as used by Konflux, but is not a drop-in replacement for the
-full Tekton pipeline.
+The default is the faster networked Mock build. Use --hermetic to reproduce
+Konflux's dependency-calculation and network-disabled build phases exactly.
+Interactive shell modes cannot be used with --hermetic.
 EOF
 }
 
@@ -41,6 +44,7 @@ image=quay.io/redhat-user-workloads/rpm-build-pipeline-tenant/environment:latest
 arch=$(uname -m)
 build_dir=""
 local_rpms_dir=""
+hermetic=""
 nocheck=""
 shell_before=""
 shell_after=""
@@ -64,6 +68,10 @@ while [[ $# -gt 0 ]]; do
         --local-rpms-dir)
             local_rpms_dir="$(realpath "$2")"
             shift 2
+            ;;
+        --hermetic)
+            hermetic="1"
+            shift
             ;;
         --nocheck)
             nocheck="--nocheck"
@@ -90,6 +98,16 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+if [[ -n "${hermetic}" && ( -n "${shell_before}" || -n "${shell_after}" ) ]]; then
+    echo "Error: Interactive shell modes cannot be used with --hermetic" >&2
+    exit 1
+fi
+
+mock_check_args=()
+if [[ -n "${nocheck}" ]]; then
+    mock_check_args+=(--nocheck)
+fi
+
 # Validate exactly one package name was provided
 if [[ -z "${package_name}" ]]; then
     echo "Error: No package name provided" >&2
@@ -100,7 +118,7 @@ fi
 
 # Use builds directory as workdir for easier debugging
 if [[ -n "${build_dir}" ]]; then
-    workdir="${build_dir}"
+    workdir="$(realpath -m "${build_dir}")"
 else
     workdir="${OUT_DIR}/${package_name}"
 fi
@@ -108,11 +126,16 @@ mkdir -p "${workdir}"
 
 cd "${workdir}"
 mkdir -p results config sources RPMS SRPMS
-# Clean previous build artifacts so this run only shows current outputs
-rm -f RPMS/*.rpm SRPMS/*.src.rpm 2>/dev/null || true
+# CI gives each build fresh source, result, and Mock storage.  Do the same here:
+# retaining Mock's root cache without its nested Podman image store makes a
+# subsequent dependency-lock calculation fail while inspecting the bootstrap
+# image that the cached root caused Mock not to pull.
+find results config sources -mindepth 1 -delete
+find RPMS SRPMS -mindepth 1 -type f -delete
 
 # Create directory for mock buildroot on host filesystem (avoids overlayfs xattr issues)
 mkdir -p var_lib_mock
+podman unshare find var_lib_mock -mindepth 1 -delete
 
 # Allow mockbuilder (gid 135/mock) to read config and write results
 if command -v setfacl &> /dev/null; then
@@ -144,11 +167,11 @@ if [[ -n "${local_rpms_dir}" ]]; then
 
     # Inject local repo config into mock.cfg at the anchor point
     # Priority 1 ensures it takes precedence over all other repos
-    # Uses /tmp/local-rpms which is created inside the container from the mounted source
+    # Uses /sources/local-rpms so every build phase sees the same repository.
     local_repo_config=$(cat <<'EOF'
 [local-rpms]
 name=local-rpms
-baseurl=file:///tmp/local-rpms/
+baseurl=file:///sources/local-rpms/
 enabled=1
 gpgcheck=0
 priority=1
@@ -209,7 +232,7 @@ else
     bare_repo="${REPO_ROOT}/.git"
 fi
 
-# Build podman arguments
+# Podman arguments shared by dependency calculation and package builds.
 podman_args=(
     --rm -ti --privileged --init
     --pids-limit=16384
@@ -228,7 +251,7 @@ if [[ -n "${local_rpms_dir}" ]]; then
     podman_args+=(-v "${local_rpms_dir}:/local-rpms-src:ro,z")
 fi
 
-# mock command for building package_name
+# Mock command used by the non-hermetic debugging path.
 mock_cmd="mock -r /config/mock.cfg \\
      --spec '/repo/rpms/${package_name}/${spec_file_name}' \\
      --sources /sources \\
@@ -248,9 +271,9 @@ export CONFIG_DIR=/tmp/dist-git-client-config
 # Create repo from local RPMs if mounted
 if [[ -d /local-rpms-src ]]; then
     echo 'Creating repository from local RPMs...'
-    mkdir -p /tmp/local-rpms
-    cp /local-rpms-src/*.rpm /tmp/local-rpms/ 2>/dev/null || true
-    createrepo_c /tmp/local-rpms
+    mkdir -p /sources/local-rpms
+    cp /local-rpms-src/*.rpm /sources/local-rpms/ 2>/dev/null || true
+    createrepo_c /sources/local-rpms
 fi
 
 # Download sources using dist-git-client
@@ -269,14 +292,10 @@ dist-git-client --configdir \${CONFIG_DIR} --forked-from ${upstream_repo_url} so
 echo 'Copying sources to /sources directory...'
 cp -v * /sources/ 2>/dev/null || true
 
-# Install dnf5 into the mock buildroot if using shell mode
-if [[ -n '${shell_before}' || -n '${shell_after}' ]]; then
-    echo 'Installing dnf5 into mock buildroot...'
+# The remaining non-hermetic actions intentionally stay in this container.
+if [[ -z '${hermetic}' && -n '${shell_before}' ]]; then
+    echo 'Installing dnf5 into the mock buildroot...'
     mock -r /config/mock.cfg --resultdir /results --no-clean --install dnf5
-fi
-
-# Either run mock or drop into interactive shell
-if [[ -n '${shell_before}' ]]; then
     echo ''
     echo '=========================================='
     echo 'Ready to build. The mock command would be:'
@@ -287,7 +306,7 @@ if [[ -n '${shell_before}' ]]; then
     echo '=========================================='
     echo ''
     mock -r /config/mock.cfg --resultdir /results --no-clean --enable-network --shell
-elif [[ -n '${shell_after}' ]]; then
+elif [[ -z '${hermetic}' && -n '${shell_after}' ]]; then
     ${mock_cmd} || true
 
     popd
@@ -297,12 +316,46 @@ elif [[ -n '${shell_after}' ]]; then
     echo '=========================================='
     echo ''
     mock -r /config/mock.cfg --resultdir /results --no-clean --enable-network --shell
-else
+elif [[ -z '${hermetic}' ]]; then
     ${mock_cmd}
 
     popd
 fi
 "
+
+if [[ -n "${hermetic}" ]]; then
+    echo "Calculating build dependencies..."
+    podman run "${podman_args[@]}" "${image}" \
+        mock -r /config/mock.cfg \
+            --spec "/sources/${spec_file_name}" \
+            --sources /sources \
+            --resultdir /results \
+            --calculate-build-dependencies \
+            "${mock_check_args[@]}"
+
+    echo "Materializing hermetic buildroot repository..."
+    root_podman_args=("${podman_args[@]}")
+    for i in "${!root_podman_args[@]}"; do
+        if [[ "${root_podman_args[${i}]}" == "-u" ]]; then
+            unset 'root_podman_args[i]' 'root_podman_args[i+1]'
+            break
+        fi
+    done
+    podman run "${root_podman_args[@]}" "${image}" \
+        mock-hermetic-repo \
+            --lockfile /results/buildroot_lock.json \
+            --output-repo /results/buildroot_repo
+
+    echo "Building without network access..."
+    podman run --network=none "${podman_args[@]}" "${image}" \
+        mock --hermetic-build \
+            /results/buildroot_lock.json \
+            /results/buildroot_repo \
+            --spec "/sources/${spec_file_name}" \
+            --sources /sources \
+            --resultdir /results \
+            "${mock_check_args[@]}"
+fi
 
 # Organize RPMs into separate directories
 mkdir -p "${workdir}/RPMS" "${workdir}/SRPMS"
