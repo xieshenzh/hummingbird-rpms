@@ -1,5 +1,5 @@
 {
-  "modification_reason": "backport fix for CVE-2026-59869; fix c-ares callback compatibility for buildroot c-ares",
+  "modification_reason": "backport fix for CVE-2026-59869; fix c-ares callback compatibility for buildroot c-ares; backport fix for CVE-2026-14257",
   "modification_status": "modified",
   "release": "1.3",
   "release_monitoring_project_id": 8251,
