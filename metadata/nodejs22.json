@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 22.23.1; backport fix for CVE-2026-13149; backport fix for CVE-2026-59869",
+  "modification_reason": "Update to upstream version 22.23.1; backport fix for CVE-2026-13149; backport fix for CVE-2026-59869; backport fix for CVE-2026-14257",
   "modification_status": "modified",
   "release": "2.2",
   "release_monitoring_project_id": 8251,
