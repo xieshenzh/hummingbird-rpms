@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "840f88c31fc5ab1cfce949bf0e1c02e0a5584694",
+  "sha": "ccb19b21f95044dcbc2d5ec8e6c317ef3cd2c262",
   "source": "https://src.fedoraproject.org/rpms/vim.git",
   "upstream_repo": "https://github.com/vim/vim",
-  "version": "9.2.782"
+  "version": "9.2.843"
 }
