@@ -4,7 +4,7 @@
 
 Name:           snappy
 Version:        1.2.2
-Release:        4.1%{?dist}
+Release:        4.2%{?dist}
 Summary:        Fast compression and decompression library
 
 License:        BSD-3-Clause
