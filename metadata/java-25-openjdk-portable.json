@@ -3,10 +3,10 @@
   "cve_product": "Oracle Corporation / Oracle Java SE",
   "modification_reason": "Add changelog separator to spec file",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "d336b97280ae1cb4745ac1cc6334887eba51dba7",
+  "release": "2.0",
+  "sha": "5a268016ad909c415222f9453d4b2bcf17a48561",
   "source": "https://src.fedoraproject.org/rpms/java-25-openjdk-portable.git",
   "upstream_repo": "https://github.com/openjdk/jdk25u",
-  "version": "25.0.3.0.9",
+  "version": "25.0.4.0.7",
   "version_transform": "openjdk_to_oracle"
 }

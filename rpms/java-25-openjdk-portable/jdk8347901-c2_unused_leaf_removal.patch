@@ -1,0 +1,772 @@
+From 09853461a6896ab1f15469c753c21ca212e7e650 Mon Sep 17 00:00:00 2001
+From: duke <duke@openjdk.org>
+Date: Tue, 7 Apr 2026 15:14:53 +0000
+Subject: [PATCH 1/2] Backport ed70910b0f3e1b19d915ec13ac3434407d01bc5d
+
+---
+ src/hotspot/share/opto/callnode.cpp     |  53 +++++++-
+ src/hotspot/share/opto/callnode.hpp     |  29 ++++-
+ src/hotspot/share/opto/classes.hpp      |   2 +
+ src/hotspot/share/opto/compile.cpp      |  19 +++
+ src/hotspot/share/opto/divnode.cpp      | 158 ++++++++++--------------
+ src/hotspot/share/opto/divnode.hpp      |  35 +++---
+ src/hotspot/share/opto/graphKit.cpp     |  29 +++--
+ src/hotspot/share/opto/graphKit.hpp     |   1 +
+ src/hotspot/share/opto/library_call.cpp |   2 +-
+ src/hotspot/share/opto/macro.cpp        |  15 +--
+ src/hotspot/share/opto/multnode.cpp     |  13 ++
+ src/hotspot/share/opto/multnode.hpp     |  46 +++++++
+ src/hotspot/share/opto/node.cpp         |  12 +-
+ src/hotspot/share/opto/node.hpp         |   5 +-
+ src/hotspot/share/opto/parse2.cpp       |   8 +-
+ 15 files changed, 282 insertions(+), 145 deletions(-)
+
+diff --git a/src/hotspot/share/opto/callnode.cpp b/src/hotspot/share/opto/callnode.cpp
+index 6f13ce0f809..fc4b0c35dff 100644
+--- a/src/hotspot/share/opto/callnode.cpp
++++ b/src/hotspot/share/opto/callnode.cpp
+@@ -935,7 +935,7 @@ Node *CallNode::result_cast() {
+ }
+ 
+ 
+-void CallNode::extract_projections(CallProjections* projs, bool separate_io_proj, bool do_asserts) {
++void CallNode::extract_projections(CallProjections* projs, bool separate_io_proj, bool do_asserts) const {
+   projs->fallthrough_proj      = nullptr;
+   projs->fallthrough_catchproj = nullptr;
+   projs->fallthrough_ioproj    = nullptr;
+@@ -1319,6 +1319,57 @@ void CallLeafVectorNode::calling_convention( BasicType* sig_bt, VMRegPair *parm_
+ 
+ 
+ //=============================================================================
++bool CallLeafPureNode::is_unused() const {
++  return proj_out_or_null(TypeFunc::Parms) == nullptr;
++}
++
++bool CallLeafPureNode::is_dead() const {
++  return proj_out_or_null(TypeFunc::Control) == nullptr;
++}
++
++/* We make a tuple of the global input state + TOP for the output values.
++ * We use this to delete a pure function that is not used: by replacing the call with
++ * such a tuple, we let output Proj's idealization pick the corresponding input of the
++ * pure call, so jumping over it, and effectively, removing the call from the graph.
++ * This avoids doing the graph surgery manually, but leaves that to IGVN
++ * that is specialized for doing that right. We need also tuple components for output
++ * values of the function to respect the return arity, and in case there is a projection
++ * that would pick an output (which shouldn't happen at the moment).
++ */
++TupleNode* CallLeafPureNode::make_tuple_of_input_state_and_top_return_values(const Compile* C) const {
++  // Transparently propagate input state but parameters
++  TupleNode* tuple = TupleNode::make(
++      tf()->range(),
++      in(TypeFunc::Control),
++      in(TypeFunc::I_O),
++      in(TypeFunc::Memory),
++      in(TypeFunc::FramePtr),
++      in(TypeFunc::ReturnAdr));
++
++  // And add TOPs for the return values
++  for (uint i = TypeFunc::Parms; i < tf()->range()->cnt(); i++) {
++    tuple->set_req(i, C->top());
++  }
++
++  return tuple;
++}
++
++Node* CallLeafPureNode::Ideal(PhaseGVN* phase, bool can_reshape) {
++  if (is_dead()) {
++    return nullptr;
++  }
++
++  // We need to wait until IGVN because during parsing, usages might still be missing
++  // and we would remove the call immediately.
++  if (can_reshape && is_unused()) {
++    // The result is not used. We remove the call by replacing it with a tuple, that
++    // is later disintegrated by the projections.
++    return make_tuple_of_input_state_and_top_return_values(phase->C);
++  }
++
++  return CallRuntimeNode::Ideal(phase, can_reshape);
++}
++
+ #ifndef PRODUCT
+ void CallLeafNode::dump_spec(outputStream *st) const {
+   st->print("# ");
+diff --git a/src/hotspot/share/opto/callnode.hpp b/src/hotspot/share/opto/callnode.hpp
+index 213fbda4e89..2462a88143f 100644
+--- a/src/hotspot/share/opto/callnode.hpp
++++ b/src/hotspot/share/opto/callnode.hpp
+@@ -752,7 +752,7 @@ class CallNode : public SafePointNode {
+   // Collect all the interesting edges from a call for use in
+   // replacing the call by something else.  Used by macro expansion
+   // and the late inlining support.
+-  void extract_projections(CallProjections* projs, bool separate_io_proj, bool do_asserts = true);
++  void extract_projections(CallProjections* projs, bool separate_io_proj, bool do_asserts = true) const;
+ 
+   virtual uint match_edge(uint idx) const;
+ 
+@@ -928,6 +928,33 @@ class CallLeafNode : public CallRuntimeNode {
+ #endif
+ };
+ 
++/* A pure function call, they are assumed not to be safepoints, not to read or write memory,
++ * have no exception... They just take parameters, return a value without side effect. It is
++ * always correct to create some, or remove them, if the result is not used.
++ *
++ * They still have control input to allow easy lowering into other kind of calls that require
++ * a control, but this is more a technical than a moral constraint.
++ *
++ * Pure calls must have only control and data input and output: I/O, Memory and so on must be top.
++ * Nevertheless, pure calls can typically be expensive math operations so care must be taken
++ * when letting the node float.
++ */
++class CallLeafPureNode : public CallLeafNode {
++protected:
++  bool is_unused() const;
++  bool is_dead() const;
++  TupleNode* make_tuple_of_input_state_and_top_return_values(const Compile* C) const;
++
++public:
++  CallLeafPureNode(const TypeFunc* tf, address addr, const char* name,
++                   const TypePtr* adr_type)
++      : CallLeafNode(tf, addr, name, adr_type) {
++    init_class_id(Class_CallLeafPure);
++  }
++  int Opcode() const override;
++  Node* Ideal(PhaseGVN* phase, bool can_reshape) override;
++};
++
+ //------------------------------CallLeafNoFPNode-------------------------------
+ // CallLeafNode, not using floating point or using it in the same manner as
+ // the generated code
+diff --git a/src/hotspot/share/opto/classes.hpp b/src/hotspot/share/opto/classes.hpp
+index bc259eed2d1..587d5fad8f2 100644
+--- a/src/hotspot/share/opto/classes.hpp
++++ b/src/hotspot/share/opto/classes.hpp
+@@ -61,6 +61,7 @@ macro(CallDynamicJava)
+ macro(CallJava)
+ macro(CallLeaf)
+ macro(CallLeafNoFP)
++macro(CallLeafPure)
+ macro(CallLeafVector)
+ macro(CallRuntime)
+ macro(CallStaticJava)
+@@ -372,6 +373,7 @@ macro(SubI)
+ macro(SubL)
+ macro(TailCall)
+ macro(TailJump)
++macro(Tuple)
+ macro(MacroLogicV)
+ macro(ThreadLocal)
+ macro(Unlock)
+diff --git a/src/hotspot/share/opto/compile.cpp b/src/hotspot/share/opto/compile.cpp
+index 2b956dcb5d8..9f7f48b9a34 100644
+--- a/src/hotspot/share/opto/compile.cpp
++++ b/src/hotspot/share/opto/compile.cpp
+@@ -3298,6 +3298,25 @@ void Compile::final_graph_reshaping_main_switch(Node* n, Final_Reshape_Counts& f
+   case Op_Opaque1:              // Remove Opaque Nodes before matching
+     n->subsume_by(n->in(1), this);
+     break;
++  case Op_CallLeafPure: {
++    // If the pure call is not supported, then lower to a CallLeaf.
++    if (!Matcher::match_rule_supported(Op_CallLeafPure)) {
++      CallNode* call = n->as_Call();
++      CallNode* new_call = new CallLeafNode(call->tf(), call->entry_point(),
++                                            call->_name, TypeRawPtr::BOTTOM);
++      new_call->init_req(TypeFunc::Control, call->in(TypeFunc::Control));
++      new_call->init_req(TypeFunc::I_O, C->top());
++      new_call->init_req(TypeFunc::Memory, C->top());
++      new_call->init_req(TypeFunc::ReturnAdr, C->top());
++      new_call->init_req(TypeFunc::FramePtr, C->top());
++      for (unsigned int i = TypeFunc::Parms; i < call->tf()->domain()->cnt(); i++) {
++        new_call->init_req(i, call->in(i));
++      }
++      n->subsume_by(new_call, this);
++    }
++    frc.inc_call_count();
++    break;
++  }
+   case Op_CallStaticJava:
+   case Op_CallJava:
+   case Op_CallDynamicJava:
+diff --git a/src/hotspot/share/opto/divnode.cpp b/src/hotspot/share/opto/divnode.cpp
+index a70194274a7..5dd8be877ff 100644
+--- a/src/hotspot/share/opto/divnode.cpp
++++ b/src/hotspot/share/opto/divnode.cpp
+@@ -42,19 +42,19 @@
+ 
+ #include <math.h>
+ 
+-ModFloatingNode::ModFloatingNode(Compile* C, const TypeFunc* tf, const char* name) : CallLeafNode(tf, nullptr, name, TypeRawPtr::BOTTOM) {
++ModFloatingNode::ModFloatingNode(Compile* C, const TypeFunc* tf, address addr, const char* name) : CallLeafPureNode(tf, addr, name, TypeRawPtr::BOTTOM) {
+   add_flag(Flag_is_macro);
+   C->add_macro_node(this);
+ }
+ 
+-ModDNode::ModDNode(Compile* C, Node* a, Node* b) : ModFloatingNode(C, OptoRuntime::Math_DD_D_Type(), "drem") {
++ModDNode::ModDNode(Compile* C, Node* a, Node* b) : ModFloatingNode(C, OptoRuntime::Math_DD_D_Type(), CAST_FROM_FN_PTR(address, SharedRuntime::drem), "drem") {
+   init_req(TypeFunc::Parms + 0, a);
+   init_req(TypeFunc::Parms + 1, C->top());
+   init_req(TypeFunc::Parms + 2, b);
+   init_req(TypeFunc::Parms + 3, C->top());
+ }
+ 
+-ModFNode::ModFNode(Compile* C, Node* a, Node* b) : ModFloatingNode(C, OptoRuntime::modf_Type(), "frem") {
++ModFNode::ModFNode(Compile* C, Node* a, Node* b) : ModFloatingNode(C, OptoRuntime::modf_Type(), CAST_FROM_FN_PTR(address, SharedRuntime::frem), "frem") {
+   init_req(TypeFunc::Parms + 0, a);
+   init_req(TypeFunc::Parms + 1, b);
+ }
+@@ -1516,137 +1516,109 @@ const Type* UModLNode::Value(PhaseGVN* phase) const {
+   return unsigned_mod_value<TypeLong, julong, jlong>(phase, this);
+ }
+ 
+-Node* ModFNode::Ideal(PhaseGVN* phase, bool can_reshape) {
+-  if (!can_reshape) {
+-    return nullptr;
+-  }
+-  PhaseIterGVN* igvn = phase->is_IterGVN();
+-
+-  bool result_is_unused = proj_out_or_null(TypeFunc::Parms) == nullptr;
+-  bool not_dead = proj_out_or_null(TypeFunc::Control) != nullptr;
+-  if (result_is_unused && not_dead) {
+-    return replace_with_con(igvn, TypeF::make(0.));
+-  }
+-
+-  // Either input is TOP ==> the result is TOP
+-  const Type* t1 = phase->type(dividend());
+-  const Type* t2 = phase->type(divisor());
+-  if (t1 == Type::TOP || t2 == Type::TOP) {
+-    return phase->C->top();
+-  }
+-
++const Type* ModFNode::get_result_if_constant(const Type* dividend, const Type* divisor) const {
+   // If either number is not a constant, we know nothing.
+-  if ((t1->base() != Type::FloatCon) || (t2->base() != Type::FloatCon)) {
++  if ((dividend->base() != Type::FloatCon) || (divisor->base() != Type::FloatCon)) {
+     return nullptr; // note: x%x can be either NaN or 0
+   }
+ 
+-  float f1 = t1->getf();
+-  float f2 = t2->getf();
+-  jint x1 = jint_cast(f1); // note:  *(int*)&f1, not just (int)f1
+-  jint x2 = jint_cast(f2);
++  float dividend_f = dividend->getf();
++  float divisor_f = divisor->getf();
++  jint dividend_i = jint_cast(dividend_f); // note:  *(int*)&f1, not just (int)f1
++  jint divisor_i = jint_cast(divisor_f);
+ 
+   // If either is a NaN, return an input NaN
+-  if (g_isnan(f1)) {
+-    return replace_with_con(igvn, t1);
++  if (g_isnan(dividend_f)) {
++    return dividend;
+   }
+-  if (g_isnan(f2)) {
+-    return replace_with_con(igvn, t2);
++  if (g_isnan(divisor_f)) {
++    return divisor;
+   }
+ 
+   // If an operand is infinity or the divisor is +/- zero, punt.
+-  if (!g_isfinite(f1) || !g_isfinite(f2) || x2 == 0 || x2 == min_jint) {
++  if (!g_isfinite(dividend_f) || !g_isfinite(divisor_f) || divisor_i == 0 || divisor_i == min_jint) {
+     return nullptr;
+   }
+ 
+   // We must be modulo'ing 2 float constants.
+   // Make sure that the sign of the fmod is equal to the sign of the dividend
+-  jint xr = jint_cast(fmod(f1, f2));
+-  if ((x1 ^ xr) < 0) {
++  jint xr = jint_cast(fmod(dividend_f, divisor_f));
++  if ((dividend_i ^ xr) < 0) {
+     xr ^= min_jint;
+   }
+ 
+-  return replace_with_con(igvn, TypeF::make(jfloat_cast(xr)));
++  return TypeF::make(jfloat_cast(xr));
+ }
+ 
+-Node* ModDNode::Ideal(PhaseGVN* phase, bool can_reshape) {
+-  if (!can_reshape) {
+-    return nullptr;
+-  }
+-  PhaseIterGVN* igvn = phase->is_IterGVN();
+-
+-  bool result_is_unused = proj_out_or_null(TypeFunc::Parms) == nullptr;
+-  bool not_dead = proj_out_or_null(TypeFunc::Control) != nullptr;
+-  if (result_is_unused && not_dead) {
+-    return replace_with_con(igvn, TypeD::make(0.));
+-  }
+-
+-  // Either input is TOP ==> the result is TOP
+-  const Type* t1 = phase->type(dividend());
+-  const Type* t2 = phase->type(divisor());
+-  if (t1 == Type::TOP || t2 == Type::TOP) {
+-    return nullptr;
+-  }
+-
++const Type* ModDNode::get_result_if_constant(const Type* dividend, const Type* divisor) const {
+   // If either number is not a constant, we know nothing.
+-  if ((t1->base() != Type::DoubleCon) || (t2->base() != Type::DoubleCon)) {
++  if ((dividend->base() != Type::DoubleCon) || (divisor->base() != Type::DoubleCon)) {
+     return nullptr; // note: x%x can be either NaN or 0
+   }
+ 
+-  double f1 = t1->getd();
+-  double f2 = t2->getd();
+-  jlong x1 = jlong_cast(f1); // note:  *(long*)&f1, not just (long)f1
+-  jlong x2 = jlong_cast(f2);
++  double dividend_d = dividend->getd();
++  double divisor_d = divisor->getd();
++  jlong dividend_l = jlong_cast(dividend_d); // note:  *(long*)&f1, not just (long)f1
++  jlong divisor_l = jlong_cast(divisor_d);
+ 
+   // If either is a NaN, return an input NaN
+-  if (g_isnan(f1)) {
+-    return replace_with_con(igvn, t1);
++  if (g_isnan(dividend_d)) {
++    return dividend;
+   }
+-  if (g_isnan(f2)) {
+-    return replace_with_con(igvn, t2);
++  if (g_isnan(divisor_d)) {
++    return divisor;
+   }
+ 
+   // If an operand is infinity or the divisor is +/- zero, punt.
+-  if (!g_isfinite(f1) || !g_isfinite(f2) || x2 == 0 || x2 == min_jlong) {
++  if (!g_isfinite(dividend_d) || !g_isfinite(divisor_d) || divisor_l == 0 || divisor_l == min_jlong) {
+     return nullptr;
+   }
+ 
+   // We must be modulo'ing 2 double constants.
+   // Make sure that the sign of the fmod is equal to the sign of the dividend
+-  jlong xr = jlong_cast(fmod(f1, f2));
+-  if ((x1 ^ xr) < 0) {
++  jlong xr = jlong_cast(fmod(dividend_d, divisor_d));
++  if ((dividend_l ^ xr) < 0) {
+     xr ^= min_jlong;
+   }
+ 
+-  return replace_with_con(igvn, TypeD::make(jdouble_cast(xr)));
++  return TypeD::make(jdouble_cast(xr));
+ }
+ 
+-Node* ModFloatingNode::replace_with_con(PhaseIterGVN* phase, const Type* con) {
+-  Compile* C = phase->C;
+-  Node* con_node = phase->makecon(con);
+-  CallProjections projs;
+-  extract_projections(&projs, false, false);
+-  phase->replace_node(projs.fallthrough_proj, in(TypeFunc::Control));
+-  if (projs.fallthrough_catchproj != nullptr) {
+-    phase->replace_node(projs.fallthrough_catchproj, in(TypeFunc::Control));
+-  }
+-  if (projs.fallthrough_memproj != nullptr) {
+-    phase->replace_node(projs.fallthrough_memproj, in(TypeFunc::Memory));
+-  }
+-  if (projs.catchall_memproj != nullptr) {
+-    phase->replace_node(projs.catchall_memproj, C->top());
+-  }
+-  if (projs.fallthrough_ioproj != nullptr) {
+-    phase->replace_node(projs.fallthrough_ioproj, in(TypeFunc::I_O));
+-  }
+-  assert(projs.catchall_ioproj == nullptr, "no exceptions from floating mod");
+-  assert(projs.catchall_catchproj == nullptr, "no exceptions from floating mod");
+-  if (projs.resproj != nullptr) {
+-    phase->replace_node(projs.resproj, con_node);
++Node* ModFloatingNode::Ideal(PhaseGVN* phase, bool can_reshape) {
++  if (can_reshape) {
++    PhaseIterGVN* igvn = phase->is_IterGVN();
++
++    // Either input is TOP ==> the result is TOP
++    const Type* dividend_type = phase->type(dividend());
++    const Type* divisor_type = phase->type(divisor());
++    if (dividend_type == Type::TOP || divisor_type == Type::TOP) {
++      return phase->C->top();
++    }
++    const Type* constant_result = get_result_if_constant(dividend_type, divisor_type);
++    if (constant_result != nullptr) {
++      return make_tuple_of_input_state_and_constant_result(igvn, constant_result);
++    }
+   }
+-  phase->replace_node(this, C->top());
+-  C->remove_macro_node(this);
+-  disconnect_inputs(C);
+-  return nullptr;
++
++  return CallLeafPureNode::Ideal(phase, can_reshape);
++}
++
++/* Give a tuple node for ::Ideal to return, made of the input state (control to return addr)
++ * and the given constant result. Idealization of projections will make sure to transparently
++ * propagate the input state and replace the result by the said constant.
++ */
++TupleNode* ModFloatingNode::make_tuple_of_input_state_and_constant_result(PhaseIterGVN* phase, const Type* con) const {
++  Node* con_node = phase->makecon(con);
++  TupleNode* tuple = TupleNode::make(
++      tf()->range(),
++      in(TypeFunc::Control),
++      in(TypeFunc::I_O),
++      in(TypeFunc::Memory),
++      in(TypeFunc::FramePtr),
++      in(TypeFunc::ReturnAdr),
++      con_node);
++
++  return tuple;
+ }
+ 
+ //=============================================================================
+diff --git a/src/hotspot/share/opto/divnode.hpp b/src/hotspot/share/opto/divnode.hpp
+index 127e2431b0b..b13460c89f5 100644
+--- a/src/hotspot/share/opto/divnode.hpp
++++ b/src/hotspot/share/opto/divnode.hpp
+@@ -156,40 +156,45 @@ class ModLNode : public Node {
+ };
+ 
+ // Base class for float and double modulus
+-class ModFloatingNode : public CallLeafNode {
++class ModFloatingNode : public CallLeafPureNode {
++  TupleNode* make_tuple_of_input_state_and_constant_result(PhaseIterGVN* phase, const Type* con) const;
++
+ protected:
+-  Node* replace_with_con(PhaseIterGVN* phase, const Type* con);
++  virtual Node* dividend() const = 0;
++  virtual Node* divisor() const = 0;
++  virtual const Type* get_result_if_constant(const Type* dividend, const Type* divisor) const = 0;
+ 
+ public:
+-  ModFloatingNode(Compile* C, const TypeFunc* tf, const char *name);
++  ModFloatingNode(Compile* C, const TypeFunc* tf, address addr, const char* name);
++  Node* Ideal(PhaseGVN* phase, bool can_reshape) override;
+ };
+ 
+ // Float Modulus
+ class ModFNode : public ModFloatingNode {
+ private:
+-  Node* dividend() const { return in(TypeFunc::Parms + 0); }
+-  Node* divisor() const { return in(TypeFunc::Parms + 1); }
++  Node* dividend() const override { return in(TypeFunc::Parms + 0); }
++  Node* divisor() const override { return in(TypeFunc::Parms + 1); }
++  const Type* get_result_if_constant(const Type* dividend, const Type* divisor) const override;
+ 
+ public:
+   ModFNode(Compile* C, Node* a, Node* b);
+-  virtual int Opcode() const;
+-  virtual uint ideal_reg() const { return Op_RegF; }
+-  virtual uint size_of() const { return sizeof(*this); }
+-  virtual Node* Ideal(PhaseGVN* phase, bool can_reshape);
++  int Opcode() const override;
++  uint ideal_reg() const override { return Op_RegF; }
++  uint size_of() const override { return sizeof(*this); }
+ };
+ 
+ // Double Modulus
+ class ModDNode : public ModFloatingNode {
+ private:
+-  Node* dividend() const { return in(TypeFunc::Parms + 0); }
+-  Node* divisor() const { return in(TypeFunc::Parms + 2); }
++  Node* dividend() const override { return in(TypeFunc::Parms + 0); }
++  Node* divisor() const override { return in(TypeFunc::Parms + 2); }
++  const Type* get_result_if_constant(const Type* dividend, const Type* divisor) const override;
+ 
+ public:
+   ModDNode(Compile* C, Node* a, Node* b);
+-  virtual int Opcode() const;
+-  virtual uint ideal_reg() const { return Op_RegD; }
+-  virtual uint size_of() const { return sizeof(*this); }
+-  virtual Node* Ideal(PhaseGVN* phase, bool can_reshape);
++  int Opcode() const override;
++  uint ideal_reg() const override { return Op_RegD; }
++  uint size_of() const override { return sizeof(*this); }
+ };
+ 
+ //------------------------------UModINode---------------------------------------
+diff --git a/src/hotspot/share/opto/graphKit.cpp b/src/hotspot/share/opto/graphKit.cpp
+index 20feca26ede..1b8b7008578 100644
+--- a/src/hotspot/share/opto/graphKit.cpp
++++ b/src/hotspot/share/opto/graphKit.cpp
+@@ -1880,14 +1880,20 @@ Node* GraphKit::set_results_for_java_call(CallJavaNode* call, bool separate_io_p
+ // after the call, if this call has restricted memory effects.
+ Node* GraphKit::set_predefined_input_for_runtime_call(SafePointNode* call, Node* narrow_mem) {
+   // Set fixed predefined input arguments
+-  Node* memory = reset_memory();
+-  Node* m = narrow_mem == nullptr ? memory : narrow_mem;
+-  call->init_req( TypeFunc::Control,   control()  );
+-  call->init_req( TypeFunc::I_O,       top()      ); // does no i/o
+-  call->init_req( TypeFunc::Memory,    m          ); // may gc ptrs
+-  call->init_req( TypeFunc::FramePtr,  frameptr() );
+-  call->init_req( TypeFunc::ReturnAdr, top()      );
+-  return memory;
++  call->init_req(TypeFunc::Control, control());
++  call->init_req(TypeFunc::I_O, top()); // does no i/o
++  call->init_req(TypeFunc::ReturnAdr, top());
++  if (call->is_CallLeafPure()) {
++    call->init_req(TypeFunc::Memory, top());
++    call->init_req(TypeFunc::FramePtr, top());
++    return nullptr;
++  } else {
++    Node* memory = reset_memory();
++    Node* m = narrow_mem == nullptr ? memory : narrow_mem;
++    call->init_req(TypeFunc::Memory, m); // may gc ptrs
++    call->init_req(TypeFunc::FramePtr, frameptr());
++    return memory;
++  }
+ }
+ 
+ //-------------------set_predefined_output_for_runtime_call--------------------
+@@ -1905,6 +1911,11 @@ void GraphKit::set_predefined_output_for_runtime_call(Node* call,
+                                                       const TypePtr* hook_mem) {
+   // no i/o
+   set_control(_gvn.transform( new ProjNode(call,TypeFunc::Control) ));
++  if (call->is_CallLeafPure()) {
++    // Pure function have only control (for now) and data output, in particular
++    // they don't touch the memory, so we don't want a memory proj that is set after.
++    return;
++  }
+   if (keep_mem) {
+     // First clone the existing memory state
+     set_all_memory(keep_mem);
+@@ -2491,6 +2502,8 @@ Node* GraphKit::make_runtime_call(int flags,
+   } else  if (flags & RC_VECTOR){
+     uint num_bits = call_type->range()->field_at(TypeFunc::Parms)->is_vect()->length_in_bytes() * BitsPerByte;
+     call = new CallLeafVectorNode(call_type, call_addr, call_name, adr_type, num_bits);
++  } else if (flags & RC_PURE) {
++    call = new CallLeafPureNode(call_type, call_addr, call_name, adr_type);
+   } else {
+     call = new CallLeafNode(call_type, call_addr, call_name, adr_type);
+   }
+diff --git a/src/hotspot/share/opto/graphKit.hpp b/src/hotspot/share/opto/graphKit.hpp
+index 28773d75333..806a211d7e2 100644
+--- a/src/hotspot/share/opto/graphKit.hpp
++++ b/src/hotspot/share/opto/graphKit.hpp
+@@ -784,6 +784,7 @@ class GraphKit : public Phase {
+     RC_NARROW_MEM = 16,         // input memory is same as output
+     RC_UNCOMMON = 32,           // freq. expected to be like uncommon trap
+     RC_VECTOR = 64,             // CallLeafVectorNode
++    RC_PURE = 128,              // CallLeaf is pure
+     RC_LEAF = 0                 // null value:  no flags set
+   };
+ 
+diff --git a/src/hotspot/share/opto/library_call.cpp b/src/hotspot/share/opto/library_call.cpp
+index f74af38387c..12960d101a8 100644
+--- a/src/hotspot/share/opto/library_call.cpp
++++ b/src/hotspot/share/opto/library_call.cpp
+@@ -1802,7 +1802,7 @@ bool LibraryCallKit::runtime_math(const TypeFunc* call_type, address funcAddr, c
+   Node* b = (call_type == OptoRuntime::Math_DD_D_Type()) ? argument(2) : nullptr;
+ 
+   const TypePtr* no_memory_effects = nullptr;
+-  Node* trig = make_runtime_call(RC_LEAF, call_type, funcAddr, funcName,
++  Node* trig = make_runtime_call(RC_LEAF | RC_PURE, call_type, funcAddr, funcName,
+                                  no_memory_effects,
+                                  a, top(), b, b ? top() : nullptr);
+   Node* value = _gvn.transform(new ProjNode(trig, TypeFunc::Parms+0));
+diff --git a/src/hotspot/share/opto/macro.cpp b/src/hotspot/share/opto/macro.cpp
+index acf1dbabf19..aafc5d3c170 100644
+--- a/src/hotspot/share/opto/macro.cpp
++++ b/src/hotspot/share/opto/macro.cpp
+@@ -2638,17 +2638,14 @@ bool PhaseMacroExpand::expand_macro_nodes() {
+       switch (n->Opcode()) {
+       case Op_ModD:
+       case Op_ModF: {
+-        bool is_drem = n->Opcode() == Op_ModD;
+         CallNode* mod_macro = n->as_Call();
+-        CallNode* call = new CallLeafNode(mod_macro->tf(),
+-                                          is_drem ? CAST_FROM_FN_PTR(address, SharedRuntime::drem)
+-                                                  : CAST_FROM_FN_PTR(address, SharedRuntime::frem),
+-                                          is_drem ? "drem" : "frem", TypeRawPtr::BOTTOM);
++        CallNode* call = new CallLeafPureNode(mod_macro->tf(), mod_macro->entry_point(),
++                                              mod_macro->_name, TypeRawPtr::BOTTOM);
+         call->init_req(TypeFunc::Control, mod_macro->in(TypeFunc::Control));
+-        call->init_req(TypeFunc::I_O, mod_macro->in(TypeFunc::I_O));
+-        call->init_req(TypeFunc::Memory, mod_macro->in(TypeFunc::Memory));
+-        call->init_req(TypeFunc::ReturnAdr, mod_macro->in(TypeFunc::ReturnAdr));
+-        call->init_req(TypeFunc::FramePtr, mod_macro->in(TypeFunc::FramePtr));
++        call->init_req(TypeFunc::I_O, C->top());
++        call->init_req(TypeFunc::Memory, C->top());
++        call->init_req(TypeFunc::ReturnAdr, C->top());
++        call->init_req(TypeFunc::FramePtr, C->top());
+         for (unsigned int i = 0; i < mod_macro->tf()->domain()->cnt() - TypeFunc::Parms; i++) {
+           call->init_req(TypeFunc::Parms + i, mod_macro->in(TypeFunc::Parms + i));
+         }
+diff --git a/src/hotspot/share/opto/multnode.cpp b/src/hotspot/share/opto/multnode.cpp
+index 736e84315ee..f429d5daac0 100644
+--- a/src/hotspot/share/opto/multnode.cpp
++++ b/src/hotspot/share/opto/multnode.cpp
+@@ -120,6 +120,10 @@ const TypePtr *ProjNode::adr_type() const {
+   if (bottom_type() == Type::MEMORY) {
+     // in(0) might be a narrow MemBar; otherwise we will report TypePtr::BOTTOM
+     Node* ctrl = in(0);
++    if (ctrl->Opcode() == Op_Tuple) {
++      // Jumping over Tuples: the i-th projection of a Tuple is the i-th input of the Tuple.
++      ctrl = ctrl->in(_con);
++    }
+     if (ctrl == nullptr)  return nullptr; // node is dead
+     const TypePtr* adr_type = ctrl->adr_type();
+     #ifdef ASSERT
+@@ -163,6 +167,15 @@ void ProjNode::check_con() const {
+   assert(_con < t->is_tuple()->cnt(), "ProjNode::_con must be in range");
+ }
+ 
++//------------------------------Identity---------------------------------------
++Node* ProjNode::Identity(PhaseGVN* phase) {
++  if (in(0) != nullptr && in(0)->Opcode() == Op_Tuple) {
++    // Jumping over Tuples: the i-th projection of a Tuple is the i-th input of the Tuple.
++    return in(0)->in(_con);
++  }
++  return this;
++}
++
+ //------------------------------Value------------------------------------------
+ const Type* ProjNode::Value(PhaseGVN* phase) const {
+   if (in(0) == nullptr) return Type::TOP;
+diff --git a/src/hotspot/share/opto/multnode.hpp b/src/hotspot/share/opto/multnode.hpp
+index dff2caed38d..834dcfdca6d 100644
+--- a/src/hotspot/share/opto/multnode.hpp
++++ b/src/hotspot/share/opto/multnode.hpp
+@@ -82,6 +82,7 @@ class ProjNode : public Node {
+   virtual const Type *bottom_type() const;
+   virtual const TypePtr *adr_type() const;
+   virtual bool pinned() const;
++  virtual Node* Identity(PhaseGVN* phase);
+   virtual const Type* Value(PhaseGVN* phase) const;
+   virtual uint ideal_reg() const;
+   virtual const RegMask &out_RegMask() const;
+@@ -105,4 +106,49 @@ class ProjNode : public Node {
+   ProjNode* other_if_proj() const;
+ };
+ 
++/* Tuples are used to avoid manual graph surgery. When a node with Proj outputs (such as a call)
++ * must be removed and its ouputs replaced by its input, or some other value, we can make its
++ * ::Ideal return a tuple of what we want for each output: the ::Identity of output Proj will
++ * take care to jump over the Tuple and directly pick up the right input of the Tuple.
++ *
++ * For instance, if a function call is proven to have no side effect and return the constant 0,
++ * we can replace it with the 6-tuple:
++ * (control input, IO input, memory input, frame ptr input, return addr input, Con:0)
++ * all the output projections will pick up the input of the now gone call, except for the result
++ * projection that is replaced by 0.
++ *
++ * Using TupleNode avoid manual graph surgery and leave that to our expert surgeon: IGVN.
++ * Since the user of a Tuple are expected to be Proj, when creating a tuple during idealization,
++ * the output Proj should be enqueued for IGVN immediately after, and the tuple should not survive
++ * after the current IGVN.
++ */
++class TupleNode : public MultiNode {
++  const TypeTuple* _tf;
++
++  template <typename... NN>
++  static void make_helper(TupleNode* tn, uint i, Node* node, NN... nn) {
++    tn->set_req(i, node);
++    make_helper(tn, i + 1, nn...);
++  }
++
++  static void make_helper(TupleNode*, uint) {}
++
++public:
++  TupleNode(const TypeTuple* tf) : MultiNode(tf->cnt()), _tf(tf) {}
++
++  int Opcode() const override;
++  const Type* bottom_type() const override { return _tf; }
++
++  /* Give as many `Node*` as you want in the `nn` pack:
++   * TupleNode::make(tf, input1)
++   * TupleNode::make(tf, input1, input2, input3, input4)
++   */
++  template <typename... NN>
++  static TupleNode* make(const TypeTuple* tf, NN... nn) {
++    TupleNode* tn = new TupleNode(tf);
++    make_helper(tn, 0, nn...);
++    return tn;
++  }
++};
++
+ #endif // SHARE_OPTO_MULTNODE_HPP
+diff --git a/src/hotspot/share/opto/node.cpp b/src/hotspot/share/opto/node.cpp
+index 8f6c67c16f5..5ecc038954d 100644
+--- a/src/hotspot/share/opto/node.cpp
++++ b/src/hotspot/share/opto/node.cpp
+@@ -2946,23 +2946,13 @@ bool Node::is_dead_loop_safe() const {
+ bool Node::is_div_or_mod(BasicType bt) const { return Opcode() == Op_Div(bt) || Opcode() == Op_Mod(bt) ||
+                                                       Opcode() == Op_UDiv(bt) || Opcode() == Op_UMod(bt); }
+ 
+-bool Node::is_pure_function() const {
+-  switch (Opcode()) {
+-  case Op_ModD:
+-  case Op_ModF:
+-    return true;
+-  default:
+-    return false;
+-  }
+-}
+-
+ // `maybe_pure_function` is assumed to be the input of `this`. This is a bit redundant,
+ // but we already have and need maybe_pure_function in all the call sites, so
+ // it makes it obvious that the `maybe_pure_function` is the same node as in the caller,
+ // while it takes more thinking to realize that a locally computed in(0) must be equal to
+ // the local in the caller.
+ bool Node::is_data_proj_of_pure_function(const Node* maybe_pure_function) const {
+-  return Opcode() == Op_Proj && as_Proj()->_con == TypeFunc::Parms && maybe_pure_function->is_pure_function();
++  return Opcode() == Op_Proj && as_Proj()->_con == TypeFunc::Parms && maybe_pure_function->is_CallLeafPure();
+ }
+ 
+ //=============================================================================
+diff --git a/src/hotspot/share/opto/node.hpp b/src/hotspot/share/opto/node.hpp
+index 2bbb10879f5..dc0ac474c4b 100644
+--- a/src/hotspot/share/opto/node.hpp
++++ b/src/hotspot/share/opto/node.hpp
+@@ -54,6 +54,7 @@ class CallDynamicJavaNode;
+ class CallJavaNode;
+ class CallLeafNode;
+ class CallLeafNoFPNode;
++class CallLeafPureNode;
+ class CallNode;
+ class CallRuntimeNode;
+ class CallStaticJavaNode;
+@@ -673,6 +674,7 @@ class Node {
+           DEFINE_CLASS_ID(CallRuntime,      Call, 1)
+             DEFINE_CLASS_ID(CallLeaf,         CallRuntime, 0)
+               DEFINE_CLASS_ID(CallLeafNoFP,     CallLeaf, 0)
++              DEFINE_CLASS_ID(CallLeafPure,     CallLeaf, 1)
+           DEFINE_CLASS_ID(Allocate,         Call, 2)
+             DEFINE_CLASS_ID(AllocateArray,    Allocate, 0)
+           DEFINE_CLASS_ID(AbstractLock,     Call, 3)
+@@ -907,6 +909,7 @@ class Node {
+   DEFINE_CLASS_QUERY(CallJava)
+   DEFINE_CLASS_QUERY(CallLeaf)
+   DEFINE_CLASS_QUERY(CallLeafNoFP)
++  DEFINE_CLASS_QUERY(CallLeafPure)
+   DEFINE_CLASS_QUERY(CallRuntime)
+   DEFINE_CLASS_QUERY(CallStaticJava)
+   DEFINE_CLASS_QUERY(Catch)
+@@ -1289,8 +1292,6 @@ class Node {
+ 
+   bool is_div_or_mod(BasicType bt) const;
+ 
+-  bool is_pure_function() const;
+-
+   bool is_data_proj_of_pure_function(const Node* maybe_pure_function) const;
+ 
+ //----------------- Printing, etc
+diff --git a/src/hotspot/share/opto/parse2.cpp b/src/hotspot/share/opto/parse2.cpp
+index 1a4c3c91c4f..04b6e49b620 100644
+--- a/src/hotspot/share/opto/parse2.cpp
++++ b/src/hotspot/share/opto/parse2.cpp
+@@ -1097,11 +1097,11 @@ void Parse::jump_switch_ranges(Node* key_val, SwitchRange *lo, SwitchRange *hi,
+ 
+ Node* Parse::floating_point_mod(Node* a, Node* b, BasicType type) {
+   assert(type == BasicType::T_FLOAT || type == BasicType::T_DOUBLE, "only float and double are floating points");
+-  CallNode* mod = type == BasicType::T_DOUBLE ? static_cast<CallNode*>(new ModDNode(C, a, b)) : new ModFNode(C, a, b);
++  CallLeafPureNode* mod = type == BasicType::T_DOUBLE ? static_cast<CallLeafPureNode*>(new ModDNode(C, a, b)) : new ModFNode(C, a, b);
+ 
+-  Node* prev_mem = set_predefined_input_for_runtime_call(mod);
+-  mod = _gvn.transform(mod)->as_Call();
+-  set_predefined_output_for_runtime_call(mod, prev_mem, TypeRawPtr::BOTTOM);
++  set_predefined_input_for_runtime_call(mod);
++  mod = _gvn.transform(mod)->as_CallLeafPure();
++  set_predefined_output_for_runtime_call(mod);
+   Node* result = _gvn.transform(new ProjNode(mod, TypeFunc::Parms + 0));
+   record_for_igvn(mod);
+   return result;
+-- 
+2.53.0
+
