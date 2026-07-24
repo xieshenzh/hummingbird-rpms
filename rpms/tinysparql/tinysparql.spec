@@ -13,7 +13,7 @@
 
 Name:           tinysparql
 Version:        3.11.1
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        Desktop-neutral metadata database and search tool
 
 License:        GPL-2.0-or-later
