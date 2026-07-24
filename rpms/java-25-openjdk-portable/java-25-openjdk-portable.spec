@@ -52,7 +52,7 @@
 
 Name:    java-25-%{origin}-portable%{?pkgos:-%{pkgos}}
 Version: %{newjavaver}.%{buildver}
-Release: %{?eaprefix}%{portablerelease}.%{rpmrelease}%{?extraver}%{?dist}
+Release: %{?eaprefix}%{portablerelease}.%{rpmrelease}%{?extraver}.2%{?dist}
 
 %global fullversion     %{compatiblename}-%{version}-%{release}
 
@@ -1237,11 +1237,33 @@ function buildjdk() {
     || ( pwd; cat $(find | grep config.log) && false )
 
     cat spec.gmk
+%ifarch x86_64
+    # JDK-8385169: the "newboot" JVM built in this same debuglevel crashes
+    # with a C2 SuperWord (auto-vectorization) segfault while JIT-compiling
+    # itself during the CreateSymbols/gensrc bootstrap step, but only in
+    # fastdebug builds on GCC 16 (i.e. only since the F44 buildroot move;
+    # release and slowdebug builds are unaffected). Upstream already fixed
+    # this in JDK 26 (JDK-8324751) but it is not yet backported to 25u.
+    # Disable SuperWord for just this build-time bootstrap self-compilation
+    # step; this has no effect on the shipped JVM's runtime configuration.
+    #
+    # Must only be set around the make invocation, NOT earlier: OpenJDK's
+    # own configure script (invoked above, and again on the next buildjdk()
+    # call for the same suffix) treats JAVA_TOOL_OPTIONS/_JAVA_OPTIONS being
+    # set in the environment at all as a fatal error ("Cannot continue"),
+    # since it can interfere with configure's own boot-JDK probing.
+    if [ "${debuglevel}" = "fastdebug" ]; then
+        export JAVA_TOOL_OPTIONS="-XX:-UseSuperWord"
+    fi
+%endif
     LD_LIBRARY_PATH=${LIBPATH} \
     %{?dts_command} make LOG=trace \
       WARNINGS_ARE_ERRORS="-Wno-error" \
       CFLAGS_WARNINGS_ARE_ERRORS="-Wno-error" $maketargets ||\
         ( pwd; find ${top_dir_abs_src_path} ${top_dir_abs_build_path} -name \"hs_err_pid*.log\" | xargs cat && false )
+%ifarch x86_64
+    unset JAVA_TOOL_OPTIONS
+%endif
     popd
 }
 
@@ -1545,6 +1567,15 @@ done # end of release / debug cycle loop
 # We test debug first as it will give better diagnostics on a crash
 for suffix in %{build_loop} ; do
 
+%ifarch x86_64
+# JDK-8385169: see comment in %build above. Applies equally to the
+# various test .java files compiled/run below against each variant's
+# freshly built javac/java.
+if [ "x$suffix" = "x%{fastdebug_suffix_unquoted}" ]; then
+    export JAVA_TOOL_OPTIONS="-XX:-UseSuperWord"
+fi
+%endif
+
 # portable builds have static_libs embedded, thus top_dir_abs_main_build_path is same as top_dir_abs_staticlibs_build_path
 top_dir_abs_main_build_path=$(pwd)/%{installoutputdir -- ${suffix}}
 %if %{include_staticlibs}
@@ -1730,6 +1761,10 @@ run -version
 EOF
 %ifarch %{gdb_arches}
 grep 'JavaCallWrapper::JavaCallWrapper' gdb.out
+%endif
+
+%ifarch x86_64
+unset JAVA_TOOL_OPTIONS
 %endif
 
 # build cycles check
