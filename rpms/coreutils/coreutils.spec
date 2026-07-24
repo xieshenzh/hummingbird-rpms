@@ -1,7 +1,7 @@
 Summary: A set of basic GNU tools commonly used in shell scripts
 Name:    coreutils
 Version: 9.11
-Release: 5%{?dist}
+Release: 5.1%{?dist}
 # some used parts of gnulib are under various variants of LGPL
 License: GPL-3.0-or-later AND GFDL-1.3-no-invariants-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later
 Url:     https://www.gnu.org/software/coreutils/
@@ -38,6 +38,10 @@ Patch104: coreutils-df-direct.patch
 # https://cgit.git.savannah.gnu.org/cgit/coreutils.git/commit/?id=b60a159fdc5bfcf9988d3a4cb6f53abe8ad5d35d
 # https://cgit.git.savannah.gnu.org/cgit/coreutils.git/commit/?id=4ade9cf77f6c7b39e3fdc5ce97a778f8e294694c
 Patch200: coreutils-9.11-unexpand-heap-overflows.patch
+
+# uniq: fix read overrun with -w (CVE-2026-56391)
+# https://cgit.git.savannah.gnu.org/cgit/coreutils.git/commit/?id=d64e35a8a4c0e4608321433e0d84d917e4e36371
+Patch201: coreutils-9.11-uniq-w-read-overrun.patch
 
 # (sb) lin18nux/lsb compliance - multibyte functionality patch
 Patch800: coreutils-i18n.patch
