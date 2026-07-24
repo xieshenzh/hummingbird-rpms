@@ -4,5 +4,5 @@
   "release_monitoring_project_id": 760,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/etcd-io/etcd",
-  "version": "3.7.0"
+  "version": "3.7.1"
 }
