@@ -358,6 +358,9 @@ swift-lang:
             limits:
               memory: 10Gi
 
+sqlite:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

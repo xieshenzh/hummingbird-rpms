@@ -1,11 +1,12 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "2",
+  "modification_reason": "Update to upstream version 3.53.4",
+  "modification_status": "modified",
+  "release": "0.1",
   "release_monitoring_project_id": 4877,
   "sha": "58450efa8f53421406adef3d1c3bfe93186613de",
   "source": "https://src.fedoraproject.org/rpms/sqlite.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/sqlite/sqlite",
-  "version": "3.53.3"
+  "version": "3.53.4"
 }

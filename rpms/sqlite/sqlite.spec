@@ -5,15 +5,15 @@
 %bcond_without check
 
 %define majorver 3
-%define realver 3530300
-%define docver 3530300
-%define rpmver 3.53.3
+%define realver 3530400
+%define docver 3530400
+%define rpmver 3.53.4
 %define year 2026
 
 Summary: Library that implements an embeddable SQL database engine
 Name: sqlite
 Version: %{rpmver}
-Release: 2%{?dist}
+Release: 0.1%{?dist}
 License: blessing
 URL: http://www.sqlite.org/
 
