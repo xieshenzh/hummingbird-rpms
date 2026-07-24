@@ -64,5 +64,5 @@ newrelease.conf
 /kubernetes-1.35.5.tar.gz
 /kubernetes-1.35.6-vendor.tar.bz2
 /kubernetes-1.35.6.tar.gz
-kubernetes-1.35.7.tar.gz
-kubernetes-1.35.7-vendor.tar.bz2
+/kubernetes-1.35.7-vendor.tar.bz2
+/kubernetes-1.35.7.tar.gz
