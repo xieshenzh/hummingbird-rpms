@@ -59,6 +59,11 @@ sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
 expression = "MIT AND (MIT AND Apache-2.0)"
 
 [[licensing.licenses]]
+path = "vendor/github.com/coder/quartz/LICENSE"
+sha256sum = "34249295ec0fd2a7fda941f54602b61d5e308fcd733f8b276dfc75dcca2b883a"
+expression = "MIT-0"
+
+[[licensing.licenses]]
 path = "vendor/modernc.org/libc/LICENSE-3RD-PARTY.md"
 sha256sum = "f597097efe3d97021f89170746bd3a0fb9a8b6fb26b82043ed68a4e0283bee6c"
 expression = "BSD-3-Clause"
