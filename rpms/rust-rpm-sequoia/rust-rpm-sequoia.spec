@@ -5,7 +5,7 @@
 
 Name:           rust-rpm-sequoia
 Version:        1.10.1.1
-Release:        1.3%{?dist}
+Release:        1.4%{?dist}
 Summary:        Implementation of the RPM PGP interface using Sequoia
 
 License:        LGPL-2.0-or-later
@@ -28,6 +28,18 @@ Source2:        vendor.toml
 # CVE-2026-2625: reject signatures with invalid issuer subpackets
 # https://github.com/rpm-software-management/rpm-sequoia/pull/112
 Patch0:         CVE-2026-2625.patch
+# The vendored `ossl` crate's build-dependency on `bindgen` 0.71.1 fails to
+# compile against the F44 buildroot's openssl-devel + clang 22 combination:
+# bindgen 0.71.1 has a bug that causes it to emit an opaque (fieldless)
+# `ossl_param_st` binding instead of the real struct fields, even though
+# upstream OpenSSL's struct is fully public.
+# This is a bindgen bug fixed in 0.72.1 (verified: real upstream OpenSSL
+# 3.5.6 core.h still declares ossl_param_st with all fields; bindgen 0.72.1
+# correctly binds it, 0.71.1 does not, against the same headers/clang).
+# Bumps the vendored bindgen build-dependency from 0.71.1 to 0.72.1 (and
+# relaxes vendor/ossl's Cargo.toml requirement to allow it), regenerated via
+# `cargo vendor` + manual Cargo.lock reconciliation.
+Patch1:         0001-Update-vendored-bindgen-to-0.72.1.patch
 
 %if 0%{?rhel}
 BuildRequires:  rust-toolset
@@ -81,6 +93,7 @@ Requires:       %{crate}%{?_isa} = %{version}-%{release}
 %prep
 %autosetup -n %{crate}-%{version} -N -a1
 %patch 0 -p1
+%patch 1 -p1
 %cargo_prep -N
 # include full configuration for vendored dependencies
 cat %{SOURCE2} >> .cargo/config.toml
