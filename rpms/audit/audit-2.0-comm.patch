@@ -1,0 +1,92 @@
+commit d7ea98263ebdb974b383a4057856a5ec339776fc
+Author: Sergio Correia <scorreia@redhat.com>
+Date:   Fri Jul 24 06:32:19 2026 -0300
+
+    libaudit: truncate overlong comm values instead of rejecting them
+    
+    Commit 81c09ebb ("libaudit: enforce kernel comm length limit") added
+    a strict 15-byte limit to audit_log_user_comm_message(), rejecting
+    caller-supplied comm strings longer than TASK_COMM_LEN with EINVAL.
+    
+    While /proc/self/comm is indeed limited to 15 content bytes, callers
+    such as systemd-update-utmp (19 bytes) have always passed their full
+    program name as the comm parameter. The EINVAL rejection broke
+    systemd-update-utmp.service on boot across Fedora 43, 44, and
+    Rawhide after the audit-4.2 update.
+    
+    Truncate overlong caller-supplied comm values to 15 bytes and emit
+    a LOG_WARNING instead of failing the call entirely. Update the man
+    page and regression test to reflect truncation semantics.
+    
+    Assisted-by: Claude Opus 4.6
+    Signed-off-by: Sergio Correia <scorreia@redhat.com>
+
+diff --git a/docs/audit_log_user_comm_message.3 b/docs/audit_log_user_comm_message.3
+index 24a27234..17bd4d1d 100644
+--- a/docs/audit_log_user_comm_message.3
++++ b/docs/audit_log_user_comm_message.3
+@@ -33,7 +33,8 @@ The kernel task command name is limited to 15 bytes because
+ .B TASK_COMM_LEN
+ is 16 bytes including the terminating null byte. A non-NULL
+ .I comm
+-value longer than 15 bytes is malformed and is rejected.
++value longer than 15 bytes is truncated to 15 bytes and a warning
++is logged.
+ 
+ .SH "RETURN VALUE"
+ 
+@@ -42,11 +43,6 @@ It returns the sequence number which is > 0 on success or <= 0 on error.
+ .SH "ERRORS"
+ 
+ This function returns \-1 on failure. Examine errno for more info.
+-.TP
+-.B EINVAL
+-The
+-.I comm
+-value is longer than the kernel task command name limit of 15 bytes.
+ 
+ .SH "SEE ALSO"
+ 
+diff --git a/lib/audit_logging.c b/lib/audit_logging.c
+index c812ddd3..189b1787 100644
+--- a/lib/audit_logging.c
++++ b/lib/audit_logging.c
+@@ -231,8 +231,10 @@ static char *_get_commname(const char *comm, char *commname, unsigned int size)
+ 
+ 	len = strnlen(comm, AUDIT_COMM_LEN);
+ 	if (len == AUDIT_COMM_LEN) {
+-		errno = EINVAL;
+-		return NULL;
++		audit_msg(LOG_WARNING,
++			"comm value truncated to %d bytes",
++			AUDIT_COMM_LEN - 1);
++		len = AUDIT_COMM_LEN - 1;
+ 	}
+ 	if (audit_value_needs_encoding(comm, len))
+ 		audit_encode_value(commname, comm, len);
+diff --git a/lib/test/lookup_test.c b/lib/test/lookup_test.c
+index c81465be..712d6a67 100644
+--- a/lib/test/lookup_test.c
++++ b/lib/test/lookup_test.c
+@@ -482,7 +482,7 @@ test_audit_logging_encoding(void)
+ }
+ 
+ /*
+- * Test audit logging task command length validation.
++ * Test that an overlong comm value is truncated rather than rejected.
+  * Input variables: none. Return codes: none, aborts on failure.
+  */
+ static void
+@@ -498,8 +498,10 @@ test_audit_logging_comm_length(void)
+ 	errno = 0;
+ 	rc = audit_log_user_comm_message(0, AUDIT_USER, "test", comm,
+ 					 NULL, NULL, "", 1);
+-	assert(rc == -1);
+-	assert(errno == EINVAL);
++	/* Overlong comm is truncated, not rejected. The call itself
++	 * may still fail (fd 0 is not an audit socket) but NOT with
++	 * EINVAL from comm validation. */
++	assert(errno != EINVAL);
+ }
+ 
+ int

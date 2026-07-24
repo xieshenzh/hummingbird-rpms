@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "3f83db0debfd793ebb84604754dd9b2ae162e794",
+  "release": "2",
+  "sha": "190b8f9acc4a680ce6720bf390567e853a9aec75",
   "source": "https://src.fedoraproject.org/rpms/audit.git",
   "upstream_repo": "https://github.com/linux-audit/audit-userspace",
   "version": "4.2"
