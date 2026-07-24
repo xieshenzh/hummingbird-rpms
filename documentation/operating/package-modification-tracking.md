@@ -10,16 +10,12 @@ The RPMs repository tracks whether packages have been locally modified from thei
 source. This tracking prevents automatic updates from overwriting local changes like backported
 patches or custom modifications.
 
-## Modification Status Types
+## Modification Status
 
-Each package metadata file (`metadata/<package>.json`) contains a `modification_status` field with
-one of three values:
-
-| Status     | Meaning                                      | Auto-updates |
-| ---------- | -------------------------------------------- | ------------ |
-| `clean`    | Unmodified Fedora import                     | ✅ Allowed   |
-| `modified` | Local changes (patches, spec modifications)  | ❌ Blocked   |
-| `native`   | Hummingbird-native package (not from Fedora) | ❌ Blocked   |
+Each package metadata file (`metadata/<package>.json`) has a `modification_status` of `clean`,
+`modified`, or `native`. That field (and related `modification_reason` / `release` configuration)
+is documented in [Package Metadata Fields](package-metadata-fields.md). This page covers the
+workflows for checking status, marking packages, viewing diffs, and configuring update hooks.
 
 An optional `track_upstream` string field controls whether a package is checked by
 `check_upstream_versions.py` for new upstream releases (via release-monitoring.org). Set it to
@@ -626,5 +622,7 @@ This is expected for modified packages. Options:
 
 ## Related Documentation
 
+- [Package Metadata Fields](package-metadata-fields.md) - `modification_status` and `release`
+  configuration
 - [Rebuilding Packages](../rebuilding-packages) - How to rebuild and backport patches
 - [Updating Dist-git Packages](../updating-dist-git-packages) - How automatic updates work
