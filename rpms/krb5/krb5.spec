@@ -6,7 +6,7 @@
 %global configure_default_ccache_name 1
 %global configured_default_ccache_name KEYRING:persistent:%%{uid}
 
-%global krb5_release 9%{?dist}
+%global krb5_release 9.1%{?dist}
 
 # This should be e.g. beta1 or %%nil
 %global pre_release %nil
