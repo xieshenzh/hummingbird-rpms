@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Add BSD-3-Clause to License for golang.org/fips140 module pulled in by Hummingbird's GOFIPS140=certified-fips-auto default (not present in Fedora's golang)",
+  "modification_status": "modified",
   "release": "2",
   "sha": "0dcc171cd9ab2818b492dadcdfcf156a9b913683",
   "source": "https://src.fedoraproject.org/rpms/go-md2man.git",
