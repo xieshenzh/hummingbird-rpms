@@ -156,7 +156,7 @@ Source101:      nodejs.srpm.macros
 %patchlist
 0001-Remove-unused-OpenSSL-config.patch
 0001-fips-disable-options.patch
-0001-src-cares-wrap-support-const-hostent-callback.patch
+0001-cares-host-callback-compat.patch
 CVE-2026-59869-js-yaml-4.3.0.patch
 
 %description
