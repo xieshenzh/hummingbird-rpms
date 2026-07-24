@@ -1,7 +1,7 @@
 Summary: GNU collection of diff utilities
 Name: diffutils
 Version: 3.12
-Release: 6%{?dist}
+Release: 6.1%{?dist}
 URL: https://www.gnu.org/software/diffutils/diffutils.html
 Source: https://ftp.gnu.org/gnu/diffutils/diffutils-%{version}.tar.xz
 # upstream fixes
@@ -13,6 +13,10 @@ Patch: diffutils-3.12-sdiff-continue-break.patch
 Patch: 0001-sdiff-pacify-gcc-flto-Wmaybe-uninitialized.patch
 # sdiff: port back to C17
 Patch: 0001-sdiff-port-back-to-C17.patch
+# CVE-2026-53910: diff3 integer overflows in line-number parsing
+Patch: diffutils-3.12-diff3-check-integer-overflows.patch
+# CVE-2026-53910: limit line numbers to LIN_MAX/2
+Patch: diffutils-3.12-diff3-prevent-overflow-line-offsets.patch
 License: GPL-3.0-or-later
 Provides: bundled(gnulib)
 BuildRequires: gcc
