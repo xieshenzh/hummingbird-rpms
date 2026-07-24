@@ -1,5 +1,5 @@
 /* TestTranslations -- Ensure translations are available for new timezones
-   Copyright (C) 2022 Red Hat, Inc.
+   Copyright (C) 2026 Red Hat, Inc.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -50,25 +50,38 @@ public class TestTranslations {
                                           "Mountain Daylight Time", "MDT", "MDT",
                                           "Mountain Time", "MT", "MT"});
         map.put(Locale.FRANCE, new String[] { "heure normale des Rocheuses", "UTC\u221207:00", "MST",
-                                              "heure d\u2019\u00e9t\u00e9 des Rocheuses", "UTC\u221206:00", "MST",
-                                              "heure des Rocheuses", "UTC\u221207:00", "MST"});
+                                              "heure d\u2019\u00e9t\u00e9 des Rocheuses", "UTC\u221206:00", "MDT",
+                                              "heure des Rocheuses", "UTC\u221207:00", "MT"});
         map.put(Locale.GERMANY, new String[] { "Rocky-Mountains-Normalzeit", "GMT-07:00", "MST",
-                                               "Rocky-Mountains-Sommerzeit", "GMT-06:00", "MST",
-                                               "Rocky-Mountains-Zeit", "GMT-07:00", "MST"});
+                                               "Rocky-Mountains-Sommerzeit", "GMT-06:00", "MDT",
+                                               "Rocky-Mountains-Zeit", "GMT-07:00", "MT"});
         CIUDAD_JUAREZ = Collections.unmodifiableMap(map);
     }
 
 
     public static void main(String[] args) {
-        if (args.length < 1) {
-            System.err.println("Test must be started with the name of the locale provider.");
-            System.exit(1);
+        boolean debug = false;
+
+        if (args.length > 0) {
+            debug = Boolean.parseBoolean(args[0]);
         }
 
+        System.err.printf("Debugging: %s\n", debug);
+
+        testZoneStrings(debug);
+
+        testZone(KYIV,
+                 new String[] { "Europe/Kiev", "Europe/Kyiv", "Europe/Uzhgorod", "Europe/Zaporozhye" });
+        testZone(CIUDAD_JUAREZ,
+                 new String[] { "America/Cambridge_Bay", "America/Ciudad_Juarez" });
+    }
+
+    private static void testZoneStrings(final boolean debug) {
         System.out.println("Checking sanity of full zone string set...");
         boolean invalid = Arrays.stream(Locale.getAvailableLocales())
-            .peek(l -> System.out.println("Locale: " + l))
+            .peek(l -> System.out.printf(debug ? "Locale: %s\n" : "", l))
             .map(l -> DateFormatSymbols.getInstance(l).getZoneStrings())
+            .peek(df -> System.out.printf(debug ? "Zone string size: %s\n" : "", df.length))
             .flatMap(zs -> Arrays.stream(zs))
             .flatMap(names -> Arrays.stream(names))
             .filter(name -> Objects.isNull(name) || name.isEmpty())
@@ -78,15 +91,9 @@ public class TestTranslations {
             System.err.println("Zone string for a locale returned null or empty string");
             System.exit(2);
         }
-
-        String localeProvider = args[0];
-        testZone(localeProvider, KYIV,
-                 new String[] { "Europe/Kiev", "Europe/Kyiv", "Europe/Uzhgorod", "Europe/Zaporozhye" });
-        testZone(localeProvider, CIUDAD_JUAREZ,
-                 new String[] { "America/Cambridge_Bay", "America/Ciudad_Juarez" });
     }
 
-    private static void testZone(String localeProvider, Map<Locale,String[]> exp, String[] ids) {
+    private static void testZone(Map<Locale,String[]> exp, String[] ids) {
         for (Locale l : exp.keySet()) {
             String[] expected = exp.get(l);
             System.out.printf("Expected values for %s are %s\n", l, Arrays.toString(expected));
@@ -97,16 +104,11 @@ public class TestTranslations {
 
                 System.out.printf("Checking locale %s for %s...\n", l, id);
 
-                if ("JRE".equals(localeProvider) || "CLDR".equals(localeProvider)) {
-                    expectedShortStd = expected[2];
-                    expectedShortDST = expected[5];
-                    expectedShortGen = expected[8];
-                } else {
-                    System.err.printf("Invalid locale provider %s\n", localeProvider);
-                    System.exit(3);
-                }
-                System.out.printf("Locale Provider is %s, using short values %s, %s and %s\n",
-                                  localeProvider, expectedShortStd, expectedShortDST, expectedShortGen);
+                expectedShortStd = expected[2];
+                expectedShortDST = expected[5];
+                expectedShortGen = expected[8];
+                System.out.printf("Using short values %s, %s and %s\n",
+                                  expectedShortStd, expectedShortDST, expectedShortGen);
 
                 String longStd = TimeZone.getTimeZone(id).getDisplayName(false, TimeZone.LONG, l);
                 String shortStd = TimeZone.getTimeZone(id).getDisplayName(false, TimeZone.SHORT, l);
