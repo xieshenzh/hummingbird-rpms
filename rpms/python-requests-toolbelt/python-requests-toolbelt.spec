@@ -3,7 +3,7 @@
 
 Name:           python-%{srcname}
 Version:        1.0.0
-Release:        15.2%{?dist}
+Release:        15.3%{?dist}
 Summary:        Utility belt for advanced users of python-requests
 
 License:        Apache-2.0
