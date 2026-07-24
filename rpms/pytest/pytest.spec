@@ -1,6 +1,6 @@
 Name:           pytest
 Version:        9.0.3
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        Simple powerful testing with Python
 # SPDX
 License:        MIT
