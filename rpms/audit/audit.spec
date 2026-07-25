@@ -1,7 +1,7 @@
 Summary: User space tools for kernel auditing
 Name: audit
 Version: 4.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.0-or-later
 URL: https://github.com/linux-audit/audit-userspace/
 Source0: audit-userspace-%{version}.tar.gz
@@ -305,6 +305,9 @@ fi
 %attr(750,root,root) %{_sbindir}/audispd-zos-remote
 
 %changelog
+* Fri Jul 24 2026 Python Maint <python-maint@redhat.com> - 4.2-3
+- Rebuilt for Python 3.15.0b4 ABI change
+
 * Fri Jul 24 2026 Steve Grubb <sgrubb@redhat.com> 4.2-2
 - Truncate comm instead of rejecting invalid length
 
