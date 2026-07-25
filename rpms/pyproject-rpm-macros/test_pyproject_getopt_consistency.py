@@ -21,6 +21,7 @@ MACROS_PYTHON = (
 MACROS_README = (
     "pyproject_buildrequires",
     "pyproject_check_import",
+    "pyproject_extras_subpkg",
     "pyproject_save_files",
     "pyproject_wheel",
     "tox",

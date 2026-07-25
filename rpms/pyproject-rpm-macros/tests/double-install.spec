@@ -24,7 +24,7 @@ Summary:        markdown-it-py from double-install test
 markdown-it-py subpackage.
 
 # Note: Throughout this spec, we use mixed case and -_ inconsistently in -D to assert it is correctly normalized
-%pyproject_extras_subpkg -n python3-double-markdown-it-py -D MARKDOWN-it_py linkify
+%pyproject_extras_subpkg -n python3-double-markdown-it-py --dist-name MARKDOWN-it_py linkify
 
 
 %package -n python3-double-setuptools-scm
@@ -33,7 +33,7 @@ Summary:        setuptools_scm from double-install test
 %description -n python3-double-setuptools-scm
 setuptools_scm subpackage.
 
-%pyproject_extras_subpkg -n python3-double-setuptools-scm -D Setuptools_scm toml
+%pyproject_extras_subpkg --name python3-double-setuptools-scm --dist-name Setuptools_scm toml
 
 
 %prep

@@ -448,6 +448,114 @@ function M.test_optflag_cleanup_between_calls()
 end
 
 
+-- Nested macro scope: save/restore prevents inner getopt from clobbering outer values
+
+function M.test_nested_getopt_with_restore_preserves_outer_opts()
+    rpm.define([[_test_inner(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}inner%{lua:require("pyproject_getopt").restore()}]]
+    )
+    rpm.define([[_test_outer(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}%{_test_inner}/%{?__pyproject_opt_d}]]
+    )
+
+    local result = rpm.expand("%_test_outer -d hello")
+    assert(result == "inner/hello",
+        "expected 'inner/hello', got '" .. result .. "'")
+end
+
+function M.test_nested_getopt_with_restore_preserves_outer_optflags()
+    rpm.define([[_test_inner2(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}inner%{lua:require("pyproject_getopt").restore()}]]
+    )
+    rpm.define([[_test_outer2(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}%{_test_inner2}/%{?__pyproject_optflag_d}]]
+    )
+
+    local result = rpm.expand("%_test_outer2 -d hello")
+    assert(result == "inner/-d hello",
+        "expected 'inner/-d hello', got '" .. result .. "'")
+end
+
+function M.test_nested_getopt_without_restore_clobbers()
+    rpm.define([[_test_inner3(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}inner]]
+    )
+    rpm.define([[_test_outer3(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}%{_test_inner3}/%{?__pyproject_opt_d}]]
+    )
+
+    local result = rpm.expand("%_test_outer3 -d hello")
+    -- Without restore(), inner getopt clobbers outer's value
+    assert(result == "inner/",
+        "expected 'inner/' (clobbered without restore), got '" .. result .. "'")
+end
+
+function M.test_nested_getopt_with_restore_preserves_outer_positional_args()
+    rpm.define([[_test_inner4(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}inner%{lua:require("pyproject_getopt").restore()}]]
+    )
+    rpm.define([[_test_outer4(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}%{_test_inner4}/%{?__pyproject_positional_args}]]
+    )
+
+    local result = rpm.expand("%_test_outer4 -d hello world")
+    assert(result == "inner/world",
+        "expected 'inner/world', got '" .. result .. "'")
+end
+
+function M.test_nested_getopt_with_different_values()
+    rpm.define([[_test_inner5(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}%{?__pyproject_opt_d}%{lua:require("pyproject_getopt").restore()}]]
+    )
+    rpm.define([[_test_outer5(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}%{_test_inner5 -d other}/%{?__pyproject_opt_d}]]
+    )
+
+    local result = rpm.expand("%_test_outer5 -d hello")
+    assert(result == "other/hello",
+        "expected 'other/hello', got '" .. result .. "'")
+end
+
+function M.test_triple_nested_getopt_restores_all_levels()
+    rpm.define([[_test_innermost(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}%{?__pyproject_opt_d}%{lua:require("pyproject_getopt").restore()}]])
+    rpm.define([[_test_middle(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}%{_test_innermost -d deep}+%{?__pyproject_opt_d}%{lua:require("pyproject_getopt").restore()}]])
+    rpm.define([[_test_outermost(-) %{lua:
+        require("pyproject_getopt").getopt({
+            {short="d", long="directory", value=true},
+        })}%{_test_middle -d mid}+%{?__pyproject_opt_d}]])
+
+    local result = rpm.expand("%_test_outermost -d top")
+    assert(result == "deep+mid+top",
+        "expected 'deep+mid+top', got '" .. result .. "'")
+end
+
+
 -- Raw error functions (without pcall) for Python-side stderr checking.
 -- These are not discovered by list() since they don't start with test_.
 
