@@ -3,7 +3,7 @@
 %{load:%{_sourcedir}/nodejs.srpm.macros}
 
 # === Versions of any software shipped in the main nodejs tarball
-%nodejs_define_version node 1:26.5.0-1.4%{?dist} -p
+%nodejs_define_version node 1:26.5.0-1.5%{?dist} -p
 
 # Special release for sub-packages with their own version string.
 # The complex release string ensures that the subpackage release is always increasing,
@@ -163,7 +163,6 @@ Source101:      nodejs.srpm.macros
 CVE-2026-13149-brace-expansion-dos.patch
 CVE-2026-14257-brace-expansion-bound-expansion-length.patch
 CVE-2026-59869-js-yaml-merge-keys.patch
-0002-cares-host-callback-compat.patch
 0001-v8-memcopy-include-climits.patch
 
 %description
