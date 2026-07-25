@@ -489,13 +489,20 @@ contains the fix:
    - Include `.tekton/` and `package-overrides.yaml` in the
      commit.
 
-8. **Mark the package as modified.** If the metadata already has
-   a `modification_reason`, read it first and **append** to it
-   rather than replacing it.
+8. **Mark the package as modified.** Set `modification_reason` to
+   the CVE ID only (no descriptive prose). If the metadata already
+   has a `modification_reason`, read it first and **append** the
+   CVE ID to it rather than replacing it. For multiple CVEs fixed
+   in the same change, append each ID (semicolon-separated).
 
    ```bash
+   # First CVE fix for this package:
    ./ci/dist_git.py mark-modified <package> --modified \
-     --reason "<existing reason>; update to <version> for CVE-YYYY-NNNNN"
+     --reason "CVE-YYYY-NNNNN"
+
+   # Package already modified — append the CVE ID:
+   ./ci/dist_git.py mark-modified <package> --modified \
+     --reason "<existing reason>; CVE-YYYY-NNNNN"
    ```
 
 9. **Commit, validate, build, push, MR.** Commit with a
@@ -640,13 +647,20 @@ version bump is not appropriate:
    - If the spec uses `%patch N -p1`, use that form; if
      `%autosetup -p1`, patches apply automatically
 
-3. **Mark the package as modified.** If the metadata already has
-   a `modification_reason`, read it first and **append** to it
-   rather than replacing it.
+3. **Mark the package as modified.** Set `modification_reason` to
+   the CVE ID only (no descriptive prose). If the metadata already
+   has a `modification_reason`, read it first and **append** the
+   CVE ID to it rather than replacing it. For multiple CVEs fixed
+   in the same change, append each ID (semicolon-separated).
 
    ```bash
+   # First CVE fix for this package:
    ./ci/dist_git.py mark-modified <package> --modified \
-     --reason "<existing reason>; backport fix for CVE-YYYY-NNNNN"
+     --reason "CVE-YYYY-NNNNN"
+
+   # Package already modified — append the CVE ID:
+   ./ci/dist_git.py mark-modified <package> --modified \
+     --reason "<existing reason>; CVE-YYYY-NNNNN"
    ```
 
    **Do NOT change the metadata `release` field for backports.**
@@ -743,6 +757,14 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
 12. When the user provides the package name and multiple HUM ticket
    keys together (e.g. "let's look at ruby4.0 HUM-2648 HUM-2645"),
    investigate all tickets for that package as a batch.
+
+13. **`modification_reason` must contain only CVE IDs.** When
+    marking a package modified for a CVE fix (version bump or
+    backport), set `--reason` to the CVE ID alone (e.g.
+    `CVE-YYYY-NNNNN`). Append additional CVE IDs with
+    `; CVE-YYYY-MMMMM`. Do not include prose such as "update to
+    …" or "backport fix for …" — scripts and automation parse
+    this field for CVE IDs.
 
 ## Worktree cleanup
 
