@@ -1,4 +1,17 @@
-* Fri Jul 17 2026 Zdenek Pytela <zpytela@redhat.com>
+* Fri Jul 24 2026 Zdenek Pytela <zpytela@redhat.com> - 45.10-1
+- Changes adapting to bind packages with suffixes
+- Dontaudit unconfined_t map its private directories
+- Support cronie create crontab backups
+- Allow nfsidmapd read virt lib files
+- Allow sysadm_t run and read/write networkmanager bpf programs
+- Allow dhcpc_hook_t connect to init_t over a unix stream socket
+- Allow unconfined_t mounton its lnk_files
+- Allow wireguard read cgroup files
+- Label /usr/local/share/man with man_t
+- Allow pcscd get attributes of a pty filesystem
+- Allow geoclue read cgroup files
+
+* Fri Jul 17 2026 Zdenek Pytela <zpytela@redhat.com> - 45.9-1
 - Allow init_t nnp domain transition to postgresql_t
 - Move bootupd systemd interface to 2 optional blocks
 - Allow net_admin to the nfsd_t domain
