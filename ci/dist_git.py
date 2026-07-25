@@ -81,7 +81,7 @@ class PackageMetadata(TypedDict):
     release_monitoring_project_id: NotRequired[int | str]  # Anitya project ID (int) or upstream name (str)
     upstream_repo: NotRequired[str]  # Canonical upstream git repository URL
     upstream_branch: NotRequired[str]  # Upstream branch (versioned packages sharing a repo)
-    cve_product: NotRequired[str]  # CVE vendor/product override (e.g., "F5 / NGINX Open Source")
+    cve_product: NotRequired[str | list[str]]  # CVE vendor/product override; list for multi-product
     version_transform: NotRequired[str]  # Version transform rule (e.g., "dotnet_sdk_to_runtime")
 
 
