@@ -171,19 +171,7 @@ fi
 }, {
     {"D", {"i", "f", "F"}},
 })}\
-%{expand:\\\
-%{?python_extras_subpkg:\\\
-%{python_extras_subpkg\\\
-  %{!?__pyproject_opt_i:%{!?__pyproject_opt_f:%{!?__pyproject_opt_F:\\\
-    -f %{_pyproject_ghost_distinfo %{?__pyproject_optflag_D}}}}}\\\
-  %{?__pyproject_optflag_n}\\\
-  %{?__pyproject_optflag_i}\\\
-  %{?__pyproject_optflag_f}\\\
-  %{?__pyproject_optflag_F}\\\
-  %{?__pyproject_optflag_a}\\\
-  %{?__pyproject_optflag_A}\\\
-  %{?__pyproject_positional_args}\\\
-}}%{__pyproject_getopt_restore}}
+%{expand:%{?python_extras_subpkg:%{python_extras_subpkg%{!?__pyproject_opt_i:%{!?__pyproject_opt_f:%{!?__pyproject_opt_F: -f %{_pyproject_ghost_distinfo %{?__pyproject_optflag_D}}}}} %{?__pyproject_optflag_n} %{?__pyproject_optflag_i} %{?__pyproject_optflag_f} %{?__pyproject_optflag_F} %{?__pyproject_optflag_a} %{?__pyproject_optflag_A} %{?__pyproject_positional_args}}}%{__pyproject_getopt_restore}}
 
 
 # Escaping shell-globs, percentage signs and spaces was reworked in RPM 4.19+
