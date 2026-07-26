@@ -6,7 +6,7 @@
 
 Name:		libssh2
 Version:	1.11.1
-Release:	10.1%{?dist}
+Release:	10.2%{?dist}
 Summary:	A library implementing the SSH2 protocol
 License:	BSD-3-Clause
 URL:		https://www.libssh2.org/
@@ -19,6 +19,9 @@ Patch1:		97acf3dfda80c91c3a8c9f2372546301d4a1a7a8-libssh2-1.11.1.patch
 Patch2:		17626857d20b3c9a1addfa45979dadcee1cd84a4.patch
 Patch3:		2dae302-libssh2-1.11.1.patch
 Patch4:		libssh2-1.11.1-CVE-2026-58051.patch
+Patch5:		5e4776146552-libssh2-1.11.1-CVE-2026-66032.patch
+Patch6:		a13bb6c773f0-libssh2-1.11.1-CVE-2026-66034.patch
+Patch7:		a2ed82d40964bbc0-libssh2-1.11.1-CVE-2026-66033.patch
 
 BuildRequires:	coreutils
 BuildRequires:	findutils
@@ -89,6 +92,18 @@ developing applications that use libssh2.
 # https://github.com/libssh2/libssh2/pull/2127
 # https://github.com/libssh2/libssh2/pull/2380
 %patch -p1 -P4
+
+# CVE-2026-66032: double-free in sftp_open() via FX_OK then failed HANDLE require
+# https://github.com/libssh2/libssh2/commit/5e4776146552d898b9c0e1b313cd093fa8dc92d0
+%patch -p1 -P5
+
+# CVE-2026-66034: heap OOB read in libssh2_publickey_list_fetch()
+# https://github.com/libssh2/libssh2/commit/a13bb6c773f0d55ad1628cede57e99803cd898d9
+%patch -p1 -P6
+
+# CVE-2026-66033: integer underflow / OOB in AES-GCM ssh2_cipher_crypt()
+# https://github.com/libssh2/libssh2/commit/a2ed82d40964bbc0d64cd717aa0a5a892117d2e6
+%patch -p1 -P7
 
 # Replace hard wired port number in the test suite to avoid collisions
 # between 32-bit and 64-bit builds running on a single build-host
