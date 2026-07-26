@@ -6,7 +6,7 @@
 
 Name:		libssh2
 Version:	1.11.1
-Release:	10%{?dist}
+Release:	10.1%{?dist}
 Summary:	A library implementing the SSH2 protocol
 License:	BSD-3-Clause
 URL:		https://www.libssh2.org/
@@ -18,6 +18,7 @@ Patch0:		libssh2-1.11.1-CVE-2026-7598.patch
 Patch1:		97acf3dfda80c91c3a8c9f2372546301d4a1a7a8-libssh2-1.11.1.patch
 Patch2:		17626857d20b3c9a1addfa45979dadcee1cd84a4.patch
 Patch3:		2dae302-libssh2-1.11.1.patch
+Patch4:		libssh2-1.11.1-CVE-2026-58051.patch
 
 BuildRequires:	coreutils
 BuildRequires:	findutils
@@ -83,6 +84,11 @@ developing applications that use libssh2.
 # https://github.com/libssh2/libssh2/pull/1705
 # https://github.com/libssh2/libssh2/pull/1717
 %patch -p1 -P3
+
+# CVE-2026-58051: free of uninitialized pointer in publickey list cleanup
+# https://github.com/libssh2/libssh2/pull/2127
+# https://github.com/libssh2/libssh2/pull/2380
+%patch -p1 -P4
 
 # Replace hard wired port number in the test suite to avoid collisions
 # between 32-bit and 64-bit builds running on a single build-host
