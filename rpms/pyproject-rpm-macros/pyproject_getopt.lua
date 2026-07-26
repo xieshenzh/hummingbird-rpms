@@ -213,6 +213,7 @@ local function cleanup_macros(opt_spec)
         rpm.undefine("__pyproject_opt_" .. spec.short)
         rpm.undefine("__pyproject_optflag_" .. spec.short)
     end
+    rpm.undefine("__pyproject_positional_args")
 end
 
 
@@ -242,16 +243,18 @@ local function quote_values(values)
     return parts
 end
 
--- Define %__pyproject_opt_{short} and %__pyproject_optflag_{short} for each found option.
+-- Define %__pyproject_opt_{short}, %__pyproject_optflag_{short}, and
+-- %__pyproject_positional_args from a parse result.
+-- Takes a table {found, opt_spec, positional}.
 -- opt: Flags get %{nil} (defined but empty), value options get each individual
 --      value joined by separator.
 -- optflag: Ready-to-forward form: "-X" for flags, "-X value" for value options.
 -- See the quote_value function about how values are quoted.
-local function define_macros(found, opt_spec)
-    for _, spec in ipairs(opt_spec) do
-        if found[spec.short] then
+local function define_macros(state)
+    for _, spec in ipairs(state.opt_spec) do
+        if state.found[spec.short] then
             if spec.value then
-                local parts = quote_values(found[spec.short])
+                local parts = quote_values(state.found[spec.short])
                 local value = table.concat(parts, spec.separator)
                 rpm.define("__pyproject_opt_" .. spec.short .. " " .. value)
                 rpm.define("__pyproject_optflag_" .. spec.short .. " -" .. spec.short .. " " .. value)
@@ -261,6 +264,28 @@ local function define_macros(found, opt_spec)
             end
         end
     end
+    if #state.positional > 0 then
+        local parts = quote_values(state.positional)
+        rpm.define("__pyproject_positional_args " .. table.concat(parts, " "))
+    end
+end
+
+
+-- Save/restore stack for nested getopt calls.
+-- rpm.define()/rpm.undefine() are global (not scoped to parametric macros),
+-- so an inner getopt cleanup clobbers outer values. We save the structured
+-- parse result and re-run define_macros() in restore(), avoiding any
+-- rpm.expand() round-trip that would strip %{quote:} wrappers.
+local _current = nil  -- {found, opt_spec, positional} from the most recent getopt()
+local _save_stack = {} -- stack of {found, opt_spec, positional} tables
+
+function M.restore()
+    if _current then
+        cleanup_macros(_current.opt_spec)
+    end
+    _current = table.remove(_save_stack)
+    if not _current then return end
+    define_macros(_current)
 end
 
 
@@ -274,8 +299,8 @@ function M.getopt(opt_spec, exclusion_rules, tokens, macro_name)
     tokens = normalize_tokens(tokens or M.rpm_args())
     macro_name = macro_name or rpm.expand("%0")
     local by_short, by_long = build_lookup(opt_spec)
+    _save_stack[#_save_stack + 1] = _current
     cleanup_macros(opt_spec)
-    rpm.undefine("__pyproject_positional_args")
 
     local result = parse(macro_name, tokens, by_short, by_long)
     if not result then return end
@@ -286,12 +311,8 @@ function M.getopt(opt_spec, exclusion_rules, tokens, macro_name)
         end
     end
 
-    define_macros(result.found, opt_spec)
-
-    if #result.positional > 0 then
-        local parts = quote_values(result.positional)
-        rpm.define("__pyproject_positional_args " .. table.concat(parts, " "))
-    end
+    _current = {found = result.found, opt_spec = opt_spec, positional = result.positional}
+    define_macros(_current)
 end
 
 return M

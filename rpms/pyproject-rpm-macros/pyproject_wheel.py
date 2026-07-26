@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 import subprocess
 
@@ -56,7 +57,8 @@ def build_wheel(*, wheeldir, stdout=None, config_settings=None):
         *get_config_settings_args(config_settings),
         '.',
     )
-    cp = subprocess.run(command, stdout=stdout)
+    env = {'PIP_CONFIG_FILE': '/dev/null', **os.environ}
+    cp = subprocess.run(command, env=env, stdout=stdout)
     return cp.returncode
 
 

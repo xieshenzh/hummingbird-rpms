@@ -20,7 +20,7 @@ Summary:        %{summary}
 %description -n python3-markdown-it-py
 ...
 
-%pyproject_extras_subpkg -n python3-markdown-it-py linkify
+%pyproject_extras_subpkg --name python3-markdown-it-py linkify
 
 %prep
 %autosetup -p1 -n markdown-it-py-%{version}

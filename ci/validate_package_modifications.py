@@ -206,6 +206,10 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     # Superseded by Fedora update 626c31b9 (1.6.58-1).
     bad_commits = [line for line in bad_commits if not line.startswith('f1c05ee76df178ca4df227e372670ee21e2828ec ')]
 
+    # pyproject-rpm-macros positional-args clobbering fix was committed without the
+    # Upstream: trailer. Superseded by Fedora 1.23.1 getopt save/restore stack.
+    bad_commits = [line for line in bad_commits if not line.startswith('b5fb4f662c6474e14d6c6bec1c4239ab65cd572f ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)
