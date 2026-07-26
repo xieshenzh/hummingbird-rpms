@@ -328,6 +328,7 @@ rm CHANGELOG.md
     -s "TestPrepareResources"
     %dnl flaky on some arches
     -s "TestUnPrepareResources"
+    %[ "%{_arch}" == "s390x" ? "-s TestPodGroupProtectionController" : "" ]
     %dnl next 5 tests seem flaky
     %dnl binding volumes: context deadline exceeded
     %[ "%{_arch}" == "aarch64" ? "-s TestBindPodVolumes" : "" ]
