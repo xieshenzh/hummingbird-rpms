@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "5",
-  "sha": "afd94202734ebef9e0ccd27202ef560e00f83e86",
+  "release": "6",
+  "sha": "43fdf5a3e7a0b10ebd58729ce8da74051c16cdbe",
   "source": "https://src.fedoraproject.org/rpms/PyYAML.git",
   "upstream_repo": "https://github.com/yaml/pyyaml",
   "version": "6.0.3"
