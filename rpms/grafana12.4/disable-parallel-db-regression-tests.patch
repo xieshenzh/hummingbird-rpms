@@ -1,0 +1,110 @@
+From d588525b3817dc027ed5c53362f18a6c1bd0b31d Mon Sep 17 00:00:00 2001
+From: Renato Costa <renato.costa@grafana.com>
+Date: Tue, 17 Mar 2026 10:08:36 -0400
+Subject: [PATCH] unified-storage: don't run regression tests in parallel and
+ bump timeout (#120483)
+
+---
+ .../dbimpl/regression_incident_2144_test.go   | 26 +++++++------------
+ 1 file changed, 9 insertions(+), 17 deletions(-)
+
+diff --git a/pkg/storage/unified/sql/db/dbimpl/regression_incident_2144_test.go b/pkg/storage/unified/sql/db/dbimpl/regression_incident_2144_test.go
+index dfbcd93aea7a9..408ae15e67693 100644
+--- a/pkg/storage/unified/sql/db/dbimpl/regression_incident_2144_test.go
++++ b/pkg/storage/unified/sql/db/dbimpl/regression_incident_2144_test.go
+@@ -3,6 +3,7 @@ package dbimpl
+ import (
+ 	"database/sql"
+ 	"testing"
++	"time"
+ 
+ 	"github.com/stretchr/testify/require"
+ 
+@@ -14,16 +15,16 @@ import (
+ const noIsolationLevelSupportErrStr = "sql: driver does not support non-" +
+ 	"default isolation level"
+ 
++const testTimeout = 2 * time.Second
++
+ func TestReproIncident2144IndependentOfGrafanaDB(t *testing.T) {
+-	t.Parallel()
+ 	registerTestSQLDrivers()
+ 	txOpts := &sql.TxOptions{
+ 		Isolation: sql.LevelSerializable,
+ 	}
+ 
+ 	t.Run("driver without isolation level should fail", func(t *testing.T) {
+-		t.Parallel()
+-		ctx := testutil.NewDefaultTestContext(t)
++		ctx := testutil.NewTestContext(t, time.Now().Add(testTimeout))
+ 
+ 		db, err := sql.Open(driverWithoutIsolationLevelName, "")
+ 		require.NoError(t, err)
+@@ -35,8 +36,7 @@ func TestReproIncident2144IndependentOfGrafanaDB(t *testing.T) {
+ 	})
+ 
+ 	t.Run("driver with isolation level should work", func(t *testing.T) {
+-		t.Parallel()
+-		ctx := testutil.NewDefaultTestContext(t)
++		ctx := testutil.NewTestContext(t, time.Now().Add(testTimeout))
+ 
+ 		db, err := sql.Open(driverWithIsolationLevelName, "")
+ 		require.NoError(t, err)
+@@ -48,18 +48,14 @@ func TestReproIncident2144IndependentOfGrafanaDB(t *testing.T) {
+ }
+ 
+ func TestReproIncident2144UsingGrafanaDB(t *testing.T) {
+-	t.Parallel()
+ 	txOpts := &sql.TxOptions{
+ 		Isolation: sql.LevelSerializable,
+ 	}
+ 
+ 	t.Run("core Grafana db without instrumentation preserves driver ability to use isolation levels",
+ 		func(t *testing.T) {
+-			t.Parallel()
+-
+ 			t.Run("base behaviour is preserved", func(t *testing.T) {
+-				t.Parallel()
+-				ctx := testutil.NewDefaultTestContext(t)
++				ctx := testutil.NewTestContext(t, time.Now().Add(testTimeout))
+ 				cfgMap := cfgMap{}
+ 				setupDBForGrafana(t, ctx, cfgMap)
+ 				grafanaDB := newTestInfraDB(t, cfgMap)
+@@ -70,8 +66,7 @@ func TestReproIncident2144UsingGrafanaDB(t *testing.T) {
+ 
+ 			t.Run("Resource API does not fail and correctly uses Grafana DB as fallback",
+ 				func(t *testing.T) {
+-					t.Parallel()
+-					ctx := testutil.NewDefaultTestContext(t)
++					ctx := testutil.NewTestContext(t, time.Now().Add(testTimeout))
+ 					cfgMap := cfgMap{}
+ 					cfg := newCfgFromIniMap(t, cfgMap)
+ 					setupDBForGrafana(t, ctx, cfgMap)
+@@ -84,8 +79,7 @@ func TestReproIncident2144UsingGrafanaDB(t *testing.T) {
+ 
+ 	t.Run("core Grafana db instrumentation removes driver ability to use isolation levels",
+ 		func(t *testing.T) {
+-			t.Parallel()
+-			ctx := testutil.NewDefaultTestContext(t)
++			ctx := testutil.NewTestContext(t, time.Now().Add(testTimeout))
+ 			cfgMap := cfgMap{
+ 				"database": cfgSectionMap{
+ 					grafanaDBInstrumentQueriesKey: "true",
+@@ -95,8 +89,7 @@ func TestReproIncident2144UsingGrafanaDB(t *testing.T) {
+ 			grafanaDB := newTestInfraDB(t, cfgMap)
+ 
+ 			t.Run("base failure caused by instrumentation", func(t *testing.T) {
+-				t.Parallel()
+-				ctx := testutil.NewDefaultTestContext(t)
++				ctx := testutil.NewTestContext(t, time.Now().Add(testTimeout))
+ 				db := grafanaDB.GetEngine().DB().DB
+ 				_, err := db.BeginTx(ctx, txOpts)
+ 				require.Error(t, err)
+@@ -104,7 +97,6 @@ func TestReproIncident2144UsingGrafanaDB(t *testing.T) {
+ 			})
+ 
+ 			t.Run("Resource API provides a reasonable error for this case", func(t *testing.T) {
+-				t.Parallel()
+ 				cfg := setting.NewCfg()
+ 				cfg.SectionWithEnvOverrides("database").Key(grafanaDBInstrumentQueriesKey).SetValue("true")
+				resourceDB, err := ProvideResourceDB(grafanaDB, cfg, nil)

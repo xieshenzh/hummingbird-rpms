@@ -1,0 +1,69 @@
+From 9915b2507f5870a590d17260b6e229dc12b3d689 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Peter=20=C5=A0tibran=C3=BD?= <pstibrany@gmail.com>
+Date: Thu, 7 May 2026 17:04:24 +0200
+Subject: [PATCH] unified-storage: don't share BeginTx deadline with fixture
+ setup in incident 2144 regression test (#124399)
+
+TestReproIncident2144UsingGrafanaDB is flaky on slow CI runners. The
+subtests create a 2s-deadline context and pass it to both
+setupDBForGrafana (cfg load + sqlite + default org/admin) and the
+BeginTx call that's actually under test. On a slow runner the fixture
+setup alone can take ~2s, so BeginTx is hit with an already-expired
+context and fails with 'context deadline exceeded'.
+
+PR #120483 previously bumped this timeout from 1s to 2s for the same
+reason. This change addresses the cause instead: setup now runs with
+t.Context() (no deadline, canceled on test cleanup), and the 2s
+deadline is created fresh just before BeginTx. The hang guard around
+BeginTx is preserved.
+---
+ .../sql/db/dbimpl/regression_incident_2144_test.go  | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/pkg/storage/unified/sql/db/dbimpl/regression_incident_2144_test.go b/pkg/storage/unified/sql/db/dbimpl/regression_incident_2144_test.go
+index 408ae15e67693..e9717ae3294f4 100644
+--- a/pkg/storage/unified/sql/db/dbimpl/regression_incident_2144_test.go
++++ b/pkg/storage/unified/sql/db/dbimpl/regression_incident_2144_test.go
+@@ -55,21 +55,23 @@ func TestReproIncident2144UsingGrafanaDB(t *testing.T) {
+ 	t.Run("core Grafana db without instrumentation preserves driver ability to use isolation levels",
+ 		func(t *testing.T) {
+ 			t.Run("base behaviour is preserved", func(t *testing.T) {
+-				ctx := testutil.NewTestContext(t, time.Now().Add(testTimeout))
+ 				cfgMap := cfgMap{}
+-				setupDBForGrafana(t, ctx, cfgMap)
++				// Fixture setup can take longer than testTimeout on slow CI
++				// runners, so don't share its deadline with the BeginTx call
++				// that's actually under test.
++				setupDBForGrafana(t, t.Context(), cfgMap)
+ 				grafanaDB := newTestInfraDB(t, cfgMap)
+ 				db := grafanaDB.GetEngine().DB().DB
++				ctx := testutil.NewTestContext(t, time.Now().Add(testTimeout))
+ 				_, err := db.BeginTx(ctx, txOpts)
+ 				require.NoError(t, err)
+ 			})
+ 
+ 			t.Run("Resource API does not fail and correctly uses Grafana DB as fallback",
+ 				func(t *testing.T) {
+-					ctx := testutil.NewTestContext(t, time.Now().Add(testTimeout))
+ 					cfgMap := cfgMap{}
+ 					cfg := newCfgFromIniMap(t, cfgMap)
+-					setupDBForGrafana(t, ctx, cfgMap)
++					setupDBForGrafana(t, t.Context(), cfgMap)
+ 					grafanaDB := newTestInfraDB(t, cfgMap)
+ 					resourceDB, err := ProvideResourceDB(grafanaDB, cfg, nil)
+ 					require.NotNil(t, resourceDB)
+@@ -79,13 +81,12 @@ func TestReproIncident2144UsingGrafanaDB(t *testing.T) {
+ 
+ 	t.Run("core Grafana db instrumentation removes driver ability to use isolation levels",
+ 		func(t *testing.T) {
+-			ctx := testutil.NewTestContext(t, time.Now().Add(testTimeout))
+ 			cfgMap := cfgMap{
+ 				"database": cfgSectionMap{
+ 					grafanaDBInstrumentQueriesKey: "true",
+ 				},
+ 			}
+-			setupDBForGrafana(t, ctx, cfgMap)
++			setupDBForGrafana(t, t.Context(), cfgMap)
+ 			grafanaDB := newTestInfraDB(t, cfgMap)
+ 
+			t.Run("base failure caused by instrumentation", func(t *testing.T) {

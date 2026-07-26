@@ -1,0 +1,32 @@
+# Download Grafana and generate its Go vendor and multi-architecture Yarn cache archives.
+download_sources: |
+  set -euo pipefail
+  version="${UPDATE_NEW_VERSION}"
+  package_dir="${UPDATE_PACKAGE_DIR}"
+  workdir="$(mktemp -d)"
+  trap 'rm -rf "${workdir}"' EXIT
+  cd "${package_dir}"
+
+  source="grafana-${version}.tar.gz"
+  vendor="grafana-${version}-vendor.tar.bz2"
+  yarn_cache="grafana-yarn-cache-${version}.tar.bz2"
+
+  curl -fSL -o "${source}" \
+    "https://github.com/grafana/grafana/archive/v${version}/${source}" >&2
+  ./generate-bundled-npm-provides.py "${version}" >&2
+
+  GOCACHE="${workdir}/go-build" GOMODCACHE="${workdir}/go-mod" \
+    go_vendor_archive create --config go-vendor-tools.toml \
+      -O "${vendor}" "${source}" >&2
+
+  tar -xzf "${source}" -C "${workdir}" >&2
+  source_dir="${workdir}/grafana-${version}"
+  patch -d "${source_dir}" -p1 < grafana-yarn-cache.patch >&2
+  cd "${source_dir}"
+  CYPRESS_INSTALL_BINARY=0 YARN_ENABLE_GLOBAL_CACHE=false YARN_CACHE_FOLDER=.yarn/cache \
+    node .yarn/releases/yarn-*.cjs install --immutable >&2
+  tar -cjf "${package_dir}/${yarn_cache}" .yarn/cache >&2
+
+  echo "${source}"
+  echo "${vendor}"
+  echo "${yarn_cache}"
