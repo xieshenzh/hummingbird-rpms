@@ -195,6 +195,7 @@ Requires: %{name}-wx%{?_isa} = %{version}-%{release}
 Requires: %{name}-xmerl%{?_isa} = %{version}-%{release}
 Obsoletes: %{name}-src
 Provides: erlang%{?_isa} = %{version}-%{release}
+Provides: erlang = %{version}-%{release}
 
 %description
 Erlang is a general-purpose programming language and runtime
@@ -207,6 +208,7 @@ systems from Ericsson.
 %package asn1
 Summary: Provides support for Abstract Syntax Notation One
 Provides: erlang-asn1%{?_isa} = %{version}-%{release}
+Provides: erlang-asn1 = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
@@ -218,6 +220,7 @@ Provides support for Abstract Syntax Notation One.
 %package common_test
 Summary: A portable framework for automatic testing
 Provides: erlang-common_test%{?_isa} = %{version}-%{release}
+Provides: erlang-common_test = %{version}-%{release}
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
 Requires: %{name}-debugger%{?_isa} = %{version}-%{release}
@@ -242,6 +245,7 @@ A portable framework for automatic testing.
 %package compiler
 Summary: A byte code compiler for Erlang which produces highly compact code
 Provides: erlang-compiler%{?_isa} = %{version}-%{release}
+Provides: erlang-compiler = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -253,6 +257,7 @@ A byte code compiler for Erlang which produces highly compact code.
 %package crypto
 Summary: Cryptographical support
 Provides: erlang-crypto%{?_isa} = %{version}-%{release}
+Provides: erlang-crypto = %{version}-%{release}
 BuildRequires: pkgconfig(openssl)
 %if 0%{?fedora} > 40 && 0%{?fedora} < 45
 BuildRequires: openssl-devel-engine
@@ -268,6 +273,7 @@ Cryptographical support.
 %package debugger
 Summary: A debugger for debugging and testing of Erlang programs
 Provides: erlang-debugger%{?_isa} = %{version}-%{release}
+Provides: erlang-debugger = %{version}-%{release}
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -282,6 +288,7 @@ A debugger for debugging and testing of Erlang programs.
 %package dialyzer
 Summary: A DIscrepancy AnaLYZer for ERlang programs
 Provides: erlang-dialyzer%{?_isa} = %{version}-%{release}
+Provides: erlang-dialyzer = %{version}-%{release}
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -298,6 +305,7 @@ A DIscrepancy AnaLYZer for ERlang programs.
 %package diameter
 Summary: Diameter (RFC 3588) library
 Provides: erlang-diameter%{?_isa} = %{version}-%{release}
+Provides: erlang-diameter = %{version}-%{release}
 BuildRequires: ed
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -313,6 +321,7 @@ Diameter (RFC 3588) library
 %package doc
 Summary: Erlang documentation
 Provides: erlang-doc%{?_isa} = %{version}-%{release}
+Provides: erlang-doc = %{version}-%{release}
 #BuildRequires: erlang-ex_doc
 
 %description doc
@@ -322,6 +331,7 @@ Documentation for Erlang.
 %package edoc
 Summary: A utility used to generate documentation out of tags in source files
 Provides: erlang-edoc%{?_isa} = %{version}-%{release}
+Provides: erlang-edoc = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-inets%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -335,6 +345,7 @@ A utility used to generate documentation out of tags in source files.
 %package eldap
 Summary: Erlang LDAP library
 Provides: erlang-eldap%{?_isa} = %{version}-%{release}
+Provides: erlang-eldap = %{version}-%{release}
 Requires: %{name}-asn1%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -347,6 +358,7 @@ Erlang LDAP library.
 %package erl_interface
 Summary: Low level interface to C
 Provides: erlang-erl_interface%{?_isa} = %{version}-%{release}
+Provides: erlang-erl_interface = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 
 %description erl_interface
@@ -355,6 +367,7 @@ Low level interface to C.
 %package erts
 Summary: Functionality necessary to run the Erlang System itself
 Provides: erlang-erts%{?_isa} = %{version}-%{release}
+Provides: erlang-erts = %{version}-%{release}
 BuildRequires: lksctp-tools-devel
 BuildRequires: m4
 BuildRequires: ncurses-devel
@@ -398,6 +411,7 @@ Functionality necessary to run the Erlang System itself.
 %package et
 Summary: An event tracer for Erlang programs
 Provides: erlang-et%{?_isa} = %{version}-%{release}
+Provides: erlang-et = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-runtime_tools%{?_isa} = %{version}-%{release}
@@ -411,6 +425,7 @@ An event tracer for Erlang programs.
 %package eunit
 Summary: Support for unit testing
 Provides: erlang-eunit%{?_isa} = %{version}-%{release}
+Provides: erlang-eunit = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
@@ -422,6 +437,7 @@ Support for unit testing.
 %package examples
 Summary: Examples for some Erlang modules
 Provides: erlang-examples%{?_isa} = %{version}-%{release}
+Provides: erlang-examples = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-public_key%{?_isa} = %{version}-%{release}
@@ -436,6 +452,7 @@ Examples for some Erlang modules.
 %package ftp
 Summary: FTP client
 Provides: erlang-ftp%{?_isa} = %{version}-%{release}
+Provides: erlang-ftp = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
@@ -446,6 +463,7 @@ FTP client.
 %package gdb-tools
 Summary: GDB plugin
 Provides: erlang-gdb-tools%{?_isa} = %{version}-%{release}
+Provides: erlang-gdb-tools = %{version}-%{release}
 License: GPL-3.0-or-later
 Requires: gdb
 
@@ -455,6 +473,7 @@ GDB plugin.
 %package inets
 Summary: A set of services such as a Web server and a HTTP client etc
 Provides: erlang-inets%{?_isa} = %{version}-%{release}
+Provides: erlang-inets = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-mnesia%{?_isa} = %{version}-%{release}
@@ -469,6 +488,7 @@ A set of services such as a Web server and a HTTP client etc.
 %package jinterface
 Summary: A library for accessing Java from Erlang
 Provides: erlang-jinterface%{?_isa} = %{version}-%{release}
+Provides: erlang-jinterface = %{version}-%{release}
 BuildRequires: java-devel
 BuildRequires: javapackages-common
 BuildRequires: xmvn-tools
@@ -482,6 +502,7 @@ Low level interface to Java.
 %package kernel
 Summary: Main erlang library
 Provides: erlang-kernel%{?_isa} = %{version}-%{release}
+Provides: erlang-kernel = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
 
@@ -492,6 +513,7 @@ Main erlang library.
 %package megaco
 Summary: Megaco/H.248 support library
 Provides: erlang-megaco%{?_isa} = %{version}-%{release}
+Provides: erlang-megaco = %{version}-%{release}
 Requires: %{name}-asn1%{?_isa} = %{version}-%{release}
 Requires: %{name}-debugger%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
@@ -509,6 +531,7 @@ from media conversion.
 %package mnesia
 Summary: A heavy duty real-time distributed database
 Provides: erlang-mnesia%{?_isa} = %{version}-%{release}
+Provides: erlang-mnesia = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
@@ -520,6 +543,7 @@ A heavy duty real-time distributed database.
 %package observer
 Summary: A set of tools for tracing and investigation of distributed systems
 Provides: erlang-observer%{?_isa} = %{version}-%{release}
+Provides: erlang-observer = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-et%{?_isa} = %{version}-%{release}
 Requires: %{name}-inets%{?_isa} = %{version}-%{release}
@@ -535,6 +559,7 @@ A set of tools for tracing and investigation of distributed systems.
 %package odbc
 Summary: A library for unixODBC support in Erlang
 Provides: erlang-odbc%{?_isa} = %{version}-%{release}
+Provides: erlang-odbc = %{version}-%{release}
 BuildRequires: unixODBC-devel
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -547,6 +572,7 @@ Connectivity).
 %package os_mon
 Summary: A monitor which allows inspection of the underlying operating system
 Provides: erlang-os_mon%{?_isa} = %{version}-%{release}
+Provides: erlang-os_mon = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-mnesia%{?_isa} = %{version}-%{release}
@@ -560,6 +586,7 @@ A monitor which allows inspection of the underlying operating system.
 %package parsetools
 Summary: A set of parsing and lexical analysis tools
 Provides: erlang-parsetools%{?_isa} = %{version}-%{release}
+Provides: erlang-parsetools = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
@@ -570,6 +597,7 @@ A set of parsing and lexical analysis tools.
 %package public_key
 Summary: API to public key infrastructure
 Provides: erlang-public_key%{?_isa} = %{version}-%{release}
+Provides: erlang-public_key = %{version}-%{release}
 Requires: %{name}-asn1%{?_isa} = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
@@ -583,6 +611,7 @@ API to public key infrastructure.
 %package reltool
 Summary: A release management tool
 Provides: erlang-reltool%{?_isa} = %{version}-%{release}
+Provides: erlang-reltool = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-sasl%{?_isa} = %{version}-%{release}
@@ -602,6 +631,7 @@ for generation of customized target systems.
 %package runtime_tools
 Summary: A set of tools to include in a production system
 Provides: erlang-runtime_tools%{?_isa} = %{version}-%{release}
+Provides: erlang-runtime_tools = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-mnesia%{?_isa} = %{version}-%{release}
@@ -613,6 +643,7 @@ A set of tools to include in a production system.
 %package sasl
 Summary: The System Architecture Support Libraries
 Provides: erlang-sasl%{?_isa} = %{version}-%{release}
+Provides: erlang-sasl = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
@@ -625,6 +656,7 @@ release upgrades and alarm handling etc.
 %package snmp
 Summary: Simple Network Management Protocol (SNMP) support
 Provides: erlang-snmp%{?_isa} = %{version}-%{release}
+Provides: erlang-snmp = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -639,6 +671,7 @@ MIB compiler and tools for creating SNMP agents.
 %package ssh
 Summary: Secure Shell application with sftp and ssh support
 Provides: erlang-ssh%{?_isa} = %{version}-%{release}
+Provides: erlang-ssh = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -651,6 +684,7 @@ Secure Shell application with sftp and ssh support.
 %package ssl
 Summary: Secure Socket Layer support
 Provides: erlang-ssl%{?_isa} = %{version}-%{release}
+Provides: erlang-ssl = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-inets%{?_isa} = %{version}-%{release}
@@ -664,6 +698,7 @@ Secure Socket Layer support.
 %package stdlib
 Summary: The Erlang standard libraries
 Provides: erlang-stdlib%{?_isa} = %{version}-%{release}
+Provides: erlang-stdlib = %{version}-%{release}
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
@@ -675,6 +710,7 @@ The Erlang standard libraries.
 %package syntax_tools
 Summary: A set of tools for dealing with erlang sources
 Provides: erlang-syntax_tools%{?_isa} = %{version}-%{release}
+Provides: erlang-syntax_tools = %{version}-%{release}
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -687,6 +723,7 @@ reading source files differently, pretty-printing syntax trees.
 %package tftp
 Summary: TFTP client
 Provides: erlang-tftp%{?_isa} = %{version}-%{release}
+Provides: erlang-tftp = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
@@ -697,6 +734,7 @@ TFTP client.
 %package tools
 Summary: A set of programming tools including a coverage analyzer etc
 Provides: erlang-tools%{?_isa} = %{version}-%{release}
+Provides: erlang-tools = %{version}-%{release}
 %if %{__with_emacs}
 BuildRequires: emacs
 BuildRequires: emacs-el
@@ -721,6 +759,7 @@ A set of programming tools including a coverage analyzer etc.
 %package wx
 Summary: A library for wxWidgets support in Erlang
 Provides: erlang-wx%{?_isa} = %{version}-%{release}
+Provides: erlang-wx = %{version}-%{release}
 BuildRequires: wxGTK-devel
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
@@ -735,6 +774,7 @@ A Graphics System used to write platform independent user interfaces.
 %package xmerl
 Summary: Provides support for XML 1.0
 Provides: erlang-xmerl%{?_isa} = %{version}-%{release}
+Provides: erlang-xmerl = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}

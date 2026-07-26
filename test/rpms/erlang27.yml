@@ -30,7 +30,7 @@ unversioned-provides-alias:
     # Strip arch qualifiers like "(x86-64)" before matching — the spec
     # uses %{?_isa} so provides are arch-qualified, but we only care
     # that the unversioned name alias exists at the correct version.
-    provides_plain=$(echo "${provides}" | sed 's/([^)]*)//g')
+    provides_plain=$(echo "${provides}" | sed 's/([^)]*)//g; s/  */ /g')
 
     if echo "${provides_plain}" | grep -qxF "${expected} = ${version_release}"; then
       echo "PASS: ${rpm_name} provides ${expected} = ${version_release}"
