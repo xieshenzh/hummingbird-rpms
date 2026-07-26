@@ -42,7 +42,7 @@
 Summary: A Modern Concurrent Version Control System
 Name: subversion
 Version: 1.14.5
-Release: 29%{?dist}
+Release: 32%{?dist}
 License: Apache-2.0
 URL: https://subversion.apache.org/
 Source0: https://downloads.apache.org/subversion/subversion-%{version}.tar.bz2
