@@ -3,8 +3,8 @@
   "modification_reason": "Hummingbird-specific build configuration",
   "modification_status": "modified",
   "release": "3",
-  "sha": "57bd9e21b7cdddc96c0ef888968f5a8866d479cd",
+  "sha": "eb5d2157a7aa8dc54e24f2aa71d43fd4ceb3fa65",
   "source": "https://src.fedoraproject.org/rpms/python-cryptography.git",
   "upstream_repo": "https://github.com/pyca/cryptography",
-  "version": "48.0.0"
+  "version": "49.0.0"
 }

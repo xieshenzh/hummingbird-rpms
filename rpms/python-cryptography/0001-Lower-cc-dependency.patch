@@ -19,8 +19,8 @@ index d045bb077..680344f95 100644
  [workspace.dependencies]
  asn1 = { version = "0.24.1", default-features = false }
  base64 = "0.22"
--cc = "1.2.61"
-+cc = "1.2.60"
+-cc = "1.2.63"
++cc = "1.2.62"
  cfg-if = "1"
  foreign-types = "0.3"
  foreign-types-shared = "0.1"
