@@ -19,6 +19,12 @@
 %bcond bootstrap 0
 %bcond tests     1
 
+# When enabled, rely on filesystem(unmerged-sbin-symlinks) file triggers to
+# create /usr/sbin symlinks instead of shipping them in the package. This
+# avoids file conflicts when installing on merged-sbin systems and eliminates
+# bootstrap ordering issues with the bin/sbin merge.
+%bcond sbin_compat 1
+
 # riscv64 has LTO disabled globally
 %bcond lto       %["%_arch" != "riscv64"]
 
@@ -64,6 +70,11 @@
 %define noarch_requires_version %{version}-%{release}
 %endif
 
+%if 0%{?__isa_bits} == 64
+%global elf_bits (64bit)
+%global elf_suffix ()%{elf_bits}
+%endif
+
 Name:           systemd
 Url:            https://systemd.io
 # Allow users to specify the version and release when building the rpm by
@@ -71,13 +82,16 @@ Url:            https://systemd.io
 # But don't do that on OBS, otherwise the version subst fails, and will be
 # like 257-123-gabcd257.1 instead of 257-123-gabcd
 %if %{without obs}
-Version:        %{?version_override}%{!?version_override:261}
+Version:        %{?version_override}%{!?version_override:261.2}
 %else
 Version:        %{?version_override}%{!?version_override:%(cat meson.version)}
 %endif
-Release:        2.1%{?dist}
+Release:        1%{?dist}
 
 %global stable %(c="%version"; [ "$c" = "${c#*.*}" ]; echo $?)
+
+# Temporary macro to enable systemd-report.standalone
+%bcond report_standalone %[ v"%{version}" >= v"261.999" || %{defined commit} ]
 
 # For a breakdown of the licensing, see README
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
@@ -105,7 +119,6 @@ Source6:        inittab
 Source7:        sysctl.conf.README
 Source8:        systemd-journal-remote.xml
 Source9:        systemd-journal-gatewayd.xml
-Source10:       20-yama-ptrace.conf
 Source11:       systemd-udev-trigger-no-reload.conf
 # https://fedoraproject.org/wiki/How_to_filter_libabigail_reports
 Source13:       libabigail.abignore
@@ -115,7 +128,7 @@ Source15:       10-oomd-per-slice-defaults.conf
 Source16:       10-timeout-abort.conf
 Source17:       10-map-count.conf
 Source18:       60-block-scheduler.rules
-
+Source19:       99-kernel-hardening.conf
 Source20:       macros.sysusers.compat
 Source21:       macros.sysusers
 Source22:       sysusers.attr
@@ -170,9 +183,14 @@ BuildRequires:  cryptsetup-devel
 # Require (previous version) of our macros package.
 # We use the %%systemd_{post,preun,…} macros for various services.
 BuildRequires:  systemd-rpm-macros
-# Use dlopen-notes to generate Requires/Recommends from embedded metadata.
-BuildRequires:  package-notes >= 0.18
 %endif
+
+%if !%{defined rhel} || 0%{?rhel} > 10
+# Use dlopen-notes to generate Requires/Recommends from embedded metadata.
+# Currently, package-notes are not available on Centos Stream 9 or 10.
+BuildRequires:  package-notes >= 0.20
+%endif
+
 BuildRequires:  dbus-devel
 BuildRequires:  util-linux
 # /usr/bin/getfacl is needed by test-acl-util
@@ -288,6 +306,10 @@ Requires:       /usr/bin/systemd-sysusers
 # so this biases towards the common version.
 Recommends:     systemd-sysusers%{_isa} = %{version}-%{release}
 
+%if %{defined rhel} && 0%{?rhel} <= 10
+Requires:       libzstd.so.1%{?elf_suffix}
+%endif
+
 Recommends:     diffutils
 Requires:       (util-linux-core or util-linux)
 Requires:       (libbpf >= 2:1.4.7 if libbpf)
@@ -320,12 +342,16 @@ Conflicts:      dracut < 060-2
 Conflicts:      dracut < 059-16
 %endif
 
+%if %{with report_standalone}
+Conflicts:      systemd-standalone-report
+Provides:       systemd-report = %{version}-%{release}
+%endif
 Conflicts:      systemd-standalone-tmpfiles
 Provides:       systemd-tmpfiles = %{version}-%{release}
 Conflicts:      systemd-standalone-shutdown
 Provides:       systemd-shutdown = %{version}-%{release}
 
-%if "%{_sbindir}" == "%{_bindir}"
+%if %{with sbin_compat} || "%{_sbindir}" == "%{_bindir}"
 # Compat symlinks for Requires in other packages.
 # We rely on filesystem to create the symlinks for us.
 Requires:       filesystem(unmerged-sbin-symlinks)
@@ -334,6 +360,15 @@ Provides:       /usr/sbin/init
 Provides:       /usr/sbin/poweroff
 Provides:       /usr/sbin/reboot
 Provides:       /usr/sbin/shutdown
+%endif
+
+%if %{defined rhel} && 0%{?rhel} <= 10
+# libmount is always required, even in containers, so make it a hard dependency.
+Requires:       libmount.so.1%{?elf_suffix}
+Requires:       libmount.so.1(MOUNT_2.26)%{?elf_bits}
+# Various systemd services have syscall filters so make libseccomp a hard dependency.
+Requires:       libseccomp.so.2%{?elf_suffix}
+Requires:       libacl.so.1%{?elf_suffix}
 %endif
 
 %define dlopen_notes_features %{expand:
@@ -453,6 +488,17 @@ Requires(postun): systemd%{_isa} = %{version}-%{release}
 Requires(post): grep
 Requires:       kmod >= 18-4
 
+%if %{defined rhel} && 0%{?rhel} <= 10
+# Libkmod is used to load modules. Assume that if we need udevd, we certainly
+# want to load modules, so make this into a hard dependency here.
+Requires:       libkmod.so.2%{?elf_suffix}
+Requires:       libkmod.so.2(LIBKMOD_5)%{?elf_bits}
+# udev uses libblkid in various builtins so make it a hard dependency.
+Requires:       libblkid.so.1%{?elf_suffix}
+Requires:       libblkid.so.1(BLKID_2.30)%{?elf_bits}
+Requires:       libfdisk.so.1%{?elf_suffix}
+%endif
+
 Provides:       udev = %{version}
 Provides:       udev%{_isa} = %{version}
 %if 0%{?fedora} || 0%{?rhel} >= 10
@@ -469,6 +515,16 @@ Obsoletes:      systemd-timesyncd < %{version}-%{release}
 Provides:       systemd-timesyncd = %{version}-%{release}
 %endif
 Conflicts:      systemd-networkd < %{version}-%{release}
+
+%if %{defined rhel} && 0%{?rhel} <= 10
+# Libkmod is used to load modules. Assume that if we need udevd, we certainly
+# want to load modules, so make this into a hard dependency here.
+Requires:       libkmod.so.2%{?elf_suffix}
+Requires:       libkmod.so.2(LIBKMOD_5)%{?elf_bits}
+# udev uses libblkid in various builtins so make it a hard dependency.
+Requires:       libblkid.so.1%{?elf_suffix}
+Requires:       libblkid.so.1(BLKID_2.30)%{?elf_bits}
+%endif
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1377733#c9
 Suggests:       systemd-bootchart
@@ -492,7 +548,7 @@ Provides:       systemd-repart = %{version}-%{release}
 Conflicts:      xorg-x11-drv-evdev < 2.11.0
 Conflicts:      xorg-x11-drv-libinput < 1.5.0
 
-%if "%{_sbindir}" == "%{_bindir}"
+%if %{with sbin_compat} || "%{_sbindir}" == "%{_bindir}"
 # Compat symlinks for Requires in other packages.
 # We rely on filesystem to create the symlinks for us.
 Requires:       filesystem(unmerged-sbin-symlinks)
@@ -611,6 +667,10 @@ License:        LGPL-2.1-or-later
 Requires:       firewalld-filesystem
 Provides:       systemd-journal-gateway = %{version}-%{release}
 Provides:       systemd-journal-gateway%{_isa} = %{version}-%{release}
+%if %{defined rhel} && 0%{?rhel} <= 10
+Requires:       libmicrohttpd.so.12%{?elf_suffix}
+Requires:       libcurl.so.4%{?elf_suffix}
+%endif
 # Bias the system towards libcurl-minimal if nothing pulls in full libcurl (#1997040)
 Suggests:       libcurl-minimal
 
@@ -647,6 +707,10 @@ enabled for this to have any effect.
 %package resolved
 Summary:        Network Name Resolution manager
 Requires:       systemd%{_isa} = %{version}-%{release}
+%if %{defined rhel} && 0%{?rhel} <= 10
+Requires:       libidn2.so.0%{?elf_suffix}
+Requires:       libidn2.so.0(IDN2_0.0.0)%{?elf_bits}
+%endif
 Requires(posttrans): grep
 
 %description resolved
@@ -688,7 +752,21 @@ RemovePathPostfixes: .standalone
 %description standalone-repart
 Standalone systemd-repart binary with no dependencies on the systemd-shared
 library or other libraries from systemd-libs. This package conflicts with the
-main systemd package and is meant for use on systems without systemd.
+systemd-udev package and is meant for use on systems without systemd-udev.
+
+%if %{with report_standalone}
+%package standalone-report
+Summary:       Standalone systemd-report binaries for use on systems without systemd
+Provides:      systemd-report = %{version}-%{release}
+Conflicts:     systemd
+RemovePathPostfixes: .standalone
+
+%description standalone-report
+Standalone systemd-report, systemd-report-basic, systemd-report-sign-plain, …
+binaries with no dependencies on the systemd-shared library or other libraries
+from systemd-libs. This package conflicts with the main systemd package and
+is meant for use on systems without systemd or with older version of it.
+%endif
 
 %package standalone-tmpfiles
 Summary:       Standalone systemd-tmpfiles binary for use on systems without systemd
@@ -725,7 +803,30 @@ Standalone systemd-shutdown binary with no dependencies on the systemd-shared
 library or other libraries from systemd-libs. This package conflicts with the
 main systemd package and is meant for use in exitrds.
 
+%define status %{shrink:
+       '**'
+       bzip2=%{?with_bzip2}%{!?with_bzip2:0}
+       gnutls=%{?with_gnutls}%{!?with_gnutls:0}
+       lz4=%{?with_lz4}%{!?with_lz4:0}
+       xz=%{?with_xz}%{!?with_xz:0}
+       zlib=%{?with_zlib}%{!?with_zlib:0}
+       zstd=%{?with_zstd}%{!?with_zstd:0}
+       bootstrap=%{?with_bootstrap}%{!?with_bootstrap:0}
+       tests=%{?with_tests}%{!?with_tests:0}
+       lto=%{?with_lto}%{!?with_lto:0}
+       docs=%{?with_docs}%{!?with_docs:0}
+       upstream=%{?with_upstream}%{!?with_upstream:0}
+       obs=%{?with_obs}%{!?with_obs:0}
+       report_standalone=%{?with_report_standalone}%{!?with_report_standalone:0}
+       fedora=%{?fedora}
+       rhel=%{?rhel}
+       _arch=%{_arch}
+       '**'}
+
 %prep
+# Print varius with's and without's to make it easier to figure out what is going on
+echo %{status}
+
 %if %{with obs}
 # Recipe files in the OBS build are in a distro-specific dir, as they conflict (e.g. with SUSE ones)
 mv %{_sourcedir}/%{name}.fedora/* %{_sourcedir}
@@ -742,7 +843,13 @@ mv %{_sourcedir}/%{name}.fedora/* %{_sourcedir}
 sed -r -i 's/^u!/u/' sysusers.d/*.conf*
 
 %build
+echo %{status}
+
+%if 0%{?eln}
+%global ntpvendor fedora
+%else
 %global ntpvendor %(source /etc/os-release; echo ${ID})
+%endif
 %{!?ntpvendor: echo 'NTP vendor zone is not set!'; exit 1}
 
 VMLINUX_H_PATH=''
@@ -926,7 +1033,7 @@ sed -r 's|/system/|/user/|g' %{SOURCE16} >10-timeout-abort.conf.user
 %meson_install
 
 # udev links
-%if "%{_sbindir}" != "%{_bindir}"
+%if !%{with sbin_compat} && "%{_sbindir}" != "%{_bindir}"
 mkdir -p %{buildroot}/%{_sbindir}
 ln -sf ../bin/udevadm %{buildroot}%{_sbindir}/udevadm
 %endif
@@ -1026,9 +1133,8 @@ EOF
 
 install -Dm0644 -t %{buildroot}/usr/lib/firewalld/services/ %{SOURCE8} %{SOURCE9}
 
-# Install additional docs
-# https://bugzilla.redhat.com/show_bug.cgi?id=1234951
-install -Dm0644 -t %{buildroot}%{_pkgdocdir}/ %{SOURCE10}
+# Install kernel hardening file. Disabled by default.
+install -Dm0644 -t %{buildroot}%{_pkgdocdir}/ %{SOURCE19}
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1378974
 install -Dm0644 -t %{buildroot}%{system_unit_dir}/systemd-udev-trigger.service.d/ %{SOURCE11}
@@ -1075,7 +1181,7 @@ install -Dm0644 -t %{buildroot}%{_prefix}/lib/systemd/network/ %{SOURCE25}
 ln -s --relative %{buildroot}%{_bindir}/kernel-install %{buildroot}%{_sbindir}/installkernel
 %endif
 
-%if "%{_sbindir}" == "%{_bindir}"
+%if %{with sbin_compat} || "%{_sbindir}" == "%{_bindir}"
 # Systemd has the split-sbin option which is also used to select the directory
 # for alias symlinks. We need to keep split-sbin=true for now, to support
 # unmerged systems. Move the symlinks here instead.
@@ -1428,10 +1534,10 @@ fi
 %global _docdir_fmt %{name}
 
 %files -f %{name}.lang -f .file-list-main
-%doc %{_pkgdocdir}
 %exclude %{_pkgdocdir}/LICENSE*
 # Only the licenses texts for the licenses in License line are included.
 %license LICENSE.GPL2
+%license LICENSE.LGPL2.1
 %license LICENSES/MIT.txt
 %ghost %dir %attr(0755,-,-) /etc/systemd/system/basic.target.wants
 %ghost %dir %attr(0755,-,-) /etc/systemd/system/bluetooth.target.wants
@@ -1493,6 +1599,10 @@ fi
 %files tests -f .file-list-tests
 
 %files standalone-repart -f .file-list-standalone-repart
+
+%if %{with report_standalone}
+%files standalone-report -f .file-list-standalone-report
+%endif
 
 %files standalone-tmpfiles -f .file-list-standalone-tmpfiles
 
