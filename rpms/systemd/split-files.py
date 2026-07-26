@@ -1,7 +1,11 @@
 import re, sys, os, collections
 
 buildroot = sys.argv[1]
-no_bootloader = '--no-bootloader' in sys.argv
+
+potentially_empty_outputs = [
+    'standalone-report',
+    *(['boot'] if '--no-bootloader' in sys.argv else []),
+]
 
 known_files = '''
 %ghost %config(noreplace) /etc/crypttab
@@ -73,6 +77,7 @@ outputs = {suffix: open(f'.file-list-{suffix}', 'w')
                    'resolve',
                    'tests',
                    'standalone-repart',
+                   'standalone-report',
                    'standalone-tmpfiles',
                    'standalone-sysusers',
                    'standalone-shutdown',
@@ -94,10 +99,11 @@ for file in files(buildroot):
                     /usr/lib.*/(security|pkgconfig)$|
                     /usr/lib/rpm(/macros.d|)$|
                     /usr/lib/firewalld(/services|)$|
-                    /usr/share/(locale|licenses|doc)|             # no $
+                    /usr/share/(locale|licenses)|             # no $
+                    LICENSE|
                     /etc(/pam\.d|/xdg|/X11|/X11/xinit|/X11.*\.d|)$|
                     /etc/(dnf|dnf/protected.d)$|
-                    /usr/(src|lib/debug)|                         # no $
+                    /usr/(src|lib/debug)|                     # no $
                     /run$|
                     /var(/cache|/log|/lib|/run|)$
     ''', n, re.X):
@@ -106,6 +112,8 @@ for file in files(buildroot):
     if n.endswith('.standalone'):
         if 'repart' in n:
             o = outputs['standalone-repart']
+        elif 'report' in n:
+            o = outputs['standalone-report']
         elif 'tmpfiles' in n:
             o = outputs['standalone-tmpfiles']
         elif 'sysusers' in n:
@@ -113,7 +121,7 @@ for file in files(buildroot):
         elif 'shutdown' in n:
             o = outputs['standalone-shutdown']
         else:
-            assert False, 'Found .standalone not belonging to known packages'
+            assert False, f'Found {n} not belonging to known standalone packages'
 
     elif '/security/pam_' in n or '/man8/pam_' in n:
         o = outputs['pam']
@@ -151,6 +159,7 @@ for file in files(buildroot):
                        mount.ddi|
                        importctl|
                        portablectl|
+                       portabled|portable1|
                        systemd-nspawn|
                        systemd\.nspawn|
                        systemd-vmspawn|
@@ -248,13 +257,11 @@ for file in files(buildroot):
                        binfmt|
                        sysctl|
                        coredump|
+                       homectl|
                        homed|home1|
-                       sysupdate|updatctl|
-                       oomd|
-                       portabled|portable1
-    ''', n, re.X):     # coredumpctl, homectl, portablectl are included in the main package because
-                       # they can be used to interact with remote daemons. Also, the user could be
-                       # confused if those user-facing binaries are not available.
+                       sysupdate|updatectl|
+                       oomd
+    ''', n, re.X):
         o = outputs['udev']
 
     elif re.search(r'''/boot/efi|
@@ -277,7 +284,8 @@ for file in files(buildroot):
         prefix = known_files[n].split()[:-1]
     elif file.is_dir(follow_symlinks=False):
         prefix = ['%dir']
-    elif 'README' in n:
+    # Allow .conf files to be linked as config. They must not be %doc.
+    elif ('README' in n or '/doc/' in n) and not n.endswith('.conf'):
         prefix = ['%doc']
     elif n.startswith('/etc'):
         prefix = ['%config(noreplace)']
@@ -294,9 +302,10 @@ for file in files(buildroot):
     for file in o:
         print(f'{prefix}{n}{suffix}', file=file)
 
-if [print(f'ERROR: no file names were written to {o.name}')
-    for name, o in outputs.items()
-    if (o.tell() == 0 and
-        not (no_bootloader and name == 'boot'))
-    ]:
+
+if [
+        print(f'ERROR: no file names were written to {o.name}')
+        for name, o in outputs.items()
+        if o.tell() == 0 and name not in potentially_empty_outputs
+]:
     sys.exit(1)
