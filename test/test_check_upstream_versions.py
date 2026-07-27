@@ -88,6 +88,32 @@ Test package
     return pkg_dir
 
 
+def test_run_git_logs_start_and_completion(cuv_module, caplog) -> None:
+    """Git command boundaries and elapsed time are visible in CI logs."""
+    completed = subprocess.CompletedProcess(['git', 'status'], 0, stdout='')
+
+    with patch.object(cuv_module.subprocess, 'run', return_value=completed), \
+         patch.object(cuv_module.time, 'monotonic', side_effect=[10.0, 12.5]), \
+         caplog.at_level('INFO'):
+        cuv_module.run_git('status')
+
+    assert 'Running command: git status' in caplog.text
+    assert 'Command completed after 2.5s: git status' in caplog.text
+
+
+def test_run_git_logs_failure(cuv_module, caplog) -> None:
+    """Failed Git commands report their elapsed time before propagating."""
+    error = subprocess.CalledProcessError(1, ['git', 'commit'])
+
+    with patch.object(cuv_module.subprocess, 'run', side_effect=error), \
+         patch.object(cuv_module.time, 'monotonic', side_effect=[10.0, 11.0]), \
+         caplog.at_level('INFO'), \
+         pytest.raises(subprocess.CalledProcessError):
+        cuv_module.run_git('commit')
+
+    assert 'Command failed after 1.0s: git commit' in caplog.text
+
+
 #
 # Tests — compare_versions
 #
@@ -1310,6 +1336,21 @@ def test_run_hook_receives_env(cuv_module, workdir: Path) -> None:
     assert '9.9.9' in result.stdout
 
 
+def test_run_hook_streams_stderr(cuv_module, workdir: Path, capfd) -> None:
+    """Hook diagnostics on stderr are emitted while stdout remains captured."""
+    _create_package(workdir, 'pkg', '1.0')
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    import os
+    env = {**os.environ, 'UPDATE_PACKAGE': 'pkg'}
+
+    result = cuv_module._run_hook(
+        'test', 'echo source.tar.gz; echo progress >&2', 'pkg', env,
+    )
+
+    assert result.stdout.strip() == 'source.tar.gz'
+    assert 'progress' in capfd.readouterr().err
+
+
 #
 # Tests — update_spec_version with hooks
 #
@@ -1380,7 +1421,7 @@ def test_update_spec_version_with_download_sources_hook(
 
 
 def test_update_spec_version_with_post_update_hook(
-    cuv_module, workdir: Path,
+    cuv_module, workdir: Path, caplog,
 ) -> None:
     """post_update hook runs after default phases."""
     pkg_dir = _create_package(workdir, 'pkg', '1.0',
@@ -1399,13 +1440,16 @@ def test_update_spec_version_with_post_update_hook(
     cuv_module.METADATA_DIR = workdir / 'metadata'
     cuv_module.ROOT_DIR = workdir
 
-    with patch.object(cuv_module, 'download_new_sources', return_value=[]):
+    with patch.object(cuv_module, 'download_new_sources', return_value=[]), \
+         caplog.at_level('INFO'):
         cuv_module.update_spec_version('pkg', '2.0')
 
     # The hook should have created a marker file
     marker = pkg_dir / 'post-hook-marker'
     assert marker.exists()
     assert 'post-hook ran' in marker.read_text()
+    assert 'pkg: running post_update hook' in caplog.text
+    assert 'pkg: post_update hook completed after' in caplog.text
 
 
 def test_update_spec_version_hook_failure_propagates(
