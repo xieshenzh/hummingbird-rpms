@@ -1,0 +1,101 @@
+[archive]
+post_commands = [
+  # These nested modules do not carry separate license files. They use the
+  # license of their parent repository or state their license in README.md.
+  ["cp", "-p", "vendor/github.com/grafana/nanogit/LICENSE.md", "vendor/github.com/grafana/nanogit/gittest/LICENSE.md"],
+  ["cp", "-p", "vendor/github.com/mattn/go-localereader/README.md", "vendor/github.com/mattn/go-localereader/LICENSE"],
+]
+
+[licensing]
+detector = "askalono"
+exclude_files = ["vendor/modernc.org/memory/LICENSE-LOGO"]
+
+[[licensing.licenses]]
+path = "vendor/github.com/apparentlymart/go-textseg/v15/LICENSE"
+sha256sum = "59e80949c14925f65181757d837ed93dea3783f62b031f642281d9e5b1936917"
+expression = "MIT AND Apache-2.0 AND LicenseRef-scancode-unicode"
+
+[[licensing.licenses]]
+path = "vendor/github.com/cloudflare/circl/LICENSE"
+sha256sum = "b0da1764fe4d13d610b695536fc3f2ebc362482d053a1cd258e36975bc6b97a7"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/dave/dst/LICENSE"
+sha256sum = "04fc8537871ac4ef6f0eee1a597948f5d890a09fc8350c391736b55a28371500"
+expression = "MIT AND BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/dgraph-io/ristretto/v2/z/LICENSE"
+sha256sum = "08e26ca4ab0399871df0626c92944e62a7e763fddb0995ffb1728c66254a2a5f"
+expression = "MIT AND Apache-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/emirpasic/gods/LICENSE"
+sha256sum = "871b440e9b348d6b2485c72e15f1d18f4cf8ee7bb424cbcd854b6a4a772b61d8"
+expression = "BSD-2-Clause AND ISC"
+
+[[licensing.licenses]]
+path = "vendor/github.com/grpc-ecosystem/go-grpc-middleware/v2/COPYRIGHT"
+sha256sum = "8befb41eac649775143c81fddaf84b7d7e1197899d968b8b51cfec405f2ff72f"
+expression = "Apache-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/miekg/dns/COPYRIGHT"
+sha256sum = "66550c0ad5ca7ec1e08683e5f872cc45c741f311eee3b8ee484206ecbf9c740d"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/oasdiff/yaml/LICENSE"
+sha256sum = "24653fd8a39354396da1a265d68316399edc39b1df48c5866d55f9f06484fa9a"
+expression = "BSD-3-Clause AND MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/oasdiff/yaml3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "Apache-2.0 AND MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/sean-/seed/LICENSE"
+sha256sum = "a9acefe76ede3dc382f2b449f968571f796a3bedc8eb0ef53dd4ef41083f3fd3"
+expression = "MIT AND BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shirou/gopsutil/v4/LICENSE"
+sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shopspring/decimal/LICENSE"
+sha256sum = "b92ba0f6ee02f2309628bfdadb123668a17c016e475ba477b857d33470d9d625"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/yudai/gojsondiff/LICENSE"
+sha256sum = "ca9764dd05bbd23485eac6cfa7619ba4eb7f010a98f1358cd99da955399058cc"
+expression = "MIT AND BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "Apache-2.0 AND MIT"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "Apache-2.0 AND MIT"
+
+[[licensing.licenses]]
+path = "vendor/modernc.org/libc/LICENSE-3RD-PARTY.md"
+sha256sum = "f597097efe3d97021f89170746bd3a0fb9a8b6fb26b82043ed68a4e0283bee6c"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/modernc.org/sqlite/SQLITE-LICENSE"
+sha256sum = "8438c9c89b849131ead81d5435cb97fcf052df5b0b286dda8a2d4c29e6cb3fd0"
+expression = "LicenseRef-Fedora-Public-Domain"
+
+[[licensing.licenses]]
+path = "vendor/github.com/mattn/go-localereader/LICENSE"
+sha256sum = "0c5c52517f13becd7a1e1234f1e8a5ba370f5a5078cee9ac058c2d534e267fcb"
+expression = "MIT"
