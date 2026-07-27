@@ -156,15 +156,17 @@ Do not proceed with any analysis, comments, or code changes.
 **Batch Resolution:** When multiple tickets share a CVE (e.g., ruby3.3/ruby4.0,
 llvm/llvm21), investigate once but **verify each package individually**:
 
-1. Verify each package's versions, config, and role (runtime vs test-only vs
-   vendored) using Step 2 methods per-package. Do not assume uniformity.
-2. Collect the outcome for each ticket (resolution path 3a–3g).
-3. **If all have the same resolution:**
-   - Comment once, post to all with a shell loop.
-   - Create one task ticket, link it as blocker to each tracker.
-   - Set FIB on each tracker if applicable.
-4. **If outcomes are mixed:** handle each independently. The task blocks only
-   the trackers that need the fix. Close unaffected ones directly.
+1. **Initial triage:** Use helper output to identify which packages likely have
+   the component (product-mismatch warnings, vendored deps indicators).
+2. **Per-package verification:** For each package, verify using Step 2 methods
+   (spec file bundled deps, SBOM, code inspection). Do not assume uniformity.
+3. **Group by outcome:** Collect tickets by resolution (NAB/component-absent,
+   FIB, needs-update).
+4. **Batch actions by outcome:**
+   - **Same resolution:** Write one comment template, post to each ticket in a loop,
+     create one task linking all trackers, set FIB on each if applicable.
+   - **Mixed outcomes:** Handle each group independently. Close unaffected ones
+     directly, create tasks for those needing fixes.
 
 > IMPORTANT: If a patch is required, handle each ticket separately.
 
@@ -195,7 +197,13 @@ and often resolves mismatch cases without any web search.
 When you do search:
 
 - **Product mismatch** (CVE vendor/product differs from Hummingbird package):
-  1. **First: Search official documentation** for feature/component support
+  **First: Extract the vulnerable sub-component** from the CVE description/flaw
+  field before concluding mismatch. The CVE often targets a specific module,
+  plugin, or feature — check whether *that* exists in the Hummingbird package,
+  not just whether the product names match. Many mismatches resolve once the
+  component is identified.
+
+  1. **Search official documentation** for feature/component support
      Example: `"<HummingbirdPkg>" "<CVE_component>" support documentation`
   2. **For forks**: Go directly to compatibility/feature-difference documentation
      Example: `"<fork>" "<upstream>" compatibility differences documentation`
@@ -231,17 +239,26 @@ the CVE are already applied, the package is fixed.
 
 #### 2c: Vendored dependency check (Go packages)
 
-For CVEs against Go modules filed on `golang*` packages, check
-whether any Hummingbird package vendors the module:
+The `cve_helper.py` output already shows `Vendored deps: yes (go-vendor-tools)`
+for any package with a `go-vendor-tools.toml` — use this as a first check.
 
-```bash
-rg -i "<module-name>" ci/vendored_deps.csv
-```
+For module-level presence, use SBOM verification (Step 2d) which identifies
+the specific vendored module, its version, and whether it's runtime-installed.
 
-If vendored, identify which packages carry it and what version.
 If not vendored by any package, the ticket is misfiled.
 
-#### 2d: SBOM verification
+#### 2d: Spec file bundled dependency check
+
+For product-mismatch CVEs, check the spec file for bundled dependencies:
+
+```bash
+grep -i "<component-name>" rpms/<package>/<package>.spec
+```
+
+Look for `Provides: bundled(...)` lines showing vendored dependencies
+and their versions. If found, compare against the CVE affected range.
+
+#### 2e: SBOM verification
 
 When the CVE product differs from the Hummingbird package name,
 download and inspect the SBOM to determine:
@@ -287,7 +304,7 @@ include SBOM evidence in the Jira comment:
 - runtime-installed vs build-time-only conclusion
 - why that supports the chosen VEX justification
 
-#### 2e: Upstream fix verification
+#### 2f: Upstream fix verification
 
 **CRITICAL:** Never conclude "fixed" based solely on the Hummingbird
 SRPM version being numerically higher than a distro's patched
@@ -300,7 +317,7 @@ When recommending Done-Errata:
 2. Compare its date against the SRPM's upstream release tag date
 3. Only confirm fixed if the fix commit predates the release tag
 
-#### 2f: Known version-scheme issues
+#### 2g: Known version-scheme issues
 
 **dotnet packages:** SRPM uses SDK versions (e.g. 9.0.116), CVEs
 use runtime versions (e.g. 9.0.16). Mapping: SDK third component
@@ -343,14 +360,17 @@ disputed):
 1. For product-mismatch or component-absence cases, perform SBOM
    verification first (Step 2d) and capture runtime-vs-build-time
    evidence for binary RPM installation status.
-2. Write a closing comment to a temp file explaining why
-3. Post the comment:
+2. **Name the specific component** extracted from the CVE description
+   in the closing comment. State why it was checked and why it is
+   absent from the Hummingbird package.
+3. Write a closing comment to a temp file explaining why
+4. Post the comment:
 
    ```bash
    rhjira comment HUM-XXXX --noeditor -f /tmp/close-comment.txt
    ```
 
-4. **Ask the user for approval before closing.** Then use the
+5. **Ask the user for approval before closing.** Then use the
    appropriate VEX justification:
 
    ```bash
@@ -369,8 +389,8 @@ disputed):
      --vexjustification "Vulnerable Code not Present"
    ```
 
-5. Rename the chat (see Step 1) with `--title-prefix "NAB"`.
-6. Verify: `rhjira show HUM-XXXX 2>&1 | grep "^Status:"`
+6. Rename the chat (see Step 1) with `--title-prefix "NAB"`.
+7. Verify: `rhjira show HUM-XXXX 2>&1 | grep "^Status:"`
 
 If SBOM retrieval is unavailable (network/policy/tooling), do not
 close as `Component not Present` yet. Document the blocker in a
@@ -674,6 +694,13 @@ version bump is not appropriate:
    If `mark-modified` changes the release field, revert that
    change before committing.
 
+   **For Go packages that vendor deps:** When a CVE targets a
+   vendored module, create the patch against `go.mod`+`go.sum`.
+   Use `PatchN:` (not `dependency_overrides` in
+   `go-vendor-tools.toml`) — patches persist across version
+   updates; overrides don't. After patching, regenerate the
+   vendor tarball with `go-vendor-tools` and upload to lookaside.
+
 4. **Commit, validate, build, push, MR** (same as 3d step 9).
 
 #### 3f: No upstream fix yet
@@ -761,8 +788,8 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
    validation rejects local changelog entries.
 
 12. When the user provides the package name and multiple HUM ticket
-   keys together (e.g. "let's look at ruby4.0 HUM-2648 HUM-2645"),
-   investigate all tickets for that package as a batch.
+    keys together (e.g. "let's look at ruby4.0 HUM-2648 HUM-2645"),
+    investigate all tickets for that package as a batch.
 
 13. **`modification_reason` must contain only CVE IDs.** When
     marking a package modified for a CVE fix (version bump or
