@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "bump vendored golang.org/x/text to v0.39.0 for CVE-2026-56852",
+  "modification_status": "modified",
   "release": "2",
   "sha": "e6466c251f8655ce653aca3387a6ec42afcc5934",
   "source": "https://src.fedoraproject.org/rpms/go-fdo-client.git",

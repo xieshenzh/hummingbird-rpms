@@ -98,6 +98,9 @@ expat:
 fontconfig:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+go-fdo-client:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 git-sync:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
