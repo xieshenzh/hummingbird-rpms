@@ -14,6 +14,18 @@ Packages that require custom logic can provide a hooks file at
 the defaults. See the Package Modification Tracking documentation for
 the full hook reference.
 
+If ``metadata/<package>.source-pipeline.yaml`` exists, it takes priority
+over both the hooks file and the generic default for source download:
+the gorget source-pipeline tool (quay.io/hummingbird-ci/gorget) runs in a
+container to fetch, transform, verify, and emit source artifacts, which
+are then uploaded to the lookaside cache in place of the download_sources
+phase. Pass --skip-pipeline to force the legacy hook/default path even
+when a source-pipeline definition exists. See
+documentation/design/source-pipeline-tool.md for background on gorget;
+the pipeline YAML schema itself is defined by gorget's own
+src/gorget/config/schema.py (github.com/gorget-project/gorget), which has
+drifted ahead of the design doc's examples.
+
 Subcommands:
     check   Check tracked packages for updates
     list    List ALL packages with version and tracking status
@@ -48,8 +60,10 @@ import logging
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -76,6 +90,10 @@ METADATA_DIR = ROOT_DIR / "metadata"
 ANITYA_API_BASE = "https://release-monitoring.org/api"
 UPLOAD_SCRIPT = ROOT_DIR / "ci" / "upload-to-lookaside-cache.sh"
 
+# Container image for the gorget source-pipeline tool (see
+# metadata/<package>.source-pipeline.yaml and documentation/design/source-pipeline-tool.md)
+GORGET_IMAGE = "quay.io/hummingbird-ci/gorget:latest"
+
 # Rate limiting: delay between API requests (in seconds)
 API_DELAY = 0.2
 
@@ -87,6 +105,10 @@ logger = logging.getLogger(__name__)
 
 # Global sign-off flag, set from command line
 sign_off: bool = False
+
+# Global escape hatch: force the legacy hook/default source-download path
+# even when metadata/<package>.source-pipeline.yaml exists, set from --skip-pipeline
+skip_pipeline: bool = False
 
 
 def run_git(
@@ -471,6 +493,130 @@ def _regenerate_vendor_archive(
     return new_vendor_filename
 
 
+def _load_source_pipeline(package: str) -> Optional[Path]:
+    """Return the path to metadata/<package>.source-pipeline.yaml, or None.
+
+    A source-pipeline definition takes priority over both
+    metadata/<package>.update-hooks.yaml and the generic default source
+    download path (see gorget's container interface,
+    documentation/design/source-pipeline-tool.md).
+    """
+    pipeline_file = METADATA_DIR / f"{package}.source-pipeline.yaml"
+    return pipeline_file if pipeline_file.is_file() else None
+
+
+def _run_gorget_pipeline(
+    package: str,
+    old_version: str,
+    new_version: str,
+    pipeline_file: Path,
+) -> list[str]:
+    """
+    Run the gorget source-pipeline tool for a package and upload its
+    output to the lookaside cache.
+
+    Invokes GORGET_IMAGE via podman, mounting the package directory
+    (read-only), the pipeline YAML (read-only), a shared GPG keyring
+    directory (read-only), and a scratch output directory. On success,
+    every artifact gorget emits is copied into the package directory,
+    uploaded to the lookaside cache, and the package's ``sources`` file
+    is replaced wholesale with the one gorget emitted -- gorget's sources
+    file is authoritative for a pipeline-managed package, not something to
+    hand-patch entries into.
+
+    Args:
+        package: Package name
+        old_version: Version before the spec update
+        new_version: Version after the spec update
+        pipeline_file: Path to metadata/<package>.source-pipeline.yaml
+
+    Returns:
+        List of new source filenames (for the caller to add to .gitignore)
+
+    Raises:
+        RuntimeError: If the gorget container exits non-zero, or emits no
+            usable ``sources`` file
+    """
+    package_dir = RPMS_DIR / package
+    gpg_keys_dir = METADATA_DIR / "gpg-keys"
+    gpg_keys_dir.mkdir(exist_ok=True)
+
+    with tempfile.TemporaryDirectory(prefix=f"gorget-{package}-") as output_dir_str:
+        output_dir = Path(output_dir_str)
+        output_dir.chmod(0o777)
+
+        command = [
+            "podman", "run", "--rm",
+            "-v", f"{package_dir}:/package:ro,z",
+            "-v", f"{pipeline_file}:/pipeline.yaml:ro,z",
+            "-v", f"{gpg_keys_dir}:/gpg-keys:ro,z",
+            "-v", f"{output_dir}:/output:z",
+            GORGET_IMAGE,
+            "--version", new_version,
+            "--old-version", old_version,
+        ]
+        logger.info(
+            "%s: running gorget pipeline %s -> %s: %s",
+            package, old_version, new_version, shlex.join(command),
+        )
+        started_at = time.monotonic()
+        try:
+            result = subprocess.run(command, stdout=subprocess.PIPE, text=True)
+        finally:
+            logger.info(
+                "%s: gorget pipeline completed after %.1fs",
+                package, time.monotonic() - started_at,
+            )
+
+        if result.returncode != 0:
+            report_path = output_dir / "report.json"
+            report = f"\n{report_path.read_text()}" if report_path.is_file() else ""
+            details = result.stdout.strip()
+            suffix = f": {details}" if details else ""
+            raise RuntimeError(
+                f"{package}: gorget pipeline failed (exit {result.returncode}){suffix}{report}"
+            )
+
+        new_sources_path = output_dir / "sources"
+        if not new_sources_path.is_file():
+            raise RuntimeError(
+                f"{package}: gorget pipeline exited 0 but emitted no 'sources' file"
+            )
+        new_entries = _parse_sources_file(new_sources_path)
+        if not new_entries:
+            raise RuntimeError(
+                f"{package}: gorget pipeline emitted an empty 'sources' file "
+                f"(no parseable entries)"
+            )
+
+        uploaded = []
+        for entry in new_entries:
+            src = output_dir / entry["filename"]
+            if not src.is_file():
+                raise RuntimeError(
+                    f"{package}: gorget's sources file references "
+                    f"{entry['filename']!r} but it was not emitted to /output"
+                )
+            dest = package_dir / entry["filename"]
+            shutil.copyfile(src, dest)
+            _upload_to_lookaside(dest, package, entry["algo"])
+            uploaded.append(entry["filename"])
+
+    # Remove local files superseded by this run (old filenames not in the
+    # new gorget-emitted sources file).
+    old_entries = _parse_sources_file(package_dir / "sources")
+    old_filenames = {e["filename"] for e in old_entries}
+    new_filenames = {e["filename"] for e in new_entries}
+    for filename in sorted(old_filenames - new_filenames):
+        stale_path = package_dir / filename
+        if stale_path.exists():
+            stale_path.unlink()
+            logger.debug(f"{package}: removed stale source entry {filename}")
+
+    _write_sources_file(package_dir / "sources", new_entries)
+    return uploaded
+
+
 def download_new_sources(
     package: str,
     old_version: str,
@@ -793,12 +939,21 @@ def update_spec_version(package: str, new_version: str) -> list[str]:
       lookaside cache.
     - **post_update** — runs after the spec and source phases (additive).
 
+    If ``metadata/<package>.source-pipeline.yaml`` exists, it takes
+    priority over both the download_sources hook and the generic default
+    for the source-download phase (spec update and post_update still run
+    as above): the gorget source-pipeline tool runs instead, and its
+    output replaces the ``sources`` file wholesale. See
+    ``_run_gorget_pipeline``. The global ``skip_pipeline`` flag
+    (``--skip-pipeline``) forces the legacy path even when a
+    source-pipeline definition exists.
+
     Returns:
         List of downloaded source filenames
 
     Raises:
         FileNotFoundError: If spec file is not found
-        RuntimeError: If a hook command fails
+        RuntimeError: If a hook command or the gorget pipeline fails
     """
     from specfile import Specfile
 
@@ -858,13 +1013,18 @@ def update_spec_version(package: str, new_version: str) -> list[str]:
     logger.info(f"{package}: updated spec {old_version} -> {new_version}")
 
     # --- Phase 2: source download --------------------------------------------
-    if hooks and hooks.download_sources:
+    pipeline_file = None if skip_pipeline else _load_source_pipeline(package)
+    if pipeline_file:
+        downloaded = _run_gorget_pipeline(
+            package, old_version, new_version, pipeline_file,
+        )
+    elif hooks and hooks.download_sources:
         env = _build_hook_env(package, old_version, new_version)
         result = _run_hook(
             "download_sources", hooks.download_sources, package, env,
         )
         # Each non-empty stdout line is a filename to upload
-        downloaded: list[str] = []
+        downloaded = []
         sources_path = package_dir / "sources"
         sources_entries = _parse_sources_file(sources_path)
 
@@ -1225,8 +1385,9 @@ def run_check(args: argparse.Namespace) -> None:
     This is the core logic shared by the 'check' subcommand and the
     legacy (no subcommand) invocation.
     """
-    global sign_off
+    global sign_off, skip_pipeline
     sign_off = getattr(args, "sign_off", False)
+    skip_pipeline = getattr(args, "skip_pipeline", False)
 
     if args.verbose:
         logger.setLevel(logging.DEBUG)
@@ -1498,6 +1659,13 @@ Examples:
     check_parser.add_argument(
         "-s", "--sign-off", action="store_true",
         help="Add Signed-off-by trailer to commit messages",
+    )
+    check_parser.add_argument(
+        "--skip-pipeline", action="store_true",
+        help=(
+            "Force the legacy hook/default source-download path even when "
+            "metadata/<package>.source-pipeline.yaml exists"
+        ),
     )
 
     # 'list' subcommand

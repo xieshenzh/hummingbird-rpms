@@ -4,7 +4,7 @@ import json
 import subprocess
 import types
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import pytest
 
@@ -1158,6 +1158,228 @@ def test_regenerate_vendor_archive_failure(cuv_module, workdir: Path) -> None:
 
 
 #
+# Tests — _load_source_pipeline / _run_gorget_pipeline
+#
+
+
+def test_load_source_pipeline_missing(cuv_module, workdir: Path) -> None:
+    """Returns None when no source-pipeline.yaml exists."""
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    assert cuv_module._load_source_pipeline('pkg') is None
+
+
+def test_load_source_pipeline_exists(cuv_module, workdir: Path) -> None:
+    """Returns the path when source-pipeline.yaml exists."""
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    assert cuv_module._load_source_pipeline('pkg') == pipeline_file
+
+
+def _output_dir_from_podman_cmd(cmd: list[str]) -> Path:
+    """Extract the host-side /output mount path from a podman argv list."""
+    output_mount = next(arg for arg in cmd if arg.endswith(':/output:z'))
+    return Path(output_mount[: -len(':/output:z')])
+
+
+def _fake_gorget_run(artifacts: dict[str, bytes]):
+    """Build a `subprocess.run` side_effect simulating a successful gorget
+    container run: writes `artifacts` plus a `sources` manifest into the
+    mounted /output directory."""
+
+    def fake_subprocess_run(cmd, **kwargs):
+        if cmd[0] != 'podman':
+            return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
+
+        output_dir = _output_dir_from_podman_cmd(cmd)
+        lines = []
+        for i, (filename, content) in enumerate(artifacts.items()):
+            (output_dir / filename).write_bytes(content)
+            lines.append(f"SHA512 ({filename}) = fakehash{i}")
+        (output_dir / 'sources').write_text('\n'.join(lines) + '\n')
+        (output_dir / 'report.json').write_text('{}')
+        return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
+
+    return fake_subprocess_run
+
+
+def test_run_gorget_pipeline_success(cuv_module, workdir: Path) -> None:
+    """Runs gorget via podman, uploads emitted artifacts, replaces sources."""
+    pkg_dir = _create_package(
+        workdir, 'pkg', '1.0',
+        sources={'pkg-1.0.tar.gz': 'oldhash'},
+    )
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    fake_run = _fake_gorget_run({
+        'pkg-2.0.tar.gz': b'source',
+        'pkg-2.0-vendor.tar.gz': b'vendor',
+    })
+
+    with patch.object(cuv_module, '_upload_to_lookaside') as mock_ul, \
+         patch('subprocess.run', side_effect=fake_run):
+        cuv_module.RPMS_DIR = workdir / 'rpms'
+        cuv_module.METADATA_DIR = workdir / 'metadata'
+        downloaded = cuv_module._run_gorget_pipeline(
+            'pkg', '1.0', '2.0', pipeline_file,
+        )
+
+    assert sorted(downloaded) == ['pkg-2.0-vendor.tar.gz', 'pkg-2.0.tar.gz']
+    assert mock_ul.call_args_list == [
+        call(pkg_dir / 'pkg-2.0.tar.gz', 'pkg', 'SHA512'),
+        call(pkg_dir / 'pkg-2.0-vendor.tar.gz', 'pkg', 'SHA512'),
+    ]
+    assert (pkg_dir / 'pkg-2.0.tar.gz').read_bytes() == b'source'
+    assert (pkg_dir / 'pkg-2.0-vendor.tar.gz').read_bytes() == b'vendor'
+
+    # Old file removed, sources file replaced wholesale (not hand-patched)
+    assert not (pkg_dir / 'pkg-1.0.tar.gz').exists()
+    entries = cuv_module._parse_sources_file(pkg_dir / 'sources')
+    filenames = {e['filename'] for e in entries}
+    assert filenames == {'pkg-2.0.tar.gz', 'pkg-2.0-vendor.tar.gz'}
+
+
+def test_run_gorget_pipeline_logs_command_and_duration(
+    cuv_module, workdir: Path, caplog
+) -> None:
+    """Pipeline command and elapsed time are visible in CI logs, matching
+    run_git/_run_hook's diagnostics -- and stderr is left unbuffered rather
+    than captured, so a chatty container can't stall on a full pipe."""
+    _create_package(workdir, 'pkg', '1.0', sources={'pkg-1.0.tar.gz': 'oldhash'})
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    fake_run = _fake_gorget_run({'pkg-2.0.tar.gz': b'x'})
+
+    with patch.object(cuv_module, '_upload_to_lookaside'), \
+         patch('subprocess.run', side_effect=fake_run), \
+         patch.object(cuv_module.time, 'monotonic', side_effect=[10.0, 12.5]), \
+         caplog.at_level('INFO'):
+        cuv_module.RPMS_DIR = workdir / 'rpms'
+        cuv_module.METADATA_DIR = workdir / 'metadata'
+        cuv_module._run_gorget_pipeline('pkg', '1.0', '2.0', pipeline_file)
+
+    assert 'running gorget pipeline 1.0 -> 2.0: podman run' in caplog.text
+    assert 'gorget pipeline completed after 2.5s' in caplog.text
+
+
+def test_run_gorget_pipeline_creates_gpg_keys_dir(
+    cuv_module, workdir: Path
+) -> None:
+    """Creates metadata/gpg-keys/ if it doesn't already exist, for the mount."""
+    _create_package(workdir, 'pkg', '1.0', sources={'pkg-1.0.tar.gz': 'oldhash'})
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    with patch('subprocess.run', side_effect=_fake_gorget_run({'pkg-2.0.tar.gz': b'x'})):
+        cuv_module._run_gorget_pipeline('pkg', '1.0', '2.0', pipeline_file)
+
+    assert (workdir / 'metadata' / 'gpg-keys').is_dir()
+
+
+def test_run_gorget_pipeline_failure_includes_report(
+    cuv_module, workdir: Path
+) -> None:
+    """Raises RuntimeError with the report.json contents on non-zero exit."""
+    _create_package(workdir, 'pkg', '1.0', sources={'pkg-1.0.tar.gz': 'oldhash'})
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    def fake_subprocess_run(cmd, **kwargs):
+        if cmd[0] != 'podman':
+            return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
+        output_dir = _output_dir_from_podman_cmd(cmd)
+        (output_dir / 'report.json').write_text('{"stages": ["verify failed"]}')
+        return subprocess.CompletedProcess(
+            cmd, 1, stdout='republication check failed',
+        )
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    with patch('subprocess.run', side_effect=fake_subprocess_run), \
+         pytest.raises(RuntimeError, match='republication check failed'):
+        cuv_module._run_gorget_pipeline('pkg', '1.0', '2.0', pipeline_file)
+
+
+def test_run_gorget_pipeline_missing_sources_file(
+    cuv_module, workdir: Path
+) -> None:
+    """Raises RuntimeError if gorget exits 0 but writes no sources file."""
+    _create_package(workdir, 'pkg', '1.0', sources={'pkg-1.0.tar.gz': 'oldhash'})
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    def fake_subprocess_run(cmd, **kwargs):
+        return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    with patch('subprocess.run', side_effect=fake_subprocess_run), \
+         pytest.raises(RuntimeError, match="emitted no 'sources' file"):
+        cuv_module._run_gorget_pipeline('pkg', '1.0', '2.0', pipeline_file)
+
+
+def test_run_gorget_pipeline_empty_sources_file(
+    cuv_module, workdir: Path
+) -> None:
+    """Raises RuntimeError if gorget exits 0 but writes an empty sources
+    file, instead of silently deleting every existing source artifact."""
+    pkg_dir = _create_package(
+        workdir, 'pkg', '1.0', sources={'pkg-1.0.tar.gz': 'oldhash'},
+    )
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    def fake_subprocess_run(cmd, **kwargs):
+        if cmd[0] != 'podman':
+            return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
+        output_dir = _output_dir_from_podman_cmd(cmd)
+        (output_dir / 'sources').write_text('')
+        return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    with patch('subprocess.run', side_effect=fake_subprocess_run), \
+         pytest.raises(RuntimeError, match='empty .sources. file'):
+        cuv_module._run_gorget_pipeline('pkg', '1.0', '2.0', pipeline_file)
+
+    # Old sources manifest must survive -- the guard must fire before any
+    # stale-file cleanup or sources-file rewrite happens.
+    entries = cuv_module._parse_sources_file(pkg_dir / 'sources')
+    assert {e['filename'] for e in entries} == {'pkg-1.0.tar.gz'}
+
+
+def test_run_gorget_pipeline_missing_declared_artifact(
+    cuv_module, workdir: Path
+) -> None:
+    """Raises RuntimeError if the emitted sources file references a file
+    that wasn't actually written to /output."""
+    _create_package(workdir, 'pkg', '1.0', sources={'pkg-1.0.tar.gz': 'oldhash'})
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    def fake_subprocess_run(cmd, **kwargs):
+        if cmd[0] != 'podman':
+            return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
+        output_dir = _output_dir_from_podman_cmd(cmd)
+        # sources references a file that was never written
+        (output_dir / 'sources').write_text(
+            'SHA512 (pkg-2.0.tar.gz) = deadbeef\n'
+        )
+        return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    with patch('subprocess.run', side_effect=fake_subprocess_run), \
+         pytest.raises(RuntimeError, match='was not emitted to /output'):
+        cuv_module._run_gorget_pipeline('pkg', '1.0', '2.0', pipeline_file)
+
+
+#
 # Tests — update_spec_version
 #
 
@@ -1524,6 +1746,63 @@ def test_update_spec_version_no_hooks_default_path(
     spec_content = (workdir / 'rpms' / 'pkg' / 'pkg.spec').read_text()
     assert 'Version: 2.0' in spec_content
     assert 'Release: 0.1%{?dist}' in spec_content
+
+
+def test_update_spec_version_pipeline_takes_priority_over_hooks(
+    cuv_module, workdir: Path,
+) -> None:
+    """A source-pipeline.yaml takes priority over update-hooks.yaml and the
+    generic default for the source-download phase."""
+    _create_package(workdir, 'pkg', '1.0',
+                    sources={'pkg-1.0.tar.gz': 'oldhash'},
+                    metadata={'version': '1.0', 'release': '1'})
+
+    import yaml
+    (workdir / 'metadata' / 'pkg.update-hooks.yaml').write_text(
+        yaml.dump({'download_sources': 'echo should-not-run.tar.gz'})
+    )
+    (workdir / 'metadata' / 'pkg.source-pipeline.yaml').write_text('fetch: []\n')
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    cuv_module.ROOT_DIR = workdir
+
+    with patch.object(cuv_module, '_run_gorget_pipeline',
+                      return_value=['pkg-2.0.tar.gz']) as mock_pipeline:
+        downloaded = cuv_module.update_spec_version('pkg', '2.0')
+
+    assert downloaded == ['pkg-2.0.tar.gz']
+    mock_pipeline.assert_called_once_with(
+        'pkg', '1.0', '2.0', workdir / 'metadata' / 'pkg.source-pipeline.yaml',
+    )
+
+
+def test_update_spec_version_skip_pipeline_forces_legacy_path(
+    cuv_module, workdir: Path,
+) -> None:
+    """The skip_pipeline global (--skip-pipeline) bypasses source-pipeline.yaml
+    even when it exists, falling back to the default path."""
+    _create_package(workdir, 'pkg', '1.0',
+                    sources={'pkg-1.0.tar.gz': 'oldhash'},
+                    metadata={'version': '1.0', 'release': '1'})
+    (workdir / 'metadata' / 'pkg.source-pipeline.yaml').write_text('fetch: []\n')
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    cuv_module.ROOT_DIR = workdir
+    cuv_module.skip_pipeline = True
+
+    try:
+        with patch.object(cuv_module, '_run_gorget_pipeline') as mock_pipeline, \
+             patch.object(cuv_module, 'download_new_sources',
+                          return_value=['pkg-2.0.tar.gz']) as mock_dl:
+            downloaded = cuv_module.update_spec_version('pkg', '2.0')
+    finally:
+        cuv_module.skip_pipeline = False
+
+    mock_pipeline.assert_not_called()
+    mock_dl.assert_called_once_with('pkg', '1.0', '2.0')
+    assert downloaded == ['pkg-2.0.tar.gz']
 
 
 #
