@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "backport fix for CVE-2026-58051; backport fixes for CVE-2026-66032, CVE-2026-66033, CVE-2026-66034",
+  "modification_reason": "CVE-2026-58051; CVE-2026-66032; CVE-2026-66033; CVE-2026-66034; CVE-2026-66035",
   "modification_status": "modified",
   "release": "10",
   "sha": "f34edd610c7701eb7958c0440d028a8070bd043a",
