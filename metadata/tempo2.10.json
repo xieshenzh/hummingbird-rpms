@@ -1,6 +1,5 @@
 {
-  "modification_reason": "CVE-2026-48586",
-  "modification_status": "modified",
+  "modification_status": "native",
   "release": "0.1",
   "release_monitoring_project_id": 381994,
   "track_upstream": "2.10",
