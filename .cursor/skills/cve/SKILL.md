@@ -123,7 +123,9 @@ Use the script output as the primary source for:
 - CVE IDs and package guess
 - Status, severity, labels, fixed-in-build
 - Linked HUM tickets and linked task MR URLs
-- cve_analysis `{noformat}` excerpt
+- Flaw description (vulnerability details from the ticket Description)
+- Upstream Affected Component
+- cve_analysis `{noformat}` block (full bot assessment)
 - `suggested_chat_title` (deterministic title for `rename_chat`)
 
 **Discovered vs initial tickets:** User-provided tickets get full detail
@@ -131,8 +133,9 @@ Use the script output as the primary source for:
 related tickets are batch-fetched with lightweight fields only (summary,
 status, type, assignee, labels) — severity, FIB, linked tickets, and
 cve_analysis are absent. When you need full detail on a discovered
-ticket (e.g., to set FIB or check its cve_analysis), run `rhjira show`
-on that specific ticket.
+ticket (e.g., to set FIB or check its cve_analysis), run
+`python .cursor/skills/cve/cve_helper.py HUM-XXXX --no-find-related`
+or `rhjira show` on that specific ticket.
 
 Also inspect comments for: Hummingbird SRPM version, CVE affected range,
 upstream fix info (commits, PRs), and blocking Task tickets with MRs (work
@@ -165,7 +168,10 @@ llvm/llvm21), investigate once but **verify each package individually**:
 
 > IMPORTANT: If a patch is required, handle each ticket separately.
 
-Do not run raw `rhjira show`/`rhjira dump` when the helper succeeds.
+Use the helper output as the primary source. Only fall back to
+`rhjira show`/`rhjira dump` when the helper output is not sufficient
+to resolve the ticket (e.g., you need raw comment text or fields the
+helper does not extract).
 
 After showing the ticket(s), rename the chat using `suggested_chat_title`
 from `cve_helper.py`. Use `--title-prefix` for resolution-specific labels
@@ -180,11 +186,11 @@ python .cursor/skills/cve/cve_helper.py HUM-XXXX --title-only --title-prefix "FI
 The user will typically ask to investigate. Use whichever of these
 approaches fits the situation:
 
-**Web search efficiency:** Check local sources first—ticket
-description, cve_analysis comment, local code, SBOM, metadata.
-The Jira `Description` field usually names the specific vulnerable
-sub-component; extract it early (`rhjira dump`) as it often
-resolves mismatch cases without any web search.
+**Web search efficiency:** Check local sources first—the
+`cve_helper.py` output (flaw description, upstream component,
+cve_analysis block), local code, SBOM, metadata. The flaw
+description usually names the specific vulnerable sub-component
+and often resolves mismatch cases without any web search.
 
 When you do search:
 
