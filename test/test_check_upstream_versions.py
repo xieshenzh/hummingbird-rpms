@@ -1206,6 +1206,32 @@ def test_update_spec_version_sets_release_0_1(cuv_module, workdir: Path) -> None
     assert 'Release: 0.1%{?dist}' in spec_content
 
 
+def test_update_spec_version_ignores_matching_dependency_version(
+    cuv_module, workdir: Path,
+) -> None:
+    """A literal Version update does not scan or rewrite other matching tags."""
+    package_dir = _create_package(
+        workdir, 'pkg', '13.1.0',
+        sources={'pkg-13.1.0.tar.gz': 'oldhash'},
+        metadata={'version': '13.1.0', 'release': '1'},
+    )
+    spec_file = package_dir / 'pkg.spec'
+    spec_file.write_text(spec_file.read_text().replace(
+        '%description',
+        'Provides: bundled(npm(commander)) = 13.1.0\n\n%description',
+    ))
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    cuv_module.ROOT_DIR = workdir
+
+    with patch.object(cuv_module, 'download_new_sources', return_value=[]):
+        cuv_module.update_spec_version('pkg', '13.1.1')
+
+    updated_spec = spec_file.read_text()
+    assert 'Version: 13.1.1' in updated_spec
+    assert 'bundled(npm(commander)) = 13.1.0' in updated_spec
+
+
 #
 # Tests — _load_update_hooks
 #

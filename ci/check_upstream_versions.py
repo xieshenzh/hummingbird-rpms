@@ -832,15 +832,26 @@ def update_spec_version(package: str, new_version: str) -> list[str]:
         logger.info("%s: loading spec with specfile", package)
         spec = Specfile(str(spec_file), sourcedir=str(package_dir))
         old_version = spec.expanded_version
+        with spec.tags() as tags:
+            version_tag_value = tags.version.value
 
         logger.info("%s: updating spec version", package)
-        spec.update_version(new_version)
+        if version_tag_value == old_version:
+            # The Version tag is already literal. Avoid scanning every macro and
+            # tag for possible substitutions; large generated Provides lists can
+            # contain the same version and make that search prohibitively slow.
+            spec.update_tag("Version", new_version, protected_entities=".*")
+        else:
+            # Preserve macro indirection when Version expands from another value.
+            spec.update_version(new_version)
         if not spec.has_autorelease:
             logger.info("%s: updating spec release", package)
             # Use Release 0.1 so that when the same version is later
             # imported from Fedora (with Release >= 1), it sorts higher
             # and replaces this locally-built version.
-            spec.update_tag("Release", "0.1%{?dist}")
+            spec.update_tag(
+                "Release", "0.1%{?dist}", protected_entities=".*"
+            )
         logger.info("%s: saving updated spec", package)
         spec.save()
 

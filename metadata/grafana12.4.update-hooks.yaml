@@ -4,7 +4,7 @@ download_sources: |
   version="${UPDATE_NEW_VERSION}"
   package_dir="${UPDATE_PACKAGE_DIR}"
   workdir="$(mktemp -d)"
-  trap 'rm -rf "${workdir}"' EXIT
+  trap 'chmod -R u+w "${workdir}" && rm -rf "${workdir}"' EXIT
   cd "${package_dir}"
 
   source="grafana-${version}.tar.gz"
@@ -23,6 +23,12 @@ download_sources: |
   source_dir="${workdir}/grafana-${version}"
   patch -d "${source_dir}" -p1 < grafana-yarn-cache.patch >&2
   cd "${source_dir}"
+  if [[ -n "${HTTP_PROXY:-}" ]]; then
+    export YARN_HTTP_PROXY="${HTTP_PROXY}"
+  fi
+  if [[ -n "${HTTPS_PROXY:-}" ]]; then
+    export YARN_HTTPS_PROXY="${HTTPS_PROXY}"
+  fi
   CYPRESS_INSTALL_BINARY=0 YARN_ENABLE_GLOBAL_CACHE=false YARN_CACHE_FOLDER=.yarn/cache \
     node .yarn/releases/yarn-*.cjs install --immutable >&2
   tar -cjf "${package_dir}/${yarn_cache}" .yarn/cache >&2
