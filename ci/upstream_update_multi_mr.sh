@@ -55,7 +55,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Configuration
-TARGET_BRANCH=${CI_COMMIT_BRANCH:-${CI_DEFAULT_BRANCH:-main}}
+TARGET_BRANCH=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME:-${CI_COMMIT_BRANCH:-${CI_DEFAULT_BRANCH:-main}}}
 
 # Cleanup function for clone mode
 # shellcheck disable=SC2329  # Function is invoked via EXIT trap
@@ -176,8 +176,12 @@ if [[ ${MAX_UPDATES} -gt 0 ]]; then
 fi
 echo ""
 
-# Make sure we're on the target branch before running updates
-git checkout --quiet "${TARGET_BRANCH}" 2>/dev/null || true
+# Merge request pipelines already have the source commit checked out. Keep that
+# checkout so manual jobs exercise the code under review rather than switching
+# back to the default branch.
+if [[ -z "${CI_MERGE_REQUEST_IID:-}" ]]; then
+    git checkout --quiet "${TARGET_BRANCH}" 2>/dev/null || true
+fi
 
 # Save the current commit before running updates
 START_COMMIT=$(git rev-parse HEAD)

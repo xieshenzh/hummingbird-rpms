@@ -47,6 +47,7 @@ import json
 import logging
 import os
 import re
+import shlex
 import subprocess
 import sys
 import time
@@ -92,9 +93,27 @@ def run_git(
     *args: str, cwd: Path | str | None = None
 ) -> subprocess.CompletedProcess[str]:
     """Run a git command and return the result."""
-    return subprocess.run(
-        ["git", *args], cwd=cwd, check=True, stdout=subprocess.PIPE, text=True
+    command = ["git", *args]
+    display_command = shlex.join(command)
+    logger.info("Running command: %s", display_command)
+    started_at = time.monotonic()
+    try:
+        result = subprocess.run(
+            command, cwd=cwd, check=True, stdout=subprocess.PIPE, text=True
+        )
+    except subprocess.CalledProcessError:
+        logger.error(
+            "Command failed after %.1fs: %s",
+            time.monotonic() - started_at,
+            display_command,
+        )
+        raise
+    logger.info(
+        "Command completed after %.1fs: %s",
+        time.monotonic() - started_at,
+        display_command,
     )
+    return result
 
 
 def run_git_commit(
@@ -719,19 +738,31 @@ def _run_hook(
     Raises ``RuntimeError`` on non-zero exit.
     """
     package_dir = RPMS_DIR / package
-    logger.info(f"{package}: running {hook_name} hook")
-    result = subprocess.run(
-        ["bash", "-eo", "pipefail", "-c", command],
-        cwd=str(package_dir),
-        env=env,
-        capture_output=True,
-        text=True,
+    logger.info(
+        "%s: running %s hook command:\n%s", package, hook_name, command.rstrip()
     )
+    started_at = time.monotonic()
+    try:
+        result = subprocess.run(
+            ["bash", "-eo", "pipefail", "-c", command],
+            cwd=str(package_dir),
+            env=env,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+    finally:
+        logger.info(
+            "%s: %s hook completed after %.1fs",
+            package,
+            hook_name,
+            time.monotonic() - started_at,
+        )
     if result.returncode != 0:
-        stderr = result.stderr.strip() or result.stdout.strip()
+        details = result.stdout.strip()
+        suffix = f": {details}" if details else ""
         raise RuntimeError(
             f"{package}: {hook_name} hook failed "
-            f"(exit {result.returncode}): {stderr}"
+            f"(exit {result.returncode}){suffix}"
         )
     logger.debug(f"{package}: {hook_name} hook stdout: {result.stdout.strip()}")
     return result
@@ -798,15 +829,30 @@ def update_spec_version(package: str, new_version: str) -> list[str]:
         _run_hook("update_spec", hooks.update_spec, package, env)
     else:
         # Default specfile-library path
+        logger.info("%s: loading spec with specfile", package)
         spec = Specfile(str(spec_file), sourcedir=str(package_dir))
         old_version = spec.expanded_version
+        with spec.tags() as tags:
+            version_tag_value = tags.version.value
 
-        spec.update_version(new_version)
+        logger.info("%s: updating spec version", package)
+        if version_tag_value == old_version:
+            # The Version tag is already literal. Avoid scanning every macro and
+            # tag for possible substitutions; large generated Provides lists can
+            # contain the same version and make that search prohibitively slow.
+            spec.update_tag("Version", new_version, protected_entities=".*")
+        else:
+            # Preserve macro indirection when Version expands from another value.
+            spec.update_version(new_version)
         if not spec.has_autorelease:
+            logger.info("%s: updating spec release", package)
             # Use Release 0.1 so that when the same version is later
             # imported from Fedora (with Release >= 1), it sorts higher
             # and replaces this locally-built version.
-            spec.update_tag("Release", "0.1%{?dist}")
+            spec.update_tag(
+                "Release", "0.1%{?dist}", protected_entities=".*"
+            )
+        logger.info("%s: saving updated spec", package)
         spec.save()
 
     logger.info(f"{package}: updated spec {old_version} -> {new_version}")
@@ -1235,6 +1281,12 @@ def run_check(args: argparse.Namespace) -> None:
         for result in results:
             if not result.has_update or not result.upstream_version:
                 continue
+            logger.info(
+                "%s: applying upstream update %s -> %s",
+                result.package,
+                result.current_version,
+                result.upstream_version,
+            )
             try:
                 downloaded = update_spec_version(
                     result.package, result.upstream_version
