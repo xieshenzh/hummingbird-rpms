@@ -16,12 +16,12 @@ names to their canonical upstream git repositories.
 
 Each `metadata/<package>.json` file should contain:
 
-| Field               | Required | Description                                                  |
-| ------------------- | -------- | ------------------------------------------------------------ |
-| `upstream_repo`     | Yes      | Canonical upstream git repository URL                        |
-| `upstream_branch`   | No       | Upstream branch (only for versioned packages sharing a repo) |
-| `cve_product`       | No       | CVE vendor/product override (e.g. `F5 / NGINX Open Source`)  |
-| `version_transform` | No       | Version transform rule (e.g. `dotnet_sdk_to_runtime`)        |
+| Field               | Required | Description                                                              |
+| ------------------- | -------- | ------------------------------------------------------------------------ |
+| `upstream_repo`     | Yes      | Canonical upstream git repository URL                                    |
+| `upstream_branch`   | No       | Upstream branch (only for versioned packages sharing a repo)             |
+| `cve_product`       | No       | CVE vendor/product override (`Vendor / Product`, or a list for multiple) |
+| `version_transform` | No       | Version transform rule (e.g. `dotnet_sdk_to_runtime`)                    |
 
 When no upstream repo exists, use the Fedora DistGit URL
 `https://src.fedoraproject.org/rpms/<name>` as the fallback.
@@ -162,13 +162,15 @@ For each package, update `metadata/<package>.json`:
 #### Known CVE product overrides
 
 These packages have `cve_product` set to resolve multi-product CVEs.
-The value can be `Vendor / Product` for an exact match, or just `Vendor`
-for a vendor-only partial match:
+The value can be `Vendor / Product` for an exact match, just `Vendor`
+for a vendor-only partial match, or a list of selectors when a package
+maps to more than one CVE product (match-any):
 
-| Package   | `cve_product`                     | Reason                                                              |
-| --------- | --------------------------------- | ------------------------------------------------------------------- |
-| `nginx`   | `F5 / NGINX Open Source`          | CVE also lists NGINX Plus with incompatible R-versioning            |
-| `golang*` | `` `Go ` `` (note trailing space) | Vendor prefix match; trailing space prevents matching "Google" etc. |
+| Package   | `cve_product`                                         | Reason                                                              |
+| --------- | ----------------------------------------------------- | ------------------------------------------------------------------- |
+| `nginx`   | `F5 / NGINX Open Source`                              | CVE also lists NGINX Plus with incompatible R-versioning            |
+| `golang*` | `` `Go ` `` (note trailing space)                     | Vendor prefix match; trailing space prevents matching "Google" etc. |
+| `busybox` | `["vda-linux / busybox_mirror", "BusyBox / BusyBox"]` | Two upstream identifiers for the same package                       |
 
 ## Adding a single new package
 

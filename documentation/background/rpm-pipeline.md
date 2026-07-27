@@ -84,7 +84,7 @@ Key fields:
 | `upstream_repo` | Canonical upstream git repository URL |
 | `track_upstream` | Version prefix constraint (e.g., `"1.26"` for golang1.26) |
 | `version_transform` | Version mapping rule for CVE analysis (e.g., `dotnet_sdk_to_runtime`) |
-| `cve_product` | CVE vendor/product override (e.g., `"Oracle Corporation / Oracle Java SE"`) |
+| `cve_product` | CVE vendor/product override (string, or a list for multiple products; e.g. `"Oracle Corporation / Oracle Java SE"`) |
 
 See [Package Metadata Fields][metadata-fields] for `modification_status` and `release`
 configuration, and [Package Modification Tracking][mod-tracking] for managing modification
