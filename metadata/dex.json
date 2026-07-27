@@ -1,0 +1,8 @@
+{
+  "modification_status": "native",
+  "release": "1",
+  "release_monitoring_project_id": 374886,
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/dexidp/dex",
+  "version": "2.45.1"
+}
