@@ -1,0 +1,726 @@
+From 17dbc48b51b8198d49e2f0898a3ea934e42044b0 Mon Sep 17 00:00:00 2001
+From: Prarit Bhargava <prarit@redhat.com>
+Date: Mon, 27 Jul 2026 12:47:25 -0400
+Subject: [PATCH] Bump github.com/apache/thrift to v0.24.0 for CVE-2026-48586
+ CVE-2026-55969
+
+---
+ go.mod                                        |  2 +-
+ go.sum                                        |  4 +-
+ .../thrift/lib/go/thrift/binary_protocol.go   |  9 +-
+ .../thrift/lib/go/thrift/compact_protocol.go  | 16 ++--
+ .../thrift/lib/go/thrift/configuration.go     | 29 ++++++
+ .../thrift/lib/go/thrift/framed_transport.go  |  9 +-
+ .../thrift/lib/go/thrift/json_protocol.go     |  6 +-
+ .../apache/thrift/lib/go/thrift/middleware.go | 22 ++---
+ .../thrift/lib/go/thrift/recursion_tracker.go | 58 ++++++++++++
+ .../thrift/lib/go/thrift/server_socket.go     | 94 ++++++++++++-------
+ .../lib/go/thrift/simple_json_protocol.go     | 14 ++-
+ .../apache/thrift/lib/go/thrift/socket.go     | 10 +-
+ .../thrift/lib/go/thrift/socket_conn.go       | 13 ++-
+ .../thrift/lib/go/thrift/socket_unix_conn.go  | 10 +-
+ .../apache/thrift/lib/go/thrift/ssl_socket.go | 14 +--
+ .../thrift/lib/go/thrift/zlib_transport.go    | 17 +++-
+ vendor/modules.txt                            |  2 +-
+ 17 files changed, 235 insertions(+), 94 deletions(-)
+ create mode 100644 vendor/github.com/apache/thrift/lib/go/thrift/recursion_tracker.go
+
+diff --git a/go.mod b/go.mod
+index 3899fffa813a..79689d799894 100644
+--- a/go.mod
++++ b/go.mod
+@@ -143,7 +143,7 @@ require (
+ 	github.com/andybalholm/brotli v1.1.1 // indirect
+ 	github.com/antchfx/xmlquery v1.5.1 // indirect
+ 	github.com/antchfx/xpath v1.3.6 // indirect
+-	github.com/apache/thrift v0.23.0 // indirect
++	github.com/apache/thrift v0.24.0 // indirect
+ 	github.com/armon/go-metrics v0.4.1 // indirect
+ 	github.com/aws/aws-msk-iam-sasl-signer-go v1.0.4 // indirect
+ 	github.com/aws/aws-sdk-go-v2 v1.41.4 // indirect
+diff --git a/go.sum b/go.sum
+index 8b3a3b2a5c7d..0373255cb9cf 100644
+--- a/go.sum
++++ b/go.sum
+@@ -87,8 +87,8 @@ github.com/antchfx/xmlquery v1.5.1 h1:T9I4Ns1EXiWHy0IqKupGhnfTQtJwlGrpXtauYOoNv7
+ github.com/antchfx/xmlquery v1.5.1/go.mod h1:bVqnl7TaDXSReKINrhZz+2E/PbCu2tUahb+wZ7WZNT8=
+ github.com/antchfx/xpath v1.3.6 h1:s0y+ElRRtTQdfHP609qFu0+c6bglDv20pqOViQjjdPI=
+ github.com/antchfx/xpath v1.3.6/go.mod h1:i54GszH55fYfBmoZXapTHN8T8tkcHfRgLyVwwqzXNcs=
+-github.com/apache/thrift v0.23.0 h1:wKR6YnefQSEnxpEfmgTPuJibNG4bF0p2TK34tHLWi3s=
+-github.com/apache/thrift v0.23.0/go.mod h1:zPt6WxgvTOM6hF92y8C+MkEM5LMxZuk4JcQOiU4Esvs=
++github.com/apache/thrift v0.24.0 h1:zy31L1a49QTNB2bG1BBfMXol3yJrTH975G3pPubQVLQ=
++github.com/apache/thrift v0.24.0/go.mod h1:zPt6WxgvTOM6hF92y8C+MkEM5LMxZuk4JcQOiU4Esvs=
+ github.com/armon/go-metrics v0.4.1 h1:hR91U9KYmb6bLBYLQjyM+3j+rcd/UhE+G78SFnF8gJA=
+ github.com/armon/go-metrics v0.4.1/go.mod h1:E6amYzXo6aW1tqzoZGT755KkbgrJsSdpwZ+3JqfkOG4=
+ github.com/aws/aws-msk-iam-sasl-signer-go v1.0.4 h1:2jAwFwA0Xgcx94dUId+K24yFabsKYDtAhCgyMit6OqE=
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/binary_protocol.go b/vendor/github.com/apache/thrift/lib/go/thrift/binary_protocol.go
+index 3f2843ef9668..23c58bc09048 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/binary_protocol.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/binary_protocol.go
+@@ -356,8 +356,7 @@ func (p *TBinaryProtocol) ReadMapBegin(ctx context.Context) (kType, vType TType,
+ 		return
+ 	}
+ 	minElemSize := p.getMinSerializedSize(kType) + p.getMinSerializedSize(vType)
+-	totalMinSize := size32 * minElemSize
+-	err = checkSizeForProtocol(totalMinSize, p.cfg)
++	err = checkContainerSizeForProtocol(int64(size32), minElemSize, p.cfg)
+ 	if err != nil {
+ 		return
+ 	}
+@@ -382,8 +381,7 @@ func (p *TBinaryProtocol) ReadListBegin(ctx context.Context) (elemType TType, si
+ 		return
+ 	}
+ 	minElemSize := p.getMinSerializedSize(elemType)
+-	totalMinSize := size32 * minElemSize
+-	err = checkSizeForProtocol(totalMinSize, p.cfg)
++	err = checkContainerSizeForProtocol(int64(size32), minElemSize, p.cfg)
+ 	if err != nil {
+ 		return
+ 	}
+@@ -409,8 +407,7 @@ func (p *TBinaryProtocol) ReadSetBegin(ctx context.Context) (elemType TType, siz
+ 		return
+ 	}
+ 	minElemSize := p.getMinSerializedSize(elemType)
+-	totalMinSize := size32 * minElemSize
+-	err = checkSizeForProtocol(totalMinSize, p.cfg)
++	err = checkContainerSizeForProtocol(int64(size32), minElemSize, p.cfg)
+ 	if err != nil {
+ 		return
+ 	}
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/compact_protocol.go b/vendor/github.com/apache/thrift/lib/go/thrift/compact_protocol.go
+index a5223d38e412..bd6bd36c5f0c 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/compact_protocol.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/compact_protocol.go
+@@ -499,8 +499,7 @@ func (p *TCompactProtocol) ReadMapBegin(ctx context.Context) (keyType TType, val
+ 	valueType, _ = p.getTType(tCompactType(keyAndValueType & 0xf))
+ 
+ 	minElemSize := p.getMinSerializedSize(keyType) + p.getMinSerializedSize(valueType)
+-	totalMinSize := size32 * minElemSize
+-	err = checkSizeForProtocol(totalMinSize, p.cfg)
++	err = checkContainerSizeForProtocol(int64(size32), minElemSize, p.cfg)
+ 	if err != nil {
+ 		return
+ 	}
+@@ -534,8 +533,7 @@ func (p *TCompactProtocol) ReadListBegin(ctx context.Context) (elemType TType, s
+ 	}
+ 
+ 	minElemSize := p.getMinSerializedSize(elemType)
+-	totalMinSize := int32(size) * minElemSize
+-	err = checkSizeForProtocol(totalMinSize, p.cfg)
++	err = checkContainerSizeForProtocol(int64(size), minElemSize, p.cfg)
+ 	if err != nil {
+ 		return
+ 	}
+@@ -766,23 +764,27 @@ func (p *TCompactProtocol) readVarint32() (int32, error) {
+ 	return int32(v), err
+ }
+ 
++// maxVarint64Bytes is the maximum wire size of a varint-encoded 64-bit integer:
++// ceil(64/7) = 10 bytes, matching the protobuf wire-format specification.
++const maxVarint64Bytes = 10
++
+ // Read an i64 from the wire as a proper varint. The MSB of each byte is set
+ // if there is another byte to follow. This can read up to 10 bytes.
+ func (p *TCompactProtocol) readVarint64() (int64, error) {
+ 	shift := uint(0)
+ 	result := int64(0)
+-	for {
++	for range maxVarint64Bytes {
+ 		b, err := p.readByteDirect()
+ 		if err != nil {
+ 			return 0, err
+ 		}
+ 		result |= int64(b&0x7f) << shift
+ 		if (b & 0x80) != 0x80 {
+-			break
++			return result, nil
+ 		}
+ 		shift += 7
+ 	}
+-	return result, nil
++	return 0, NewTProtocolExceptionWithType(INVALID_DATA, errors.New("variable-length int over 10 bytes"))
+ }
+ 
+ // Read a byte, unlike ReadByte that reads Thrift-byte that is i8.
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/configuration.go b/vendor/github.com/apache/thrift/lib/go/thrift/configuration.go
+index 9ae641802371..145d38c839e8 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/configuration.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/configuration.go
+@@ -22,6 +22,7 @@ package thrift
+ import (
+ 	"crypto/tls"
+ 	"fmt"
++	"math"
+ 	"time"
+ )
+ 
+@@ -332,6 +333,34 @@ func checkSizeForProtocol(size int32, cfg *TConfiguration) error {
+ 	return nil
+ }
+ 
++// checkContainerSizeForProtocol validates the minimum on-wire size of a
++// container with the given wire-supplied element count, where each element
++// occupies at least minElemSize bytes. The count is range-checked and the
++// product is computed in 64-bit arithmetic, so the value handed to
++// checkSizeForProtocol always stays within int32 range.
++func checkContainerSizeForProtocol(size int64, minElemSize int32, cfg *TConfiguration) error {
++	if size < 0 {
++		return NewTProtocolExceptionWithType(
++			NEGATIVE_SIZE,
++			fmt.Errorf("negative size: %d", size),
++		)
++	}
++	if size > math.MaxInt32 {
++		return NewTProtocolExceptionWithType(
++			SIZE_LIMIT,
++			fmt.Errorf("size exceeded max allowed: %d", size),
++		)
++	}
++	totalMinSize := size * int64(minElemSize)
++	if totalMinSize > math.MaxInt32 {
++		return NewTProtocolExceptionWithType(
++			SIZE_LIMIT,
++			fmt.Errorf("size exceeded max allowed: %d", totalMinSize),
++		)
++	}
++	return checkSizeForProtocol(int32(totalMinSize), cfg)
++}
++
+ type tTransportFactoryConf struct {
+ 	delegate TTransportFactory
+ 	cfg      *TConfiguration
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/framed_transport.go b/vendor/github.com/apache/thrift/lib/go/thrift/framed_transport.go
+index 00f277e1819e..f689ee76f5db 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/framed_transport.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/framed_transport.go
+@@ -61,10 +61,7 @@ func NewTFramedTransportFactory(factory TTransportFactory) TTransportFactory {
+ 
+ // Deprecated: Use NewTFramedTransportFactoryConf instead.
+ func NewTFramedTransportFactoryMaxLength(factory TTransportFactory, maxLength uint32) TTransportFactory {
+-	safeMax := maxLength
+-	if safeMax > math.MaxInt32 {
+-		safeMax = math.MaxInt32
+-	}
++	safeMax := min(maxLength, math.MaxInt32)
+ 
+ 	return NewTFramedTransportFactoryConf(factory, &TConfiguration{
+ 		MaxFrameSize: int32(safeMax),
+@@ -203,8 +200,8 @@ func (p *TFramedTransport) WriteString(s string) (n int, err error) {
+ 
+ func (p *TFramedTransport) Flush(ctx context.Context) error {
+ 	size := p.writeBuf.Len()
+-	if size > math.MaxUint32 {
+-		return NewTTransportException(UNKNOWN_TRANSPORT_EXCEPTION, fmt.Sprintf("frame too large: %d bytes exceeds uint32 max",size))
++	if uint64(size) > uint64(math.MaxUint32) {
++		return NewTTransportException(UNKNOWN_TRANSPORT_EXCEPTION, fmt.Sprintf("frame too large: %d bytes exceeds uint32 max", size))
+ 	}
+ 
+ 	defer bufPool.put(&p.writeBuf)
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/json_protocol.go b/vendor/github.com/apache/thrift/lib/go/thrift/json_protocol.go
+index 3d53b698d809..7d88e1451176 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/json_protocol.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/json_protocol.go
+@@ -317,8 +317,7 @@ func (p *TJSONProtocol) ReadMapBegin(ctx context.Context) (keyType TType, valueT
+ 	size = int(iSize)
+ 
+ 	minElemSize := p.getMinSerializedSize(keyType) + p.getMinSerializedSize(valueType)
+-	totalMinSize := int32(iSize) * minElemSize
+-	err = checkSizeForProtocol(totalMinSize, p.cfg)
++	err = checkContainerSizeForProtocol(iSize, minElemSize, p.cfg)
+ 	if err != nil {
+ 		return keyType, valueType, 0, err
+ 	}
+@@ -498,8 +497,7 @@ func (p *TJSONProtocol) ParseElemListBegin() (elemType TType, size int, e error)
+ 	size = int(nSize)
+ 
+ 	minElemSize := p.getMinSerializedSize(elemType)
+-	totalMinSize := int32(nSize) * minElemSize
+-	err = checkSizeForProtocol(totalMinSize, p.cfg)
++	err = checkContainerSizeForProtocol(nSize, minElemSize, p.cfg)
+ 	if err != nil {
+ 		return elemType, 0, err
+ 	}
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/middleware.go b/vendor/github.com/apache/thrift/lib/go/thrift/middleware.go
+index 85c7e06948db..af4a65affbd2 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/middleware.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/middleware.go
+@@ -35,10 +35,7 @@ type ProcessorMiddleware func(name string, next TProcessorFunction) TProcessorFu
+ //
+ // Middlewares will be called in the order that they are defined:
+ //
+-//		1. Middlewares[0]
+-//		2. Middlewares[1]
+-//		...
+-//		N. Middlewares[n]
++//	Middlewares[0] -> Middlewares[1] -> ... -> Middlewares[n]
+ func WrapProcessor(processor TProcessor, middlewares ...ProcessorMiddleware) TProcessor {
+ 	for name, processorFunc := range processor.ProcessorMap() {
+ 		wrapped := processorFunc
+@@ -98,10 +95,7 @@ var (
+ //
+ // Middlewares will be called in the order that they are defined:
+ //
+-//		1. Middlewares[0]
+-//		2. Middlewares[1]
+-//		...
+-//		N. Middlewares[n]
++//	Middlewares[0] -> Middlewares[1] -> ... -> Middlewares[n]
+ func WrapClient(client TClient, middlewares ...ClientMiddleware) TClient {
+ 	// Add middlewares in reverse so the first in the list is the outermost.
+ 	for i := len(middlewares) - 1; i >= 0; i-- {
+@@ -117,12 +111,12 @@ func WrapClient(client TClient, middlewares ...ClientMiddleware) TClient {
+ // By default if a client call gets an exception defined in the thrift IDL, for
+ // example:
+ //
+-//     service MyService {
+-//       FooResponse foo(1: FooRequest request) throws (
+-//         1: Exception1 error1,
+-//         2: Exception2 error2,
+-//       )
+-//     }
++//	service MyService {
++//	  FooResponse foo(1: FooRequest request) throws (
++//	    1: Exception1 error1,
++//	    2: Exception2 error2,
++//	  )
++//	}
+ //
+ // Exception1 or Exception2 will not be in the err return of TClient.Call,
+ // but in the result TStruct instead, and there's no easy access to them.
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/recursion_tracker.go b/vendor/github.com/apache/thrift/lib/go/thrift/recursion_tracker.go
+new file mode 100644
+index 000000000000..2b7b9ee57227
+--- /dev/null
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/recursion_tracker.go
+@@ -0,0 +1,58 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements. See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership. The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License. You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied. See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ */
++
++package thrift
++
++import (
++	"context"
++	"errors"
++)
++
++type recursionDepthKey struct{}
++
++type recursionDepthTracker struct {
++	depth int
++	limit int
++}
++
++// CheckRecursionDepth increments the per-context struct nesting depth and
++// returns an error when it exceeds DEFAULT_RECURSION_DEPTH.  The returned
++// context must be passed to DecrementRecursionDepth when the struct is done
++// being read or written.
++func CheckRecursionDepth(ctx context.Context) (context.Context, error) {
++	tracker, _ := ctx.Value(recursionDepthKey{}).(*recursionDepthTracker)
++	if tracker == nil {
++		tracker = &recursionDepthTracker{limit: DEFAULT_RECURSION_DEPTH}
++		ctx = context.WithValue(ctx, recursionDepthKey{}, tracker)
++	}
++	tracker.depth++
++	if tracker.depth > tracker.limit {
++		tracker.depth--
++		return ctx, NewTProtocolExceptionWithType(DEPTH_LIMIT, errors.New("maximum recursion depth exceeded"))
++	}
++	return ctx, nil
++}
++
++// DecrementRecursionDepth decrements the per-context struct nesting depth.
++// It must be called after CheckRecursionDepth returns nil, typically via defer.
++func DecrementRecursionDepth(ctx context.Context) {
++	if tracker, ok := ctx.Value(recursionDepthKey{}).(*recursionDepthTracker); ok && tracker != nil {
++		tracker.depth--
++	}
++}
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/server_socket.go b/vendor/github.com/apache/thrift/lib/go/thrift/server_socket.go
+index 164221e92b21..4ad646373891 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/server_socket.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/server_socket.go
+@@ -26,8 +26,10 @@ import (
+ )
+ 
+ type TServerSocket struct {
+-	addr          net.Addr
+-	clientTimeout time.Duration
++	// TServerSocketListenerFactory abstracts how listeners are created.
++	listenerFactory func(net.Addr) (net.Listener, error)
++	addr            net.Addr
++	clientTimeout   time.Duration
+ 
+ 	// Protects the listener and interrupted fields to make them thread safe.
+ 	mu          sync.RWMutex
+@@ -44,28 +46,62 @@ func NewTServerSocketTimeout(listenAddr string, clientTimeout time.Duration) (*T
+ 	if err != nil {
+ 		return nil, err
+ 	}
+-	return &TServerSocket{addr: addr, clientTimeout: clientTimeout}, nil
++
++	return NewTServerSocketFromAddrTimeout(addr, clientTimeout), nil
+ }
+ 
++// NewTServerSocketFromAddrTimeout returns TServerSocket
+ // Creates a TServerSocket from a net.Addr
+ func NewTServerSocketFromAddrTimeout(addr net.Addr, clientTimeout time.Duration) *TServerSocket {
+-	return &TServerSocket{addr: addr, clientTimeout: clientTimeout}
++	listenerFactory := func(addr net.Addr) (net.Listener, error) {
++		return net.Listen(addr.Network(), addr.String())
++	}
++
++	return NewTServerSocketFromFactoryTimeout(listenerFactory, addr, clientTimeout)
+ }
+ 
+-func (p *TServerSocket) Listen() error {
++// NewTServerSocketFromFactoryTimeout creates TServerSocket via a listener factory.
++//
++// Allows full customization (TLS, mocks, unix sockets, windows named pipes, etc.)
++func NewTServerSocketFromFactoryTimeout(listenerFactory func(addr net.Addr) (listener net.Listener, err error), addr net.Addr, clientTimeout time.Duration) *TServerSocket {
++	return &TServerSocket{
++		listenerFactory: listenerFactory,
++		addr:            addr,
++		clientTimeout:   clientTimeout,
++	}
++}
++
++func (p *TServerSocket) try_listen(raise bool) error {
+ 	p.mu.Lock()
+ 	defer p.mu.Unlock()
+-	if p.IsListening() {
++
++	if p.listener != nil {
++		if raise {
++			return NewTTransportException(ALREADY_OPEN, "Server socket already open")
++		}
+ 		return nil
+ 	}
+-	l, err := net.Listen(p.addr.Network(), p.addr.String())
++
++	l, err := p.listenerFactory(p.addr)
+ 	if err != nil {
+ 		return err
+ 	}
++
+ 	p.listener = l
++	p.interrupted = false
+ 	return nil
+ }
+ 
++// Open does try to listen and return on failure
++// Connects the socket, creating a new socket object if necessary.
++func (p *TServerSocket) Open() error {
++	return p.try_listen(true /* raise error if listening */)
++}
++
++func (p *TServerSocket) Listen() error {
++	return p.try_listen(false /* do not raise error if listening */)
++}
++
+ func (p *TServerSocket) Accept() (TTransport, error) {
+ 	p.mu.RLock()
+ 	interrupted := p.interrupted
+@@ -87,51 +123,43 @@ func (p *TServerSocket) Accept() (TTransport, error) {
+ 	return NewTSocketFromConnTimeout(conn, p.clientTimeout), nil
+ }
+ 
++// IsListening returns listener != nil
+ // Checks whether the socket is listening.
+ func (p *TServerSocket) IsListening() bool {
++	p.mu.RLock()
++	defer p.mu.RUnlock()
+ 	return p.listener != nil
+ }
+ 
+-// Connects the socket, creating a new socket object if necessary.
+-func (p *TServerSocket) Open() error {
+-	p.mu.Lock()
+-	defer p.mu.Unlock()
+-	if p.IsListening() {
+-		return NewTTransportException(ALREADY_OPEN, "Server socket already open")
+-	}
+-	if l, err := net.Listen(p.addr.Network(), p.addr.String()); err != nil {
+-		return err
+-	} else {
+-		p.listener = l
+-	}
+-	return nil
+-}
+-
+ func (p *TServerSocket) Addr() net.Addr {
+ 	p.mu.RLock()
+ 	defer p.mu.RUnlock()
+-	if p.IsListening() {
++
++	if p.listener != nil {
+ 		return p.listener.Addr()
+ 	}
+ 	return p.addr
+ }
+ 
+-func (p *TServerSocket) Close() error {
+-	var err error
++func (p *TServerSocket) try_close(interrupt bool) error {
+ 	p.mu.Lock()
+-	if p.IsListening() {
++	defer p.mu.Unlock()
++	if interrupt {
++		p.interrupted = true
++	}
++
++	var err error = nil
++	if p.listener != nil {
+ 		err = p.listener.Close()
+ 		p.listener = nil
+ 	}
+-	p.mu.Unlock()
+ 	return err
+ }
+ 
+-func (p *TServerSocket) Interrupt() error {
+-	p.mu.Lock()
+-	p.interrupted = true
+-	p.mu.Unlock()
+-	p.Close()
++func (p *TServerSocket) Close() error {
++	return p.try_close(false /* do not set interrupted flag */)
++}
+ 
+-	return nil
++func (p *TServerSocket) Interrupt() error {
++	return p.try_close(true /* set interrupted flag */)
+ }
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/simple_json_protocol.go b/vendor/github.com/apache/thrift/lib/go/thrift/simple_json_protocol.go
+index ec12991a1d7b..7239e2acbae5 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/simple_json_protocol.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/simple_json_protocol.go
+@@ -432,7 +432,13 @@ func (p *TSimpleJSONProtocol) ReadMapBegin(ctx context.Context) (keyType TType,
+ 	if err != nil {
+ 		return keyType, valueType, 0, err
+ 	}
+-	err = checkSizeForProtocol(int32(size), p.cfg)
++	if iSize > math.MaxInt32 {
++		return keyType, valueType, 0, NewTProtocolExceptionWithType(
++			SIZE_LIMIT,
++			fmt.Errorf("size exceeded max allowed: %d", iSize),
++		)
++	}
++	err = checkSizeForProtocol(int32(iSize), p.cfg)
+ 	if err != nil {
+ 		return keyType, valueType, 0, err
+ 	}
+@@ -1111,6 +1117,12 @@ func (p *TSimpleJSONProtocol) ParseElemListBegin() (elemType TType, size int, e
+ 	if err != nil {
+ 		return elemType, 0, err
+ 	}
++	if nSize > math.MaxInt32 {
++		return elemType, 0, NewTProtocolExceptionWithType(
++			SIZE_LIMIT,
++			fmt.Errorf("size exceeded max allowed: %d", nSize),
++		)
++	}
+ 	err = checkSizeForProtocol(int32(nSize), p.cfg)
+ 	if err != nil {
+ 		return elemType, 0, err
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/socket.go b/vendor/github.com/apache/thrift/lib/go/thrift/socket.go
+index 2185fb18ca0d..c91e11cfe287 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/socket.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/socket.go
+@@ -55,10 +55,10 @@ func NewTSocket(hostPort string) (*TSocket, error) {
+ //
+ // Example:
+ //
+-//     trans := thrift.NewTSocketConf("localhost:9090", &TConfiguration{
+-//         ConnectTimeout: time.Second, // Use 0 for no timeout
+-//         SocketTimeout:  time.Second, // Use 0 for no timeout
+-//     })
++//	trans := thrift.NewTSocketConf("localhost:9090", &TConfiguration{
++//	    ConnectTimeout: time.Second, // Use 0 for no timeout
++//	    SocketTimeout:  time.Second, // Use 0 for no timeout
++//	})
+ func NewTSocketConf(hostPort string, conf *TConfiguration) *TSocket {
+ 	return NewTSocketFromAddrConf(tcpAddr(hostPort), conf)
+ }
+@@ -197,7 +197,7 @@ func (p *TSocket) Close() error {
+ 	return p.conn.Close()
+ }
+ 
+-//Returns the remote address of the socket.
++// Returns the remote address of the socket.
+ func (p *TSocket) Addr() net.Addr {
+ 	return p.addr
+ }
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/socket_conn.go b/vendor/github.com/apache/thrift/lib/go/thrift/socket_conn.go
+index dfd0913abcdb..211821f0a4dc 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/socket_conn.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/socket_conn.go
+@@ -114,11 +114,16 @@ func (sc *socketConn) Read(p []byte) (n int, err error) {
+ 	return sc.Conn.Read(p)
+ }
+ 
++// Close closes the connection and the underlying net.Conn.
++//
++// Only the first call will actually close the underlying connection;
++// subsequent calls return net.ErrClosed error.
+ func (sc *socketConn) Close() error {
+-	if !sc.isValid() {
+-		// Already closed
++	if sc == nil || sc.Conn == nil {
+ 		return net.ErrClosed
+ 	}
+-	sc.closed.Store(1)
+-	return sc.Conn.Close()
++	if sc.closed.CompareAndSwap(0, 1) {
++		return sc.Conn.Close()
++	}
++	return net.ErrClosed
+ }
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/socket_unix_conn.go b/vendor/github.com/apache/thrift/lib/go/thrift/socket_unix_conn.go
+index c76212579951..2722c1b82aa5 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/socket_unix_conn.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/socket_unix_conn.go
+@@ -22,6 +22,7 @@
+ package thrift
+ 
+ import (
++	"crypto/tls"
+ 	"errors"
+ 	"io"
+ 	"syscall"
+@@ -38,7 +39,12 @@ func (sc *socketConn) read0() error {
+ }
+ 
+ func (sc *socketConn) checkConn() error {
+-	syscallConn, ok := sc.Conn.(syscall.Conn)
++	rawConn := sc.Conn
++	if tlsConn, ok := rawConn.(*tls.Conn); ok {
++		rawConn = tlsConn.NetConn()
++	}
++
++	syscallConn, ok := rawConn.(syscall.Conn)
+ 	if !ok {
+ 		// No way to check, return nil
+ 		return nil
+@@ -47,7 +53,7 @@ func (sc *socketConn) checkConn() error {
+ 	// The reading about to be done here is non-blocking so we don't really
+ 	// need a read deadline. We just need to clear the previously set read
+ 	// deadline, if any.
+-	sc.Conn.SetReadDeadline(zeroTime)
++	rawConn.SetReadDeadline(zeroTime)
+ 
+ 	rc, err := syscallConn.SyscallConn()
+ 	if err != nil {
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/ssl_socket.go b/vendor/github.com/apache/thrift/lib/go/thrift/ssl_socket.go
+index d7ba415ec873..b72609f121ea 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/ssl_socket.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/ssl_socket.go
+@@ -42,14 +42,14 @@ type TSSLSocket struct {
+ //
+ // Example:
+ //
+-//     trans := thrift.NewTSSLSocketConf("localhost:9090", &TConfiguration{
+-//         ConnectTimeout: time.Second, // Use 0 for no timeout
+-//         SocketTimeout:  time.Second, // Use 0 for no timeout
++//	trans := thrift.NewTSSLSocketConf("localhost:9090", &TConfiguration{
++//	    ConnectTimeout: time.Second, // Use 0 for no timeout
++//	    SocketTimeout:  time.Second, // Use 0 for no timeout
+ //
+-//         TLSConfig: &tls.Config{
+-//             // Fill in tls config here.
+-//         }
+-//     })
++//	    TLSConfig: &tls.Config{
++//	        // Fill in tls config here.
++//	    }
++//	})
+ func NewTSSLSocketConf(hostPort string, conf *TConfiguration) *TSSLSocket {
+ 	if cfg := conf.GetTLSConfig(); cfg != nil && cfg.MinVersion == 0 {
+ 		cfg.MinVersion = tls.VersionTLS10
+diff --git a/vendor/github.com/apache/thrift/lib/go/thrift/zlib_transport.go b/vendor/github.com/apache/thrift/lib/go/thrift/zlib_transport.go
+index 8f2d073b53ee..59e8639901cb 100644
+--- a/vendor/github.com/apache/thrift/lib/go/thrift/zlib_transport.go
++++ b/vendor/github.com/apache/thrift/lib/go/thrift/zlib_transport.go
+@@ -22,6 +22,7 @@ package thrift
+ import (
+ 	"compress/zlib"
+ 	"context"
++	"fmt"
+ 	"io"
+ )
+ 
+@@ -37,6 +38,8 @@ type TZlibTransport struct {
+ 	transport   TTransport
+ 	writer      *zlib.Writer
+ 	writeCloser io.Closer
++	conf        *TConfiguration
++	bytesRead   int64
+ }
+ 
+ // GetTransport constructs a new instance of NewTZlibTransport
+@@ -79,6 +82,7 @@ func NewTZlibTransport(trans TTransport, level int) (*TZlibTransport, error) {
+ // Close closes the reader and writer (flushing any unwritten data) and closes
+ // the underlying transport.
+ func (z *TZlibTransport) Close() error {
++	z.bytesRead = 0
+ 	if z.reader != nil {
+ 		if err := z.reader.Close(); err != nil {
+ 			return err
+@@ -117,7 +121,17 @@ func (z *TZlibTransport) Read(p []byte) (int, error) {
+ 		z.reader = r
+ 	}
+ 
+-	return z.reader.Read(p)
++	n, err := z.reader.Read(p)
++	if n > 0 {
++		z.bytesRead += int64(n)
++		if maxSize := int64(z.conf.GetMaxMessageSize()); z.bytesRead > maxSize {
++			return n, NewTProtocolExceptionWithType(
++				SIZE_LIMIT,
++				fmt.Errorf("decompressed size exceeded limit of %d bytes", maxSize),
++			)
++		}
++	}
++	return n, err
+ }
+ 
+ // RemainingBytes returns the size in bytes of the data that is still to be
+@@ -132,6 +146,7 @@ func (z *TZlibTransport) Write(p []byte) (int, error) {
+ 
+ // SetTConfiguration implements TConfigurationSetter for propagation.
+ func (z *TZlibTransport) SetTConfiguration(conf *TConfiguration) {
++	z.conf = conf
+ 	PropagateTConfiguration(z.transport, conf)
+ }
+ 
+diff --git a/vendor/modules.txt b/vendor/modules.txt
+index 093e6e2e9d56..499898f6d207 100644
+--- a/vendor/modules.txt
++++ b/vendor/modules.txt
+@@ -169,7 +169,7 @@ github.com/antchfx/xmlquery
+ # github.com/antchfx/xpath v1.3.6
+ ## explicit; go 1.14
+ github.com/antchfx/xpath
+-# github.com/apache/thrift v0.23.0
++# github.com/apache/thrift v0.24.0
+ ## explicit; go 1.25
+ github.com/apache/thrift/lib/go/thrift
+ # github.com/armon/go-metrics v0.4.1
+-- 
+2.55.0
+
