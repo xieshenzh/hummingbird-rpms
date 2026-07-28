@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "release_monitoring_project_id": 7329,
+  "sha": "86e15e44559fd8b0ac401cb7f85e63a32c0d4152",
+  "source": "https://src.fedoraproject.org/rpms/pgbouncer.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/pgbouncer/pgbouncer",
+  "version": "1.25.2"
+}
