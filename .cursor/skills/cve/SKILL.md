@@ -328,6 +328,19 @@ full details.
 a commit snapshot, not a proper release tag. Compare the commit
 date and hash against the fix, not the version number.
 
+#### 2h: Resolution Summary
+
+After completing your Step 2 investigation, **state your recommended
+resolution to the user**:
+
+- Which resolution path applies (e.g., "3a: Already fixed — set FIB",
+  "3b: Not affected — close as NAB", "3d: Needs version bump")
+- Why (brief justification based on your investigation)
+- What evidence supports it (version comparison, SBOM findings, code
+  inspection results, upstream fix verification)
+
+Then wait for the user's direction before proceeding with Step 3 actions.
+
 ### Step 3: Take action
 
 Based on the analysis, one of these paths applies:
