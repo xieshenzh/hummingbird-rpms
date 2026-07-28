@@ -7,7 +7,7 @@ Name: binutils%{?_with_debug:-debug}
 # The variable %%{source} (see below) should be set to indicate which of these
 # origins is being used.
 Version: 2.46.1
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: GPL-3.0-or-later AND (GPL-3.0-or-later WITH Bison-exception-2.2) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND BSD-3-Clause AND GFDL-1.3-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-2.0-or-later
 URL: https://sourceware.org/binutils
 
@@ -364,6 +364,12 @@ Patch22: binutils-CVE-2026-6846.patch
 #            PR 33919 (CVE-2026-4647).
 # Lifetime: Fixed in 2.47
 Patch23: binutils-CVE-2026-4647.patch
+
+# Purpose:  Fix heap-buffer-overflow READ in xcoff_link_add_symbols where
+#            n_numaux was used without validating aux entries are within the
+#            symbol buffer.  PR 34053 (CVE-2026-15003).
+# Lifetime: Fixed in 2.47
+Patch24: binutils-CVE-2026-15003.patch
 
 #----------------------------------------------------------------------------
 
