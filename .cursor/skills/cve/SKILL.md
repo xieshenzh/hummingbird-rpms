@@ -361,9 +361,14 @@ When the fix is confirmed present in the shipped SRPM:
    ```
 
 3. Rename the chat (see Step 1) with `--title-prefix "FIB"`.
-4. **Do NOT close the ticket.** The cve_analysis automation will
-   close it as Done-Errata automatically. The user has consistently
-   said "we can wait for the automation to pick this up."
+4. **Do NOT close the ticket and do NOT open a manual advisory MR.**
+   Set Fixed in Build and leave the ticket open. The cve_analysis
+   automation opens the advisory MR and closes the ticket as
+   Done-Errata. The manual advisory steps in
+   `cve-manual-process.md` Step 8 are a human fallback when
+   bypassing automation — do not follow them during `/cve` unless
+   the user explicitly asks or automation is blocked (e.g.
+   `advisory-mr-failed`).
 
 #### 3b: Not affected / misfiled -- close as Not a Bug
 
@@ -495,8 +500,16 @@ contains the fix:
      signature (see `documentation/operating/lookaside-cache-access.md`)
    - `.gitignore` -- update the version glob pattern if the
      new version falls outside the existing range
-   - `metadata/<package>.json` -- update `version` and
-     `release` to match the spec
+   - `metadata/<package>.json` -- update `version` to the new
+     version. Metadata `release` is for `dist_git.py`
+     update/rebuild bookkeeping (base release for `.N`
+     micro-bumps), **not** for CVE automation
+     (`cve_analysis.py` ignores it). When ahead of Fedora, set
+     it to the local base release without a dist tag (typically
+     `0.1`, matching spec `0.1%{?dist}`). When Fedora already
+     has this version, set it to the Fedora baseline (no dist
+     tag). See
+     `documentation/operating/package-metadata-fields.md`.
 
 7. **Lookaside and build pipeline setup (when ahead of
    Fedora):** When Fedora has not yet released this version,
@@ -666,9 +679,10 @@ version bump is not appropriate:
    - Download the patch from upstream (`curl`, `git format-patch`,
      or `git diff tag1..tag2`)
    - Add `PatchN:` to the spec file
-   - **Bump the Release field correctly.** The metadata `release`
-     field contains the Fedora base release number -- use that as
-     the base. Append or increment a `.N` micro-bump suffix:
+   - **Bump the spec `Release:` field correctly.** Use metadata
+     `release` only as the Fedora base for computing the next
+     `.N` micro-bump (same value `dist_git.py rebuild` uses).
+     CVE automation does not read this field.
 
      | Metadata release | Current spec Release | New spec Release |
      | --- | --- | --- |
@@ -703,9 +717,10 @@ version bump is not appropriate:
    ```
 
    **Do NOT change the metadata `release` field for backports.**
-   The `release` field must stay at the Fedora base release value.
-   If `mark-modified` changes the release field, revert that
-   change before committing.
+   Leave it at the Fedora base so `dist_git.py rebuild` can
+   compute the next `.N` suffix. This field is dist-git
+   bookkeeping, not a CVE/FIB input. If `mark-modified` changes
+   it, revert that change before committing.
 
    **For Go packages that vendor deps:** When a CVE targets a
    vendored module, create the patch against `go.mod`+`go.sum`.
@@ -762,8 +777,10 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
 ## Important rules
 
 1. **Never close Done-Errata tickets directly.** Set Fixed in Build
-   and let the automation close them. The user has been clear about
-   this pattern across many sessions.
+   and let the automation open the advisory MR and close the
+   ticket. Do not follow the manual advisory steps in
+   `cve-manual-process.md` Step 8 unless the user asks or
+   automation cannot proceed (e.g. `advisory-mr-failed`).
 
 2. **Always ask before closing any ticket.** Closing requires
    explicit user approval.
@@ -811,6 +828,11 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
     `; CVE-YYYY-MMMMM`. Do not include prose such as "update to
     …" or "backport fix for …" — scripts and automation parse
     this field for CVE IDs.
+
+14. **Metadata `release` is not a CVE field.** It tracks the base
+    release for `dist_git.py` update/rebuild. `cve_analysis.py`
+    ignores it. Only adjust it when 3d/3e package changes require
+    it; never for FIB or advisory reasons alone.
 
 ## Worktree cleanup
 
