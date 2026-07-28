@@ -1,27 +1,39 @@
-# Prometheus ships a go.work file that pulls in extra workspace modules
-# (compliance, internal/tools, etc.).  GOWORK=off ensures only the root
-# module's go.mod is used when generating the vendor archive.
+# Generate Go vendor archive and offline pnpm cache used to build UI from source.
 download_sources: |
   set -euo pipefail
   version="${UPDATE_NEW_VERSION}"
+  package_dir="${UPDATE_PACKAGE_DIR}"
+  workdir="$(mktemp -d)"
+  trap 'chmod -R u+w "${workdir}" && rm -rf "${workdir}"' EXIT
   cd "${UPDATE_PACKAGE_DIR}"
 
   archive="prometheus-${version}.tar.gz"
   vendor="prometheus-${version}-vendor.tar.bz2"
-  webui="prometheus-web-ui-${version}.tar.gz"
+  pnpm_cache="prometheus-pnpm-cache-${version}.tar.bz2"
 
   curl -fSL -o "${archive}" \
     "https://github.com/prometheus/prometheus/archive/v${version}/${archive}" >&2
+  ./generate-bundled-npm-provides.py "${version}" >&2
 
-  curl -fSL -o "${webui}" \
-    "https://github.com/prometheus/prometheus/releases/download/v${version}/${webui}" >&2
-
+  # Prometheus ships a go.work file that pulls in extra workspace modules.
   export GOWORK=off
   go_vendor_archive create \
     -c go-vendor-tools.toml \
     -O "${vendor}" \
     "${UPDATE_SPEC_FILE}" >&2
 
+  tar -xzf "${archive}" -C "${workdir}"
+  source_dir="${workdir}/prometheus-${version}"
+  patch -d "${source_dir}" -p1 < 0003-pnpm-cache-both-rpm-architectures.patch >&2
+  npm install --prefix "${workdir}/.pnpm" --ignore-scripts pnpm@11 >&2
+  pnpm="${workdir}/.pnpm/node_modules/.bin/pnpm"
+  pnpm_store="${workdir}/.pnpm-store"
+  (cd "${source_dir}/web/ui" && \
+    ${pnpm} fetch --frozen-lockfile --store-dir "${pnpm_store}") >&2
+  (cd "${source_dir}/web/ui/react-app" && \
+    ${pnpm} fetch --frozen-lockfile --store-dir "${pnpm_store}") >&2
+  tar -cjf "${package_dir}/${pnpm_cache}" -C "${workdir}" .pnpm .pnpm-store >&2
+
   echo "${archive}"
   echo "${vendor}"
-  echo "${webui}"
+  echo "${pnpm_cache}"
