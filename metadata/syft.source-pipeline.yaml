@@ -5,4 +5,4 @@ fetch:
     archive_name: "${PACKAGE}-${VERSION}.tar.gz"
   - type: vendor
     ecosystem: go
-    archive_name: "${PACKAGE}-${VERSION}-vendor.tar.gz"
+    archive_name: "${PACKAGE}-${VERSION}-vendor.tar.bz2"
