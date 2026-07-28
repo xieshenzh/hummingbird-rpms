@@ -10,7 +10,7 @@
 
 Name: rabbitmq-server4.2
 Version: 4.2.9
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 Summary: The RabbitMQ server
 License: MPL-2.0
 Source0: https://github.com/rabbitmq/rabbitmq-server/releases/download/v%{version}/%{srcname}_%{version}.orig.tar.xz
@@ -25,6 +25,10 @@ Patch: rabbitmq-server-0001-Use-default-EPMD-socket.patch
 Patch: rabbitmq-server-0002-Use-proto_dist-from-command-line.patch
 Patch: rabbitmq-server-0003-force-python3.patch
 Patch: rabbitmq-server-0004-Greatly-simplified-wrapper-script-which-works-proper.patch
+# CVE-2026-65624: cowboy HTTP/1.1 duplicate header DoS
+Patch: rabbitmq-server-0005-cowboy-fix-max-headers-duplicate-names.patch
+# CVE-2026-59248: cowlib unbounded HPACK integer decoding DoS
+Patch: rabbitmq-server-0006-cowlib-limit-hpack-integer-decoding.patch
 
 URL: https://www.rabbitmq.com/
 BuildRequires: elixir
