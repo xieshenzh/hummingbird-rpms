@@ -210,6 +210,10 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     # Upstream: trailer. Superseded by Fedora 1.23.1 getopt save/restore stack.
     bad_commits = [line for line in bad_commits if not line.startswith('b5fb4f662c6474e14d6c6bec1c4239ab65cd572f ')]
 
+    # libXpm CVE-2026-4367 backport was committed without the Upstream: trailer.
+    # Superseded by Fedora update to 3.5.19 which includes the fix upstream.
+    bad_commits = [line for line in bad_commits if not line.startswith('4f575724f889c3e78cc12560d8991fa896f1b756 ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)

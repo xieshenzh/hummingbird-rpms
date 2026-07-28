@@ -1,10 +1,9 @@
 {
   "branch": "rawhide",
-  "modification_reason": "CVE-2026-4367: out-of-bounds read in xpmNextWord()",
-  "modification_status": "modified",
-  "release": "8",
-  "sha": "8ac5bfe971a75592ca465c8ca2a170c1297b2199",
+  "modification_status": "clean",
+  "release": "4",
+  "sha": "3a020942bdc7acc7d0bf0612b7e982413c790a9b",
   "source": "https://src.fedoraproject.org/rpms/libXpm.git",
   "upstream_repo": "https://gitlab.freedesktop.org/xorg/lib/libxpm",
-  "version": "3.5.17"
+  "version": "3.5.19"
 }
