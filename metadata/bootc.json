@@ -3,8 +3,8 @@
   "modification_reason": "Historical commit missing Upstream trailer",
   "modification_status": "modified",
   "release": "1",
-  "sha": "95f833571dccd66c511dca1f2998da9ff00956e4",
+  "sha": "b742c96c52cb298645f37d278616aa6e9687f588",
   "source": "https://src.fedoraproject.org/rpms/bootc.git",
   "upstream_repo": "https://github.com/containers/bootc",
-  "version": "1.16.5"
+  "version": "1.16.6"
 }
