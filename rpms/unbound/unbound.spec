@@ -43,7 +43,7 @@
 Summary: Validating, recursive, and caching DNS(SEC) resolver
 Name: unbound
 Version: 1.25.2
-Release: 0.1%{?dist}
+Release: 1%{?dist}
 License: BSD-3-Clause
 Url: https://nlnetlabs.nl/projects/unbound/
 VCS: git:%{forgeurl0}
@@ -77,10 +77,6 @@ Source29: tmpfiles-unbound-libs.conf
 
 # Downstream configuration changes
 Patch1:   unbound-fedora-config.patch
-# https://github.com/NLnetLabs/unbound/pull/1349 (rebased for 1.25.0)
-Patch4:   unbound-1.25-tls-crypto-policy.patch
-# https://github.com/NLnetLabs/unbound/pull/1401 (rebased for 1.25.0)
-Patch5:   unbound-1.25-tls-crypto-policy-default.patch
 # https://github.com/NLnetLabs/unbound/pull/1437
 Patch6:   0001-Fix-build-failure-with-openssl4.0.patch
 
