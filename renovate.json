@@ -7,8 +7,11 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Update pinned image digests in generate_resources.py",
-      "managerFilePatterns": ["/ci/generate_resources\\.py$/"],
+      "description": "Update pinned image digests in generate_resources.py and check_upstream_versions.py",
+      "managerFilePatterns": [
+        "/ci/generate_resources\\.py$/",
+        "/ci/check_upstream_versions\\.py$/"
+      ],
       "matchStrings": [
         "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\n\\s*[A-Z_]+\\s*=\\s*\"[^\"@:]+(?::(?<currentValue>[^\"@]+))?@(?<currentDigest>sha256:[a-f0-9]+)\""
       ],
