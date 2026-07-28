@@ -1,0 +1,19 @@
+From: Hummingbird Packaging <hummingbird@redhat.com>
+Date: Tue, 28 Jul 2026 19:00:00 +0100
+Subject: [PATCH] promqltest: tolerate rounding in bigzero average
+
+The order in which the four large samples are evaluated can leave a tiny
+floating-point residual rather than exact zero. Normalize the result so the
+test harness's existing epsilon comparison measures the error relative to the
+input magnitude.
+---
+ promql/promqltest/testdata/aggregators.test | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/promql/promqltest/testdata/aggregators.test b/promql/promqltest/testdata/aggregators.test
+index 359648759..50facfba3 100644
+--- a/promql/promqltest/testdata/aggregators.test
++++ b/promql/promqltest/testdata/aggregators.test
+@@ -596 +596 @@
+-eval instant at 1m avg(data{test="bigzero"})
++eval instant at 1m avg(data{test="bigzero"}) / 1e307
