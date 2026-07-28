@@ -42,6 +42,9 @@ The `rebuild` command automates the Release field bump:
 
 # Rebuild all packages (one commit per package)
 ./ci/dist_git.py rebuild --all --reason "<reason>"
+
+# Rebuild all packages except specific ones (requires --all)
+./ci/dist_git.py rebuild --all --exclude <pkg1>,<pkg2> --reason "<reason>"
 ```
 
 Examples:
@@ -55,7 +58,14 @@ Examples:
 
 # All packages (useful after toolchain updates)
 ./ci/dist_git.py rebuild --all --reason "toolchain update: GCC 15"
+
+# All packages except a few already rebuilt earlier in the same rollout
+./ci/dist_git.py rebuild --all --exclude glibc,gcc,llvm --reason "toolchain update: GCC 15"
 ```
+
+`--exclude` takes a comma-separated list of package names and only works together with
+`--all` — it is rejected when combined with an explicit package list, since you can simply
+omit the packages you don't want to rebuild in that case.
 
 The command:
 
