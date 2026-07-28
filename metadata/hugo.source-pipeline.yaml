@@ -1,0 +1,11 @@
+fetch:
+  - type: git
+    repo: "https://github.com/gohugoio/hugo"
+    ref: "v${VERSION}"
+    archive_name: "hugo-${VERSION}.tar.gz"
+  - type: url
+    url: "https://github.com/sass/libsass/archive/3.6.6/libsass-3.6.6.tar.gz"
+    filename: "libsass-3.6.6.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "hugo-${VERSION}-vendor.tar.bz2"

@@ -1,0 +1,5 @@
+fetch:
+  - type: git
+    repo: "https://github.com/grafana/loki"
+    ref: "v${VERSION}"
+    archive_name: "loki-${VERSION}.tar.gz"

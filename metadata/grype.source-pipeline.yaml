@@ -1,0 +1,8 @@
+fetch:
+  - type: git
+    repo: "https://github.com/anchore/grype"
+    ref: "v${VERSION}"
+    archive_name: "${PACKAGE}-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "${PACKAGE}-${VERSION}-vendor.tar.bz2"

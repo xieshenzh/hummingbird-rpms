@@ -1,0 +1,8 @@
+fetch:
+  - type: git
+    repo: "https://github.com/helm/helm"
+    ref: "v${VERSION}"
+    archive_name: "helm-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "helm-${VERSION}-vendor.tar.bz2"

@@ -1,0 +1,8 @@
+fetch:
+  - type: git
+    repo: "https://github.com/kubernetes/kubernetes"
+    ref: "v${VERSION}"
+    archive_name: "kubernetes-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "kubernetes-${VERSION}-vendor.tar.bz2"

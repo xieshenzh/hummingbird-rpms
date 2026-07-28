@@ -1,0 +1,8 @@
+fetch:
+  - type: git
+    repo: "https://github.com/grafana/k6"
+    ref: "v${VERSION}"
+    archive_name: "k6-${VERSION}.tar.gz"
+  - type: url
+    url: "https://raw.githubusercontent.com/grafana/k6-cloud-openapi-client-go/97c96146fa7c3cf455a330c6c36cc69fdf6a43e5/LICENSE"
+    filename: "k6-cloud-openapi-client-go-LICENSE"

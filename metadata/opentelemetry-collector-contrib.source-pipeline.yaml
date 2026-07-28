@@ -1,0 +1,47 @@
+fetch:
+  - type: url
+    url: "https://github.com/open-telemetry/opentelemetry-collector-releases/archive/v${VERSION}/opentelemetry-collector-releases-${VERSION}.tar.gz"
+    filename: "opentelemetry-collector-releases-${VERSION}.tar.gz"
+
+transform:
+  - type: run
+    path: "opentelemetry-collector-releases-${VERSION}"
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        curl -fSL -o /tmp/ocb \
+          "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/cmd%2Fbuilder%2Fv${VERSION}/ocb_${VERSION}_linux_amd64"
+        chmod +x /tmp/ocb
+
+        # otelcol-contrib 0.156.0+ includes OBI (eBPF instrumentation), which uses
+        # a local replace directive pointing to internal/obi-src. prepare-obi.sh
+        # fetches the pre-generated source tarball into that path.
+        if [ -f scripts/prepare-obi.sh ]; then
+          bash scripts/prepare-obi.sh otelcol-contrib
+        fi
+
+        # _build/go.mod's replace directive reaches ../../../internal/obi-src --
+        # 3 levels up from _build/ (repo dir -> _transform_source -> work_dir),
+        # i.e. 2 levels up from here. Symlink the prepared OBI source there so
+        # `go mod tidy` can find it.
+        if [ -d internal/obi-src ]; then
+          mkdir -p ../../internal
+          ln -sfn "$(pwd)/internal/obi-src" ../../internal/obi-src
+        fi
+
+        /tmp/ocb --skip-compilation --config distributions/otelcol-contrib/manifest.yaml
+
+        generated_files=(go.mod go.sum)
+        while IFS= read -r f; do
+          generated_files+=("$f")
+        done < <(find _build -maxdepth 1 -name '*.go' -printf '%P\n' | sort)
+        tar -C _build -cjf "opentelemetry-collector-contrib-${VERSION}-generated.tar.bz2" "${generated_files[@]}"
+    outputs:
+      - "opentelemetry-collector-contrib-${VERSION}-generated.tar.bz2"
+  - type: vendor
+    ecosystem: go
+    archive_name: "opentelemetry-collector-contrib-${VERSION}-vendor.tar.bz2"
+    modules:
+      - path: "opentelemetry-collector-releases-${VERSION}/_build"

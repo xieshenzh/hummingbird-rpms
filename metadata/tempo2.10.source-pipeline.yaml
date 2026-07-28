@@ -1,0 +1,5 @@
+fetch:
+  - type: git
+    repo: "https://github.com/grafana/tempo"
+    ref: "v${VERSION}"
+    archive_name: "tempo-${VERSION}.tar.gz"

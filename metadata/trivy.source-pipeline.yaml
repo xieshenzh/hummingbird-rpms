@@ -1,0 +1,8 @@
+fetch:
+  - type: git
+    repo: "https://github.com/aquasecurity/trivy"
+    ref: "v${VERSION}"
+    archive_name: "trivy-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "trivy-${VERSION}-vendor.tar.bz2"

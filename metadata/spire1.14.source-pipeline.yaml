@@ -1,0 +1,8 @@
+fetch:
+  - type: git
+    repo: "https://github.com/spiffe/spire"
+    ref: "v${VERSION}"
+    archive_name: "spire-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "spire-${VERSION}-vendor.tar.bz2"

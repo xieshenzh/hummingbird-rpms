@@ -1,0 +1,8 @@
+fetch:
+  - type: git
+    repo: "https://github.com/opentofu/opentofu"
+    ref: "v${VERSION}"
+    archive_name: "opentofu-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "opentofu-${VERSION}-vendor.tar.bz2"

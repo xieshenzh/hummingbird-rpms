@@ -1,0 +1,11 @@
+fetch:
+  - type: git
+    repo: "https://github.com/jaegertracing/jaeger"
+    ref: "v${VERSION}"
+    archive_name: "jaeger-${VERSION}.tar.gz"
+  - type: url
+    url: "https://github.com/jaegertracing/jaeger-ui/releases/download/v${VERSION}/assets.tar.gz"
+    filename: "jaeger-ui-assets-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "jaeger-${VERSION}-vendor.tar.bz2"
