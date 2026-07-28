@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 4.3.4",
+  "modification_reason": "Update to upstream version 4.3.4; CVE-2026-65624; CVE-2026-59248",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 5585,
