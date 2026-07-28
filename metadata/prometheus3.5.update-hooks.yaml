@@ -1,0 +1,38 @@
+# Generate Go vendor archive and offline npm cache used to build UI from source.
+download_sources: |
+  set -euo pipefail
+  version="${UPDATE_NEW_VERSION}"
+  package_dir="${UPDATE_PACKAGE_DIR}"
+  workdir="$(mktemp -d)"
+  trap 'chmod -R u+w "${workdir}" && rm -rf "${workdir}"' EXIT
+  cd "${package_dir}"
+
+  archive="prometheus-${version}.tar.gz"
+  vendor="prometheus-${version}-vendor.tar.bz2"
+  npm_cache="prometheus-npm-cache-${version}.tar.bz2"
+
+  curl -fSL -o "${archive}" \
+    "https://github.com/prometheus/prometheus/archive/v${version}/${archive}" >&2
+  ./generate-bundled-npm-provides.py "${version}" >&2
+
+  # Prometheus ships a go.work file that pulls in extra workspace modules.
+  export GOWORK=off
+  go_vendor_archive create \
+    -c go-vendor-tools.toml \
+    -O "${vendor}" \
+    "${UPDATE_SPEC_FILE}" >&2
+
+  tar -xzf "${archive}" -C "${workdir}"
+  source_dir="${workdir}/prometheus-${version}"
+  mkdir "${workdir}/.npm-cache"
+  for arch in x64 arm64; do
+    (cd "${source_dir}/web/ui" && npm ci --ignore-scripts \
+      --cache "${workdir}/.npm-cache" --cpu "${arch}" --os linux --libc glibc) >&2
+    (cd "${source_dir}/web/ui/react-app" && npm ci --ignore-scripts \
+      --cache "${workdir}/.npm-cache" --cpu "${arch}" --os linux --libc glibc) >&2
+  done
+  tar -cjf "${package_dir}/${npm_cache}" -C "${workdir}" .npm-cache >&2
+
+  echo "${archive}"
+  echo "${vendor}"
+  echo "${npm_cache}"
