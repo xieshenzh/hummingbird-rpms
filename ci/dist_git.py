@@ -2300,6 +2300,9 @@ Examples:
                                help='Package name(s) to rebuild (mutually exclusive with --all)')
     rebuild_parser.add_argument('--all', action='store_true',
                                help='Rebuild all packages (one commit per package)')
+    rebuild_parser.add_argument('--exclude', type=str, default=None,
+                               help='Comma-separated list of package names to exclude from the '
+                                    'rebuild (requires --all)')
     rebuild_parser.add_argument('--reason', required=True,
                                help='Reason for rebuild (e.g., "fix faulty build", "toolchain update")')
 
@@ -2442,11 +2445,25 @@ Examples:
             # Validate mutually exclusive options
             if args.all and args.packages:
                 sys.exit("ERROR: Cannot specify both package names and --all")
+            if args.exclude and not args.all:
+                sys.exit("ERROR: --exclude can only be used with --all")
             if not args.all and not args.packages:
                 sys.exit("ERROR: Must specify either package name(s) or --all")
 
             # Rebuild all packages or specified ones
             packages = list(imports.keys()) if args.all else args.packages
+
+            if args.exclude:
+                exclude_names = {p.strip() for p in args.exclude.split(',') if p.strip()}
+                if not exclude_names:
+                    sys.exit("ERROR: --exclude value is empty or contains only whitespace/commas")
+                unknown = exclude_names - set(imports.keys())
+                if unknown:
+                    sys.exit(f"ERROR: --exclude package(s) not found: {', '.join(sorted(unknown))}")
+                packages = [pkg for pkg in packages if pkg not in exclude_names]
+                if not packages:
+                    sys.exit("ERROR: --exclude excluded all packages; nothing to rebuild")
+
             failed_packages = []
             for pkg in packages:
                 try:

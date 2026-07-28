@@ -2926,6 +2926,133 @@ def test_rebuild_all(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     assert len([s for s in commit_subjects if 'Rebuild' in s and 'test rebuild all' in s]) == 2
 
 
+def test_rebuild_all_with_exclude(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test that rebuild --all --exclude skips the excluded package(s)."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    # Get commit count before rebuild
+    result = subprocess.run(
+        ['git', 'rev-list', '--count', 'HEAD'],
+        cwd=workdir, capture_output=True, check=True, text=True
+    )
+    commits_before = int(result.stdout.strip())
+
+    # Rebuild all packages except chocolate
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', '--all', '--exclude', 'chocolate',
+         '--reason', 'test rebuild all with exclude'],
+        cwd=workdir, check=True,
+    )
+
+    # Get commit count after rebuild
+    result = subprocess.run(
+        ['git', 'rev-list', '--count', 'HEAD'],
+        cwd=workdir, capture_output=True, check=True, text=True
+    )
+    commits_after = int(result.stdout.strip())
+
+    # Only vanilla should have been rebuilt (1 commit)
+    assert commits_after - commits_before == 1
+
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    assert 'Release: 1.1%{?dist}' in vanilla_spec.read_text()
+
+    # chocolate must remain untouched
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    assert 'Release: 1%{?dist}' in chocolate_spec.read_text()
+    assert 'Release: 1.1%{?dist}' not in chocolate_spec.read_text()
+
+
+@pytest.mark.parametrize(
+    "extra_args,expected_stderr",
+    [
+        (['vanilla', 'chocolate', '--exclude', 'chocolate'], '--exclude can only be used with --all'),
+        (['--exclude', 'chocolate'], '--exclude can only be used with --all'),
+        (['--all', '--exclude', 'nonexistent'], '--exclude package(s) not found: nonexistent'),
+        (['--all', '--exclude', 'vanilla,chocolate'], '--exclude excluded all packages; nothing to rebuild'),
+        (['--all', '--exclude', ','], '--exclude value is empty or contains only whitespace/commas'),
+        (['--all', '--exclude', ' , '], '--exclude value is empty or contains only whitespace/commas'),
+        (['--all', '--exclude', '  '], '--exclude value is empty or contains only whitespace/commas'),
+    ],
+    ids=[
+        'exclude_with_explicit_packages',
+        'exclude_without_all_or_packages',
+        'unknown_package_name',
+        'excludes_everything',
+        'value_is_comma_only',
+        'value_is_comma_with_spaces',
+        'value_is_whitespace_only',
+    ],
+)
+def test_rebuild_exclude_validation_errors(
+    workdir: Path, upstream_repos: dict[str, Path], extra_args: list[str], expected_stderr: str,
+) -> None:
+    """Test that invalid --exclude usage is rejected with a clear, specific error and
+    that no package is touched. Covers: combining --exclude with an explicit package
+    list, --exclude with neither --all nor packages, an unknown/typo'd package name
+    (protects against the original hand-rolled-regex pain point), excluding every
+    imported package, and an --exclude value that is empty after stripping
+    whitespace/commas.
+
+    Note: 'excludes_everything' with a comma-separated 'vanilla,chocolate' value also
+    exercises multi-name comma parsing: if splitting were broken and only one name
+    were recognized, the other package would remain in the rebuild set, the command
+    would succeed instead of erroring, and this case would fail.
+    """
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', *extra_args, '--reason', 'test'],
+        cwd=workdir, capture_output=True, text=True
+    )
+    assert result.returncode != 0
+    assert expected_stderr in result.stderr
+
+    # A rejected command must not touch either package.
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    assert 'Release: 1%{?dist}' in vanilla_spec.read_text()
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    assert 'Release: 1%{?dist}' in chocolate_spec.read_text()
+
+
+def test_rebuild_exclude_duplicates(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test that duplicate names in --exclude are handled gracefully."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, check=True,
+    )
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', '--all',
+         '--exclude', 'chocolate,chocolate', '--reason', 'test duplicates'],
+        cwd=workdir, capture_output=True, text=True
+    )
+    assert result.returncode == 0
+
+    vanilla_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    assert 'Release: 1.1%{?dist}' in vanilla_spec.read_text()
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    assert 'Release: 1%{?dist}' in chocolate_spec.read_text()
+
+
 def test_rebuild_all_vs_package_mutually_exclusive(workdir: Path, upstream_repos: dict[str, Path]) -> None:
     """Test that --all and package name are mutually exclusive."""
     subprocess.run(
