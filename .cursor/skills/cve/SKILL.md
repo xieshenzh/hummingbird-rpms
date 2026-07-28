@@ -19,7 +19,7 @@ For a high-level overview, use `/cve-status`.
 
 ## Procedure
 
-### Step 0: Run Jira commands reliably (HUM-4821)
+### Preparation: Run Jira commands reliably (HUM-4821)
 
 Use `rhjira` directly for all Jira reads and writes. Do not wrap
 routine `/cve` Jira operations in Python subprocess wrappers,
@@ -84,6 +84,41 @@ Rules for using the helper:
    HUM-1234: jira_unavailable (proxy tunnel 403 after 3 attempts; no changes applied)
    HUM-1235: read_ok
    ```
+
+### Step 0: Check for in-flight bot updates
+
+Before manual remediation, check whether the automation bot already has
+an update MR:
+
+```bash
+# Bot username is project-specific (project ID 73447720)
+# Verify if needed: glab api projects/73447720 | jq -r '.name'
+BOT_USER="project_73447720_bot_6f7c574289c710ebc9ab9ee76059d959"
+
+# Check for open bot MRs
+glab mr list --repo redhat/hummingbird/rpms \
+  --author "$BOT_USER" --search "<package>" --per-page 5
+
+# If no open MR found, check recently merged ones
+glab mr list --repo redhat/hummingbird/rpms --merged \
+  --author "$BOT_USER" --search "<package>" --per-page 5
+```
+
+**Evaluating a bot MR:**
+
+1. Check the version being updated against the CVE fix version
+2. Review the MR diff or changelog to confirm the fix is included
+3. The bot MR may not reference the CVE ID explicitly but still fix it
+
+If a bot MR exists and includes the CVE fix:
+
+- **Open MR:** Link it to the CVE tracker and monitor it instead of
+  creating duplicate work
+- **Merged MR:** The CVE is already fixed; proceed to Step 3a to set
+  Fixed in Build
+
+Only proceed with manual remediation (Step 2+) if no bot MR exists or
+the bot MR's version doesn't include the CVE fix.
 
 ### Step 1: Show the ticket(s)
 
