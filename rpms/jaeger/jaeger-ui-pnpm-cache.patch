@@ -1,0 +1,17 @@
+diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
+index 657d256..13f806d 100644
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -5,2 +5,12 @@ packages:
+   - 'packages/jaeger-ui'
+   - 'packages/plexus'
++
++# Populate the offline RPM source cache for both build architectures.
++supportedArchitectures:
++  os:
++    - linux
++  cpu:
++    - x64
++    - arm64
++  libc:
++    - glibc

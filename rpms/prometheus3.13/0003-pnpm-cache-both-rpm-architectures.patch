@@ -1,0 +1,40 @@
+diff --git a/web/ui/pnpm-workspace.yaml b/web/ui/pnpm-workspace.yaml
+index 58ac0af..86fd665 100644
+--- a/web/ui/pnpm-workspace.yaml
++++ b/web/ui/pnpm-workspace.yaml
+@@ -2,4 +2,14 @@ packages:
+   - "mantine-ui"
+   - "module/*"
++# Populate the offline RPM source cache for both build architectures.
++supportedArchitectures:
++  os:
++    - linux
++  cpu:
++    - x64
++    - arm64
++  libc:
++    - glibc
++
+ allowBuilds:
+   esbuild: true
+   unrs-resolver: true
+diff --git a/web/ui/react-app/pnpm-workspace.yaml b/web/ui/react-app/pnpm-workspace.yaml
+index 077e43a..c26a33b 100644
+--- a/web/ui/react-app/pnpm-workspace.yaml
++++ b/web/ui/react-app/pnpm-workspace.yaml
+@@ -4,5 +4,15 @@ issues with conflicting dependencies. This is a temporary solution until the
+ packages: []
++# Populate the offline RPM source cache for both build architectures.
++supportedArchitectures:
++  os:
++    - linux
++  cpu:
++    - x64
++    - arm64
++  libc:
++    - glibc
++
+ allowBuilds:
+   '@parcel/watcher': true
+   core-js: true
+   core-js-pure: true
