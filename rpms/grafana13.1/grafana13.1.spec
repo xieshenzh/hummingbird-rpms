@@ -2,7 +2,7 @@
 
 # https://github.com/grafana/grafana
 %global goipath github.com/grafana/grafana
-Version:        13.1.0
+Version:        13.1.1
 
 %gometa -L -f
 
@@ -1769,7 +1769,7 @@ Provides:       bundled(npm(human-signals)) = 8.0.1
 Provides:       bundled(npm(hyphenate-style-name)) = 1.0.4
 Provides:       bundled(npm(i18next)) = 19.9.2
 Provides:       bundled(npm(i18next)) = 23.16.8
-Provides:       bundled(npm(i18next)) = 25.6.2
+Provides:       bundled(npm(i18next)) = 25.10.10
 Provides:       bundled(npm(i18next-browser-languagedetector)) = 8.2.1
 Provides:       bundled(npm(i18next-cli)) = 1.58.0
 Provides:       bundled(npm(i18next-pseudo)) = 2.2.1
@@ -2547,7 +2547,7 @@ Provides:       bundled(npm(react-from-dom)) = 0.7.5
 Provides:       bundled(npm(react-grid-layout)) = 1.4.4
 Provides:       bundled(npm(react-highlight-words)) = 0.21.0
 Provides:       bundled(npm(react-hook-form)) = 7.62.0
-Provides:       bundled(npm(react-i18next)) = 15.6.1
+Provides:       bundled(npm(react-i18next)) = 16.6.6
 Provides:       bundled(npm(react-i18next)) = 17.0.8
 Provides:       bundled(npm(react-immutable-proptypes)) = 2.2.0
 Provides:       bundled(npm(react-immutable-pure-component)) = 2.2.2
@@ -3039,7 +3039,7 @@ Provides:       bundled(npm(webpack-sources)) = 3.3.3
 Provides:       bundled(npm(webpack-subresource-integrity)) = 5.2.0~rc.1
 Provides:       bundled(npm(webpack-virtual-modules)) = 0.6.2
 Provides:       bundled(npm(webpackbar)) = 7.0.0
-Provides:       bundled(npm(websocket-driver)) = 0.7.4
+Provides:       bundled(npm(websocket-driver)) = 0.7.5
 Provides:       bundled(npm(websocket-extensions)) = 0.1.4
 Provides:       bundled(npm(whatwg-encoding)) = 2.0.0
 Provides:       bundled(npm(whatwg-fetch)) = 3.6.20
