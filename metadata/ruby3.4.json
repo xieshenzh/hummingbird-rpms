@@ -1,7 +1,7 @@
 {
   "branch": "f43",
   "cve_product": "ruby-lang / ruby",
-  "modification_reason": "Backport net-imap 0.5.14 security fixes for CVE-2026-42245, CVE-2026-42246, CVE-2026-42256; backport fix for CVE-2026-47242",
+  "modification_reason": "CVE-2026-42245; CVE-2026-42246; CVE-2026-42256; CVE-2026-47242; CVE-2026-54696",
   "modification_status": "modified",
   "release": "31",
   "sha": "13ec45290ca2daff61ce739ade287a78e753a2d0",
