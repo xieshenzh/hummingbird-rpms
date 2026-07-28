@@ -500,16 +500,10 @@ contains the fix:
      signature (see `documentation/operating/lookaside-cache-access.md`)
    - `.gitignore` -- update the version glob pattern if the
      new version falls outside the existing range
-   - `metadata/<package>.json` -- update `version` to the new
-     version. Metadata `release` is for `dist_git.py`
-     update/rebuild bookkeeping (base release for `.N`
-     micro-bumps), **not** for CVE automation
-     (`cve_analysis.py` ignores it). When ahead of Fedora, set
-     it to the local base release without a dist tag (typically
-     `0.1`, matching spec `0.1%{?dist}`). When Fedora already
-     has this version, set it to the Fedora baseline (no dist
-     tag). See
-     `documentation/operating/package-metadata-fields.md`.
+   - `metadata/<package>.json` -- update `version`. For
+     `release`, follow
+     `documentation/operating/package-metadata-fields.md`
+     (no CVE-specific rule).
 
 7. **Lookaside and build pipeline setup (when ahead of
    Fedora):** When Fedora has not yet released this version,
@@ -680,9 +674,8 @@ version bump is not appropriate:
      or `git diff tag1..tag2`)
    - Add `PatchN:` to the spec file
    - **Bump the spec `Release:` field correctly.** Use metadata
-     `release` only as the Fedora base for computing the next
-     `.N` micro-bump (same value `dist_git.py rebuild` uses).
-     CVE automation does not read this field.
+     `release` as the Fedora base for the next `.N` micro-bump
+     (see `documentation/operating/package-metadata-fields.md`):
 
      | Metadata release | Current spec Release | New spec Release |
      | --- | --- | --- |
@@ -716,11 +709,8 @@ version bump is not appropriate:
      --reason "<existing reason>; CVE-YYYY-NNNNN"
    ```
 
-   **Do NOT change the metadata `release` field for backports.**
-   Leave it at the Fedora base so `dist_git.py rebuild` can
-   compute the next `.N` suffix. This field is dist-git
-   bookkeeping, not a CVE/FIB input. If `mark-modified` changes
-   it, revert that change before committing.
+   **Do not touch metadata `release` for backports.** If
+   `mark-modified` changes it, revert that before committing.
 
    **For Go packages that vendor deps:** When a CVE targets a
    vendored module, create the patch against `go.mod`+`go.sum`.
@@ -829,10 +819,10 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
     …" or "backport fix for …" — scripts and automation parse
     this field for CVE IDs.
 
-14. **Metadata `release` is not a CVE field.** It tracks the base
-    release for `dist_git.py` update/rebuild. `cve_analysis.py`
-    ignores it. Only adjust it when 3d/3e package changes require
-    it; never for FIB or advisory reasons alone.
+14. **Metadata `release` follows
+    `documentation/operating/package-metadata-fields.md`.** Do
+    not invent a CVE-specific rule; never change it for FIB or
+    advisory reasons alone.
 
 ## Worktree cleanup
 
