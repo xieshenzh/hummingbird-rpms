@@ -42,6 +42,20 @@ JIRA_FIELDS_LINKED = "summary,status,issuetype"
 JIRA_FIELDS_BATCH = "summary,status,issuetype,assignee,labels"
 _json_cache: dict[str, dict[str, Any]] = {}
 
+### Output formatting ###
+
+TICKET_HEADER_FMT = "{ticket}{pkg} {ttype} {status} | {sev} | {fib} | {assignee}{cves}"
+TICKET_DETAIL = {
+    "assessment": "  Assessment: {0}",
+    "affected": "  Affected: {0}",
+    "fixed": "  Fixed: {0}",
+    "mr": "  MR: {0}",
+    "link": "  Link: {ticket} [{ttype}] {status} - {summary}",
+    "link_error": "  Link: {ticket} ERROR {error}",
+    "component": "  Upstream component: {0}",
+    "vendored": "  Vendored deps: yes (go-vendor-tools)",
+}
+
 ### Dataclasses ###
 
 
@@ -113,6 +127,13 @@ def run_command(args: list[str]) -> subprocess.CompletedProcess:
         return subprocess.run(args, check=False, capture_output=True, text=True)
     except OSError as err:
         raise RuntimeError(f"Failed to execute {' '.join(args)}: {err}") from err
+
+
+def uses_vendored_deps(package: str) -> bool:
+    # 4 parents up: .cursor/skills/cve → .cursor/skills → .cursor → repo root
+    repo_root = Path(__file__).parent.parent.parent.parent
+    go_vendor_path = repo_root / "rpms" / package / "go-vendor-tools.toml"
+    return go_vendor_path.exists()
 
 
 def normalize_hum_key(value: str) -> str:
@@ -332,7 +353,10 @@ def parse_ticket_json(ticket_key: str, fields: dict[str, Any]) -> TicketReport:
 
 
 def fetch_json(
-    key: str, fields: str = JIRA_FIELDS_FULL, *, raise_on_error: bool = True,
+    key: str,
+    fields: str = JIRA_FIELDS_FULL,
+    *,
+    raise_on_error: bool = True,
 ) -> dict[str, Any] | None:
     cache_key = f"{key}:{fields}"
     if cache_key in _json_cache:
@@ -389,7 +413,12 @@ def batch_fetch_tickets(keys: list[str]) -> dict[str, TicketReport]:
         status = _json_str(fields, "status", "name")
         issuetype = _json_str(fields, "issuetype", "name")
         result[key] = TicketReport(
-            key, summary, status, issuetype, _extract_assignee(fields), _extract_labels(fields),
+            key,
+            summary,
+            status,
+            issuetype,
+            _extract_assignee(fields),
+            _extract_labels(fields),
         )
     return result
 
@@ -417,40 +446,54 @@ def print_ticket(report: TicketReport) -> None:
     if report.embargoed:
         print(f"*** EMBARGOED: {report.ticket} — do not analyze or act. ***")
         return
-    pkg_part = f" [{report.package_guess}]" if report.package_guess else ""
-    sev = f"Sev:{report.severity}" if report.severity else "Sev:-"
-    fib = f"FIB:{report.fixed_in_build}" if report.fixed_in_build else "FIB:-"
-    cvs = ",".join(report.cve_ids) if report.cve_ids else ""
-    who = report.assignee or "Unassigned"
-    ttype = report.ticket_type or "?"
-    parts = [f"{report.ticket}{pkg_part} {ttype} {report.status}", sev, fib, who]
 
-    if cvs:
-        parts.append(cvs)
-    print(" | ".join(parts))
+    # Header line
+    print(
+        TICKET_HEADER_FMT.format(
+            ticket=report.ticket,
+            pkg=f" [{report.package_guess}]" if report.package_guess else "",
+            ttype=report.ticket_type or "?",
+            status=report.status,
+            sev=f"Sev:{report.severity}" if report.severity else "Sev:-",
+            fib=f"FIB:{report.fixed_in_build}" if report.fixed_in_build else "FIB:-",
+            assignee=report.assignee or "Unassigned",
+            cves=f" | {','.join(report.cve_ids)}" if report.cve_ids else "",
+        )
+    )
+    # Detail lines
     if report.assessment:
-        print(f"  Assessment: {report.assessment}")
+        print(TICKET_DETAIL["assessment"].format(report.assessment))
     if report.affected_range or report.fixed_version:
-        range_parts = []
+        parts = []
         if report.affected_range:
-            range_parts.append(f"Affected: {report.affected_range}")
+            parts.append(TICKET_DETAIL["affected"].format(report.affected_range))
         if report.fixed_version:
-            range_parts.append(f"Fixed: {report.fixed_version}")
-        print(f"  {'  '.join(range_parts)}")
-    for u in report.mr_links_in_ticket:
-        print(f"  MR: {u}")
+            parts.append(TICKET_DETAIL["fixed"].format(report.fixed_version))
+        print("  ".join(parts))
+    for mr in report.mr_links_in_ticket:
+        print(TICKET_DETAIL["mr"].format(mr))
     for linked in report.linked_ticket_details:
         if linked.error:
-            print(f"  Link: {linked.ticket} ERROR {linked.error}")
-            continue
-        print(
-            f"  Link: {linked.ticket} [{linked.ticket_type}] {linked.status} - {linked.summary}"
-        )
+            print(
+                TICKET_DETAIL["link_error"].format(
+                    ticket=linked.ticket, error=linked.error
+                )
+            )
+        else:
+            print(
+                TICKET_DETAIL["link"].format(
+                    ticket=linked.ticket,
+                    ttype=linked.ticket_type,
+                    status=linked.status,
+                    summary=linked.summary,
+                )
+            )
     if report.upstream_component:
-        print(f"  Upstream component: {report.upstream_component}")
+        print(TICKET_DETAIL["component"].format(report.upstream_component))
+    if report.package_guess and uses_vendored_deps(report.package_guess):
+        print(TICKET_DETAIL["vendored"])
     if report.description:
-        flaw = _extract_flaw_summary(report.description)
-        if flaw:
+        if flaw := _extract_flaw_summary(report.description):
             print()
             print(flaw)
     if report.cve_analysis_block:
@@ -549,7 +592,7 @@ def main() -> int:
             print(f"Warning: failed to fetch {key}: {e}", file=sys.stderr)
             continue
         print(f"Processing {key}...", file=sys.stderr, end="\r")
-        initial_reports[key] = parse_ticket_json(key, fields)
+        initial_reports[key] = parse_ticket_json(key, fields)  # type: ignore[arg-type] - Can't be None, fetch_json would raise
 
     if args.find_related:
         print("Finding related tickets...", file=sys.stderr)
