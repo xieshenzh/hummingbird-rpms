@@ -771,7 +771,9 @@ def mark_package_modified(
         package: Package name
         reason: Reason for the update
         version: If provided, update the version field in metadata
-        release: If provided, update the release field in metadata
+        release: If provided, update metadata ``release`` (base without
+            dist tag — Fedora/rawhide baseline, or a local placeholder
+            such as ``0.1`` when ahead of Fedora)
     """
     metadata_file = METADATA_DIR / f"{package}.json"
     if not metadata_file.exists():
@@ -928,7 +930,10 @@ def update_spec_version(package: str, new_version: str) -> list[str]:
       later imported from Fedora (with ``Release >= 1``), it sorts
       higher and replaces this locally-built version.
     - Downloads new source archives and updates the ``sources`` file
-    - Marks the package metadata as modified
+    - Marks the package metadata as modified, writing resolved
+      ``version`` and ``release``.  The metadata ``release`` is
+      typically that same locally invented ``0.1`` placeholder — not
+      a value confirmed from an actual Fedora build.
 
     If ``metadata/<package>.update-hooks.yaml`` exists, the hook commands
     defined there replace (or extend) the default phases:
@@ -1069,6 +1074,8 @@ def update_spec_version(package: str, new_version: str) -> list[str]:
         _run_hook("post_update", hooks.post_update, package, env)
 
     # --- Metadata bookkeeping ------------------------------------------------
+    # Persist resolved Version/Release into metadata. After a default
+    # bump, release is usually the local 0.1 placeholder (not Fedora).
     vr = parse_spec_version_release(package_dir)
     resolved_version = vr[0] if vr else new_version
     resolved_release = vr[1] if vr else None

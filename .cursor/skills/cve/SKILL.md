@@ -535,10 +535,14 @@ contains the fix:
      signature (see `documentation/operating/lookaside-cache-access.md`)
    - `.gitignore` -- update the version glob pattern if the
      new version falls outside the existing range
-   - `metadata/<package>.json` -- update `version`. For
-     `release`, follow
-     `documentation/operating/package-metadata-fields.md`
-     (no CVE-specific rule).
+   - `metadata/<package>.json` -- update `version` to the new
+     version. Metadata `release` is the base release for
+     `dist_git.py` update/rebuild bookkeeping (no dist tag),
+     **not** a CVE/FIB field. When ahead of Fedora, set it to
+     the local base (typically `0.1`, matching spec
+     `0.1%{?dist}`). When Fedora already has this version, set
+     it to the Fedora/rawhide baseline. See
+     `documentation/operating/package-metadata-fields.md`.
 
 7. **Lookaside and build pipeline setup (when ahead of
    Fedora):** When Fedora has not yet released this version,
@@ -708,8 +712,10 @@ version bump is not appropriate:
    - Download the patch from upstream (`curl`, `git format-patch`,
      or `git diff tag1..tag2`)
    - Add `PatchN:` to the spec file
-   - **Bump the spec `Release:` field correctly.** Use metadata
-     `release` as the Fedora base for the next `.N` micro-bump
+   - **Bump the spec `Release:` field correctly.** The metadata `release`
+     field is the current base release (Fedora/rawhide baseline,
+     or local `0.1` if already ahead of Fedora) — use that as the
+     base. Append or increment a `.N` micro-bump suffix:
      (see `documentation/operating/package-metadata-fields.md`):
 
      | Metadata release | Current spec Release | New spec Release |
@@ -717,13 +723,14 @@ version bump is not appropriate:
      | `1` | `1%{?dist}` | `1.1%{?dist}` |
      | `1` | `1.1%{?dist}` | `1.2%{?dist}` |
      | `1` | `1.2%{?dist}` | `1.3%{?dist}` |
+     | `0.1` | `0.1%{?dist}` | `0.1.1%{?dist}` |
      | `5` | `5%{?dist}` | `5.1%{?dist}` |
      | `5` | `5.2%{?dist}` | `5.3%{?dist}` |
 
-     The integer part **must** match the metadata `release` value.
-     Never increment the integer (e.g. `1` to `2`). Only the
-     micro-bump after the dot changes. If the spec already has a
-     micro-bump, increment it; if not, add `.1`.
+     The base part **must** match the metadata `release` value.
+     Never invent a new base (e.g. `1` to `2`, or `0.1` to `1`).
+     Only the micro-bump after the base changes. If the spec
+     already has a micro-bump, increment it; if not, add `.1`.
 
    - If the spec uses `%patch N -p1`, use that form; if
      `%autosetup -p1`, patches apply automatically
@@ -744,8 +751,11 @@ version bump is not appropriate:
      --reason "<existing reason>; CVE-YYYY-NNNNN"
    ```
 
-   **Do not touch metadata `release` for backports.** If
-   `mark-modified` changes it, revert that before committing.
+   **Do NOT change the metadata `release` field for backports.**
+   Keep it at the current base (Fedora/rawhide or local
+   placeholder). If `mark-modified` changes the release field,
+   revert that change before committing. See
+   `documentation/operating/package-metadata-fields.md`.
 
    **For Go packages that vendor deps:** When a CVE targets a
    vendored module, create the patch against `go.mod`+`go.sum`.
