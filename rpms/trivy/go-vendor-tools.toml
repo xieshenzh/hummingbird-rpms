@@ -25,14 +25,14 @@ post_commands = [
   # Copy missing license files that go mod vendor doesn't include
   ["mkdir", "-p", "vendor/github.com/csaf-poc/csaf_distribution/v3/LICENSES"],
   [
-    "wget", "-q",
-    "https://github.com/csaf-poc/csaf_distribution/raw/v3.0.0/LICENSES/MIT.txt",
-    "-O", "vendor/github.com/csaf-poc/csaf_distribution/v3/LICENSES/MIT.txt"
+    "curl", "-fsSL",
+    "-o", "vendor/github.com/csaf-poc/csaf_distribution/v3/LICENSES/MIT.txt",
+    "https://github.com/csaf-poc/csaf_distribution/raw/v3.0.0/LICENSES/MIT.txt"
   ],
   [
-    "wget", "-q",
-    "https://github.com/csaf-poc/csaf_distribution/raw/v3.0.0/LICENSES/LicenseRef-Go119-BSD-Patentgrant.txt",
-    "-O", "vendor/github.com/csaf-poc/csaf_distribution/v3/LICENSES/BSD-3-Clause.txt"
+    "curl", "-fsSL",
+    "-o", "vendor/github.com/csaf-poc/csaf_distribution/v3/LICENSES/BSD-3-Clause.txt",
+    "https://github.com/csaf-poc/csaf_distribution/raw/v3.0.0/LICENSES/LicenseRef-Go119-BSD-Patentgrant.txt"
   ],
   [
     "sh", "-ec",
