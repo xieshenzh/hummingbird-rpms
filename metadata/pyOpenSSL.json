@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "1",
-  "sha": "74fc9fe3a2aba2df9bb4f1e93f8589194752e3bd",
+  "release": "2",
+  "sha": "4847124ea1607a1ae213a4a9f549ae815cf01d8d",
   "source": "https://src.fedoraproject.org/rpms/pyOpenSSL.git",
   "upstream_repo": "https://github.com/pyca/pyopenssl",
   "version": "26.3.0"
