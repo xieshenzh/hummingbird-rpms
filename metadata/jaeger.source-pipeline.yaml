@@ -1,0 +1,49 @@
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "v${VERSION}"
+    archive_name: "jaeger-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "jaeger-${VERSION}-vendor.tar.bz2"
+
+transform:
+  - type: run
+    path: "."
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        root="$(pwd)"
+
+        # The Jaeger UI lives in a separate repo, pinned as a submodule --
+        # resolve its commit for this tag rather than assuming a matching
+        # jaeger-ui release tag exists.
+        ui_workdir="$(mktemp -d)"
+        trap 'rm -rf "${ui_workdir}"' EXIT
+        git clone --quiet --depth 1 --filter=blob:none --no-checkout \
+          --branch "v${VERSION}" https://github.com/jaegertracing/jaeger.git \
+          "${ui_workdir}/jaeger-git"
+        ui_commit="$(git -C "${ui_workdir}/jaeger-git" ls-tree HEAD jaeger-ui | \
+          awk '$1 == "160000" && $2 == "commit" { print $3 }')"
+        if [[ ! "${ui_commit}" =~ ^[0-9a-f]{40}$ ]]; then
+          echo "Could not resolve Jaeger UI submodule for v${VERSION}" >&2
+          exit 1
+        fi
+
+        ui_archive="jaeger-ui-${VERSION}.tar.gz"
+        curl -fSL -o "${ui_archive}" \
+          "https://github.com/jaegertracing/jaeger-ui/archive/${ui_commit}/${ui_archive}"
+
+        mkdir "${root}/.jaeger-ui-src"
+        tar -xzf "${ui_archive}" -C "${root}/.jaeger-ui-src" --strip-components=1
+        patch -d "${root}/.jaeger-ui-src" -p1 < "${PACKAGE_DIR}/jaeger-ui-pnpm-cache.patch"
+        npm install --prefix "${root}/.pnpm" --ignore-scripts pnpm@10.5.0
+        pnpm="${root}/.pnpm/node_modules/.bin/pnpm"
+        pnpm_store="${root}/.pnpm-store"
+        (cd "${root}/.jaeger-ui-src" && "${pnpm}" fetch --frozen-lockfile --store-dir "${pnpm_store}")
+        tar -cjf "jaeger-ui-pnpm-cache-${VERSION}.tar.bz2" -C "${root}" .pnpm .pnpm-store
+    outputs:
+      - "jaeger-ui-${VERSION}.tar.gz"
+      - "jaeger-ui-pnpm-cache-${VERSION}.tar.bz2"

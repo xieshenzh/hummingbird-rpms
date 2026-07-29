@@ -1,0 +1,30 @@
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "v${VERSION}"
+    archive_name: "prometheus-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "prometheus-${VERSION}-vendor.tar.bz2"
+    modules:
+      - path: "."
+        use_workspace: false
+
+transform:
+  - type: run
+    path: "."
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        root="$(pwd)"
+        patch -p1 < "${PACKAGE_DIR}/0003-pnpm-cache-both-rpm-architectures.patch"
+        npm install --prefix "${root}/.pnpm" --ignore-scripts pnpm@11
+        pnpm="${root}/.pnpm/node_modules/.bin/pnpm"
+        pnpm_store="${root}/.pnpm-store"
+        (cd web/ui && "${pnpm}" fetch --frozen-lockfile --store-dir "${pnpm_store}")
+        (cd web/ui/react-app && "${pnpm}" fetch --frozen-lockfile --store-dir "${pnpm_store}")
+        tar -cjf "prometheus-pnpm-cache-${VERSION}.tar.bz2" -C "${root}" .pnpm .pnpm-store
+    outputs:
+      - "prometheus-pnpm-cache-${VERSION}.tar.bz2"

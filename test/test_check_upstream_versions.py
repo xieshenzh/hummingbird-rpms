@@ -1240,6 +1240,69 @@ def test_run_gorget_pipeline_success(cuv_module, workdir: Path) -> None:
     assert filenames == {'pkg-2.0.tar.gz', 'pkg-2.0-vendor.tar.gz'}
 
 
+def test_run_gorget_pipeline_always_passes_debug(cuv_module, workdir: Path) -> None:
+    """--debug is always passed, so gorget's stage/step trace lands in the
+    job log."""
+    _create_package(workdir, 'pkg', '1.0', sources={'pkg-1.0.tar.gz': 'oldhash'})
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    fake_run = _fake_gorget_run({'pkg-2.0.tar.gz': b'x'})
+    with patch.object(cuv_module, '_upload_to_lookaside'), \
+         patch('subprocess.run', side_effect=fake_run) as mock_run:
+        cuv_module.RPMS_DIR = workdir / 'rpms'
+        cuv_module.METADATA_DIR = workdir / 'metadata'
+        cuv_module._run_gorget_pipeline('pkg', '1.0', '2.0', pipeline_file)
+
+    cmd = mock_run.call_args.args[0]
+    assert '--debug' in cmd
+
+
+def test_run_gorget_pipeline_passes_upstream_repo_when_declared(
+    cuv_module, workdir: Path
+) -> None:
+    """--upstream-repo is passed when metadata/<package>.json declares one,
+    so the pipeline can reference ${UPSTREAM_REPO} instead of duplicating
+    the URL."""
+    _create_package(
+        workdir, 'pkg', '1.0',
+        sources={'pkg-1.0.tar.gz': 'oldhash'},
+        metadata={'upstream_repo': 'https://example.com/org/pkg'},
+    )
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    fake_run = _fake_gorget_run({'pkg-2.0.tar.gz': b'x'})
+    with patch.object(cuv_module, '_upload_to_lookaside'), \
+         patch('subprocess.run', side_effect=fake_run) as mock_run:
+        cuv_module.RPMS_DIR = workdir / 'rpms'
+        cuv_module.METADATA_DIR = workdir / 'metadata'
+        cuv_module._run_gorget_pipeline('pkg', '1.0', '2.0', pipeline_file)
+
+    cmd = mock_run.call_args.args[0]
+    assert cmd[cmd.index('--upstream-repo') + 1] == 'https://example.com/org/pkg'
+
+
+def test_run_gorget_pipeline_omits_upstream_repo_when_not_declared(
+    cuv_module, workdir: Path
+) -> None:
+    """No --upstream-repo when metadata/<package>.json has no upstream_repo
+    (or doesn't exist at all)."""
+    _create_package(workdir, 'pkg', '1.0', sources={'pkg-1.0.tar.gz': 'oldhash'})
+    pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
+    pipeline_file.write_text('fetch: []\n')
+
+    fake_run = _fake_gorget_run({'pkg-2.0.tar.gz': b'x'})
+    with patch.object(cuv_module, '_upload_to_lookaside'), \
+         patch('subprocess.run', side_effect=fake_run) as mock_run:
+        cuv_module.RPMS_DIR = workdir / 'rpms'
+        cuv_module.METADATA_DIR = workdir / 'metadata'
+        cuv_module._run_gorget_pipeline('pkg', '1.0', '2.0', pipeline_file)
+
+    cmd = mock_run.call_args.args[0]
+    assert '--upstream-repo' not in cmd
+
+
 def test_run_gorget_pipeline_logs_command_and_duration(
     cuv_module, workdir: Path, caplog
 ) -> None:

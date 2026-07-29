@@ -1,0 +1,20 @@
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "v${VERSION}"
+    archive_name: "${PACKAGE}-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "${PACKAGE}-server-${VERSION}-vendor.tar.bz2"
+    modules:
+      - path: server
+  - type: vendor
+    ecosystem: go
+    archive_name: "${PACKAGE}-etcdctl-${VERSION}-vendor.tar.bz2"
+    modules:
+      - path: etcdctl
+  - type: vendor
+    ecosystem: go
+    archive_name: "${PACKAGE}-etcdutl-${VERSION}-vendor.tar.bz2"
+    modules:
+      - path: etcdutl

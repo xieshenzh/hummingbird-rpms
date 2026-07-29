@@ -1,0 +1,5 @@
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "v${VERSION}"
+    archive_name: "tempo-${VERSION}.tar.gz"

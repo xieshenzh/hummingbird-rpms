@@ -2,7 +2,7 @@ fetch:
   - type: git
     repo: "${UPSTREAM_REPO}"
     ref: "v${VERSION}"
-    archive_name: "${PACKAGE}-${VERSION}.tar.gz"
+    archive_name: "opentofu-${VERSION}.tar.gz"
   - type: vendor
     ecosystem: go
-    archive_name: "${PACKAGE}-${VERSION}-vendor.tar.bz2"
+    archive_name: "opentofu-${VERSION}-vendor.tar.bz2"

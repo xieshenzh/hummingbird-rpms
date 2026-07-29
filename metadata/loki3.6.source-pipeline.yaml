@@ -1,0 +1,8 @@
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "v${VERSION}"
+    archive_name: "loki-${VERSION}.tar.gz"
+  - type: url
+    url: "https://raw.githubusercontent.com/mattn/go-localereader/6bae6c923850ab5e0da9f36f69811ffe17064228/LICENSE"
+    filename: "go-localereader-LICENSE"

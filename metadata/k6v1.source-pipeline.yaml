@@ -1,0 +1,10 @@
+# k6v1 tracks the 1.x stream; k6v2 tracks 2.x -- ${VERSION} can never
+# collide between the two packages' archive_name below.
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "v${VERSION}"
+    archive_name: "k6-${VERSION}.tar.gz"
+  - type: url
+    url: "https://raw.githubusercontent.com/grafana/k6-cloud-openapi-client-go/97c96146fa7c3cf455a330c6c36cc69fdf6a43e5/LICENSE"
+    filename: "k6-cloud-openapi-client-go-LICENSE"
