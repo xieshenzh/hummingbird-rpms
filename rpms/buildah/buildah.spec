@@ -37,10 +37,10 @@ Epoch: 2
 # If that's what you're reading, Version must be 0, and will be updated by Packit for
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
-Version: 1.44.0
+Version: 1.44.1
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 3.2%{?dist}
+Release: 3.1%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -51,6 +51,7 @@ URL: https://%{name}.io
 # Tarball fetched from upstream
 Source: %{git0}/archive/v%{version}.tar.gz
 Patch0: 0001-buildah-bump-moby-buildkit-to-v0.31.2.patch
+Patch1: 0002-bump-golang.org-x-text-to-v0.39.0.patch
 BuildRequires: device-mapper-devel
 BuildRequires: git-core
 BuildRequires: golang >= 1.16.6

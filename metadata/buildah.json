@@ -1,10 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Disable tests subpackage: circular dependency between podman and buildah tests; backport fix for CVE-2026-15788",
+  "modification_reason": "Disable tests subpackage: circular dependency between podman and buildah tests; backport fix for CVE-2026-15788; CVE-2026-56852",
   "modification_status": "modified",
   "release": "3",
-  "sha": "d1921a40842a4e5f81584089f21895ac41a23137",
+  "sha": "62e1955f649e9aa8d2cbeaafbf865c0ad3ffb1a9",
   "source": "https://src.fedoraproject.org/rpms/buildah.git",
   "upstream_repo": "https://github.com/containers/buildah",
-  "version": "1.44.0"
+  "version": "1.44.1"
 }
