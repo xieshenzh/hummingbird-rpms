@@ -1,0 +1,36 @@
+fetch:
+  - type: git
+    repo: "https://github.com/open-telemetry/opentelemetry-collector-releases"
+    ref: "v${VERSION}"
+    archive_name: "opentelemetry-collector-releases-${VERSION}.tar.gz"
+
+transform:
+  - type: run
+    path: "."
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        # Hummingbird's build runners are amd64-only; revisit if that changes.
+        curl -fSL -o "/tmp/ocb-${VERSION}" \
+          "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/cmd%2Fbuilder%2Fv${VERSION}/ocb_${VERSION}_linux_amd64"
+        chmod +x "/tmp/ocb-${VERSION}"
+        "/tmp/ocb-${VERSION}" --skip-compilation --config distributions/otelcol-k8s/manifest.yaml
+        generated_files=(go.mod go.sum)
+        while IFS= read -r f; do
+          generated_files+=("$f")
+        done < <(find _build -maxdepth 1 -name '*.go' -printf '%P\n' | sort)
+        source_date_epoch=$(git log -1 --format=%ct HEAD)
+        tar -C _build --sort=name --mtime="@${source_date_epoch}" \
+          --owner=0 --group=0 --numeric-owner \
+          -cjf "opentelemetry-collector-k8s-${VERSION}-generated.tar.bz2" \
+          "${generated_files[@]}"
+    outputs:
+      - "opentelemetry-collector-k8s-${VERSION}-generated.tar.bz2"
+  - type: vendor
+    ecosystem: go
+    archive_name: "opentelemetry-collector-k8s-${VERSION}-vendor.tar.bz2"
+    modules:
+      - path: "_build"
+        name: "vendor"
