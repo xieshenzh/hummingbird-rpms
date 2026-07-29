@@ -1030,6 +1030,8 @@ spec:
           contentType: rpm
         - name: tzdata-main
           contentType: rpm
+        - name: ucx-main
+          contentType: rpm
         - name: unbound-main
           contentType: rpm
         - name: unzip-main
