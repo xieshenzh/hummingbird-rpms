@@ -1,5 +1,14 @@
 [archive]
 
+# github.com/gogo/googleapis ships no LICENSE in its vendored snapshot
+post_commands = [
+  ["curl", "-fSL", "-o", "vendor/github.com/gogo/googleapis/LICENSE", "https://raw.githubusercontent.com/gogo/googleapis/master/LICENSE"],
+]
+
+[archive.dependency_overrides]
+# CVE-2026-49834
+"github.com/sigstore/sigstore-go" = "v1.2.0"
+
 [licensing]
 detector = "askalono"
 
@@ -33,9 +42,8 @@ path = "vendor/gopkg.in/yaml.v3/LICENSE"
 sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
 expression = "MIT AND (MIT AND Apache-2.0)"
 
-# github.com/gogo/googleapis ships no LICENSE file in its vendored pseudo-version snapshot;
-# fetched from https://github.com/gogo/googleapis/blob/master/LICENSE and added to the vendor
-# tarball at vendor/github.com/gogo/googleapis/LICENSE.
+# github.com/gogo/googleapis ships no LICENSE file in its vendored snapshot;
+# injected by post_commands above.
 [[licensing.licenses]]
 path = "vendor/github.com/gogo/googleapis/LICENSE"
 sha256sum = "95fd77e95594af9b9ef25cf5cfd5faf8c016231261bc60ce8c1d1fa3cac2c46a"
