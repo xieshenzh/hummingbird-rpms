@@ -1,6 +1,6 @@
 fetch:
   - type: git
-    repo: "https://github.com/caddyserver/xcaddy"
+    repo: "${UPSTREAM_REPO}"
     ref: "v${VERSION}"
     archive_name: "${PACKAGE}-${VERSION}.tar.gz"
   - type: vendor

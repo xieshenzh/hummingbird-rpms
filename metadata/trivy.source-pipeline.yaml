@@ -1,6 +1,6 @@
 fetch:
   - type: git
-    repo: "https://github.com/aquasecurity/trivy"
+    repo: "${UPSTREAM_REPO}"
     ref: "v${VERSION}"
     archive_name: "trivy-${VERSION}.tar.gz"
   - type: vendor

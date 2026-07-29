@@ -1,6 +1,6 @@
 fetch:
   - type: git
-    repo: "https://github.com/kubernetes/kubernetes"
+    repo: "${UPSTREAM_REPO}"
     ref: "v${VERSION}"
     archive_name: "kubernetes-${VERSION}.tar.gz"
   - type: vendor

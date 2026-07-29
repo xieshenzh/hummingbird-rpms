@@ -1,6 +1,6 @@
 fetch:
   - type: git
-    repo: "https://github.com/anchore/grype"
+    repo: "${UPSTREAM_REPO}"
     ref: "v${VERSION}"
     archive_name: "${PACKAGE}-${VERSION}.tar.gz"
   - type: vendor

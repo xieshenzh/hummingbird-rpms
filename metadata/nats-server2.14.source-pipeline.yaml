@@ -1,6 +1,6 @@
 fetch:
   - type: git
-    repo: "https://github.com/nats-io/nats-server"
+    repo: "${UPSTREAM_REPO}"
     ref: "v${VERSION}"
     archive_name: "nats-server-${VERSION}.tar.gz"
   - type: vendor

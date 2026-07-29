@@ -1,6 +1,6 @@
 fetch:
   - type: git
-    repo: "https://github.com/prometheus/prometheus"
+    repo: "${UPSTREAM_REPO}"
     ref: "v${VERSION}"
     archive_name: "prometheus-${VERSION}.tar.gz"
   - type: vendor

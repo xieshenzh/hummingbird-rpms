@@ -1,6 +1,6 @@
 fetch:
   - type: git
-    repo: "https://github.com/grafana/loki"
+    repo: "${UPSTREAM_REPO}"
     ref: "v${VERSION}"
     archive_name: "loki-${VERSION}.tar.gz"
   - type: url

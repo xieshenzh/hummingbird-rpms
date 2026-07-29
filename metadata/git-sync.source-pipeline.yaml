@@ -1,6 +1,6 @@
 fetch:
   - type: git
-    repo: "https://github.com/kubernetes/git-sync"
+    repo: "${UPSTREAM_REPO}"
     ref: "v${VERSION}"
     archive_name: "${PACKAGE}-${VERSION}.tar.gz"
   - type: vendor
