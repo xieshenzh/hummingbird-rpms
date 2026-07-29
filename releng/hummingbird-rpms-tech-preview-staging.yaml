@@ -826,6 +826,8 @@ spec:
           contentType: rpm
         - name: prometheus3-5-main
           contentType: rpm
+        - name: protobuf-main
+          contentType: rpm
         - name: protobuf-c-main
           contentType: rpm
         - name: prrte-main
