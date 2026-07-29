@@ -1,0 +1,8 @@
+# Version is derived from the hyphenated release tag by removing hyphens.
+# Update the tag directly so Source keeps the upstream tag/filename format
+# while the RPM Version remains a compact date.
+update_spec: |
+  sed -Ei \
+    -e 's/^(%global tag\s+).*/\1'"${UPDATE_NEW_VERSION}"'/' \
+    -e 's/^(Release:\s+)[^ ]+/\10.1%{?dist}/' \
+    "${UPDATE_SPEC_FILE}"

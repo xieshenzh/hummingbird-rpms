@@ -938,6 +938,8 @@ spec:
           contentType: rpm
         - name: rdma-core-main
           contentType: rpm
+        - name: re2-main
+          contentType: rpm
         - name: readline-main
           contentType: rpm
         - name: redhat-rpm-config-main
