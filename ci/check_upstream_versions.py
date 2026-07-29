@@ -16,15 +16,16 @@ the full hook reference.
 
 If ``metadata/<package>.source-pipeline.yaml`` exists, it takes priority
 over both the hooks file and the generic default for source download:
-the gorget source-pipeline tool (quay.io/hummingbird-ci/gorget) runs in a
-container to fetch, transform, verify, and emit source artifacts, which
-are then uploaded to the lookaside cache in place of the download_sources
-phase. Pass --skip-pipeline to force the legacy hook/default path even
-when a source-pipeline definition exists. See
-documentation/design/source-pipeline-tool.md for background on gorget;
-the pipeline YAML schema itself is defined by gorget's own
-src/gorget/config/schema.py (github.com/gorget-project/gorget), which has
-drifted ahead of the design doc's examples.
+the gorget source-pipeline tool (installed directly on the runner, same
+as go-vendor-tools/syft/cosign/etc.) runs to fetch, transform, verify,
+and emit source artifacts, which are then uploaded to the lookaside
+cache in place of the download_sources phase. Pass --skip-pipeline to
+force the legacy hook/default path even when a source-pipeline
+definition exists. See documentation/design/source-pipeline-tool.md for
+background on gorget; the pipeline YAML schema itself is defined by
+gorget's own src/gorget/config/schema.py
+(github.com/gorget-project/gorget), which has drifted ahead of the
+design doc's examples.
 
 Subcommands:
     check   Check tracked packages for updates
@@ -89,11 +90,6 @@ METADATA_DIR = ROOT_DIR / "metadata"
 # release-monitoring.org API base URL
 ANITYA_API_BASE = "https://release-monitoring.org/api"
 UPLOAD_SCRIPT = ROOT_DIR / "ci" / "upload-to-lookaside-cache.sh"
-
-# Container image for the gorget source-pipeline tool (see
-# metadata/<package>.source-pipeline.yaml and documentation/design/source-pipeline-tool.md)
-# renovate: datasource=docker depName=quay.io/hummingbird-ci/gorget
-GORGET_IMAGE = "quay.io/hummingbird-ci/gorget:latest@sha256:8a08395e2973d288d1bac28c6d0606d4c3064a5b2d2c2ee5b95d54d8b3327901"
 
 # Rate limiting: delay between API requests (in seconds)
 API_DELAY = 0.2
@@ -499,7 +495,7 @@ def _load_source_pipeline(package: str) -> Optional[Path]:
 
     A source-pipeline definition takes priority over both
     metadata/<package>.update-hooks.yaml and the generic default source
-    download path (see gorget's container interface,
+    download path (see gorget's CLI interface,
     documentation/design/source-pipeline-tool.md).
     """
     pipeline_file = METADATA_DIR / f"{package}.source-pipeline.yaml"
@@ -516,14 +512,17 @@ def _run_gorget_pipeline(
     Run the gorget source-pipeline tool for a package and upload its
     output to the lookaside cache.
 
-    Invokes GORGET_IMAGE via podman, mounting the package directory
-    (read-only), the pipeline YAML (read-only), a shared GPG keyring
-    directory (read-only), and a scratch output directory. On success,
-    every artifact gorget emits is copied into the package directory,
-    uploaded to the lookaside cache, and the package's ``sources`` file
-    is replaced wholesale with the one gorget emitted -- gorget's sources
-    file is authoritative for a pipeline-managed package, not something to
-    hand-patch entries into.
+    Invokes the gorget CLI directly (installed on the runner via the
+    ``gorget`` RPM, same as go-vendor-tools/syft/cosign/etc. -- gorget's
+    fetch/vendor steps already run untrusted third-party code same as
+    those tools do, so it doesn't get container isolation the rest of
+    this pipeline doesn't have either), pointing it at the package
+    directory, the pipeline YAML, a shared GPG keyring directory, and a
+    scratch output directory. On success, every artifact gorget emits is
+    copied into the package directory, uploaded to the lookaside cache,
+    and the package's ``sources`` file is replaced wholesale with the one
+    gorget emitted -- gorget's sources file is authoritative for a
+    pipeline-managed package, not something to hand-patch entries into.
 
     Args:
         package: Package name
@@ -535,8 +534,8 @@ def _run_gorget_pipeline(
         List of new source filenames (for the caller to add to .gitignore)
 
     Raises:
-        RuntimeError: If the gorget container exits non-zero, or emits no
-            usable ``sources`` file
+        RuntimeError: If gorget exits non-zero, or emits no usable
+            ``sources`` file
     """
     package_dir = RPMS_DIR / package
     gpg_keys_dir = METADATA_DIR / "gpg-keys"
@@ -544,17 +543,15 @@ def _run_gorget_pipeline(
 
     with tempfile.TemporaryDirectory(prefix=f"gorget-{package}-") as output_dir_str:
         output_dir = Path(output_dir_str)
-        output_dir.chmod(0o777)
 
         command = [
-            "podman", "run", "--rm",
-            "-v", f"{package_dir}:/package:ro,z",
-            "-v", f"{pipeline_file}:/pipeline.yaml:ro,z",
-            "-v", f"{gpg_keys_dir}:/gpg-keys:ro,z",
-            "-v", f"{output_dir}:/output:z",
-            GORGET_IMAGE,
+            "gorget",
             "--version", new_version,
             "--old-version", old_version,
+            "--package-dir", str(package_dir),
+            "--pipeline-file", str(pipeline_file),
+            "--gpg-keys-dir", str(gpg_keys_dir),
+            "--output-dir", str(output_dir),
         ]
         logger.info(
             "%s: running gorget pipeline %s -> %s: %s",

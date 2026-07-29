@@ -1177,22 +1177,21 @@ def test_load_source_pipeline_exists(cuv_module, workdir: Path) -> None:
     assert cuv_module._load_source_pipeline('pkg') == pipeline_file
 
 
-def _output_dir_from_podman_cmd(cmd: list[str]) -> Path:
-    """Extract the host-side /output mount path from a podman argv list."""
-    output_mount = next(arg for arg in cmd if arg.endswith(':/output:z'))
-    return Path(output_mount[: -len(':/output:z')])
+def _output_dir_from_gorget_cmd(cmd: list[str]) -> Path:
+    """Extract the --output-dir value from a gorget argv list."""
+    return Path(cmd[cmd.index('--output-dir') + 1])
 
 
 def _fake_gorget_run(artifacts: dict[str, bytes]):
     """Build a `subprocess.run` side_effect simulating a successful gorget
-    container run: writes `artifacts` plus a `sources` manifest into the
-    mounted /output directory."""
+    run: writes `artifacts` plus a `sources` manifest into the
+    --output-dir directory."""
 
     def fake_subprocess_run(cmd, **kwargs):
-        if cmd[0] != 'podman':
+        if cmd[0] != 'gorget':
             return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
 
-        output_dir = _output_dir_from_podman_cmd(cmd)
+        output_dir = _output_dir_from_gorget_cmd(cmd)
         lines = []
         for i, (filename, content) in enumerate(artifacts.items()):
             (output_dir / filename).write_bytes(content)
@@ -1205,7 +1204,7 @@ def _fake_gorget_run(artifacts: dict[str, bytes]):
 
 
 def test_run_gorget_pipeline_success(cuv_module, workdir: Path) -> None:
-    """Runs gorget via podman, uploads emitted artifacts, replaces sources."""
+    """Runs gorget natively, uploads emitted artifacts, replaces sources."""
     pkg_dir = _create_package(
         workdir, 'pkg', '1.0',
         sources={'pkg-1.0.tar.gz': 'oldhash'},
@@ -1246,7 +1245,7 @@ def test_run_gorget_pipeline_logs_command_and_duration(
 ) -> None:
     """Pipeline command and elapsed time are visible in CI logs, matching
     run_git/_run_hook's diagnostics -- and stderr is left unbuffered rather
-    than captured, so a chatty container can't stall on a full pipe."""
+    than captured, so a chatty gorget invocation can't stall on a full pipe."""
     _create_package(workdir, 'pkg', '1.0', sources={'pkg-1.0.tar.gz': 'oldhash'})
     pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
     pipeline_file.write_text('fetch: []\n')
@@ -1261,14 +1260,14 @@ def test_run_gorget_pipeline_logs_command_and_duration(
         cuv_module.METADATA_DIR = workdir / 'metadata'
         cuv_module._run_gorget_pipeline('pkg', '1.0', '2.0', pipeline_file)
 
-    assert 'running gorget pipeline 1.0 -> 2.0: podman run' in caplog.text
+    assert 'running gorget pipeline 1.0 -> 2.0: gorget --version 2.0' in caplog.text
     assert 'gorget pipeline completed after 2.5s' in caplog.text
 
 
 def test_run_gorget_pipeline_creates_gpg_keys_dir(
     cuv_module, workdir: Path
 ) -> None:
-    """Creates metadata/gpg-keys/ if it doesn't already exist, for the mount."""
+    """Creates metadata/gpg-keys/ if it doesn't already exist, for --gpg-keys-dir."""
     _create_package(workdir, 'pkg', '1.0', sources={'pkg-1.0.tar.gz': 'oldhash'})
     pipeline_file = workdir / 'metadata' / 'pkg.source-pipeline.yaml'
     pipeline_file.write_text('fetch: []\n')
@@ -1290,9 +1289,9 @@ def test_run_gorget_pipeline_failure_includes_report(
     pipeline_file.write_text('fetch: []\n')
 
     def fake_subprocess_run(cmd, **kwargs):
-        if cmd[0] != 'podman':
+        if cmd[0] != 'gorget':
             return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
-        output_dir = _output_dir_from_podman_cmd(cmd)
+        output_dir = _output_dir_from_gorget_cmd(cmd)
         (output_dir / 'report.json').write_text('{"stages": ["verify failed"]}')
         return subprocess.CompletedProcess(
             cmd, 1, stdout='republication check failed',
@@ -1335,9 +1334,9 @@ def test_run_gorget_pipeline_empty_sources_file(
     pipeline_file.write_text('fetch: []\n')
 
     def fake_subprocess_run(cmd, **kwargs):
-        if cmd[0] != 'podman':
+        if cmd[0] != 'gorget':
             return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
-        output_dir = _output_dir_from_podman_cmd(cmd)
+        output_dir = _output_dir_from_gorget_cmd(cmd)
         (output_dir / 'sources').write_text('')
         return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
 
@@ -1363,9 +1362,9 @@ def test_run_gorget_pipeline_missing_declared_artifact(
     pipeline_file.write_text('fetch: []\n')
 
     def fake_subprocess_run(cmd, **kwargs):
-        if cmd[0] != 'podman':
+        if cmd[0] != 'gorget':
             return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
-        output_dir = _output_dir_from_podman_cmd(cmd)
+        output_dir = _output_dir_from_gorget_cmd(cmd)
         # sources references a file that was never written
         (output_dir / 'sources').write_text(
             'SHA512 (pkg-2.0.tar.gz) = deadbeef\n'
