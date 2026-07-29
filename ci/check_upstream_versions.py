@@ -518,11 +518,18 @@ def _run_gorget_pipeline(
     those tools do, so it doesn't get container isolation the rest of
     this pipeline doesn't have either), pointing it at the package
     directory, the pipeline YAML, a shared GPG keyring directory, and a
-    scratch output directory. On success, every artifact gorget emits is
-    copied into the package directory, uploaded to the lookaside cache,
-    and the package's ``sources`` file is replaced wholesale with the one
-    gorget emitted -- gorget's sources file is authoritative for a
-    pipeline-managed package, not something to hand-patch entries into.
+    scratch output directory. Always passes ``--debug`` so gorget's
+    stage/step trace lands in the job log -- stderr is left unbuffered
+    rather than captured (only stdout is), so the trace streams straight
+    to the log instead of only surfacing after the process exits. Also
+    passes ``--upstream-repo`` when ``metadata/<package>.json`` declares
+    one, so a pipeline can reference ``${UPSTREAM_REPO}`` instead of
+    duplicating that URL in its own ``repo:`` field. On success, every
+    artifact gorget emits is copied into the package directory, uploaded
+    to the lookaside cache, and the package's ``sources`` file is
+    replaced wholesale with the one gorget emitted -- gorget's sources
+    file is authoritative for a pipeline-managed package, not something
+    to hand-patch entries into.
 
     Args:
         package: Package name
@@ -552,7 +559,11 @@ def _run_gorget_pipeline(
             "--pipeline-file", str(pipeline_file),
             "--gpg-keys-dir", str(gpg_keys_dir),
             "--output-dir", str(output_dir),
+            "--debug",
         ]
+        upstream_repo = (get_package_metadata(package) or {}).get("upstream_repo")
+        if upstream_repo:
+            command += ["--upstream-repo", upstream_repo]
         logger.info(
             "%s: running gorget pipeline %s -> %s: %s",
             package, old_version, new_version, shlex.join(command),
