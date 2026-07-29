@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1.6%{?dist}
+Release: 1.7%{?dist}
 License: Python-2.0.1
 
 
@@ -432,6 +432,12 @@ Patch480: 00480-cve-2026-11940.patch
 #
 # gh-151987: Pass filter_function to TarFile._extract_one() during .extract()
 Patch481: 00481-cve-2026-4360.patch
+
+# 00482 # 0dfaf7c0f8ac4a18227a2800a45809897b39e7e2
+# CVE-2026-6879
+#
+# gh-152674: Avoid quadratic behavior in xml.etree.ElementPath index predicates
+Patch482: 00482-cve-2026-6879.patch
 
 # (New patches go here ^^^)
 #
