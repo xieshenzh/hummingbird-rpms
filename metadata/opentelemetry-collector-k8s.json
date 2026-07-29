@@ -1,6 +1,5 @@
 {
-  "modification_reason": "update to 0.157.0 for CVE-2026-56852",
-  "modification_status": "modified",
+  "modification_status": "native",
   "release": "0.1",
   "release_monitoring_project_id": 390561,
   "track_upstream": "latest",

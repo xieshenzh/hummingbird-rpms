@@ -1,0 +1,117 @@
+---
+# Verify the Kubernetes distribution binary, component inventory, and an OTLP
+# metrics pipeline configured explicitly by the user.
+
+opentelemetry-collector-k8s-functionality:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "opentelemetry-collector-k8s" ]]; then
+      echo "Skipping: only runs on opentelemetry-collector-k8s (got: ${rpm_name})"
+      exit 0
+    fi
+
+    rpm_version=$(rpm -qp --queryformat '%{VERSION}' "${TEST_RPM}")
+    build_dir=$(mktemp -d)
+    trap 'rm -rf "${build_dir}"' EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 \
+        -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      -e "RPM_VERSION=${rpm_version}" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y opentelemetry-collector-k8s curl
+
+        [[ -x /usr/bin/otelcol-k8s ]] || {
+          echo "FAIL: /usr/bin/otelcol-k8s not installed or not executable"
+          exit 1
+        }
+        version_output=$(otelcol-k8s --version 2>&1)
+        [[ "${version_output}" == *"${RPM_VERSION}"* ]] || {
+          echo "FAIL: expected version ${RPM_VERSION}, got: ${version_output}"
+          exit 1
+        }
+
+        components=$(otelcol-k8s components)
+        for component in k8s_cluster k8s_events k8s_objects kubelet_stats \
+          groupbyattrs transform file_storage; do
+          grep -q "${component}" <<< "${components}" || {
+            echo "FAIL: required component not found: ${component}"
+            exit 1
+          }
+        done
+
+        config=$(mktemp)
+        collector_log=$(mktemp)
+        cat > "${config}" <<EOF
+    receivers:
+      otlp:
+        protocols:
+          http:
+            endpoint: 127.0.0.1:4318
+    processors:
+      batch:
+    exporters:
+      debug:
+        verbosity: detailed
+    service:
+      pipelines:
+        metrics:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [debug]
+    EOF
+
+        otelcol-k8s --config "${config}" > "${collector_log}" 2>&1 &
+        collector_pid=$!
+        cleanup_collector() {
+          kill "${collector_pid}" 2>/dev/null || true
+          wait "${collector_pid}" 2>/dev/null || true
+        }
+        trap cleanup_collector EXIT
+
+        status=
+        for _ in $(seq 1 60); do
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST http://127.0.0.1:4318/v1/metrics \
+            -H "Content-Type: application/json" -d "{}" || true)
+          [[ "${status}" =~ ^(200|400)$ ]] && break
+          sleep 0.5
+        done
+        [[ "${status}" =~ ^(200|400)$ ]] || {
+          echo "FAIL: OTLP HTTP endpoint did not become ready within 30 s"
+          cat "${collector_log}"
+          exit 1
+        }
+
+        now_ns=$(date +%s)000000000
+        http_status=$(curl -s -o /dev/null -w "%{http_code}" \
+          -X POST http://127.0.0.1:4318/v1/metrics \
+          -H "Content-Type: application/json" \
+          -d "{\"resourceMetrics\":[{\"scopeMetrics\":[{\"metrics\":[{\"name\":\"hummingbird.k8s.test\",\"gauge\":{\"dataPoints\":[{\"asInt\":\"42\",\"timeUnixNano\":\"${now_ns}\"}]}}]}]}]}")
+        [[ "${http_status}" == "200" ]] || {
+          echo "FAIL: OTLP HTTP export returned ${http_status}"
+          exit 1
+        }
+
+        sleep 1
+        cleanup_collector
+        grep -q "hummingbird.k8s.test" "${collector_log}" || {
+          echo "FAIL: metric not found in collector log"
+          cat "${collector_log}"
+          exit 1
+        }
+      '

@@ -12041,6 +12041,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- opentelemetry-collector-k8s ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: opentelemetry-collector-k8s-main
+spec:
+  application: rpms-main
+  componentName: opentelemetry-collector-k8s-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/opentelemetry-collector-k8s-main
+  source:
+    git:
+      context: rpms/opentelemetry-collector-k8s
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: opentelemetry-collector-k8s-main
+  name: opentelemetry-collector-k8s-main
+spec:
+  image:
+    name: hummingbird-tenant/opentelemetry-collector-k8s-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- opentofu1.10 ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1
