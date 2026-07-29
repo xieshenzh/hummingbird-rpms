@@ -782,6 +782,8 @@ spec:
           contentType: rpm
         - name: perl-threads-shared-main
           contentType: rpm
+        - name: pgbouncer-main
+          contentType: rpm
         - name: php-main
           contentType: rpm
         - name: php-patchwork-jsqueeze-main
