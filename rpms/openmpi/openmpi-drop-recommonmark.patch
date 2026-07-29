@@ -1,0 +1,31 @@
+diff -ru openmpi-5.0.10/config/oac/oac_setup_sphinx.m4 openmpi-5.0.10-new/config/oac/oac_setup_sphinx.m4
+--- openmpi-5.0.10/config/oac/oac_setup_sphinx.m4	2026-02-23 21:21:40.731399193 +0100
++++ openmpi-5.0.10-new/config/oac/oac_setup_sphinx.m4	2026-07-27 17:10:12.450825327 +0200
+@@ -115,7 +115,7 @@
+ author = 'Testing'
+ import sphinx_rtd_theme
+ # Note the extra quoting needed for square brackets because this is m4
+-extensions = [[ 'recommonmark', 'sphinx_rtd_theme', 'sphinx.ext.extlinks' ]]
++extensions = [[ 'sphinx_rtd_theme', 'sphinx.ext.extlinks' ]]
+ html_theme = 'sphinx_rtd_theme'
+ EOF
+            echo "Hello world" > index.rst
+diff -ru openmpi-5.0.10/docs/conf.py openmpi-5.0.10-new/docs/conf.py
+--- openmpi-5.0.10/docs/conf.py	2026-02-23 21:21:10.775279351 +0100
++++ openmpi-5.0.10-new/docs/conf.py	2026-07-27 17:10:34.017830912 +0200
+@@ -174,7 +174,6 @@
+ # ones.
+ import sphinx_rtd_theme
+ extensions = [
+-    'recommonmark',
+     "sphinx_rtd_theme",
+     "sphinx.ext.extlinks",
+ ]
+diff -ru openmpi-5.0.10/docs/requirements.txt openmpi-5.0.10-new/docs/requirements.txt
+--- openmpi-5.0.10/docs/requirements.txt	2026-02-23 21:21:10.811279501 +0100
++++ openmpi-5.0.10-new/docs/requirements.txt	2026-07-27 17:10:43.482113314 +0200
+@@ -1,4 +1,3 @@
+ sphinx>=4.2.0
+-recommonmark
+ docutils
+ sphinx-rtd-theme
