@@ -1,10 +1,10 @@
 {
-  "modification_reason": "backport fix for CVE-2026-59869; backport fix for CVE-2026-14257; fix aarch64 V8 memcopy.h climits include for GCC 16",
+  "modification_reason": "Update to upstream version 26.5.1",
   "modification_status": "modified",
-  "release": "1.3",
+  "release": "1.5",
   "release_monitoring_project_id": 8251,
   "track_upstream": "26",
   "upstream_branch": "v26.x",
   "upstream_repo": "https://github.com/nodejs/node",
-  "version": "26.5.0"
+  "version": "26.5.1"
 }
