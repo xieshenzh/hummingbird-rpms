@@ -11963,6 +11963,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- openssl3 ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: openssl3-main
+spec:
+  application: rpms-main
+  componentName: openssl3-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/openssl3-main
+  source:
+    git:
+      context: rpms/openssl3
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: openssl3-main
+  name: openssl3-main
+spec:
+  image:
+    name: hummingbird-tenant/openssl3-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- opentelemetry-collector ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1

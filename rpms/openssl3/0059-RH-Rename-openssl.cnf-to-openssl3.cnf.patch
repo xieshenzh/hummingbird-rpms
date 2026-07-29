@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <dbelyavs@redhat.com>
+Date: Tue, 8 Apr 2026 00:00:00 +0000
+Subject: [PATCH 59/59] RH: Rename openssl.cnf to openssl3.cnf
+
+For openssl3 parallel-installable package, rename the default
+configuration file from openssl.cnf to openssl3.cnf to avoid
+conflicts with the system openssl package.
+
+Signed-off-by: Dmitry Belyavskiy <dbelyavs@redhat.com>
+---
+ include/internal/common.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/internal/common.h b/include/internal/common.h
+index 1234567890..0987654321 100644
+--- a/include/internal/common.h
++++ b/include/internal/common.h
+@@ -77,7 +77,7 @@
+     ossl_uintmax_t align_int; \
+     void *align_ptr
+
+-#define OPENSSL_CONF "openssl.cnf"
++#define OPENSSL_CONF "openssl3.cnf"
+
+ #ifndef OPENSSL_SYS_VMS
+ #define X509_CERT_AREA OPENSSLDIR
+--
+2.52.0

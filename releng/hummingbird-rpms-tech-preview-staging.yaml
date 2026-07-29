@@ -676,6 +676,8 @@ spec:
           contentType: rpm
         - name: openssl-fips-provider-main
           contentType: rpm
+        - name: openssl3-main
+          contentType: rpm
         - name: opentelemetry-collector-main
           contentType: rpm
         - name: opentelemetry-collector-contrib-main

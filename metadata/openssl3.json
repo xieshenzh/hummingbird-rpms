@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "release_monitoring_project_id": 377610,
+  "sha": "8d1c92561b3f6ca1a1bd6e72d71cb3a5fe67ec4d",
+  "source": "https://src.fedoraproject.org/rpms/openssl3.git",
+  "track_upstream": "3.5",
+  "upstream_repo": "https://github.com/openssl/openssl",
+  "version": "3.5.7"
+}

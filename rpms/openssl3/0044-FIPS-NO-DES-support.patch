@@ -1,0 +1,158 @@
+From 62748c233ae3afb8b0797a7d1ce2f391721d2971 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Fri, 7 Mar 2025 18:15:13 -0500
+Subject: [PATCH 44/57] FIPS: NO DES support
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ providers/fips/fipsprov.c                           |  4 ----
+ providers/fips/self_test_data.inc                   |  2 ++
+ test/evp_libctx_test.c                              |  4 +++-
+ .../30-test_evp_data/evpciph_des3_common.txt        | 13 ++++---------
+ test/recipes/30-test_evp_data/evpmac_cmac_des.txt   | 10 ----------
+ test/recipes/80-test_cms.t                          |  2 +-
+ 6 files changed, 10 insertions(+), 25 deletions(-)
+
+diff --git a/providers/fips/fipsprov.c b/providers/fips/fipsprov.c
+index f8f2822300..33e1a179cf 100644
+--- a/providers/fips/fipsprov.c
++++ b/providers/fips/fipsprov.c
+@@ -355,10 +355,6 @@ static const OSSL_ALGORITHM_CAPABLE fips_ciphers[] = {
+         ossl_cipher_capable_aes_cbc_hmac_sha256),
+     ALGC(PROV_NAMES_AES_256_CBC_HMAC_SHA256, ossl_aes256cbc_hmac_sha256_functions,
+         ossl_cipher_capable_aes_cbc_hmac_sha256),
+-#ifndef OPENSSL_NO_DES
+-    ALG(PROV_NAMES_DES_EDE3_ECB, ossl_tdes_ede3_ecb_functions),
+-    ALG(PROV_NAMES_DES_EDE3_CBC, ossl_tdes_ede3_cbc_functions),
+-#endif /* OPENSSL_NO_DES */
+     { { NULL, NULL, NULL }, NULL }
+ };
+ static OSSL_ALGORITHM exported_fips_ciphers[OSSL_NELEM(fips_ciphers)];
+diff --git a/providers/fips/self_test_data.inc b/providers/fips/self_test_data.inc
+index a7d7684d96..d8d23e6f90 100644
+--- a/providers/fips/self_test_data.inc
++++ b/providers/fips/self_test_data.inc
+@@ -305,6 +305,7 @@ static const ST_KAT_CIPHER st_kat_cipher_tests[] = {
+         CIPHER_MODE_DECRYPT,
+         ITM(aes_128_ecb_key)
+     },
++#if 0
+ #ifndef OPENSSL_NO_DES
+     {
+         {
+@@ -317,6 +318,7 @@ static const ST_KAT_CIPHER st_kat_cipher_tests[] = {
+         ITM(tdes_key)
+     }
+ #endif
++#endif
+ };
+ 
+ static const char hkdf_digest[] = "SHA256";
+diff --git a/test/evp_libctx_test.c b/test/evp_libctx_test.c
+index 773210fadb..e0b4efe3f4 100644
+--- a/test/evp_libctx_test.c
++++ b/test/evp_libctx_test.c
+@@ -984,7 +984,9 @@ int setup_tests(void)
+     ADD_TEST(kem_invalid_keytype);
+ #endif
+ #ifndef OPENSSL_NO_DES
+-    ADD_TEST(test_cipher_tdes_randkey);
++    if (strcmp(prov_name, "fips") != 0) {
++        ADD_TEST(test_cipher_tdes_randkey);
++    }
+ #endif
+     return 1;
+ }
+diff --git a/test/recipes/30-test_evp_data/evpciph_des3_common.txt b/test/recipes/30-test_evp_data/evpciph_des3_common.txt
+index 6c74b65cef..8bcb78cd2d 100644
+--- a/test/recipes/30-test_evp_data/evpciph_des3_common.txt
++++ b/test/recipes/30-test_evp_data/evpciph_des3_common.txt
+@@ -14,7 +14,7 @@
+ Title = DES3 Tests
+ 
+ # DES EDE3 CBC tests (from destest)
+-FIPSversion = <3.4.0
++Availablein = default
+ Cipher = DES-EDE3-CBC
+ Key = 0123456789abcdeff1e0d3c2b5a49786fedcba9876543210
+ IV = fedcba9876543210
+@@ -24,8 +24,7 @@ NextIV = 1c673812cfde9675
+ 
+ # DES EDE3 ECB test
+ # FIPS(3.0.0): has a bug in the IV length #17591
+-FIPSversion = >3.0.0
+-FIPSversion = <3.4.0
++Availablein = default
+ Cipher = DES-EDE3-ECB
+ Key = 0123456789abcdeff1e0d3c2b5a49786fedcba9876543210
+ Plaintext = 37363534333231204E6F77206973207468652074696D6520666F722000000000
+@@ -42,7 +41,6 @@ Ciphertext = 4d1332e49f380e23d80a0d8b2bae5e4e6a0094171abcfc27df2bfd40da9f4e4d
+ 
+ # Test that DES3 CBC mode encryption fails because it is not FIPS approved
+ Availablein = fips
+-FIPSversion = >=3.4.0
+ Cipher = DES-EDE3-CBC
+ Key = 0123456789abcdeff1e0d3c2b5a49786fedcba9876543210
+ IV = fedcba9876543210
+@@ -52,7 +50,6 @@ Result = CIPHERINIT_ERROR
+ 
+ # Test that DES3 EBC mode encryption fails because it is not FIPS approved
+ Availablein = fips
+-FIPSversion = >=3.4.0
+ Cipher = DES-EDE3-ECB
+ Key = 0123456789abcdeff1e0d3c2b5a49786fedcba9876543210
+ Plaintext = 37363534333231204E6F77206973207468652074696D6520666F722000000000
+@@ -62,8 +59,7 @@ Result = CIPHERINIT_ERROR
+ Title = DES3 FIPS Indicator Tests
+ 
+ # Test that DES3 CBC mode encryption is not FIPS approved
+-Availablein = fips
+-FIPSversion = >=3.4.0
++Availablein = none
+ Cipher = DES-EDE3-CBC
+ Unapproved = 1
+ CtrlInit = encrypt-check:0
+@@ -74,8 +70,7 @@ Plaintext = 37363534333231204E6F77206973207468652074696D6520666F722000000000
+ Ciphertext = 3FE301C962AC01D02213763C1CBD4CDC799657C064ECF5D41C673812CFDE9675
+ 
+ # Test that DES3 ECB mode encryption is not FIPS approved
+-Availablein = fips
+-FIPSversion = >=3.4.0
++Availablein = none
+ Cipher = DES-EDE3-ECB
+ Operation = ENCRYPT
+ Unapproved = 1
+diff --git a/test/recipes/30-test_evp_data/evpmac_cmac_des.txt b/test/recipes/30-test_evp_data/evpmac_cmac_des.txt
+index a11e5ffe54..e4a7cbe75e 100644
+--- a/test/recipes/30-test_evp_data/evpmac_cmac_des.txt
++++ b/test/recipes/30-test_evp_data/evpmac_cmac_des.txt
+@@ -35,13 +35,3 @@ Algorithm = DES-EDE3-CBC
+ Key = 89BCD952A8C8AB371AF48AC7D07085D5EFF702E6D62CDC23
+ Input = FA620C1BBE97319E9A0CF0492121F7A20EB08A6A709DCBD00AAF38E4F99E754E
+ Result = MAC_INIT_ERROR
+-
+-Availablein = fips
+-FIPSversion = >=3.4.0
+-MAC = CMAC
+-Unapproved = 1
+-Ctrl = encrypt-check:0
+-Algorithm = DES-EDE3-CBC
+-Key = 89BCD952A8C8AB371AF48AC7D07085D5EFF702E6D62CDC23
+-Input = FA620C1BBE97319E9A0CF0492121F7A20EB08A6A709DCBD00AAF38E4F99E754E
+-Output = 8F49A1B7D6AA2258
+diff --git a/test/recipes/80-test_cms.t b/test/recipes/80-test_cms.t
+index beadb43cf4..71ab4a3910 100644
+--- a/test/recipes/80-test_cms.t
++++ b/test/recipes/80-test_cms.t
+@@ -415,7 +415,7 @@ my @smime_cms_tests = (
+       \&final_compare
+     ],
+ 
+-    [ "encrypted content test streaming PEM format, triple DES key",
++    [ "encrypted content test streaming PEM format, triple DES key, no Red Hat FIPS",
+       [ "{cmd1}", @defaultprov, "-EncryptedData_encrypt", "-in", $smcont, "-outform", "PEM",
+         "-des3", "-secretkey", "000102030405060708090A0B0C0D0E0F1011121314151617",
+         "-stream", "-out", "{output}.cms" ],
+-- 
+2.52.0
+
