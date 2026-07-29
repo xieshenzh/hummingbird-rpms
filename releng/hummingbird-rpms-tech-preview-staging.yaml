@@ -248,6 +248,8 @@ spec:
           contentType: rpm
         - name: fedora-repos-main
           contentType: rpm
+        - name: fftw-main
+          contentType: rpm
         - name: file-main
           contentType: rpm
         - name: filesystem-main
