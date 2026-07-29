@@ -214,6 +214,12 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     # Superseded by Fedora update to 3.5.19 which includes the fix upstream.
     bad_commits = [line for line in bad_commits if not line.startswith('4f575724f889c3e78cc12560d8991fa896f1b756 ')]
 
+    # unbound pre-Fedora version bumps (1.25.0, 1.25.1, 1.25.2) committed without
+    # the Upstream: trailer. All superseded by Fedora update to 1.25.2-1.
+    bad_commits = [line for line in bad_commits if not line.startswith('9a82048c8aaf1f83607a5d74b3609bbbbfba21d3 ')]
+    bad_commits = [line for line in bad_commits if not line.startswith('609bdcca277e9d2c0830ea8b6be39368ce78b810 ')]
+    bad_commits = [line for line in bad_commits if not line.startswith('2bad62ba0ea82514ec430c7a0e4e141ca90589b8 ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)
