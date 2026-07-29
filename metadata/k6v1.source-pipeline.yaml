@@ -1,3 +1,5 @@
+# k6v1 tracks the 1.x stream; k6v2 tracks 2.x -- ${VERSION} can never
+# collide between the two packages' archive_name below.
 fetch:
   - type: git
     repo: "https://github.com/grafana/k6"
