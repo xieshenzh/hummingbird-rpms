@@ -234,6 +234,8 @@ spec:
           contentType: rpm
         - name: emacs-filesystem-main
           contentType: rpm
+        - name: environment-modules-main
+          contentType: rpm
         - name: erlang-rpm-macros-main
           contentType: rpm
         - name: erlang27-main
