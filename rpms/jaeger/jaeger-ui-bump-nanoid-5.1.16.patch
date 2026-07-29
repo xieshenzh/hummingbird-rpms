@@ -1,0 +1,50 @@
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+--- a/pnpm-lock.yaml	2026-07-19 21:58:14.000000000 -0400
++++ b/pnpm-lock.yaml	2026-07-29 11:33:01.157040554 -0400
+@@ -4178,8 +4178,8 @@
+     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+     hasBin: true
+ 
+-  nanoid@5.1.15:
+-    resolution: {integrity: sha512-kBg3RpGtIe+RpTbyXwoI6pk5yD7KUiI3sygUqgeBMRst42KmhB4RZC7eiO9Wa1HIpaCCtpE2DJ6OI4Wi5ebwFw==}
++  nanoid@5.1.16:
++    resolution: {integrity: sha512-kVrnsrJqMR8+oLJnGEmSWw9BivK5mt7H3FZatVRjrc5wGqFYuBxX1yG7+A7Gi5AefkX6t/oCkizcQgpu0cY1dQ==}
+     engines: {node: ^18 || >=20}
+     hasBin: true
+ 
+@@ -5327,7 +5327,7 @@
+       '@assistant-ui/store': 0.2.13(@assistant-ui/tap@0.5.14(@types/react@19.2.7)(react@19.2.0))(@types/react@19.2.7)(react@19.2.0)
+       '@assistant-ui/tap': 0.5.14(@types/react@19.2.7)(react@19.2.0)
+       assistant-stream: 0.3.23
+-      nanoid: 5.1.15
++      nanoid: 5.1.16
+     optionalDependencies:
+       '@types/react': 19.2.7
+       assistant-cloud: 0.1.33
+@@ -5367,7 +5367,7 @@
+       '@radix-ui/react-use-escape-keydown': 1.1.2(@types/react@19.2.7)(react@19.2.0)
+       assistant-cloud: 0.1.33
+       assistant-stream: 0.3.23
+-      nanoid: 5.1.15
++      nanoid: 5.1.16
+       radix-ui: 1.6.0(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+       react: 19.2.0
+       react-dom: 19.2.0(react@19.2.0)
+@@ -7930,7 +7930,7 @@
+   assistant-stream@0.3.23:
+     dependencies:
+       '@standard-schema/spec': 1.1.0
+-      nanoid: 5.1.15
++      nanoid: 5.1.16
+       secure-json-parse: 4.1.0
+ 
+   ast-v8-to-istanbul@1.0.4:
+@@ -8938,7 +8938,7 @@
+ 
+   nanoid@3.3.16: {}
+ 
+-  nanoid@5.1.15: {}
++  nanoid@5.1.16: {}
+ 
+   natural-compare@1.4.0: {}
+ 
