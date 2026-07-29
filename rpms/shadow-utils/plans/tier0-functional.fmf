@@ -14,7 +14,10 @@ prepare:
       how: install
       package:
         - expect
+        - gcc
         - git
+        - libssh-devel
+        - python3-devel
         - python3-pip
 
     - name: Setup SSH keys for localhost testing
