@@ -1,5 +1,0 @@
-download_sources: |
-  ./create-vendor-tarball.sh "${UPDATE_NEW_VERSION}" >&2
-  echo "opentelemetry-collector-releases-${UPDATE_NEW_VERSION}.tar.gz"
-  echo "opentelemetry-collector-contrib-${UPDATE_NEW_VERSION}-generated.tar.bz2"
-  echo "opentelemetry-collector-contrib-${UPDATE_NEW_VERSION}-vendor.tar.bz2"
