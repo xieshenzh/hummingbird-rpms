@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Add FIPS mode support (00329-fips.patch), CVE-2026-8723 fix for vendored qs; backport fix for CVE-2026-11972; backport fix for CVE-2026-15308; backport fix for CVE-2026-11940; CVE-2026-4360",
+  "modification_reason": "Add FIPS mode support (00329-fips.patch), CVE-2026-8723 fix for vendored qs; backport fix for CVE-2026-11972; backport fix for CVE-2026-15308; backport fix for CVE-2026-11940; CVE-2026-4360; CVE-2026-6879",
   "modification_status": "modified",
   "release": "2",
   "sha": "4669c6fce01b2883f16b44c9c2003027460878e8",
