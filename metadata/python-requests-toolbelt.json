@@ -1,8 +1,8 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "16",
-  "sha": "17295df55ac6639fe2dfab4f6f8121c623fffefa",
+  "release": "17",
+  "sha": "1f51fa6563196fe586d91caa146b1e2940b83bcc",
   "source": "https://src.fedoraproject.org/rpms/python-requests-toolbelt.git",
   "upstream_repo": "https://github.com/requests/toolbelt",
   "version": "1.0.0"
