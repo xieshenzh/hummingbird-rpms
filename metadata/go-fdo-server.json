@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Bump to 1.0.1 ahead of Fedora rawhide",
+  "modification_reason": "Bump to 1.0.1 ahead of Fedora rawhide; CVE-2026-56852",
   "modification_status": "modified",
   "release": "0.1",
   "sha": "a5c50650b6b371a7d76e53994f9b3b093394f151",
