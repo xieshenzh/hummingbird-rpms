@@ -362,6 +362,8 @@ spec:
           contentType: rpm
         - name: hummingbird-release-main
           contentType: rpm
+        - name: hwloc-main
+          contentType: rpm
         - name: icu-main
           contentType: rpm
         - name: ima-evm-utils-main

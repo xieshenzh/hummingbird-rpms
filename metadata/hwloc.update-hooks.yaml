@@ -1,0 +1,8 @@
+# Source archives are grouped by the major.minor release series.
+update_spec: |
+  release_series=${UPDATE_NEW_VERSION%.*}
+  sed -Ei \
+    -e 's/^(Version:\s+).*/\1'"${UPDATE_NEW_VERSION}"'/' \
+    -e 's#(release/hwloc/v)[0-9]+\.[0-9]+/#\1'"${release_series}"'/#' \
+    -e 's/^(Release:\s+)[^ ]+/\10.1%{?dist}/' \
+    "${UPDATE_SPEC_FILE}"
