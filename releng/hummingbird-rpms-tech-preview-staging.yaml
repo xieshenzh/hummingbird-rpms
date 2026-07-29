@@ -820,6 +820,8 @@ spec:
           contentType: rpm
         - name: protobuf-c-main
           contentType: rpm
+        - name: prrte-main
+          contentType: rpm
         - name: psmisc-main
           contentType: rpm
         - name: publicsuffix-list-main
