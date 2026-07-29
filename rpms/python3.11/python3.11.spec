@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 5.3%{?dist}
+Release: 5.4%{?dist}
 License: Python-2.0.1
 
 
@@ -473,6 +473,12 @@ Patch492: 00492-cve-2026-15308.patch
 #
 # gh-151558: Fix symlink escape via tarfile hardlink-extraction fallback
 Patch493: 00493-cve-2026-11940.patch
+
+# 00494 # d2b2f5eacab4dd48446b63340613b05dcbbf0b44
+# CVE-2026-4360
+#
+# gh-151987: Pass filter_function to TarFile._extract_one() during .extract()
+Patch494: 00494-cve-2026-4360.patch
 
 # (New patches go here ^^^)
 #
