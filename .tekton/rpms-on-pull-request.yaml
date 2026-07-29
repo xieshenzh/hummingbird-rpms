@@ -25272,7 +25272,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/pgbouncer/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/pgbouncer/***, test/rpms/pgbouncer.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main

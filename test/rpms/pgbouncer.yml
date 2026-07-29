@@ -1,0 +1,48 @@
+---
+# PgBouncer is packaged as a container runtime, without host service helpers.
+
+minimal-runtime-dependencies:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "pgbouncer" ]]; then
+      echo "Skipping: only runs on pgbouncer (got: ${rpm_name})"
+      exit 0
+    fi
+
+    requires=$(rpm -qRp "${TEST_RPM}")
+    for forbidden in systemd logrotate python3-psycopg2; do
+      if grep -qxF "${forbidden}" <<< "${requires}"; then
+        TEST_FAIL "pgbouncer must not require ${forbidden} at runtime"
+      fi
+    done
+
+    if grep -qE '^lib(lber|ldap|pam)' <<< "${requires}"; then
+      TEST_FAIL "pgbouncer must not require LDAP or PAM libraries at runtime"
+    fi
+
+    echo "PASS: PgBouncer has no host-service, Python helper, LDAP, or PAM dependencies"
+
+container-runtime-contents:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "pgbouncer" ]]; then
+      echo "Skipping: only runs on pgbouncer (got: ${rpm_name})"
+      exit 0
+    fi
+
+    contents=$(rpm -qlp "${TEST_RPM}")
+    grep -qxF "/usr/bin/pgbouncer" <<< "${contents}" \
+      || TEST_FAIL "pgbouncer binary is missing"
+    for forbidden in \
+      /etc/pgbouncer/mkauth.py \
+      /etc/pgbouncer/pgbouncer.ini \
+      /etc/pgbouncer/userlist.txt \
+      /etc/pam.d/pgbouncer \
+      /etc/logrotate.d/pgbouncer \
+      /usr/lib/systemd/system/pgbouncer.service; do
+      if grep -qxF "${forbidden}" <<< "${contents}"; then
+        TEST_FAIL "container package must not contain ${forbidden}"
+      fi
+    done
+
+    echo "PASS: PgBouncer contains only container runtime assets"
