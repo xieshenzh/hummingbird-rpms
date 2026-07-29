@@ -5514,6 +5514,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- hdf5 ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: hdf5-main
+spec:
+  application: rpms-main
+  componentName: hdf5-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/hdf5-main
+  source:
+    git:
+      context: rpms/hdf5
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: hdf5-main
+  name: hdf5-main
+spec:
+  image:
+    name: hummingbird-tenant/hdf5-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- hello ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1

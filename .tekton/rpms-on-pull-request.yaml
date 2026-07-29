@@ -5724,7 +5724,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-environment-modules-main
   timeouts:
@@ -6230,7 +6230,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fftw-main
   timeouts:
@@ -9906,6 +9906,76 @@ spec:
     - name: git-auth
       secret:
         secretName: '{{git_auth_secret}}'
+# --- hdf5 ---
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/redhat/hummingbird/rpms/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/hdf5/***]"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: rpms-main
+    appstudio.openshift.io/component: hdf5-main
+    pipelines.appstudio.openshift.io/type: build
+  name: hdf5-main-on-pull-request
+  namespace: hummingbird-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
+    - name: image-expires-after
+      value: "5d"
+    - name: ociStorage
+      value: quay.io/redhat-user-workloads/hummingbird-tenant/hdf5-main:on-mr-{{pull_request_number}}-{{revision}}
+    - name: package-name
+      value: hdf5
+    - name: target-branch
+      value: '{{target_branch}}'
+    - name: build-architectures
+      value:
+        - aarch64
+        - x86_64
+    - name: build-platforms
+      value:
+        - "linux/x86_64"
+        - "linux/arm64"
+    - name: specfile
+      value: "hdf5.spec"
+    - name: monorepo-subdir
+      value: "rpms/hdf5"
+    - name: mock-config-template-filename-in-sources
+      value: "mock/mock.cfg"
+  pipelineRef:
+    resolver: bundles
+    params:
+      - name: name
+        value: build-rpm-package
+      - name: kind
+        value: pipeline
+      - name: bundle
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-hdf5-main
+  timeouts:
+    pipeline: 4h
+    tasks: 4h
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{git_auth_secret}}'
 # --- hello ---
 ---
 apiVersion: tekton.dev/v1
@@ -10546,7 +10616,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-hwloc-main
   timeouts:
@@ -14154,7 +14224,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libfabric-main
   timeouts:
@@ -15698,7 +15768,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-libpsm2-main
   timeouts:
@@ -22366,7 +22436,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-orangefs-main
   timeouts:
@@ -26174,7 +26244,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-pmix-main
   timeouts:
@@ -26892,7 +26962,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-protobuf-main
   timeouts:
@@ -27032,7 +27102,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-prrte-main
   timeouts:
@@ -30974,7 +31044,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-re2-main
   timeouts:
@@ -33852,7 +33922,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-tbb-main
   timeouts:
@@ -34142,7 +34212,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-thrift-main
   timeouts:
@@ -34852,7 +34922,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-ucx-main
   timeouts:
@@ -35136,7 +35206,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-utf8proc-main
   timeouts:
@@ -36130,7 +36200,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:381af207172315ea314dbdc2acc99566ad2685d3ab862e3524479976f206e049"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
   taskRunTemplate:
     serviceAccountName: build-pipeline-zeromq-main
   timeouts:
