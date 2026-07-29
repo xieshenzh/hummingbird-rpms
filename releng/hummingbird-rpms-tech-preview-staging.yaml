@@ -510,6 +510,8 @@ spec:
           contentType: rpm
         - name: libpsl-main
           contentType: rpm
+        - name: libpsm2-main
+          contentType: rpm
         - name: libpwquality-main
           contentType: rpm
         - name: librepo-main
