@@ -1,38 +1,7 @@
-# Download Grafana and generate its Go vendor and multi-architecture Yarn cache archives.
-download_sources: |
+# Fetch/vendor/yarn-cache generation is handled by gorget (see
+# metadata/grafana13.1.source-pipeline.yaml). This just refreshes the
+# bundled npm Provides block afterward, which needs write access to the
+# spec file that gorget's sandboxed run: steps don't have.
+post_update: |
   set -euo pipefail
-  version="${UPDATE_NEW_VERSION}"
-  package_dir="${UPDATE_PACKAGE_DIR}"
-  workdir="$(mktemp -d)"
-  trap 'chmod -R u+w "${workdir}" && rm -rf "${workdir}"' EXIT
-  cd "${package_dir}"
-
-  source="grafana-${version}.tar.gz"
-  vendor="grafana-${version}-vendor.tar.bz2"
-  yarn_cache="grafana-yarn-cache-${version}.tar.bz2"
-
-  curl -fSL -o "${source}" \
-    "https://github.com/grafana/grafana/archive/v${version}/${source}" >&2
-  ./generate-bundled-npm-provides.py "${version}" >&2
-
-  GOCACHE="${workdir}/go-build" GOMODCACHE="${workdir}/go-mod" \
-    go_vendor_archive create --config go-vendor-tools.toml \
-      -O "${vendor}" "${source}" >&2
-
-  tar -xzf "${source}" -C "${workdir}" >&2
-  source_dir="${workdir}/grafana-${version}"
-  patch -d "${source_dir}" -p1 < grafana-yarn-cache.patch >&2
-  cd "${source_dir}"
-  if [[ -n "${HTTP_PROXY:-}" ]]; then
-    export YARN_HTTP_PROXY="${HTTP_PROXY}"
-  fi
-  if [[ -n "${HTTPS_PROXY:-}" ]]; then
-    export YARN_HTTPS_PROXY="${HTTPS_PROXY}"
-  fi
-  YARN_ENABLE_GLOBAL_CACHE=false YARN_CACHE_FOLDER=.yarn/cache \
-    node .yarn/releases/yarn-*.cjs install --immutable >&2
-  tar -cjf "${package_dir}/${yarn_cache}" .yarn/cache >&2
-
-  echo "${source}"
-  echo "${vendor}"
-  echo "${yarn_cache}"
+  ./generate-bundled-npm-provides.py "${UPDATE_NEW_VERSION}"
