@@ -19458,6 +19458,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- utf8proc ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: utf8proc-main
+spec:
+  application: rpms-main
+  componentName: utf8proc-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/utf8proc-main
+  source:
+    git:
+      context: rpms/utf8proc
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: utf8proc-main
+  name: utf8proc-main
+spec:
+  image:
+    name: hummingbird-tenant/utf8proc-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- util-linux ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1

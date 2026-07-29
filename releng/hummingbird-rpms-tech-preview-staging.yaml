@@ -1054,6 +1054,8 @@ spec:
           contentType: rpm
         - name: uriparser-main
           contentType: rpm
+        - name: utf8proc-main
+          contentType: rpm
         - name: util-linux-main
           contentType: rpm
         - name: uuid-main
