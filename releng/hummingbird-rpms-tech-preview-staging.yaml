@@ -1016,6 +1016,8 @@ spec:
           contentType: rpm
         - name: tar-main
           contentType: rpm
+        - name: tbb-main
+          contentType: rpm
         - name: tcl-main
           contentType: rpm
         - name: tempo2-10-main
