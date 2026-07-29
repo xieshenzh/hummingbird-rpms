@@ -220,6 +220,12 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     bad_commits = [line for line in bad_commits if not line.startswith('609bdcca277e9d2c0830ea8b6be39368ce78b810 ')]
     bad_commits = [line for line in bad_commits if not line.startswith('2bad62ba0ea82514ec430c7a0e4e141ca90589b8 ')]
 
+    # jq merge conflict resolution and patch cleanup were committed without the
+    # Upstream: trailer. Superseded by Fedora update to 1.8.2-5.
+    bad_commits = [line for line in bad_commits if not line.startswith('671a6d654e605e81b9d18e43295b925a392a8ff9 ')]
+    bad_commits = [line for line in bad_commits if not line.startswith('15a348055110d0f7f136ab8959c70244d0500a7e ')]
+    bad_commits = [line for line in bad_commits if not line.startswith('93a1e70095f9a162ff8e4f08e8a6965f9c88bad5 ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)
