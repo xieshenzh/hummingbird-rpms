@@ -1084,6 +1084,8 @@ spec:
           contentType: rpm
         - name: zchunk-main
           contentType: rpm
+        - name: zeromq-main
+          contentType: rpm
         - name: zig-srpm-macros-main
           contentType: rpm
         - name: zip-main
