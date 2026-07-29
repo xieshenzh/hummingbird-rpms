@@ -93,7 +93,7 @@ UPLOAD_SCRIPT = ROOT_DIR / "ci" / "upload-to-lookaside-cache.sh"
 # Container image for the gorget source-pipeline tool (see
 # metadata/<package>.source-pipeline.yaml and documentation/design/source-pipeline-tool.md)
 # renovate: datasource=docker depName=quay.io/hummingbird-ci/gorget
-GORGET_IMAGE = "quay.io/hummingbird-ci/gorget:latest@sha256:544625a977e612dfaca521ed9f48264ef42562e92e9d44de583c00791901d8d4"
+GORGET_IMAGE = "quay.io/hummingbird-ci/gorget:latest@sha256:8a08395e2973d288d1bac28c6d0606d4c3064a5b2d2c2ee5b95d54d8b3327901"
 
 # Rate limiting: delay between API requests (in seconds)
 API_DELAY = 0.2
