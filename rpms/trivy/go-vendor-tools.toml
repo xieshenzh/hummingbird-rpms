@@ -18,6 +18,8 @@ pre_commands = [
   ["go", "get", "github.com/moby/buildkit@v0.31.2"],
   # CVE-2026-56852
   ["go", "get", "golang.org/x/text@v0.39.0"],
+  # CVE-2026-49834
+  ["go", "get", "github.com/sigstore/sigstore-go@v1.2.2"],
 ]
 post_commands = [
   # Copy missing license files that go mod vendor doesn't include
