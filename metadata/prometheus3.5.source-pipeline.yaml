@@ -1,0 +1,31 @@
+fetch:
+  - type: git
+    repo: "https://github.com/prometheus/prometheus"
+    ref: "v${VERSION}"
+    archive_name: "prometheus-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "prometheus-${VERSION}-vendor.tar.bz2"
+    modules:
+      - path: "."
+        use_workspace: false
+
+transform:
+  - type: run
+    path: "."
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        root="$(pwd)"
+        mkdir "${root}/.npm-cache"
+        for arch in x64 arm64; do
+          (cd web/ui && npm ci --ignore-scripts \
+            --cache "${root}/.npm-cache" --cpu "${arch}" --os linux --libc glibc)
+          (cd web/ui/react-app && npm ci --ignore-scripts \
+            --cache "${root}/.npm-cache" --cpu "${arch}" --os linux --libc glibc)
+        done
+        tar -cjf "prometheus-npm-cache-${VERSION}.tar.bz2" -C "${root}" .npm-cache
+    outputs:
+      - "prometheus-npm-cache-${VERSION}.tar.bz2"

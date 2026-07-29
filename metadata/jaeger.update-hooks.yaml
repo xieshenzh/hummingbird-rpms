@@ -1,48 +1,7 @@
-# Generate Jaeger backend/UI sources, Go vendor archive, and offline pnpm cache.
-download_sources: |
+# Fetch/vendor/pnpm-cache generation is handled by gorget (see
+# metadata/jaeger.source-pipeline.yaml). This just refreshes the bundled
+# npm Provides block afterward, which needs write access to the spec file
+# that gorget's sandboxed run: steps don't have.
+post_update: |
   set -euo pipefail
-  version="${UPDATE_NEW_VERSION}"
-  package_dir="${UPDATE_PACKAGE_DIR}"
-  workdir="$(mktemp -d)"
-  trap 'chmod -R u+w "${workdir}" && rm -rf "${workdir}"' EXIT
-  cd "${package_dir}"
-
-  archive="jaeger-${version}.tar.gz"
-  ui_archive="jaeger-ui-${version}.tar.gz"
-  vendor="jaeger-${version}-vendor.tar.bz2"
-  pnpm_cache="jaeger-ui-pnpm-cache-${version}.tar.bz2"
-
-  curl -fSL -o "${archive}" \
-    "https://github.com/jaegertracing/jaeger/archive/v${version}/${archive}" >&2
-  git clone --quiet --depth 1 --filter=blob:none --no-checkout \
-    --branch "v${version}" https://github.com/jaegertracing/jaeger.git \
-    "${workdir}/jaeger-git" >&2
-  ui_commit="$(git -C "${workdir}/jaeger-git" ls-tree HEAD jaeger-ui | \
-    awk '$1 == "160000" && $2 == "commit" { print $3 }')"
-  if [[ ! "${ui_commit}" =~ ^[0-9a-f]{40}$ ]]; then
-    echo "Could not resolve Jaeger UI submodule for v${version}" >&2
-    exit 1
-  fi
-  curl -fSL -o "${ui_archive}" \
-    "https://github.com/jaegertracing/jaeger-ui/archive/${ui_commit}/${ui_archive}" >&2
-  ./generate-bundled-npm-provides.py "${version}" >&2
-
-  go_vendor_archive create \
-    -c go-vendor-tools.toml \
-    -O "${vendor}" \
-    "${UPDATE_SPEC_FILE}" >&2
-
-  mkdir "${workdir}/jaeger-ui"
-  tar -xzf "${ui_archive}" -C "${workdir}/jaeger-ui" --strip-components=1
-  patch -d "${workdir}/jaeger-ui" -p1 < jaeger-ui-pnpm-cache.patch >&2
-  npm install --prefix "${workdir}/.pnpm" --ignore-scripts pnpm@10.5.0 >&2
-  pnpm="${workdir}/.pnpm/node_modules/.bin/pnpm"
-  pnpm_store="${workdir}/.pnpm-store"
-  (cd "${workdir}/jaeger-ui" && \
-    ${pnpm} fetch --frozen-lockfile --store-dir "${pnpm_store}") >&2
-  tar -cjf "${package_dir}/${pnpm_cache}" -C "${workdir}" .pnpm .pnpm-store >&2
-
-  echo "${archive}"
-  echo "${ui_archive}"
-  echo "${vendor}"
-  echo "${pnpm_cache}"
+  ./generate-bundled-npm-provides.py "${UPDATE_NEW_VERSION}"
