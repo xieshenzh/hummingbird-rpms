@@ -14284,6 +14284,45 @@ spec:
     title: SBOM-event-to-Bombino
 # --- pkgconfig ---
 # PENDING
+# --- pmix ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: pmix-main
+spec:
+  application: rpms-main
+  componentName: pmix-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/pmix-main
+  source:
+    git:
+      context: rpms/pmix
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: pmix-main
+  name: pmix-main
+spec:
+  image:
+    name: hummingbird-tenant/pmix-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- po4a ---
 # PENDING
 # --- podman ---

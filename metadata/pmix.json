@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "4",
+  "release_monitoring_project_id": 10931,
+  "sha": "9cbfbc001ae4d6304483597b0f209c66bfa19008",
+  "source": "https://src.fedoraproject.org/rpms/pmix.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/openpmix/openpmix",
+  "version": "5.0.7"
+}
