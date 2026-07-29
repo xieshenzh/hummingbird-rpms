@@ -4,5 +4,5 @@
   "release_monitoring_project_id": 380418,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/anchore/grype",
-  "version": "0.116.0"
+  "version": "0.116.1"
 }
