@@ -18,6 +18,8 @@ transform:
         patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache.patch"
         if [ -n "${HTTP_PROXY-}" ]; then export YARN_HTTP_PROXY="${HTTP_PROXY-}"; fi
         if [ -n "${HTTPS_PROXY-}" ]; then export YARN_HTTPS_PROXY="${HTTPS_PROXY-}"; fi
+        # Unlike grafana12.4, 13.1's yarn.lock has no Cypress dependency to
+        # suppress a binary download for.
         YARN_ENABLE_GLOBAL_CACHE=false YARN_CACHE_FOLDER=.yarn/cache \
           node .yarn/releases/yarn-*.cjs install --immutable
         tar -cjf "grafana-yarn-cache-${VERSION}.tar.bz2" .yarn/cache
