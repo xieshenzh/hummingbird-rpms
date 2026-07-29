@@ -12,10 +12,10 @@ transform:
       - |
         set -euo pipefail
         # Hummingbird's build runners are amd64-only; revisit if that changes.
-        curl -fSL -o /tmp/ocb \
+        curl -fSL -o "/tmp/ocb-${VERSION}" \
           "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/cmd%2Fbuilder%2Fv${VERSION}/ocb_${VERSION}_linux_amd64"
-        chmod +x /tmp/ocb
-        /tmp/ocb --skip-compilation --config distributions/otelcol/manifest.yaml
+        chmod +x "/tmp/ocb-${VERSION}"
+        "/tmp/ocb-${VERSION}" --skip-compilation --config distributions/otelcol/manifest.yaml
         generated_files=(go.mod go.sum)
         while IFS= read -r f; do
           generated_files+=("$f")
