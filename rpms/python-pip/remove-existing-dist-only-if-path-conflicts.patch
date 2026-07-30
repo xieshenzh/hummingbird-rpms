@@ -16,17 +16,12 @@ Co-Authored-By: Lumir Balhar <lbalhar@redhat.com>
 Co-Authored-By: Miro Hrončok <miro@hroncok.cz>
 Co-Authored-By: Karolina Surma <ksurma@redhat.com>
 ---
- src/pip/_internal/metadata/base.py                 | 12 +++++++++++-
- src/pip/_internal/req/req_install.py               |  2 +-
- src/pip/_internal/resolution/legacy/resolver.py    |  4 +++-
- src/pip/_internal/resolution/resolvelib/factory.py | 12 ++++++++++++
- 4 files changed, 27 insertions(+), 3 deletions(-)
 
 diff --git a/src/pip/_internal/metadata/base.py b/src/pip/_internal/metadata/base.py
-index 230e114..8bd5d31 100644
+index 76fb9636583a..cb130730cc09 100644
 --- a/src/pip/_internal/metadata/base.py
 +++ b/src/pip/_internal/metadata/base.py
-@@ -23,7 +23,7 @@ from pip._vendor.packaging.utils import NormalizedName, canonicalize_name
+@@ -22,7 +22,7 @@ from pip._vendor.packaging.utils import NormalizedName, canonicalize_name
  from pip._vendor.packaging.version import Version
  
  from pip._internal.exceptions import NoneMetadataError
@@ -35,7 +30,7 @@ index 230e114..8bd5d31 100644
  from pip._internal.models.direct_url import (
      DIRECT_URL_METADATA_NAME,
      DirectUrl,
-@@ -575,6 +575,16 @@ class BaseDistribution(Protocol):
+@@ -580,6 +580,16 @@ class BaseDistribution(Protocol):
              for extra in self._iter_egg_info_extras():
                  metadata["Provides-Extra"] = extra
  
@@ -53,10 +48,10 @@ index 230e114..8bd5d31 100644
  class BaseEnvironment:
      """An environment containing distributions to introspect."""
 diff --git a/src/pip/_internal/req/req_install.py b/src/pip/_internal/req/req_install.py
-index aad2f0e..7b385b1 100644
+index f20707f3d24b..15ca3735439e 100644
 --- a/src/pip/_internal/req/req_install.py
 +++ b/src/pip/_internal/req/req_install.py
-@@ -439,7 +439,7 @@ class InstallRequirement:
+@@ -428,7 +428,7 @@ class InstallRequirement:
                          f"lack sys.path precedence to {existing_dist.raw_name} "
                          f"in {existing_dist.location}"
                      )
@@ -66,7 +61,7 @@ index aad2f0e..7b385b1 100644
          else:
              if self.editable:
 diff --git a/src/pip/_internal/resolution/legacy/resolver.py b/src/pip/_internal/resolution/legacy/resolver.py
-index 6cc6311..4188ef1 100644
+index f2b0379096e6..eed368e9a03d 100644
 --- a/src/pip/_internal/resolution/legacy/resolver.py
 +++ b/src/pip/_internal/resolution/legacy/resolver.py
 @@ -322,7 +322,9 @@ class Resolver(BaseResolver):
@@ -81,7 +76,7 @@ index 6cc6311..4188ef1 100644
          req.satisfied_by = None
  
 diff --git a/src/pip/_internal/resolution/resolvelib/factory.py b/src/pip/_internal/resolution/resolvelib/factory.py
-index a74200a..99738cc 100644
+index c9fb839d4a0f..82d0244bf023 100644
 --- a/src/pip/_internal/resolution/resolvelib/factory.py
 +++ b/src/pip/_internal/resolution/resolvelib/factory.py
 @@ -4,6 +4,8 @@ import contextlib
@@ -90,10 +85,10 @@ index a74200a..99738cc 100644
  import logging
 +import sys
 +import sysconfig
- from collections.abc import Iterable, Iterator, Mapping, Sequence
+ from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
  from typing import (
      TYPE_CHECKING,
-@@ -674,6 +676,16 @@ class Factory:
+@@ -640,6 +642,16 @@ class Factory:
          if dist is None:  # Not installed, no uninstallation required.
              return None
  
@@ -111,5 +106,5 @@ index a74200a..99738cc 100644
          # be uninstalled, no matter it's in global or user site, because the
          # user site installation has precedence over global.
 -- 
-2.54.0
+2.55.0
 
