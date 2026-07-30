@@ -46,6 +46,18 @@ default:
     when: manual
     allow_failure: true # allow to merge MR without running this job
 
+.notify_schedule_failure: &notify_schedule_failure
+  - |
+    if [ "$CI_JOB_STATUS" == "failed" ] && [ "$CI_PIPELINE_SOURCE" == "schedule" ]; then
+      if [ -z "$SLACK_WEBHOOK_URL" ]; then
+        echo "WARNING: SLACK_WEBHOOK_URL is not set, skipping Slack notification"
+      else
+        curl -f --show-error -X POST -H 'Content-Type: application/json' \
+          --data "{\"text\": \"⚠️ ${CI_JOB_NAME} scheduled pipeline failed: ${CI_JOB_URL}\"}" \
+          "$SLACK_WEBHOOK_URL"
+      fi
+    fi
+
 tree_status:
   stage: external
   script:
@@ -141,6 +153,7 @@ dist_git_update:
   script:
     - |
       ./ci/dist_git_update_multi_mr.sh
+  after_script: *notify_schedule_failure
   rules:
     - !reference [.rules, schedule]
     - !reference [.rules, mr_manual]
@@ -173,6 +186,7 @@ upstream_version_update:
       export AWS_ROLE_ARN="arn:aws:iam::${LOOKASIDE_UPLOAD_AWS_ACCOUNT_ID}:role/${LOOKASIDE_UPLOAD_AWS_ROLE_NAME}"
       export AWS_ROLE_SESSION_NAME="gitlab-ci-${CI_JOB_ID}"
       ./ci/upstream_update_multi_mr.sh
+  after_script: *notify_schedule_failure
   rules:
     - !reference [.rules, schedule]
     - !reference [.rules, mr_manual]
