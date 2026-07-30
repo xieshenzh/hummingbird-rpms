@@ -317,6 +317,10 @@ pytest_k="$pytest_k and not (functional and bazaar)"
 pytest_k="$pytest_k and not test_all_fields and not test_report_mixed_not_found and not test_basic_show"  # "Editable project location" missing
 pytest_k="$pytest_k and not test_basic_install_from_wheel"
 pytest_k="$pytest_k and not test_check_unsupported"
+# Hummingbird buildroot has no cmake on PATH for this isolation smoke test
+pytest_k="$pytest_k and not test_build_env_can_still_access_python_tools_on_system_path"
+# keyring CLI version parsing differs with Hummingbird's keyring packaging
+pytest_k="$pytest_k and not test_keyring_cli_outdated_version"
 
 %pytest -n auto -m 'not network' -k "$(echo $pytest_k)" \
     --ignore tests/functional/test_proxy.py  # no proxy.py in Fedora
