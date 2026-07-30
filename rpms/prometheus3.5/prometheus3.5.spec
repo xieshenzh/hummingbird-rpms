@@ -8,7 +8,7 @@ Version:                3.5.5
 %gometa -L -f
 
 Name:           prometheus3.5
-Release:        0.5%{?dist}
+Release:        0.6%{?dist}
 Summary:        Monitoring system and time series database
 License:        Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL:            %{gourl}
@@ -21,6 +21,7 @@ Source3:        go-vendor-tools.toml
 Patch0:         0001-Disable-pprof-debug-endpoints.patch
 Patch1:         0002-Backport-x-text-security-update.patch
 Patch2:         0003-Make-bigzero-average-test-tolerant.patch
+Patch3:         0004-cve-2026-53669-bump-react-router-to-7.18.0.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.23
@@ -229,9 +230,9 @@ Provides:       bundled(npm(react-remove-scroll)) = 2.6.2
 Provides:       bundled(npm(react-remove-scroll-bar)) = 2.3.8
 Provides:       bundled(npm(react-resize-detector)) = 7.1.2
 Provides:       bundled(npm(react-router)) = 5.3.4
-Provides:       bundled(npm(react-router)) = 7.17.0
+Provides:       bundled(npm(react-router)) = 7.18.0
 Provides:       bundled(npm(react-router-dom)) = 5.3.4
-Provides:       bundled(npm(react-router-dom)) = 7.17.0
+Provides:       bundled(npm(react-router-dom)) = 7.18.0
 Provides:       bundled(npm(react-shallow-renderer)) = 16.15.0
 Provides:       bundled(npm(react-style-singleton)) = 2.2.3
 Provides:       bundled(npm(react-test-renderer)) = 17.0.2
