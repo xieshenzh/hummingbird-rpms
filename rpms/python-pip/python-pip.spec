@@ -6,13 +6,13 @@
 %bcond man 1
 
 %global srcname pip
-%global base_version 26.1.2
+%global base_version 26.2
 %global upstream_version %{base_version}%{?prerel}
 %global python_wheel_name %{srcname}-%{upstream_version}-py3-none-any.whl
 
 Name:           python-%{srcname}
 Version:        %{base_version}%{?prerel:~%{prerel}}
-Release:        1.1%{?dist}
+Release:        0.1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 # We bundle a lot of libraries with pip, which itself is under MIT license.
@@ -95,18 +95,6 @@ Patch:          dummy-certifi.patch
 # We don't need a layer to check that, as we're by default in an offline environment
 Patch:          downstream-remove-pytest-subket.patch
 
-# Fix sitecustomize.py used for build isolation on Python 3.15+
-Patch:          https://github.com/pypa/pip/commit/6099a54ddd.patch
-
-# Fix user-site path ordering in the test suite on Python 3.15+
-# The same CPython gh-149819 change that broke build env isolation also broke
-# _customize_site() in tests/lib/venv.py: site.addsitedir() no longer
-# re-appends paths already in sys.path, so the detection of system-site paths
-# produces an empty list and user site ends up after venv site-packages instead
-# of before it, causing user-site install/uninstall tests to operate on the
-# wrong installation.
-Patch:          https://github.com/pypa/pip/commit/4c6d7471de.patch
-
 # Remove -s from Python shebang - ensure that packages installed with pip
 # to user locations are seen by pip itself
 %undefine _py3_shebang_s
@@ -124,23 +112,23 @@ Packages" or "Pip Installs Python".
 # %%{_rpmconfigdir}/pythonbundles.py --namespace 'python%%{1}dist' src/pip/_vendor/vendor.txt
 %global bundled() %{expand:
 Provides: bundled(python%{1}dist(cachecontrol)) = 0.14.4
-Provides: bundled(python%{1}dist(certifi)) = 2026.2.25
-Provides: bundled(python%{1}dist(distlib)) = 0.4
+Provides: bundled(python%{1}dist(certifi)) = 2026.6.17
+Provides: bundled(python%{1}dist(distlib)) = 0.4.2
 Provides: bundled(python%{1}dist(distro)) = 1.9
-Provides: bundled(python%{1}dist(idna)) = 3.11
+Provides: bundled(python%{1}dist(idna)) = 3.18
 Provides: bundled(python%{1}dist(msgpack)) = 1.1.2
 Provides: bundled(python%{1}dist(packaging)) = 26.2
-Provides: bundled(python%{1}dist(platformdirs)) = 4.5.1
-Provides: bundled(python%{1}dist(pygments)) = 2.19.2
+Provides: bundled(python%{1}dist(platformdirs)) = 4.10
+Provides: bundled(python%{1}dist(pygments)) = 2.20
 Provides: bundled(python%{1}dist(pyproject-hooks)) = 1.2
-Provides: bundled(python%{1}dist(requests)) = 2.33.1
+Provides: bundled(python%{1}dist(requests)) = 2.34.2
 Provides: bundled(python%{1}dist(resolvelib)) = 1.2.1
 Provides: bundled(python%{1}dist(rich)) = 14.2
 Provides: bundled(python%{1}dist(setuptools)) = 70.3
-Provides: bundled(python%{1}dist(tomli)) = 2.3.1
+Provides: bundled(python%{1}dist(tomli)) = 2.4.1
 Provides: bundled(python%{1}dist(tomli-w)) = 1.2
 Provides: bundled(python%{1}dist(truststore)) = 0.10.4
-Provides: bundled(python%{1}dist(urllib3)) = 2.6.3
+Provides: bundled(python%{1}dist(urllib3)) = 2.7
 }
 
 # Some manylinux1 wheels need libcrypt.so.1.
@@ -329,6 +317,10 @@ pytest_k="$pytest_k and not (functional and bazaar)"
 pytest_k="$pytest_k and not test_all_fields and not test_report_mixed_not_found and not test_basic_show"  # "Editable project location" missing
 pytest_k="$pytest_k and not test_basic_install_from_wheel"
 pytest_k="$pytest_k and not test_check_unsupported"
+# Hummingbird buildroot has no cmake on PATH for this isolation smoke test
+pytest_k="$pytest_k and not test_build_env_can_still_access_python_tools_on_system_path"
+# keyring CLI version parsing differs with Hummingbird's keyring packaging
+pytest_k="$pytest_k and not test_keyring_cli_outdated_version"
 
 %pytest -n auto -m 'not network' -k "$(echo $pytest_k)" \
     --ignore tests/functional/test_proxy.py  # no proxy.py in Fedora
