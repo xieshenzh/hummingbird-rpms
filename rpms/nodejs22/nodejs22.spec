@@ -140,8 +140,8 @@ Provides:   nodejs(engine) = %{node_version}
 # Backwards compatibility
 %obsolete_default_stream_rpm
 
-# Main source tarball; see packaging/make-nodejs-tarball.sh on how it is created
-Source:         node-v%{node_version}-stripped.tar.gz
+# Main source tarball; see metadata/nodejs22.source-pipeline.yaml on how it is created
+Source:         node-v%{node_version}.tar.gz
 # Sources 001-099: reserved for additional sources to be installed
 # - Full ICU database data
 Source001:      https://github.com/unicode-org/icu/releases/download/release-%{icu_version_major}.%{icu_version_minor}/icu4c-%{icu_version_major}.%{icu_version_minor}-data-bin-b.zip
