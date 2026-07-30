@@ -20,6 +20,7 @@ transform:
         set -euo pipefail
         root="$(pwd)"
         patch -p1 < "${PACKAGE_DIR}/0003-pnpm-cache-both-rpm-architectures.patch"
+        patch -p1 < "${PACKAGE_DIR}/0004-cve-2026-53669-bump-react-router-to-7.18.0.patch"
         npm install --prefix "${root}/.pnpm" --ignore-scripts pnpm@11
         pnpm="${root}/.pnpm/node_modules/.bin/pnpm"
         pnpm_store="${root}/.pnpm-store"

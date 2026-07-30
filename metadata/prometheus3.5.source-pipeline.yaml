@@ -19,6 +19,7 @@ transform:
       - |
         set -euo pipefail
         root="$(pwd)"
+        patch -p1 < "${PACKAGE_DIR}/0004-cve-2026-53669-bump-react-router-to-7.18.0.patch"
         mkdir "${root}/.npm-cache"
         for arch in x64 arm64; do
           (cd web/ui && npm ci --ignore-scripts \
