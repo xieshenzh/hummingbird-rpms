@@ -27,6 +27,13 @@ Two modes:
   files (e.g. the output of `ci/build_rpms.sh`). No prediction needed --
   this is ground truth.
 
+--mr mode only considers rpms/<package>/ path changes (matching Konflux's
+own build trigger), not metadata/<package>.json changes: a metadata-only
+change (e.g. `ci/dist_git.py mark-modified`) never causes a
+rebuild/republish, so treating it as "changed" would predict a NEVR
+that's already published purely because nothing is actually being
+rebuilt -- a false-positive CONFLICT. See get_changed_rpm_packages().
+
 In spec mode, `rpmspec -q` lists a package entry for every declared Name:
 and %package stanza, even ones with no bare %files section of their own
 (e.g. krb5.spec, where every %files line is subpackage-qualified and the
@@ -90,10 +97,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
-
-# Reuse the existing MR-changed-package detection instead of duplicating it.
-sys.path.insert(0, str(Path(__file__).parent))
-from validate_package_modifications import get_changed_packages_in_mr
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 RPMS_DIR = ROOT_DIR / 'rpms'
@@ -472,6 +475,41 @@ def get_all_packages() -> list[str]:
     return sorted(p.name for p in RPMS_DIR.iterdir() if has_spec(p.name))
 
 
+def get_changed_rpm_packages() -> list[str]:
+    """Return packages whose rpms/<package>/ directory changed in the current MR.
+
+    This is deliberately narrower than validate_package_modifications.py's
+    get_changed_packages_in_mr(), which also treats a changed
+    metadata/<package>.json as "changed" -- appropriate for validating
+    metadata tracking, but wrong here: Konflux's actual build trigger is
+    scoped to rpms/<package>/*** only (see
+    .tekton/macros/pipeline-run.j2's on-path-change annotation), so a
+    metadata-only change (e.g. `ci/dist_git.py mark-modified`) never causes
+    a rebuild/republish. Treating it as "changed" here would predict a
+    NEVR that's already published purely because nothing is actually being
+    rebuilt -- a false-positive CONFLICT.
+    """
+    target_branch = os.environ.get('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', 'main')
+    try:
+        result = subprocess.run(
+            ['git', 'diff', '--name-only', f'origin/{target_branch}...HEAD'],
+            cwd=ROOT_DIR, capture_output=True, text=True, check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        raise NevrCheckError(f"git diff against origin/{target_branch} failed: {e.stderr.strip()}") from e
+    except FileNotFoundError as e:
+        raise NevrCheckError("git is required but not found in PATH") from e
+
+    changed_packages = set()
+    for line in result.stdout.strip().splitlines():
+        if not line.startswith('rpms/'):
+            continue
+        parts = line.split('/')
+        if len(parts) >= 2:
+            changed_packages.add(parts[1])
+    return sorted(changed_packages)
+
+
 # --------------------------------------------------------------------------
 # Main
 # --------------------------------------------------------------------------
@@ -534,7 +572,11 @@ Examples:
                 errors.append(str(e))
     else:
         if args.mr:
-            packages = [p for p in get_changed_packages_in_mr() if has_spec(p)]
+            try:
+                packages = [p for p in get_changed_rpm_packages() if has_spec(p)]
+            except NevrCheckError as e:
+                print(f"ERROR: {e}", file=sys.stderr)
+                return 2
         elif args.all:
             packages = get_all_packages()
         elif args.packages:

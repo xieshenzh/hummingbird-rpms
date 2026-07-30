@@ -9,6 +9,7 @@ Only `dnf`/Pulp network access is faked, via a PATH-injected script.
 import json
 import os
 import shutil
+import subprocess
 import sys
 import types
 from pathlib import Path
@@ -747,6 +748,55 @@ Test
     assert 'ldap' in out
 
 
+def _git(args: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(['git', *args], cwd=cwd, check=True, capture_output=True, text=True)
+
+
+def test_get_changed_rpm_packages_excludes_metadata_only_changes(checker, tmp_path, monkeypatch):
+    """A metadata/<pkg>.json-only change (e.g. `dist_git.py mark-modified`)
+    must NOT be treated as a changed package: Konflux's actual build
+    trigger only reacts to rpms/<pkg>/*** path changes, so predicting a
+    NEVR for a package that isn't actually being rebuilt would produce a
+    false-positive CONFLICT against its already-published NEVR."""
+    repo = tmp_path
+    _git(['init', '--initial-branch=main'], repo)
+    _git(['config', 'user.name', 'Test'], repo)
+    _git(['config', 'user.email', 'test@example.com'], repo)
+
+    (repo / 'rpms' / 'existing').mkdir(parents=True)
+    (repo / 'rpms' / 'existing' / 'existing.spec').write_text('placeholder\n')
+    (repo / 'metadata').mkdir()
+    (repo / 'metadata' / 'existing.json').write_text('{}\n')
+    _git(['add', '.'], repo)
+    _git(['commit', '-m', 'Initial commit'], repo)
+
+    base_sha = _git(['rev-parse', 'HEAD'], repo).stdout.strip()
+    _git(['update-ref', 'refs/remotes/origin/main', base_sha], repo)
+
+    # Metadata-only change for 'metadata-only-pkg' -- no rpms/ directory at all.
+    (repo / 'metadata' / 'metadata-only-pkg.json').write_text('{}\n')
+    # A real spec change for 'spec-changed-pkg'.
+    (repo / 'rpms' / 'spec-changed-pkg').mkdir()
+    (repo / 'rpms' / 'spec-changed-pkg' / 'spec-changed-pkg.spec').write_text('placeholder\n')
+    _git(['add', '.'], repo)
+    _git(['commit', '-m', 'Metadata-only + spec change'], repo)
+
+    monkeypatch.setattr(checker, 'ROOT_DIR', repo)
+    monkeypatch.delenv('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', raising=False)
+
+    result = checker.get_changed_rpm_packages()
+
+    assert result == ['spec-changed-pkg']
+
+
+def test_get_changed_rpm_packages_git_failure_raises(checker, tmp_path, monkeypatch):
+    monkeypatch.setattr(checker, 'ROOT_DIR', tmp_path)
+    monkeypatch.setenv('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', 'main')
+    # tmp_path is not a git repo at all, so the diff must fail cleanly.
+    with pytest.raises(checker.NevrCheckError):
+        checker.get_changed_rpm_packages()
+
+
 def test_main_mr_mode_filters_to_packages_with_specs(checker, tmp_path, fake_dnf, monkeypatch, capsys):
     _create_package(tmp_path, 'widget', """\
 Name: widget
@@ -764,7 +814,7 @@ Test
     # 'ghost-package' has no rpms/ directory (e.g. a metadata-only change for
     # a package that was since removed) and must be silently skipped rather
     # than crashing the whole run.
-    monkeypatch.setattr(checker, 'get_changed_packages_in_mr', lambda: ['widget', 'ghost-package'])
+    monkeypatch.setattr(checker, 'get_changed_rpm_packages', lambda: ['widget', 'ghost-package'])
     monkeypatch.setattr(sys, 'argv', _argv_with_urls('--mr'))
 
     exit_code = checker.main()
@@ -776,7 +826,7 @@ Test
 
 
 def test_main_mr_mode_no_changes_is_clean(checker, monkeypatch, capsys):
-    monkeypatch.setattr(checker, 'get_changed_packages_in_mr', lambda: [])
+    monkeypatch.setattr(checker, 'get_changed_rpm_packages', lambda: [])
     monkeypatch.setattr(sys, 'argv', ['check_nevr_conflicts.py', '--mr'])
 
     exit_code = checker.main()

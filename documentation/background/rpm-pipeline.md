@@ -114,8 +114,13 @@ GitLab CI runs validation jobs on every merge request:
   NEVR was already published (typically two independent Release bumps based
   on stale `main`, e.g. two `rebuild` MRs), which fails the post-merge
   build+sign+publish pipeline since Pulp treats each NEVRA as unique and
-  immutable. Run locally with `make check-nevr-conflicts ARGS='<package>'`,
-  or against real built RPMs with
+  immutable. Only scheduled for MRs that touch `rpms/**/*`, and within that,
+  only checks packages whose `rpms/<package>/` directory itself changed --
+  matching Konflux's own build trigger -- not packages whose only change is
+  under `metadata/`, since a metadata-only change (e.g.
+  `ci/dist_git.py mark-modified`) never causes a rebuild/republish. Run
+  locally with `make check-nevr-conflicts ARGS='<package>'`, or against real
+  built RPMs with
   `make check-nevr-conflicts ARGS='--rpms-dir builds/<package>'` after
   `ci/build_rpms.sh`. See `ci/check_nevr_conflicts.py`'s module docstring for
   full details. Known limitations: only the public signed Pulp domain is

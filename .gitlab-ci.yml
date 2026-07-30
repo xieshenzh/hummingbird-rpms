@@ -92,7 +92,14 @@ check_nevr_conflicts:
     - git fetch --quiet origin "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
     - make check-nevr-conflicts-host ARGS='--mr'
   rules:
-    - !reference [.rules, mr]
+    # Only schedule this job when an MR actually touches rpms/, matching
+    # get_changed_rpm_packages()'s own filtering in check_nevr_conflicts.py.
+    # metadata/**/*.json is deliberately excluded here (see that function's
+    # docstring): a metadata-only change (e.g. `dist_git.py mark-modified`)
+    # never causes Konflux to rebuild/republish anything.
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - rpms/**/*
 
 deploy_components_to_konflux:
   variables:
