@@ -111,7 +111,10 @@ DEFAULT_BASE_URLS = {
 BINARY_ARCHES = ('x86_64', 'aarch64')
 DEBUGINFO_SUFFIXES = ('-debuginfo', '-debugsource')
 DEFAULT_DNF_TIMEOUT_SECS = 30
-DEFAULT_RPMSPEC_TIMEOUT_SECS = 20
+# Used for both rpmspec (spec mode) and rpm -qp (built-RPM mode) subprocess
+# calls; 20s is generous for either -- rpmspec parses a local spec file and
+# rpm -qp reads a local RPM header, neither touches the network.
+DEFAULT_SUBPROCESS_TIMEOUT_SECS = 20
 
 # Matches the heredoc that hummingbird-release.spec writes to
 # %{_rpmmacrodir}/macros.dist, after macro expansion via `rpmspec -P`.
@@ -174,7 +177,7 @@ def get_distro_macros() -> str:
         result = subprocess.run(
             ['rpmspec', '-P', f'--define=_sourcedir {HUMMINGBIRD_RELEASE_SPEC.parent}',
              str(HUMMINGBIRD_RELEASE_SPEC)],
-            capture_output=True, text=True, timeout=DEFAULT_RPMSPEC_TIMEOUT_SECS,
+            capture_output=True, text=True, timeout=DEFAULT_SUBPROCESS_TIMEOUT_SECS,
         )
     except subprocess.TimeoutExpired as e:
         raise NevrCheckError("Timed out parsing hummingbird-release.spec") from e
@@ -214,7 +217,7 @@ def _run_rpmspec(args: list[str], env: dict[str, str]) -> str:
     try:
         result = subprocess.run(
             ['rpmspec', *args], capture_output=True, text=True, env=env,
-            timeout=DEFAULT_RPMSPEC_TIMEOUT_SECS,
+            timeout=DEFAULT_SUBPROCESS_TIMEOUT_SECS,
         )
     except subprocess.TimeoutExpired as e:
         raise NevrCheckError(f"rpmspec timed out: {' '.join(args)}") from e
@@ -326,7 +329,7 @@ def get_built_rpm_candidates(rpms_dir: Path) -> list[Candidate]:
         try:
             result = subprocess.run(
                 ['rpm', '-qp', '--qf', f'%{{NAME}}\t{EVR_QUERYFORMAT}\t%{{ARCH}}\n', str(rpm_path)],
-                capture_output=True, text=True, timeout=DEFAULT_RPMSPEC_TIMEOUT_SECS, check=True,
+                capture_output=True, text=True, timeout=DEFAULT_SUBPROCESS_TIMEOUT_SECS, check=True,
             )
         except subprocess.TimeoutExpired as e:
             raise NevrCheckError(f"rpm timed out reading {rpm_path}") from e
