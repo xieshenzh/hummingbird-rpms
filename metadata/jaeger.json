@@ -1,5 +1,5 @@
 {
-  "modification_reason": "bump ai-sidecar dependency pyasn1 to 0.6.4 for CVE fixes; backport fix for CVE-2026-56852; CVE-2026-48586; CVE-2026-55969; CVE-2026-67214",
+  "modification_reason": "bump ai-sidecar dependency pyasn1 to 0.6.4 for CVE fixes; backport fix for CVE-2026-56852; CVE-2026-48586; CVE-2026-55969; CVE-2026-67214; CVE-2026-62995",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 371233,
