@@ -389,8 +389,16 @@ def query_pulp_evrs(base_url: str, names: set[str], timeout: int) -> dict[str, s
     except FileNotFoundError:
         raise NevrCheckError("dnf is required but not found in PATH")
 
-    if result.returncode != 0 and not result.stdout.strip():
-        logging.error("dnf repoquery against %s failed: %s", base_url, result.stderr.strip())
+    if result.returncode != 0:
+        # Treat any non-zero exit as a failure, even if some stdout was
+        # produced (e.g. a partial result before a timeout/network drop).
+        # Trusting partial output here would silently treat any name
+        # missing from it as "not published" (OK) -- a false negative for
+        # exactly the case this tool exists to catch.
+        logging.error(
+            "dnf repoquery against %s failed (rc=%d): %s",
+            base_url, result.returncode, result.stderr.strip(),
+        )
         return None
 
     evrs: dict[str, set[str]] = {}
@@ -607,7 +615,11 @@ Examples:
         print("No binary or source packages found to check")
         return 0
 
-    results = check_candidates(candidates, base_urls, args.timeout) if candidates else []
+    try:
+        results = check_candidates(candidates, base_urls, args.timeout) if candidates else []
+    except NevrCheckError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 2
     private_products = load_private_products()
     conflicts = [r for r in results if r.status == 'CONFLICT']
     unknown = [r for r in results if r.status == 'CANNOT_DETERMINE']

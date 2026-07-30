@@ -76,6 +76,8 @@ repo_data = data.get(base_url or "", {})
 for name in names:
     for evr in repo_data.get(name, []):
         print(name + "\\t" + evr)
+
+sys.exit(int(os.environ.get("FAKE_DNF_EXIT_CODE", "0")))
 """
 
 FAKE_RPM_SCRIPT = """#!/usr/bin/env python3
@@ -476,6 +478,48 @@ def test_check_candidates_brand_new_package_is_ok(checker, fake_dnf):
     assert results[0].status == 'OK'
 
 
+def test_query_pulp_evrs_nonzero_exit_with_partial_stdout_is_failure(
+    checker, fake_dnf, monkeypatch,
+):
+    """A non-zero dnf exit code must be treated as a failed query (None)
+    even if some stdout was produced (e.g. a partial result before a
+    timeout/network drop) -- trusting partial output here would silently
+    treat any missing name as OK, a false negative for a real conflict."""
+    fake_dnf({PUBLIC_BASE_URLS['x86_64']: {'widget': ['1.0-3.hum1']}})
+    monkeypatch.setenv('FAKE_DNF_EXIT_CODE', '1')
+
+    result = checker.query_pulp_evrs(PUBLIC_BASE_URLS['x86_64'], {'widget'}, timeout=5)
+
+    assert result is None
+
+
+def test_check_candidates_partial_dnf_failure_is_cannot_determine_not_ok(
+    checker, fake_dnf, monkeypatch,
+):
+    """End-to-end: a partial dnf failure must surface as CANNOT_DETERMINE,
+    never as a false-negative OK."""
+    fake_dnf({PUBLIC_BASE_URLS['x86_64']: {'widget': ['1.0-3.hum1']}})
+    monkeypatch.setenv('FAKE_DNF_EXIT_CODE', '1')
+    candidates = [checker.Candidate('widget', 'widget', '1.0-9.hum1', 'x86_64')]
+
+    results = checker.check_candidates(candidates, PUBLIC_BASE_URLS, timeout=5)
+
+    assert results[0].status == 'CANNOT_DETERMINE'
+
+
+def test_check_candidates_unrecognized_arch_is_cannot_determine(checker, fake_dnf):
+    """repo_keys_for_candidate() returns [] for any arch it doesn't
+    recognize (defensive path: rpmspec never actually produces one in
+    practice, but the code should not silently treat it as OK)."""
+    fake_dnf({})
+    candidates = [checker.Candidate('widget', 'widget', '1.hum1', 'ppc64le')]
+
+    results = checker.check_candidates(candidates, PUBLIC_BASE_URLS, timeout=5)
+
+    assert results[0].status == 'CANNOT_DETERMINE'
+    assert 'ppc64le' in results[0].note
+
+
 def test_check_candidates_noarch_checked_against_both_arch_repos(checker, fake_dnf):
     fake_dnf({PUBLIC_BASE_URLS['aarch64']: {'widget-doc': ['1.hum1']}})
     candidates = [checker.Candidate('widget', 'widget-doc', '1.hum1', 'noarch')]
@@ -562,6 +606,41 @@ def _argv_with_urls(*extra: str) -> list[str]:
         '--base-url-aarch64', PUBLIC_BASE_URLS['aarch64'],
         '--base-url-source', PUBLIC_BASE_URLS['source'],
     ]
+
+
+def test_main_exits_2_cleanly_when_dnf_not_found(checker, tmp_path, monkeypatch, capsys):
+    """dnf missing from PATH must produce a clean ERROR + exit 2, not an
+    unhandled traceback (query_pulp_evrs's NevrCheckError must propagate
+    through check_candidates() and be caught in main())."""
+    _create_package(tmp_path, 'widget', """\
+Name: widget
+Version: 1.0
+Release: 1%{?dist}
+Summary: Test
+License: MIT
+
+%description
+Test
+
+%files
+""")
+    # PATH with rpmspec/rpm/git (needed for spec-mode candidate generation)
+    # but deliberately no dnf, so query_pulp_evrs() hits FileNotFoundError.
+    bin_dir = tmp_path / 'no-dnf-bin'
+    bin_dir.mkdir()
+    for tool in ('rpmspec', 'rpm', 'git'):
+        real_path = shutil.which(tool)
+        assert real_path is not None, f"{tool} must be installed to run this test"
+        (bin_dir / tool).symlink_to(real_path)
+    monkeypatch.setenv('PATH', str(bin_dir))
+    monkeypatch.setattr(sys, 'argv', _argv_with_urls('widget'))
+
+    exit_code = checker.main()
+
+    err = capsys.readouterr().err
+    assert exit_code == 2
+    assert 'dnf' in err
+    assert 'Traceback' not in err
 
 
 def test_main_exits_1_on_conflict(checker, tmp_path, fake_dnf, monkeypatch, capsys):
