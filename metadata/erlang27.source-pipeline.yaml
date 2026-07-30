@@ -1,0 +1,23 @@
+fetch:
+  - type: spec-source
+    index: 0
+
+# jinterface's own version (lib/jinterface/vsn.mk) doesn't track the OTP
+# release version, so it can't be derived from ${VERSION}. Read it out of
+# the freshly-fetched tarball and patch the %global by hand, same as
+# Fedora's maintainer does manually on every bump.
+post:
+  - type: run
+    artifacts: ["otp-OTP-${VERSION}.tar.gz"]
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        jinterface_ver="$(tar -xOf "otp-OTP-${VERSION}.tar.gz" \
+          --wildcards '*/lib/jinterface/vsn.mk' | grep -oPm1 'VSN\s*=\s*\K\S+')"
+        if [ -z "${jinterface_ver}" ]; then
+          echo "post: could not extract jinterface VSN from tarball" >&2
+          exit 1
+        fi
+        sed -Ei "s/^%global jinterface_ver .*/%global jinterface_ver ${jinterface_ver}/" *.spec
