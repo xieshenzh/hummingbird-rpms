@@ -1,8 +1,8 @@
 {
   "modification_status": "native",
-  "release": "1",
+  "release": "0.1",
   "release_monitoring_project_id": 24287,
   "track_upstream": "2.12",
   "upstream_repo": "https://github.com/nats-io/nats-server",
-  "version": "2.12.12"
+  "version": "2.12.14"
 }
