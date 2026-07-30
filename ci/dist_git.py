@@ -1016,23 +1016,26 @@ def bump_release(current_release: str, upstream_release: str | None = None) -> s
     """Bump release number using .N suffix pattern.
 
     If upstream_release is provided and matches current_release, this is the first
-    rebuild of a Fedora package, so we append .1. Otherwise, if the release already
+    rebuild against that base, so we append .1. Otherwise, if the release already
     has a .N suffix, we increment it.
 
-    This handles the edge case where Fedora ships Release: 3.1%{?dist} - we need to
-    know if the current 3.1 is from Fedora (should become 3.1.1) or from our previous
-    rebuild of Fedora's 3 (should become 3.2).
+    This handles the edge case where the base is Release: 3.1 (e.g. Fedora ships
+    3.1%{?dist}, or a local placeholder) - we need to know if the current 3.1 is
+    that base (should become 3.1.1) or from our previous rebuild of base 3
+    (should become 3.2).
 
     Examples:
         "3" -> "3.1"
         "3.1" -> "3.2" (if upstream_release is None or "3")
-        "3.1" -> "3.1.1" (if upstream_release is "3.1" - first rebuild of Fedora's 3.1)
+        "3.1" -> "3.1.1" (if upstream_release is "3.1" - first rebuild of that base)
         "3.1.1" -> "3.1.2" (if upstream_release is "3.1" - second rebuild)
         "8.%{revision}" -> "8.%{revision}.1"
 
     Args:
         current_release: Current release string (without %{?dist})
-        upstream_release: Upstream Fedora release (without %{?dist}), if known
+        upstream_release: Base release from metadata (without %{?dist}), if
+            known. Usually the Fedora/rawhide baseline; after an
+            ahead-of-Fedora bump it may be the local ``0.1`` placeholder.
 
     Returns:
         Bumped release string
@@ -1570,19 +1573,20 @@ def rebuild_package(package_name: str, reason: str, dry_run: bool = False) -> No
     # Parse current version and release
     version, current_release = parse_spec_version(package_dir)
 
-    # Load metadata to get upstream release (for smart bumping)
+    # Load metadata base release for smart .N bumping (Fedora/rawhide
+    # baseline, or local placeholder such as 0.1 when ahead of Fedora).
     metadata = load_package_metadata(package_name)
     if not metadata:
         sys.exit(f"ERROR: Could not load metadata for {package_name}")
 
-    # Get upstream release from metadata (for non-native packages only)
+    # Pass metadata release as the base for packages with a Fedora source.
     # This allows us to distinguish between:
-    # - Fedora ships 3.1 -> first rebuild should be 3.1.1
-    # - We already rebuilt Fedora's 3 to 3.1 -> next rebuild should be 3.2
-    # For native packages, don't pass upstream_release - they have no upstream
+    # - Base is 3.1 -> first rebuild should be 3.1.1
+    # - We already rebuilt base 3 to 3.1 -> next rebuild should be 3.2
+    # For native packages, don't pass a base — they have no Fedora upstream.
     upstream_release = metadata.get('release') if 'source' in metadata else None
 
-    # Bump release with upstream awareness
+    # Bump release with base-release awareness
     new_release = bump_release(current_release, upstream_release)
     logging.info("Bumping release: %s -> %s", current_release, new_release)
 

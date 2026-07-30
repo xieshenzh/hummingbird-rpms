@@ -80,7 +80,7 @@ Key fields:
 | ------- | --------- |
 | `modification_status` | `clean` (auto-updates enabled), `modified` (auto-updates blocked), or `native` (no upstream) |
 | `modification_reason` | Explanation of local modifications (when `modified`) |
-| `release` | Upstream Fedora release at last import/update (not the spec `Release:`) |
+| `release` | Base release without dist tag — Fedora/rawhide baseline, or a local base (natives / ahead-of-Fedora) |
 | `upstream_repo` | Canonical upstream git repository URL |
 | `track_upstream` | Version prefix constraint (e.g., `"1.26"` for golang1.26) |
 | `version_transform` | Version mapping rule for CVE analysis (e.g., `dotnet_sdk_to_runtime`) |
