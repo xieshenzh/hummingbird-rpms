@@ -17,6 +17,7 @@ help:
 	@echo "  generate                - Generate Konflux/Tekton resources"
 	@echo "  dist-git                - Run dist-git operations (pass ARGS='...')"
 	@echo "  find-missing-rpms       - List RPMs missing in Pulp that need publishing"
+	@echo "  check-nevr-conflicts    - Check that branch RPMs don't conflict with Pulp"
 	@echo "  analyze-rpms            - List RPMs in containers repo not present here"
 	@echo "  markdownlint            - Run markdown linter"
 	@echo "  delete-konflux-comments - Delete Konflux bot comments (pass ARGS='...')"
@@ -104,6 +105,13 @@ find-missing-rpms-host:
 	ci/verify_rpms_in_pulp.sh $(ARGS)
 find-missing-rpms: # This lists rpms missing in pulp that need to be published.
 	$(PODMAN_RUN) $(PODMAN_IMAGE) make find-missing-rpms-host ARGS='$(ARGS)'
+
+
+.PHONY: check-nevr-conflicts-host check-nevr-conflicts
+check-nevr-conflicts-host:
+	ci/check_nevr_conflicts.py $(ARGS)
+check-nevr-conflicts: # Check that branch RPMs don't conflict with NEVRs already published to Pulp.
+	$(PODMAN_RUN) $(PODMAN_IMAGE) make check-nevr-conflicts-host ARGS='$(ARGS)'
 
 
 .PHONY: analyze-rpms

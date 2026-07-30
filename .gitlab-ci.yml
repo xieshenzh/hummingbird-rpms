@@ -75,6 +75,25 @@ check:
   rules:
     - !reference [.rules, mr]
 
+# Predicts the NEVR(A) each changed package's spec would build and checks it
+# against the public Pulp repo, to catch the case where a Release value
+# already published (e.g. by another rebuild MR based on stale main) would
+# conflict at publish time -- something Konflux's build-only validation does
+# not check. Kept as its own job (rather than folded into `check`) since it
+# depends on live Pulp/network state rather than being a pure offline lint,
+# and `needs: [check]` so it only runs once the spec files are known-valid,
+# without waiting on the rest of the test stage. See
+# documentation/background/rpm-pipeline.md for details and known
+# limitations (private products, the inherent race window).
+check_nevr_conflicts:
+  needs: ["check"]
+  script:
+    # Ensure the target branch ref is available locally for the MR diff.
+    - git fetch --quiet origin "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+    - make check-nevr-conflicts-host ARGS='--mr'
+  rules:
+    - !reference [.rules, mr]
+
 deploy_components_to_konflux:
   variables:
     PARENT_PROJECT_PATH: $CI_PROJECT_PATH

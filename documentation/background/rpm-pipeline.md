@@ -107,6 +107,31 @@ Changes reach main via merge requests. Automated MRs are created using:
 GitLab CI runs validation jobs on every merge request:
 
 - **`check`** - Linting, type checking, and spec validation
+- **`check_nevr_conflicts`** - Predicts the NEVR(A) each changed package's
+  spec would build (using `rpmspec` with the real dist-tag macros, without
+  actually building) and checks it against the public Pulp repo. Catches the
+  case where a Konflux build succeeds and the MR merges, but the resulting
+  NEVR was already published (typically two independent Release bumps based
+  on stale `main`, e.g. two `rebuild` MRs), which fails the post-merge
+  build+sign+publish pipeline since Pulp treats each NEVRA as unique and
+  immutable. Run locally with `make check-nevr-conflicts ARGS='<package>'`,
+  or against real built RPMs with
+  `make check-nevr-conflicts ARGS='--rpms-dir builds/<package>'` after
+  `ci/build_rpms.sh`. See `ci/check_nevr_conflicts.py`'s module docstring for
+  full details. Known limitations: only the public signed Pulp domain is
+  checked (packages routed to a `private_product` are noted but not fully
+  verified, since their domains require Pulp API credentials this tool
+  doesn't have); and since it reflects Pulp's state at job-run time, it
+  reduces but cannot fully close the race where another MR publishes the
+  same NEVR between this check passing and this MR's eventual merge -- only
+  a hard check inside the actual Konflux publish pipeline (a separate
+  pipeline-bundle repository, `quay.io/hummingbird-ci/rpmbuild-pipeline`,
+  not covered by this job) could close that window completely; and in spec
+  mode some `OK` results can be for a package name a real build never
+  actually produces (e.g. a base package with no top-level `%files`
+  section, roughly 14% of packages in this repo) -- expected and harmless,
+  and never a reason to discount a `CONFLICT` found elsewhere in the same
+  run.
 - **`tree_status`** - Repository consistency checks (metadata integrity, spec
   file presence)
 - **Testing Farm** - Integration tests run via an IntegrationTestScenario that
