@@ -1,4 +1,9 @@
 fetch:
+  # nodejs24's Version: is a literal value (unlike nodejs22/25/26, which
+  # derive it from the %nodejs_define_version macro line and so opt out of
+  # this) -- needs the default set-version: true to bump it on each run.
+  - type: spec-update
+    reset-release: "0.1"
   - type: url
     url: "https://nodejs.org/dist/v${VERSION}/node-v${VERSION}.tar.gz"
 
