@@ -1,5 +1,5 @@
 %global nspr_version 4.39.0
-%global nss_version 3.125.0
+%global nss_version 3.126.0
 # NOTE: To avoid NVR clashes of nspr* packages:
 # - reset %%{nspr_release} to 1, when updating %%{nspr_version}
 # - increment %%{nspr_version}, when updating the NSS part only
@@ -7,7 +7,7 @@
 %global nss_release %baserelease
 # use "%%global nspr_release %%[%%baserelease+n]" to handle offsets when
 # release number between nss and nspr are different.
-%global nspr_release %[%baserelease+1]
+%global nspr_release %[%baserelease+2]
 # only need to update this as we added new
 # algorithms under nss policy control
 %global crypto_policies_version 20240521
@@ -63,7 +63,7 @@ rpm.define(string.format("nss_release_tag NSS_%s_RTM",
 Summary:          Network Security Services
 Name:             nss
 Version:          %{nss_version}
-Release:          %{nss_release}.1%{?dist}
+Release:          %{nss_release}%{?dist}
 License:          MPL-2.0
 URL:              http://www.mozilla.org/projects/security/pki/nss/
 Requires:         nspr >= %{nspr_version}
@@ -149,6 +149,10 @@ Patch65:          nss-3.118-ml-dsa-test-for-sign-verify-pkcs12.patch
 Patch66:          nss-3.118-ml-dsa-tls-test.patch
 Patch67:          nss-3.118-ml-dsa-unittests.patch
 Patch68:          nss-3.123-fix-mldsa-import-regeneration.patch
+
+# Reseed the freebl DRBG in the child after fork(), so forked children do not
+# replay the parent's random stream (mozbz#2056509)
+Patch70:          nss-3.125-drbg-reseed-after-fork.patch
 
 Patch100:         nspr-config-pc.patch
 Patch101:         nspr-gcc-atomics.patch
@@ -279,7 +283,7 @@ Header and library files for doing development with Network Security Services.
 %package -n nspr
 Summary:        Netscape Portable Runtime
 Version:        %{nspr_version}
-Release:        %{nss_release}.1%{?dist}
+Release:        %{nspr_release}%{?dist}
 License:        MPL-2.0
 URL:            http://www.mozilla.org/projects/nspr/
 Conflicts:      filesystem < 3
@@ -294,7 +298,7 @@ memory management (malloc and free) and shared library linking.
 %package -n nspr-devel
 Summary:        Development libraries for the Netscape Portable Runtime
 Version:        %{nspr_version}
-Release:        %{nss_release}.1%{?dist}
+Release:        %{nspr_release}%{?dist}
 Requires:       nspr%{?_isa} = %{nspr_version}-%{nspr_release}%{?dist}
 Requires:       pkgconfig
 BuildRequires:  xmlto
@@ -1097,6 +1101,13 @@ fi
 
 
 %changelog
+* Thu Jul 30 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.126.0-1
+- Update NSS to 3.126.0
+
+* Sat Jul 25 2026 Rostislav Krasny <rostiprodev@gmail.com> - 3.125.0-2
+- Reseed the freebl DRBG after fork() so forked children do not replay the
+  parent's random stream (Firefox fork server duplicate UUIDs / crypto output)
+
 * Thu Jun 18 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.125.0-1
 - Update NSS to 3.125.0
 - Fix NSPR versioning scheme
