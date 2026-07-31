@@ -3,12 +3,12 @@
 # https://github.com/prometheus/prometheus
 %global goipath         github.com/prometheus/prometheus
 %global forgeurl        https://github.com/prometheus/prometheus
-Version:                3.13.1
+Version:                3.13.2
 
 %gometa -L -f
 
 Name:           prometheus3.13
-Release:        0.5%{?dist}
+Release:        0.1%{?dist}
 Summary:        Monitoring system and time series database
 License:        Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL:            %{gourl}
@@ -19,7 +19,9 @@ Source1:        %{archivename}-vendor.tar.bz2
 Source2:        prometheus-pnpm-cache-%{version}.tar.bz2
 Source3:        go-vendor-tools.toml
 Patch0:         0001-Disable-pprof-debug-endpoints.patch
-Patch1:         0002-cve-2026-56852-update-golang.org-x-text-to-v0.39.0.patch
+# 0002-cve-2026-56852-update-golang.org-x-text-to-v0.39.0.patch dropped:
+# upstream 3.13.2 already bundles golang.org/x/text v0.39.0 (and the other
+# transitive bumps this patch made) natively in go.mod/go.sum.
 Patch2:         0003-pnpm-cache-both-rpm-architectures.patch
 Patch3:         0004-cve-2026-53669-bump-react-router-to-7.18.0.patch
 
@@ -221,9 +223,9 @@ Provides:       bundled(npm(react-remove-scroll)) = 2.7.2
 Provides:       bundled(npm(react-remove-scroll-bar)) = 2.3.8
 Provides:       bundled(npm(react-resize-detector)) = 7.1.2
 Provides:       bundled(npm(react-router)) = 5.3.4
-Provides:       bundled(npm(react-router)) = 7.18.0
+Provides:       bundled(npm(react-router)) = 7.17.0
 Provides:       bundled(npm(react-router-dom)) = 5.3.4
-Provides:       bundled(npm(react-router-dom)) = 7.18.0
+Provides:       bundled(npm(react-router-dom)) = 7.17.0
 Provides:       bundled(npm(react-shallow-renderer)) = 16.15.0
 Provides:       bundled(npm(react-style-singleton)) = 2.2.3
 Provides:       bundled(npm(react-test-renderer)) = 17.0.2
