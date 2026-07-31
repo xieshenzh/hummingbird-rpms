@@ -1,0 +1,19 @@
+# Upstream never cut a tagged release for 2.0.5 -- the pinned commit below is
+# the one php-patchwork-jsqueeze-get-source.sh has cloned+checked out since
+# this package was first packaged. Bumping VERSION requires updating this ref
+# too (matching the previous manual process).
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "693d64850eab2ce6a7c8f7cf547e1ab46e69d542"
+    archive_name: "php-patchwork-jsqueeze-${VERSION}-693d64850eab2ce6a7c8f7cf547e1ab46e69d542.tar.gz"
+
+accepted-checksums:
+  - file: "php-patchwork-jsqueeze-2.0.5-693d64850eab2ce6a7c8f7cf547e1ab46e69d542.tar.gz"
+    checksum: "f3da6c1b0945f40cca41f3726b0a80690e88ce1b92b909ee94a61807f9385a5da76a9db6aca0ace07e1b1de0277581d85c06e6a9d7a01735d7733580622a1a96"
+    reason: "One-time transition: content verified identical to the previous
+      manually-run get-source.sh output (same pinned commit, .git/ excluded)
+      except gorget's archive also retains .gitignore/.gitattributes (the old
+      script's `tar --exclude-vcs` dropped those too) and stamps a
+      deterministic commit-timestamp mtime instead of the wall-clock time the
+      script happened to run at."
