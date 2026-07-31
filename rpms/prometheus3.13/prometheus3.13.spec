@@ -3,12 +3,12 @@
 # https://github.com/prometheus/prometheus
 %global goipath         github.com/prometheus/prometheus
 %global forgeurl        https://github.com/prometheus/prometheus
-Version:                3.13.1
+Version:                3.13.2
 
 %gometa -L -f
 
 Name:           prometheus3.13
-Release:        0.5%{?dist}
+Release:        0.1%{?dist}
 Summary:        Monitoring system and time series database
 License:        Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL:            %{gourl}
@@ -221,9 +221,9 @@ Provides:       bundled(npm(react-remove-scroll)) = 2.7.2
 Provides:       bundled(npm(react-remove-scroll-bar)) = 2.3.8
 Provides:       bundled(npm(react-resize-detector)) = 7.1.2
 Provides:       bundled(npm(react-router)) = 5.3.4
-Provides:       bundled(npm(react-router)) = 7.18.0
+Provides:       bundled(npm(react-router)) = 7.17.0
 Provides:       bundled(npm(react-router-dom)) = 5.3.4
-Provides:       bundled(npm(react-router-dom)) = 7.18.0
+Provides:       bundled(npm(react-router-dom)) = 7.17.0
 Provides:       bundled(npm(react-shallow-renderer)) = 16.15.0
 Provides:       bundled(npm(react-style-singleton)) = 2.2.3
 Provides:       bundled(npm(react-test-renderer)) = 17.0.2
