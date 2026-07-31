@@ -1,0 +1,11 @@
+fetch:
+  - type: url
+    url: "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-${VERSION}/cyrus-sasl-${VERSION}.tar.gz"
+
+transform:
+  # Matches make-no-dlcompatorsrp-tarball.sh's exact removal list: upstream's
+  # dlcompat and SRP plugin code is unwanted (SRP was removed for FIPS/export
+  # reasons, dlcompat is a macOS-only shim irrelevant to this distro).
+  - type: strip-tarball
+    target: "cyrus-sasl-${VERSION}.tar.gz"
+    paths: ["*/dlcompat*", "*/plugins/srp*"]
