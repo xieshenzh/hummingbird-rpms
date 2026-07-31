@@ -499,15 +499,46 @@ def get_changed_rpm_packages() -> list[str]:
     a rebuild/republish. Treating it as "changed" here would predict a
     NEVR that's already published purely because nothing is actually being
     rebuilt -- a false-positive CONFLICT.
+
+    Prefers CI_MERGE_REQUEST_DIFF_BASE_SHA -- GitLab's own merge-base for
+    this MR's diff, set in every merge-request-event pipeline -- over
+    asking git to compute one itself via a triple-dot diff
+    (`origin/<target>...HEAD`). CI checkouts are shallow by default (this
+    project's ci_default_git_depth=20): once a branch has diverged from
+    the target further back than the fetch depth, the triple-dot diff's
+    history search finds no common commit and git fails with "no merge
+    base" (see !3887). A plain two-commit diff against the known base SHA
+    needs no such search -- it's a direct tree comparison -- and GitLab's
+    remote permits fetching that exact SHA on demand even though it isn't
+    a ref and may sit well outside the default shallow window. Falls back
+    to the old target-branch-name behavior when the variable isn't set
+    (e.g. running locally outside a GitLab MR pipeline).
     """
-    target_branch = os.environ.get('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', 'main')
+    diff_base_sha = os.environ.get('CI_MERGE_REQUEST_DIFF_BASE_SHA')
+    if diff_base_sha:
+        try:
+            subprocess.run(
+                ['git', 'fetch', '--quiet', 'origin', diff_base_sha],
+                cwd=ROOT_DIR, capture_output=True, text=True, check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            raise NevrCheckError(f"git fetch of MR diff base {diff_base_sha} failed: {e.stderr.strip()}") from e
+        except FileNotFoundError as e:
+            raise NevrCheckError("git is required but not found in PATH") from e
+        base_desc = diff_base_sha
+        diff_args = [diff_base_sha, 'HEAD']
+    else:
+        target_branch = os.environ.get('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', 'main')
+        base_desc = f'origin/{target_branch}'
+        diff_args = [f'{base_desc}...HEAD']
+
     try:
         result = subprocess.run(
-            ['git', 'diff', '--name-only', f'origin/{target_branch}...HEAD'],
+            ['git', 'diff', '--name-only', *diff_args],
             cwd=ROOT_DIR, capture_output=True, text=True, check=True,
         )
     except subprocess.CalledProcessError as e:
-        raise NevrCheckError(f"git diff against origin/{target_branch} failed: {e.stderr.strip()}") from e
+        raise NevrCheckError(f"git diff against {base_desc} failed: {e.stderr.strip()}") from e
     except FileNotFoundError as e:
         raise NevrCheckError("git is required but not found in PATH") from e
 

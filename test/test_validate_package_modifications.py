@@ -172,3 +172,85 @@ def test_track_upstream_integer_rejected(validator) -> None:
     assert not valid
     assert 'track_upstream' in error
     assert 'int' in error
+
+
+#
+# Tests — get_changed_packages_in_mr()
+#
+
+
+def _git(args: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(['git', *args], cwd=cwd, check=True, capture_output=True, text=True)
+
+
+def test_get_changed_packages_in_mr_uses_diff_base_sha_across_disconnected_history(
+    validator, tmp_path_factory, monkeypatch,
+):
+    """CI_MERGE_REQUEST_DIFF_BASE_SHA is GitLab's own merge-base for this
+    MR's diff. Using it directly (two-commit diff, no ancestry search) must
+    work even when the base commit and HEAD share no local common ancestor
+    -- exactly the shallow-clone shape that makes a origin/<target>...HEAD
+    triple-dot diff fail with "no merge base" in a long-lived MR (see
+    ci/check_nevr_conflicts.py's get_changed_rpm_packages(), which hit this
+    in practice in !3887)."""
+    root = validator.ROOT_DIR  # already an initialized git repo, per the `validator` fixture
+
+    # Kept fully outside root's working tree (not a subdirectory of it) so
+    # it can never be mistaken for a nested repo/submodule by a future
+    # `git add .` in either repo.
+    remote_repo = tmp_path_factory.mktemp('validate-remote')
+    _git(['init', '--initial-branch=main'], remote_repo)
+    _git(['config', 'user.name', 'Test'], remote_repo)
+    _git(['config', 'user.email', 'test@example.com'], remote_repo)
+    (remote_repo / 'rpms' / 'unchanged-pkg').mkdir(parents=True)
+    (remote_repo / 'rpms' / 'unchanged-pkg' / 'unchanged-pkg.spec').write_text('v1\n')
+    _git(['add', '.'], remote_repo)
+    _git(['commit', '-m', 'Base commit'], remote_repo)
+    base_sha = _git(['rev-parse', 'HEAD'], remote_repo).stdout.strip()
+
+    _git(['remote', 'add', 'origin', str(remote_repo)], root)
+    # Same path + content as the remote's base -- must NOT show as changed.
+    (root / 'rpms' / 'unchanged-pkg').mkdir(parents=True)
+    (root / 'rpms' / 'unchanged-pkg' / 'unchanged-pkg.spec').write_text('v1\n')
+    # A genuinely new package -- must show as changed.
+    (root / 'rpms' / 'changed-pkg').mkdir(parents=True)
+    (root / 'rpms' / 'changed-pkg' / 'changed-pkg.spec').write_text('v1\n')
+    _git(['add', 'rpms'], root)
+    _git(['commit', '-m', 'MR commit'], root)
+
+    monkeypatch.setenv('CI_MERGE_REQUEST_DIFF_BASE_SHA', base_sha)
+    monkeypatch.delenv('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', raising=False)
+
+    result = validator.get_changed_packages_in_mr()
+
+    assert result == ['changed-pkg']
+
+
+def test_get_changed_packages_in_mr_diff_base_sha_fetch_failure_raises(validator, monkeypatch):
+    """A bogus/unfetchable CI_MERGE_REQUEST_DIFF_BASE_SHA must fail (no
+    'origin' remote is configured in the `validator` fixture's repo)."""
+    monkeypatch.setenv('CI_MERGE_REQUEST_DIFF_BASE_SHA', '0' * 40)
+    with pytest.raises(subprocess.CalledProcessError):
+        validator.get_changed_packages_in_mr()
+
+
+def test_get_changed_packages_in_mr_fallback_to_target_branch(validator, monkeypatch):
+    """When CI_MERGE_REQUEST_DIFF_BASE_SHA is not set (e.g. running locally
+    outside a GitLab MR pipeline), falls back to the pre-existing
+    origin/<target>...HEAD triple-dot diff behavior."""
+    root = validator.ROOT_DIR
+    base_sha = _git(['rev-parse', 'HEAD'], root).stdout.strip()
+    _git(['update-ref', 'refs/remotes/origin/main', base_sha], root)
+
+    (root / 'rpms' / 'changed-pkg').mkdir(parents=True)
+    (root / 'rpms' / 'changed-pkg' / 'changed-pkg.spec').write_text('v1\n')
+    (root / 'metadata' / 'meta-only-pkg.json').write_text('{}\n')
+    _git(['add', '.'], root)
+    _git(['commit', '-m', 'MR commit'], root)
+
+    monkeypatch.delenv('CI_MERGE_REQUEST_DIFF_BASE_SHA', raising=False)
+    monkeypatch.delenv('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', raising=False)
+
+    result = validator.get_changed_packages_in_mr()
+
+    assert result == ['changed-pkg', 'meta-only-pkg']

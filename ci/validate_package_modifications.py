@@ -30,12 +30,32 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 
 def get_changed_packages_in_mr() -> list[str]:
-    """Get list of packages that were modified in the current MR/branch."""
-    # Get the target branch (usually 'main')
-    target_branch = os.environ.get('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', 'main')
+    """Get list of packages that were modified in the current MR/branch.
+
+    Prefers CI_MERGE_REQUEST_DIFF_BASE_SHA -- GitLab's own merge-base for
+    this MR's diff -- over asking git to compute one itself via a
+    triple-dot diff (`origin/<target>...HEAD`). CI checkouts are shallow by
+    default: once a branch has diverged from the target further back than
+    the fetch depth, the triple-dot diff's history search finds no common
+    commit and git fails with "fatal: ...: no merge base" (see
+    ci/check_nevr_conflicts.py's get_changed_rpm_packages(), which hit this
+    in practice in !3887). A plain two-commit diff against the known base
+    SHA needs no such search -- it's a direct tree comparison -- and
+    GitLab's remote permits fetching that exact SHA on demand even though
+    it isn't a ref and may sit well outside the default shallow window.
+    Falls back to the old target-branch-name behavior when the variable
+    isn't set (e.g. running locally outside a GitLab MR pipeline).
+    """
+    diff_base_sha = os.environ.get('CI_MERGE_REQUEST_DIFF_BASE_SHA')
+    if diff_base_sha:
+        run_git('fetch', '--quiet', 'origin', diff_base_sha, cwd=ROOT_DIR)
+        diff_args = [diff_base_sha, 'HEAD']
+    else:
+        target_branch = os.environ.get('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', 'main')
+        diff_args = [f'origin/{target_branch}...HEAD']
 
     # Get changed files in rpms/ or metadata/
-    result = run_git('diff', '--name-only', f'origin/{target_branch}...HEAD', cwd=ROOT_DIR)
+    result = run_git('diff', '--name-only', *diff_args, cwd=ROOT_DIR)
 
     changed_packages = set()
     for line in result.stdout.strip().split('\n'):
