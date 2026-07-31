@@ -68,6 +68,7 @@ tree_status:
     - !reference [.rules, push]
 
 check:
+  tags: [big-runner]
   script:
     # Fetch full history for git commit trailer validation
     - git fetch --unshallow --quiet
