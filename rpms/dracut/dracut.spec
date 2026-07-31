@@ -202,7 +202,10 @@ in a squashfs image, result in a smaller initramfs size and reduce runtime memor
 usage.
 
 %prep
-%autosetup -n %{name}-ng-%{version} -S git_am
+# Upstream renamed the GitHub repo from dracut-ng/dracut-ng to
+# dracut-ng/dracut, which changed the tag archive's internal directory name
+# from dracut-ng-%%{version} to dracut-%%{version}.
+%autosetup -n %{name}-%{version} -S git_am
 cp %{SOURCE1} .
 
 %build
