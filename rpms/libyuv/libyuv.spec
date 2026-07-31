@@ -11,7 +11,10 @@ Release:	0.63.20260213git6067afd%{?dist}
 License:	BSD-3-Clause
 Url:		https://chromium.googlesource.com/libyuv/libyuv
 VCS:		git:%{url}
-Source0:	%{url}/+archive/%{git_commit}.tar.gz
+# Fetched via git (not the +archive/ gitiles endpoint, which can regenerate
+# a non-deterministic tarball on re-fetch) by
+# metadata/libyuv.source-pipeline.yaml.
+Source0:	%{name}-%{git_commit}.tar.gz
 # Fedora-specific. Upstream isn't interested in these patches.
 Patch:		libyuv-0001-Use-a-proper-so-version.patch
 Patch:		libyuv-0002-Link-against-shared-library.patch
@@ -43,7 +46,7 @@ Additional header files for development with %{name}.
 
 
 %prep
-%autosetup -p1 -c %{name}-%{version}
+%autosetup -p1 -n %{name}-%{git_commit}
 
 cat > %{name}.pc << EOF
 prefix=%{_prefix}

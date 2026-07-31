@@ -1,0 +1,10 @@
+# Same non-determinism as aom: chromium.googlesource.com's +archive/ gitiles
+# endpoint (the spec's plain Source0 URL) can regenerate a different tarball
+# wrapper on re-fetch. Fetch via git instead so gorget generates its own
+# deterministic archive. Content verified identical to the gitiles archive
+# by diffing extracted trees against a plain git clone at the pinned commit.
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "afff0cf68bdd2d713c81040a4bd1b7c7fe69e39c"
+    archive_name: "libyuv-afff0cf68bdd2d713c81040a4bd1b7c7fe69e39c.tar.gz"
