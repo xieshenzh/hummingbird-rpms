@@ -862,6 +862,7 @@ def test_get_changed_rpm_packages_excludes_metadata_only_changes(checker, tmp_pa
 
     monkeypatch.setattr(checker, 'ROOT_DIR', repo)
     monkeypatch.delenv('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', raising=False)
+    monkeypatch.delenv('CI_MERGE_REQUEST_DIFF_BASE_SHA', raising=False)
 
     result = checker.get_changed_rpm_packages()
 
@@ -871,8 +872,72 @@ def test_get_changed_rpm_packages_excludes_metadata_only_changes(checker, tmp_pa
 def test_get_changed_rpm_packages_git_failure_raises(checker, tmp_path, monkeypatch):
     monkeypatch.setattr(checker, 'ROOT_DIR', tmp_path)
     monkeypatch.setenv('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', 'main')
+    monkeypatch.delenv('CI_MERGE_REQUEST_DIFF_BASE_SHA', raising=False)
     # tmp_path is not a git repo at all, so the diff must fail cleanly.
     with pytest.raises(checker.NevrCheckError):
+        checker.get_changed_rpm_packages()
+
+
+def test_get_changed_rpm_packages_uses_diff_base_sha_across_disconnected_history(
+    checker, tmp_path_factory, monkeypatch,
+):
+    """CI_MERGE_REQUEST_DIFF_BASE_SHA is GitLab's own merge-base for this
+    MR's diff. Using it directly (two-commit diff, no ancestry search) must
+    work even when the base commit and HEAD share no local common ancestor
+    -- exactly the shallow-clone shape that made the old
+    origin/<target>...HEAD triple-dot diff fail with "no merge base" in a
+    long-lived MR (see !3887)."""
+    local_repo = checker.ROOT_DIR  # already has hummingbird-release fixture files
+
+    # Kept fully outside local_repo's working tree (not a subdirectory of
+    # it) so it can never be mistaken for a nested repo/submodule by a
+    # future `git add .` in either repo.
+    remote_repo = tmp_path_factory.mktemp('nevr-remote')
+    _git(['init', '--initial-branch=main'], remote_repo)
+    _git(['config', 'user.name', 'Test'], remote_repo)
+    _git(['config', 'user.email', 'test@example.com'], remote_repo)
+    (remote_repo / 'rpms' / 'unchanged-pkg').mkdir(parents=True)
+    (remote_repo / 'rpms' / 'unchanged-pkg' / 'unchanged-pkg.spec').write_text('v1\n')
+    _git(['add', '.'], remote_repo)
+    _git(['commit', '-m', 'Base commit'], remote_repo)
+    base_sha = _git(['rev-parse', 'HEAD'], remote_repo).stdout.strip()
+
+    # The local repo (the MR branch checkout) has a *completely separate*
+    # git history from the remote -- simulating two disjoint shallow
+    # histories that share no locally-known common ancestor.
+    _git(['init', '--initial-branch=mr-branch'], local_repo)
+    _git(['config', 'user.name', 'Test'], local_repo)
+    _git(['config', 'user.email', 'test@example.com'], local_repo)
+    _git(['remote', 'add', 'origin', str(remote_repo)], local_repo)
+    # Same path + content as the remote's base -- must NOT show as changed.
+    (local_repo / 'rpms' / 'unchanged-pkg').mkdir(parents=True)
+    (local_repo / 'rpms' / 'unchanged-pkg' / 'unchanged-pkg.spec').write_text('v1\n')
+    # A genuinely new package -- must show as changed.
+    (local_repo / 'rpms' / 'changed-pkg').mkdir(parents=True)
+    (local_repo / 'rpms' / 'changed-pkg' / 'changed-pkg.spec').write_text('v1\n')
+    # Only stage these two package dirs -- not the `checker` fixture's
+    # pre-existing rpms/hummingbird-release/, which is irrelevant here and
+    # would otherwise show up as a spurious "changed" package.
+    _git(['add', 'rpms/unchanged-pkg', 'rpms/changed-pkg'], local_repo)
+    _git(['commit', '-m', 'MR commit'], local_repo)
+
+    monkeypatch.setenv('CI_MERGE_REQUEST_DIFF_BASE_SHA', base_sha)
+    monkeypatch.delenv('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', raising=False)
+
+    result = checker.get_changed_rpm_packages()
+
+    assert result == ['changed-pkg']
+
+
+def test_get_changed_rpm_packages_diff_base_sha_fetch_failure_raises(checker, monkeypatch):
+    repo = checker.ROOT_DIR
+    _git(['init', '--initial-branch=main'], repo)
+    _git(['config', 'user.name', 'Test'], repo)
+    _git(['config', 'user.email', 'test@example.com'], repo)
+    _git(['commit', '--allow-empty', '-m', 'c1'], repo)
+    # No 'origin' remote configured at all, so fetching the diff base SHA fails cleanly.
+    monkeypatch.setenv('CI_MERGE_REQUEST_DIFF_BASE_SHA', '0' * 40)
+    with pytest.raises(checker.NevrCheckError, match='git fetch'):
         checker.get_changed_rpm_packages()
 
 
