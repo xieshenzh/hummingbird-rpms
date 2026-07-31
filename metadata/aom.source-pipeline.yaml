@@ -1,0 +1,22 @@
+# googlesource's gitiles "+archive/" tarball endpoint (the spec's plain
+# Source0 URL) is not reproducible -- fetching the exact same URL twice
+# back-to-back produces two different archive checksums (confirmed
+# 2026-07-30), even though the extracted tree content is byte-identical both
+# times. Rather than fight that with accepted-checksums: (which would need a
+# new entry every single fetch), fetch via git instead: gorget's git fetch
+# generates its own deterministic archive (commit-timestamp mtime), so the
+# same tag always produces the same checksum. Content verified identical to
+# the gitiles archive by diffing extracted trees.
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "v${VERSION}"
+    archive_name: "aom-${VERSION}.tar.gz"
+
+accepted-checksums:
+  - file: "aom-3.14.0.tar.gz"
+    checksum: "f2dbf77397734edc2ea48c870d8b70c78b6ccf76d9f730239a25dd081b6c493d12a1823a07388b8840dd0643c032476077e93e2bad16500a2f617a92f76ed08e"
+    reason: "One-time transition from the non-deterministic +archive/ gitiles
+      endpoint to gorget's own deterministic git-based archive. Content
+      verified identical (diffed extracted trees); re-run twice back-to-back
+      to confirm this new checksum is itself stable going forward."
