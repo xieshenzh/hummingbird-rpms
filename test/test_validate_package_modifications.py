@@ -228,7 +228,13 @@ def test_get_changed_packages_in_mr_uses_diff_base_sha_across_disconnected_histo
 
 def test_get_changed_packages_in_mr_diff_base_sha_fetch_failure_raises(validator, monkeypatch):
     """A bogus/unfetchable CI_MERGE_REQUEST_DIFF_BASE_SHA must fail (no
-    'origin' remote is configured in the `validator` fixture's repo)."""
+    'origin' remote is configured in the `validator` fixture's repo).
+
+    Unlike check_nevr_conflicts.py (which has its own NevrCheckError to
+    wrap failures in), this module has no custom exception type, so the
+    function logs a clarifying message and then re-raises the original
+    subprocess.CalledProcessError unchanged rather than inventing one just
+    for this call site."""
     monkeypatch.setenv('CI_MERGE_REQUEST_DIFF_BASE_SHA', '0' * 40)
     with pytest.raises(subprocess.CalledProcessError):
         validator.get_changed_packages_in_mr()

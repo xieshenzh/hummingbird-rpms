@@ -10,6 +10,7 @@ import argparse
 import json
 import logging
 import os
+import subprocess
 import sys
 import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -48,7 +49,16 @@ def get_changed_packages_in_mr() -> list[str]:
     """
     diff_base_sha = os.environ.get('CI_MERGE_REQUEST_DIFF_BASE_SHA')
     if diff_base_sha:
-        run_git('fetch', '--quiet', 'origin', diff_base_sha, cwd=ROOT_DIR)
+        try:
+            run_git('fetch', '--quiet', 'origin', diff_base_sha, cwd=ROOT_DIR)
+        except subprocess.CalledProcessError:
+            # run_git() doesn't capture stderr (only stdout), so e.stderr is
+            # always None here -- git's own error text already went straight
+            # to the CI log via inherited stderr. Log a short marker so it's
+            # easy to spot in noisy output, then re-raise the original
+            # exception unchanged rather than swallowing it.
+            logging.error("git fetch of MR diff base %s failed (see git's error output above)", diff_base_sha)
+            raise
         diff_args = [diff_base_sha, 'HEAD']
     else:
         target_branch = os.environ.get('CI_MERGE_REQUEST_TARGET_BRANCH_NAME', 'main')
