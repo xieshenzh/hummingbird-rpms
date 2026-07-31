@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Migrated to gorget source-pipeline.yaml (HUM-4622): Source0 now fetched via a pinned git commit by gorget instead of php-patchwork-jsqueeze-get-source.sh, with %prep's %setup -n updated to match gorget's archive naming -- diverges from Fedora's own tarball-generation process.",
+  "modification_status": "modified",
   "release": "24",
   "sha": "7090b709002b6d260ec114b107e1adea8d07f341",
   "source": "https://src.fedoraproject.org/rpms/php-patchwork-jsqueeze.git",

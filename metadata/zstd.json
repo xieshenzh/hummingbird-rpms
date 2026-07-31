@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Added gorget source-pipeline.yaml (HUM-4622) with an accepted-checksums: entry curing a GitHub archive re-publication -- Fedora's own sources file still has the old checksum.",
+  "modification_status": "modified",
   "release": "6",
   "sha": "efe3715ae2af861bbd41fc4c529be2c9da1f2d37",
   "source": "https://src.fedoraproject.org/rpms/zstd.git",
