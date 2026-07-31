@@ -8,7 +8,7 @@
 
 Name: dracut
 Version: 109
-Release: 7%{?dist}
+Release: 7.1%{?dist}
 
 Summary: Initramfs generator using udev
 
