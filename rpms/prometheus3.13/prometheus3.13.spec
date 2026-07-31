@@ -19,7 +19,9 @@ Source1:        %{archivename}-vendor.tar.bz2
 Source2:        prometheus-pnpm-cache-%{version}.tar.bz2
 Source3:        go-vendor-tools.toml
 Patch0:         0001-Disable-pprof-debug-endpoints.patch
-Patch1:         0002-cve-2026-56852-update-golang.org-x-text-to-v0.39.0.patch
+# 0002-cve-2026-56852-update-golang.org-x-text-to-v0.39.0.patch dropped:
+# upstream 3.13.2 already bundles golang.org/x/text v0.39.0 (and the other
+# transitive bumps this patch made) natively in go.mod/go.sum.
 Patch2:         0003-pnpm-cache-both-rpm-architectures.patch
 Patch3:         0004-cve-2026-53669-bump-react-router-to-7.18.0.patch
 
