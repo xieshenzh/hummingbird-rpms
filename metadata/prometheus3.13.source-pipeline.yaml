@@ -24,8 +24,8 @@ transform:
         npm install --prefix "${root}/.pnpm" --ignore-scripts pnpm@11
         pnpm="${root}/.pnpm/node_modules/.bin/pnpm"
         pnpm_store="${root}/.pnpm-store"
-        (cd web/ui && "${pnpm}" fetch --frozen-lockfile --store-dir "${pnpm_store}")
-        (cd web/ui/react-app && "${pnpm}" fetch --frozen-lockfile --store-dir "${pnpm_store}")
+        (cd web/ui && "${pnpm}" fetch --frozen-lockfile --ignore-scripts --store-dir "${pnpm_store}")
+        (cd web/ui/react-app && "${pnpm}" fetch --frozen-lockfile --ignore-scripts --store-dir "${pnpm_store}")
         tar -cjf "prometheus-pnpm-cache-${VERSION}.tar.bz2" -C "${root}" .pnpm .pnpm-store
     outputs:
       - "prometheus-pnpm-cache-${VERSION}.tar.bz2"
