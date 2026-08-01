@@ -1,0 +1,22 @@
+--- OpenBLAS-0.3.34/common.h.orig	2026-07-19 22:51:37.303252809 +0100
++++ OpenBLAS-0.3.34/common.h	2026-07-19 22:54:40.394426336 +0100
+@@ -582,8 +582,8 @@
+ #ifdef HAVE_C11
+ static __inline void blas_lock(volatile BLASULONG *address) {
+   BLASULONG expected = 0;
+-  while (!atomic_compare_exchange_strong((volatile _Atomic BLASULONG *)address,
+-             &expected, (BLASULONG)1)) {
++  while (!__atomic_compare_exchange_n(address, &expected, 1, 0,
++                                       __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
+     expected = 0;
+     YIELDING;
+   }
+@@ -592,7 +592,7 @@
+ 
+ static __inline void blas_unlock(volatile BLASULONG *address){
+ #ifdef HAVE_C11
+-  atomic_store((volatile _Atomic BLASULONG *)address, (BLASULONG)0);
++  __atomic_store_n(address, (BLASULONG)0, __ATOMIC_SEQ_CST);
+ #else
+   MB;
+   *address = 0;
