@@ -83,6 +83,7 @@ class PackageMetadata(TypedDict):
     upstream_branch: NotRequired[str]  # Upstream branch (versioned packages sharing a repo)
     cve_product: NotRequired[str | list[str]]  # CVE vendor/product override; list for multi-product
     version_transform: NotRequired[str]  # Version transform rule (e.g., "dotnet_sdk_to_runtime")
+    upstream_version_transform: NotRequired[str]  # Named Anitya-to-RPM version transform (e.g., "openjdk_to_rpm")
 
 
 class KojiBuild(TypedDict, total=False):

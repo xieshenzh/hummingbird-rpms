@@ -4,9 +4,12 @@
   "modification_reason": "Add changelog separator to spec file",
   "modification_status": "modified",
   "release": "2",
+  "release_monitoring_project_id": 369281,
   "sha": "600f24cf2628385b0de3db8db516085dcc573fa8",
   "source": "https://src.fedoraproject.org/rpms/java-21-openjdk-portable.git",
+  "track_upstream": "21",
   "upstream_repo": "https://github.com/openjdk/jdk21u",
+  "upstream_version_transform": "openjdk_to_rpm",
   "version": "21.0.11.0.10",
   "version_transform": "openjdk_to_oracle"
 }

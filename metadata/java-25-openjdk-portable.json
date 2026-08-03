@@ -4,9 +4,12 @@
   "modification_reason": "Add changelog separator to spec file",
   "modification_status": "modified",
   "release": "2.0",
+  "release_monitoring_project_id": 378887,
   "sha": "5a268016ad909c415222f9453d4b2bcf17a48561",
   "source": "https://src.fedoraproject.org/rpms/java-25-openjdk-portable.git",
+  "track_upstream": "25",
   "upstream_repo": "https://github.com/openjdk/jdk25u",
+  "upstream_version_transform": "openjdk_to_rpm",
   "version": "25.0.4.0.7",
   "version_transform": "openjdk_to_oracle"
 }

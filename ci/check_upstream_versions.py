@@ -70,7 +70,7 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 import yaml
 
@@ -1165,6 +1165,33 @@ def _matches_track_version(version: str, track_version: str) -> bool:
     return version == track_version or version.startswith(track_version + ".")
 
 
+def _openjdk_to_rpm(version: str) -> str:
+    """Convert OpenJDK upstream tag version to RPM version scheme.
+
+    21.0.12+8   -> 21.0.12.0.8
+    21.0.12.1+0 -> 21.0.12.1.0
+    """
+    m = re.fullmatch(r'(\d+\.\d+\.\d+)(?:\.(\d+))?\+(\d+)', version)
+    if not m:
+        raise ValueError(f"version {version!r} is not a supported OpenJDK version")
+    base, patch, build = m.groups()
+    patch = patch or '0'
+    return f'{base}.{patch}.{int(build)}'
+
+
+UPSTREAM_VERSION_TRANSFORMS: dict[str, Callable[[str], str]] = {
+    "openjdk_to_rpm": _openjdk_to_rpm,
+}
+
+
+def transform_upstream_version(version: str, transform: str) -> str:
+    """Apply a named upstream-to-RPM version transform."""
+    fn = UPSTREAM_VERSION_TRANSFORMS.get(transform)
+    if fn is None:
+        raise ValueError(f"unknown upstream_version_transform {transform!r}")
+    return fn(version)
+
+
 def check_package_version(
     package: str, distro: str = DEFAULT_DISTRO
 ) -> VersionCheckResult:
@@ -1207,12 +1234,14 @@ def check_package_version(
     track_version = None
     project_id = None
     version_suffix_strip = None
+    version_transform = None
     if meta:
         track_upstream = meta.get("track_upstream")
         if track_upstream and track_upstream != "latest":
             track_version = track_upstream
         project_id = meta.get("release_monitoring_project_id")
         version_suffix_strip = meta.get("version_suffix_strip")
+        version_transform = meta.get("upstream_version_transform")
 
     # Query release-monitoring.org
     try:
@@ -1242,6 +1271,24 @@ def check_package_version(
             ]
         if anitya_data.get("version"):
             anitya_data["version"] = _strip_suffix(anitya_data["version"])
+
+    # Apply a named version transform if configured
+    # (e.g., OpenJDK reports "21.0.12+8" from Anitya, RPM uses "21.0.12.0.8").
+    if version_transform:
+        def _apply_transform(v: str) -> str | None:
+            try:
+                return transform_upstream_version(v, version_transform)
+            except ValueError:
+                logger.debug("%s: skipping untransformable version %s", package, v)
+                return None
+
+        if anitya_data.get("stable_versions"):
+            anitya_data["stable_versions"] = [
+                tv for v in anitya_data["stable_versions"]
+                if (tv := _apply_transform(v)) is not None
+            ]
+        if anitya_data.get("version"):
+            anitya_data["version"] = _apply_transform(anitya_data["version"])
 
     # Prefer stable_versions[0] over version field, as version can sometimes
     # contain incorrect data (e.g., development tags that aren't real releases)
