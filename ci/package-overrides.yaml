@@ -410,6 +410,9 @@ tempo2.10:
 tempo3.0:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+thrift:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 tomcat11:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

@@ -70,8 +70,8 @@
 # NOTE: thrift versions their libraries by package version, so each version
 # change is a SONAME change and dependencies need to be rebuilt
 Name:    thrift
-Version: 0.20.0
-Release: 12%{?dist}
+Version: 0.24.0
+Release: 0.1%{?dist}
 Summary: Software framework for cross-language services development
 
 # Parts of the source are used under the BSD and zlib licenses, but
@@ -87,13 +87,10 @@ URL:     https://thrift.apache.org/
 Source0: https://archive.apache.org/dist/%{name}/%{version}/%{name}-%{version}.tar.gz
 
 Source1: https://repo1.maven.org/maven2/org/apache/thrift/lib%{name}/%{version}/lib%{name}-%{version}.pom
-Source2: https://raw.github.com/apache/%{name}/%{version}/bootstrap.sh
+Source2: https://raw.githubusercontent.com/apache/%{name}/v%{version}/bootstrap.sh
 
 # fix configure.ac insistence on using /usr/local/lib for JAVA_PREFIX
 Patch2: configure-java-prefix.patch
-# fix build with GCC 15: https://github.com/apache/thrift/pull/3078
-Patch3: gcc15.patch
-
 
 # BuildRequires for language-specific bindings are listed under these
 # subpackages, to facilitate enabling or disabling individual language
@@ -157,6 +154,7 @@ The %{name}-qt package contains GLib bindings for %{name}.
 %package -n python3-%{name}
 Summary: Python 3 support for %{name}
 BuildRequires: python3-devel
+BuildRequires: python3-pip
 BuildRequires: python3-setuptools
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: python3
@@ -346,6 +344,7 @@ sed -i -e 's/ -shared / -Wl,--as-needed\0/g' libtool
 
 
 %install
+export PYTHON_SETUPUTIL_ARGS="--no-build-isolation --no-deps"
 %make_install
 find %{buildroot} -name '*.la' -exec rm -f {} ';'
 find %{buildroot} -name fastbinary.so | xargs -r chmod 755
@@ -434,7 +433,7 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 
 %files -n python3-%{name}
 %{python3_sitearch}/%{name}
-%{python3_sitearch}/%{name}-%{version}-py%{python3_version}.egg-info
+%{python3_sitearch}/%{name}-%{version}.dist-info
 %doc LICENSE NOTICE
 
 %if 0%{?want_java} > 0
