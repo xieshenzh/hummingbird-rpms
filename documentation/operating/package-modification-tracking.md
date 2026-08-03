@@ -167,11 +167,13 @@ together).
 
 **Metadata fields:**
 
-| Field                           | Description                                       | Example                |
-| ------------------------------- | ------------------------------------------------- | ---------------------- |
-| `track_upstream`                | `"latest"` or version prefix to constrain updates | `"latest"`, `"1.26"`   |
-| `release_monitoring_project_id` | Anitya project ID (int) or upstream name (str)    | `13254`, `"golang"`    |
-| `version_suffix_strip`          | Suffix to strip from Anitya-reported versions     | `"-RELEASE"`           |
+| Field                           | Description                                                       | Example                                  |
+| ------------------------------- | ----------------------------------------------------------------- | ---------------------------------------- |
+| `track_upstream`                | `"latest"` or version prefix to constrain updates                 | `"latest"`, `"1.26"`                     |
+| `release_monitoring_project_id` | Anitya project ID (int) or upstream name (str)                    | `13254`, `"golang"`                      |
+| `version_suffix_strip`          | Suffix to strip from Anitya-reported versions                     | `"-RELEASE"`                             |
+| `upstream_version_transform`    | Named transform from Anitya version to RPM scheme                 | `"openjdk_to_rpm"`                       |
+| `source_availability_check`     | Named source checker to HEAD-probe before selecting a version     | `"openjdk_osci"`                         |
 
 These fields affect two systems:
 
@@ -206,6 +208,23 @@ allowed). Use `version_suffix_strip` to remove it before comparison and update:
 {
   "release_monitoring_project_id": 21267,
   "version_suffix_strip": "-RELEASE"
+}
+```
+
+Some upstream projects publish source tarballs independently of tag creation, and Anitya may report
+a version before the tarball is available. Use `source_availability_check` to name a checker
+function (registered in `SOURCE_AVAILABILITY_CHECKERS` in `check_upstream_versions.py`) that
+HEAD-probes the source URL before selecting a version. Versions whose source returns 404 are
+skipped in favour of the next available version. Available checkers:
+
+- `openjdk_osci` — probes `https://openjdk-sources.osci.io/openjdk{feature}/openjdk-{version}.tar.xz`
+
+```json
+{
+  "release_monitoring_project_id": 369281,
+  "track_upstream": "21",
+  "upstream_version_transform": "openjdk_to_rpm",
+  "source_availability_check": "openjdk_osci"
 }
 ```
 
