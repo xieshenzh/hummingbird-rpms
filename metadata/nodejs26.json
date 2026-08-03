@@ -1,10 +1,10 @@
 {
-  "modification_reason": "Update to upstream version 26.5.1",
+  "modification_reason": "Update to upstream version 26.6.0",
   "modification_status": "modified",
   "release": "1.5",
   "release_monitoring_project_id": 8251,
   "track_upstream": "26",
   "upstream_branch": "v26.x",
   "upstream_repo": "https://github.com/nodejs/node",
-  "version": "26.5.1"
+  "version": "26.6.0"
 }
