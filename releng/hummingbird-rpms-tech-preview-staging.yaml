@@ -280,6 +280,8 @@ spec:
           contentType: rpm
         - name: gcc-main
           contentType: rpm
+        - name: gcc13-main
+          contentType: rpm
         - name: gd-main
           contentType: rpm
         - name: gdb-main
