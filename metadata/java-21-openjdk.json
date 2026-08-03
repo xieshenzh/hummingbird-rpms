@@ -9,6 +9,7 @@
   "source": "https://src.fedoraproject.org/rpms/java-21-openjdk.git",
   "track_upstream": "21",
   "upstream_repo": "https://github.com/openjdk/jdk21u",
+  "upstream_version_transform": "openjdk_to_rpm",
   "version": "21.0.11.0.10",
   "version_transform": "openjdk_to_oracle"
 }

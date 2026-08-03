@@ -9,6 +9,7 @@
   "source": "https://src.fedoraproject.org/rpms/java-25-openjdk.git",
   "track_upstream": "25",
   "upstream_repo": "https://github.com/openjdk/jdk25u",
+  "upstream_version_transform": "openjdk_to_rpm",
   "version": "25.0.3.0.9",
   "version_transform": "openjdk_to_oracle"
 }
