@@ -95,6 +95,9 @@ erlang27:
 expat:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+fftw:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 fontconfig:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
