@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to 0.72.0 (ahead of Fedora); Waiting for code to be accepted upstream; bump vendored BuildKit to v0.31.2 and x/text to v0.39.0 for CVE-2026-15788, CVE-2026-15792 and CVE-2026-56852; CVE-2026-49834",
+  "modification_reason": "Update to upstream version 0.73.0",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 141362,
@@ -8,5 +8,5 @@
   "source": "https://src.fedoraproject.org/rpms/trivy.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/aquasecurity/trivy",
-  "version": "0.72.0"
+  "version": "0.73.0"
 }
