@@ -155,6 +155,9 @@ grype:
 haproxy:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+hdf5:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 hello:
   private_product: example
 
