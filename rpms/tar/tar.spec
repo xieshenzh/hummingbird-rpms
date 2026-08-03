@@ -10,7 +10,7 @@ Summary: GNU file archiving program
 Name: tar
 Epoch: 2
 Version: 1.35
-Release: 9.1%{?dist}
+Release: 9.2%{?dist}
 License: GPL-3.0-or-later
 URL: https://www.gnu.org/software/tar/
 
@@ -64,6 +64,9 @@ Patch25: tar-1.35-Avoid-acl_-prefix-for-functions.patch
 # Source: https://cgit.git.savannah.gnu.org/cgit/tar.git/commit/?id=0714d2f082104005a1c70ee6ec4175194943ea88
 # Fixes CVE-2026-18477
 Patch26: tar-1.35-CVE-2026-18477.patch
+# Source: https://cgit.git.savannah.gnu.org/cgit/tar.git/commit/?id=1b91f5f66f8e6c490eef0fdee50f652cfe155844
+# Fixes CVE-2026-18508
+Patch27: tar-1.35-CVE-2026-18508.patch
 
 BuildRequires: autoconf
 BuildRequires: automake

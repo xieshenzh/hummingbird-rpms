@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "CVE-2026-18477",
+  "modification_reason": "CVE-2026-18477; CVE-2026-18508",
   "modification_status": "modified",
   "release": "9",
   "sha": "56aba219a0aa641dec2e4932c721eb6b6379ebec",
