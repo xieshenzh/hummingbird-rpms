@@ -404,6 +404,9 @@ sqlite:
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+tbb:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 tempo2.10:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
