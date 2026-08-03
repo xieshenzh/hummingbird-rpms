@@ -175,8 +175,11 @@ or `rhjira show` on that specific ticket.
 Also inspect comments for: Hummingbird SRPM version, CVE affected range,
 upstream fix info (commits, PRs), and blocking Task tickets with MRs (work
 already in progress). Review all comments for prior analysis, decisions, or
-FIB values already set. Summarize relevant context — if it's already been
-resolved, say so rather than re-doing the work.
+FIB values already set. Note any `*.sbom.json` attachments listed by
+`rhjira show` — `cve_analysis` attaches `{nvr}.sbom.json` for SBOM-backed
+reviews; reuse a matching NVR in Step 2e instead of re-fetching from Pulp.
+Summarize relevant context — if it's already been resolved, say so rather
+than re-doing the work.
 
 **EMBARGO CHECK:** If the ticket summary starts with `EMBARGOED`,
 stop immediately and output:
@@ -296,17 +299,54 @@ and their versions. If found, compare against the CVE affected range.
 #### 2e: SBOM verification
 
 When the CVE product differs from the Hummingbird package name,
-download and inspect the SBOM to determine:
+obtain and inspect the SBOM to determine:
 
 - whether the CVE product/component is present at all
 - whether it is runtime-installed in shipped binary RPMs
 - or only a build-time/test-time dependency
 
+**Prefer a Jira-attached SBOM when it matches the NVR you need.**
+`cve_analysis` attaches the analyzed package SBOM to the tracker as
+`{nvr}.sbom.json` (for example
+`grafana13.1-13.1.1-0.5.hum1.sbom.json`). Reuse that copy instead of
+re-fetching from Pulp when the attachment NVR matches the version
+under investigation.
+
+1. Determine the target NVR (prefer the most specific source
+   available):
+   - Latest `cve_analysis` comment `NVR:` line
+   - `Hummingbird repo (latest): … / {nvr}.src.rpm` (strip
+     `.src.rpm`)
+   - Fixed in Build (strip `.src.rpm`) when that is the SRPM being
+     verified
+2. Check the ticket Attachments list from `rhjira show` (or the
+   Attachments section already visible after Step 1) for
+   `{nvr}.sbom.json`.
+3. If a matching attachment exists, download it from Jira:
+
+```bash
+# rhjira writes to the current directory using the attachment name
+(cd /tmp && rhjira_retry attach -d HUM-XXXX "<nvr>.sbom.json")
+# optional stable path for later rg/jq:
+cp -f "/tmp/<nvr>.sbom.json" /tmp/<package>.sbom.json
+```
+
+4. Only if no matching `{nvr}.sbom.json` attachment is present (or
+   the attached NVR is not the version you need), fetch from Pulp:
+
 ```bash
 SBOM_BASE="https://packages.redhat.com/api/pulp-content/public-hummingbird/metadata/sboms/<package>-main/"
+# Pulp directory names replace dots in the package name with hyphens
+# (e.g. grafana13.1 -> grafana13-1-main)
 SBOM_FILE=$(curl -fsSL "$SBOM_BASE" | rg -o 'sha256-[^"]+\.sbom' | sort -u | tail -1)
 curl -fsSL "${SBOM_BASE}${SBOM_FILE}" -o /tmp/<package>.sbom.json
 ```
+
+When multiple `*.sbom.json` attachments exist, use the one whose
+NVR matches the target from step 1 — do not assume the newest
+attachment filename is correct without that check. If the attached
+NVR does not match the version being investigated, fall back to
+Pulp.
 
 Then inspect SBOM contents for the CVE product/component:
 
@@ -334,7 +374,8 @@ Decision guidance:
 For any `Not a Bug` recommendation based on product mismatch,
 include SBOM evidence in the Jira comment:
 
-- SBOM URL/file used
+- SBOM source used (Jira attachment `{nvr}.sbom.json` and/or Pulp
+  URL/file)
 - exact match/no-match terms
 - runtime-installed vs build-time-only conclusion
 - why that supports the chosen VEX justification
@@ -783,8 +824,8 @@ include whichever of the following apply:
 - Version details (CVE range, Hummingbird SRPM version, comparison)
 - Upstream fix commit verification (hash, URL, date, release tag)
 - Vendored dependency check results
-- SBOM evidence (URL/file, match terms, runtime vs build-time
-  determination)
+- SBOM evidence (Jira `{nvr}.sbom.json` attachment and/or Pulp
+  URL/file, match terms, runtime vs build-time determination)
 - Version-scheme notes for dotnet/Go packages
 
 Use Jira wiki markup in comments (`{noformat}`, `*bold*`,
