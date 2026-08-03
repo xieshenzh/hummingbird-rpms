@@ -1,6 +1,6 @@
 Name:           prrte
-Version:        3.0.6
-Release:        10%{?dist}
+Version:        4.1.0
+Release:        0.1%{?dist}
 Summary:        PMIx Reference RunTime Environment (PRRTE)
 # src/mca/prtereachable/netlink/reachable_netlink_utils_common.c is BSD-2-Clause
 # -devel related licenses:
@@ -10,15 +10,13 @@ Summary:        PMIx Reference RunTime Environment (PRRTE)
 License:        BSD-3-Clause-Open-MPI AND BSD-2-Clause
 URL:            https://github.com/openpmix/%{name}
 Source0:        https://github.com/openpmix/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
-# Upstream fix for --stdfor for non-zeron ranks - fixes rhbz#2307533
-Patch0:         https://patch-diff.githubusercontent.com/raw/openpmix/prrte/pull/2038.patch
 
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  hwloc-devel
 BuildRequires:  libevent-devel
-BuildRequires:  pmix-devel >= 4.2.2
+BuildRequires:  pmix-devel >= 6.1.0
 # For pmixcc - https://bugzilla.redhat.com/show_bug.cgi?id=2078048
 BuildRequires:  pmix-tools
 BuildRequires:  perl-interpreter
@@ -98,6 +96,9 @@ find %{buildroot} -name '*.la' -delete
 %files
 %doc README.md
 %{_libdir}/openmpi/bin/prte
+%{_libdir}/openmpi/bin/prte-info
+%{_libdir}/openmpi/bin/prte-submit
+%{_libdir}/openmpi/bin/prte-term
 %{_libdir}/openmpi/bin/prte_info
 %{_libdir}/openmpi/bin/prted
 %{_libdir}/openmpi/bin/prterun
