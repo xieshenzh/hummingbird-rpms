@@ -416,6 +416,9 @@ tomcat11:
 trivy:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+ucx:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 unbound:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
