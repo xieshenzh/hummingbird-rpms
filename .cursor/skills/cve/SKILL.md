@@ -324,23 +324,23 @@ under investigation.
    `{nvr}.sbom.json`.
 3. If a matching attachment exists, download it from Jira:
 
-```bash
-# rhjira writes to the current directory using the attachment name
-(cd /tmp && rhjira_retry attach -d HUM-XXXX "<nvr>.sbom.json")
-# optional stable path for later rg/jq:
-cp -f "/tmp/<nvr>.sbom.json" /tmp/<package>.sbom.json
-```
+   ```bash
+   # rhjira writes to the current directory using the attachment name
+   (cd /tmp && rhjira_retry attach -d HUM-XXXX "<nvr>.sbom.json")
+   # optional stable path for later rg/jq:
+   cp -f "/tmp/<nvr>.sbom.json" /tmp/<package>.sbom.json
+   ```
 
 4. Only if no matching `{nvr}.sbom.json` attachment is present (or
    the attached NVR is not the version you need), fetch from Pulp:
 
-```bash
-SBOM_BASE="https://packages.redhat.com/api/pulp-content/public-hummingbird/metadata/sboms/<package>-main/"
-# Pulp directory names replace dots in the package name with hyphens
-# (e.g. grafana13.1 -> grafana13-1-main)
-SBOM_FILE=$(curl -fsSL "$SBOM_BASE" | rg -o 'sha256-[^"]+\.sbom' | sort -u | tail -1)
-curl -fsSL "${SBOM_BASE}${SBOM_FILE}" -o /tmp/<package>.sbom.json
-```
+   ```bash
+   SBOM_BASE="https://packages.redhat.com/api/pulp-content/public-hummingbird/metadata/sboms/<package>-main/"
+   # Pulp directory names replace dots in the package name with hyphens
+   # (e.g. grafana13.1 -> grafana13-1-main)
+   SBOM_FILE=$(curl -fsSL "$SBOM_BASE" | rg -o 'sha256-[^"]+\.sbom' | sort -u | tail -1)
+   curl -fsSL "${SBOM_BASE}${SBOM_FILE}" -o /tmp/<package>.sbom.json
+   ```
 
 When multiple `*.sbom.json` attachments exist, use the one whose
 NVR matches the target from step 1 — do not assume the newest
