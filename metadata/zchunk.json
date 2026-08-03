@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "c59ec4183a45ed4cb1925e7e22a66c2bc040c284",
+  "release": "1",
+  "sha": "8f0a8f17ddf73ab52e3fa2a431d9c1affecae582",
   "source": "https://src.fedoraproject.org/rpms/zchunk.git",
   "upstream_repo": "https://github.com/zchunk/zchunk",
-  "version": "1.5.3"
+  "version": "1.5.4"
 }
