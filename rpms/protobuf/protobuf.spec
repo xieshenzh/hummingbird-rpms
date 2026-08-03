@@ -16,9 +16,9 @@ Name:           protobuf
 # NOTE: perl-Alien-ProtoBuf has an exact-version dependency on the version of
 # protobuf with which it was built; it therefore needs to be rebuilt even for
 # “patch” updates of protobuf.
-Version:        33.5
-%global so_version 33
-Release:        7%{?dist}
+Version:        35.1
+%global so_version 35
+Release:        0.1%{?dist}
 
 # See version.json:
 %global version_protoc %{version}
@@ -482,7 +482,7 @@ cd java/lite
         pom_template.xml > pom.xml
     awk -v dep="${dependencies}" -i inplace '{gsub(/\{dependencies\}/,dep)}1' pom.xml
     awk -v bld="${build1}${includes}${build2}" -i inplace '{gsub(/<build>/,"&" bld)}1' pom.xml
-    cp -p ../core/src/main/java/com/google/protobuf/{Abstract{Parser,ProtobufList},Android,ArrayDecoders,{Boolean,Int,Double,Float,Long,Protobuf}ArrayList,ByteBufferWriter,ByteOutput,ByteString,CanIgnoreReturnValue,CheckReturnValue,CodedInputStream{,Reader},CodedOutputStream{,Writer},CompileTimeConstant,ExperimentalApi,ExtensionRegistryFactory,ExtensionSchema{,s},Field{Info,Set,Type},Generated{,MessageInfoFactory},InlineMe,Internal,InvalidProtocolBufferException,IterableByteBufferInputStream,Java8Compatibility,JavaType,Lazy{Field,StringList},ListFieldSchema{,s},ManifestSchemaFactory,MapFieldSchema{,s},Message{Info{,Factory},{Set,}Schema},NewInstanceSchema{,s},OneofInfo,Parser,PrimitiveNonBoxingCollection,Protobuf,ProtocolStringList,ProtoSyntax,RawMessageInfo,Reader,RopeByteString,Schema{,Factory,Util},SmallSortedMap,StructuralMessageInfo,TextFormatEscaper,UninitializedMessageException,UnknownFieldSchema,UnsafeUtil,Utf8,WireFormat,Writer,*Lite*}.java src/main/java/com/google/protobuf
+    cp -p ../core/src/main/java/com/google/protobuf/{Abstract{Parser,ProtobufList},Android,ArrayDecoders,{Boolean,Int,Double,Float,Long,Protobuf}ArrayList,ByteBufferWriter,ByteOutput,ByteString,CanIgnoreReturnValue,CheckReturnValue,CodedInputStream{,Reader},CodedOutputStream{,Writer},CompileTimeConstant,DoNotInline,ExperimentalApi,ExtensionRegistryFactory,ExtensionSchema{,s},Field{Info,Set,Type},Generated{,MessageInfoFactory},InlineMe,Internal,InternalLazyField,InvalidProtobufRuntimeException,InvalidProtocolBufferException,IterableByteBufferInputStream,Java8Compatibility,JavaType,Lazy{Field,StringList},ListFieldSchema{,s},ManifestSchemaFactory,MapFieldSchema{,s},Message{Info{,Factory},{Set,}Schema},NewInstanceSchema{,s},OneofInfo,Parser,PrimitiveNonBoxingCollection,Protobuf,ProtocolStringList,ProtoSyntax,RawMessageInfo,Reader,RopeByteString,Schema{,Factory,Util},SmallSortedMap,StructuralMessageInfo,TextFormatEscaper,UninitializedMessageException,UnknownFieldSchema,UnsafeUtil,Utf8,WireFormat,Writer,*Lite*}.java src/main/java/com/google/protobuf
 cd -
 cd java/util
     sed -e 's/{groupId}/com.google.protobuf/' \
