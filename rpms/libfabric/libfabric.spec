@@ -9,8 +9,8 @@
 %endif
 
 Name:           libfabric
-Version:        2.5.1
-Release:        3%{?dist}
+Version:        2.6.0
+Release:        0.1%{?dist}
 Summary:        Open Fabric Interfaces
 
 License:        BSD-2-Clause OR GPL-2.0-only
