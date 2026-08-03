@@ -1,12 +1,12 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Remove unused texlive BuildRequires to avoid libicu version conflict",
+  "modification_reason": "Update to upstream version 0.24.0",
   "modification_status": "modified",
-  "release": "12",
+  "release": "0.1",
   "release_monitoring_project_id": 5581,
   "sha": "07a3ace795101f8133798d0ae32e00bce0c1c281",
   "source": "https://src.fedoraproject.org/rpms/thrift.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/apache/thrift",
-  "version": "0.20.0"
+  "version": "0.24.0"
 }

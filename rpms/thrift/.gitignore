@@ -4,3 +4,6 @@
 /thrift-0.14.0.tar.gz
 /thrift-0.15.0.tar.gz
 /thrift-0.20.0.tar.gz
+thrift-0.24.0.tar.gz
+libthrift-0.24.0.pom
+bootstrap.sh
