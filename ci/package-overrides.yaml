@@ -197,6 +197,9 @@ kubernetes1.35:
 kubernetes1.36:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+libfabric:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 libpng:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
