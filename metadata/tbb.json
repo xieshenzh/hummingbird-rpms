@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "3",
+  "release_monitoring_project_id": 8217,
+  "sha": "f8ea3a15a49c5637b22c26e1ffad1eda39921b07",
+  "source": "https://src.fedoraproject.org/rpms/tbb.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/uxlfoundation/oneTBB",
+  "version": "2023.0.0"
+}

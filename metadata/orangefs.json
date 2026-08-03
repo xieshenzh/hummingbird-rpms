@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "5",
+  "release_monitoring_project_id": 93317,
+  "sha": "2584d953b210a70cdbc0d8e64bc57c744e8dd36b",
+  "source": "https://src.fedoraproject.org/rpms/orangefs.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/waltligon/orangefs",
+  "version": "2.10.1"
+}

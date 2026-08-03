@@ -1,0 +1,12 @@
+{
+  "branch": "rawhide",
+  "modification_reason": "Remove conflict markers inherited from Fedora rawhide .gitignore",
+  "modification_status": "modified",
+  "release": "18",
+  "release_monitoring_project_id": 803,
+  "sha": "c90534544d579832bcafa366bfd4b248598df7c7",
+  "source": "https://src.fedoraproject.org/rpms/fftw.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/FFTW/fftw3",
+  "version": "3.3.10"
+}

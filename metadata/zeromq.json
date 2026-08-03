@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "23",
+  "release_monitoring_project_id": 16245,
+  "sha": "2b568b01363eff740cc72599500094aab3073dc8",
+  "source": "https://src.fedoraproject.org/rpms/zeromq.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/zeromq/libzmq",
+  "version": "4.3.5"
+}

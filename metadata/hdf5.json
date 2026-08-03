@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "5",
+  "release_monitoring_project_id": 1303,
+  "sha": "1e302c76d38e567d7f856d27eb233da2b0f41fe2",
+  "source": "https://src.fedoraproject.org/rpms/hdf5.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/HDFGroup/hdf5",
+  "version": "2.1.1"
+}

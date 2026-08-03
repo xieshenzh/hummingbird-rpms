@@ -1,0 +1,673 @@
+diff --git a/CMakeInstallation.cmake b/CMakeInstallation.cmake
+index 0313580bbf..84534c4bf0 100644
+--- a/CMakeInstallation.cmake
++++ b/CMakeInstallation.cmake
+@@ -52,23 +52,59 @@ endif ()
+ #-----------------------------------------------------------------------------
+ if (NOT HDF5_EXTERNALLY_CONFIGURED)
+   if (HDF5_EXPORTED_TARGETS)
+-    install (
+-        EXPORT ${HDF5_EXPORTED_TARGETS}
+-        DESTINATION ${HDF5_INSTALL_CMAKE_DIR}
+-        FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-targets.cmake
+-        NAMESPACE ${HDF_PACKAGE_NAMESPACE}
+-        COMPONENT configinstall
+-    )
++    if (HDF5_BUILD_JAVA)
++      install (
++          EXPORT ${HDF5_EXPORTED_TARGETS}_java
++          DESTINATION ${HDF5_INSTALL_CMAKE_DIR}
++          FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}_java-targets.cmake
++          NAMESPACE ${HDF_PACKAGE_NAMESPACE}
++          COMPONENT configinstall
++      )
++    endif ()
++    if (BUILD_STATIC_LIBS)
++      install (
++          EXPORT ${HDF5_EXPORTED_TARGETS}_static
++          DESTINATION ${HDF5_INSTALL_CMAKE_DIR}
++          FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}_static-targets.cmake
++          NAMESPACE ${HDF_PACKAGE_NAMESPACE}
++          COMPONENT configinstall
++      )
++    endif ()
++    if (BUILD_SHARED_LIBS)
++      install (
++          EXPORT ${HDF5_EXPORTED_TARGETS}
++          DESTINATION ${HDF5_INSTALL_CMAKE_DIR}
++          FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-targets.cmake
++          NAMESPACE ${HDF_PACKAGE_NAMESPACE}
++          COMPONENT configinstall
++      )
++    endif ()
+   endif ()
+ 
+   #-----------------------------------------------------------------------------
+   # Export all exported targets to the build tree for use by parent project
+   #-----------------------------------------------------------------------------
+-  export (
+-      TARGETS ${HDF5_LIBRARIES_TO_EXPORT} ${HDF5_LIB_DEPENDENCIES} ${HDF5_UTILS_TO_EXPORT}
+-      FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-targets.cmake
+-      NAMESPACE ${HDF_PACKAGE_NAMESPACE}
+-  )
++  if (HDF5_BUILD_JAVA)
++    export (
++        TARGETS ${HDF5_JAVA_LIBRARIES_TO_EXPORT} ${HDF5_LIB_DEPENDENCIES} ${HDF5_UTILS_TO_EXPORT}
++        FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}_java-targets.cmake
++        NAMESPACE ${HDF_PACKAGE_NAMESPACE}
++    )
++  endif ()
++  if (BUILD_STATIC_LIBS)
++    export (
++        TARGETS ${HDF5_STATIC_LIBRARIES_TO_EXPORT} ${HDF5_LIB_DEPENDENCIES} ${HDF5_UTILS_TO_EXPORT}
++        FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}_static-targets.cmake
++        NAMESPACE ${HDF_PACKAGE_NAMESPACE}
++    )
++  endif ()
++  if (BUILD_SHARED_LIBS)
++    export (
++        TARGETS ${HDF5_LIBRARIES_TO_EXPORT} ${HDF5_LIB_DEPENDENCIES} ${HDF5_UTILS_TO_EXPORT}
++        FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-targets.cmake
++        NAMESPACE ${HDF_PACKAGE_NAMESPACE}
++    )
++  endif ()
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6c4532a2b7..e4d9bc6961 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -561,6 +561,8 @@ endif ()
+ # which include hdf5 as a sub-project within their build tree
+ #-----------------------------------------------------------------------------
+ set_global_variable (HDF5_LIBRARIES_TO_EXPORT "")
++set_global_variable (HDF5_JAVA_LIBRARIES_TO_EXPORT "")
++set_global_variable (HDF5_STATIC_LIBRARIES_TO_EXPORT "")
+ set_global_variable (HDF5_UTILS_TO_EXPORT "")
+ 
+ set (EXTERNAL_HEADER_LIST "")
+diff --git a/c++/src/CMakeLists.txt b/c++/src/CMakeLists.txt
+index b94c255c7a..dcab004515 100644
+--- a/c++/src/CMakeLists.txt
++++ b/c++/src/CMakeLists.txt
+@@ -93,10 +93,10 @@ if (BUILD_STATIC_LIBS)
+   )
+   TARGET_C_PROPERTIES (${HDF5_CPP_LIB_TARGET} STATIC)
+   target_link_libraries (${HDF5_CPP_LIB_TARGET} PUBLIC ${HDF5_LIB_TARGET})
+-  set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_CPP_LIB_TARGET}")
++  set_global_variable (HDF5_STATIC_LIBRARIES_TO_EXPORT "${HDF5_STATIC_LIBRARIES_TO_EXPORT};${HDF5_CPP_LIB_TARGET}")
+   H5_SET_LIB_OPTIONS (${HDF5_CPP_LIB_TARGET} ${HDF5_CPP_LIB_NAME} STATIC 0)
+   set_target_properties (${HDF5_CPP_LIB_TARGET} PROPERTIES FOLDER libraries/cpp)
+-  set (install_targets ${HDF5_CPP_LIB_TARGET})
++  set (install_targets_static ${HDF5_CPP_LIB_TARGET})
+ endif ()
+ 
+ if (BUILD_SHARED_LIBS)
+@@ -122,7 +122,7 @@ if (BUILD_SHARED_LIBS)
+   set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_CPP_LIBSH_TARGET}")
+   H5_SET_LIB_OPTIONS (${HDF5_CPP_LIBSH_TARGET} ${HDF5_CPP_LIB_NAME} SHARED "CXX")
+   set_target_properties (${HDF5_CPP_LIBSH_TARGET} PROPERTIES FOLDER libraries/cpp)
+-  set (install_targets ${install_targets} ${HDF5_CPP_LIBSH_TARGET})
++  set (install_targets_shared ${HDF5_CPP_LIBSH_TARGET})
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+@@ -154,22 +154,34 @@ install (
+ if (HDF5_EXPORTED_TARGETS)
+   if (BUILD_SHARED_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_CPP_LIBSH_TARGET} ${HDF5_INSTALL_BIN_DIR} cpplibraries)
++
++    install (
++        TARGETS
++            ${install_targets_shared}
++        EXPORT
++            ${HDF5_EXPORTED_TARGETS}
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT cpplibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT cpplibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT cpplibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT cpplibraries
++        INCLUDES DESTINATION include
++    )
+   endif ()
+   if (BUILD_STATIC_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_CPP_LIB_TARGET} ${HDF5_INSTALL_LIB_DIR} cpplibraries)
+-  endif ()
+ 
+-  install (
+-      TARGETS
+-          ${install_targets}
+-      EXPORT
+-          ${HDF5_EXPORTED_TARGETS}
+-      LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT cpplibraries
+-      ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT cpplibraries
+-      RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT cpplibraries
+-      FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT cpplibraries
+-      INCLUDES DESTINATION include
+-  )
++    install (
++        TARGETS
++            ${install_targets_static}
++        EXPORT
++            ${HDF5_EXPORTED_TARGETS}_static
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT cpplibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT cpplibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT cpplibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT cpplibraries
++        INCLUDES DESTINATION include
++    )
++  endif ()
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+diff --git a/config/install/hdf5-config.cmake.in b/config/install/hdf5-config.cmake.in
+index 6b82510365..1547904451 100644
+--- a/config/install/hdf5-config.cmake.in
++++ b/config/install/hdf5-config.cmake.in
+@@ -186,6 +186,12 @@ if (NOT TARGET "@HDF5_PACKAGE@")
+     endif ()
+   endif ()
+   include (@PACKAGE_SHARE_INSTALL_DIR@/@HDF5_PACKAGE@@HDF_PACKAGE_EXT@-targets.cmake)
++  if ( @BUILD_STATIC_LIBS@ )
++  include (@PACKAGE_SHARE_INSTALL_DIR@/@HDF5_PACKAGE@@HDF_PACKAGE_EXT@_static-targets.cmake OPTIONAL)
++  endif ()
++  if ( @HDF5_BUILD_JAVA@ )
++  include (@PACKAGE_SHARE_INSTALL_DIR@/@HDF5_PACKAGE@@HDF_PACKAGE_EXT@_java-targets.cmake OPTIONAL)
++  endif ()
+ endif ()
+ 
+ # Handle default component(static) :
+diff --git a/fortran/src/CMakeLists.txt b/fortran/src/CMakeLists.txt
+index d84143b00f..93cd6a5229 100644
+--- a/fortran/src/CMakeLists.txt
++++ b/fortran/src/CMakeLists.txt
+@@ -274,14 +274,14 @@ if (BUILD_STATIC_LIBS)
+   target_compile_options (${HDF5_F90_C_LIB_TARGET} PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+   TARGET_C_PROPERTIES (${HDF5_F90_C_LIB_TARGET} STATIC)
+   target_link_libraries (${HDF5_F90_C_LIB_TARGET} PUBLIC ${HDF5_LIB_TARGET})
+-  set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_F90_C_LIB_TARGET}")
++  set_global_variable (HDF5_STATIC_LIBRARIES_TO_EXPORT "${HDF5_STATIC_LIBRARIES_TO_EXPORT};${HDF5_F90_C_LIB_TARGET}")
+   H5_SET_LIB_OPTIONS (${HDF5_F90_C_LIB_TARGET} ${HDF5_F90_C_LIB_NAME} STATIC 0)
+   set_target_properties (${HDF5_F90_C_LIB_TARGET} PROPERTIES
+       FOLDER libraries/fortran
+       LINKER_LANGUAGE C
+   )
+   add_dependencies (${HDF5_F90_C_LIB_TARGET} H5gen_i)
+-  set (install_targets ${HDF5_F90_C_LIB_TARGET})
++  set (install_targets_static ${HDF5_F90_C_LIB_TARGET})
+ endif ()
+ 
+ if (BUILD_SHARED_LIBS)
+@@ -301,7 +301,7 @@ if (BUILD_SHARED_LIBS)
+       LINKER_LANGUAGE C
+   )
+   add_dependencies (${HDF5_F90_C_LIBSH_TARGET} H5gen_iSH)
+-  set (install_targets ${install_targets} ${HDF5_F90_C_LIBSH_TARGET})
++  set (install_targets_shared ${HDF5_F90_C_LIBSH_TARGET})
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+@@ -483,8 +483,8 @@ if (BUILD_STATIC_LIBS)
+       Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/static
+   )
+   H5_SET_LIB_OPTIONS (${HDF5_F90_LIB_TARGET} ${HDF5_F90_LIB_NAME} STATIC 0)
+-  set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_F90_LIB_TARGET}")
+-  set (install_targets ${install_targets} ${HDF5_F90_LIB_TARGET})
++  set_global_variable (HDF5_STATIC_LIBRARIES_TO_EXPORT "${HDF5_STATIC_LIBRARIES_TO_EXPORT};${HDF5_F90_LIB_TARGET}")
++  set (install_targets_static ${install_targets_static} ${HDF5_F90_LIB_TARGET})
+   add_dependencies (${HDF5_F90_LIB_TARGET} H5gen)
+ endif ()
+ 
+@@ -520,7 +520,7 @@ if (BUILD_SHARED_LIBS)
+   )
+   set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_F90_LIBSH_TARGET}")
+   H5_SET_LIB_OPTIONS (${HDF5_F90_LIBSH_TARGET} ${HDF5_F90_LIB_NAME} SHARED "F")
+-  set (install_targets ${install_targets} ${HDF5_F90_LIBSH_TARGET})
++  set (install_targets_shared ${install_targets_shared} ${HDF5_F90_LIBSH_TARGET})
+   add_dependencies(${HDF5_F90_LIBSH_TARGET} H5genSH)
+ endif ()
+ 
+@@ -621,21 +621,31 @@ if (HDF5_EXPORTED_TARGETS)
+   if (BUILD_SHARED_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_F90_C_LIBSH_TARGET} ${HDF5_INSTALL_BIN_DIR} fortlibraries)
+     #INSTALL_TARGET_PDB (${HDF5_F90_LIBSH_TARGET} ${HDF5_INSTALL_BIN_DIR} fortlibraries)
++
++    install (
++        TARGETS ${install_targets_shared}
++        EXPORT ${HDF5_EXPORTED_TARGETS}
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT fortlibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT fortlibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT fortlibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT fortlibraries
++        INCLUDES DESTINATION include
++    )
+   endif ()
+   if (BUILD_STATIC_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_F90_C_LIB_TARGET} ${HDF5_INSTALL_LIB_DIR} fortlibraries)
+     #INSTALL_TARGET_PDB (${HDF5_F90_LIB_TARGET} ${HDF5_INSTALL_LIB_DIR} fortlibraries)
+-  endif ()
+ 
+-  install (
+-      TARGETS ${install_targets}
+-      EXPORT ${HDF5_EXPORTED_TARGETS}
+-      LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT fortlibraries
+-      ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT fortlibraries
+-      RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT fortlibraries
+-      FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT fortlibraries
+-      INCLUDES DESTINATION include
+-  )
++    install (
++        TARGETS ${install_targets_static}
++        EXPORT ${HDF5_EXPORTED_TARGETS}_static
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT fortlibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT fortlibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT fortlibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT fortlibraries
++        INCLUDES DESTINATION include
++    )
++  endif ()
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+diff --git a/hl/c++/src/CMakeLists.txt b/hl/c++/src/CMakeLists.txt
+index 7543490116..332dec293d 100644
+--- a/hl/c++/src/CMakeLists.txt
++++ b/hl/c++/src/CMakeLists.txt
+@@ -22,10 +22,10 @@ if (BUILD_STATIC_LIBS)
+   target_compile_options(${HDF5_HL_CPP_LIB_TARGET} PRIVATE "${HDF5_CMAKE_CXX_FLAGS}")
+   TARGET_C_PROPERTIES (${HDF5_HL_CPP_LIB_TARGET} STATIC)
+   target_link_libraries (${HDF5_HL_CPP_LIB_TARGET} PUBLIC ${HDF5_HL_LIB_TARGET} ${HDF5_LIB_TARGET})
+-  set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_HL_CPP_LIB_TARGET}")
++  set_global_variable (HDF5_STATIC_LIBRARIES_TO_EXPORT "${HDF5_STATIC_LIBRARIES_TO_EXPORT};${HDF5_HL_CPP_LIB_TARGET}")
+   H5_SET_LIB_OPTIONS (${HDF5_HL_CPP_LIB_TARGET} ${HDF5_HL_CPP_LIB_NAME} STATIC 0)
+   set_target_properties (${HDF5_HL_CPP_LIB_TARGET} PROPERTIES FOLDER libraries/hl)
+-  set (install_targets ${HDF5_HL_CPP_LIB_TARGET})
++  set (install_targets_static ${HDF5_HL_CPP_LIB_TARGET})
+ endif ()
+ 
+ if (BUILD_SHARED_LIBS)
+@@ -41,7 +41,7 @@ if (BUILD_SHARED_LIBS)
+   set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_HL_CPP_LIBSH_TARGET}")
+   H5_SET_LIB_OPTIONS (${HDF5_HL_CPP_LIBSH_TARGET} ${HDF5_HL_CPP_LIB_NAME} SHARED "HL_CXX")
+   set_target_properties (${HDF5_HL_CPP_LIBSH_TARGET} PROPERTIES FOLDER libraries/hl)
+-  set (install_targets ${install_targets} ${HDF5_HL_CPP_LIBSH_TARGET})
++  set (install_targets_shared ${HDF5_HL_CPP_LIBSH_TARGET})
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+@@ -73,22 +73,34 @@ install (
+ if (HDF5_EXPORTED_TARGETS)
+   if (BUILD_SHARED_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_HL_CPP_LIBSH_TARGET} ${HDF5_INSTALL_BIN_DIR} hlcpplibraries)
++
++    install (
++        TARGETS
++            ${install_targets_shared}
++        EXPORT
++            ${HDF5_EXPORTED_TARGETS}
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlcpplibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlcpplibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT hlcpplibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT hlcpplibraries
++        INCLUDES DESTINATION include
++    )
+   endif ()
+   if (BUILD_STATIC_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_HL_CPP_LIB_TARGET} ${HDF5_INSTALL_LIB_DIR} hlcpplibraries)
+-  endif ()
+ 
+-  install (
+-      TARGETS
+-          ${install_targets}
+-      EXPORT
+-          ${HDF5_EXPORTED_TARGETS}
+-      LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlcpplibraries
+-      ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlcpplibraries
+-      RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT hlcpplibraries
+-      FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT hlcpplibraries
+-      INCLUDES DESTINATION include
+-  )
++    install (
++        TARGETS
++            ${install_targets_static}
++        EXPORT
++            ${HDF5_EXPORTED_TARGETS}_static
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlcpplibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlcpplibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT hlcpplibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT hlcpplibraries
++        INCLUDES DESTINATION include
++    )
++  endif ()
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+diff --git a/hl/fortran/src/CMakeLists.txt b/hl/fortran/src/CMakeLists.txt
+index 0ddb472610..62c4d78ae6 100644
+--- a/hl/fortran/src/CMakeLists.txt
++++ b/hl/fortran/src/CMakeLists.txt
+@@ -73,13 +73,13 @@ if (BUILD_STATIC_LIBS)
+   target_compile_options(${HDF5_HL_F90_C_LIB_TARGET} PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+   TARGET_C_PROPERTIES (${HDF5_HL_F90_C_LIB_TARGET} STATIC)
+   target_link_libraries (${HDF5_HL_F90_C_LIB_TARGET} PUBLIC ${HDF5_F90_C_LIB_TARGET} ${HDF5_HL_LIB_TARGET})
+-  set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_HL_F90_C_LIB_TARGET}")
++  set_global_variable (HDF5_STATIC_LIBRARIES_TO_EXPORT "${HDF5_STATIC_LIBRARIES_TO_EXPORT};${HDF5_HL_F90_C_LIB_TARGET}")
+   H5_SET_LIB_OPTIONS (${HDF5_HL_F90_C_LIB_TARGET} ${HDF5_HL_F90_C_LIB_NAME} STATIC 0)
+   set_target_properties (${HDF5_HL_F90_C_LIB_TARGET} PROPERTIES
+       FOLDER libraries/hl/fortran
+       LINKER_LANGUAGE C
+   )
+-  set (install_targets ${HDF5_HL_F90_C_LIB_TARGET})
++  set (install_targets_static ${HDF5_HL_F90_C_LIB_TARGET})
+ endif ()
+ if (BUILD_SHARED_LIBS)
+   add_library (${HDF5_HL_F90_C_LIBSH_TARGET} SHARED ${HDF5_HL_F90_C_SOURCES} ${HDF5_HL_F90_HEADERS})
+@@ -97,7 +97,7 @@ if (BUILD_SHARED_LIBS)
+       FOLDER libraries/hl/fortran
+       LINKER_LANGUAGE C
+   )
+-  set (install_targets ${install_targets} ${HDF5_HL_F90_C_LIBSH_TARGET})
++  set (install_targets_shared ${HDF5_HL_F90_C_LIBSH_TARGET})
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+@@ -241,8 +241,8 @@ if (BUILD_STATIC_LIBS)
+       Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/static
+   )
+   H5_SET_LIB_OPTIONS (${HDF5_HL_F90_LIB_TARGET} ${HDF5_HL_F90_LIB_NAME} STATIC 0)
+-  set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_HL_F90_LIB_TARGET}")
+-  set (install_targets ${install_targets} ${HDF5_HL_F90_LIB_TARGET})
++  set_global_variable (HDF5_STATIC_LIBRARIES_TO_EXPORT "${HDF5_STATIC_LIBRARIES_TO_EXPORT};${HDF5_HL_F90_LIB_TARGET}")
++  set (install_targets_static ${install_targets_static} ${HDF5_HL_F90_LIB_TARGET})
+   add_dependencies(${HDF5_HL_F90_LIB_TARGET} H5HLgen)
+ endif ()
+ if (BUILD_SHARED_LIBS)
+@@ -281,7 +281,7 @@ if (BUILD_SHARED_LIBS)
+   )
+   H5_SET_LIB_OPTIONS (${HDF5_HL_F90_LIBSH_TARGET} ${HDF5_HL_F90_LIB_NAME} SHARED "HL_F")
+   set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_HL_F90_LIBSH_TARGET}")
+-  set (install_targets ${install_targets} ${HDF5_HL_F90_LIBSH_TARGET})
++  set (install_targets_shared ${install_targets_shared} ${HDF5_HL_F90_LIBSH_TARGET})
+   add_dependencies(${HDF5_HL_F90_LIBSH_TARGET} H5HLgenSH)
+ endif ()
+ 
+@@ -341,21 +341,31 @@ if (HDF5_EXPORTED_TARGETS)
+   if (BUILD_SHARED_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_HL_F90_C_LIBSH_TARGET} ${HDF5_INSTALL_BIN_DIR} hlfortlibraries)
+     #INSTALL_TARGET_PDB (${HDF5_HL_F90_LIBSH_TARGET} ${HDF5_INSTALL_BIN_DIR} hlfortlibraries)
++
++    install (
++        TARGETS ${install_targets_shared}
++        EXPORT ${HDF5_EXPORTED_TARGETS}
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlfortlibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlfortlibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT hlfortlibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT hlfortlibraries
++        INCLUDES DESTINATION include
++    )
+   endif ()
+   if (BUILD_STATIC_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_HL_F90_C_LIB_TARGET} ${HDF5_INSTALL_LIB_DIR} hlfortlibraries)
+     #INSTALL_TARGET_PDB (${HDF5_HL_F90_LIB_TARGET} ${HDF5_INSTALL_LIB_DIR} hlfortlibraries)
+-  endif ()
+ 
+-  install (
+-      TARGETS ${install_targets}
+-      EXPORT ${HDF5_EXPORTED_TARGETS}
+-      LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlfortlibraries
+-      ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlfortlibraries
+-      RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT hlfortlibraries
+-      FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT hlfortlibraries
+-      INCLUDES DESTINATION include
+-  )
++    install (
++        TARGETS ${install_targets_static}
++        EXPORT ${HDF5_EXPORTED_TARGETS}_static
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlfortlibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hlfortlibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT hlfortlibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT hlfortlibraries
++        INCLUDES DESTINATION include
++    )
++  endif ()
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+diff --git a/hl/src/CMakeLists.txt b/hl/src/CMakeLists.txt
+index 9b03594b4b..b6bcb03d1d 100644
+--- a/hl/src/CMakeLists.txt
++++ b/hl/src/CMakeLists.txt
+@@ -57,8 +57,8 @@ if (BUILD_STATIC_LIBS)
+   target_link_libraries (${HDF5_HL_LIB_TARGET} PUBLIC ${HDF5_LIB_TARGET})
+   H5_SET_LIB_OPTIONS (${HDF5_HL_LIB_TARGET} ${HDF5_HL_LIB_NAME} STATIC 0)
+   set_target_properties (${HDF5_HL_LIB_TARGET} PROPERTIES FOLDER libraries/hl)
+-  set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_HL_LIB_TARGET}")
+-  set (install_targets ${HDF5_HL_LIB_TARGET})
++  set_global_variable (HDF5_STATIC_LIBRARIES_TO_EXPORT "${HDF5_STATIC_LIBRARIES_TO_EXPORT};${HDF5_HL_LIB_TARGET}")
++  set (install_targets_static ${HDF5_HL_LIB_TARGET})
+ endif ()
+ 
+ if (BUILD_SHARED_LIBS)
+@@ -74,7 +74,7 @@ if (BUILD_SHARED_LIBS)
+   H5_SET_LIB_OPTIONS (${HDF5_HL_LIBSH_TARGET} ${HDF5_HL_LIB_NAME} SHARED "HL")
+   set_target_properties (${HDF5_HL_LIBSH_TARGET} PROPERTIES FOLDER libraries/hl)
+   set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_HL_LIBSH_TARGET}")
+-  set (install_targets ${install_targets} ${HDF5_HL_LIBSH_TARGET})
++  set (install_targets_shared ${HDF5_HL_LIBSH_TARGET})
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+@@ -106,22 +106,34 @@ install (
+ if (HDF5_EXPORTED_TARGETS)
+   if (BUILD_SHARED_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_HL_LIBSH_TARGET} ${HDF5_INSTALL_BIN_DIR} hllibraries)
++
++    install (
++        TARGETS
++            ${install_targets_shared}
++        EXPORT
++            ${HDF5_EXPORTED_TARGETS}
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hllibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hllibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT hllibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT hllibraries
++        INCLUDES DESTINATION include
++    )
+   endif ()
+   if (BUILD_STATIC_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_HL_LIB_TARGET} ${HDF5_INSTALL_LIB_DIR} hllibraries)
+-  endif ()
+ 
+-  install (
+-      TARGETS
+-          ${install_targets}
+-      EXPORT
+-          ${HDF5_EXPORTED_TARGETS}
+-      LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hllibraries
+-      ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hllibraries
+-      RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT hllibraries
+-      FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT hllibraries
+-      INCLUDES DESTINATION include
+-  )
++    install (
++        TARGETS
++            ${install_targets_static}
++        EXPORT
++            ${HDF5_EXPORTED_TARGETS}_static
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hllibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT hllibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT hllibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT hllibraries
++        INCLUDES DESTINATION include
++    )
++  endif ()
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+diff --git a/java/src-jni/jni/CMakeLists.txt b/java/src-jni/jni/CMakeLists.txt
+index 71319cf1e6..5f2e1e0b52 100644
+--- a/java/src-jni/jni/CMakeLists.txt
++++ b/java/src-jni/jni/CMakeLists.txt
+@@ -91,7 +91,7 @@ target_compile_options(${HDF5_JAVA_JNI_LIB_TARGET} PRIVATE "${HDF5_CMAKE_C_FLAGS
+ TARGET_C_PROPERTIES (${HDF5_JAVA_JNI_LIB_TARGET} SHARED)
+ target_link_libraries (${HDF5_JAVA_JNI_LIB_TARGET} PUBLIC ${HDF5_LIBSH_TARGET})
+ set_target_properties (${HDF5_JAVA_JNI_LIB_TARGET} PROPERTIES FOLDER libraries/jni)
+-SET_GLOBAL_VARIABLE (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_JAVA_JNI_LIB_TARGET}")
++SET_GLOBAL_VARIABLE (HDF5_JAVA_LIBRARIES_TO_EXPORT "${HDF5_JAVA_LIBRARIES_TO_EXPORT};${HDF5_JAVA_JNI_LIB_TARGET}")
+ H5_SET_LIB_OPTIONS (${HDF5_JAVA_JNI_LIB_TARGET} ${HDF5_JAVA_JNI_LIB_NAME} SHARED "JAVA")
+ 
+ #-----------------------------------------------------------------------------
+@@ -110,7 +110,7 @@ if (HDF5_EXPORTED_TARGETS)
+       TARGETS
+           ${HDF5_JAVA_JNI_LIB_TARGET}
+       EXPORT
+-          ${HDF5_EXPORTED_TARGETS}
++          ${HDF5_EXPORTED_TARGETS}_java
+       LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT libraries
+       ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT libraries
+       RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT libraries
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index bbdf92ab7f..b94be96c2e 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -1263,11 +1263,11 @@ if (BUILD_STATIC_LIBS)
+       PRIVATE ${LINK_LIBS} ${LINK_COMP_LIBS}
+       PUBLIC ${LINK_PUB_LIBS}
+   )
+-  set_global_variable (HDF5_LIBRARIES_TO_EXPORT ${HDF5_LIB_TARGET})
++  set_global_variable (HDF5_STATIC_LIBRARIES_TO_EXPORT ${HDF5_LIB_TARGET})
+   H5_SET_LIB_OPTIONS (${HDF5_LIB_TARGET} ${HDF5_LIB_NAME} STATIC 0)
+   set_target_properties (${HDF5_LIB_TARGET} PROPERTIES FOLDER libraries)
+ 
+-  set (install_targets ${HDF5_LIB_TARGET})
++  set (install_targets_static ${HDF5_LIB_TARGET})
+ endif ()
+ 
+ if (BUILD_SHARED_LIBS)
+@@ -1296,7 +1296,7 @@ if (BUILD_SHARED_LIBS)
+   H5_SET_LIB_OPTIONS (${HDF5_LIBSH_TARGET} ${HDF5_LIB_NAME} SHARED "LIB")
+   set_target_properties (${HDF5_LIBSH_TARGET} PROPERTIES FOLDER libraries)
+ 
+-  set (install_targets ${install_targets} ${HDF5_LIBSH_TARGET})
++  set (install_targets_shared ${HDF5_LIBSH_TARGET})
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+@@ -1332,22 +1332,34 @@ endif ()
+ if (HDF5_EXPORTED_TARGETS)
+   if (BUILD_SHARED_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_LIBSH_TARGET} ${HDF5_INSTALL_BIN_DIR} libraries)
++
++    install (
++        TARGETS
++            ${install_targets_shared}
++        EXPORT
++            ${HDF5_EXPORTED_TARGETS}
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT libraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT libraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT libraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT libraries
++        INCLUDES DESTINATION include
++    )
+   endif ()
+   if (BUILD_STATIC_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_LIB_TARGET} ${HDF5_INSTALL_LIB_DIR} libraries)
+-  endif ()
+ 
+-  install (
+-      TARGETS
+-          ${install_targets}
+-      EXPORT
+-          ${HDF5_EXPORTED_TARGETS}
+-      LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT libraries
+-      ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT libraries
+-      RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT libraries
+-      FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT libraries
+-      INCLUDES DESTINATION include
+-  )
++    install (
++        TARGETS
++            ${install_targets_static}
++        EXPORT
++            ${HDF5_EXPORTED_TARGETS}_static
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT libraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT libraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT libraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT libraries
++        INCLUDES DESTINATION include
++    )
++  endif ()
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+diff --git a/tools/lib/CMakeLists.txt b/tools/lib/CMakeLists.txt
+index 44e94f27c6..d92ec275c2 100644
+--- a/tools/lib/CMakeLists.txt
++++ b/tools/lib/CMakeLists.txt
+@@ -56,10 +56,10 @@ if (BUILD_STATIC_LIBS)
+       PUBLIC ${HDF5_LIB_TARGET}
+       PRIVATE "$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:MPI::MPI_C>"
+   )
+-  set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_TOOLS_LIB_TARGET}")
++  set_global_variable (HDF5_STATIC_LIBRARIES_TO_EXPORT "${HDF5_STATIC_LIBRARIES_TO_EXPORT};${HDF5_TOOLS_LIB_TARGET}")
+   H5_SET_LIB_OPTIONS (${HDF5_TOOLS_LIB_TARGET} ${HDF5_TOOLS_LIB_NAME} STATIC 0)
+   set_target_properties (${HDF5_TOOLS_LIB_TARGET} PROPERTIES FOLDER libraries/tools)
+-  set (install_targets ${HDF5_TOOLS_LIB_TARGET})
++  set (install_targets_static ${HDF5_TOOLS_LIB_TARGET})
+ endif ()
+ 
+ if (BUILD_SHARED_LIBS)
+@@ -85,7 +85,7 @@ if (BUILD_SHARED_LIBS)
+   set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_TOOLS_LIBSH_TARGET}")
+   H5_SET_LIB_OPTIONS (${HDF5_TOOLS_LIBSH_TARGET} ${HDF5_TOOLS_LIB_NAME} SHARED "TOOLS")
+   set_target_properties (${HDF5_TOOLS_LIBSH_TARGET} PROPERTIES FOLDER libraries/tools)
+-  set (install_targets ${install_targets} ${HDF5_TOOLS_LIBSH_TARGET})
++  set (install_targets_shared ${HDF5_TOOLS_LIBSH_TARGET})
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+@@ -111,20 +111,32 @@ endif ()
+ if (HDF5_EXPORTED_TARGETS)
+   if (BUILD_SHARED_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_TOOLS_LIBSH_TARGET} ${HDF5_INSTALL_BIN_DIR} toolslibraries)
++
++    install (
++        TARGETS
++            ${install_targets_shared}
++        EXPORT
++            ${HDF5_EXPORTED_TARGETS}
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT toolslibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT toolslibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT toolslibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT toolslibraries
++        INCLUDES DESTINATION include
++    )
+   endif ()
+   if (BUILD_STATIC_LIBS)
+     INSTALL_TARGET_PDB (${HDF5_TOOLS_LIB_TARGET} ${HDF5_INSTALL_LIB_DIR} toolslibraries)
+-  endif ()
+ 
+-  install (
+-      TARGETS
+-          ${install_targets}
+-      EXPORT
+-          ${HDF5_EXPORTED_TARGETS}
+-      LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT toolslibraries
+-      ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT toolslibraries
+-      RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT toolslibraries
+-      FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT toolslibraries
+-      INCLUDES DESTINATION include
+-  )
++    install (
++        TARGETS
++            ${install_targets_static}
++        EXPORT
++            ${HDF5_EXPORTED_TARGETS}_static
++        LIBRARY DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT toolslibraries
++        ARCHIVE DESTINATION ${HDF5_INSTALL_LIB_DIR} COMPONENT toolslibraries
++        RUNTIME DESTINATION ${HDF5_INSTALL_BIN_DIR} COMPONENT toolslibraries
++        FRAMEWORK DESTINATION ${HDF5_INSTALL_FWRK_DIR} COMPONENT toolslibraries
++        INCLUDES DESTINATION include
++    )
++  endif ()
+ endif ()

@@ -1,0 +1,9 @@
+# Protobuf's SONAME major follows the first component of the protoc/base
+# version. Subpackage versions remain derived from the version_* macros.
+update_spec: |
+  so_version=${UPDATE_NEW_VERSION%%.*}
+  sed -Ei \
+    -e '0,/^Version:/{s/^Version:.*/Version:        '"${UPDATE_NEW_VERSION}"'/}' \
+    -e 's/^(%global so_version\s+).*/\1'"${so_version}"'/' \
+    -e 's/^(Release:\s+)[^ ]+/\10.1%{?dist}/' \
+    "${UPDATE_SPEC_FILE}"

@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "12",
+  "release_monitoring_project_id": 10678,
+  "sha": "ccb2b5a33f0ff5168006818c0a47570177998ed4",
+  "source": "https://src.fedoraproject.org/rpms/libpsm2.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/cornelisnetworks/opa-psm2",
+  "version": "12.0.1"
+}

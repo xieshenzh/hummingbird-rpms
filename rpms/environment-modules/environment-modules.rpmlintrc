@@ -1,0 +1,20 @@
+# from the https://docs.fedoraproject.org/en-US/packaging-guidelines/:
+# "If a package supersedes/replaces an existing package without being a
+# sufficiently compatible replacement as defined above, use only the
+# 'Obsoletes:' line."
+addFilter("W: obsolete-not-provided environment-modules-compat")
+
+# %ghost file mode false positive
+addFilter("W: non-executable-in-bin /usr/bin/modulecmd 644")
+
+# generic environment(modules) provides statement
+addFilter("W: unversioned-explicit-provides environment\(modules\)")
+
+# false positive spelling errors
+addFilter("E: spelling-error \('modulefiles', '%description -l en_US modulefiles -> module files, module-files, modifies'\)")
+addFilter("E: spelling-error \('modulefile', '%description -l en_US modulefile -> module file, module-file, doleful'\)")
+addFilter("E: spelling-error \('ksh', '%description -l en_US ksh -> KS, Ks, ks'\)")
+addFilter("E: spelling-error \('zsh', '%description -l en_US zsh -> Zs, sh, sch'\)")
+addFilter("E: spelling-error \('csh', '%description -l en_US csh -> Cash, cash, cosh'\)")
+addFilter("E: spelling-error \('tcsh', '%description -l en_US tcsh -> tosh, tush, Cash'\)")
+addFilter("E: spelling-error \('perl', '%description -l en_US perl -> Perl, Pearl, Peel'\)")

@@ -1,0 +1,47 @@
+diff -up hdf5-hdf5_2.0.0/CMakeLists.txt.jarname hdf5-hdf5_2.0.0/CMakeLists.txt
+--- hdf5-hdf5_2.0.0/CMakeLists.txt.jarname	2025-11-10 16:56:41.000000000 -0700
++++ hdf5-hdf5_2.0.0/CMakeLists.txt	2025-11-24 17:37:10.018273347 -0700
+@@ -231,8 +231,8 @@ set (HDF5_F90_C_TEST_LIB_CORENAME   "${H
+ set (HDF5_HL_F90_LIB_CORENAME       "${HDF5_LIB_BASE}${HDF5_HL_F90_LIB_CORE}")
+ set (HDF5_HL_F90_C_LIB_CORENAME     "${HDF5_LIB_BASE}${HDF5_HL_F90_C_LIB_CORE}")
+ set (HDF5_JAVA_JNI_LIB_CORENAME     "${HDF5_LIB_BASE}${HDF5_JAVA_JNI_LIB_CORE}")
+-set (HDF5_JAVA_HDF5_LIB_CORENAME    "jarhdf5")
+-set (HDF5_JAVA_TEST_LIB_CORENAME    "jartest5")
++set (HDF5_JAVA_HDF5_LIB_CORENAME    "hdf5")
++set (HDF5_JAVA_TEST_LIB_CORENAME    "test5")
+ set (HDF5_JAVA_JSRC_LIB_CORENAME    "javahdf5")
+ set (HDF5_JAVA_JTEST_LIB_CORENAME   "javatest5")
+ 
+diff -up hdf5-hdf5_2.0.0/java/src-jni/hdf/hdf5lib/CMakeLists.txt.jarname hdf5-hdf5_2.0.0/java/src-jni/hdf/hdf5lib/CMakeLists.txt
+--- hdf5-hdf5_2.0.0/java/src-jni/hdf/hdf5lib/CMakeLists.txt.jarname	2025-11-10 16:56:41.000000000 -0700
++++ hdf5-hdf5_2.0.0/java/src-jni/hdf/hdf5lib/CMakeLists.txt	2025-12-09 21:37:25.124622036 -0700
+@@ -167,7 +167,7 @@ if (HDF5_ENABLE_MAVEN_DEPLOY)
+   get_target_property (HDF5_JAVA_PLATFORM_JAR_FILE ${HDF5_JAVA_HDF5_LIB_TARGET} JAR_FILE)
+ 
+   # Define the universal JAR name and path (without classifier)
+-  set (HDF5_JAVA_UNIVERSAL_JAR_NAME "${HDF5_JAVA_HDF5_LIB_TARGET}-${HDF5_PACKAGE_VERSION}${HDF5_MAVEN_VERSION_SUFFIX}.jar")
++  set (HDF5_JAVA_UNIVERSAL_JAR_NAME "${HDF5_JAVA_HDF5_LIB_TARGET}.jar")
+   set (HDF5_JAVA_UNIVERSAL_JAR_FILE "${CMAKE_CURRENT_BINARY_DIR}/${HDF5_JAVA_UNIVERSAL_JAR_NAME}")
+ 
+   # Create universal JAR by copying the platform-specific JAR
+@@ -197,7 +197,7 @@ if (HDF5_ENABLE_MAVEN_DEPLOY)
+   SET_GLOBAL_VARIABLE (HDF5_MAVEN_PLATFORM_JAR_FILE "${HDF5_JAVA_PLATFORM_JAR_FILE}")
+ else ()
+   # Standard JAR creation without Maven classifiers
+-  add_jar (${HDF5_JAVA_HDF5_LIB_TARGET} OUTPUT_NAME "${HDF5_JAVA_HDF5_LIB_TARGET}-${HDF5_PACKAGE_VERSION}" MANIFEST ${PROJECT_BINARY_DIR}/Manifest.txt ${HDF5_JAVA_HDF_HDF5_CALLBACKS_SOURCES} ${HDF5_JAVA_HDF_HDF5_EXCEPTIONS_SOURCES} ${HDF5_JAVA_HDF_HDF5_STRUCTS_SOURCES} ${HDF5_JAVA_HDF_HDF5_SOURCES})
++  add_jar (${HDF5_JAVA_HDF5_LIB_TARGET} OUTPUT_NAME "${HDF5_JAVA_HDF5_LIB_TARGET}" MANIFEST ${PROJECT_BINARY_DIR}/Manifest.txt ${HDF5_JAVA_HDF_HDF5_CALLBACKS_SOURCES} ${HDF5_JAVA_HDF_HDF5_EXCEPTIONS_SOURCES} ${HDF5_JAVA_HDF_HDF5_STRUCTS_SOURCES} ${HDF5_JAVA_HDF_HDF5_SOURCES})
+   install_jar (${HDF5_JAVA_HDF5_LIB_TARGET} LIBRARY DESTINATION ${HDF5_INSTALL_JAR_DIR} COMPONENT libraries)
+   # For non-Maven builds, use the standard JAR
+   get_target_property (${HDF5_JAVA_HDF5_LIB_TARGET}_JAR_FILE ${HDF5_JAVA_HDF5_LIB_TARGET} JAR_FILE)
+diff -up hdf5-hdf5_2.0.0/java/hdf/hdf5lib/CMakeLists.txt.jarname hdf5-hdf5_2.0.0/java/hdf/hdf5lib/CMakeLists.txt
+--- hdf5-hdf5_2.0.0/java/hdf/hdf5lib/CMakeLists.txt.jarname	2025-11-10 16:56:41.000000000 -0700
++++ hdf5-hdf5_2.0.0/java/hdf/hdf5lib/CMakeLists.txt	2025-12-09 22:08:14.167993823 -0700
+@@ -246,7 +246,7 @@ else ()
+     endif ()
+   endif ()
+ 
+-  add_jar (${HDF5_JAVA_HDF5_LIB_TARGET} OUTPUT_NAME "${HDF5_JAVA_HDF5_LIB_TARGET}-${HDF5_PACKAGE_VERSION}" MANIFEST ${PROJECT_BINARY_DIR}/Manifest.txt ${HDF5_STANDARD_JAR_SOURCES})
++  add_jar (${HDF5_JAVA_HDF5_LIB_TARGET} OUTPUT_NAME "${HDF5_JAVA_HDF5_LIB_TARGET}" MANIFEST ${PROJECT_BINARY_DIR}/Manifest.txt ${HDF5_STANDARD_JAR_SOURCES})
+   install_jar (${HDF5_JAVA_HDF5_LIB_TARGET} LIBRARY DESTINATION ${HDF5_INSTALL_JAR_DIR} COMPONENT libraries)
+   # For non-Maven builds, use the standard JAR
+   get_target_property (${HDF5_JAVA_HDF5_LIB_TARGET}_JAR_FILE ${HDF5_JAVA_HDF5_LIB_TARGET} JAR_FILE)

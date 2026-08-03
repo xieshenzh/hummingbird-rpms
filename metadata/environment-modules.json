@@ -1,0 +1,11 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "4",
+  "release_monitoring_project_id": 700,
+  "sha": "57c3e41de1e8e69454f58b3102022fd2cd26e0b0",
+  "source": "https://src.fedoraproject.org/rpms/environment-modules.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/envmodules/modules",
+  "version": "5.6.1"
+}

@@ -1,0 +1,29 @@
+Avoid implicit function declarations and implicit int, for improved
+compatibility with future compilers.
+
+Submitted upstream: <https://github.com/waltligon/orangefs/pull/99>
+
+diff --git a/configure.ac b/configure.ac
+index ce77bd534..ec54db931 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -996,7 +996,9 @@ test_for_epoll()
+ {
+   AC_CHECK_HEADERS(sys/epoll.h)
+   AC_MSG_CHECKING(for epoll functions)
+-  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sys/epoll.h>]], [[
++  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sys/epoll.h>
++	#include <unistd.h>
++	]], [[
+ 	int fd;
+ 	fd = epoll_create(1);
+ 	close(fd);
+@@ -1289,7 +1291,7 @@ AC_MSG_CHECKING(if dlfns needs explicit library request)
+ AC_LINK_IFELSE([AC_LANG_SOURCE([
+ #define _GNU_SOURCE 1
+ #include <dlfcn.h>
+-main() {void *p = dlsym(RTLD_DEFAULT,"sym");}
++int main(void) {void *p = dlsym(RTLD_DEFAULT,"sym");}
+ ])],[
+     AC_MSG_RESULT(no)
+ ],[
