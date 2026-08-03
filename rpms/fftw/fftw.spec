@@ -21,15 +21,13 @@
 %endif
 
 Name:           fftw
-Version:        3.3.10
-Release:        18%{?dist}
+Version:        3.3.11
+Release:        0.1%{?dist}
 Summary:        A Fast Fourier Transform library
 # Generally, the code is under GPL but some headers are also under MIT or BSD:
 License:        GPL-2.0-or-later AND MIT AND BSD-2-Clause
 URL:            http://www.fftw.org
 Source0:        http://www.fftw.org/fftw-%{version}.tar.gz
-# https://github.com/FFTW/fftw3/pull/346
-Patch1:         fix_autotools_build.patch
 
 BuildRequires:  gcc-gfortran
 
