@@ -315,6 +315,9 @@ oras:
 pgbouncer:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+pmix:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 poppler:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
