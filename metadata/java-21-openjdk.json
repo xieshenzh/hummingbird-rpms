@@ -4,8 +4,10 @@
   "modification_reason": "Weaken cups-libs to Recommends to exclude gnutls from FIPS container images",
   "modification_status": "modified",
   "release": "2",
+  "release_monitoring_project_id": 369281,
   "sha": "45c24b697884357727915c1bd9c9ca2d51dc33c1",
   "source": "https://src.fedoraproject.org/rpms/java-21-openjdk.git",
+  "track_upstream": "21",
   "upstream_repo": "https://github.com/openjdk/jdk21u",
   "version": "21.0.11.0.10",
   "version_transform": "openjdk_to_oracle"

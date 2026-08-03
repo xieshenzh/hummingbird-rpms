@@ -4,8 +4,10 @@
   "modification_reason": "Weaken cups-libs to Recommends to exclude gnutls from FIPS container images",
   "modification_status": "modified",
   "release": "2",
+  "release_monitoring_project_id": 378887,
   "sha": "14ff086f901d8b01fdf433f217c1349d22792c67",
   "source": "https://src.fedoraproject.org/rpms/java-25-openjdk.git",
+  "track_upstream": "25",
   "upstream_repo": "https://github.com/openjdk/jdk25u",
   "version": "25.0.3.0.9",
   "version_transform": "openjdk_to_oracle"
