@@ -309,6 +309,9 @@ prometheus3.13:
 prometheus3.5:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+prrte:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 oras:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

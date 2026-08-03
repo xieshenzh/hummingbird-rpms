@@ -1,11 +1,12 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "10",
+  "modification_reason": "Update to upstream version 4.1.0",
+  "modification_status": "modified",
+  "release": "0.1",
   "release_monitoring_project_id": 391462,
   "sha": "4fa73361844e70928568bf674594e097c0ca36bf",
   "source": "https://src.fedoraproject.org/rpms/prrte.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/openpmix/prrte",
-  "version": "3.0.6"
+  "version": "4.1.0"
 }
