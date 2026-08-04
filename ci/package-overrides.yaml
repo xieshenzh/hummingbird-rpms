@@ -197,6 +197,9 @@ java-25-openjdk-portable:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+kube-state-metrics:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 kubernetes1.35:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

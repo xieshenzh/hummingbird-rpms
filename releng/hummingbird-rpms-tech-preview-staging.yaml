@@ -418,6 +418,8 @@ spec:
           contentType: rpm
         - name: krb5-main
           contentType: rpm
+        - name: kube-state-metrics-main
+          contentType: rpm
         - name: kubernetes1-35-main
           contentType: rpm
         - name: kubernetes1-36-main
