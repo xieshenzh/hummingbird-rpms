@@ -1,0 +1,11 @@
+/Tutorial.pdf
+/Reference.pdf
+/Getting_Started.pdf
+/Design_Patterns.pdf
+tbb*/
+*.rpm
+.*.log
+/tbb*.tgz
+/*.tar.gz
+/objects.inv
+tbb-2023.1.0.tar.gz

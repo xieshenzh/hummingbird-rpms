@@ -1,0 +1,65 @@
+From 54c51bb43cb4b5068d4b682d61d20cb5907de512 Mon Sep 17 00:00:00 2001
+From: Brendan Cunningham <bcunningham@cornelisnetworks.com>
+Date: Thu, 26 Mar 2026 10:40:58 -0400
+Subject: [PATCH 3/4] Fix missing memset-zero caused by unaligned heap
+ allocation fix
+
+Commit f6e0969a100e ("Fix unaligned heap allocations of aligned structs")
+replaced some psmi_calloc() calls with psmi_memalign().
+
+This introduced a bug; psmi_calloc() zeroes-out the allocated memory
+whereas psmi_memalign() does not. This could cause problems as it is
+probable there is code that assumes the new allocation will be
+all-zeroes but this is not guaranteed to be the case.
+
+Fix this by zeroing out the allocated memory with memset() after
+psmi_memalign() in places where this is needed.
+
+Signed-off-by: Brendan Cunningham <bcunningham@cornelisnetworks.com>
+---
+ psm_hal_gen1/psm_hal_gen1_spio.c | 1 +
+ ptl_ips/ips_tid.c                | 2 ++
+ ptl_ips/ips_tidflow.c            | 2 ++
+ 3 files changed, 5 insertions(+)
+
+diff --git a/psm_hal_gen1/psm_hal_gen1_spio.c b/psm_hal_gen1/psm_hal_gen1_spio.c
+index 9c63e29e0394..de995c2e7836 100644
+--- a/psm_hal_gen1/psm_hal_gen1_spio.c
++++ b/psm_hal_gen1/psm_hal_gen1_spio.c
+@@ -124,6 +124,7 @@ ips_spio_init(const struct psmi_context *context, struct ptl *ptl,
+ 			return PSM2_NO_MEMORY;
+ 		}
+ 
++		memset((void *)ctrl->spio_ctrl, 0, sizeof(*ctrl->spio_ctrl));
+ 		ctrl->spio_reset_hfi = spio_reset_hfi;
+ 		ctrl->spio_credit_return_update =
+ 				spio_credit_return_update;
+diff --git a/ptl_ips/ips_tid.c b/ptl_ips/ips_tid.c
+index a9c323423905..e2e159b72102 100644
+--- a/ptl_ips/ips_tid.c
++++ b/ptl_ips/ips_tid.c
+@@ -144,6 +144,8 @@ ips_tid_init(const psmi_context_t *context, struct ips_protoexp *protoexp,
+ 		if (tidc->tid_ctrl == NULL) {
+ 			return PSM2_NO_MEMORY;
+ 		}
++
++		memset(tidc->tid_ctrl, 0, sizeof(*tidc->tid_ctrl));
+ 	}
+ 
+ 	/*
+diff --git a/ptl_ips/ips_tidflow.c b/ptl_ips/ips_tidflow.c
+index b571c16f8aaa..6009cc974d0e 100644
+--- a/ptl_ips/ips_tidflow.c
++++ b/ptl_ips/ips_tidflow.c
+@@ -111,6 +111,8 @@ psm2_error_t ips_tf_init(struct ips_protoexp *protoexp,
+ 		if (tfc->tf_ctrl == NULL) {
+ 			return PSM2_NO_MEMORY;
+ 		}
++
++		memset(tfc->tf_ctrl, 0, sizeof(*tfc->tf_ctrl));
+ 	}
+ 
+ 	/*
+-- 
+2.54.0
+

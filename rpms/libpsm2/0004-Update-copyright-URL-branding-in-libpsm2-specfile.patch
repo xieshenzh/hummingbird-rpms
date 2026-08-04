@@ -1,0 +1,137 @@
+From be99e35465b0de6a37d9c30408256f1dc5b12ea6 Mon Sep 17 00:00:00 2001
+From: Brendan Cunningham <bcunningham@cornelisnetworks.com>
+Date: Wed, 1 Apr 2026 11:01:44 -0400
+Subject: [PATCH 4/4] Update copyright, URL, branding in libpsm2 specfile
+
+Intel to Cornelis.
+
+Signed-off-by: Brendan Cunningham <bcunningham@cornelisnetworks.com>
+---
+ libpsm2.spec.in | 34 ++++++++++++++++++----------------
+ 1 file changed, 18 insertions(+), 16 deletions(-)
+
+diff --git a/libpsm2.spec.in b/libpsm2.spec.in
+index e9ef766e239b..51f683f0aaea 100644
+--- a/libpsm2.spec.in
++++ b/libpsm2.spec.in
+@@ -4,7 +4,8 @@
+ #
+ #  GPL LICENSE SUMMARY
+ #
+-#  Copyright(c) 2017 Intel Corporation.
++#  Copyright(c) 2017-2020 Intel Corporation.
++#  Copyright (c) 2021-2025, Cornelis Networks
+ #
+ #  This program is free software; you can redistribute it and/or modify
+ #  it under the terms of version 2 of the GNU General Public License as
+@@ -16,11 +17,12 @@
+ #  General Public License for more details.
+ #
+ #  Contact Information:
+-#  Intel Corporation, www.intel.com
++#  Cornelis Networks, www.cornelisnetworks.com
+ #
+ #  BSD LICENSE
+ #
+-#  Copyright(c) 2017 Intel Corporation.
++#  Copyright(c) 2017-2020 Intel Corporation.
++#  Copyright (c) 2021-2025, Cornelis Networks
+ #
+ #  Redistribution and use in source and binary forms, with or without
+ #  modification, are permitted provided that the following conditions
+@@ -32,7 +34,7 @@
+ #      notice, this list of conditions and the following disclaimer in
+ #      the documentation and/or other materials provided with the
+ #      distribution.
+-#    * Neither the name of Intel Corporation nor the names of its
++#    * Neither the name of Cornelis Networks nor the names of its
+ #      contributors may be used to endorse or promote products derived
+ #      from this software without specific prior written permission.
+ #
+@@ -48,21 +50,21 @@
+ #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #
+-Summary: Intel PSM2 Libraries
++Summary: Cornelis PSM2 Libraries
+ Name: @RPM_NAME@
+ Version: @VERSION@
+ Release: 1@SPEC_FILE_RELEASE_DIST@
+ License: BSD or GPLv2
+-URL: https://github.com/intel/opa-psm2/
++URL: https://github.com/cornelisnetworks/opa-psm2/
+ 
+ # The tarball can be created by:
+-# git clone https://github.com/intel/opa-psm2
++# git clone https://github.com/cornelisnetworks/opa-psm2
+ # cd opa-psm2
+ # git checkout @DIST_SHA@
+ # make dist
+ Source0: @RPM_NAME@-%{version}.tar.gz
+ 
+-# The OPA product is supported on x86_64 only:
++# The Omni-Path product is supported on x86_64 only:
+ ExclusiveArch: x86_64
+ 
+ BuildRequires: gcc
+@@ -71,7 +73,7 @@ Obsoletes: hfi1-psm < 1.0.0
+ 
+ %if "@RPM_NAME_BASEEXT@"
+ %package -n @RPM_NAME@@RPM_NAME_BASEEXT@
+-Summary: Intel PSM2 Libraries
++Summary: Cornelis PSM2 Libraries
+ %endif
+ Provides: @RPM_NAME@ = %{version}-%{release}
+ Provides: @RPM_NAME@%{_isa} = %{version}-%{release}
+@@ -87,13 +89,13 @@ Requires: numactl-libs
+ %endif
+ 
+ %package -n @RPM_NAME@-devel
+-Summary: Development files for Intel PSM2
++Summary: Development files for Cornelis PSM2
+ Requires: %{name}%{?_isa} = %{version}-%{release}
+ Provides: hfi1-psm-devel
+ Obsoletes: hfi1-psm-devel < 1.0.0
+ 
+ %package -n @RPM_NAME@-compat
+-Summary: Compat library for Intel PSM2
++Summary: Compat library for Cornelis PSM2
+ Requires: %{name}%{?_isa} = %{version}-%{release}
+ %if 0%{?fedora}
+ Requires: systemd-udev
+@@ -107,7 +109,7 @@ Obsoletes: hfi1-psm-compat < 1.0.0
+ %if "@RPM_NAME_BASEEXT@"
+ %description
+ The source code for the PSM2 messaging API, libpsm2.
+-A low-level user-level communications interface for the Intel(R) OPA
++A low-level user-level communications interface for the Cornelis(R) Omni-Path
+ family of products. PSM2 users are enabled with mechanisms
+ necessary to implement higher level communications
+ interfaces in parallel environments.
+@@ -118,19 +120,19 @@ interfaces in parallel environments.
+ # RPM_NAME_BASEEXT defaults to empty contents.
+ %description -n @RPM_NAME@@RPM_NAME_BASEEXT@
+ PSM2 Messaging API, or PSM2 API, is the low-level
+-user-level communications interface for the Intel(R) OPA
++user-level communications interface for the Cornelis(R) Omni-Path
+ family of products. PSM2 users are enabled with mechanisms
+ necessary to implement higher level communications
+ interfaces in parallel environments.
+ 
+ %description -n @RPM_NAME@-devel
+-Intel(R) PSM2, psm2*.h, headers and libpsm2.so files necessary
++Cornelis(R) PSM2, psm2*.h, headers and libpsm2.so files necessary
+ for developing software using libpsm2.
+ 
+ %description -n @RPM_NAME@-compat
+ Support for MPIs linked with PSM versions < 2. This will allow
+-software compiled to use Intel(R) Truescale PSM, libinfinipath, to run
+-with Intel(R) OPA PSM2, libpsm2.
++software compiled to use Cornelis(R) Truescale PSM, libinfinipath, to run
++with Cornelis(R) Omni-Path PSM2, libpsm2.
+ 
+ %prep
+ %setup -q -n @RPM_NAME@-%{version}
+-- 
+2.54.0
+

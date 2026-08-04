@@ -234,6 +234,8 @@ spec:
           contentType: rpm
         - name: emacs-filesystem-main
           contentType: rpm
+        - name: environment-modules-main
+          contentType: rpm
         - name: erlang-rpm-macros-main
           contentType: rpm
         - name: erlang27-main
@@ -245,6 +247,8 @@ spec:
         - name: fedora-logos-main
           contentType: rpm
         - name: fedora-repos-main
+          contentType: rpm
+        - name: fftw-main
           contentType: rpm
         - name: file-main
           contentType: rpm
@@ -275,6 +279,8 @@ spec:
         - name: gawk-main
           contentType: rpm
         - name: gcc-main
+          contentType: rpm
+        - name: gcc13-main
           contentType: rpm
         - name: gd-main
           contentType: rpm
@@ -348,6 +354,8 @@ spec:
           contentType: rpm
         - name: harfbuzz-main
           contentType: rpm
+        - name: hdf5-main
+          contentType: rpm
         - name: helm3-main
           contentType: rpm
         - name: helm4-main
@@ -361,6 +369,8 @@ spec:
         - name: hugo-main
           contentType: rpm
         - name: hummingbird-release-main
+          contentType: rpm
+        - name: hwloc-main
           contentType: rpm
         - name: icu-main
           contentType: rpm
@@ -462,6 +472,8 @@ spec:
           contentType: rpm
         - name: libevent-main
           contentType: rpm
+        - name: libfabric-main
+          contentType: rpm
         - name: libffi-main
           contentType: rpm
         - name: libfido2-main
@@ -503,6 +515,8 @@ spec:
         - name: libpng-main
           contentType: rpm
         - name: libpsl-main
+          contentType: rpm
+        - name: libpsm2-main
           contentType: rpm
         - name: libpwquality-main
           contentType: rpm
@@ -614,6 +628,8 @@ spec:
           contentType: rpm
         - name: mpfr-main
           contentType: rpm
+        - name: munge-main
+          contentType: rpm
         - name: nats-server2-12-main
           contentType: rpm
         - name: nats-server2-14-main
@@ -687,6 +703,8 @@ spec:
         - name: opentofu1-11-main
           contentType: rpm
         - name: opentofu1-12-main
+          contentType: rpm
+        - name: orangefs-main
           contentType: rpm
         - name: oras-main
           contentType: rpm
@@ -794,6 +812,8 @@ spec:
           contentType: rpm
         - name: pkgconf-main
           contentType: rpm
+        - name: pmix-main
+          contentType: rpm
         - name: podman-main
           contentType: rpm
         - name: policycoreutils-main
@@ -812,7 +832,11 @@ spec:
           contentType: rpm
         - name: prometheus3-5-main
           contentType: rpm
+        - name: protobuf-main
+          contentType: rpm
         - name: protobuf-c-main
+          contentType: rpm
+        - name: prrte-main
           contentType: rpm
         - name: psmisc-main
           contentType: rpm
@@ -922,6 +946,8 @@ spec:
           contentType: rpm
         - name: rdma-core-main
           contentType: rpm
+        - name: re2-main
+          contentType: rpm
         - name: readline-main
           contentType: rpm
         - name: redhat-rpm-config-main
@@ -1000,11 +1026,15 @@ spec:
           contentType: rpm
         - name: tar-main
           contentType: rpm
+        - name: tbb-main
+          contentType: rpm
         - name: tcl-main
           contentType: rpm
         - name: tempo2-10-main
           contentType: rpm
         - name: tempo3-0-main
+          contentType: rpm
+        - name: thrift-main
           contentType: rpm
         - name: tinysparql-main
           contentType: rpm
@@ -1024,11 +1054,15 @@ spec:
           contentType: rpm
         - name: tzdata-main
           contentType: rpm
+        - name: ucx-main
+          contentType: rpm
         - name: unbound-main
           contentType: rpm
         - name: unzip-main
           contentType: rpm
         - name: uriparser-main
+          contentType: rpm
+        - name: utf8proc-main
           contentType: rpm
         - name: util-linux-main
           contentType: rpm
@@ -1055,6 +1089,8 @@ spec:
         - name: yq-main
           contentType: rpm
         - name: zchunk-main
+          contentType: rpm
+        - name: zeromq-main
           contentType: rpm
         - name: zig-srpm-macros-main
           contentType: rpm

@@ -1,0 +1,7 @@
+# Fedora's Source0 embeds the release tag instead of using %{version}.
+update_spec: |
+  sed -Ei \
+    -e 's/^(Version:\s+).*/\1'"${UPDATE_NEW_VERSION}"'/' \
+    -e 's#^(Source0:\s+.*/tags/)[^/]+(\.tar\.gz)#\1'"${UPDATE_NEW_VERSION}"'\2#' \
+    -e 's/^(Release:\s+)[^ ]+/\10.1%{?dist}/' \
+    "${UPDATE_SPEC_FILE}"

@@ -1,0 +1,8 @@
+# Release archives use an unprefixed version directory, but the Git tag used
+# for bootstrap.sh is prefixed with "v".
+update_spec: |
+  sed -Ei \
+    -e 's/^(Version:\s+).*/\1'"${UPDATE_NEW_VERSION}"'/' \
+    -e 's#^Source2:.*#Source2: https://raw.githubusercontent.com/apache/%{name}/v%{version}/bootstrap.sh#' \
+    -e 's/^(Release:\s+)[^ ]+/\10.1%{?dist}/' \
+    "${UPDATE_SPEC_FILE}"

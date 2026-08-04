@@ -1,0 +1,8 @@
+{
+  "modification_status": "native",
+  "release": "1",
+  "release_monitoring_project_id": 6502,
+  "track_upstream": "13",
+  "upstream_repo": "https://gcc.gnu.org/git/gcc.git",
+  "version": "13.4.0"
+}

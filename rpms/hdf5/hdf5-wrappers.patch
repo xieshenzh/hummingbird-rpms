@@ -1,0 +1,24 @@
+diff -up hdf5-2.1.1/config/libh5cc.in.wrappers hdf5-2.1.1/config/libh5cc.in
+--- hdf5-2.1.1/config/libh5cc.in.wrappers	2026-03-23 12:21:18.000000000 -0600
++++ hdf5-2.1.1/config/libh5cc.in	2026-04-18 20:30:09.190784990 -0600
+@@ -50,9 +50,9 @@ dir=$(
+ prog_name=$(basename -- "$prg") || exit
+ prg=$dir/bin/$prog_name
+ 
+-prefix=$dir
++prefix=/usr
+ 
+-libdir=$dir/@HDF5_INSTALL_LIB_DIR@
++libdir=$prefix/@HDF5_INSTALL_LIB_DIR@
+ 
+ export PKG_CONFIG_PATH=$libdir/pkgconfig
+ 
+@@ -60,7 +60,7 @@ export PKG_CONFIG_PATH=$libdir/pkgconfig
+ # libhdf5.settings file residing in the lib directory.
+ showconfigure()
+ {
+-  cat $dir/@HDF5_INSTALL_LIB_DIR@/libhdf5.settings
++  cat $prefix/@HDF5_INSTALL_LIB_DIR@/libhdf5.settings
+   status=$?
+ }
+ 

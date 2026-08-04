@@ -1,0 +1,53 @@
+From f1283ba7e4e35634705fd34898ee2391a67d9064 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 1 Jul 2026 16:05:24 +0800
+Subject: [PATCH] Add loongarch64 support.
+
+---
+ Makefile               | 2 +-
+ efi-rpm-macros.spec.in | 2 +-
+ macros.efi-srpm.in     | 2 ++
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 725cc86..e11ae04 100644
+--- a/Makefile
++++ b/Makefile
+@@ -14,7 +14,7 @@ override EFI_ESP_ROOT=/boot/efi
+ endif
+ EFI_ARCHES	?= $(call get-config,arches)
+ ifeq ($(EFI_ARCHES),)
+-override EFI_ARCHES="x86_64 aarch64 %{arm} %{ix86} riscv64"
++override EFI_ARCHES="x86_64 aarch64 %{arm} %{ix86} riscv64 loongarch64"
+ endif
+ EFI_VENDOR	?= $(call get-config,vendor)
+ 
+diff --git a/efi-rpm-macros.spec.in b/efi-rpm-macros.spec.in
+index 7f56e87..015d3e0 100644
+--- a/efi-rpm-macros.spec.in
++++ b/efi-rpm-macros.spec.in
+@@ -36,7 +36,7 @@ machine bootloaders and tools.
+ %autosetup -S git_am -n %{name}-@@EFI_SOURCE_VERSION@@
+ git config --local --add efi.vendor "%{_efi_vendor_}"
+ git config --local --add efi.esp-root /boot/efi
+-git config --local --add efi.arches "x86_64 aarch64 %{arm} %{ix86} riscv64"
++git config --local --add efi.arches "x86_64 aarch64 %{arm} %{ix86} riscv64 loongarch64"
+ 
+ %build
+ %make_build clean all
+diff --git a/macros.efi-srpm.in b/macros.efi-srpm.in
+index e78c0f0..7c9c8db 100644
+--- a/macros.efi-srpm.in
++++ b/macros.efi-srpm.in
+@@ -39,6 +39,8 @@
+       return("arm")
+     elseif arch("riscv64") then
+       return("riscv64")
++    elseif arch("loongarch64") then
++      return("loongarch64")
+     else
+       return("none")
+     end
+-- 
+2.48.1
+

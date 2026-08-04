@@ -8,7 +8,7 @@ Version:                3.5.5
 %gometa -L -f
 
 Name:           prometheus3.5
-Release:        0.6%{?dist}
+Release:        0.7%{?dist}
 Summary:        Monitoring system and time series database
 License:        Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL:            %{gourl}
@@ -22,6 +22,7 @@ Patch0:         0001-Disable-pprof-debug-endpoints.patch
 Patch1:         0002-Backport-x-text-security-update.patch
 Patch2:         0003-Make-bigzero-average-test-tolerant.patch
 Patch3:         0004-cve-2026-53669-bump-react-router-to-7.18.0.patch
+Patch4:         0005-cve-2026-69153-bump-postcss-to-8.5.19.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.23
@@ -209,8 +210,7 @@ Provides:       bundled(npm(path-to-regexp)) = 1.9.0
 Provides:       bundled(npm(picocolors)) = 1.1.1
 Provides:       bundled(npm(picomatch)) = 2.3.1
 Provides:       bundled(npm(popper.js)) = 1.16.1
-Provides:       bundled(npm(postcss)) = 8.4.38
-Provides:       bundled(npm(postcss)) = 8.5.15
+Provides:       bundled(npm(postcss)) = 8.5.19
 Provides:       bundled(npm(pretty-format)) = 27.5.1
 Provides:       bundled(npm(prop-types)) = 15.8.1
 Provides:       bundled(npm(react)) = 17.0.2
