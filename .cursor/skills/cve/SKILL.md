@@ -551,7 +551,8 @@ contains the fix:
    ```
 
    All subsequent file operations (spec edits, tarball downloads,
-   `mark-modified`, `build_rpms.sh`) happen inside the worktree.
+   metadata updates when required, `build_rpms.sh`) happen inside
+   the worktree.
 
 3. **Download and verify the new tarball** -- download the
    tarball and signature, then verify the GPG signature. If
@@ -615,18 +616,29 @@ contains the fix:
    - Include `.tekton/` and `package-overrides.yaml` in the
      commit.
 
-8. **Mark the package as modified.** Set `modification_reason` to
-   the CVE ID only (no descriptive prose). If the metadata already
-   has a `modification_reason`, read it first and **append** the
-   CVE ID to it rather than replacing it. For multiple CVEs fixed
-   in the same change, append each ID (semicolon-separated).
+8. **Update package metadata status only when required.** Follow
+   `documentation/operating/package-metadata-fields.md` (authoritative
+   for `modification_status`, `modification_reason`, and metadata
+   `release`). Read `metadata/<package>.json` first:
+
+   - **`native`:** Do **not** run `mark-modified`. Leave
+     `modification_status` as `native` and do **not** add
+     `modification_reason`. Native packages have no Fedora
+     auto-update to block; the CVE fix is tracked in the
+     spec/patch and git history.
+   - **`clean` or `modified` (Fedora-imported):** Mark modified so
+     auto-updates stay blocked. Set `modification_reason` to a
+     short explanation that includes the CVE ID (see
+     `package-metadata-fields.md`). If a reason already exists,
+     **append** the new CVE (semicolon-separated) rather than
+     replacing it.
 
    ```bash
-   # First CVE fix for this package:
+   # Fedora-imported only — first CVE fix for this package:
    ./ci/dist_git.py mark-modified <package> --modified \
-     --reason "CVE-YYYY-NNNNN"
+     --reason "Backport CVE-YYYY-NNNNN"
 
-   # Package already modified — append the CVE ID:
+   # Fedora-imported only — already modified; append the CVE:
    ./ci/dist_git.py mark-modified <package> --modified \
      --reason "<existing reason>; CVE-YYYY-NNNNN"
    ```
@@ -776,18 +788,24 @@ version bump is not appropriate:
    - If the spec uses `%patch N -p1`, use that form; if
      `%autosetup -p1`, patches apply automatically
 
-3. **Mark the package as modified.** Set `modification_reason` to
-   the CVE ID only (no descriptive prose). If the metadata already
-   has a `modification_reason`, read it first and **append** the
-   CVE ID to it rather than replacing it. For multiple CVEs fixed
-   in the same change, append each ID (semicolon-separated).
+3. **Update package metadata status only when required.** Same
+   rules as the version-bump path step 8 — follow
+   `documentation/operating/package-metadata-fields.md`. Read
+   `metadata/<package>.json` first:
+
+   - **`native`:** Do **not** run `mark-modified`. Keep
+     `modification_status: "native"` and do **not** add
+     `modification_reason`.
+   - **`clean` or `modified` (Fedora-imported):** Mark modified
+     with a short explanation that includes the CVE ID (append
+     if a reason already exists):
 
    ```bash
-   # First CVE fix for this package:
+   # Fedora-imported only — first CVE fix for this package:
    ./ci/dist_git.py mark-modified <package> --modified \
-     --reason "CVE-YYYY-NNNNN"
+     --reason "Backport CVE-YYYY-NNNNN"
 
-   # Package already modified — append the CVE ID:
+   # Fedora-imported only — already modified; append the CVE:
    ./ci/dist_git.py mark-modified <package> --modified \
      --reason "<existing reason>; CVE-YYYY-NNNNN"
    ```
@@ -795,8 +813,7 @@ version bump is not appropriate:
    **Do NOT change the metadata `release` field for backports.**
    Keep it at the current base (Fedora/rawhide or local
    placeholder). If `mark-modified` changes the release field,
-   revert that change before committing. See
-   `documentation/operating/package-metadata-fields.md`.
+   revert that change before committing.
 
    **For Go packages that vendor deps:** When a CVE targets a
    vendored module, create the patch against `go.mod`+`go.sum`.
@@ -805,7 +822,8 @@ version bump is not appropriate:
    updates; overrides don't. After patching, regenerate the
    vendor tarball with `go-vendor-tools` and upload to lookaside.
 
-4. **Commit, validate, build, push, MR** (same as 3d step 9).
+4. **Commit, validate, build, push, MR** (same as the
+   version-bump path step 9).
 
 #### 3f: No upstream fix yet
 
@@ -897,13 +915,13 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
     keys together (e.g. "let's look at ruby4.0 HUM-2648 HUM-2645"),
     investigate all tickets for that package as a batch.
 
-13. **`modification_reason` must contain only CVE IDs.** When
-    marking a package modified for a CVE fix (version bump or
-    backport), set `--reason` to the CVE ID alone (e.g.
-    `CVE-YYYY-NNNNN`). Append additional CVE IDs with
-    `; CVE-YYYY-MMMMM`. Do not include prose such as "update to
-    …" or "backport fix for …" — scripts and automation parse
-    this field for CVE IDs.
+13. **`modification_reason` must identify the CVE**, and only for
+    Fedora-imported packages that are (or become) `modified`.
+    Set `--reason` to a short explanation that includes the CVE
+    ID (e.g. `"Backport CVE-YYYY-NNNNN"`), matching
+    `documentation/operating/package-metadata-fields.md`. Append
+    additional CVEs with `; CVE-YYYY-MMMMM`. Never add
+    `modification_reason` to a `native` package.
 
 14. **Metadata `release` follows
     `documentation/operating/package-metadata-fields.md`.** Do
