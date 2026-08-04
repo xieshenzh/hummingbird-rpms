@@ -1,0 +1,10 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "3",
+  "release_monitoring_project_id": 138097,
+  "sha": "1bb740e59a33eabc2db4a28fecfff69ccb125870",
+  "source": "https://src.fedoraproject.org/rpms/munge.git",
+  "upstream_repo": "https://github.com/dun/munge",
+  "version": "0.5.18"
+}
