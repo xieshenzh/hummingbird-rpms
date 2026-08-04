@@ -9,8 +9,8 @@
 #global snaprel -beta
 
 Name: hdf5
-Version: 2.1.1
-Release: 5%{?dist}
+Version: 2.2.0
+Release: 0.1%{?dist}
 Summary: A general purpose library and file format for storing scientific data
 License: BSD-3-Clause
 URL: https://www.hdfgroup.org/solutions/hdf5/
@@ -27,9 +27,6 @@ Source2: http://ftp.us.debian.org/debian/pool/main/h/hdf5/hdf5_1.14.4.3+repack-1
 Patch: hdf5-wrappers.patch
 # Change jar names
 Patch: hdf5-jarname.patch
-# Fix JNI install directory
-# https://github.com/HDFGroup/hdf5/pull/6344
-Patch: hdf5-jni.patch
 # Fix Fortran module directory
 Patch: hdf5-fmoddir.patch
 
@@ -198,10 +195,12 @@ HDF5 parallel openmpi static libraries
 %if 0%{?rhel} >= 9 || 0%{?fedora}
 find . ! -name junit.jar -name "*.jar" -delete
 ln -s $(build-classpath hamcrest) java/lib/hamcrest-core.jar
+ln -s $(build-classpath hamcrest) java/lib/org.hamcrest.jar
 ln -s $(build-classpath junit) java/lib/org.junit.jar
 %else
 find . -name "*.jar" -delete
 ln -s $(build-classpath hamcrest/core) java/lib/hamcrest-core.jar
+ln -s $(build-classpath hamcrest/core) java/lib/org.hamcrest.jar
 ln -s $(build-classpath junit) java/lib/org.junit.jar
 # Fix test output
 junit_ver=$(sed -n '/<version>/{s/^.*>\([0-9]\.[0-9.]*\)<.*/\1/;p;q}' /usr/share/maven-poms/junit.pom)
@@ -365,6 +364,9 @@ done
 # Java
 rm %{buildroot}%{_jnidir}/slf*.jar
 %endif
+
+# CMake installs its own docs; we use %doc instead
+rm -rf %{buildroot}%{_docdir}/HDF5
 
 
 %check
