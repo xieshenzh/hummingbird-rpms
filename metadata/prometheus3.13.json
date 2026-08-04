@@ -1,6 +1,6 @@
 {
   "modification_status": "native",
-  "release": "0.1",
+  "release": "0.2",
   "release_monitoring_project_id": 6527,
   "track_upstream": "3.13",
   "upstream_repo": "https://github.com/prometheus/prometheus",
