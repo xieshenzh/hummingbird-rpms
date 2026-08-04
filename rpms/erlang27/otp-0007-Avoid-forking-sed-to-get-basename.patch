@@ -1,3 +1,4 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jan Pazdziora <jpazdziora@redhat.com>
 Date: Thu, 10 May 2018 18:35:02 +0200
 Subject: [PATCH] Avoid forking sed to get basename.

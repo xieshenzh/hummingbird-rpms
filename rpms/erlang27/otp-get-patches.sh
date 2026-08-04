@@ -30,7 +30,7 @@ tmpdir="$(mktemp -d --tmpdir="$PWD")"
 
 # Generate patch files
 pushd "$otp_dir"
-git format-patch -N --no-signature --no-stat -o "$tmpdir" "${otp_upstream}..${otp_fedora}" > "$tmpdir/patch-list.txt"
+git format-patch -N --no-signature --no-stat --zero-commit -o "$tmpdir" "${otp_upstream}..${otp_fedora}" > "$tmpdir/patch-list.txt"
 popd
 
 test -s "$tmpdir/patch-list.txt"
@@ -41,7 +41,7 @@ n=1
 while read patch
 do
 	otppatch="$(dirname "$patch")/otp-$(basename "$patch")"
-	${SED-sed} -e '1d' -e '/^-- $/,$d' "$patch" > "$otppatch"
+	${SED-sed} -e '/^-- $/,$d' "$patch" > "$otppatch"
 	rm -f "$patch"
 	echo "Patch$n: $(basename "$otppatch")" >> "$tmpdir/patch-list-tags.txt"
 	n=$(($n + 1))
