@@ -245,6 +245,9 @@ loki3.7:
 memcached:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+nodejs20:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 nodejs22:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
