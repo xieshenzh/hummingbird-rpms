@@ -6,6 +6,9 @@
 #   build_platforms: Override the default MPLs (instance sizes) for builds
 #   forked_from: Override the upstream dist-git repository URL for lookaside cache resolution
 #                (default: https://src.fedoraproject.org/rpms/<package-name>)
+#   lookaside_cache_url: URL of a private lookaside cache (CloudFront distribution) for
+#                        downloading source tarballs with signed URLs. When set, the pipeline
+#                        bypasses dist-git-client. Requires the cloudfront-signing-key secret.
 #   private_product: Route this package to a private per-product Pulp repository
 #                    instead of (or in addition to) the public one. The value is the
 #                    product name (e.g., "example", "dotnet") which must match an entry
@@ -30,6 +33,10 @@
 #
 # All available MPLs can be found in the:
 # https://konflux.pages.redhat.com/docs/users/getting-started/multi-platform-builds.html documentation.
+
+# Anchor for the common private lookaside cache URL, aliased below as
+# *private_lookaside_cache_url to avoid repeating the literal string for every package.
+_private_lookaside_cache_url: &private_lookaside_cache_url "https://dp9y1t38f72i0.cloudfront.net/"
 
 acl:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
