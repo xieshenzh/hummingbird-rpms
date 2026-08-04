@@ -53,14 +53,14 @@ spec:
       value: "rpms/{{ rpm.dname }}"
     - name: mock-config-template-filename-in-sources
       value: "mock/mock.cfg"
-{# forked_from: tells dist-git-client to fetch source tarballs from hummingbird's lookaside instead of Fedora's dist-git (for Public RPM builds) #}
+{#- forked_from: tells dist-git-client to fetch source tarballs from hummingbird's lookaside instead of Fedora's dist-git (for Public RPM builds) #}
 {%- if forked_from %}
     - name: dist-git-client-configdir
       value: "mock/"
     - name: forked-from
       value: "{{ forked_from }}"
 {%- endif %}
-{# lookaside_cache_url: private CloudFront distribution; bypasses dist-git-client and requires cloudfront-signing-key (for LTS RPM builds) #}
+{#- lookaside_cache_url: private CloudFront distribution; bypasses dist-git-client and requires cloudfront-signing-key (for LTS RPM builds) #}
 {%- if lookaside_cache_url %}
     - name: lookaside-cache-url
       value: "{{ lookaside_cache_url }}"
@@ -84,7 +84,7 @@ spec:
     - name: git-auth
       secret:
         secretName: '{{ "{{git_auth_secret}}" }}'
-{# the name: value must match the workspace declared in the build-rpm-package Pipeline #}
+{#- the name: value must match the workspace declared in the build-rpm-package Pipeline #}
 {%- if lookaside_cache_url %}
     - name: cloudfront-signing-key
       secret:
