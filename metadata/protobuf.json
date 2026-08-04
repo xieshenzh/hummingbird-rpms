@@ -1,11 +1,12 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "7",
+  "modification_reason": "Update to upstream version 35.1",
+  "modification_status": "modified",
+  "release": "0.1",
   "release_monitoring_project_id": 3715,
   "sha": "823108311dd525219823c0eaaaa1b7c535215d0f",
   "source": "https://src.fedoraproject.org/rpms/protobuf.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/protocolbuffers/protobuf",
-  "version": "33.5"
+  "version": "35.1"
 }
