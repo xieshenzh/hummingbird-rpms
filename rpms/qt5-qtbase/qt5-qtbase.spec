@@ -57,7 +57,7 @@
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.18
-Release: 4.1%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
@@ -161,6 +161,9 @@ Patch103: qtbase-QTBUG-112136.patch
 # to fix ssl trust store discovery with
 # https://fedoraproject.org/wiki/Changes/dropingOfCertPemFile
 Patch104: 0001-Update-SSL-trust-store-locations-for-modern-Red-Hat-.patch
+
+# Fix build with OpenSSL 4.0
+Patch105: qtbase-openssl4-opaque-structs.patch
 
 ## Qt 6 backports for better Gtk/GNOME integration
 # https://fedoraproject.org/wiki/Changes/Qt_Wayland_By_Default_On_Gnome
@@ -482,6 +485,9 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch -P102 -p1
 %patch -P103 -p1
 %patch -P104 -p1
+%if 0%{?fedora} >= 45
+%patch -P105 -p1
+%endif
 
 ## Qt 6 backports
 %if 0%{?fedora} > 30 || 0%{?rhel} > 8
@@ -1178,6 +1184,9 @@ fi
 
 
 %changelog
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.18-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 5.15.18-4
 - Rebuilt for openssl 4.0
 
