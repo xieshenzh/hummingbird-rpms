@@ -1,9 +1,8 @@
 {
-  "modification_reason": "CVE-2026-14257; CVE-2026-69152; CVE-2026-69153",
-  "modification_status": "modified",
+  "modification_status": "native",
   "release": "0.1",
   "release_monitoring_project_id": 13916,
-  "track_upstream": "12.4",
   "upstream_repo": "https://github.com/grafana/grafana",
+  "track_upstream": "12.4",
   "version": "12.4.6"
 }
