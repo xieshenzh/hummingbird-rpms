@@ -1,10 +1,10 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "4",
-  "sha": "eb1dfe3da82df8c5e524c9c9d5752df1d065289e",
+  "release": "5",
+  "sha": "6e6b075076302c6882da943e4d29f4fad57ca155",
   "source": "https://src.fedoraproject.org/rpms/qt5-qtbase.git",
-  "upstream_repo": "https://github.com/qt/qtbase",
   "upstream_branch": "5.15",
+  "upstream_repo": "https://github.com/qt/qtbase",
   "version": "5.15.18"
 }
