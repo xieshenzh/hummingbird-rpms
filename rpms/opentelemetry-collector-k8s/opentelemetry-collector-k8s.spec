@@ -1,7 +1,7 @@
 # https://github.com/open-telemetry/opentelemetry-collector-releases
 %global goipath         github.com/open-telemetry/opentelemetry-collector-releases/k8s
 %global forgeurl        https://github.com/open-telemetry/opentelemetry-collector-releases
-Version:                0.157.0
+Version:                0.158.0
 
 %gometa -L
 %forgemeta
