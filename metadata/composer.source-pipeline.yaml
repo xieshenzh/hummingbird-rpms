@@ -1,0 +1,21 @@
+# Fedora's own makesrc.sh bundled composer's vendored PHP dependencies
+# directly into the same tarball as the source (git clone + `composer
+# install` + tar the whole checkout). gorget's vendor: step instead
+# produces a separate vendor archive -- matching the pattern already used
+# for Go/npm packages (e.g. prometheus3.13) -- so composer.spec extracts
+# two sources instead of one. `composer install --no-dev` needs a preceding
+# git checkout in this same pipeline to vendor against.
+#
+# makesrc.sh also ran `composer config platform.php 7.2.5` before
+# installing -- redundant with gorget's plain `composer install`, since
+# that exact platform pin is already committed in composer's own
+# composer.json (`config.platform.php: "7.2.5"`).
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "${VERSION}"
+    archive_name: "composer-${VERSION}.tar.gz"
+
+  - type: vendor
+    ecosystem: composer
+    archive_name: "composer-${VERSION}-vendor.tar.gz"
