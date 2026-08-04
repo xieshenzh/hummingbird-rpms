@@ -355,6 +355,22 @@ def _compute_file_hash(filepath: Path, algo: str = "SHA512") -> str:
     return h.hexdigest()
 
 
+def _check_source_exists(url: str) -> bool:
+    """HEAD-probe a URL and return True if it exists (HTTP 200)."""
+    req = urllib.request.Request(
+        url,
+        method="HEAD",
+        headers={"User-Agent": "hummingbird-rpms-version-checker/1.0"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=10):
+            return True
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return False
+        raise
+
+
 def _download_file(url: str, dest: Path) -> None:
     """Download a file from a URL to a local path."""
     req = urllib.request.Request(
@@ -1192,6 +1208,28 @@ def transform_upstream_version(version: str, transform: str) -> str:
     return fn(version)
 
 
+def _openjdk_source_check(version: str, metadata: dict[str, object]) -> bool:
+    """Check OpenJDK source tarball availability on openjdk-sources.osci.io."""
+    feature = metadata.get("track_upstream", "")
+    if feature == "latest":
+        feature = ""
+    url = f"https://openjdk-sources.osci.io/openjdk{feature}/openjdk-{version}.tar.xz"
+    return _check_source_exists(url)
+
+
+SOURCE_AVAILABILITY_CHECKERS: dict[str, Callable[[str, dict[str, object]], bool]] = {
+    "openjdk_osci": _openjdk_source_check,
+}
+
+
+def check_source_available(version: str, checker_name: str, metadata: dict[str, object]) -> bool:
+    """Check if a source tarball is available using a named checker."""
+    fn = SOURCE_AVAILABILITY_CHECKERS.get(checker_name)
+    if fn is None:
+        raise ValueError(f"unknown source_availability_check {checker_name!r}")
+    return fn(version, metadata)
+
+
 def check_package_version(
     package: str, distro: str = DEFAULT_DISTRO
 ) -> VersionCheckResult:
@@ -1235,6 +1273,7 @@ def check_package_version(
     project_id = None
     version_suffix_strip = None
     version_transform = None
+    source_checker = None
     if meta:
         track_upstream = meta.get("track_upstream")
         if track_upstream and track_upstream != "latest":
@@ -1242,6 +1281,7 @@ def check_package_version(
         project_id = meta.get("release_monitoring_project_id")
         version_suffix_strip = meta.get("version_suffix_strip")
         version_transform = meta.get("upstream_version_transform")
+        source_checker = meta.get("source_availability_check")
 
     # Query release-monitoring.org
     try:
@@ -1271,6 +1311,31 @@ def check_package_version(
             ]
         if anitya_data.get("version"):
             anitya_data["version"] = _strip_suffix(anitya_data["version"])
+
+    # Filter out leading versions whose source tarball is not yet published.
+    # Probes only until a published version is found; older versions are
+    # assumed available.
+    if source_checker and meta is not None:
+        raw_stable = anitya_data.get("stable_versions", [])
+        skip = 0
+        for v in raw_stable:
+            try:
+                if check_source_available(v, source_checker, meta):
+                    break
+                logger.info(
+                    "%s: skipping %s (source not published)",
+                    package, v,
+                )
+                skip += 1
+            except urllib.error.URLError as e:
+                logger.warning(
+                    "%s: error probing source for %s: %s", package, v, e,
+                )
+                break
+        if skip:
+            anitya_data["stable_versions"] = raw_stable[skip:]
+            if not raw_stable[skip:]:
+                anitya_data["version"] = None
 
     # Apply a named version transform if configured
     # (e.g., OpenJDK reports "21.0.12+8" from Anitya, RPM uses "21.0.12.0.8").
