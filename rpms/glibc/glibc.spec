@@ -1,4 +1,4 @@
-%global glibcsrcdir glibc-2.43-45-gdae425b554
+%global glibcsrcdir glibc-2.43-47-gbc95068f5f
 %global glibcversion 2.43
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
@@ -152,8 +152,8 @@ Version: %{glibcversion}
 # - It allows using the Release number without the %%dist tag in the dependency
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
-%global baserelease 7
-Release: %{baserelease}.1%{?dist}
+%global baserelease 8
+Release: %{baserelease}%{?dist}
 
 # Licenses:
 #
@@ -2399,6 +2399,12 @@ update_gconv_modules_cache ()
 %endif
 
 %changelog
+* Tue Aug 04 2026 Frédéric Bérat <fberat@redhat.com> - 2.43-8
+- Auto-sync with upstream branch release/2.43/master,
+  commit bc95068f5f9d7f57d0f01757fed0900893b122b8:
+- ppc64le: Restore optimized memchr for power10 [BZ #34300] (Sachin Monga)
+- rtld: cache cpuid results on the stack for intel (Fabian Rast)
+
 * Tue Jul 07 2026 Frédéric Bérat <fberat@redhat.com> - 2.43-7
 - Auto-sync with upstream branch release/2.43/master,
   commit dae425b554207f7c4599c7fac707ad4c08545674:

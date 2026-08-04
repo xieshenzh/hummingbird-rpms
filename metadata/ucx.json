@@ -1,0 +1,12 @@
+{
+  "branch": "rawhide",
+  "modification_reason": "Update to upstream version 1.22.0",
+  "modification_status": "modified",
+  "release": "0.1",
+  "release_monitoring_project_id": 16895,
+  "sha": "e55261197e56388b6403886b4f0557b04fb6e8b5",
+  "source": "https://src.fedoraproject.org/rpms/ucx.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/openucx/ucx",
+  "version": "1.22.0"
+}

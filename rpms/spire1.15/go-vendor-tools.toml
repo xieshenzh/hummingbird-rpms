@@ -7,6 +7,8 @@ post_commands = [
 
 [archive.dependency_overrides]
 "golang.org/x/text" = "v0.39.0"
+# CVE-2026-54787
+"github.com/sigstore/sigstore-go" = "v1.2.1"
 
 [licensing]
 detector = "askalono"

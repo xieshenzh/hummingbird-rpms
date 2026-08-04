@@ -3,6 +3,8 @@
 import json
 import subprocess
 import types
+import urllib.error
+from email.message import Message
 from pathlib import Path
 from unittest.mock import call, patch
 
@@ -758,6 +760,291 @@ def test_check_package_version_suffix_strip_no_update(cuv_module, workdir: Path)
 
     assert result.has_update is False
     assert result.upstream_version == '6.3.2'
+
+
+def test_openjdk_to_rpm(cuv_module) -> None:
+    """_openjdk_to_rpm converts upstream tag versions to RPM scheme."""
+    fn = cuv_module._openjdk_to_rpm
+    assert fn('21.0.12+8') == '21.0.12.0.8'
+    assert fn('21.0.12.1+0') == '21.0.12.1.0'
+    assert fn('21.0.11+10') == '21.0.11.0.10'
+    assert fn('25.0.4+7') == '25.0.4.0.7'
+    assert fn('25.0.4.1+0') == '25.0.4.1.0'
+    # Leading zeros in build number are stripped
+    assert fn('21.0.12+08') == '21.0.12.0.8'
+
+    with pytest.raises(ValueError):
+        fn('not-a-version')
+    with pytest.raises(ValueError):
+        fn('21.0.12')  # missing +build
+
+
+def test_transform_upstream_version_unknown(cuv_module) -> None:
+    """transform_upstream_version raises ValueError for unknown transform."""
+    with pytest.raises(ValueError, match="unknown upstream_version_transform"):
+        cuv_module.transform_upstream_version('1.0', 'nonexistent_transform')
+
+
+def test_check_package_version_transforms_openjdk_version(
+    cuv_module, workdir: Path,
+) -> None:
+    """Detects update when Anitya version is transformed to RPM scheme."""
+    _create_package(workdir, 'java-21-openjdk-portable', '21.0.11.0.10',
+                    metadata={'version': '21.0.11.0.10', 'release': '2',
+                              'release_monitoring_project_id': 369281,
+                              'track_upstream': '21',
+                              'upstream_version_transform': 'openjdk_to_rpm'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'stable_versions': ['21.0.12.1+0', '21.0.12+8', '21.0.11+10'],
+    }
+
+    with patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response):
+        result = cuv_module.check_package_version('java-21-openjdk-portable')
+
+    assert result.has_update is True
+    assert result.upstream_version == '21.0.12.1.0'
+    assert result.current_version == '21.0.11.0.10'
+
+
+def test_check_package_version_transform_no_update(
+    cuv_module, workdir: Path,
+) -> None:
+    """No update when transformed version matches current."""
+    _create_package(workdir, 'java-21-openjdk-portable', '21.0.12.0.8',
+                    metadata={'version': '21.0.12.0.8', 'release': '1',
+                              'release_monitoring_project_id': 369281,
+                              'track_upstream': '21',
+                              'upstream_version_transform': 'openjdk_to_rpm'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'stable_versions': ['21.0.12+8', '21.0.11+10'],
+    }
+
+    with patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response):
+        result = cuv_module.check_package_version('java-21-openjdk-portable')
+
+    assert result.has_update is False
+    assert result.upstream_version == '21.0.12.0.8'
+
+
+def test_check_package_version_transform_with_cpu_release(
+    cuv_module, workdir: Path,
+) -> None:
+    """Handles OpenJDK CPU/PSU releases with 4-part base version."""
+    _create_package(workdir, 'java-25-openjdk-portable', '25.0.4.0.7',
+                    metadata={'version': '25.0.4.0.7', 'release': '2',
+                              'release_monitoring_project_id': 378887,
+                              'track_upstream': '25',
+                              'upstream_version_transform': 'openjdk_to_rpm'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'stable_versions': ['25.0.4.1+0', '25.0.4+7'],
+    }
+
+    with patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response):
+        result = cuv_module.check_package_version('java-25-openjdk-portable')
+
+    assert result.has_update is True
+    assert result.upstream_version == '25.0.4.1.0'
+
+
+def test_check_package_version_transform_skips_unparseable(
+    cuv_module, workdir: Path,
+) -> None:
+    """Unparseable versions in stable_versions are filtered out."""
+    _create_package(workdir, 'java-21-openjdk-portable', '21.0.11.0.10',
+                    metadata={'version': '21.0.11.0.10', 'release': '2',
+                              'release_monitoring_project_id': 369281,
+                              'track_upstream': '21',
+                              'upstream_version_transform': 'openjdk_to_rpm'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'stable_versions': ['bad-tag', '21.0.12+8', '21.0.11+10'],
+    }
+
+    with patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response):
+        result = cuv_module.check_package_version('java-21-openjdk-portable')
+
+    assert result.has_update is True
+    assert result.upstream_version == '21.0.12.0.8'
+
+
+def test_check_source_exists(cuv_module) -> None:
+    """_check_source_exists returns True on 200, False on 404."""
+
+    with patch.object(cuv_module.urllib.request, 'urlopen'):
+        assert cuv_module._check_source_exists('https://example.com/a.tar.xz') is True
+
+    with patch.object(
+        cuv_module.urllib.request, 'urlopen',
+        side_effect=urllib.error.HTTPError(
+            'https://example.com/a.tar.xz', 404, 'Not Found', Message(), None,
+        ),
+    ):
+        assert cuv_module._check_source_exists('https://example.com/a.tar.xz') is False
+
+    with patch.object(
+        cuv_module.urllib.request, 'urlopen',
+        side_effect=urllib.error.HTTPError(
+            'https://example.com/a.tar.xz', 500, 'Server Error', Message(), None,
+        ),
+    ):
+        with pytest.raises(urllib.error.HTTPError):
+            cuv_module._check_source_exists('https://example.com/a.tar.xz')
+
+
+def test_check_package_version_skips_unavailable_source(
+    cuv_module, workdir: Path,
+) -> None:
+    """source_availability_check filters out versions whose tarball is not published."""
+    _create_package(workdir, 'java-21-openjdk-portable', '21.0.11.0.10',
+                    metadata={'version': '21.0.11.0.10', 'release': '2',
+                              'release_monitoring_project_id': 369281,
+                              'track_upstream': '21',
+                              'upstream_version_transform': 'openjdk_to_rpm',
+                              'source_availability_check': 'openjdk_osci'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'stable_versions': ['21.0.12.1+0', '21.0.12+8', '21.0.11+10'],
+    }
+
+    def fake_check(version: str, _checker: str, _meta: dict) -> bool:
+        return version != '21.0.12.1+0'
+
+    with (
+        patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response),
+        patch.object(cuv_module, 'check_source_available',
+                      side_effect=fake_check),
+    ):
+        result = cuv_module.check_package_version('java-21-openjdk-portable')
+
+    assert result.has_update is True
+    assert result.upstream_version == '21.0.12.0.8'
+
+
+def test_check_package_version_all_sources_unavailable(
+    cuv_module, workdir: Path,
+) -> None:
+    """No update when all candidate source tarballs return 404."""
+    _create_package(workdir, 'java-21-openjdk-portable', '21.0.11.0.10',
+                    metadata={'version': '21.0.11.0.10', 'release': '2',
+                              'release_monitoring_project_id': 369281,
+                              'track_upstream': '21',
+                              'upstream_version_transform': 'openjdk_to_rpm',
+                              'source_availability_check': 'openjdk_osci'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'stable_versions': ['21.0.12.1+0'],
+        'version': '21.0.12.1+0',
+    }
+
+    with (
+        patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response),
+        patch.object(cuv_module, 'check_source_available', return_value=False),
+    ):
+        result = cuv_module.check_package_version('java-21-openjdk-portable')
+
+    assert result.has_update is False
+
+
+def test_check_source_available_unknown(cuv_module) -> None:
+    """check_source_available raises ValueError for unknown checker name."""
+    with pytest.raises(ValueError, match="unknown source_availability_check"):
+        cuv_module.check_source_available('1.0', 'nonexistent', {})
+
+
+def test_openjdk_source_check_url_construction(cuv_module) -> None:
+    """_openjdk_source_check constructs correct URL from version and metadata."""
+    checked_urls = []
+
+    def capture_check(url: str) -> bool:
+        checked_urls.append(url)
+        return True
+
+    with patch.object(cuv_module, '_check_source_exists', side_effect=capture_check):
+        cuv_module._openjdk_source_check('21.0.12+8', {'track_upstream': '21'})
+
+    assert checked_urls == [
+        'https://openjdk-sources.osci.io/openjdk21/openjdk-21.0.12+8.tar.xz',
+    ]
+
+    checked_urls.clear()
+    with patch.object(cuv_module, '_check_source_exists', side_effect=capture_check):
+        cuv_module._openjdk_source_check('25.0.1+3', {'track_upstream': 'latest'})
+
+    assert checked_urls == [
+        'https://openjdk-sources.osci.io/openjdk/openjdk-25.0.1+3.tar.xz',
+    ]
+
+    checked_urls.clear()
+    with patch.object(cuv_module, '_check_source_exists', side_effect=capture_check):
+        cuv_module._openjdk_source_check('25.0.1+3', {})
+
+    assert checked_urls == [
+        'https://openjdk-sources.osci.io/openjdk/openjdk-25.0.1+3.tar.xz',
+    ]
+
+
+def test_check_package_version_source_checker_dispatches_correctly(
+    cuv_module, workdir: Path,
+) -> None:
+    """source_availability_check dispatches to the named checker with correct args."""
+    _create_package(workdir, 'java-21-openjdk-portable', '21.0.11.0.10',
+                    metadata={'version': '21.0.11.0.10', 'release': '2',
+                              'release_monitoring_project_id': 369281,
+                              'track_upstream': '21',
+                              'upstream_version_transform': 'openjdk_to_rpm',
+                              'source_availability_check': 'openjdk_osci'})
+
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+
+    mock_response = {
+        'stable_versions': ['21.0.12+8'],
+    }
+
+    checked_urls = []
+
+    def capture_check(url: str) -> bool:
+        checked_urls.append(url)
+        return True
+
+    with (
+        patch.object(cuv_module, 'query_anitya_by_project_id',
+                      return_value=mock_response),
+        patch.object(cuv_module, '_check_source_exists',
+                      side_effect=capture_check),
+    ):
+        cuv_module.check_package_version('java-21-openjdk-portable')
+
+    assert checked_urls == [
+        'https://openjdk-sources.osci.io/openjdk21/openjdk-21.0.12+8.tar.xz',
+    ]
 
 
 def test_matches_track_version(cuv_module) -> None:

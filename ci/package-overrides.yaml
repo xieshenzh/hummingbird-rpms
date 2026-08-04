@@ -101,6 +101,9 @@ erlang27:
 expat:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+fftw:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 fontconfig:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
@@ -112,6 +115,14 @@ git-sync:
 
 gcc:
   # Larger builders are required for the build to complete in a reasonable time
+  timeout_hours: 12
+  build_platforms:
+    - "linux-d160-c8xlarge/amd64"
+    - "linux-d160-c8xlarge/arm64"
+
+gcc13:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+  # GCC bootstrap requires the same larger builders as the system compiler
   timeout_hours: 12
   build_platforms:
     - "linux-d160-c8xlarge/amd64"
@@ -151,6 +162,9 @@ grype:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 haproxy:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+hdf5:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 hello:
@@ -193,6 +207,9 @@ kubernetes1.35:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 kubernetes1.36:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+libfabric:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 libpng:
@@ -310,10 +327,19 @@ prometheus3.5:
 php-patchwork-jsqueeze:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+protobuf:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+prrte:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 oras:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 pgbouncer:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+pmix:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 poppler:
@@ -405,16 +431,25 @@ sqlite:
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+tbb:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 tempo2.10:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 tempo3.0:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+thrift:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 tomcat11:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 trivy:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+ucx:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 unbound:

@@ -1,0 +1,108 @@
+diff -up hdf5-hdf5_2.0.0/hl/fortran/src/CMakeLists.txt.fmoddir hdf5-hdf5_2.0.0/hl/fortran/src/CMakeLists.txt
+--- hdf5-hdf5_2.0.0/hl/fortran/src/CMakeLists.txt.fmoddir	2025-11-10 16:56:41.000000000 -0700
++++ hdf5-hdf5_2.0.0/hl/fortran/src/CMakeLists.txt	2025-11-24 17:46:41.030437105 -0700
+@@ -305,16 +305,9 @@ if (BUILD_STATIC_LIBS)
+   endforeach ()
+   install (
+       FILES ${mod_files}
+-      DESTINATION ${HDF5_INSTALL_MODULE_DIR}/static
++      DESTINATION ${HDF5_INSTALL_MODULE_DIR}
+       COMPONENT fortheaders
+   )
+-  if (HDF5_INSTALL_MOD_FORTRAN MATCHES "STATIC")
+-    install (
+-        FILES ${mod_files}
+-        DESTINATION ${HDF5_INSTALL_INCLUDE_DIR}
+-        COMPONENT fortheaders
+-    )
+-  endif ()
+ endif ()
+ if (BUILD_SHARED_LIBS)
+   foreach (mod_file ${mod_export_files})
+@@ -322,16 +315,9 @@ if (BUILD_SHARED_LIBS)
+   endforeach ()
+   install (
+       FILES ${modsh_files}
+-      DESTINATION ${HDF5_INSTALL_MODULE_DIR}/shared
++      DESTINATION ${HDF5_INSTALL_MODULE_DIR}
+       COMPONENT fortheaders
+   )
+-  if (HDF5_INSTALL_MOD_FORTRAN MATCHES "SHARED")
+-    install (
+-        FILES ${modsh_files}
+-        DESTINATION ${HDF5_INSTALL_INCLUDE_DIR}
+-        COMPONENT fortheaders
+-    )
+-  endif ()
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+diff -up hdf5-hdf5_2.0.0/fortran/src/CMakeLists.txt.fmoddir hdf5-hdf5_2.0.0/fortran/src/CMakeLists.txt
+--- hdf5-hdf5_2.0.0/fortran/src/CMakeLists.txt.fmoddir	2025-11-10 16:56:41.000000000 -0700
++++ hdf5-hdf5_2.0.0/fortran/src/CMakeLists.txt	2025-12-11 22:20:08.458394084 -0700
+@@ -460,7 +460,7 @@ if (BUILD_STATIC_LIBS)
+   add_library (${HDF5_F90_LIB_TARGET} STATIC ${f90_F_SOURCES})
+   target_include_directories (${HDF5_F90_LIB_TARGET}
+       PRIVATE "${HDF5_F90_SRC_SOURCE_DIR};${CMAKE_Fortran_MODULE_DIRECTORY}/static;${HDF5_F90_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_Fortran_INCLUDE_DIRS}>"
+-      INTERFACE "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${HDF5_INSTALL_MODULE_DIR}/static>"
++      INTERFACE "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${HDF5_INSTALL_MODULE_DIR}>"
+   )
+   target_compile_options (${HDF5_F90_LIB_TARGET} PRIVATE "${HDF5_CMAKE_Fortran_FLAGS}")
+   target_compile_definitions (${HDF5_F90_LIB_TARGET}
+@@ -497,7 +497,7 @@ if (BUILD_SHARED_LIBS)
+   add_library (${HDF5_F90_LIBSH_TARGET} SHARED ${DLLDEF} ${f90_F_SOURCES_SHARED})
+   target_include_directories (${HDF5_F90_LIBSH_TARGET}
+       PRIVATE "${HDF5_F90_SRC_SOURCE_DIR};${CMAKE_Fortran_MODULE_DIRECTORY}/shared;${HDF5_F90_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_Fortran_INCLUDE_DIRS}>"
+-      INTERFACE "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${HDF5_INSTALL_MODULE_DIR}/shared>"
++      INTERFACE "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${HDF5_INSTALL_MODULE_DIR}>"
+   )
+   target_compile_options (${HDF5_F90_LIBSH_TARGET} PRIVATE "${HDF5_CMAKE_Fortran_FLAGS}")
+   target_compile_definitions (${HDF5_F90_LIBSH_TARGET}
+@@ -584,16 +584,9 @@ if (BUILD_STATIC_LIBS)
+   endforeach ()
+   install (
+       FILES ${mod_files}
+-      DESTINATION ${HDF5_INSTALL_MODULE_DIR}/static
++      DESTINATION ${HDF5_INSTALL_MODULE_DIR}
+       COMPONENT fortheaders
+   )
+-  if (HDF5_INSTALL_MOD_FORTRAN MATCHES "STATIC")
+-    install (
+-        FILES ${mod_files}
+-        DESTINATION ${HDF5_INSTALL_INCLUDE_DIR}
+-        COMPONENT fortheaders
+-    )
+-  endif ()
+ endif ()
+ 
+ if (BUILD_SHARED_LIBS)
+@@ -602,16 +595,9 @@ if (BUILD_SHARED_LIBS)
+   endforeach ()
+   install (
+       FILES ${modsh_files}
+-      DESTINATION ${HDF5_INSTALL_MODULE_DIR}/shared
++      DESTINATION ${HDF5_INSTALL_MODULE_DIR}
+       COMPONENT fortheaders
+   )
+-  if (HDF5_INSTALL_MOD_FORTRAN MATCHES "SHARED")
+-    install (
+-        FILES ${modsh_files}
+-        DESTINATION ${HDF5_INSTALL_INCLUDE_DIR}
+-        COMPONENT  fortheaders
+-    )
+-  endif ()
+ endif ()
+ 
+ #-----------------------------------------------------------------------------
+@@ -646,9 +632,9 @@ set (_PKG_CONFIG_EXEC_PREFIX \${prefix})
+ set (_PKG_CONFIG_LIBDIR \${exec_prefix}/${HDF5_INSTALL_LIB_DIR})
+ set (_PKG_CONFIG_INCLUDEDIR \${prefix}/${HDF5_INSTALL_INCLUDE_DIR})
+ if (BUILD_SHARED_LIBS)
+-  set (_PKG_CONFIG_MODULEDIR \${prefix}/${HDF5_INSTALL_MODULE_DIR}/shared)
++  set (_PKG_CONFIG_MODULEDIR \${prefix}/${HDF5_INSTALL_MODULE_DIR})
+ else ()
+-  set (_PKG_CONFIG_MODULEDIR \${prefix}/${HDF5_INSTALL_MODULE_DIR}/static)
++  set (_PKG_CONFIG_MODULEDIR \${prefix}/${HDF5_INSTALL_MODULE_DIR})
+ endif ()
+ if (NOT HDF5_INSTALL_MOD_FORTRAN MATCHES "NO")
+   set (_PKG_CONFIG_MODULEDIR \${prefix}/${HDF5_INSTALL_INCLUDE_DIR})

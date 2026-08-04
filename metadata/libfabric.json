@@ -1,0 +1,12 @@
+{
+  "branch": "rawhide",
+  "modification_reason": "Update to upstream version 2.6.0",
+  "modification_status": "modified",
+  "release": "0.1",
+  "release_monitoring_project_id": 15790,
+  "sha": "d77458f5f555772ac3c97df79df836a8d2a0a017",
+  "source": "https://src.fedoraproject.org/rpms/libfabric.git",
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/ofiwg/libfabric",
+  "version": "2.6.0"
+}

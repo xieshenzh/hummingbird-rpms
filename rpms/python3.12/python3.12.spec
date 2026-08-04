@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3.8%{?dist}
+Release: 6%{?dist}
 License: Python-2.0.1
 
 
@@ -514,36 +514,46 @@ Patch488: 00488-cve-2026-3479.patch
 # gh-90309: Base64-encode cookie values embedded in JS
 Patch489: 00489-cve-2026-6019.patch
 
-# 00490 # c250d10145d6ca61bf104c3475ccab78be5585bd
+# 00490 # 3e8c5ad70d6a515107352d8779269240a0553f54
+# gh-153030: Fix quadratic complexity in incremental parsing in HTMLParser
+#
+# When an unterminated construct (e.g. a tag or comment) spanned many
+# feed() calls, rescanning the growing buffer and concatenating new data
+# onto it were both quadratic.  New data is now accumulated in a list and
+# only joined and parsed once enough has piled up.
+Patch490: 00490-cve-2026-15308.patch
+
+# 00491 # 1ad95144c42a6933283352245c5df5a4c142e75f
+# gh-149776: Skip UDP Lite tests if it's not supported
+#
+# Fix test_socket on Linux kernel 7.1 and newer: skip UDP Lite tests if
+# it's not supported.
+Patch491: 00491-gh-149776-skip-udp-lite-tests-if-it-s-not-supported.patch
+
+# 00492 # c250d10145d6ca61bf104c3475ccab78be5585bd
 # CVE-2026-11972
 #
 # gh-151981: Make tarfile._Stream.seek break at EOF
-Patch490: 00490-cve-2026-11972.patch
+Patch492: 00492-cve-2026-11972.patch
 
-# 00491 # bcf98ddbc40ec9b3ee87da0124a5660b19b7e606
-# CVE-2026-15308
-#
-# gh-153030: Fix quadratic complexity in incremental parsing in HTMLParser
-Patch491: 00491-cve-2026-15308.patch
-
-# 00492 # d0ba16dce6df2f68e8968699d5c247eddeef9960
+# 00493 # d0ba16dce6df2f68e8968699d5c247eddeef9960
 # CVE-2026-11940
 #
 # gh-151558: Fix symlink escape via tarfile hardlink-extraction fallback
-Patch492: 00492-cve-2026-11940.patch
+Patch493: 00493-cve-2026-11940.patch
 
-# 00493 # 61d17f4516bc3284b59c6ec01ee2e81da619f4ff
+# 00494 # 61d17f4516bc3284b59c6ec01ee2e81da619f4ff
 # CVE-2026-4360
 #
 # gh-151987: Pass filter_function to TarFile._extract_one() during .extract()
 # (from open upstream PR #152611 until it merges)
-Patch493: 00493-cve-2026-4360.patch
+Patch494: 00494-cve-2026-4360.patch
 
-# 00494 # 165b26307b609608753fcd622ccecbfb921667cc
+# 00495 # 165b26307b609608753fcd622ccecbfb921667cc
 # CVE-2026-6879
 #
 # gh-152674: Avoid quadratic behavior in xml.etree.ElementPath index predicates
-Patch494: 00494-cve-2026-6879.patch
+Patch495: 00495-cve-2026-6879.patch
 
 # (New patches go here ^^^)
 #
@@ -1874,6 +1884,17 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Jul 28 2026 Lukáš Zachar <lzachar@redhat.com> - 3.12.13-6
+- Security fix for CVE-2026-15308
+Resolves: rhbz#2498688
+
+* Tue Jul 28 2026 Miro Hrončok <mhroncok@redhat.com> - 3.12.13-5
+- Skip UDP Lite tests if it's not supported
+- Fixes FTBFS on Linux kernel 7.1 and newer
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.13-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Thu Apr 16 2026 Charalampos Stratakis <cstratak@redhat.com> - 3.12.13-3
 - Security fixes for CVE-2026-1502, CVE-2026-4786, CVE-2026-6100, CVE-2026-2297, CVE-2026-3644, CVE-2026-4224
 Resolves: rhbz#2444705, rhbz#2448189, rhbz#2448205, rhbz#2457942, rhbz#2458014, rhbz#2458222
