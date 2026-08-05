@@ -37,10 +37,10 @@ Epoch: 2
 # If that's what you're reading, Version must be 0, and will be updated by Packit for
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
-Version: 1.44.0
+Version: 1.45.0
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 3.3%{?dist}
+Release: 2%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -164,6 +164,7 @@ export BUILDTAGS+=" containers_image_sequoia"
 %gobuild -o bin/crash ./tests/crash
 %gobuild -o bin/wait ./tests/wait
 %gobuild -o bin/grpcnoop ./tests/rpc/noop
+%gobuild -o bin/pipeloop ./tests/pipeloop/pipeloop.go
 %endif
 %{__make} docs
 
@@ -182,6 +183,7 @@ cp bin/passwd %{buildroot}/%{_bindir}/%{name}-passwd
 cp bin/crash %{buildroot}/%{_bindir}/%{name}-crash
 cp bin/wait %{buildroot}/%{_bindir}/%{name}-wait
 cp bin/grpcnoop %{buildroot}/%{_bindir}/%{name}-grpcnoop
+cp bin/pipeloop %{buildroot}/%{_bindir}/%{name}-pipeloop
 
 rm %{buildroot}%{_datadir}/%{name}/test/system/tools/build/*
 %endif
@@ -213,6 +215,7 @@ rm %{buildroot}%{_datadir}/%{name}/test/system/tools/build/*
 %{_bindir}/%{name}-crash
 %{_bindir}/%{name}-wait
 %{_bindir}/%{name}-grpcnoop
+%{_bindir}/%{name}-pipeloop
 %{_datadir}/%{name}/test
 %endif
 
