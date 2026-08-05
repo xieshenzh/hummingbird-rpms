@@ -161,6 +161,43 @@ Applies per-package source modifications.
   that `build-ui`, `vendor`, and `run:` steps use the correct toolchain without requiring
   separate container images per package
 
+#### Known sharp edge: patch-list duplication
+
+Two independent mechanisms hand-apply changes outside of `%prep`, and neither reads its list from
+the spec's `PatchN:` declarations — so both can silently drift out of sync with what the spec
+actually declares. This is the canonical writeup; `rebuilding-packages.md` and the `/cve` skill
+point back here instead of re-telling the story.
+
+**Custom `run:` transforms** that hand-apply patches before resolving a lockfile (`patch -p1 < ...`
+followed by `yarn install`/`pnpm fetch`/etc., as grafana's yarn-cache generation does) maintain
+their own copy of "which patches touch this source tree" rather than reading it from the spec's
+`PatchN:` declarations. Nothing enforces these two lists stay in sync. A patch added to the spec
+through the normal backport workflow (see
+[Rebuilding Packages](https://hummingbird-project.io/l/rebuilding-packages)) is invisible to the
+transform unless a human also updates the pipeline YAML — and if that patch touches a file the
+transform's install command resolves against (a lockfile or manifest), the generated artifact
+silently drifts from what `%build` actually applies. This broke grafana12.4 and grafana13.1: four
+separate CVE backports bumped `yarn.lock` without updating the pipeline's yarn-cache generation
+step, and the mismatch didn't surface until the next automated version bump re-ran the transform
+from a pristine checkout. `test/test_source_pipeline_patches.py` checks for this drift across all
+packages with a pipeline definition, but it's a safety net for a design gap, not a fix for it: a
+built-in transform primitive that reads `PatchN:` from the spec directly, instead of requiring the
+YAML to hand-duplicate the list, would close this class of bug at the source rather than relying on
+the check to catch it after the fact.
+
+**`go-vendor-tools.toml`'s `[archive] pre_commands`** have the same shape of problem for Go
+packages, whether or not they're migrated to gorget: `pre_commands` (sed edits, `go get` bumps, `go
+mod tidy`) only ever run against the vendor archive's own checkout, never against the plain source
+tarball (`Source0`), which is fetched separately. A patch that bumps a vendored dependency's
+version must be mirrored into `go.mod`/`go.sum` by a spec patch — nothing keeps `pre_commands` and
+the spec's patches in sync. This broke trivy: a CVE backport added `go get` calls to `pre_commands`
+to bump vendored dependencies (CVE-2026-15788/15792/56852) without a matching spec patch, so
+`go.mod` in the build tree and `vendor/modules.txt` in the generated vendor archive ended up
+requiring different versions of the same package — `go build -mod=vendor` rejected it as
+inconsistent vendoring. The mismatch sat latent for over a week until an unrelated version bump's
+`%check` run finally caught it. `test/test_govendortools_gomod_patch_sync.py` checks for this
+drift, same caveat as above.
+
 ### 3. Verify
 
 Validates integrity and authenticity of fetched sources.

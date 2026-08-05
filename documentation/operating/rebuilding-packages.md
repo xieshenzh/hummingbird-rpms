@@ -462,7 +462,62 @@ Patch4:         0004-fix-foo.patch
 The patch will be applied automatically if the spec uses `%autosetup -p1`. If the spec uses explicit
 `%patchN` macros, add the corresponding apply line in the `%prep` section.
 
-### 3. Bump the Release
+### 3. Check for a gorget source-pipeline
+
+If `metadata/<package>.source-pipeline.yaml` exists, check whether its `transform:` step applies
+patches or otherwise runs against patched source (e.g. resolving a lockfile with `yarn install`,
+`pnpm fetch`, `npm ci`):
+
+```bash
+# run from the root of the rpms repo checkout
+grep -n -E "patch -p[0-9]|git apply" metadata/<package>.source-pipeline.yaml
+```
+
+This catches the common forms, but isn't exhaustive — if the transform applies patches some other
+way (a different tool, or a script that wraps `patch`/`git apply`), read the `transform:` step
+directly rather than trusting a `grep` miss.
+
+If it does, and your new patch touches a file that step depends on (a lockfile or manifest such as
+`yarn.lock`, `package.json`, `pnpm-lock.yaml`, `go.sum`, `Cargo.lock`), add the same
+`patch -p1 < "${PACKAGE_DIR}/<your-patch>.patch"` line there too, **in the same relative order** as
+its `PatchN:` slot in the spec. The patch file itself needs no extra fetch step — it's already in
+`${PACKAGE_DIR}/` because you committed it there in step 2.
+
+The pipeline's `transform:` step and the spec's `%prep`/`%goprep` are two independent lists of
+patches to apply — nothing keeps them in sync automatically. A patch declared only in the spec is
+invisible to whatever artifact the transform step generates (e.g. an offline yarn/pnpm cache built
+from the lockfile), and the generated artifact silently drifts from what `%build` actually applies.
+See "Known sharp edge: patch-list duplication" in
+[the source-pipeline design doc][sharp-edge] for the grafana12.4/grafana13.1 incident this rule
+comes from. `test/test_source_pipeline_patches.py` checks for this drift, but treat it as a safety
+net, not a substitute for updating the pipeline yourself here.
+
+### 4. For Go packages: check go-vendor-tools.toml's pre_commands
+
+This applies whether or not the package uses gorget — `rpms/<package>/go-vendor-tools.toml`'s
+`[archive] pre_commands` (sed edits, `go get` bumps, `go mod tidy`) only ever run against the
+vendor archive's own checkout, never against the plain source tarball (`Source0`), which is fetched
+separately:
+
+```bash
+grep -n -A2 "pre_commands" rpms/<package>/go-vendor-tools.toml
+```
+
+If your new patch targets a vendored Go module (or you're editing `pre_commands` directly instead
+of adding a patch — don't), and any `pre_commands` entry mutates `go.mod`/`go.sum` (directly, via
+`go get`, or via `go mod tidy`/`edit`), your patch must apply the *same* `go.mod`/`go.sum` change to
+the actual source tree, not just to `go-vendor-tools.toml`. `pre_commands` cannot substitute for
+this: they require live network access to run `go get`, which `%prep` doesn't have (Konflux builds
+are hermetic). Compute the resulting `go.mod`/`go.sum` diff offline (e.g. clone upstream, apply the
+same edits, run `go mod tidy` if `pre_commands` does) and commit that as the patch.
+
+Skipping this leaves `go.mod` in the build tree and `vendor/modules.txt` in the generated vendor
+archive silently requiring different versions of the same package, which `go build -mod=vendor`
+rejects as inconsistent vendoring. See [the source-pipeline design doc][sharp-edge] for the trivy
+incident this rule comes from. `test/test_govendortools_gomod_patch_sync.py` checks for this
+drift, same caveat as above.
+
+### 5. Bump the Release
 
 Follow the same `.N` suffix pattern as no-change rebuilds:
 
@@ -471,7 +526,7 @@ Follow the same `.N` suffix pattern as no-change rebuilds:
 + Release: 3.1%{?dist}
 ```
 
-### 4. Commit the patch
+### 6. Commit the patch
 
 Use this commit message format:
 
@@ -490,7 +545,7 @@ dnf5: backport reproducible build sorting fix
 Backport: https://github.com/rpm-software-management/dnf5/pull/2522
 ```
 
-### 5. Mark package as modified
+### 7. Mark package as modified
 
 Mark the package as modified to prevent automatic Fedora updates from overwriting your backport:
 
@@ -509,7 +564,7 @@ Example:
 This ensures the package won't be automatically updated from Fedora until the backported patch lands
 upstream and you explicitly mark it clean again.
 
-### 6. Test the build locally (optional)
+### 8. Test the build locally (optional)
 
 Build the package locally to verify the patch applies cleanly:
 
@@ -524,3 +579,4 @@ Built RPMs will be in `builds/<package>/RPMS/`.
 - [Excluding Packages from Images][exclude] - temporarily block faulty packages in container builds
 
 [exclude]: https://hummingbird-project.io/l/excluding-packages-from-images
+[sharp-edge]: ../design/source-pipeline-tool.md#known-sharp-edge-patch-list-duplication
