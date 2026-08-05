@@ -3,9 +3,10 @@ Subject: [PATCH] Pin yarn compressionLevel for reproducible offline cache
 
 Must apply after the CVE patches (grafana-nanoid-cve.patch,
 grafana-fast-uri-cve.patch, grafana-axios-cve.patch,
-grafana-brace-postcss-cve.patch): those patches also bump entries in
-yarn.lock, and this patch's checksum regeneration below must reflect
-their post-patch checksums, not the pristine ones.
+grafana-brace-postcss-cve.patch, grafana-ip-address-cve.patch): those
+patches also bump entries in yarn.lock, and this patch's checksum
+regeneration below must reflect their post-patch checksums, not the
+pristine ones.
 
 diff --git a/.yarnrc.yml b/.yarnrc.yml
 --- a/.yarnrc.yml
@@ -19,14 +20,15 @@ diff --git a/.yarnrc.yml b/.yarnrc.yml
 +# from .yarn/cache is byte-reproducible: "mixed" lets yarn choose a
 +# per-package compression level, which isn't guaranteed stable across
 +# separate install runs even for identical resolved content. Applied after
-+# the CVE patches (not as part of grafana-yarn-cache.patch) since changing
-+# it requires yarn to regenerate every package's checksum in yarn.lock
-+# (below) to match -- doing that before the CVE patches would break their
-+# ability to apply against the original checksums.
++# the CVE/test patches (not as part of grafana-yarn-cache.patch) since
++# changing it requires yarn to regenerate every package's checksum in
++# yarn.lock (below) to match -- doing that before those patches would break
++# their ability to apply against the original checksums.
 +compressionLevel: 0
  
  enableGlobalCache: false
  
+
 diff --git a/yarn.lock b/yarn.lock
 --- a/yarn.lock
 +++ b/yarn.lock
@@ -13710,11 +13712,11 @@ diff --git a/yarn.lock b/yarn.lock
    languageName: node
    linkType: hard
  
- "ip-address@npm:10.2.0, ip-address@npm:^10.2.0":
-   version: 10.2.0
-   resolution: "ip-address@npm:10.2.0"
--  checksum: 10/12fec399e1af5753ac322e47a6d81a50d3a528b3abb17c09525b2a2edcaedcca628c40520706f7037bc4d8e951b0296c47e7b86d0a8e6e2335c8f0ba4afcfac1
-+  checksum: 10c0/5a00aada6e922c9c69dfc800ed5d0fa3348675ebdeed0e1575f503f27ca385b5f534363c9af7ad1daf64c1f1409388cdd3cc2e9b9b0fe1c924a431378d55075a
+ "ip-address@npm:10.3.1":
+   version: 10.3.1
+   resolution: "ip-address@npm:10.3.1"
+-  checksum: 10/cc0d5b9953acb4114990a3887e0701f8fe843903811f982cf2856cd307c5fb6cdca426ad16c39a1f4950091935c8be4d42631a443f797a96626cce161fffed41
++  checksum: 10c0/45b1c31e2cc53d6354ea39f276d70c365a9b0332e7ca2140a9ad4cdb7fdb9d73b6a7ec0d8bf19993d8dce7ab636cd86c46c3e417b98db5ccb8c25546fe8c0b17
    languageName: node
    linkType: hard
  
