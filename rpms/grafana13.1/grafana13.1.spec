@@ -24,6 +24,10 @@ Patch1:         grafana-nanoid-cve.patch
 Patch2:         grafana-fast-uri-cve.patch
 Patch3:         grafana-axios-cve.patch
 Patch4:         grafana-brace-postcss-cve.patch
+# Must apply after the CVE patches above: pins compressionLevel (was
+# upstream's non-deterministic "mixed") and carries the full yarn.lock
+# checksum regeneration that requires, reflecting their yarn.lock changes.
+Patch5:         grafana-yarn-cache-compression.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.26.4

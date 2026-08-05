@@ -15,13 +15,35 @@ transform:
       - "-c"
       - |
         set -euo pipefail
+        # Apply every patch %prep will (in the same order), not just
+        # grafana-yarn-cache.patch: the nanoid/fast-uri/axios/brace-postcss
+        # CVE patches also bump yarn.lock/package.json entries. Populating
+        # the cache from the pristine (pre-CVE-patch) lockfile leaves it
+        # missing whatever versions those patches bump to, so %build's own
+        # `yarn install --immutable` (against the post-patch lockfile) fails
+        # with "Cache entry required but missing" for exactly those packages.
         patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache.patch"
+        patch -p1 < "${PACKAGE_DIR}/grafana-nanoid-cve.patch"
+        patch -p1 < "${PACKAGE_DIR}/grafana-fast-uri-cve.patch"
+        patch -p1 < "${PACKAGE_DIR}/grafana-axios-cve.patch"
+        patch -p1 < "${PACKAGE_DIR}/grafana-brace-postcss-cve.patch"
+        # Must apply after the CVE patches above: pins compressionLevel and
+        # carries the resulting full yarn.lock checksum regeneration (see
+        # grafana-yarn-cache-compression.patch's own header comment).
+        patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache-compression.patch"
         if [ -n "${HTTP_PROXY-}" ]; then export YARN_HTTP_PROXY="${HTTP_PROXY-}"; fi
         if [ -n "${HTTPS_PROXY-}" ]; then export YARN_HTTPS_PROXY="${HTTPS_PROXY-}"; fi
         # Unlike grafana12.4, 13.1's yarn.lock has no Cypress dependency to
         # suppress a binary download for.
         YARN_ENABLE_GLOBAL_CACHE=false YARN_CACHE_FOLDER=.yarn/cache \
           node .yarn/releases/yarn-*.cjs install --immutable
-        tar -cjf "grafana-yarn-cache-${VERSION}.tar.bz2" .yarn/cache
+        # Deterministic flags: yarn's own cache writes carry live wall-clock
+        # mtimes and directory listing order isn't guaranteed sorted, so a
+        # plain `tar -cjf` here reproduced a different checksum on every
+        # single run even with byte-identical cache contents.
+        source_date_epoch=$(git log -1 --format=%ct HEAD)
+        tar --sort=name --mtime="@${source_date_epoch}" \
+          --owner=0 --group=0 --numeric-owner \
+          -cjf "grafana-yarn-cache-${VERSION}.tar.bz2" .yarn/cache
     outputs:
       - "grafana-yarn-cache-${VERSION}.tar.bz2"
