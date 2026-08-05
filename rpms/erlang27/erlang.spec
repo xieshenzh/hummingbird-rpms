@@ -74,7 +74,7 @@
 
 
 Name:		erlang27
-Version:	27.3.4.15
+Version:	27.3.4.16
 Release:	0.1%{?dist}
 Summary:	General-purpose programming language and runtime environment
 
