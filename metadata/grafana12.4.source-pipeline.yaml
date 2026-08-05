@@ -28,6 +28,7 @@ transform:
         patch -p1 < "${PACKAGE_DIR}/reset-begintx-test-deadline.patch"
         patch -p1 < "${PACKAGE_DIR}/grafana-fast-uri-cve.patch"
         patch -p1 < "${PACKAGE_DIR}/grafana-npm-cve-brace-postcss.patch"
+        patch -p1 < "${PACKAGE_DIR}/grafana-ip-address-cve.patch"
         # Must apply after the CVE patches above: pins compressionLevel and
         # carries the resulting full yarn.lock checksum regeneration (see
         # grafana-yarn-cache-compression.patch's own header comment).
@@ -59,3 +60,6 @@ accepted-checksums:
   - file: "grafana-12.4.7-vendor.tar.bz2"
     checksum: "8c743976f9f26c67cbd6bc33d9fa3bb46f232cd2615bded698644c8c1fb08eb80c7d38fec110567918784921480c48e313dd07562c49335b9aa98c345b9b1b97"
     reason: "gorget 0.1.16 fixes vendor archive layout (gorget-project/gorget#32); go.mod/go.sum/go.work added alongside vendor/, no dependency content changed"
+  - file: "grafana-yarn-cache-12.4.7.tar.bz2"
+    checksum: "f09b98d94912bc67506074fdbc2f7365d6805363a020fe58d6d35157a1ede110c17217dad03abe2f8efb33bd5da95ff6999f7a1ce3f6d3ce125fa9fef096f74f"
+    reason: "grafana-ip-address-cve.patch (CVE-2026-69192) ported forward from main, bumping ip-address 10.1.0/9.0.5 -> 10.3.1; grafana-yarn-cache-compression.patch regenerated to reflect its yarn.lock changes"

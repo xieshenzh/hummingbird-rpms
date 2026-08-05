@@ -27,10 +27,11 @@ Patch1:         disable-parallel-db-regression-tests.patch
 Patch2:         reset-begintx-test-deadline.patch
 Patch3:         grafana-fast-uri-cve.patch
 Patch4:         grafana-npm-cve-brace-postcss.patch
+Patch5:         grafana-ip-address-cve.patch
 # Must apply after the CVE patches above: pins compressionLevel (was
 # upstream's non-deterministic "mixed") and carries the full yarn.lock
 # checksum regeneration that requires, reflecting their yarn.lock changes.
-Patch5:         grafana-yarn-cache-compression.patch
+Patch6:         grafana-yarn-cache-compression.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.26.5
@@ -1208,8 +1209,7 @@ Provides:       bundled(npm(internmap)) = 2.0.3
 Provides:       bundled(npm(interpret)) = 3.1.1
 Provides:       bundled(npm(intl-messageformat)) = 10.1.4
 Provides:       bundled(npm(invariant)) = 2.2.4
-Provides:       bundled(npm(ip-address)) = 10.1.0
-Provides:       bundled(npm(ip-address)) = 9.0.5
+Provides:       bundled(npm(ip-address)) = 10.3.1
 Provides:       bundled(npm(ipaddr.js)) = 1.9.1
 Provides:       bundled(npm(is-absolute)) = 1.0.0
 Provides:       bundled(npm(is-alphabetical)) = 2.0.1
