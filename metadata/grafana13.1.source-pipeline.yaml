@@ -47,3 +47,16 @@ transform:
           -cjf "grafana-yarn-cache-${VERSION}.tar.bz2" .yarn/cache
     outputs:
       - "grafana-yarn-cache-${VERSION}.tar.bz2"
+
+# gorget 0.1.16 fixed a bug where a single-module Go vendor archive packed
+# only "vendor/" at its top level, which go_vendor_license --use-archive
+# mis-extracts as an independently-wrapped sibling of the source tree
+# instead of nesting it inside -- causing every go-vendor-tools.toml license
+# pin to spuriously report as "changed" in %check even though the vendor
+# content itself was untouched (gorget-project/gorget#32). The fix adds
+# go.mod/go.sum/go.work alongside vendor/, which changes this archive's own
+# checksum without changing any dependency's resolved version or content.
+accepted-checksums:
+  - file: "grafana-13.1.2-vendor.tar.bz2"
+    checksum: "80c40e092eb0cf591cf5a7e740303f4435f71ebac89264cf0b11338aa92122aab616700763ea037af68a65dcb1d98f6341a47d76f18026d7f50684ca21b86bd6"
+    reason: "gorget 0.1.16 fixes vendor archive layout (gorget-project/gorget#32); go.mod/go.sum/go.work added alongside vendor/, no dependency content changed"
