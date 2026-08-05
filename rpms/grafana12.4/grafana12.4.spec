@@ -27,6 +27,10 @@ Patch1:         disable-parallel-db-regression-tests.patch
 Patch2:         reset-begintx-test-deadline.patch
 Patch3:         grafana-fast-uri-cve.patch
 Patch4:         grafana-npm-cve-brace-postcss.patch
+# Must apply after the CVE patches above: pins compressionLevel (was
+# upstream's non-deterministic "mixed") and carries the full yarn.lock
+# checksum regeneration that requires, reflecting their yarn.lock changes.
+Patch5:         grafana-yarn-cache-compression.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.26.5
