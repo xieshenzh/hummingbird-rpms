@@ -1,7 +1,7 @@
 %bcond check 1
 
 %global goipath github.com/grafana/loki/v3
-Version: 3.6.13
+Version: 3.6.14
 
 %gometa -L
 

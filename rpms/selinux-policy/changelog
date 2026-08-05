@@ -1,3 +1,21 @@
+* Wed Aug 05 2026 Zdenek Pytela <zpytela@redhat.com>
+- Allow ctdbd manage access to Samba PID directories
+- Allow rhsmcertd read selinux config and default file contexts
+- Allow staff_t and user_t execute udev without a domain transition
+- Allow mpd dbus chat with avahi
+- Allow init_t nnp domain transition to mpd_t
+- Update tuned-ppd policy
+- Update policy for virsh_ssh_t to help with live migration
+- Update sysadm policy for encrypted volumes usage
+- Allow bootupd read all passwd sources
+- Allow local login and sshd-session signull cockpit-session
+- Allow sysadm_t read/write kvm devices
+- Allow sysadm user run fail2ban-client
+- Add 2 interfaces helping to handle cloud-what cache files
+- Allow all domains to use inherited sshd-session pipes
+- Dontaudit tlp_t dac_override (bsc#1272935)
+- Use NetworkManager_t instead of networkmanager_t
+
 * Fri Jul 24 2026 Zdenek Pytela <zpytela@redhat.com> - 45.10-1
 - Changes adapting to bind packages with suffixes
 - Dontaudit unconfined_t map its private directories
