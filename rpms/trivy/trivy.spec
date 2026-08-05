@@ -24,6 +24,10 @@ Source4:        trivy-env.sh
 
 # Red Hat Hummingbird support
 Patch0:         0001-feat-redhat-Add-Red-Hat-Hummingbird-support.patch
+# Must stay in sync with go-vendor-tools.toml's [archive] pre_commands --
+# see this patch's own header comment for why it exists as a static patch
+# rather than replicating the pre_commands' `go get` calls in %prep.
+Patch1:         0002-sync-go-mod-with-go-vendor-tools-pre-commands.patch
 
 BuildRequires:  git-core
 BuildRequires:  go-vendor-tools
