@@ -4,6 +4,7 @@
 post_commands = [
   ["curl", "-fSL", "-o", "vendor/bitbucket.org/atlassian/go-asap/v2/LICENSE", "https://bitbucket.org/atlassian/go-asap/raw/HEAD/LICENSE.txt"],
   ["curl", "-fSL", "-o", "vendor/modernc.org/memory/LICENSE", "https://gitlab.com/cznic/memory/-/raw/master/LICENSE"],
+  ["cp", "vendor/github.com/hamba/avro/v2/LICENCE", "vendor/github.com/iskorotkov/avro/v2/LICENCE"],
 ]
 
 [licensing]
@@ -30,6 +31,21 @@ expression = "BSD-2-Clause"
 path = "vendor/github.com/gosnmp/gosnmp/LICENSE"
 sha256sum = "28b63cdfceda72f7b8c9a8db2d7ab07661eb4d6bb9fc020077925b6b4faf84fa"
 expression = "BSD-2-Clause"
+
+[[licensing.licenses]]
+# hamba/avro is replaced by iskorotkov/avro in go.mod, but go mod vendor
+# stores files under the original module path.  British spelling ("LICENCE")
+# is not detected by askalono, so an explicit override is needed.
+path = "vendor/github.com/hamba/avro/v2/LICENCE"
+sha256sum = "624cb79ad8b19d883131a90baf6ab3003e01cece97287452a438b8670963022d"
+expression = "MIT"
+
+[[licensing.licenses]]
+# Replacement module also gets a partial vendor dir; LICENCE copied from
+# hamba/avro in %prep (same file, same checksum).
+path = "vendor/github.com/iskorotkov/avro/v2/LICENCE"
+sha256sum = "624cb79ad8b19d883131a90baf6ab3003e01cece97287452a438b8670963022d"
+expression = "MIT"
 
 [[licensing.licenses]]
 path = "vendor/github.com/miekg/dns/COPYRIGHT"

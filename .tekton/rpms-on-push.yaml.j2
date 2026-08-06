@@ -12,6 +12,7 @@
     timeout_hours=rpm.timeout_hours,
     task_run_specs=rpm.task_run_specs if rpm.task_run_specs is defined else None,
     forked_from=rpm.forked_from if rpm.forked_from is defined else None,
+    lookaside_cache_url=rpm.lookaside_cache_url if rpm.lookaside_cache_url is defined else None,
 ) -}}
 {%- else %}
 # PENDING

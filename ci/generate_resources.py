@@ -174,6 +174,9 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
                 extra_params["image-expires-after"] = "5d"
             rpm_data["extra_params"] = extra_params
 
+            if "lookaside_cache_url" in pkg_config:
+                rpm_data["lookaside_cache_url"] = pkg_config["lookaside_cache_url"]
+
             # Extra path changes
             extra_paths = []
 

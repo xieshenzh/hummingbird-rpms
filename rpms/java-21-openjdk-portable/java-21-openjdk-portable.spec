@@ -406,7 +406,7 @@ exit 1
 # New Version-String scheme-style defines
 %global featurever 21
 %global interimver 0
-%global updatever 11
+%global updatever 12
 %global patchver 0
 # buildjdkver is usually same as %%{featurever},
 # but in time of bootstrap of next jdk, it is featurever-1,
@@ -460,8 +460,8 @@ exit 1
 %global origin_nice     OpenJDK
 %global top_level_dir_name   %{vcstag}
 %global top_level_dir_name_backup %{top_level_dir_name}-backup
-%global buildver        10
-%global rpmrelease      2
+%global buildver        8
+%global rpmrelease      0
 #%%global tagsuffix     %%{nil}
 # Priority must be 8 digits in total; up to openjdk 1.8, we were using 18..... so when we moved to 11, we had to add another digit
 %if %is_system_jdk

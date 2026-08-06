@@ -1,16 +1,16 @@
 {
   "branch": "f43",
   "cve_product": "Oracle Corporation / Oracle Java SE",
-  "modification_reason": "Add changelog separator to spec file",
+  "modification_reason": "Update to upstream version 21.0.12.0.8",
   "modification_status": "modified",
-  "release": "2",
+  "release": "0.1",
   "release_monitoring_project_id": 369281,
   "sha": "600f24cf2628385b0de3db8db516085dcc573fa8",
   "source": "https://src.fedoraproject.org/rpms/java-21-openjdk-portable.git",
+  "source_availability_check": "openjdk_osci",
   "track_upstream": "21",
   "upstream_repo": "https://github.com/openjdk/jdk21u",
-  "source_availability_check": "openjdk_osci",
   "upstream_version_transform": "openjdk_to_rpm",
-  "version": "21.0.11.0.10",
+  "version": "21.0.12.0.8",
   "version_transform": "openjdk_to_oracle"
 }

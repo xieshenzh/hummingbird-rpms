@@ -4,5 +4,5 @@
   "release_monitoring_project_id": 98357,
   "track_upstream": "3.7",
   "upstream_repo": "https://github.com/grafana/loki",
-  "version": "3.7.4"
+  "version": "3.7.5"
 }

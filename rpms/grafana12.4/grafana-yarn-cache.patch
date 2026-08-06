@@ -3,9 +3,9 @@ index 9baf2f1..1d5243c 100644
 --- a/.yarnrc.yml
 +++ b/.yarnrc.yml
 @@ -2,6 +2,18 @@ compressionLevel: mixed
- 
+
  enableGlobalCache: false
- 
+
 +cacheFolder: .yarn/cache
 +
 +# Retain the native packages required by both RPM build architectures.
@@ -19,5 +19,5 @@ index 9baf2f1..1d5243c 100644
 +    - glibc
 +
  enableTelemetry: false
- 
+
  nodeLinker: node-modules
