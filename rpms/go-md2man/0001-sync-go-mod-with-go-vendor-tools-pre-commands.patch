@@ -1,0 +1,26 @@
+From: Hummingbird <hummingbird@redhat.com>
+Subject: [PATCH] Sync go.mod with go-vendor-tools.toml pre_commands
+
+go-vendor-tools.toml's [archive] pre_commands bumps go.mod's `go`
+directive from 1.12 to 1.14 (Go's own vendor-consistency checking
+defaults to `-mod=vendor` starting at 1.14, so older module directives
+need this bump to avoid `go build` silently falling back to GOPATH mode
+against a stale vendor tree) -- but that command only ever runs against
+gorget's own fetch/vendor checkout, never against the actual %prep source
+tree, which is built straight from the plain source tarball (Source0).
+
+%prep can't just run the pre_command's `sed` directly: keeping it purely
+textual like a patch is simpler than replicating a go-vendor-tools.toml
+edit as a second, redundant %prep step, and this is the same treatment
+already used for trivy's equivalent gap.
+
+diff --git a/go.mod b/go.mod
+--- a/go.mod
++++ b/go.mod
+@@ -1,5 +1,5 @@
+ module github.com/cpuguy83/go-md2man/v2
+ 
+-go 1.12
++go 1.14
+ 
+ require github.com/russross/blackfriday/v2 v2.1.0
