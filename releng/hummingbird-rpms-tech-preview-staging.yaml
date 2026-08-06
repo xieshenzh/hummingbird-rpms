@@ -184,6 +184,8 @@ spec:
           contentType: rpm
         - name: createrepo-c-main
           contentType: rpm
+        - name: crun-main
+          contentType: rpm
         - name: crypto-policies-main
           contentType: rpm
         - name: cryptsetup-main

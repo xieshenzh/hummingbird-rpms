@@ -1,0 +1,10 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "release_monitoring_project_id": 96792,
+  "sha": "6f35ddf269b124ab1fe93f3a834f995e2bb5b173",
+  "source": "https://src.fedoraproject.org/rpms/crun.git",
+  "upstream_repo": "https://github.com/containers/crun",
+  "version": "1.28"
+}
