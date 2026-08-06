@@ -765,6 +765,25 @@ version bump is not appropriate:
    - Download the patch from upstream (`curl`, `git format-patch`,
      or `git diff tag1..tag2`)
    - Add `PatchN:` to the spec file
+   - **Check for a gorget source-pipeline** (see
+     `documentation/operating/rebuilding-packages.md` step 3 —
+     "Check for a gorget source-pipeline"): run
+     `grep -n -E "patch -p[0-9]|git apply" metadata/<package>.source-pipeline.yaml`
+     (not exhaustive — read the `transform:` step directly if this
+     misses something). If it exists and its `transform:` step
+     applies patches or
+     resolves a lockfile (`yarn install`, `pnpm fetch`, `npm ci`,
+     `go mod vendor`), and your new patch touches a file that step
+     depends on (`yarn.lock`, `package.json`, `pnpm-lock.yaml`,
+     `go.mod`, `go.sum`, `Cargo.lock`), add the same
+     `patch -p1 < "${PACKAGE_DIR}/<your-patch>.patch"` line there
+     too, in the same relative order as the `PatchN:` slot. This is
+     not optional — skipping it silently lets the generated cache/vendor
+     archive drift from what `%build` actually applies. See "Known
+     sharp edge: patch-list duplication" in
+     `documentation/design/source-pipeline-tool.md` for the
+     grafana12.4/grafana13.1/trivy incidents that motivated this
+     rule.
    - **Bump the spec `Release:` field correctly.** The metadata `release`
      field is the current base release (Fedora/rawhide baseline,
      or local `0.1` if already ahead of Fedora) — use that as the
@@ -817,10 +836,31 @@ version bump is not appropriate:
 
    **For Go packages that vendor deps:** When a CVE targets a
    vendored module, create the patch against `go.mod`+`go.sum`.
-   Use `PatchN:` (not `dependency_overrides` in
-   `go-vendor-tools.toml`) — patches persist across version
-   updates; overrides don't. After patching, regenerate the
-   vendor tarball with `go-vendor-tools` and upload to lookaside.
+   Use `PatchN:` — **not** `dependency_overrides` or `pre_commands`
+   (`go get ...`) in `go-vendor-tools.toml`. See
+   `documentation/operating/rebuilding-packages.md` step 4 ("For Go
+   packages: check go-vendor-tools.toml's pre_commands") for the
+   full procedure. This applies regardless of whether the package is
+   migrated to gorget:
+
+   - **`pre_commands`/`dependency_overrides` only run against the
+     vendor archive's own checkout** — the plain source tarball
+     (`Source0`) never sees them, so `go.mod` in the build tree and
+     `vendor/modules.txt` in the vendor archive can require different
+     versions of the same package, which `go build -mod=vendor`
+     rejects as inconsistent vendoring. See "Known sharp edge:
+     patch-list duplication" in
+     `documentation/design/source-pipeline-tool.md` for the trivy
+     incident this rule comes from.
+   - **They require live network access** (`go get`), so they can
+     only run during gorget's own fetch/vendor stage, never in
+     `%prep` (Konflux builds are hermetic, no network) — a `PatchN`
+     is the only form of this fix `%prep` can apply.
+
+   `test/test_govendortools_gomod_patch_sync.py` checks for this
+   drift, but treat it as a safety net, not a substitute for doing
+   this yourself. After patching, regenerate the vendor tarball with
+   `go-vendor-tools` and upload to lookaside.
 
 4. **Commit, validate, build, push, MR** (same as the
    version-bump path step 9).
