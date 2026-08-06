@@ -1,0 +1,12 @@
+fetch:
+  - type: url
+    url: "https://github.com/dracut-ng/dracut-ng/archive/refs/tags/${VERSION}.tar.gz"
+
+accepted-checksums:
+  - file: "109.tar.gz"
+    checksum: "4bd846fb67a0af698a34f02b6b5594e547257d9904b2173e23298623a47295e589fe6b2dcd83f32b8721b50b94e8f7a0cf41d19d17b847238d7bfd9195c3061d"
+    reason: "GitHub's archive/refs/tags/ tarball for this tag was
+      re-generated at some point since Fedora/Hummingbird last recorded its
+      checksum (confirmed stable across two fresh fetches taken seconds
+      apart, so this is GitHub-side archive regeneration, not a live
+      re-publication risk on every run)."

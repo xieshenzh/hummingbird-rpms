@@ -1,0 +1,12 @@
+fetch:
+  - type: url
+    url: "https://github.com/facebook/zstd/archive/v${VERSION}.tar.gz"
+    filename: "zstd-${VERSION}.tar.gz"
+
+accepted-checksums:
+  - file: "zstd-1.5.7.tar.gz"
+    checksum: "26e441267305f6e58080460f96ab98645219a90d290a533410b1b0b1d2f870721c95f8384e342ee647c5e968385a5b7e30c2d04340c37f59b3e6d86762c3260c"
+    reason: "GitHub's archive/v1.5.7.tar.gz was re-generated at some point
+      since Fedora/Hummingbird last recorded its checksum (confirmed stable
+      across two fresh fetches taken seconds apart, so this is GitHub-side
+      archive regeneration, not a live re-publication risk on every run)."

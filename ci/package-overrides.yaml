@@ -71,7 +71,13 @@ curl:
     - "linux-c2xlarge/amd64"
     - "linux-c2xlarge/arm64"
 
+cyrus-sasl:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 dex:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+dracut:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 dotnet8.0:
@@ -325,6 +331,9 @@ prometheus3.13:
 prometheus3.5:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+php-patchwork-jsqueeze:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 protobuf:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
@@ -460,4 +469,7 @@ xcaddy:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 xmlsec1:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+zstd:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"

@@ -14,12 +14,15 @@
 
 Name:       aom
 Version:    3.14.0
-Release:    0.1.1%{?dist}
+Release:    0.1.2%{?dist}
 Summary:    Royalty-free next-generation video format
 
 License:    BSD-3-Clause
 URL:        http://aomedia.org/
-Source:     https://aomedia.googlesource.com/%{name}/+archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Fetched via git (not the +archive/ gitiles endpoint, which regenerates a
+# non-deterministic tarball on every request) by
+# metadata/aom.source-pipeline.yaml.
+Source:     %{name}-%{version}.tar.gz
 # Building static library breaks .cmake files if we don't ship it, so drop it
 Patch:      aom-nostatic.patch
 
@@ -84,7 +87,7 @@ Documentation for libaom, the royalty-free next-generation
 video format.
 
 %prep
-%autosetup -p1 -c %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 # Set GIT revision in version
 sed -i 's@set(aom_version "")@set(aom_version "%{aom_version}")@' cmake/version.cmake
 # Disable PDF generation which is buggy

@@ -31,17 +31,16 @@
 
 Name:           php-%{composer_vendor}-%{composer_project}
 Version:        %{github_version}
-Release:        24%{?dist}
+Release:        24.1%{?dist}
 Summary:        Efficient JavaScript minification
 
 # Automatically converted from old format: ASL 2.0 or GPLv2 - review is highly recommended.
 License:        Apache-2.0 OR GPL-2.0-only
 URL:            https://github.com/%{github_owner}/%{github_name}
 
-# GitHub export does not include tests.
-# Run php-patchwork-jsqueeze-get-source.sh to create full source.
+# Fetched from a pinned upstream commit by
+# metadata/php-patchwork-jsqueeze.source-pipeline.yaml.
 Source0:       %{name}-%{github_version}-%{github_commit}.tar.gz
-Source1:       %{name}-get-source.sh
 
 BuildArch:      noarch
 # Autoloader
@@ -78,7 +77,10 @@ Autoloader: %{phpdir}/Patchwork/autoload-jsqueeze.php
 
 
 %prep
-%setup -qn %{github_name}-%{github_commit}
+# gorget's git fetch step names the archive's internal directory after the
+# archive's own filename (not %{github_name}-%{github_commit}) -- see
+# metadata/php-patchwork-jsqueeze.source-pipeline.yaml.
+%setup -qn %{name}-%{version}-%{github_commit}
 
 
 %build

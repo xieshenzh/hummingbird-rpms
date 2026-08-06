@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Migrated to gorget source-pipeline.yaml (HUM-4622): Source0 now fetched+stripped by gorget instead of make-no-dlcompatorsrp-tarball.sh, and renamed to drop the -nodlcompatorsrp suffix -- diverges from Fedora's own tarball-generation process even though content is equivalent.",
+  "modification_status": "modified",
   "release": "37",
   "sha": "1a34b2991a427a39428e93e4e51222243f463e03",
   "source": "https://src.fedoraproject.org/rpms/cyrus-sasl.git",

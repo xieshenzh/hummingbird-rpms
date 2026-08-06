@@ -8,19 +8,17 @@
 Summary: The Cyrus SASL library
 Name: cyrus-sasl
 Version: 2.1.28
-Release: 37%{?dist}
+Release: 37.1%{?dist}
 License: BSD-Attribution-HPND-disclaimer
 URL: https://www.cyrusimap.org/sasl/
 
-# Source0 originally comes from https://www.cyrusimap.org/releases/;
-# make-no-dlcompatorsrp-tarball.sh removes the "dlcompat" subdirectory and builds a
-# new tarball.
-Source0: cyrus-sasl-%{version}-nodlcompatorsrp.tar.gz
+# Fetched from https://github.com/cyrusimap/cyrus-sasl/releases and stripped
+# of dlcompat/ and plugins/srp* by metadata/cyrus-sasl.source-pipeline.yaml.
+Source0: cyrus-sasl-%{version}.tar.gz
 Source3: saslauth.sysusers
 Source5: saslauthd.service
 Source7: sasl-mechlist.c
 Source9: saslauthd.sysconfig
-Source10: make-no-dlcompatorsrp-tarball.sh
 # From upstream git, required for reconfigure after applying patches to configure.ac
 # https://raw.githubusercontent.com/cyrusimap/cyrus-sasl/master/autogen.sh
 Source11: autogen.sh
