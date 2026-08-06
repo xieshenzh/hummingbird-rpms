@@ -50,8 +50,6 @@ Summary: A command line tool used for creating OCI Images
 URL: https://%{name}.io
 # Tarball fetched from upstream
 Source: %{git0}/archive/v%{version}.tar.gz
-Patch0: 0001-buildah-bump-moby-buildkit-to-v0.31.2.patch
-Patch1: 0002-bump-golang.org-x-text-to-v0.39.0.patch
 BuildRequires: device-mapper-devel
 BuildRequires: git-core
 BuildRequires: golang >= 1.16.6
