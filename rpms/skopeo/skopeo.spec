@@ -53,7 +53,6 @@ Summary: Inspect container images and repositories on registries
 URL: https://github.com/containers/%{name}
 # Tarball fetched from upstream
 Source0: %{url}/archive/v%{version}.tar.gz
-Patch0: 0001-go.mod-bump-golang.org-x-text-to-v0.39.0.patch
 BuildRequires: %{_bindir}/go-md2man
 %if %{defined build_with_btrfs}
 BuildRequires: btrfs-progs-devel
@@ -100,7 +99,7 @@ Recommends: fakeroot
 This package installs system test dependencies for %{name}
 
 %prep
-%autosetup -Sgit -p1 %{name}-%{version}
+%autosetup -Sgit %{name}-%{version}
 # The %%install stage should not rebuild anything but only install what's
 # built in the %%build stage. So, remove any dependency on build targets.
 sed -i 's/^install-binary: bin\/%{name}.*/install-binary:/' Makefile
