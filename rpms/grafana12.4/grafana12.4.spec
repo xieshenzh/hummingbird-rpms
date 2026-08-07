@@ -2,7 +2,7 @@
 
 # https://github.com/grafana/grafana
 %global goipath github.com/grafana/grafana
-Version:        12.4.7
+Version:        12.4.8
 
 %gometa -L -f
 
@@ -750,9 +750,9 @@ Provides:       bundled(npm(bl)) = 5.1.0
 Provides:       bundled(npm(body-parser)) = 2.2.1
 Provides:       bundled(npm(boolbase)) = 1.0.0
 Provides:       bundled(npm(brace)) = 0.11.1
-Provides:       bundled(npm(brace-expansion)) = 1.1.14
-Provides:       bundled(npm(brace-expansion)) = 2.1.0
-Provides:       bundled(npm(brace-expansion)) = 5.0.2
+Provides:       bundled(npm(brace-expansion)) = 1.1.18
+Provides:       bundled(npm(brace-expansion)) = 2.1.4
+Provides:       bundled(npm(brace-expansion)) = 5.0.9
 Provides:       bundled(npm(braces)) = 3.0.3
 Provides:       bundled(npm(broccoli-node-api)) = 1.7.0
 Provides:       bundled(npm(broccoli-node-info)) = 2.2.0
@@ -1053,7 +1053,7 @@ Provides:       bundled(npm(fast-json-patch)) = 3.1.1
 Provides:       bundled(npm(fast-json-stable-stringify)) = 2.1.0
 Provides:       bundled(npm(fast-safe-stringify)) = 2.1.1
 Provides:       bundled(npm(fast-shallow-equal)) = 1.0.0
-Provides:       bundled(npm(fast-uri)) = 3.1.0
+Provides:       bundled(npm(fast-uri)) = 3.1.5
 Provides:       bundled(npm(fast_array_intersect)) = 1.1.0
 Provides:       bundled(npm(fastest-stable-stringify)) = 2.0.2
 Provides:       bundled(npm(fastq)) = 1.17.1
@@ -1321,7 +1321,6 @@ Provides:       bundled(npm(js-file-download)) = 0.4.12
 Provides:       bundled(npm(js-tokens)) = 4.0.0
 Provides:       bundled(npm(js-yaml)) = 3.14.2
 Provides:       bundled(npm(js-yaml)) = 4.1.1
-Provides:       bundled(npm(jsbn)) = 1.1.0
 Provides:       bundled(npm(jsdoc-type-pratt-parser)) = 4.1.0
 Provides:       bundled(npm(jsesc)) = 3.0.2
 Provides:       bundled(npm(json-buffer)) = 3.0.1
@@ -1456,7 +1455,7 @@ Provides:       bundled(npm(msw-storybook-addon)) = 2.0.5
 Provides:       bundled(npm(mute-stream)) = 1.0.0
 Provides:       bundled(npm(mute-stream)) = 2.0.0
 Provides:       bundled(npm(nano-css)) = 5.6.2
-Provides:       bundled(npm(nanoid)) = 3.3.11
+Provides:       bundled(npm(nanoid)) = 3.3.17
 Provides:       bundled(npm(nanoid)) = 5.1.6
 Provides:       bundled(npm(natural-compare)) = 1.4.0
 Provides:       bundled(npm(negotiator)) = 0.6.3
@@ -1572,7 +1571,7 @@ Provides:       bundled(npm(plop)) = 4.0.1
 Provides:       bundled(npm(pluralize)) = 8.0.0
 Provides:       bundled(npm(polished)) = 4.2.2
 Provides:       bundled(npm(possible-typed-array-names)) = 1.0.0
-Provides:       bundled(npm(postcss)) = 8.5.6
+Provides:       bundled(npm(postcss)) = 8.5.19
 Provides:       bundled(npm(postcss-modules-extract-imports)) = 3.1.0
 Provides:       bundled(npm(postcss-modules-local-by-default)) = 4.0.5
 Provides:       bundled(npm(postcss-modules-scope)) = 3.2.0
