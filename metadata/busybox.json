@@ -1,10 +1,13 @@
 {
   "branch": "rawhide",
-  "cve_product": ["vda-linux / busybox_mirror", "BusyBox / BusyBox"],
+  "cve_product": [
+    "vda-linux / busybox_mirror",
+    "BusyBox / BusyBox"
+  ],
   "modification_reason": "backport upstream security fixes; backport fixes for CVE-2026-38753 and CVE-2026-38754; backport fixes for CVE-2026-38752 and CVE-2026-38755",
   "modification_status": "modified",
-  "release": "8",
-  "sha": "00ceac4ab68eab1129181a82e484fba928dc8f8b",
+  "release": "9",
+  "sha": "cdff96cad7e09a51ce365e42f0c5713f071a957a",
   "source": "https://src.fedoraproject.org/rpms/busybox.git",
   "upstream_repo": "https://git.busybox.net/busybox",
   "version": "1.37.0"
