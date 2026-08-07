@@ -11,7 +11,7 @@
 Summary: SELinux policy core utilities
 Name:    policycoreutils
 Version: 3.11
-Release: 2.1%{?dist}
+Release: 2.2%{?dist}
 License: GPL-2.0-or-later
 # https://github.com/SELinuxProject/selinux/wiki/Releases
 Source0: https://github.com/SELinuxProject/selinux/releases/download/%{version}/selinux-%{version}.tar.gz
@@ -46,6 +46,7 @@ Patch0003: 0003-sandbox-Use-matchbox-window-manager-instead-of-openb.patch
 Patch0004: 0004-Use-SHA-2-instead-of-SHA-1.patch
 Patch0005: 0005-python-sepolicy-Fix-spec-file-dependencies.patch
 Patch0006: 0006-sepolicy-Fix-detection-of-writeable-locations.patch
+Patch0007: 0007-fixfiles-drop-tmp-cleanup-CVE-2026-19079.patch
 # Patch list end
 
 # gen_changelog
