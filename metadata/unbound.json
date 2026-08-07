@@ -3,9 +3,9 @@
   "modification_status": "clean",
   "release": "1",
   "release_monitoring_project_id": 5042,
-  "sha": "6bb8bb068e7588d04815a6a1bef4971169334f4e",
+  "sha": "de1d09b74b8baa4f871078e4ba01d37b4ddebceb",
   "source": "https://src.fedoraproject.org/rpms/unbound.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/NLnetLabs/unbound",
-  "version": "1.25.2"
+  "version": "1.26.0"
 }

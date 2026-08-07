@@ -1,0 +1,107 @@
+Fix build on Python 3.10 (rhbz#1889726).
+
+Backport two fixes:
+* https://github.com/NLnetLabs/unbound/commit/e0d426ebb10653a78bf5c4053198f6ac19bfcd3e
+* https://github.com/NLnetLabs/unbound/pull/427
+
+diff --git a/libunbound/python/libunbound.i b/libunbound/python/libunbound.i
+index a23c45b9c..ab244a6fb 100644
+--- a/libunbound/python/libunbound.i
++++ b/libunbound/python/libunbound.i
+@@ -916,7 +916,13 @@ int _ub_resolve_async(struct ub_ctx* ctx, char* name, int rrtype, int rrclass, v
+       struct cb_data* id;
+       id = (struct cb_data*) iddata;
+       arglist = Py_BuildValue("(OiO)",id->data,status, SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ub_result, 0 |  0 ));   // Build argument list
++#if PY_MAJOR_VERSION <= 2 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 9)
++      /* for python before 3.9 */
+       fresult = PyEval_CallObject(id->func,arglist);     // Call Python
++#else
++      /* for python 3.9 and newer */
++      fresult = PyObject_Call(id->func,arglist,NULL);
++#endif
+       Py_DECREF(id->func);
+       Py_DECREF(id->data);
+       free(id);
+diff --git a/pythonmod/pythonmod.c b/pythonmod/pythonmod.c
+index 9006429ef..040ff7051 100644
+--- a/pythonmod/pythonmod.c
++++ b/pythonmod/pythonmod.c
+@@ -299,7 +299,10 @@ int pythonmod_init(struct module_env* env, int id)
+       PyImport_AppendInittab(SWIG_name, (void*)SWIG_init);
+ #endif
+       Py_Initialize();
++#if PY_MAJOR_VERSION <= 2 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION <= 6)
++      /* initthreads only for python 3.6 and older */
+       PyEval_InitThreads();
++#endif
+       SWIG_init();
+       mainthr = PyEval_SaveThread();
+    }
+@@ -354,6 +357,8 @@ int pythonmod_init(struct module_env* env, int id)
+    /* TODO: deallocation of pe->... if an error occurs */
+ 
+    if (PyRun_SimpleFile(script_py, pe->fname) < 0) {
++#if PY_MAJOR_VERSION <= 2 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 9)
++      /* for python before 3.9 */
+       log_err("pythonmod: can't parse Python script %s", pe->fname);
+       /* print the error to logs too, run it again */
+       fseek(script_py, 0, SEEK_SET);
+@@ -369,9 +374,45 @@ int pythonmod_init(struct module_env* env, int id)
+       /* ignore the NULL return of _node, it is NULL due to the parse failure
+        * that we are expecting */
+       (void)PyParser_SimpleParseFile(script_py, pe->fname, Py_file_input);
++#else
++      /* for python 3.9 and newer */
++      char* fstr = NULL;
++      size_t flen = 0;
++      log_err("pythonmod: can't parse Python script %s", pe->fname);
++      /* print the error to logs too, run it again */
++      fseek(script_py, 0, SEEK_END);
++      flen = (size_t)ftell(script_py);
++      fstr = malloc(flen+1);
++      if(!fstr) {
++	      log_err("malloc failure to print parse error");
++	      PyGILState_Release(gil);
++	      fclose(script_py);
++	      return 0;
++      }
++      fseek(script_py, 0, SEEK_SET);
++      if(fread(fstr, flen, 1, script_py) < 1) {
++	      log_err("file read failed to print parse error: %s: %s",
++		pe->fname, strerror(errno));
++	      PyGILState_Release(gil);
++	      fclose(script_py);
++	      free(fstr);
++	      return 0;
++      }
++      fstr[flen] = 0;
++      /* we compile the string, but do not run it, to stop side-effects */
++      /* ignore the NULL return of _node, it is NULL due to the parse failure
++       * that we are expecting */
++      (void)Py_CompileString(fstr, pe->fname, Py_file_input);
++#endif
+       log_py_err();
+       PyGILState_Release(gil);
+       fclose(script_py);
++#if PY_MAJOR_VERSION <= 2 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 9)
++      /* no cleanup needed for python before 3.9 */
++#else
++      /* cleanup for python 3.9 and newer */
++      free(fstr);
++#endif
+       return 0;
+    }
+ #if PY_MAJOR_VERSION < 3
+diff --git a/pythonmod/pythonmod.c b/pythonmod/pythonmod.c
+index 040ff70..6e60d02 100644
+--- a/pythonmod/pythonmod.c
++++ b/pythonmod/pythonmod.c
+@@ -338,7 +338,7 @@ int pythonmod_init(struct module_env* env, int id)
+    PyFileObject = PyFile_FromString((char*)pe->fname, "r");
+    script_py = PyFile_AsFile(PyFileObject);
+ #else
+-   script_py = _Py_fopen(pe->fname, "r");
++   script_py = fopen(pe->fname, "r");
+ #endif
+    if (script_py == NULL)
+    {
