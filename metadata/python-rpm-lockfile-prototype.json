@@ -4,5 +4,5 @@
   "release_monitoring_project_id": 389884,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/konflux-ci/rpm-lockfile-prototype",
-  "version": "0.28.0"
+  "version": "0.29.0"
 }
