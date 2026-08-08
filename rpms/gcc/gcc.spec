@@ -1,10 +1,10 @@
-%global DATE 20260515
-%global gitrev d776f42bb910ebccf652b010b80c22bcca736f7f
-%global gcc_version 16.1.1
+%global DATE 20260807
+%global gitrev 25040fb60e95bc8cb8eaa4b6706bd32591d95e7a
+%global gcc_version 16.2.1
 %global gcc_major 16
 # Note, gcc_release must be integer, if you want to add suffixes to
 # %%{release}, append them after %%{gcc_release} on Release: line.
-%global gcc_release 2
+%global gcc_release 1
 %global nvptx_tools_gitrev 212da2e781ed0f9423824e85eb04819958513f7a
 %global newlib_cygwin_gitrev d35cc82b5ec15bb8a5fe0fe11e183d1887992e99
 %global _unpackaged_files_terminate_build 0
@@ -323,6 +323,7 @@ Patch9: gcc16-Wno-format-security.patch
 Patch10: gcc16-rh1574936.patch
 Patch11: gcc16-d-shared-libphobos.patch
 Patch12: gcc16-pr119006.patch
+Patch13: gcc16-pr126667.patch
 
 Patch50: isl-rh2155127.patch
 
@@ -1305,20 +1306,23 @@ CONFIGURE_OPTS="\
 %endif
 %endif
 %ifarch s390 s390x
-%if 0%{?rhel} >= 7
-%if 0%{?rhel} > 7
-%if 0%{?rhel} > 8
+%if 0%{?rhel} >= 11
+	--with-arch=z15 --with-tune=z17 \
+%else
+%if 0%{?rhel} >= 10
+	--with-arch=z14 --with-tune=z16 \
+%else
 %if 0%{?rhel} >= 9
 	--with-arch=z14 --with-tune=z15 \
 %else
-	--with-arch=z13 --with-tune=arch13 \
-%endif
-%else
+%if 0%{?rhel} == 8
 	--with-arch=z13 --with-tune=z14 \
-%endif
 %else
+%if 0%{?rhel} == 7
 	--with-arch=z196 --with-tune=zEC12 \
-%endif
+%else
+%if 0%{?fedora} >= 45
+	--with-arch=z15 --with-tune=z17 \
 %else
 %if 0%{?fedora} >= 38
 	--with-arch=z13 --with-tune=z14 \
@@ -1327,6 +1331,11 @@ CONFIGURE_OPTS="\
 	--with-arch=zEC12 --with-tune=z13 \
 %else
 	--with-arch=z9-109 --with-tune=z10 \
+%endif
+%endif
+%endif
+%endif
+%endif
 %endif
 %endif
 %endif
@@ -2641,7 +2650,7 @@ echo ====================TESTING=========================
 %endif
 echo ====================TESTING END=====================
 mkdir testlogs-%{_target_platform}-%{version}-%{release}
-for i in `find . -name \*.log | grep -F testsuite/ | grep -v 'config.log\|acats.*/tests/'`; do
+for i in `find . -name \*.log -o -name \*.sum | grep -F testsuite/ | grep -v 'config.log\|acats.*/tests/'`; do
   ln $i testlogs-%{_target_platform}-%{version}-%{release}/ || :
 done
 tar cf - testlogs-%{_target_platform}-%{version}-%{release} | xz -9e \
@@ -3980,6 +3989,93 @@ end
 %endif
 
 %changelog
+* Fri Aug  7 2026 Jakub Jelinek <jakub@redhat.com> 16.2.1-1
+- update from releases/gcc-16 branch
+  - GCC 16.2.0 release
+  - PRs ada/126379, ada/126482, ada/126553, algol68/126330, c/123569,
+	c/125072, c/125604, c/125935, c++/91155, c++/119343, c++/121552,
+	c++/125541, c++/125591, c++/125601, c++/125674, c++/125680,
+	c++/125901, c++/126007, c++/126031, c++/126036, c++/126057,
+	c++/126066, c++/126209, c++/126215, c++/126280, c++/126309,
+	c++/126310, c++/126343, c++/126406, c++/126420, c++/126423,
+	c++/126508, driver/124058, fortran/97592, fortran/125172,
+	fortran/125866, fortran/125998, fortran/126127, fortran/126170,
+	fortran/126210, fortran/126234, fortran/126303, fortran/126386,
+	ipa/124128, ipa/125121, ipa/125207, libfortran/126116, libgcc/123976,
+	libstdc++/122197, libstdc++/123165, libstdc++/124851,
+	libstdc++/124852, libstdc++/124853, libstdc++/124854,
+	libstdc++/125200, libstdc++/126111, lto/125257, middle-end/124637,
+	middle-end/125875, middle-end/126084, middle-end/126341,
+	middle-end/126405, middle-end/126410, middle-end/126447,
+	middle-end/126497, preprocessor/125048, rtl-optimization/125209,
+	rtl-optimization/126184, sanitizer/126307, target/67459, target/96446,
+	target/96530, target/96808, target/97360, target/98872, target/100777,
+	target/101849, target/102976, target/103127, target/104923,
+	target/105116, target/106016, target/106017, target/106833,
+	target/110411, target/119210, target/121957, target/122948,
+	target/123625, target/124364, target/124948, target/126049,
+	target/126054, target/126081, target/126098, target/126148,
+	target/126320, target/126429, target/126438, target/126446,
+	target/126450, target/126484, target/126581, testsuite/112728,
+	testsuite/118407, testsuite/124043, testsuite/124112,
+	testsuite/124361, testsuite/124726, testsuite/126261,
+	tree-optimization/120201, tree-optimization/124663,
+	tree-optimization/125040, tree-optimization/125290,
+	tree-optimization/125296, tree-optimization/125396,
+	tree-optimization/125597, tree-optimization/125668,
+	tree-optimization/125730, tree-optimization/125786,
+	tree-optimization/125953, tree-optimization/126008,
+	tree-optimization/126150, tree-optimization/126171,
+	tree-optimization/126194, tree-optimization/126225,
+	tree-optimization/126257, tree-optimization/126262,
+	tree-optimization/126404, tree-optimization/126457,
+	tree-optimization/126464, tree-optimization/126471,
+	tree-optimization/126476, tree-optimization/126490,
+	tree-optimization/126503, tree-optimization/126504,
+	tree-optimization/126547, tree-optimization/126549,
+	tree-optimization/126564, tree-optimization/126576,
+	tree-optimization/126601
+   - fix up s390x ICE on botan (PR target/126667)
+
+* Fri Jul  3 2026 Jakub Jelinek <jakub@redhat.com> 16.1.1-4
+- update from releases/gcc-16 branch
+  - PRs ada/18205, ada/125695, c/124303, c/124532, c/124985, c/125252,
+	c++/65271, c++/113563, c++/115314, c++/117259, c++/121094, c++/123536,
+	c++/124584, c++/124978, c++/125007, c++/125123, c++/125135,
+	c++/125284, c++/125333, c++/125334, c++/125376, c++/125378,
+	c++/125384, c++/125408, c++/125412, c++/125423, c++/125454,
+	c++/125490, c++/125498, c++/125745, c++/125759, c++/125764,
+	c++/125768, c++/125770, c++/125889, c++/125900, c++/125939,
+	fortran/60576, fortran/105582, fortran/106546, fortran/115260,
+	fortran/125021, fortran/125051, fortran/125391, fortran/125393,
+	fortran/125416, fortran/125430, fortran/125481, fortran/125527,
+	fortran/125528, fortran/125529, fortran/125530, fortran/125531,
+	fortran/125534, fortran/125535, fortran/125606, fortran/125650,
+	fortran/125669, fortran/125902, fortran/126018, ipa/125699,
+	libstdc++/71301, libstdc++/78302, libstdc++/118158, libstdc++/125228,
+	libstdc++/125312, libstdc++/125369, libstdc++/125374,
+	libstdc++/125450, libstdc++/125890, libstdc++/125956,
+	middle-end/125156, middle-end/125621, middle-end/125977, other/125348,
+	rtl-optimization/125173, rtl-optimization/125375, target/106895,
+	target/120144, target/120870, target/122665, target/122827,
+	target/124870, target/124895, target/124908, target/125148,
+	target/125215, target/125320, target/125351, target/125355,
+	target/125362, target/125373, target/125409, target/125448,
+	target/125469, target/125478, target/125611, target/125628,
+	target/125670, target/125751, target/125752, target/125795,
+	target/125818, target/125838, target/125883, target/125949,
+	target/125972, target/125992, tree-optimization/124151,
+	tree-optimization/125250, tree-optimization/125291,
+	tree-optimization/125419, tree-optimization/125431,
+	tree-optimization/125477, tree-optimization/125501,
+	tree-optimization/125502, tree-optimization/125545,
+	tree-optimization/125553, tree-optimization/125646,
+	tree-optimization/125652, tree-optimization/125686,
+	tree-optimization/125774, tree-optimization/125776
+
+* Tue May 19 2026 Yaakov Selkowitz <yselkowi@redhat.com> 16.1.1-3
+- increase s390x baselines for RHEL 11
+
 * Fri May 15 2026 Jakub Jelinek <jakub@redhat.com> 16.1.1-2
 - update from releases/gcc-16 branch
   - PRs ada/125168, ada/125240, c++/100903, c++/115181, c++/124628,
