@@ -1,0 +1,29 @@
+[archive]
+
+[licensing]
+detector = "askalono"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "Apache-2.0 AND MIT"
+
+[[licensing.licenses]]
+path = "docs/themes/hugo-geekdoc/static/js/165-4df74207.chunk.min.js.LICENSE.txt"
+sha256sum = "417e4d9cd1c713dd76240fbcae19324fafce38cf4a98a6fa78ce59c19fe6d1f9"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "docs/themes/hugo-geekdoc/static/js/main-2e274343.bundle.min.js.LICENSE.txt"
+sha256sum = "08253e0f29ea53ce3ba5fc47908e23ee5367c4cff4b6863ff0747b56e726d917"
+expression = "MIT"
+
+[[licensing.licenses]]
+path = "docs/themes/hugo-geekdoc/static/js/mermaid-16393d09.bundle.min.js.LICENSE.txt"
+sha256sum = "39fa882985daafdca6590d05399bdefd9b3cccb81239e0df36e0852d1ac6e94f"
+expression = "Apache-2.0 AND MIT"
+
+[[licensing.licenses]]
+path = "docs/themes/hugo-geekdoc/static/js/search-d0afef64.bundle.min.js.LICENSE.txt"
+sha256sum = "33a5f16e16213cdd24189045d81231384f471aa3f14a1afb280e4c4ac1bdd211"
+expression = "Apache-2.0"

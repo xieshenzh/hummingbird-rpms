@@ -1,0 +1,8 @@
+{
+  "modification_status": "native",
+  "release": "0.1",
+  "release_monitoring_project_id": 7513,
+  "track_upstream": "latest",
+  "upstream_repo": "https://github.com/distribution/distribution",
+  "version": "3.1.1"
+}

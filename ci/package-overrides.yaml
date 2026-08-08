@@ -80,6 +80,9 @@ cyrus-sasl:
 dex:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+distribution:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 dracut:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
