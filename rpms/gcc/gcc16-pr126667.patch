@@ -1,0 +1,47 @@
+2026-08-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/126667
+	* config/s390/s390.md (usubc<mode>5): If operands[4] is
+	an immediate operand other than const0_rtx, force it into reg
+	before using it in xor<mode>3 insn.
+
+	* gcc.dg/pr126667.c: New test.
+	* gcc.target/s390/pr126667.c: New test.
+
+--- gcc/config/s390/s390.md.jj	2026-08-06 10:24:00.121415450 +0200
++++ gcc/config/s390/s390.md	2026-08-06 13:36:37.344210259 +0200
+@@ -6745,7 +6745,9 @@ (define_expand "usubc<mode>5"
+   else
+     {
+       rtx tmp = gen_reg_rtx (<MODE>mode);
+-      emit_insn (gen_xor<mode>3 (tmp, operands[4], const1_rtx));
++      emit_insn (gen_xor<mode>3 (tmp, CONSTANT_P (operands[4])
++				      ? force_reg (<MODE>mode, operands[4])
++				      : operands[4], const1_rtx));
+       rtx slb_cond = s390_emit_compare (<MODE>mode, LEU, tmp, const0_rtx);
+       emit_insn (gen_sub<mode>3_slb_borrow1_cc (operands[0], operands[2], operands[3], slb_cond));
+     }
+--- gcc/testsuite/gcc.dg/pr126667.c.jj	2026-08-06 13:37:24.743970575 +0200
++++ gcc/testsuite/gcc.dg/pr126667.c	2026-08-06 13:37:18.352048196 +0200
+@@ -0,0 +1,9 @@
++/* PR target/126667 */
++/* { dg-do compile } */
++/* { dg-options "-O2" } */
++
++unsigned long
++foo (unsigned long x, unsigned long y, unsigned long *p)
++{
++  return __builtin_subcl (x, y, 1UL, p);
++}
+--- gcc/testsuite/gcc.target/s390/pr126667.c.jj	2026-08-06 13:37:50.592656684 +0200
++++ gcc/testsuite/gcc.target/s390/pr126667.c	2026-08-06 13:38:11.096407697 +0200
+@@ -0,0 +1,9 @@
++/* PR target/126667 */
++/* { dg-do compile } */
++/* { dg-options "-O2 -march=z14" } */
++
++unsigned long
++foo (unsigned long x, unsigned long y, unsigned long *p)
++{
++  return __builtin_subcl (x, y, 1UL, p);
++}
