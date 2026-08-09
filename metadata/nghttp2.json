@@ -1,7 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Backport fix for CVE-2026-58055",
-  "modification_status": "modified",
+  "modification_status": "clean",
   "release": "5",
   "sha": "b664865eb764ccc93a98c31db2c6fdc3b7a3f75b",
   "source": "https://src.fedoraproject.org/rpms/nghttp2.git",
