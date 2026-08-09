@@ -1,9 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "5",
-  "sha": "c0b740987182f92698a1bd5fd55634162c81d745",
+  "modification_reason": "Skip Sphinx 9-only autodoc._dynamic workaround in docs until F45 buildroot ships Sphinx >= 9",
+  "modification_status": "modified",
+  "release": "1",
+  "sha": "23a4472571f1f7c391721a9510f9cf7ac721b990",
   "source": "https://src.fedoraproject.org/rpms/pytest.git",
   "upstream_repo": "https://github.com/pytest-dev/pytest",
-  "version": "9.0.3"
+  "version": "9.1.1"
 }

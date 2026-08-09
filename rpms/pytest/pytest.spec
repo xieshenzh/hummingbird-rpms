@@ -1,14 +1,11 @@
 Name:           pytest
-Version:        9.0.3
-Release:        5%{?dist}
+Version:        9.1.1
+Release:        1.1%{?dist}
 Summary:        Simple powerful testing with Python
 # SPDX
 License:        MIT
 URL:            https://pytest.org
 Source:         %{pypi_source pytest %{version}}
-
-# Fix test_dont_write_bytecode for Python 3.15 (__cached__ no longer set)
-Patch:          https://github.com/pytest-dev/pytest/commit/7202c3af8.patch
 
 # Remove -s from Python shebang,
 # ensure that packages installed with pip to user locations are testable
@@ -103,6 +100,10 @@ sed -i '/sphinxcontrib-towncrier/d' doc/en/requirements.txt
 sed -i '/sphinxcontrib\.towncrier/d' doc/en/conf.py
 sed -i '/sphinx_issues/d' doc/en/conf.py
 sed -i '/sphinx-issues/d' doc/en/requirements.txt
+
+# Hummingbird F44 buildroot still has Sphinx 8.2; pytest 9.1.1 docs need Sphinx >= 9
+# for sphinx.ext.autodoc._dynamic (Python 3.14 workaround). Skip until Sphinx 9.
+sed -i 's/if sys.version_info >= (3, 14):/if False:  # no autodoc._dynamic in Sphinx < 9/' doc/en/conf.py
 
 
 %generate_buildrequires
