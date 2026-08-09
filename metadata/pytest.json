@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Skip Sphinx 9-only autodoc._dynamic workaround in docs until F45 buildroot ships Sphinx >= 9",
+  "modification_status": "modified",
   "release": "1",
   "sha": "23a4472571f1f7c391721a9510f9cf7ac721b990",
   "source": "https://src.fedoraproject.org/rpms/pytest.git",
