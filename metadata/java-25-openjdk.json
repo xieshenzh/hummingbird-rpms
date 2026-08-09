@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "cve_product": "Oracle Corporation / Oracle Java SE",
-  "modification_reason": "Weaken cups-libs to Recommends to exclude gnutls from FIPS container images",
+  "modification_reason": "Work around JDK-8385169 C2 SuperWord crash in fastdebug %check; keep cups-libs as Recommends",
   "modification_status": "modified",
-  "release": "1.1",
+  "release": "1.1.1",
   "release_monitoring_project_id": 378887,
   "sha": "4285fa62b22ea4a9cfb2e6a2e1e9be5f5524f469",
   "source": "https://src.fedoraproject.org/rpms/java-25-openjdk.git",

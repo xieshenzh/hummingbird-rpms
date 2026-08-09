@@ -56,7 +56,7 @@
 
 Name:    %{compatiblename}
 Version: %{newjavaver}.%{buildver}
-Release: %{?eaprefix}%{portablerelease}.%{rpmrelease}%{?extraver}%{?dist}
+Release: %{?eaprefix}%{portablerelease}.%{rpmrelease}%{?extraver}.1%{?dist}
 
 %global fullversion     %{compatiblename}-%{version}-%{release}
 
@@ -2272,6 +2272,24 @@ popd
 # We test debug first as it will give better diagnostics on a crash
 for suffix in %{build_loop} ; do
 
+%ifarch x86_64
+# JDK-8385169: fastdebug builds on GCC 16 (i.e. only since the F44 buildroot
+# move) can crash any javac/java invocation of the fastdebug variant with a
+# C2 SuperWord (auto-vectorization) segfault in
+# VLoopDependencyGraph::independent(). This is a confirmed upstream bug; it
+# occurs only in fastdebug builds, only with GCC 16 (release/slowdebug and
+# Fedora 43/GCC 15 builds are unaffected), and is already fixed in JDK 26
+# mainline (JDK-8324751) but not yet backported to 25u.
+#
+# Same workaround as java-25-openjdk-portable: disable SuperWord for the
+# fastdebug iteration of %check only. This package does not compile the JDK
+# itself (it repacks portable images), so no buildjdk()/make scoping is
+# needed here. This has no effect on the shipped JVM's runtime configuration.
+if [ "x$suffix" = "x%{fastdebug_suffix_unquoted}" ]; then
+    export JAVA_TOOL_OPTIONS="-XX:-UseSuperWord"
+fi
+%endif
+
 # Tests in the check stage are performed on the installed image
 # rpmbuild operates as follows: build -> install -> test
  if [ "x$suffix" = "x" ] ; then
@@ -2349,6 +2367,10 @@ $JAVA_HOME/bin/javap -l -c java.lang.Object | grep LocalVariableTable
 $JAVA_HOME/bin/javap -l -c java.nio.ByteBuffer | grep "Compiled from"
 $JAVA_HOME/bin/javap -l -c java.nio.ByteBuffer | grep LineNumberTable
 $JAVA_HOME/bin/javap -l -c java.nio.ByteBuffer | grep LocalVariableTable
+
+%ifarch x86_64
+unset JAVA_TOOL_OPTIONS
+%endif
 
 # build cycles check
 done
