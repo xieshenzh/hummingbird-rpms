@@ -256,6 +256,11 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     bad_commits = [line for line in bad_commits if not line.startswith('15a348055110d0f7f136ab8959c70244d0500a7e ')]
     bad_commits = [line for line in bad_commits if not line.startswith('93a1e70095f9a162ff8e4f08e8a6965f9c88bad5 ')]
 
+    # p11-kit CVE-2026-13757 backport and follow-up patch removal were committed
+    # without the Upstream: trailer. Superseded by Fedora 0.26.4 which includes the fix.
+    bad_commits = [line for line in bad_commits if not line.startswith('3ee7e596db5e6e0e85ba4132489838b736bb9683 ')]
+    bad_commits = [line for line in bad_commits if not line.startswith('9f21e3a1599c908cb522361938f64440b6d59631 ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)
