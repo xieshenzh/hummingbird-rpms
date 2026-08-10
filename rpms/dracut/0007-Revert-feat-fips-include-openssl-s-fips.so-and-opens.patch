@@ -1,7 +1,7 @@
-From 97ae61dc1e2b4ca313c28f39dcc98c01da03beaf Mon Sep 17 00:00:00 2001
+From c0404ab57a860f98068c1988a9cca5f2dd8186f3 Mon Sep 17 00:00:00 2001
 From: Pavel Valena <pvalena@redhat.com>
 Date: Fri, 4 Jul 2025 02:51:15 +0200
-Subject: [PATCH 7/7] Revert "feat(fips): include openssl's fips.so and
+Subject: [PATCH 07/12] Revert "feat(fips): include openssl's fips.so and
  openssl.cnf"
 
 This reverts commit 97c5d43ceb9d65bc0970f1e7ad44bc43bc93fc26.
@@ -49,5 +49,5 @@ index ee9adcf0..00000000
 -[default_sect]
 -activate = 1
 -- 
-2.52.0
+2.55.0
 

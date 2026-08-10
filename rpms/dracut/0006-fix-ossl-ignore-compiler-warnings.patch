@@ -1,7 +1,7 @@
-From c4a5caa795983e6867a253ae7965fbec7dbaa6e6 Mon Sep 17 00:00:00 2001
+From 55e55099d77b0e904c4ac03a3ac15018f944a980 Mon Sep 17 00:00:00 2001
 From: Pavel Valena <pvalena@redhat.com>
 Date: Wed, 2 Apr 2025 10:45:51 +0200
-Subject: [PATCH 6/7] fix(ossl): ignore compiler warnings
+Subject: [PATCH 06/12] fix(ossl): ignore compiler warnings
 
 ```
 src/ossl-files.c:37:8: error: type qualifiers ignored on function return type [-Werror=ignored-qualifiers]
@@ -28,5 +28,5 @@ index 86cf14b3..2e76d52a 100644
  
  TESTS_CONFIG = $(wildcard tests/config/*.cnf)
 -- 
-2.52.0
+2.55.0
 

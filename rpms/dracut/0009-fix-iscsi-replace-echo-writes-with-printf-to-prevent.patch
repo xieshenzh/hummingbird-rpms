@@ -1,7 +1,7 @@
-From 137076e2918518e02a54d88e6045930ee1024983 Mon Sep 17 00:00:00 2001
+From aadea48ad5b46e25b758cb419eb085533f9fa31f Mon Sep 17 00:00:00 2001
 From: Pavel Valena <pvalena@redhat.com>
 Date: Thu, 7 May 2026 00:45:31 +0200
-Subject: [PATCH 11/14] fix(iscsi): replace `echo` writes with `printf` to
+Subject: [PATCH 09/12] fix(iscsi): replace `echo` writes with `printf` to
  prevent variable injection
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -93,5 +93,5 @@ index 0b12d35b..95860804 100755
          mkdir -p /etc/iscsi
          ln -fs /run/initiatorname.iscsi /etc/iscsi/initiatorname.iscsi
 -- 
-2.54.0
+2.55.0
 
