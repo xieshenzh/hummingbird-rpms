@@ -4,7 +4,7 @@
 
 # NOTE: The Packit copr_build tasks help to check if every commit builds on
 # supported Fedora and CentOS Stream arches.
-# They do not block the current Cirrus-based workflow.
+# They do not block the GitHub Actions PR workflow.
 
 downstream_package_name: skopeo
 upstream_tag_template: v{version}

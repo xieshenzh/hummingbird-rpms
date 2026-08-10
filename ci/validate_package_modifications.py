@@ -261,6 +261,12 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     bad_commits = [line for line in bad_commits if not line.startswith('3ee7e596db5e6e0e85ba4132489838b736bb9683 ')]
     bad_commits = [line for line in bad_commits if not line.startswith('9f21e3a1599c908cb522361938f64440b6d59631 ')]
 
+    # skopeo x/text CVE-2026-56852 backport (add + later drop) was committed without the
+    # Upstream: trailer. Superseded by Fedora update to 1.24.0, which ships golang.org/x/text
+    # v0.40.0 (>= the 0.39.0 the patch targeted); current spec matches Fedora.
+    bad_commits = [line for line in bad_commits if not line.startswith('ee7e5850c2e61218d5eb08c1c325dd3b342b6e5b ')]
+    bad_commits = [line for line in bad_commits if not line.startswith('ad6a072a59433f0b55c4a099529da9b3522b92df ')]
+
     if bad_commits:
         # Filter out release-only commits (per project policy, Release-only changes
         # are not considered modifications)
