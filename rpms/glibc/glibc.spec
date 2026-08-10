@@ -153,7 +153,7 @@ Version: %{glibcversion}
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
 %global baserelease 8
-Release: %{baserelease}%{?dist}
+Release: %{baserelease}.1%{?dist}
 
 # Licenses:
 #
@@ -216,6 +216,9 @@ Release: %{baserelease}%{?dist}
 License: LGPL-2.1-or-later AND SunPro AND LGPL-2.1-or-later WITH GCC-exception-2.0 AND BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.1-or-later WITH GNU-compiler-exception AND GPL-2.0-only AND ISC AND LicenseRef-Fedora-Public-Domain AND HPND AND CMU-Mach AND LGPL-2.0-or-later AND Unicode-3.0 AND GFDL-1.1-or-later AND GPL-1.0-or-later AND FSFUL AND MIT AND Inner-Net-2.0 AND X11 AND GPL-2.0-or-later WITH GCC-exception-2.0 AND GFDL-1.3-only AND GFDL-1.1-only AND GPL-3.0-or-later AND GPL-3.0-or-later WITH Autoconf-exception-generic-3.0 AND GPL-3.0-or-later WITH Texinfo-exception
 
 URL: http://www.gnu.org/software/glibc/
+# For development snapshots (glibc_release_url unset), fetched+archived by
+# metadata/glibc.source-pipeline.yaml at the exact commit %{glibcsrcdir}
+# encodes.
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.xz
 Source1: bench.mk
 Source2: glibc-bench-compare
