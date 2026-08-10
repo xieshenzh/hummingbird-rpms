@@ -1,5 +1,4 @@
-From 31bd3a0996a85c0fced0c6ace3da1241b30dc397 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+From: Petr Mensik <pemensik@redhat.com>
 Date: Thu, 30 Apr 2026 17:28:40 +0200
 Subject: [PATCH] Use variable PROGRAM_SUFFIX in install target
 
@@ -7,28 +6,19 @@ Subject: [PATCH] Use variable PROGRAM_SUFFIX in install target
 need to know it by a special value. Provide that to make multiple
 versions installable together on a single system.
 ---
- Makefile.top            | 1 +
- bin/check/Makefile.am   | 6 +++---
- bin/confgen/Makefile.am | 6 +++---
- 3 files changed, 7 insertions(+), 6 deletions(-)
-
-diff --git a/Makefile.top b/Makefile.top
-index e186d15..91c076b 100644
 --- a/Makefile.top
 +++ b/Makefile.top
-@@ -14,6 +14,7 @@ AM_CPPFLAGS =					\
+@@ -14,6 +14,7 @@
  AM_LDFLAGS =					\
  	$(STD_LDFLAGS)
  LDADD =
 +PROGRAM_SUFFIX =
  
- if HOST_MACOS
- AM_LDFLAGS +=					\
-diff --git a/bin/check/Makefile.am b/bin/check/Makefile.am
-index 8f63c35..36f232c 100644
+ BUILT_SOURCES =
+ CLEANFILES =
 --- a/bin/check/Makefile.am
 +++ b/bin/check/Makefile.am
-@@ -27,8 +27,8 @@ LDADD +=			\
+@@ -25,8 +25,8 @@
  bin_PROGRAMS = named-checkconf named-checkzone
  
  install-exec-hook:
@@ -40,11 +30,9 @@ index 8f63c35..36f232c 100644
  uninstall-hook:
 -	-rm -f $(DESTDIR)$(bindir)/named-compilezone
 +	-rm -f $(DESTDIR)$(bindir)/named-compilezone$(PROGRAM_SUFFIX)
-diff --git a/bin/confgen/Makefile.am b/bin/confgen/Makefile.am
-index c1dca43..fe86dd7 100644
 --- a/bin/confgen/Makefile.am
 +++ b/bin/confgen/Makefile.am
-@@ -23,8 +23,8 @@ libconfgen_la_SOURCES =		\
+@@ -23,8 +23,8 @@
  sbin_PROGRAMS = tsig-keygen rndc-confgen
  
  install-exec-hook:
@@ -56,6 +44,3 @@ index c1dca43..fe86dd7 100644
  uninstall-hook:
 -	-rm -f $(DESTDIR)$(sbindir)/ddns-confgen
 +	-rm -f $(DESTDIR)$(sbindir)/ddns-confgen$(PROGRAM_SUFFIX)
--- 
-2.54.0
-
