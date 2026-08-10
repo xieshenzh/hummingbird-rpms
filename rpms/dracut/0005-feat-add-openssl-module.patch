@@ -1,7 +1,7 @@
-From 7417d2b044ef455d8b6c360e7c1bcd71558b5951 Mon Sep 17 00:00:00 2001
+From b02aee51f74cc949bd3ee74a610a435e7a692be7 Mon Sep 17 00:00:00 2001
 From: Pavel Valena <pvalena@redhat.com>
 Date: Mon, 20 Jan 2025 14:16:38 +0100
-Subject: [PATCH 5/7] feat: add openssl module
+Subject: [PATCH 05/12] feat: add openssl module
 
 + fix(ossl): build failure bellow resolved
 
@@ -68,10 +68,10 @@ and also fix CFLAGS in case of std=c99.
  create mode 100644 src/ossl/tests/files/providers.cnf.expected
 
 diff --git a/Makefile b/Makefile
-index 24e2fb62..12f001d3 100644
+index d7cab681..ee6ff229 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -66,7 +66,7 @@ manpages = $(man1pages) $(man5pages) $(man7pages) $(man8pages)
+@@ -63,7 +63,7 @@ manpages = $(man1pages) $(man5pages) $(man7pages) $(man8pages)
  
  .PHONY: install clean distclean archive test all check AUTHORS CONTRIBUTORS doc
  
@@ -80,7 +80,7 @@ index 24e2fb62..12f001d3 100644
  
  %.o : %.c
  	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(KMOD_CFLAGS) $(SYSTEMD_CFLAGS) $(if $(SYSTEMD_LIBS),-DHAVE_SYSTEMD) $< -o $@
-@@ -104,6 +104,15 @@ util/util: $(UTIL_OBJECTS)
+@@ -101,6 +101,15 @@ util/util: $(UTIL_OBJECTS)
  dracut-util: src/util/util
  	cp -a $< $@
  
@@ -96,7 +96,7 @@ index 24e2fb62..12f001d3 100644
  .PHONY: indent-c
  indent-c:
  	astyle -n --quiet --options=.astylerc $(wildcard *.[ch] */*.[ch] src/*/*.[ch])
-@@ -257,15 +266,21 @@ endif
+@@ -253,15 +262,21 @@ endif
  		ln -sf ../dracut-initqueue.service \
  		$(DESTDIR)$(systemdsystemunitdir)/initrd.target.wants/dracut-initqueue.service; \
  	fi
@@ -121,7 +121,7 @@ index 24e2fb62..12f001d3 100644
  ifeq ($(enable_dracut_cpio),yes)
  	install -m 0755 dracut-cpio $(DESTDIR)$(pkglibdir)/dracut-cpio
  endif
-@@ -305,7 +320,9 @@ clean:
+@@ -304,7 +319,9 @@ clean:
  	$(RM) dracut.pc
  	$(RM) dracut-cpio src/dracut-cpio/target/release/dracut-cpio*
  	$(RM) -rf build/ doc_site/modules/ROOT/pages/man/*
@@ -1042,5 +1042,5 @@ index 00000000..23b1b7de
 +/usr/lib64/ossl-modules/pkcs11.so
 +/usr/lib64/ossl-modules/oqsprovider.so.0.6.0
 -- 
-2.52.0
+2.55.0
 

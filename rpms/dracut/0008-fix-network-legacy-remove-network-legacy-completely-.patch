@@ -1,17 +1,17 @@
-From 2b6302d54965dd354768e5f8509a5e9eb5853754 Mon Sep 17 00:00:00 2001
+From a98d67bbe4b363303a8760fb5cfac45b49d8a18a Mon Sep 17 00:00:00 2001
 From: Pavel Valena <pvalena@redhat.com>
 Date: Thu, 7 May 2026 00:40:31 +0200
-Subject: [PATCH 10/14] fix(network-legacy): remove network-legacy completely
+Subject: [PATCH 08/12] fix(network-legacy): remove network-legacy completely
  from the codebase
 
 (To not rely solely on a dracut.spec file.)
 ---
- modules.d/35network-legacy/dhclient-script.sh | 275 ---------
+ modules.d/35network-legacy/dhclient-script.sh | 305 ----------
  modules.d/35network-legacy/dhclient.conf      |  11 -
  modules.d/35network-legacy/dhcp-multi.sh      | 133 -----
  modules.d/35network-legacy/ifup.sh            | 562 ------------------
  modules.d/35network-legacy/kill-dhclient.sh   |  15 -
- modules.d/35network-legacy/module-setup.sh    |  94 ---
+ modules.d/35network-legacy/module-setup.sh    |  90 ---
  modules.d/35network-legacy/net-genrules.sh    | 125 ----
  modules.d/35network-legacy/parse-bond.sh      |  76 ---
  modules.d/35network-legacy/parse-bridge.sh    |  49 --
@@ -20,7 +20,7 @@ Subject: [PATCH 10/14] fix(network-legacy): remove network-legacy completely
  modules.d/35network-legacy/parse-ip-opts.sh   | 151 -----
  modules.d/35network-legacy/parse-team.sh      |  66 --
  modules.d/35network-legacy/parse-vlan.sh      |  37 --
- 14 files changed, 1628 deletions(-)
+ 14 files changed, 1654 deletions(-)
  delete mode 100755 modules.d/35network-legacy/dhclient-script.sh
  delete mode 100644 modules.d/35network-legacy/dhclient.conf
  delete mode 100755 modules.d/35network-legacy/dhcp-multi.sh
@@ -38,10 +38,10 @@ Subject: [PATCH 10/14] fix(network-legacy): remove network-legacy completely
 
 diff --git a/modules.d/35network-legacy/dhclient-script.sh b/modules.d/35network-legacy/dhclient-script.sh
 deleted file mode 100755
-index 6751f2d6..00000000
+index 0cb00ab4..00000000
 --- a/modules.d/35network-legacy/dhclient-script.sh
 +++ /dev/null
-@@ -1,275 +0,0 @@
+@@ -1,305 +0,0 @@
 -#!/bin/sh
 -
 -PATH=/usr/sbin:/usr/bin:/sbin:/bin
@@ -153,50 +153,80 @@ index 6751f2d6..00000000
 -}
 -
 -parse_option_121() {
--    while [ $# -ne 0 ]; do
+-    # RFC 3442 classless static routes format:
+-    # Each route is: <mask_width> <dest_octets...> <gateway_4_octets>
+-    # mask_width determines how many destination octets follow (0-4)
+-    #
+-    # This version validates arguments before operations to prevent
+-    # "integer expression expected" and "shift count out of range" errors.
+-
+-    while [ $# -ge 5 ]; do
 -        mask="$1"
+-
+-        # Validate mask is a number between 0-32
+-        case "$mask" in
+-            '' | *[!0-9]*) return 0 ;;
+-        esac
+-        if [ "$mask" -lt 0 ] 2> /dev/null || [ "$mask" -gt 32 ] 2> /dev/null; then
+-            return 0
+-        fi
 -        shift
 -
--        # Is the destination a multicast group?
--        if [ "$1" -ge 224 ] && [ "$1" -lt 240 ]; then
--            multicast=1
+-        # Calculate how many destination address bytes we need based on mask
+-        if [ "$mask" -gt 24 ]; then
+-            need_dest=4
+-        elif [ "$mask" -gt 16 ]; then
+-            need_dest=3
+-        elif [ "$mask" -gt 8 ]; then
+-            need_dest=2
+-        elif [ "$mask" -gt 0 ]; then
+-            need_dest=1
 -        else
--            multicast=0
+-            need_dest=0
 -        fi
 -
--        # Parse the arguments into a CIDR net/mask string
+-        # We need: destination bytes + 4 gateway bytes
+-        need_total=$((need_dest + 4))
+-        if [ $# -lt $need_total ]; then
+-            return 0
+-        fi
+-
+-        # Check if destination is multicast (224.0.0.0 - 239.255.255.255)
+-        multicast=0
+-        if [ $need_dest -ge 1 ]; then
+-            case "$1" in
+-                '' | *[!0-9]*) return 0 ;;
+-            esac
+-            if [ "$1" -ge 224 ] 2> /dev/null && [ "$1" -lt 240 ] 2> /dev/null; then
+-                multicast=1
+-            fi
+-        fi
+-
+-        # Build destination address based on mask width
 -        if [ "$mask" -gt 24 ]; then
 -            destination="$1.$2.$3.$4/$mask"
--            shift
--            shift
--            shift
--            shift
+-            shift 4
 -        elif [ "$mask" -gt 16 ]; then
 -            destination="$1.$2.$3.0/$mask"
--            shift
--            shift
--            shift
+-            shift 3
 -        elif [ "$mask" -gt 8 ]; then
 -            destination="$1.$2.0.0/$mask"
--            shift
--            shift
+-            shift 2
 -        elif [ "$mask" -gt 0 ]; then
 -            destination="$1.0.0.0/$mask"
--            shift
+-            shift 1
 -        else
 -            destination="0.0.0.0/$mask"
 -        fi
 -
--        # Read the gateway
+-        # Read gateway (always 4 bytes)
+-        if [ $# -lt 4 ]; then
+-            return 0
+-        fi
 -        gateway="$1.$2.$3.$4"
--        shift
--        shift
--        shift
--        shift
+-        shift 4
 -
--        # Multicast routing on Linux
--        #  - If you set a next-hop address for a multicast group, this breaks with Cisco switches
--        #  - If you simply leave it link-local and attach it to an interface, it works fine.
+-        # Build and emit the route command
 -        if [ $multicast -eq 1 ] || [ "$gateway" = "0.0.0.0" ]; then
 -            temp_result="$destination dev $interface"
 -        else
@@ -1064,10 +1094,10 @@ index 9ed615fd..00000000
 -done
 diff --git a/modules.d/35network-legacy/module-setup.sh b/modules.d/35network-legacy/module-setup.sh
 deleted file mode 100755
-index d7162ad5..00000000
+index 463b2b98..00000000
 --- a/modules.d/35network-legacy/module-setup.sh
 +++ /dev/null
-@@ -1,94 +0,0 @@
+@@ -1,90 +0,0 @@
 -#!/bin/bash
 -
 -# called by dracut
@@ -1086,8 +1116,6 @@ index d7162ad5..00000000
 -
 -# called by dracut
 -install() {
--    local _arch
--
 -    # Adding default link and (if exists) 98-default-mac-none.link
 -    if dracut_module_included "systemd"; then
 -        inst_multiple -o \
@@ -1157,14 +1185,12 @@ index d7162ad5..00000000
 -        )
 -    done
 -
--    _arch=${DRACUT_ARCH:-$(uname -m)}
--
--    inst_libdir_file {"tls/$_arch/",tls/,"$_arch/",}"libnss_dns.so.*" \
--        {"tls/$_arch/",tls/,"$_arch/",}"libnss_mdns4_minimal.so.*"
+-    inst_libdir_file {"tls/$DRACUT_ARCH/",tls/,"$DRACUT_ARCH/",}"libnss_dns.so.*" \
+-        {"tls/$DRACUT_ARCH/",tls/,"$DRACUT_ARCH/",}"libnss_mdns4_minimal.so.*"
 -}
 diff --git a/modules.d/35network-legacy/net-genrules.sh b/modules.d/35network-legacy/net-genrules.sh
 deleted file mode 100755
-index 13bcced3..00000000
+index cd5a669a..00000000
 --- a/modules.d/35network-legacy/net-genrules.sh
 +++ /dev/null
 @@ -1,125 +0,0 @@
@@ -1283,7 +1309,7 @@ index 13bcced3..00000000
 -    # Fixme: waiting for the interface as well.
 -    else
 -        cond='ACTION=="add", SUBSYSTEM=="net", ENV{DEVTYPE}!="wlan|wwan"'
--        # if you change the name of "91-default-net.rules", also change modules.d/80cms/cmssetup.sh
+-        # if you change the name of "91-default-net.rules", also change modules.d/[0-9][0-9]cms/cmssetup.sh
 -        echo "$cond, $runcmd" > /etc/udev/rules.d/91-default-net.rules
 -        if [ "$NEEDNET" = "1" ]; then
 -            # shellcheck disable=SC2016
@@ -1291,7 +1317,7 @@ index 13bcced3..00000000
 -        fi
 -    fi
 -
--    # if you change the name of "90-net.rules", also change modules.d/80cms/cmssetup.sh
+-    # if you change the name of "90-net.rules", also change modules.d/[0-9][0-9]cms/cmssetup.sh
 -} > /etc/udev/rules.d/90-net.rules
 diff --git a/modules.d/35network-legacy/parse-bond.sh b/modules.d/35network-legacy/parse-bond.sh
 deleted file mode 100755
@@ -1749,5 +1775,5 @@ index c23f8331..00000000
 -    } > /tmp/vlan."${vlanname}"."${phydevice}"
 -done
 -- 
-2.54.0
+2.55.0
 

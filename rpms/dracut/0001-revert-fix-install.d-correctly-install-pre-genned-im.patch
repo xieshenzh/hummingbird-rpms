@@ -1,7 +1,7 @@
-From a56d706d54007ce651415eedc8950fdcff6f08bd Mon Sep 17 00:00:00 2001
+From a50df58ee9c1d9fd2819d6df730199c5214d5076 Mon Sep 17 00:00:00 2001
 From: Pavel Valena <pvalena@redhat.com>
 Date: Wed, 12 Jun 2024 06:30:42 +0200
-Subject: [PATCH 1/7] revert: "fix(install.d): correctly install pre-genned
+Subject: [PATCH 01/12] revert: "fix(install.d): correctly install pre-genned
  image and die if no args"
 
 revert: "fix(install.d): simplify and use what kernel-install gives us"
@@ -234,5 +234,5 @@ index f49d7a77..67c1cfc1 100755
      suffix=$1
      shift
 -- 
-2.52.0
+2.55.0
 

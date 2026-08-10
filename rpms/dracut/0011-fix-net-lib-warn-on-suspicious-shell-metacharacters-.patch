@@ -1,7 +1,7 @@
-From 111138c4241343b873e42dc108718e1ef62d398b Mon Sep 17 00:00:00 2001
+From 44d9b8904a973731c529ec2c01773b3aa708acd0 Mon Sep 17 00:00:00 2001
 From: Pavel Valena <pvalena@redhat.com>
 Date: Thu, 14 May 2026 14:25:07 +0200
-Subject: [PATCH 13/14] fix(net-lib): warn on suspicious shell metacharacters
+Subject: [PATCH 11/12] fix(net-lib): warn on suspicious shell metacharacters
  in hostname file
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -42,5 +42,5 @@ index a0b87408..a9c5cd3e 100755
      [ -e /tmp/net."$netif".override ] && . /tmp/net."$netif".override
      # shellcheck disable=SC1090
 -- 
-2.54.0
+2.55.0
 

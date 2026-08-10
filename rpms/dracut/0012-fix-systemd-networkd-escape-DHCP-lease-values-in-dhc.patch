@@ -1,7 +1,7 @@
-From 24d7e205f754236acae25498782b8af943c9b270 Mon Sep 17 00:00:00 2001
+From f1120c9dca684544d3e4b9634b730ae5429da5c1 Mon Sep 17 00:00:00 2001
 From: Pavel Valena <pvalena@redhat.com>
 Date: Thu, 14 May 2026 16:08:00 +0200
-Subject: [PATCH 14/14] fix(systemd-networkd): escape DHCP lease values in
+Subject: [PATCH 12/12] fix(systemd-networkd): escape DHCP lease values in
  dhcpopts generation
 
 networkd-run.sh converts DHCP lease values (ROOT_PATH, NEXT_SERVER)
@@ -42,5 +42,5 @@ index b14a43f4..d4a94e19 100755
  
          source_hook initqueue/online "$ifname"
 -- 
-2.54.0
+2.55.0
 
