@@ -3,7 +3,7 @@
 %{load:%{_sourcedir}/nodejs.srpm.macros}
 
 # === Versions of any software shipped in the main nodejs tarball
-%nodejs_define_version node 1:25.9.0-1.5%{?dist} -p
+%nodejs_define_version node 1:25.9.0-1.6%{?dist} -p
 
 # Special release for sub-packages with their own version string.
 # The complex release string ensures that the subpackage release is always increasing,
@@ -131,8 +131,8 @@ Recommends: %{name}-npm-bin          >= %{npm_evr}
 Provides:   nodejs(abi) = %{node_soversion}, nodejs(abi%{node_version_major}) = %{node_soversion}
 Provides:   nodejs(engine) = %{node_version}
 
-# Main source tarball; see packaging/make-nodejs-tarball.sh on how it is created
-Source:         node-v%{node_version}-stripped.tar.gz
+# Main source tarball; see metadata/nodejs25.source-pipeline.yaml on how it is created
+Source:         node-v%{node_version}.tar.gz
 # Sources 001-099: reserved for additional sources to be installed
 # - Full ICU database data
 Source001:      https://github.com/unicode-org/icu/releases/download/release-%{icu_version_major}.%{icu_version_minor}/icu4c-%{icu_version_major}.%{icu_version_minor}-data-bin-b.zip

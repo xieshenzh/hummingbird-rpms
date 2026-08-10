@@ -1,0 +1,89 @@
+fetch:
+  - type: spec-update
+    set-version: false
+    reset-release: null
+    substitutions:
+      - pattern: "^(%nodejs_define_version\\s+node\\b.*?):[0-9]+\\.[0-9]+\\.[0-9]+-"
+        replacement: "\\1:${VERSION}-"
+  - type: url
+    url: "https://nodejs.org/dist/v${VERSION}/node-v${VERSION}.tar.gz"
+
+transform:
+  # verify: always runs after all of transform:, so it can't check the
+  # tarball's pristine bytes once strip-tarball below has already mutated
+  # it -- verify manually here, first, before anything touches it.
+  # SHASUMS256.txt is fetched directly in-script (not as a fetch: url step)
+  # since it's a transient verification input, not something to track in
+  # sources/upload to the lookaside cache -- matches the legacy script.
+  - type: run
+    target: "node-v${VERSION}.tar.gz"
+    artifacts: ["node-v${VERSION}.tar.gz"]
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        curl -fsSL -o SHASUMS256.txt "https://nodejs.org/dist/v${VERSION}/SHASUMS256.txt"
+        grep " node-v${VERSION}.tar.gz\$" SHASUMS256.txt | sha256sum --check --strict -
+
+  - type: strip-tarball
+    target: "node-v${VERSION}.tar.gz"
+    paths: ["*/deps/openssl"]
+
+  # Discover the bundled ICU version from the tarball, fetch its two data zips.
+  - type: run
+    target: "node-v${VERSION}.tar.gz"
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        icu_url="$(jq -r '.[0].url' node-v${VERSION}/tools/icu/current_ver.dep)"
+        icu_ver="$(printf '%s' "$icu_url" | sed -E 's#.*/release-([0-9]+\.[0-9]+)/.*#\1#')"
+        curl -fsSL -o "icu4c-${icu_ver}-data-bin-b.zip" \
+          "https://github.com/unicode-org/icu/releases/download/release-${icu_ver}/icu4c-${icu_ver}-data-bin-b.zip"
+        curl -fsSL -o "icu4c-${icu_ver}-data-bin-l.zip" \
+          "https://github.com/unicode-org/icu/releases/download/release-${icu_ver}/icu4c-${icu_ver}-data-bin-l.zip"
+        {
+          printf 'icu4c-%s-data-bin-b.zip\ticu4c-%s-data-bin-b.zip\n' "$icu_ver" "$icu_ver"
+          printf 'icu4c-%s-data-bin-l.zip\ticu4c-%s-data-bin-l.zip\n' "$icu_ver" "$icu_ver"
+        } > gorget-discovered.tsv
+    discovered-outputs: "gorget-discovered.tsv"
+
+  # Regenerate packaging-scripts.tar.gz from files already in --package-dir.
+  # Deterministic flags so this reproduces identical bytes release-over-release
+  # (rather than flagging a re-publication checksum change on every run just
+  # because tar/gzip embed a fresh mtime by default).
+  - type: run
+    target: "node-v${VERSION}.tar.gz"
+    command:
+      - "tar"
+      - "--sort=name"
+      - "--mtime=@0"
+      - "--owner=0"
+      - "--group=0"
+      - "--numeric-owner"
+      - "-czf"
+      - "packaging-scripts.tar.gz"
+      - "-C"
+      - "${PACKAGE_DIR}"
+      - "Makefile"
+      - "packaging/make-nodejs-tarball.sh"
+      - "packaging/fill-versions.sh"
+    outputs: ["packaging-scripts.tar.gz"]
+
+post:
+  - type: run
+    artifacts: ["node-v${VERSION}.tar.gz"]
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        ./packaging/fill-versions.sh "${SPEC_FILE}" "node-v${VERSION}.tar.gz"
+        rm -rf "node-v${VERSION}"
+
+accepted-checksums:
+  - file: "packaging-scripts.tar.gz"
+    checksum: "20afcd77496c12be26ea1ff28d60338549726f2d2ed53d236ffb501e42b0a01a7dc854daf200e157471b812e416cdc7a007e1ec4deba0b73b8639aa6e382add3"
+    reason: "One-time transition: now regenerated deterministically by gorget's own pipeline from packaging/*.sh + Makefile (already in git), instead of a manually maintained lookaside blob. Content is identical; only tar/gzip metadata differs."
