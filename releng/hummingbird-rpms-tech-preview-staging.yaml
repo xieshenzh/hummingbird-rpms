@@ -272,6 +272,8 @@ spec:
           contentType: rpm
         - name: fsverity-utils-main
           contentType: rpm
+        - name: fuse-overlayfs-main
+          contentType: rpm
         - name: fuse3-main
           contentType: rpm
         - name: gap-srpm-macros-main
