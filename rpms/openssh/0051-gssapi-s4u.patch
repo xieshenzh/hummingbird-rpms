@@ -1,4 +1,4 @@
-From a952c4cfa579551fadae91dd224f43f768943167 Mon Sep 17 00:00:00 2001
+From 1002a35e98ba6d0ac275ccbce1a7352e01cdc0ed Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Sun, 12 Apr 2026 12:25:21 +0200
 Subject: [PATCH 51/54] gssapi-s4u
@@ -17,10 +17,10 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
  9 files changed, 851 insertions(+), 20 deletions(-)
 
 diff --git a/auth-krb5.c b/auth-krb5.c
-index 287bdd35a..7d4fbcc3d 100644
+index 2e3c1c80f..9cd3618b2 100644
 --- a/auth-krb5.c
 +++ b/auth-krb5.c
-@@ -463,6 +463,19 @@ ssh_krb5_cc_new_unique(krb5_context ctx, krb5_ccache *ccache, int *need_environm
+@@ -465,6 +465,19 @@ ssh_krb5_cc_new_unique(krb5_context ctx, krb5_ccache *ccache, int *need_environm
  	 * a primary cache for this collection, if it supports that (non-FILE)
  	 */
  	if (krb5_cc_support_switch(ctx, type)) {

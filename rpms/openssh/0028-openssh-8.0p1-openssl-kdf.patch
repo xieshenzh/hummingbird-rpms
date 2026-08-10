@@ -1,4 +1,4 @@
-From 2927324b981fd932b46fcb53e0399f701c528dc9 Mon Sep 17 00:00:00 2001
+From a7cce97da90aae29ee50dc223ac51e560640cde6 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 28/54] openssh-8.0p1-openssl-kdf

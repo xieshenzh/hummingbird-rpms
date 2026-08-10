@@ -1,4 +1,4 @@
-From 1dea30d6fd38833e2a6b99d04ee551949082156b Mon Sep 17 00:00:00 2001
+From 2f007272e169c885bf152a8fe7ddcac127b8bc07 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 14/54] openssh-6.6p1-force_krb

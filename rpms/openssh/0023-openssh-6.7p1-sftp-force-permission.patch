@@ -1,4 +1,4 @@
-From e0455cb1f98914322afe00c601e7b8677253399c Mon Sep 17 00:00:00 2001
+From 44beb498b44626a5b3896d832cd3a6ab63839253 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 23/54] openssh-6.7p1-sftp-force-permission

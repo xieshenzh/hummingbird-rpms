@@ -1,4 +1,4 @@
-From 93b945d4af00e32012d3b401767e08bf2e5019a0 Mon Sep 17 00:00:00 2001
+From 1cf118c9a9f46b4ed0d0e5e6a7f70c4a450ed470 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 17/54] openssh-6.6p1-kuserok
@@ -13,7 +13,7 @@ Subject: [PATCH 17/54] openssh-6.6p1-kuserok
  6 files changed, 133 insertions(+), 6 deletions(-)
 
 diff --git a/auth-krb5.c b/auth-krb5.c
-index 148242cbf..287bdd35a 100644
+index 996b19738..2e3c1c80f 100644
 --- a/auth-krb5.c
 +++ b/auth-krb5.c
 @@ -55,6 +55,21 @@

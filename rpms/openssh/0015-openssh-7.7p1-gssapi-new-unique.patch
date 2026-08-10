@@ -1,10 +1,10 @@
-From e0b2b31b38e6e3d1ad810782d3777def81a87a86 Mon Sep 17 00:00:00 2001
+From bbff1e17bdb5d921ab8b8cc30891c5f29d04731e Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 15/54] openssh-7.7p1-gssapi-new-unique
 
 ---
- auth-krb5.c     | 262 ++++++++++++++++++++++++++++++++++++++++++------
+ auth-krb5.c     | 264 ++++++++++++++++++++++++++++++++++++++++++------
  auth.h          |   3 +-
  gss-serv-krb5.c |  42 +++-----
  gss-serv.c      |  12 +--
@@ -14,10 +14,10 @@ Subject: [PATCH 15/54] openssh-7.7p1-gssapi-new-unique
  ssh-gss.h       |   4 +-
  sshd-session.c  |   2 +-
  sshd_config.5   |   8 ++
- 10 files changed, 274 insertions(+), 71 deletions(-)
+ 10 files changed, 276 insertions(+), 71 deletions(-)
 
 diff --git a/auth-krb5.c b/auth-krb5.c
-index 3c6dc0622..0de1aaf8d 100644
+index 3c6dc0622..863110910 100644
 --- a/auth-krb5.c
 +++ b/auth-krb5.c
 @@ -51,6 +51,7 @@
@@ -125,7 +125,7 @@ index 3c6dc0622..0de1aaf8d 100644
  	if (authctxt->krb5_user) {
  		krb5_free_principal(authctxt->krb5_ctx, authctxt->krb5_user);
  		authctxt->krb5_user = NULL;
-@@ -238,36 +281,189 @@ krb5_cleanup_proc(Authctxt *authctxt)
+@@ -238,36 +281,191 @@ krb5_cleanup_proc(Authctxt *authctxt)
  	}
  }
  
@@ -279,6 +279,7 @@ index 3c6dc0622..0de1aaf8d 100644
 +		umask(old_umask);
 +		if (tmpfd == -1) {
 +			logit("mkstemp(): %.100s", strerror(oerrno));
++			free(ccname);
 +			return oerrno;
 +		}
 +
@@ -286,6 +287,7 @@ index 3c6dc0622..0de1aaf8d 100644
 +			oerrno = errno;
 +			logit("fchmod(): %.100s", strerror(oerrno));
 +			close(tmpfd);
++			free(ccname);
 +			return oerrno;
 +		}
 +		/* make sure the KRB5CCNAME is set for non-standard location */

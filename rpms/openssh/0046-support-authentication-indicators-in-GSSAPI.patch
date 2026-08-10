@@ -1,4 +1,4 @@
-From 202fc88521798b649497519cd037ee403d047fc9 Mon Sep 17 00:00:00 2001
+From 37022658e4c96b4ffc883f677cc1587f9bab4d00 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Sun, 12 Apr 2026 12:23:51 +0200
 Subject: [PATCH 46/54] support authentication indicators in GSSAPI

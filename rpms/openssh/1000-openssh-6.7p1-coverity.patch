@@ -1,12 +1,9 @@
-From 20271efdf2801f1ddcc308a81db131548872b056 Mon Sep 17 00:00:00 2001
+From 8a56ff00539091507c57a3218641c6d96fcb89d6 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
-Date: Fri, 12 Dec 2025 14:25:41 +0100
+Date: Fri, 7 Aug 2026 17:25:07 +0200
 Subject: [PATCH 54/54] openssh-6.7p1-coverity
 
-https://bugzilla.mindrot.org/show_bug.cgi?id=2581
 ---
- auth-krb5.c                   | 2 ++
- gss-genr.c                    | 3 ++-
  krl.c                         | 3 +++
  loginrec.c                    | 2 ++
  misc.c                        | 3 +++
@@ -16,43 +13,8 @@ https://bugzilla.mindrot.org/show_bug.cgi?id=2581
  readconf.c                    | 1 +
  servconf.c                    | 5 +++--
  serverloop.c                  | 2 +-
- 11 files changed, 24 insertions(+), 11 deletions(-)
+ 9 files changed, 20 insertions(+), 10 deletions(-)
 
-diff --git a/auth-krb5.c b/auth-krb5.c
-index 7d4fbcc3d..9cd3618b2 100644
---- a/auth-krb5.c
-+++ b/auth-krb5.c
-@@ -427,6 +427,7 @@ ssh_krb5_cc_new_unique(krb5_context ctx, krb5_ccache *ccache, int *need_environm
- 		umask(old_umask);
- 		if (tmpfd == -1) {
- 			logit("mkstemp(): %.100s", strerror(oerrno));
-+			free(ccname);
- 			return oerrno;
- 		}
- 
-@@ -434,6 +435,7 @@ ssh_krb5_cc_new_unique(krb5_context ctx, krb5_ccache *ccache, int *need_environm
- 			oerrno = errno;
- 			logit("fchmod(): %.100s", strerror(oerrno));
- 			close(tmpfd);
-+			free(ccname);
- 			return oerrno;
- 		}
- 		/* make sure the KRB5CCNAME is set for non-standard location */
-diff --git a/gss-genr.c b/gss-genr.c
-index a07dbf512..ec2c9c6dd 100644
---- a/gss-genr.c
-+++ b/gss-genr.c
-@@ -178,8 +178,9 @@ ssh_gssapi_kex_mechs(gss_OID_set gss_supported, ssh_gssapi_check_fn *check,
- 			enclen = __b64_ntop(digest,
- 			    ssh_digest_bytes(SSH_DIGEST_MD5), encoded,
- 			    ssh_digest_bytes(SSH_DIGEST_MD5) * 2);
--
-+#pragma GCC diagnostic ignored "-Wstringop-overflow"
- 			cp = strncpy(s, kex, strlen(kex));
-+#pragma GCC diagnostic pop
- 			for ((p = strsep(&cp, ",")); p && *p != '\0';
- 				(p = strsep(&cp, ","))) {
- 				if (sshbuf_len(buf) != 0 &&
 diff --git a/krl.c b/krl.c
 index 0e2b5f155..f2d105f23 100644
 --- a/krl.c

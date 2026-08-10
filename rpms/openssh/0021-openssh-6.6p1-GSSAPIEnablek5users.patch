@@ -1,4 +1,4 @@
-From 5784381d6d842e88a5a0ea896a9c723227757ee3 Mon Sep 17 00:00:00 2001
+From abea763fed511c64efaea276a6037fb7930dba8e Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 21/54] openssh-6.6p1-GSSAPIEnablek5users

@@ -1,4 +1,4 @@
-From 8ec6e23e9f608226d2a28c927deb8707c2c05d19 Mon Sep 17 00:00:00 2001
+From 67b12f7fcdb4183c48195e90920cb80d2d538b34 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 29/54] openssh-8.2p1-visibility

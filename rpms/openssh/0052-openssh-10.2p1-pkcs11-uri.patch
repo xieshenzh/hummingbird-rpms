@@ -1,4 +1,4 @@
-From bb9fdcfebdd652ea819b5fbf3316794e9a7ee9e2 Mon Sep 17 00:00:00 2001
+From 4580b0efc21a6965f304ae5e0ada4e8ce41eb7ae Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Mon, 15 Dec 2025 14:24:07 +0100
 Subject: [PATCH 52/54] openssh-10.2p1-pkcs11-uri

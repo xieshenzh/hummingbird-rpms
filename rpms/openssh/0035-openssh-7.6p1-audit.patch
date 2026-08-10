@@ -1,4 +1,4 @@
-From 134511907ac99564a417a5b45e3ea13d4afbf8ae Mon Sep 17 00:00:00 2001
+From d75558f24f6f6eae7b404d66e7ccee758880f5d8 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 35/54] openssh-7.6p1-audit

@@ -1,4 +1,4 @@
-From 4223bd1e9bd103159b3e934d6060958c1d28548b Mon Sep 17 00:00:00 2001
+From 8f8e0b77fceaf7ffd015a69b4071d2c43e1c533a Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Fri, 16 May 2025 14:53:54 +0200
 Subject: [PATCH 44/54] openssh-9.9p2-error_processing

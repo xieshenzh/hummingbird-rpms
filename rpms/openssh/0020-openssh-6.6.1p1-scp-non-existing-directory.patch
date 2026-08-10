@@ -1,4 +1,4 @@
-From 2e7a638b1bbe7959f6e5b255c270fa50d2262ada Mon Sep 17 00:00:00 2001
+From 3e67dc83e590c370c9bdbf32a5e9d8fcc769b25c Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 20/54] openssh-6.6.1p1-scp-non-existing-directory

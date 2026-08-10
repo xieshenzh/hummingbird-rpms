@@ -1,4 +1,4 @@
-From 204bca10918d44cc8bb1fdd99b2bf651b7e77d4c Mon Sep 17 00:00:00 2001
+From ca19ae776b8ce786809f5778a7f08342ff87746d Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 53/54] gssapi-tests

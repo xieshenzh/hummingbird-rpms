@@ -1,4 +1,4 @@
-From d4f7c3339ad03a74e739c9d5e6129a6161c5a071 Mon Sep 17 00:00:00 2001
+From 041006bcb50a819b4af2f49712a195cd89512dae Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 24/54] openssh-7.2p2-s390-closefrom

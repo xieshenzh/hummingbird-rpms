@@ -1,4 +1,4 @@
-From e002da5afc245e3ed67f8319bd1c6ded83e959a4 Mon Sep 17 00:00:00 2001
+From 3cdcd8d81220883814af4436b7443d0e755f7bae Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Sun, 12 Apr 2026 12:25:04 +0200
 Subject: [PATCH 50/54] openssh-10.2p1-pam-auth

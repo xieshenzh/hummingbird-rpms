@@ -1,4 +1,4 @@
-From 8b2e741ada618336f01c58f61524f8d4b28cac3a Mon Sep 17 00:00:00 2001
+From 93504cc2625494b096134f478b851f140dbd8926 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Mon, 20 Oct 2025 16:07:31 +0200
 Subject: [PATCH 47/54] NIST curves hybrid KEX implementation

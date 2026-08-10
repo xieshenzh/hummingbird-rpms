@@ -1,4 +1,4 @@
-From 7a4fb1259e51621440fe0d0a27739ecf826b37bf Mon Sep 17 00:00:00 2001
+From 7a1bb302fbabeee5f740acc33b0be3df9aa9ef4a Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 27/54] openssh-8.0p1-crypto-policies
