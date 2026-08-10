@@ -181,6 +181,8 @@ BuildRequires:  pkgconfig(jemalloc)
 BuildRequires:  gnupg2
 %endif
 BuildRequires:  pkgconfig(libuv)
+# Required by BIND 9.20+
+BuildRequires:  pkgconfig(liburcu) pkgconfig(liburcu-cds)
 %if %{with UNITTEST}
 # make unit dependencies
 BuildRequires:  pkgconfig(cmocka)
@@ -292,6 +294,7 @@ Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Requires: pkgconfig(libcrypto) pkgconfig(libssl)
 Requires: pkgconfig(libxml-2.0)
 Requires: pkgconfig(libcap)
+Requires: pkgconfig(liburcu) pkgconfig(liburcu-cds)
 Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 %upname_compat %{upname}-devel
