@@ -1,0 +1,8 @@
+# ftp.gnu.org has a well-documented history of unreliability (outages,
+# multi-minute hangs, reported for years across unrelated projects). Fetches
+# from ftpmirror.gnu.org instead, which redirects to a current, nearby
+# mirror -- purely a CI-reliability choice, unrelated to Source (left
+# unchanged, matching Fedora's own spec).
+fetch:
+  - type: url
+    url: "https://ftpmirror.gnu.org/readline/readline-${VERSION}.tar.gz"
