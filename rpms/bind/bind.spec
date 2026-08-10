@@ -493,12 +493,16 @@ export TSAN_OPTIONS="log_exe_name=true log_path=ThreadSanitizer exitcode=0"
   THREADS="$CPUS"
 %if %{without UNITTEST_ALL}
   export CI=true
+  # proxyudp_test opens many sockets and routinely hits EMFILE under mock/CI.
+  # Full coverage remains available via --with UNITTEST_ALL.
+  sed -i 's/proxyudp_test//g' tests/isc/Makefile
 %endif
+  ORIGFILES=$(ulimit -n)
   if [ "$CPUS" -gt 16 ]; then
-    ORIGFILES=$(ulimit -n)
     THREADS=16
-    ulimit -n 8092 || : # Requires on some machines with many cores
   fi
+  # Netmgr unit tests need a high fd limit even with reduced parallelism.
+  ulimit -n 65536 || :
   e=0
   make unit -j${THREADS} || e=$?
   # Display details of failure
@@ -507,7 +511,7 @@ export TSAN_OPTIONS="log_exe_name=true log_path=ThreadSanitizer exitcode=0"
     echo "ERROR: this build of BIND failed 'make unit'. Aborting."
     exit $e;
   fi;
-  [ "$CPUS" -gt 16 ] && ulimit -n $ORIGFILES || :
+  ulimit -n $ORIGFILES || :
 ## End of UNITTEST
 %endif
 
