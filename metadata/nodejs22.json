@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 22.23.2",
+  "modification_reason": "Update to upstream version 22.23.2; CVE-2026-69152",
   "modification_status": "modified",
   "release": "2.3",
   "release_monitoring_project_id": 8251,
