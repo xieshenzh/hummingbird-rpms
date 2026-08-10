@@ -9,6 +9,11 @@
 
 %global gomodulesmode GO111MODULE=on
 
+# Hummingbird: the tests subpackage Requires skopeo and buildah, which creates a
+# circular rpm-install test dependency during the libsubid.so.6 (shadow-utils-subid
+# 4.20) soname transition. Do not build it.
+%bcond_with tests
+
 %if %{defined fedora}
 %define build_with_btrfs 1
 # qemu-system* isn't packageed for CentOS Stream / RHEL
@@ -62,7 +67,7 @@ Epoch: 5
 Version: 6.0.2
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 2.1%{?dist}
+Release: 2.2%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -138,6 +143,7 @@ This package installs a script named docker that emulates the Docker CLI by
 executes %{name} commands, it also creates links between all Docker CLI man
 pages and %{name}.
 
+%if %{with tests}
 %package tests
 Summary: Tests for %{name}
 
@@ -161,6 +167,7 @@ Requires: xfsprogs
 
 This package contains system tests for %{name}. Only intended to be used for
 gating tests. Not supported for end users / customers.
+%endif
 
 %package remote
 Summary: (Experimental) Remote client for managing %{name} containers
@@ -278,8 +285,10 @@ export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh)"
 %gobuild -o bin/quadlet ./cmd/quadlet
 
 # build %%{name}-testing
+%if %{with tests}
 export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh)"
 %gobuild -o bin/podman-testing ./cmd/podman-testing
+%endif
 
 # reset LDFLAGS for plugins binaries
 LDFLAGS=''
@@ -295,8 +304,12 @@ PODMAN_VERSION=%{version} %{__make} DESTDIR=%{buildroot} PREFIX=%{_prefix} ETCDI
        install.completions \
        install.docker \
        install.docker-docs \
-       install.remote \
+       install.remote
+
+%if %{with tests}
+PODMAN_VERSION=%{version} %{__make} DESTDIR=%{buildroot} PREFIX=%{_prefix} ETCDIR=%{_sysconfdir} \
        install.testing
+%endif
 
 sed -i 's;%{buildroot};;g' %{buildroot}%{_bindir}/docker
 
@@ -307,8 +320,10 @@ done
 
 rm -f %{buildroot}%{_mandir}/man5/docker*.5
 
+%if %{with tests}
 install -d -p %{buildroot}%{_datadir}/%{name}/test/system
 cp -pav test/system %{buildroot}%{_datadir}/%{name}/test/
+%endif
 
 %ifarch %{machine_arches}
 # symlink virtiofsd in %%{name} libexecdir for machine subpackage
@@ -360,9 +375,11 @@ ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
 %dir %{_datadir}/zsh/site-functions
 %{_datadir}/zsh/site-functions/_%{name}-remote
 
+%if %{with tests}
 %files tests
 %{_bindir}/%{name}-testing
 %{_datadir}/%{name}/test
+%endif
 
 %files -n %{name}sh
 %{_bindir}/%{name}sh
