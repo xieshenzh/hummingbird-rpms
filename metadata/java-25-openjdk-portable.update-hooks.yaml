@@ -1,0 +1,17 @@
+# OpenJDK specs derive Version from macros (updatever, buildver, etc.) and
+# use a macro-based Release (%{rpmrelease}).  The generic specfile-library
+# path would clobber the Release expression with a literal "0.1%{?dist}".
+# This hook updates the individual macros instead, preserving the Release
+# expression intact.
+update_spec: |
+  IFS=. read -r _feat interim updatever patchver buildver <<< "${UPDATE_NEW_VERSION}"
+  sed -Ei \
+    -e 's/^(%global interimver\s+)[0-9]+/\1'"${interim}"'/' \
+    -e 's/^(%global updatever\s+)[0-9]+/\1'"${updatever}"'/' \
+    -e 's/^(%global patchver\s+)[0-9]+/\1'"${patchver}"'/' \
+    -e 's/^(%global buildver\s+)[0-9]+/\1'"${buildver}"'/' \
+    -e 's/^(%global rpmrelease\s+)[0-9]+/\10/' \
+    "${UPDATE_SPEC_FILE}"
+  if grep -qE '^%global portablerelease\s' "${UPDATE_SPEC_FILE}"; then
+    sed -Ei 's/^(%global portablerelease\s+)[0-9]+/\10/' "${UPDATE_SPEC_FILE}"
+  fi
