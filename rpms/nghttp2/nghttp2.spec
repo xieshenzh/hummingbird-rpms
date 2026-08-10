@@ -13,7 +13,7 @@
 Summary: Experimental HTTP/2 client, server and proxy
 Name: nghttp2
 Version: 1.69.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # Parts of ruby bindings are additionally under GPL-2.0-or-later, MIT and
 # HPND-Kevlin-Henney but they are NOT shipped.
@@ -24,7 +24,8 @@ Source0: https://github.com/tatsuhiro-t/nghttp2/releases/download/v%{version}/ng
 Source1: https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz.asc
 Source2: tatsuhiro-t.pgp
 
-Patch0: 0001-nghttpx-Tighten-up-CONNECT-and-HTTP-Upgrade-handling.patch
+# fix HTTP Request/Response Smuggling and Response-Queue Poisoning via ambiguous HTTP/1.1 Upgrade requests (CVE-2026-58055)
+Patch001: 0001-nghttp2-1.69.0-CVE-2026-58055.patch
 
 BuildRequires: CUnit-devel
 BuildRequires: c-ares-devel
@@ -230,6 +231,9 @@ popd
 
 
 %changelog
+* Fri Aug 07 2026 Jan Macku <jamacku@redhat.com> - 1.69.0-5
+- fix HTTP Request/Response Smuggling and Response-Queue Poisoning via ambiguous HTTP/1.1 Upgrade requests (CVE-2026-58055)
+
 * Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.69.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
 
