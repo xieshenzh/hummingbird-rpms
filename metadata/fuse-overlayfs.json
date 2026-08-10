@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "sha": "d0d1a276d24db04a31a5ddb2b72493b2f031ab1d",
+  "source": "https://src.fedoraproject.org/rpms/fuse-overlayfs.git",
+  "upstream_repo": "https://github.com/containers/fuse-overlayfs",
+  "version": "1.17"
+}
