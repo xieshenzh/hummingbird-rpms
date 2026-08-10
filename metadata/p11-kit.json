@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "415bc467ad7a1b67dd41c7f89fb637f55fe5b558",
+  "release": "1",
+  "sha": "4837e67608d7b4a7666196595d8fda171a81f6de",
   "source": "https://src.fedoraproject.org/rpms/p11-kit.git",
   "upstream_repo": "https://github.com/p11-glue/p11-kit",
-  "version": "0.26.4"
+  "version": "0.26.5"
 }
