@@ -1,3 +1,4 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Lukas=20Backstr=C3=B6m?= <lukas@erlang.org>
 Date: Tue, 13 May 2025 09:20:58 +0200
 Subject: [PATCH] erts: Fix some possibly unitialized warnings
@@ -61,10 +62,10 @@ index 568dcf7e82..f3e2ed3c35 100644
      if (flags & BSF_NATIVE) {
          flags &= ~BSF_NATIVE;
 diff --git a/erts/emulator/drivers/common/inet_drv.c b/erts/emulator/drivers/common/inet_drv.c
-index d6835828bf..3a802d6833 100644
+index eab69d3bcc..412c66b31e 100644
 --- a/erts/emulator/drivers/common/inet_drv.c
 +++ b/erts/emulator/drivers/common/inet_drv.c
-@@ -14266,7 +14266,7 @@ static int packet_inet_init(void)
+@@ -14343,7 +14343,7 @@ static int packet_inet_init(void)
  #ifdef AF_UNSPEC
      disassoc_sa.sa_family = AF_UNSPEC;
  #endif /* #ifdef AF_UNSPEC */

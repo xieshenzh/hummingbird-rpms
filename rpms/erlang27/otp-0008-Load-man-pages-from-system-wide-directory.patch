@@ -1,3 +1,4 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Francois-Denis Gonthier <neumann@lostwebsite.net>
 Date: Thu, 20 Sep 2018 15:01:18 +0300
 Subject: [PATCH] Load man-pages from system-wide directory

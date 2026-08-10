@@ -1,3 +1,4 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Lemenkov <lemenkov@gmail.com>
 Date: Sat, 19 Jun 2010 09:59:39 +0400
 Subject: [PATCH] Do not install nteventlog and related doc-files on non-win32

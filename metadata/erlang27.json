@@ -4,7 +4,7 @@
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 707,
-  "sha": "de91635bea30ae0167e8e66e3443e4334c2f385c",
+  "sha": "040549cfe773d01e2e04eaa7b9862c327ef2ccf0",
   "source": "https://src.fedoraproject.org/rpms/erlang.git",
   "track_upstream": "27",
   "upstream_repo": "https://github.com/erlang/otp",
