@@ -1,7 +1,7 @@
 {
   "branch": "rawhide",
   "fix_status": 0,
-  "modification_reason": "disable some unit tests that don't work in Konflux",
+  "modification_reason": "disable some unit tests that don't work in Konflux; migrated to gorget source-pipeline.yaml (HUM-5618): Source0 now fetched+stripped by gorget instead of packaging/make-nodejs-tarball.sh, and packaging-scripts.tar.gz is now regenerated deterministically by the pipeline instead of a manually maintained lookaside blob.",
   "modification_status": "modified",
   "release": "3",
   "sha": "1ef4adcb666c8e885a5127738c527bbdb344fc3f",
