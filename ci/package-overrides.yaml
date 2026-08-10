@@ -465,6 +465,9 @@ ucx:
 unbound:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+userspace-rcu:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 valkey:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
