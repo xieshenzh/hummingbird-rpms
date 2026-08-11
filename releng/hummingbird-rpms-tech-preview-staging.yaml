@@ -514,6 +514,8 @@ spec:
           contentType: rpm
         - name: libndp-main
           contentType: rpm
+        - name: libnetfilter-conntrack-main
+          contentType: rpm
         - name: libnfnetlink-main
           contentType: rpm
         - name: libnftnl-main

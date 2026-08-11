@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "release_monitoring_project_id": 1675,
+  "sha": "44df88aa3fe968fe4241495c5e0d535e619da527",
+  "source": "https://src.fedoraproject.org/rpms/libnetfilter_conntrack.git",
+  "version": "1.1.1"
+}
