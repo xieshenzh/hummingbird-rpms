@@ -5,5 +5,6 @@
   "release_monitoring_project_id": 1681,
   "sha": "68af55e34affd4059ac7acf40bd8a8a06f682287",
   "source": "https://src.fedoraproject.org/rpms/libnftnl.git",
+  "upstream_repo": "https://git.netfilter.org/libnftnl",
   "version": "1.3.1"
 }

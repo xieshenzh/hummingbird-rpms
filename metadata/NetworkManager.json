@@ -5,5 +5,6 @@
   "release_monitoring_project_id": 21197,
   "sha": "47d7c2762e4fde4ce90ad216e73a7c8a4fefd509",
   "source": "https://src.fedoraproject.org/rpms/NetworkManager.git",
+  "upstream_repo": "https://gitlab.freedesktop.org/NetworkManager/NetworkManager",
   "version": "1.58.0"
 }
