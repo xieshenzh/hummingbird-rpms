@@ -298,6 +298,8 @@ spec:
           contentType: rpm
         - name: git-main
           contentType: rpm
+        - name: git-lfs-main
+          contentType: rpm
         - name: git-sync-main
           contentType: rpm
         - name: glib2-main

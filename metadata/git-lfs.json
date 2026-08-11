@@ -1,0 +1,10 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "4",
+  "release_monitoring_project_id": 11551,
+  "sha": "51f0fd08ac02f7aa2f126dbb88a679e59fbfcbb1",
+  "source": "https://src.fedoraproject.org/rpms/git-lfs.git",
+  "upstream_repo": "https://github.com/git-lfs/git-lfs",
+  "version": "3.7.1"
+}
