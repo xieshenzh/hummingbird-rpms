@@ -202,6 +202,8 @@ spec:
           contentType: rpm
         - name: diffutils-main
           contentType: rpm
+        - name: distribution-main
+          contentType: rpm
         - name: dnf-main
           contentType: rpm
         - name: dnf5-main
