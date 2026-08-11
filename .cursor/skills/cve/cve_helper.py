@@ -4,6 +4,13 @@
 This script centralizes repetitive /cve skill ticket-gathering work so the
 agent can consume a compact, structured summary instead of repeatedly
 executing and parsing long command outputs in-chat.
+
+Subcommands:
+  show (default)  Summarize HUM CVE ticket(s)
+  bot-mrs         List open/merged automation bot MRs for a package
+  sbom            Fetch package SBOM (Jira attachment or Pulp) and search it
+  spec-deps       Probe a package .spec for a component / bundled Provides
+  worktree        Create an isolated git worktree for a HUM task ticket
 """
 
 from __future__ import annotations
@@ -14,6 +21,9 @@ import re
 import shutil
 import subprocess
 import sys
+import time
+import urllib.error
+import urllib.request
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
@@ -22,6 +32,21 @@ CVE_RE = re.compile(r"CVE-\d{4}-\d{4,8}")
 HUM_RE = re.compile(r"HUM-\d{3,6}")
 MR_URL_RE = re.compile(
     r"https://gitlab\.com/redhat/hummingbird/rpms/-/merge_requests/\d+"
+)
+BOT_USER = "project_73447720_bot_6f7c574289c710ebc9ab9ee76059d959"
+PULP_SBOM_BASE = (
+    "https://packages.redhat.com/api/pulp-content/public-hummingbird/"
+    "metadata/sboms"
+)
+GITLAB_RPMS_REPO = "redhat/hummingbird/rpms"
+TRANSIENT_RHJIRA_RE = re.compile(
+    r"proxy|tunnel|timed out|timeout|temporar|502|503|504|connection reset|\beof\b",
+    re.IGNORECASE,
+)
+COMMANDS = ("show", "bot-mrs", "sbom", "spec-deps", "worktree")
+SBOM_FILE_RE = re.compile(r"sha256-[a-fA-F0-9]+\.sbom")
+BUNDLED_PROVIDES_RE = re.compile(
+    r"(?i)^\s*Provides:\s*bundled\(([^)]+)\)(?:\s*=\s*(\S+))?"
 )
 JIRA_FIELDS_FULL = ",".join(
     [
@@ -122,17 +147,54 @@ class TicketReport:
 ### Utilities ###
 
 
-def run_command(args: list[str]) -> subprocess.CompletedProcess:
+def repo_root() -> Path:
+    # 4 parents up: .cursor/skills/cve → .cursor/skills → .cursor → repo root
+    # (.claude/skills/cve is hardlinked to the same path depth)
+    return Path(__file__).resolve().parent.parent.parent.parent
+
+
+def run_command(
+    args: list[str],
+    *,
+    cwd: Path | str | None = None,
+) -> subprocess.CompletedProcess:
     try:
-        return subprocess.run(args, check=False, capture_output=True, text=True)
+        return subprocess.run(
+            args, check=False, capture_output=True, text=True, cwd=cwd
+        )
     except OSError as err:
         raise RuntimeError(f"Failed to execute {' '.join(args)}: {err}") from err
 
 
+def run_rhjira(
+    args: list[str],
+    *,
+    retries: int = 3,
+    cwd: Path | str | None = None,
+) -> subprocess.CompletedProcess:
+    """Run rhjira with bounded retries for transient proxy/network failures."""
+    backoff = 2
+    last: subprocess.CompletedProcess | None = None
+    for attempt in range(1, retries + 1):
+        last = run_command(["rhjira", *args], cwd=cwd)
+        if last.returncode == 0:
+            return last
+        combined = f"{last.stderr or ''}\n{last.stdout or ''}"
+        if attempt == retries or not TRANSIENT_RHJIRA_RE.search(combined):
+            return last
+        print(
+            f"WARN: transient Jira/proxy error (attempt {attempt}/{retries}); "
+            f"retrying in {backoff}s",
+            file=sys.stderr,
+        )
+        time.sleep(backoff)
+        backoff += 2
+    assert last is not None
+    return last
+
+
 def uses_vendored_deps(package: str) -> bool:
-    # 4 parents up: .cursor/skills/cve → .cursor/skills → .cursor → repo root
-    repo_root = Path(__file__).parent.parent.parent.parent
-    go_vendor_path = repo_root / "rpms" / package / "go-vendor-tools.toml"
+    go_vendor_path = repo_root() / "rpms" / package / "go-vendor-tools.toml"
     return go_vendor_path.exists()
 
 
@@ -143,6 +205,11 @@ def normalize_hum_key(value: str) -> str:
     if re.fullmatch(r"\d+", trimmed):
         return f"HUM-{trimmed}"
     raise ValueError(f"Invalid ticket key: {value}")
+
+
+def pulp_sbom_package_dir(package: str) -> str:
+    """Pulp SBOM dirs replace dots in the package name with hyphens."""
+    return f"{package.replace('.', '-')}-main"
 
 
 def _json_str(data: dict[str, Any], *path: str, default: str = "") -> str:
@@ -162,8 +229,8 @@ def find_related_tickets(initial_cve_ids: list[str]) -> list[str]:
 
     or_clauses = " OR ".join(f'text ~ "{c}"' for c in initial_cve_ids)
     jql = f'project = HUM AND status not in (Closed, "CLOSED (invalid)", Done, Resolved, "Won\'t Fix") AND ({or_clauses})'
-    result = run_command(
-        ["rhjira", "list", jql, "--fields", "key", "--rawoutput", "--noheader"]
+    result = run_rhjira(
+        ["list", jql, "--fields", "key", "--rawoutput", "--noheader"]
     )
     if result.returncode != 0:
         print(
@@ -191,6 +258,12 @@ def ensure_rhjira_available() -> None:
     print("Then configure authentication with:", file=sys.stderr)
     print("  rhjira settoken", file=sys.stderr)
     sys.exit(1)
+
+
+def ensure_glab_available() -> None:
+    if shutil.which("glab"):
+        return
+    raise RuntimeError("`glab` is not installed or not found in PATH.")
 
 
 ### Extraction ###
@@ -361,7 +434,7 @@ def fetch_json(
     cache_key = f"{key}:{fields}"
     if cache_key in _json_cache:
         return _json_cache[cache_key]
-    result = run_command(["rhjira", "dump", key, "--fields", fields, "--json"])
+    result = run_rhjira(["dump", key, "--fields", fields, "--json"])
     if result.returncode != 0:
         if raise_on_error:
             raise RuntimeError(
@@ -517,13 +590,407 @@ def apply_title_prefix(title: str, prefix: str) -> str:
     return " ".join(filter(None, [prefix.strip(), title.strip()]))
 
 
+### Probe helpers (bot-mrs / sbom / spec-deps / worktree) ###
+
+
+@dataclass
+class BotMrEntry:
+    iid: str
+    title: str
+    state: str
+    web_url: str = ""
+
+
+@dataclass
+class SbomHit:
+    term: str
+    path: str
+    name: str = ""
+    version: str = ""
+    purl: str = ""
+    scope: str = ""
+    component_type: str = ""
+    snippet: str = ""
+
+
+@dataclass
+class SpecDepHit:
+    kind: str
+    line_no: int
+    text: str
+    bundled_name: str = ""
+    bundled_version: str = ""
+
+
+def _parse_glab_mr_list(output: str, state: str) -> list[BotMrEntry]:
+    entries: list[BotMrEntry] = []
+    for line in output.splitlines():
+        line = line.strip()
+        if not line or line.lower().startswith("no merge"):
+            continue
+        # Typical: !1234  Title here  (branch) ← or similar
+        m = re.match(r"!(\d+)\s+(.*)$", line)
+        if not m:
+            continue
+        iid = m.group(1)
+        rest = m.group(2).strip()
+        # Drop trailing metadata like "(branch)" when present at end
+        title = re.sub(r"\s+\([^)]*\)\s*$", "", rest).strip() or rest
+        entries.append(
+            BotMrEntry(
+                iid=iid,
+                title=title,
+                state=state,
+                web_url=(
+                    f"https://gitlab.com/{GITLAB_RPMS_REPO}/-/merge_requests/{iid}"
+                ),
+            )
+        )
+    return entries
+
+
+def list_bot_mrs(package: str, *, per_page: int = 5) -> dict[str, list[BotMrEntry]]:
+    ensure_glab_available()
+    result: dict[str, list[BotMrEntry]] = {"open": [], "merged": []}
+    for state, flag in (("open", []), ("merged", ["--merged"])):
+        cmd = [
+            "glab",
+            "mr",
+            "list",
+            "--repo",
+            GITLAB_RPMS_REPO,
+            "--author",
+            BOT_USER,
+            "--search",
+            package,
+            "--per-page",
+            str(per_page),
+            *flag,
+        ]
+        proc = run_command(cmd)
+        if proc.returncode != 0:
+            err = (proc.stderr or proc.stdout or "").strip()
+            raise RuntimeError(f"glab mr list ({state}) failed: {err}")
+        result[state] = _parse_glab_mr_list(proc.stdout, state)
+    return result
+
+
+def print_bot_mrs(package: str, mrs: dict[str, list[BotMrEntry]]) -> None:
+    print(f"Bot MRs for package: {package}")
+    print(f"Bot user: {BOT_USER}")
+    for state in ("open", "merged"):
+        entries = mrs.get(state, [])
+        print(f"\n=== {state.upper()} ({len(entries)}) ===")
+        if not entries:
+            print("(none)")
+            continue
+        for entry in entries:
+            print(f"!{entry.iid}  {entry.title}")
+            print(f"  {entry.web_url}")
+
+
+def http_get_text(url: str, timeout: float = 60.0) -> str:
+    req = urllib.request.Request(url, headers={"User-Agent": "hummingbird-cve-helper"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.read().decode("utf-8", errors="replace")
+    except urllib.error.HTTPError as err:
+        raise RuntimeError(f"HTTP {err.code} fetching {url}") from err
+    except urllib.error.URLError as err:
+        raise RuntimeError(f"Failed fetching {url}: {err}") from err
+
+
+def http_download(url: str, dest: Path, timeout: float = 120.0) -> None:
+    req = urllib.request.Request(url, headers={"User-Agent": "hummingbird-cve-helper"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            dest.write_bytes(resp.read())
+    except urllib.error.HTTPError as err:
+        raise RuntimeError(f"HTTP {err.code} downloading {url}") from err
+    except urllib.error.URLError as err:
+        raise RuntimeError(f"Failed downloading {url}: {err}") from err
+
+
+def latest_pulp_sbom_filename(package: str) -> tuple[str, str]:
+    """Return (directory_url, filename) for the latest Pulp SBOM object."""
+    directory = f"{PULP_SBOM_BASE}/{pulp_sbom_package_dir(package)}/"
+    listing = http_get_text(directory)
+    files = sorted(set(SBOM_FILE_RE.findall(listing)))
+    if not files:
+        raise RuntimeError(f"No SBOM files found under {directory}")
+    return directory, files[-1]
+
+
+def try_download_jira_sbom(ticket: str, nvr: str, dest: Path) -> bool:
+    """Download `{nvr}.sbom.json` from a Jira ticket attachment into dest."""
+    ensure_rhjira_available()
+    attachment = f"{nvr}.sbom.json"
+    # rhjira writes the attachment into cwd using the attachment name
+    workdir = dest.parent
+    workdir.mkdir(parents=True, exist_ok=True)
+    staged = workdir / attachment
+    if staged.exists():
+        staged.unlink()
+    result = run_rhjira(["attach", "-d", ticket, attachment], cwd=workdir)
+    if result.returncode != 0 or not staged.exists():
+        return False
+    if staged.resolve() != dest.resolve():
+        dest.write_bytes(staged.read_bytes())
+        if staged.exists() and staged.resolve() != dest.resolve():
+            staged.unlink()
+    return dest.exists()
+
+
+def fetch_sbom(
+    package: str,
+    *,
+    nvr: str = "",
+    ticket: str = "",
+    dest: Path | None = None,
+) -> dict[str, Any]:
+    """Fetch SBOM preferring a matching Jira attachment, else Pulp."""
+    out = dest or Path(f"/tmp/{package}.sbom.json")
+    out = out.expanduser()
+    source = ""
+    url = ""
+
+    if ticket and nvr:
+        ticket_key = normalize_hum_key(ticket)
+        if try_download_jira_sbom(ticket_key, nvr, out):
+            source = "jira"
+            url = f"jira:{ticket_key}/{nvr}.sbom.json"
+        else:
+            print(
+                f"WARN: Jira attachment {nvr}.sbom.json not found on {ticket_key}; "
+                "falling back to Pulp",
+                file=sys.stderr,
+            )
+
+    if not source:
+        directory, filename = latest_pulp_sbom_filename(package)
+        url = f"{directory}{filename}"
+        http_download(url, out)
+        source = "pulp"
+
+    return {
+        "package": package,
+        "nvr": nvr,
+        "ticket": ticket,
+        "source": source,
+        "url": url,
+        "path": str(out),
+        "bytes": out.stat().st_size if out.exists() else 0,
+    }
+
+
+def _component_fields(node: dict[str, Any]) -> dict[str, str]:
+    name = str(node.get("name") or "")
+    version = str(node.get("version") or "")
+    purl = str(node.get("purl") or "")
+    scope = str(node.get("scope") or "")
+    ctype = str(node.get("type") or "")
+    props = node.get("properties")
+    if isinstance(props, list) and not scope:
+        for prop in props:
+            if not isinstance(prop, dict):
+                continue
+            key = str(prop.get("name") or prop.get("key") or "").lower()
+            if "scope" in key or key.endswith("lifecycle"):
+                scope = str(prop.get("value") or "")
+                break
+    return {
+        "name": name,
+        "version": version,
+        "purl": purl,
+        "scope": scope,
+        "component_type": ctype,
+    }
+
+
+def search_sbom_file(path: Path, terms: list[str]) -> list[SbomHit]:
+    """Search an SBOM for terms; prefer structured component hits, else text."""
+    if not terms:
+        return []
+    text = path.read_text(encoding="utf-8", errors="replace")
+    hits: list[SbomHit] = []
+    seen: set[tuple[str, str, str, str]] = set()
+
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        data = None
+
+    def consider(term: str, node: dict[str, Any], json_path: str) -> None:
+        fields = _component_fields(node)
+        blob = " ".join(fields.values()).lower()
+        if term.lower() not in blob and term.lower() not in json.dumps(node).lower():
+            return
+        key = (term, fields["name"], fields["version"], fields["purl"])
+        if key in seen:
+            return
+        seen.add(key)
+        hits.append(
+            SbomHit(
+                term=term,
+                path=json_path,
+                name=fields["name"],
+                version=fields["version"],
+                purl=fields["purl"],
+                scope=fields["scope"],
+                component_type=fields["component_type"],
+                snippet="",
+            )
+        )
+
+    def walk(node: Any, json_path: str = "$") -> None:
+        if isinstance(node, dict):
+            # CycloneDX component-like object
+            if "name" in node or "purl" in node:
+                for term in terms:
+                    consider(term, node, json_path)
+            for key, value in node.items():
+                walk(value, f"{json_path}.{key}")
+        elif isinstance(node, list):
+            for idx, value in enumerate(node):
+                walk(value, f"{json_path}[{idx}]")
+
+    if data is not None:
+        walk(data)
+
+    if hits:
+        return hits
+
+    # Text fallback (non-JSON or no structured component matches)
+    for term in terms:
+        pattern = re.compile(re.escape(term), re.IGNORECASE)
+        for match in pattern.finditer(text):
+            start = max(0, match.start() - 80)
+            end = min(len(text), match.end() + 80)
+            snippet = text[start:end].replace("\n", " ")
+            hits.append(
+                SbomHit(
+                    term=term,
+                    path="text",
+                    snippet=snippet,
+                )
+            )
+            if sum(1 for h in hits if h.term == term) >= 10:
+                break
+    return hits
+
+
+def print_sbom_result(
+    meta: dict[str, Any],
+    hits: list[SbomHit],
+    terms: list[str],
+) -> None:
+    print(f"SBOM package: {meta['package']}")
+    print(f"Source: {meta['source']}")
+    print(f"URL: {meta['url']}")
+    print(f"Path: {meta['path']} ({meta['bytes']} bytes)")
+    if meta.get("nvr"):
+        print(f"NVR: {meta['nvr']}")
+    if not terms:
+        return
+    print(f"\nSearch terms: {', '.join(terms)}")
+    print(f"Hits: {len(hits)}")
+    if not hits:
+        print("(no matches)")
+        return
+    for hit in hits:
+        label = hit.name or hit.purl or hit.path
+        bits = [f"term={hit.term}", f"match={label}"]
+        if hit.version:
+            bits.append(f"version={hit.version}")
+        if hit.scope:
+            bits.append(f"scope={hit.scope}")
+        if hit.component_type:
+            bits.append(f"type={hit.component_type}")
+        if hit.purl and hit.name:
+            bits.append(f"purl={hit.purl}")
+        print("- " + " | ".join(bits))
+        if hit.snippet:
+            print(f"  snippet: {hit.snippet}")
+
+
+def probe_spec_deps(package: str, component: str = "") -> list[SpecDepHit]:
+    spec_path = repo_root() / "rpms" / package / f"{package}.spec"
+    if not spec_path.is_file():
+        raise RuntimeError(f"Spec not found: {spec_path}")
+    hits: list[SpecDepHit] = []
+    lines = spec_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    component_re = re.compile(re.escape(component), re.IGNORECASE) if component else None
+    for idx, line in enumerate(lines, start=1):
+        bundled = BUNDLED_PROVIDES_RE.search(line)
+        if bundled:
+            name, version = bundled.group(1), bundled.group(2) or ""
+            if component_re is None or component_re.search(name) or component_re.search(line):
+                hits.append(
+                    SpecDepHit(
+                        kind="bundled_provides",
+                        line_no=idx,
+                        text=line.strip(),
+                        bundled_name=name,
+                        bundled_version=version,
+                    )
+                )
+                continue
+        if component_re and component_re.search(line):
+            hits.append(
+                SpecDepHit(
+                    kind="component_mention",
+                    line_no=idx,
+                    text=line.strip(),
+                )
+            )
+    return hits
+
+
+def print_spec_deps(package: str, component: str, hits: list[SpecDepHit]) -> None:
+    spec_path = repo_root() / "rpms" / package / f"{package}.spec"
+    print(f"Spec: {spec_path}")
+    if component:
+        print(f"Component: {component}")
+    print(f"Hits: {len(hits)}")
+    if not hits:
+        print("(no matches)")
+        return
+    for hit in hits:
+        extra = ""
+        if hit.kind == "bundled_provides":
+            extra = f" bundled={hit.bundled_name}"
+            if hit.bundled_version:
+                extra += f"={hit.bundled_version}"
+        print(f"{hit.line_no}:{hit.kind}{extra}: {hit.text}")
+
+
+def create_task_worktree(ticket: str, *, base: str = "main") -> Path:
+    ticket_key = normalize_hum_key(ticket)
+    root = repo_root()
+    worktrees = (root / ".." / "worktrees").resolve()
+    worktrees.mkdir(parents=True, exist_ok=True)
+    dest = worktrees / ticket_key
+    if dest.exists():
+        raise RuntimeError(f"Worktree path already exists: {dest}")
+    # Prefer origin/<base> when available
+    ref = base
+    remote_check = run_command(["git", "rev-parse", "--verify", f"origin/{base}"], cwd=root)
+    if remote_check.returncode == 0:
+        ref = f"origin/{base}"
+    proc = run_command(
+        ["git", "worktree", "add", str(dest), "-b", ticket_key, ref],
+        cwd=root,
+    )
+    if proc.returncode != 0:
+        err = (proc.stderr or proc.stdout or "").strip()
+        raise RuntimeError(f"git worktree add failed: {err}")
+    return dest
+
+
 ### CLI ###
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Summarize HUM CVE ticket details for /cve workflow.",
-    )
+def _add_show_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "tickets",
         nargs="+",
@@ -566,13 +1033,116 @@ def build_parser() -> argparse.ArgumentParser:
             "in a single invocation."
         ),
     )
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="HUM CVE helper for /cve workflow probes and ticket summaries.",
+    )
+    subparsers = parser.add_subparsers(dest="command")
+
+    show = subparsers.add_parser(
+        "show",
+        help="Summarize HUM CVE ticket details (default command).",
+    )
+    _add_show_arguments(show)
+
+    bot = subparsers.add_parser(
+        "bot-mrs",
+        help="List open and merged automation bot MRs for a package.",
+    )
+    bot.add_argument("package", help="Package name to search in bot MR titles/branches.")
+    bot.add_argument(
+        "--per-page",
+        type=int,
+        default=5,
+        help="Max MRs per state (default: 5).",
+    )
+    bot.add_argument(
+        "--json",
+        action="store_true",
+        help="Print JSON instead of text.",
+    )
+
+    sbom = subparsers.add_parser(
+        "sbom",
+        help="Fetch package SBOM (Jira attachment preferred, else Pulp) and optionally search it.",
+    )
+    sbom.add_argument("package", help="Package name (Hummingbird SRPM name).")
+    sbom.add_argument(
+        "--nvr",
+        default="",
+        help="NVR used to locate a matching Jira {nvr}.sbom.json attachment.",
+    )
+    sbom.add_argument(
+        "--ticket",
+        default="",
+        help="HUM ticket that may have an attached SBOM (used with --nvr).",
+    )
+    sbom.add_argument(
+        "--search",
+        action="append",
+        default=[],
+        help="Component/module search term (repeatable).",
+    )
+    sbom.add_argument(
+        "--out",
+        type=Path,
+        default=None,
+        help="Destination path (default: /tmp/<package>.sbom.json).",
+    )
+    sbom.add_argument(
+        "--json",
+        action="store_true",
+        help="Print JSON instead of text.",
+    )
+
+    spec = subparsers.add_parser(
+        "spec-deps",
+        help="Probe rpms/<pkg>/<pkg>.spec for bundled Provides and component mentions.",
+    )
+    spec.add_argument("package", help="Package name.")
+    spec.add_argument(
+        "--component",
+        default="",
+        help="Component/library name to search for (optional; lists all bundled Provides if omitted).",
+    )
+    spec.add_argument(
+        "--json",
+        action="store_true",
+        help="Print JSON instead of text.",
+    )
+
+    worktree = subparsers.add_parser(
+        "worktree",
+        help="Create ../worktrees/HUM-YYYY worktree for isolated CVE fix work.",
+    )
+    worktree.add_argument("ticket", help="HUM task ticket key (e.g. HUM-5936 or 5936).")
+    worktree.add_argument(
+        "--base",
+        default="main",
+        help="Base branch/ref (default: main; uses origin/main when available).",
+    )
+    worktree.add_argument(
+        "--json",
+        action="store_true",
+        help="Print JSON instead of text.",
+    )
     return parser
 
 
-def main() -> int:
-    parser = build_parser()
-    args = parser.parse_args()
+def normalize_argv(argv: list[str]) -> list[str]:
+    """Allow bare `cve_helper.py HUM-1234` by inserting the default `show` command."""
+    if not argv:
+        return ["show", "--help"]
+    if argv[0] in ("-h", "--help"):
+        return argv
+    if argv[0] in COMMANDS:
+        return argv
+    return ["show", *argv]
 
+
+def cmd_show(args: argparse.Namespace) -> int:
     if args.max_linked < 0:
         print("--max-linked must be >= 0", file=sys.stderr)
         return 2
@@ -662,6 +1232,105 @@ def main() -> int:
         print(f"\nSuggested chat title: {suggested_chat_title}")
 
     return 0
+
+
+def cmd_bot_mrs(args: argparse.Namespace) -> int:
+    mrs = list_bot_mrs(args.package, per_page=args.per_page)
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "package": args.package,
+                    "bot_user": BOT_USER,
+                    "open": [asdict(x) for x in mrs["open"]],
+                    "merged": [asdict(x) for x in mrs["merged"]],
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+    else:
+        print_bot_mrs(args.package, mrs)
+    return 0
+
+
+def cmd_sbom(args: argparse.Namespace) -> int:
+    meta = fetch_sbom(
+        args.package,
+        nvr=args.nvr,
+        ticket=args.ticket,
+        dest=args.out,
+    )
+    hits = search_sbom_file(Path(meta["path"]), args.search)
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    **meta,
+                    "search": args.search,
+                    "hits": [asdict(h) for h in hits],
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+    else:
+        print_sbom_result(meta, hits, args.search)
+    return 0
+
+
+def cmd_spec_deps(args: argparse.Namespace) -> int:
+    hits = probe_spec_deps(args.package, args.component)
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "package": args.package,
+                    "component": args.component,
+                    "spec": str(repo_root() / "rpms" / args.package / f"{args.package}.spec"),
+                    "hits": [asdict(h) for h in hits],
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+    else:
+        print_spec_deps(args.package, args.component, hits)
+    return 0
+
+
+def cmd_worktree(args: argparse.Namespace) -> int:
+    dest = create_task_worktree(args.ticket, base=args.base)
+    payload = {
+        "ticket": normalize_hum_key(args.ticket),
+        "path": str(dest),
+        "branch": normalize_hum_key(args.ticket),
+    }
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(f"WORKTREE={dest}")
+        print(f"BRANCH={payload['branch']}")
+        print("Move the agent workspace into this worktree before editing files.")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = normalize_argv(list(argv) if argv is not None else sys.argv[1:])
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    if not args.command:
+        parser.print_help()
+        return 2
+
+    handlers = {
+        "show": cmd_show,
+        "bot-mrs": cmd_bot_mrs,
+        "sbom": cmd_sbom,
+        "spec-deps": cmd_spec_deps,
+        "worktree": cmd_worktree,
+    }
+    return handlers[args.command](args)
 
 
 if __name__ == "__main__":
