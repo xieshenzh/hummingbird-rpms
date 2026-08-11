@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "release_monitoring_project_id": 1682,
+  "sha": "fa544ba2da26812c8a4774c32676b66d0b306ce2",
+  "source": "https://src.fedoraproject.org/rpms/libnfnetlink.git",
+  "version": "1.0.2"
+}

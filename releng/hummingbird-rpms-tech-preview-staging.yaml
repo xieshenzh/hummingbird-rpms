@@ -512,6 +512,8 @@ spec:
           contentType: rpm
         - name: libmpc-main
           contentType: rpm
+        - name: libnfnetlink-main
+          contentType: rpm
         - name: libnl3-main
           contentType: rpm
         - name: libnsl2-main
