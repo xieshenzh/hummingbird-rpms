@@ -1,0 +1,27 @@
+From c685d42987f92790772dd81806ff7d233d3e69ae Mon Sep 17 00:00:00 2001
+From: Kamal Heib <kheib@redhat.com>
+Date: Wed, 5 Aug 2026 11:54:44 -0400
+Subject: [PATCH] Revert "dracut: do not install dracut module in non-hostonly
+ by default"
+
+This reverts commit 85afa2bc9214dbc7f0921066099fa1d63dff2370.
+---
+ kernel-boot/dracut/50rdma/module-setup.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel-boot/dracut/50rdma/module-setup.sh b/kernel-boot/dracut/50rdma/module-setup.sh
+index e4929e9a1225..09162062060a 100644
+--- a/kernel-boot/dracut/50rdma/module-setup.sh
++++ b/kernel-boot/dracut/50rdma/module-setup.sh
+@@ -3,7 +3,7 @@
+ check() {
+     [ -n "$hostonly" ] && [ -e /sys/class/infiniband_verbs/uverbs0 ] && return 0
+     [ -n "$hostonly" ] && return 255
+-    return 255
++    return 0
+ }
+ 
+ depends() {
+-- 
+2.55.0
+
