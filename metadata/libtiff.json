@@ -1,10 +1,10 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Backport CVE-2026-4775 integer overflow fix; backport fix for CVE-2026-12912",
+  "modification_reason": "Backport fix for CVE-2026-12912",
   "modification_status": "modified",
   "release": "2",
-  "sha": "4e18f00841de3c708e70724806f7ed3a1849095a",
+  "sha": "f8063dac9fbfa5dc4bb3c4780a6925b2d8f906ba",
   "source": "https://src.fedoraproject.org/rpms/libtiff.git",
   "upstream_repo": "https://github.com/libsdl-org/libtiff",
-  "version": "4.7.1"
+  "version": "4.7.2"
 }

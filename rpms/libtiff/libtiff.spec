@@ -1,18 +1,11 @@
 Summary:       Library of functions for manipulating TIFF format image files
 Name:          libtiff
-Version:       4.7.1
-Release:       2.5%{?dist}
+Version:       4.7.2
+Release:       2%{?dist}
 License:       libtiff
 URL:           http://www.simplesystems.org/libtiff/
 
 Source:        http://download.osgeo.org/libtiff/tiff-%{version}.tar.gz
-
-# Backport: https://gitlab.com/libtiff/libtiff/-/commit/622e8edc07fe68189cf5338792603f31f0accc57
-Patch0:        0001-TIFFReadRGBAImage-prevent-integer-overflow-YCbCr.patch
-# Backport: https://github.com/libsdl-org/libtiff/commit/ba2b04b114c5
-# Backport: https://github.com/libsdl-org/libtiff/commit/f9bda11bf2fc
-# Backport: https://github.com/libsdl-org/libtiff/commit/90601d9a2338
-Patch1:        0002-pixarlog-fix-heap-buffer-overflow-in-8BITABGR-decode.patch
 
 BuildRequires: gcc, gcc-c++
 BuildRequires: zlib-devel libjpeg-devel jbigkit-devel libzstd-devel libwebp-devel liblerc-devel
@@ -176,8 +169,11 @@ fi
 %{_mandir}/man1/*
 
 %changelog
-* Fri Jun 26 2026 Prarit Bhargava <prarit@redhat.com> - 4.7.1-2.2
-- Fix CVE-2026-4775: signed integer overflow in YCbCr tile decoding (rhbz#2450768)
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.7.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Mon Jul 13 2026 Michal Hlavinka <mhlavink@redhat.com> - 4.7.2-1
+- updated to 4.7.2 (#2496751)
 
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.7.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
