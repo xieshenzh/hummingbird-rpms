@@ -1,0 +1,133 @@
+From 8d2659ac68ec8d46dfd8c2fc0ab057b647ac7940 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Wed, 1 Jul 2026 15:05:18 +0200
+Subject: [PATCH] Deal with ssl.PROTOCOL_TLSv1 removal from Python built with
+ OpenSSL 4+
+
+https://github.com/python/cpython/commit/3364e7e62fa24d0e19133fb0f90b1c24ef1110c5
+removed ssl.PROTOCOL_TLSv1 when python is built with OpenSSL 4+.
+
+We are hitting this error in Fedora (where we already updated OpenSSL):
+
+    ImportError while loading conftest '/builddir/build/BUILD/python-urllib3-2.7.0-build/urllib3-2.7.0/test/conftest.py'.
+    test/__init__.py:42: in <module>
+        import urllib3.contrib.pyopenssl as pyopenssl
+    ../BUILDROOT/usr/lib/python3.15/site-packages/urllib3/contrib/pyopenssl.py:72: in <module>
+        ssl.PROTOCOL_TLSv1: OpenSSL.SSL.TLSv1_METHOD,
+        ^^^^^^^^^^^^^^^^^^
+    E   AttributeError: module 'ssl' has no attribute 'PROTOCOL_TLSv1'. Did you mean '.PROTOCOL_TLS' instead of '.PROTOCOL_TLSv1'?
+
+Used LLM to figure out what to use as a replacement protocol in tests.
+
+Assisted-By: Claude Opus 4.6
+---
+ changelog/5097.bugfix.rst        |  2 ++
+ src/urllib3/contrib/pyopenssl.py |  4 +++-
+ test/test_ssl.py                 | 14 ++++++++------
+ test/test_util.py                | 24 +++++++++++++++---------
+ 4 files changed, 28 insertions(+), 16 deletions(-)
+ create mode 100644 changelog/5097.bugfix.rst
+
+diff --git a/changelog/5097.bugfix.rst b/changelog/5097.bugfix.rst
+new file mode 100644
+index 0000000000..73ed0ddaa1
+--- /dev/null
++++ b/changelog/5097.bugfix.rst
+@@ -0,0 +1,2 @@
++Fixed an ``AttributeError`` on Python built with OpenSSL 4+, where
++``ssl.PROTOCOL_TLSv1`` no longer exists.
+diff --git a/src/urllib3/contrib/pyopenssl.py b/src/urllib3/contrib/pyopenssl.py
+index 42781590ee..76a225b7bf 100644
+--- a/src/urllib3/contrib/pyopenssl.py
++++ b/src/urllib3/contrib/pyopenssl.py
+@@ -68,9 +68,11 @@ class UnsupportedExtension(Exception):  # type: ignore[no-redef]
+ _openssl_versions: dict[int, int] = {
+     util.ssl_.PROTOCOL_TLS: OpenSSL.SSL.SSLv23_METHOD,  # type: ignore[attr-defined]
+     util.ssl_.PROTOCOL_TLS_CLIENT: OpenSSL.SSL.SSLv23_METHOD,  # type: ignore[attr-defined]
+-    ssl.PROTOCOL_TLSv1: OpenSSL.SSL.TLSv1_METHOD,
+ }
+ 
++if hasattr(ssl, "PROTOCOL_TLSv1") and hasattr(OpenSSL.SSL, "TLSv1_METHOD"):
++    _openssl_versions[ssl.PROTOCOL_TLSv1] = OpenSSL.SSL.TLSv1_METHOD
++
+ if hasattr(ssl, "PROTOCOL_TLSv1_1") and hasattr(OpenSSL.SSL, "TLSv1_1_METHOD"):
+     _openssl_versions[ssl.PROTOCOL_TLSv1_1] = OpenSSL.SSL.TLSv1_1_METHOD
+ 
+diff --git a/test/test_ssl.py b/test/test_ssl.py
+index 6b1ab8589b..1e4063bf68 100644
+--- a/test/test_ssl.py
++++ b/test/test_ssl.py
+@@ -176,19 +176,21 @@ def test_create_urllib3_context_default_ciphers(
+ 
+         context.set_ciphers.assert_not_called()
+ 
++    # PROTOCOL_TLS_SERVER is used as a stand-in for any non-default ssl_version.
++    # PROTOCOL_TLSv1/TLSv1_2 are unavailable when Python is built with OpenSSL 4+.
+     @pytest.mark.parametrize(
+         "kwargs",
+         [
+             {
+-                "ssl_version": ssl.PROTOCOL_TLSv1,
++                "ssl_version": ssl.PROTOCOL_TLS_SERVER,
+                 "ssl_minimum_version": ssl.TLSVersion.MINIMUM_SUPPORTED,
+             },
+             {
+-                "ssl_version": ssl.PROTOCOL_TLSv1,
++                "ssl_version": ssl.PROTOCOL_TLS_SERVER,
+                 "ssl_maximum_version": ssl.TLSVersion.TLSv1,
+             },
+             {
+-                "ssl_version": ssl.PROTOCOL_TLSv1,
++                "ssl_version": ssl.PROTOCOL_TLS_SERVER,
+                 "ssl_minimum_version": ssl.TLSVersion.MINIMUM_SUPPORTED,
+                 "ssl_maximum_version": ssl.TLSVersion.MAXIMUM_SUPPORTED,
+             },
+@@ -229,10 +231,10 @@ def test_create_urllib3_context_ssl_version_and_ssl_min_max_version_no_warning(
+     @pytest.mark.parametrize(
+         "kwargs",
+         [
+-            {"ssl_version": ssl.PROTOCOL_TLSv1, "ssl_minimum_version": None},
+-            {"ssl_version": ssl.PROTOCOL_TLSv1, "ssl_maximum_version": None},
++            {"ssl_version": ssl.PROTOCOL_TLS_SERVER, "ssl_minimum_version": None},
++            {"ssl_version": ssl.PROTOCOL_TLS_SERVER, "ssl_maximum_version": None},
+             {
+-                "ssl_version": ssl.PROTOCOL_TLSv1,
++                "ssl_version": ssl.PROTOCOL_TLS_SERVER,
+                 "ssl_minimum_version": None,
+                 "ssl_maximum_version": None,
+             },
+diff --git a/test/test_util.py b/test/test_util.py
+index 8612ab5eaf..18c65f0312 100644
+--- a/test/test_util.py
++++ b/test/test_util.py
+@@ -1216,15 +1216,21 @@ def test_resolve_cert_reqs(
+     ) -> None:
+         assert resolve_cert_reqs(candidate) == requirements
+ 
+-    @pytest.mark.parametrize(
+-        "candidate, version",
+-        [
+-            (ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_TLSv1),
+-            ("PROTOCOL_TLSv1", ssl.PROTOCOL_TLSv1),
+-            ("TLSv1", ssl.PROTOCOL_TLSv1),
+-            (ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv23),
+-        ],
+-    )
++    candidate_version = [
++        (ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv23),
++        ("PROTOCOL_SSLv23", ssl.PROTOCOL_SSLv23),
++        ("SSLv23", ssl.PROTOCOL_SSLv23),
++    ]
++    if hasattr(ssl, "PROTOCOL_TLSv1"):
++        candidate_version.extend(
++            [
++                (ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_TLSv1),
++                ("PROTOCOL_TLSv1", ssl.PROTOCOL_TLSv1),
++                ("TLSv1", ssl.PROTOCOL_TLSv1),
++            ]
++        )
++
++    @pytest.mark.parametrize("candidate, version", candidate_version)
+     def test_resolve_ssl_version(self, candidate: int | str, version: int) -> None:
+         assert resolve_ssl_version(candidate) == version
+ 
