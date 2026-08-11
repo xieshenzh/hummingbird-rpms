@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Regression/xtables-tools-locking-vulnerable-to-local-DoS
+Description: Test for xtables tools locking vulnerable to local DoS
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: xtables tools locking vulnerable to local DoS

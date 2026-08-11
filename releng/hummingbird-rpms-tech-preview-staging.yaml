@@ -382,6 +382,8 @@ spec:
           contentType: rpm
         - name: iproute-main
           contentType: rpm
+        - name: iptables-main
+          contentType: rpm
         - name: jaeger-main
           contentType: rpm
         - name: jansson-main

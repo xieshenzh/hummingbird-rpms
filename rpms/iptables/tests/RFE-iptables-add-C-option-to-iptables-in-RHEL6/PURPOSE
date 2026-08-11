@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Regression/RFE-iptables-add-C-option-to-iptables-in-RHEL6
+Description: Test for RFE iptables add -C option to iptables in RHEL6 to
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: RFE: iptables: add -C option to iptables in RHEL6 to check for existing rules

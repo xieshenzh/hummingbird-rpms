@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Regression/TRACE-target-of-iptables-can-t-work-in
+Description: Test for TRACE target of iptables can't work in
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: TRACE target of iptables can't work in RHEL7.1/RHEL7.2

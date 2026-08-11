@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Sanity/NFQUEUE-queue-bypass
+Description: Test for "--queue-bypass" backport
+Author: Ales Zelinka <azelinka@redhat.com>
+Bug summary: "--queue-bypass" backport

@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Regression/iptables-rule-deletion-fails-for-rules-that-use
+Description: Test for iptables rule deletion fails for rules that use
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: iptables rule deletion fails for rules that use ipset match "--match-set"

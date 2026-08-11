@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Regression/ip6tables-t-nat-A-POSTROUTING-OUTPUT-with-DROP
+Description: Test for ip6tables -t nat -A POSTROUTING/OUTPUT with DROP
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: ip6tables -t nat -A POSTROUTING/OUTPUT with DROP target can't filter packets

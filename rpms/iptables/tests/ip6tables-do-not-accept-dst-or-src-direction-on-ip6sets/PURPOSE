@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Regression/ip6tables-do-not-accept-dst-or-src-direction-on-ip6sets
+Description: Test for while adding iptables rules with ipv6 sets in
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: while adding iptables rules with ipv6 sets in destination direction, either individually or combined with source we see error messages.

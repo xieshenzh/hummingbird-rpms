@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Sanity/backport-iptables-add-libxt-cgroup-frontend
+Description: Test for backport iptables add libxt_cgroup frontend
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: Backport: iptables: add libxt_cgroup frontend

@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Regression/iptables-save-modprobe-option
+Description: Test for iptables-save man page completely wrong - which
+Author: Ales Zelinka <azelinka@redhat.com>
+Bug summary: iptables-save man page completely wrong - which conflicting arguments should work?

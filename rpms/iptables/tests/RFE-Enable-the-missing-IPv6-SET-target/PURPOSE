@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Regression/RFE-Enable-the-missing-IPv6-SET-target
+Description: Test for [RFE] Enable the missing IPv6 "SET" target
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: [RFE] Enable the missing IPv6 "SET" target userland ip6tables support to enable ipset to be usable with IPv6
