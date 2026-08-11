@@ -4,7 +4,7 @@
 
 Name:           snappy
 Version:        1.2.2
-Release:        4.2%{?dist}
+Release:        6%{?dist}
 Summary:        Fast compression and decompression library
 
 License:        BSD-3-Clause
@@ -17,7 +17,6 @@ Patch0:         %{name}-thirdparty.patch
 # Do not forcibly disable RTTI
 Patch1:         %{name}-do-not-disable-rtti.patch
 
-BuildRequires:  make
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 %{?with_gbench:BuildRequires:  google-benchmark-devel}
@@ -35,8 +34,6 @@ bigger.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       cmake-filesystem
-Requires:       pkgconfig
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
@@ -49,10 +46,6 @@ developing applications that use %{name}.
 
 %build
 # gtest 1.17.0 requires C++17 or later
-# Use %%cmake_build/%%cmake_install/%%ctest instead of %%make_build/%%make_install/ctest
-# because cmake-rpm-macros 4.x defaults to the Ninja generator, not Unix Makefiles.
-# https://fedoraproject.org/wiki/Changes/CMake_ninja_default
-# https://docs.fedoraproject.org/en-US/packaging-guidelines/CMake/
 %cmake -DCMAKE_CXX_STANDARD=17 %{!?with_gbench:-DSNAPPY_BUILD_BENCHMARKS=OFF} %{!?with_gtest:-DSNAPPY_BUILD_TESTS=OFF}
 %cmake_build
 
@@ -100,6 +93,12 @@ rm -rf %{buildroot}%{_datadir}/doc/snappy-devel/
 
 
 %changelog
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sat Feb 14 2026 Cristian Le <git@lecris.dev> - 1.2.2-5
+- Use standard CMake macros (rhbz#2381131)
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.2-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
