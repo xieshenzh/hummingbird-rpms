@@ -1070,6 +1070,8 @@ spec:
           contentType: rpm
         - name: uriparser-main
           contentType: rpm
+        - name: userspace-rcu-main
+          contentType: rpm
         - name: utf8proc-main
           contentType: rpm
         - name: util-linux-main
