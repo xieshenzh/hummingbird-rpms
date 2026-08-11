@@ -1,0 +1,8 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "6",
+  "sha": "e7771e29110daf1af51ff379cf56ccc816c6074f",
+  "source": "https://src.fedoraproject.org/rpms/libndp.git",
+  "version": "1.9"
+}
