@@ -34,7 +34,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl3
 Version: 3.5.7
-Release: 2%{?dist}
+Release: 2.1%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -136,6 +136,14 @@ Requires: crypto-policies >= 20180730
 Requires(pre): sed
 Recommends: pkcs11-provider%{?_isa}
 Provides: deprecated()
+# Hummingbird: openssl3 is the 3.5 compat stack for after base openssl moves to
+# 4.x (soname libcrypto.so.4). While base openssl is still 3.x it ships the same
+# soname/files (libcrypto.so.3, engines-3/*.so), so the two cannot coexist.
+# Forbid it explicitly, otherwise the resolver may pull openssl3-libs alongside
+# openssl-libs (its Provides: openssl-devel outranks the base) and the rpm
+# transaction aborts on file conflicts. Self-deactivates once base openssl is
+# 4.x, where the two are meant to coexist.
+Conflicts: openssl-libs < 1:4.0
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs

@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Add Conflicts: openssl-libs < 1:4.0 to openssl3-libs to prevent the shared libcrypto.so.3/libssl.so.3 file conflict with base openssl while base is < 4",
+  "modification_status": "modified",
   "release": "2",
   "release_monitoring_project_id": 377610,
   "sha": "8d1c92561b3f6ca1a1bd6e72d71cb3a5fe67ec4d",
