@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Use cmake macros for Ninja generator compatibility (cmake-rpm-macros 4.x)",
   "modification_status": "modified",
-  "release": "4",
-  "sha": "53a26600710394962486bb130d06af8d6a012b6e",
+  "release": "6",
+  "sha": "4c21b8dd2a38169b5993c5ab4aef32a16fedc429",
   "source": "https://src.fedoraproject.org/rpms/snappy.git",
   "upstream_repo": "https://github.com/google/snappy",
   "version": "1.2.2"
