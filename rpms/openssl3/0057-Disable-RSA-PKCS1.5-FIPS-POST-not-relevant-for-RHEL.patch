@@ -1,0 +1,27 @@
+From 3ffdc68f16d6b326ff0854053fc9206be3dabcc2 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Wed, 21 Jan 2026 18:13:43 +0100
+Subject: [PATCH 57/57] Disable RSA-PKCS1.5 FIPS POST, not relevant for RHEL
+
+---
+ providers/fips/self_test_kats.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/providers/fips/self_test_kats.c b/providers/fips/self_test_kats.c
+index f453b2f2fb..5b37387d83 100644
+--- a/providers/fips/self_test_kats.c
++++ b/providers/fips/self_test_kats.c
+@@ -1190,8 +1190,8 @@ int SELF_TEST_kats(OSSL_SELF_TEST *st, OSSL_LIB_CTX *libctx)
+         ret = 0;
+     if (!self_test_kems(st, libctx))
+         ret = 0;
+-    if (!self_test_asym_ciphers(st, libctx))
+-        ret = 0;
++/*    if (!self_test_asym_ciphers(st, libctx))
++        ret = 0; */
+ 
+     RAND_set0_private(libctx, saved_rand);
+     return ret;
+-- 
+2.52.0
+
