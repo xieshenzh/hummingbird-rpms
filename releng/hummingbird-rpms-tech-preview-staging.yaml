@@ -656,6 +656,8 @@ spec:
           contentType: rpm
         - name: nettle-main
           contentType: rpm
+        - name: nftables-main
+          contentType: rpm
         - name: nghttp2-main
           contentType: rpm
         - name: nghttp3-main

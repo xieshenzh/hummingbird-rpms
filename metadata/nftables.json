@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "4",
+  "release_monitoring_project_id": 2082,
+  "sha": "ba3704f14acc3f5c6b9c01d230a64737c4abc480",
+  "source": "https://src.fedoraproject.org/rpms/nftables.git",
+  "version": "1.1.6"
+}
