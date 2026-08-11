@@ -736,6 +736,8 @@ spec:
           contentType: rpm
         - name: pam-main
           contentType: rpm
+        - name: passt-main
+          contentType: rpm
         - name: patch-main
           contentType: rpm
         - name: pcre2-main
