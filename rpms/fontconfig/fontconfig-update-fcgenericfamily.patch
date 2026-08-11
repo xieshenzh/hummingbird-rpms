@@ -1,0 +1,43 @@
+diff -pruN fontconfig-2.18.1.orig/fc-genericfamily/monospace.txt fontconfig-2.18.1/fc-genericfamily/monospace.txt
+--- fontconfig-2.18.1.orig/fc-genericfamily/monospace.txt	2026-07-02 18:26:39.000000000 +0900
++++ fontconfig-2.18.1/fc-genericfamily/monospace.txt	2026-07-02 20:28:07.336811750 +0900
+@@ -257,3 +257,20 @@ Tinos Nerd Font
+ Ubuntu Nerd Font
+ UbuntuMono Nerd Font
+ VictorMono Nerd Font
++# Fedora-specific
++Noto Sans Ethiopic
++Noto Sans Bengali
++Noto Sans Georgian
++Noto Sans Gujarati
++Noto Sans Hebrew
++Noto Sans Devanagari
++Noto Sans Kannada
++Noto Sans Khmer
++Noto Sans Lao
++Noto Sans Oriya
++Noto Sans Sinhala
++Noto Sans Tamil
++Noto Sans Telugu
++Noto Sans Thai
++Jomolhari
++
+diff -pruN fontconfig-2.18.1.orig/fc-genericfamily/sans-serif.txt fontconfig-2.18.1/fc-genericfamily/sans-serif.txt
+--- fontconfig-2.18.1.orig/fc-genericfamily/sans-serif.txt	2026-07-02 18:26:39.000000000 +0900
++++ fontconfig-2.18.1/fc-genericfamily/sans-serif.txt	2026-07-02 20:24:37.079481274 +0900
+@@ -565,3 +565,6 @@ Ubuntu
+ Ubuntu Condensed
+ # Nerd Fonts - Nerd Font sans-serif variants
+ Ubuntu Nerd Font
++# Fedora-specific
++PakType Naskh Basic
++Jomolhari
+diff -pruN fontconfig-2.18.1.orig/fc-genericfamily/serif.txt fontconfig-2.18.1/fc-genericfamily/serif.txt
+--- fontconfig-2.18.1.orig/fc-genericfamily/serif.txt	2026-07-02 18:26:39.000000000 +0900
++++ fontconfig-2.18.1/fc-genericfamily/serif.txt	2026-07-02 20:25:02.909273913 +0900
+@@ -325,3 +325,5 @@ Noto Serif Vithkuqi
+ Noto Serif Yezidi
+ # Nerd Fonts - Nerd Font serif variants
+ Tinos Nerd Font
++# Fedora-specific
++Padauk
