@@ -1,7 +1,7 @@
 Name:           nodejs24
 Epoch:          1
 Version:        24.18.1
-Release:        0.2.1%{?dist}
+Release:        0.2.2%{?dist}
 
 Summary:        JavaScript runtime
 License:        Apache-2.0 AND Artistic-2.0 AND BSD-2-Clause AND BSD-3-Clause AND BlueOak-1.0.0 AND CC-BY-3.0 AND CC0-1.0 AND ISC AND MIT
