@@ -260,6 +260,8 @@ spec:
           contentType: rpm
         - name: findutils-main
           contentType: rpm
+        - name: firewalld-main
+          contentType: rpm
         - name: fmt-main
           contentType: rpm
         - name: fontconfig-main
