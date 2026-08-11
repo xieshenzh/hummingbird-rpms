@@ -130,6 +130,14 @@ exit 0
 %go_vendor_license_check -c %{S:5}
 %if %{with check}
 %gocheck2
+# Disable git's automatic maintenance/gc during the test suite. Under git 2.55
+# the "git commit" in the t-prune.sh "prune does not invoke external diff
+# programs" test fires a detached "git maintenance run --auto" that repacks
+# objects concurrently with "git lfs prune", racing it and causing spurious
+# "Prune error: missing object" failures.
+GIT_CONFIG_COUNT=2 \
+  GIT_CONFIG_KEY_0=maintenance.auto GIT_CONFIG_VALUE_0=false \
+  GIT_CONFIG_KEY_1=gc.auto GIT_CONFIG_VALUE_1=0 \
 PATH=%{buildroot}%{_bindir}:%{gobuilddir}/bin:$PATH \
     make -C t PROVE_EXTRA_ARGS="-j$(getconf _NPROCESSORS_ONLN)"
 %endif
