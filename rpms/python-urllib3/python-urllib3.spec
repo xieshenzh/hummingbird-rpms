@@ -6,7 +6,7 @@
 
 Name:           python-urllib3
 Version:        2.7.0
-Release:        3.1%{?dist}
+Release:        7%{?dist}
 Summary:        HTTP library with thread-safe connection pooling, file post, and more
 
 # SPDX
@@ -30,6 +30,15 @@ Source0:        %{url}/archive/%{version}/urllib3-%{version}.tar.gz
 %global hypercorn_url https://github.com/urllib3/hypercorn
 %global hypercorn_commit d1719f8c1570cbd8e6a3719ffdb14a4d72880abb
 Source1:        %{hypercorn_url}/archive/%{hypercorn_commit}/hypercorn-%{hypercorn_commit}.tar.gz
+
+# Deal with ssl.PROTOCOL_TLSv1 removal from Python built with OpenSSL 4+
+Patch:          https://github.com/urllib3/urllib3/pull/5097.patch
+# Replace deprecated pyOpenSSL X509.get_subject and Context.set_passwd_cb methods
+# https://github.com/urllib3/urllib3/pull/5103 rebased
+Patch:          5103.patch
+
+# Compatibility with the latest pytest
+Patch:          https://github.com/urllib3/urllib3/commit/c420e267.patch
 
 BuildArch:      noarch
 
@@ -82,7 +91,7 @@ Recommends:     python3-urllib3+socks
 
 
 %prep
-%autosetup -n urllib3-%{version}
+%autosetup -p1 -n urllib3-%{version}
 %setup -q -n urllib3-%{version} -T -D -b 1
 
 # Allow setuptools-scm 10+
