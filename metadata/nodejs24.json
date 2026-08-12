@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 24.18.1",
+  "modification_reason": "Update to upstream version 24.18.1; CVE-2026-69152",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 8251,
