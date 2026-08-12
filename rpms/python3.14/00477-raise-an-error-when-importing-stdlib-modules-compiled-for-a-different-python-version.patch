@@ -81,10 +81,10 @@ index 2a17c891dd..64017c666c 100644
  }
  #endif
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index f86d7363e0..6aa97b0b6f 100644
+index 526d500fe0..506ec30408 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -3420,3 +3420,6 @@ MODULE__MULTIBYTECODEC_DEPS=$(srcdir)/Modules/cjkcodecs/multibytecodec.h
+@@ -3426,3 +3426,6 @@ MODULE__MULTIBYTECODEC_DEPS=$(srcdir)/Modules/cjkcodecs/multibytecodec.h
  # Local Variables:
  # mode: makefile
  # End:
@@ -92,10 +92,10 @@ index f86d7363e0..6aa97b0b6f 100644
 +# Fedora-specific, downstream only
 +PY_STDMODULE_CFLAGS += -D_PyHack_check_version_on_modinit=1
 diff --git a/Modules/_tkinter.c b/Modules/_tkinter.c
-index 6c1af66408..2eb3665fa7 100644
+index 22126b67d8..7ef5b5d5cd 100644
 --- a/Modules/_tkinter.c
 +++ b/Modules/_tkinter.c
-@@ -3490,6 +3490,12 @@ static struct PyModuleDef _tkintermodule = {
+@@ -3611,6 +3611,12 @@ static struct PyModuleDef _tkintermodule = {
  PyMODINIT_FUNC
  PyInit__tkinter(void)
  {

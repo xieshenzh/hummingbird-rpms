@@ -24,11 +24,12 @@ discover:
       test: "PYTHON=python${pybasever}d TOX=false VERSION=${pybasever} CYTHON=true ./venv.sh"
     - name: selftest
       path: /selftest
-      test: "VERSION=${pybasever} X='-i test_check_probes' ./parallel.sh"
+      # test_subparser_inherits_reparse_deferral fails on RHEL 9: https://github.com/python/cpython/issues/155485
+      test: "VERSION=${pybasever} X='-i test_check_probes -i test_subparser_inherits_reparse_deferral' ./parallel.sh"
     - name: debugtest
       path: /selftest
       # test_base_interpreter: https://github.com/python/cpython/issues/131372
-      test: "VERSION=${pybasever} PYTHON=python${pybasever}d X='-i test_check_probes -i test_base_interpreter' ./parallel.sh"
+      test: "VERSION=${pybasever} PYTHON=python${pybasever}d X='-i test_check_probes -i test_base_interpreter -i test_subparser_inherits_reparse_deferral' ./parallel.sh"
     - name: freethreadingtest
       path: /selftest
       test: "VERSION=${pybasever}t X='-i test_check_probes -i test_base_interpreter' ./parallel.sh"
