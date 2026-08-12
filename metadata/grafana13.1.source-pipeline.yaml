@@ -16,18 +16,18 @@ transform:
       - |
         set -euo pipefail
         # Apply every patch %prep will (in the same order), not just
-        # grafana-yarn-cache.patch: the nanoid/fast-uri/axios/brace-postcss
-        # CVE patches also bump yarn.lock/package.json entries. Populating
-        # the cache from the pristine (pre-CVE-patch) lockfile leaves it
-        # missing whatever versions those patches bump to, so %build's own
+        # grafana-yarn-cache.patch: the nanoid/axios CVE patches also bump
+        # yarn.lock/package.json entries. Populating the cache from the
+        # pristine (pre-CVE-patch) lockfile leaves it missing whatever
+        # versions those patches bump to, so %build's own
         # `yarn install --immutable` (against the post-patch lockfile) fails
         # with "Cache entry required but missing" for exactly those packages.
+        # (grafana-fast-uri-cve.patch/grafana-brace-postcss-cve.patch/
+        # grafana-ip-address-cve.patch are no longer applied as of 13.1.3 --
+        # upstream's own dependency bumps already satisfy those CVE fixes.)
         patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache.patch"
         patch -p1 < "${PACKAGE_DIR}/grafana-nanoid-cve.patch"
-        patch -p1 < "${PACKAGE_DIR}/grafana-fast-uri-cve.patch"
         patch -p1 < "${PACKAGE_DIR}/grafana-axios-cve.patch"
-        patch -p1 < "${PACKAGE_DIR}/grafana-brace-postcss-cve.patch"
-        patch -p1 < "${PACKAGE_DIR}/grafana-ip-address-cve.patch"
         # Must apply after the CVE patches above: pins compressionLevel and
         # carries the resulting full yarn.lock checksum regeneration (see
         # grafana-yarn-cache-compression.patch's own header comment).
@@ -49,18 +49,12 @@ transform:
     outputs:
       - "grafana-yarn-cache-${VERSION}.tar.bz2"
 
-# gorget 0.1.16 fixed a bug where a single-module Go vendor archive packed
-# only "vendor/" at its top level, which go_vendor_license --use-archive
-# mis-extracts as an independently-wrapped sibling of the source tree
-# instead of nesting it inside -- causing every go-vendor-tools.toml license
-# pin to spuriously report as "changed" in %check even though the vendor
-# content itself was untouched (gorget-project/gorget#32). The fix adds
-# go.mod/go.sum/go.work alongside vendor/, which changes this archive's own
-# checksum without changing any dependency's resolved version or content.
-accepted-checksums:
-  - file: "grafana-13.1.2-vendor.tar.bz2"
-    checksum: "80c40e092eb0cf591cf5a7e740303f4435f71ebac89264cf0b11338aa92122aab616700763ea037af68a65dcb1d98f6341a47d76f18026d7f50684ca21b86bd6"
-    reason: "gorget 0.1.16 fixes vendor archive layout (gorget-project/gorget#32); go.mod/go.sum/go.work added alongside vendor/, no dependency content changed"
-  - file: "grafana-yarn-cache-13.1.2.tar.bz2"
-    checksum: "fd08388567e9581794f8fa6f42bd1d1fa05ce05438f46dc7b18c00c2b366ab0315a6cc5d65176906bafcc32426ae25691c315a2bbc85ddb5f72163441056d3fb"
-    reason: "grafana-ip-address-cve.patch (CVE-2026-69192/69198) ported forward from main, bumping ip-address 10.2.0 -> 10.3.1; grafana-yarn-cache-compression.patch regenerated to reflect its yarn.lock changes"
+# No accepted-checksums needed as of 13.1.3: both Source1 and the yarn
+# cache archive embed the version in their own filename, so a version bump
+# is always a "new file" to gorget's re-publication check, never a same-name
+# checksum collision. The 13.1.2-specific entries this section used to carry
+# (gorget 0.1.16's vendor-layout fix; the ip-address CVE bump's yarn.lock
+# effect) are gone along with that filename -- both are already reflected
+# directly in the regenerated grafana-13.1.3-vendor.tar.bz2 and
+# grafana-yarn-cache-13.1.3.tar.bz2 verified above, not called out as
+# exceptions here.

@@ -2,7 +2,7 @@
 
 # https://github.com/grafana/grafana
 %global goipath github.com/grafana/grafana
-Version:        13.1.2
+Version:        13.1.3
 
 %gometa -L -f
 
@@ -21,10 +21,23 @@ Source2:        go-vendor-tools.toml
 Source3:        grafana-yarn-cache-%{version}.tar.bz2
 Patch0:         grafana-yarn-cache.patch
 Patch1:         grafana-nanoid-cve.patch
-Patch2:         grafana-fast-uri-cve.patch
+# Patch2 (grafana-fast-uri-cve.patch, HUM-5656/CVE-2026-18446) is a no-op as
+# of 13.1.3: upstream's own fast-uri@npm:^3.0.1 already resolves to 3.1.5,
+# the exact version this patch bumped to. Left commented (not deleted) for
+# audit-trail continuity with the closed CVE ticket -- the file itself is
+# still in-tree.
+#Patch2:        grafana-fast-uri-cve.patch
 Patch3:         grafana-axios-cve.patch
-Patch4:         grafana-brace-postcss-cve.patch
-Patch5:         grafana-ip-address-cve.patch
+# Patch4 (grafana-brace-postcss-cve.patch, HUM-5773/CVE-2026-69152/69153) is
+# a no-op as of 13.1.3: upstream's own resolutions for brace-expansion
+# (1.1.18/2.1.4/5.0.9) and postcss (8.5.23, newer than this patch's 8.5.19
+# target) already satisfy it. Left commented for audit-trail continuity.
+#Patch4:        grafana-brace-postcss-cve.patch
+# Patch5 (grafana-ip-address-cve.patch, HUM-5791/CVE-2026-69192/69198) is a
+# no-op as of 13.1.3: upstream's own ip-address@npm:^10.2.0 already resolves
+# to 10.4.0, newer than this patch's 10.3.1 target. Left commented for
+# audit-trail continuity.
+#Patch5:        grafana-ip-address-cve.patch
 # Must apply after the CVE patches above: pins compressionLevel (was
 # upstream's non-deterministic "mixed") and carries the full yarn.lock
 # checksum regeneration that requires, reflecting their yarn.lock changes.
@@ -700,7 +713,7 @@ Provides:       bundled(npm(attr-accept)) = 2.2.5
 Provides:       bundled(npm(autolinker)) = 3.16.2
 Provides:       bundled(npm(available-typed-arrays)) = 1.0.7
 Provides:       bundled(npm(axe-core)) = 4.11.1
-Provides:       bundled(npm(axios)) = 1.16.1
+Provides:       bundled(npm(axios)) = 1.18.0
 Provides:       bundled(npm(babel-jest)) = 30.3.0
 Provides:       bundled(npm(babel-plugin-istanbul)) = 7.0.1
 Provides:       bundled(npm(babel-plugin-jest-hoist)) = 30.3.0
@@ -715,9 +728,9 @@ Provides:       bundled(npm(base64-js)) = 1.5.1
 Provides:       bundled(npm(baseline-browser-mapping)) = 2.9.19
 Provides:       bundled(npm(body-parser)) = 2.2.1
 Provides:       bundled(npm(boolbase)) = 1.0.0
-Provides:       bundled(npm(brace-expansion)) = 1.1.14
-Provides:       bundled(npm(brace-expansion)) = 2.1.0
-Provides:       bundled(npm(brace-expansion)) = 5.0.6
+Provides:       bundled(npm(brace-expansion)) = 1.1.18
+Provides:       bundled(npm(brace-expansion)) = 2.1.4
+Provides:       bundled(npm(brace-expansion)) = 5.0.9
 Provides:       bundled(npm(braces)) = 3.0.3
 Provides:       bundled(npm(browserslist)) = 4.28.1
 Provides:       bundled(npm(bser)) = 2.1.1
@@ -978,7 +991,7 @@ Provides:       bundled(npm(fast-json-patch)) = 3.1.1
 Provides:       bundled(npm(fast-json-stable-stringify)) = 2.1.0
 Provides:       bundled(npm(fast-safe-stringify)) = 2.1.1
 Provides:       bundled(npm(fast-shallow-equal)) = 1.0.0
-Provides:       bundled(npm(fast-uri)) = 3.1.2
+Provides:       bundled(npm(fast-uri)) = 3.1.5
 Provides:       bundled(npm(fastest-stable-stringify)) = 2.0.2
 Provides:       bundled(npm(fastq)) = 1.17.1
 Provides:       bundled(npm(fault)) = 1.0.4
@@ -1107,7 +1120,7 @@ Provides:       bundled(npm(inline-style-prefixer)) = 7.0.1
 Provides:       bundled(npm(internmap)) = 2.0.3
 Provides:       bundled(npm(intl-messageformat)) = 10.1.4
 Provides:       bundled(npm(invariant)) = 2.2.4
-Provides:       bundled(npm(ip-address)) = 10.3.1
+Provides:       bundled(npm(ip-address)) = 10.4.0
 Provides:       bundled(npm(ipaddr.js)) = 1.9.1
 Provides:       bundled(npm(is-alphabetical)) = 2.0.1
 Provides:       bundled(npm(is-alphanumerical)) = 2.0.1
@@ -1352,8 +1365,8 @@ Provides:       bundled(npm(msw)) = 2.10.4
 Provides:       bundled(npm(msw-storybook-addon)) = 2.0.7
 Provides:       bundled(npm(mute-stream)) = 2.0.0
 Provides:       bundled(npm(nano-css)) = 5.6.2
-Provides:       bundled(npm(nanoid)) = 3.3.11
-Provides:       bundled(npm(nanoid)) = 5.1.6
+Provides:       bundled(npm(nanoid)) = 3.3.16
+Provides:       bundled(npm(nanoid)) = 5.1.16
 Provides:       bundled(npm(napi-postinstall)) = 0.3.4
 Provides:       bundled(npm(natural-compare)) = 1.4.0
 Provides:       bundled(npm(negotiator)) = 1.0.0
@@ -1445,7 +1458,7 @@ Provides:       bundled(npm(playwright)) = 1.56.1
 Provides:       bundled(npm(playwright-core)) = 1.56.1
 Provides:       bundled(npm(pluralize)) = 8.0.0
 Provides:       bundled(npm(possible-typed-array-names)) = 1.0.0
-Provides:       bundled(npm(postcss)) = 8.5.10
+Provides:       bundled(npm(postcss)) = 8.5.23
 Provides:       bundled(npm(postcss-modules-extract-imports)) = 3.1.0
 Provides:       bundled(npm(postcss-modules-local-by-default)) = 4.0.5
 Provides:       bundled(npm(postcss-modules-scope)) = 3.2.0
