@@ -1,0 +1,53 @@
+---
+- hosts: localhost
+  tags: [ always ]
+  tasks:
+  - set_fact:
+      our_required_packages:
+      - sudo
+      - passwd          # sudoers-options-sanity-test needs passwd command
+      - postfix         # sudoers-options-sanity-test needs mailq command
+      - wget            # upstream-testsuite-execution-and-rebuild-test needs wget command
+      - yum-utils       # upstream-testsuite-execution-and-rebuild-test needs yum-builddep command
+      - rpm-build       # upstream-testsuite-execution-and-rebuild-test needs rpmbuild command
+      - openssh-clients # use_pty-option needs ssh command
+      - expect          # use_pty-option needs expect command
+      - procps          # run-as needs ps command
+
+- hosts: localhost
+  tags:
+  - classic
+  roles:
+  - role: standard-test-beakerlib
+    tests:
+    - sudoers-options-sanity-test
+    - upstream-testsuite-execution-and-rebuild-test
+    #- use_pty-option    # test logic is currently broken; maintainer is looking into it
+    - run-as
+    - fully-qualified-hostnames
+    required_packages: "{{ our_required_packages }}"
+
+- hosts: localhost
+  tags:
+  - container
+  roles:
+  - role: standard-test-beakerlib
+    tests:
+    - sudoers-options-sanity-test
+    - upstream-testsuite-execution-and-rebuild-test
+    #- use_pty-option   # cannot run (needs sshd configured and running)
+    - run-as
+    #- fully-qualified-hostnames   # cannot run (needs sshd configured and running)
+    required_packages: "{{ our_required_packages }}"
+
+- hosts: localhost
+  tags:
+  - atomic
+  roles:
+  - role: standard-test-beakerlib
+    tests:
+    - run-as
+# - sudoers-options-sanity-test      # cannot run (needs to re-install package)
+# - upstream-testsuite-execution-and-rebuild-test    # cannot run (needs compiler suite)
+# - use_pty-option   # cannot run (needs expect)
+# - fully-qualified-hostnames   # cannot run (needs expect)

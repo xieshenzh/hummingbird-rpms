@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/sudo/Sanity/upstream-testsuite-execution-and-rebuild-test
+Description: This test rebuild sudo source rpm and checks that rebuild is OK. The second - main - part is about upstream testsuite execution.
+Author: Ales Marecek <amarecek@redhat.com>

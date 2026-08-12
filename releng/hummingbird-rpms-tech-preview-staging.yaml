@@ -1036,6 +1036,8 @@ spec:
           contentType: rpm
         - name: subversion-main
           contentType: rpm
+        - name: sudo-main
+          contentType: rpm
         - name: svt-av1-main
           contentType: rpm
         - name: swift-lang-main

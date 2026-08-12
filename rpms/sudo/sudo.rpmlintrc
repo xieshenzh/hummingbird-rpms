@@ -1,0 +1,16 @@
+# Sudo allows restricted root access for specified users. In other words,
+# it is a special package, which requires special permissions on on some
+# of the installed files.
+addFilter("missing-call-to-setgroups-before-setuid (/usr/bin/sudo|/usr/bin/sudoreplay|/usr/sbin/sudo_logsrvd|/usr/sbin/sudo_sendlog|/usr/libexec/sudo/sudoers.so|)$")
+
+addFilter("non-readable (/etc/sudo.conf|/etc/sudo_logsrvd.conf|/etc/sudoers|/usr/bin/sudoreplay) .*$")
+
+addFilter("non-standard-dir-perm (/etc/sudoers.d|/var/db/sudo|/var/db/sudo/lectured) .*$")
+
+addFilter("setuid-binary /usr/bin/sudo .*$")
+
+addFilter("non-standard-executable-perm (/usr/bin/sudo|/usr/bin/sudoreplay) .*$")
+
+addFilter("wrong-file-end-of-line-encoding /usr/share/doc/sudo/schema.ActiveDirectory$")
+
+addFilter("non-standard-dir-in-var db$")
