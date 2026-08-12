@@ -222,6 +222,8 @@ spec:
           contentType: rpm
         - name: drpm-main
           contentType: rpm
+        - name: duktape-main
+          contentType: rpm
         - name: dwz-main
           contentType: rpm
         - name: e2fsprogs-main
