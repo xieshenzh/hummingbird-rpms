@@ -1,3 +1,106 @@
+# New Version-String scheme-style defines
+%global featurever 21
+%global interimver 0
+%global updatever 12
+%global patchver 0
+%global buildver 8
+%global portablerelease 1
+%global rpmrelease 1
+
+# Define IcedTea version used for SystemTap tapsets and desktop file
+%global icedteaver      6.0.0pre00-c848b93a8598
+# Define current Git revision for the FIPS support patches
+%global fipsver 57722aab802
+# Define nssadapter variables
+%global nssadapter_version 0.1.1
+%global nssadapter_name nssadapter-%{nssadapter_version}
+# Define whether the crypto policy is expected to be active when testing
+%global crypto_policy_active true
+# Define JDK versions
+%global newjavaver %{featurever}.%{interimver}.%{updatever}.%{patchver}
+%global javaver         %{featurever}
+# Strip up to 6 trailing zeros in newjavaver, as the JDK does, to get the correct version used in filenames
+%global filever %(svn=%{newjavaver}; for i in 1 2 3 4 5 6 ; do svn=${svn%%.0} ; done; echo ${svn})
+# The tag used to create the OpenJDK tarball
+%global vcstag jdk-%{filever}+%{buildver}%{?tagsuffix:-%{tagsuffix}}
+
+# Standard JPackage naming and versioning defines
+%global origin          openjdk
+%global origin_nice     OpenJDK
+%global top_level_dir_name   %{vcstag}
+%global top_level_dir_name_backup %{top_level_dir_name}-backup
+
+# Define milestone (EA for pre-releases, GA for releases)
+# Release will be (where N is usually a number starting at 1):
+# - 0.N.ea<dist> for EA releases,
+# - N<dist> for GA releases
+%global is_ga           1
+%if %{is_ga}
+%global build_type GA
+%global ea_designator ""
+%global ea_designator_zip %{nil}
+%global extraver %{nil}
+%global eaprefix %{nil}
+%else
+%global build_type EA
+%global ea_designator ea
+%global ea_designator_zip -%{ea_designator}
+%global extraver .%{ea_designator}
+%global eaprefix 0.
+%endif
+
+%global compatiblename  java-%{javaver}-%{origin}
+# TODO think about renaming  tarball in portables so it matches and compatiblename and drop portable_compatiblename
+# It may be better to keep portables tarball as it is, as it nicely points out what is going from portables to rpms
+%global portable_compatiblename java-%{featurever}-%{origin}
+
+Name:    %{compatiblename}
+Version: %{newjavaver}.%{buildver}
+Release: %{?eaprefix}%{portablerelease}.%{rpmrelease}%{?extraver}%{?dist}
+
+%global fullversion     %{compatiblename}-%{version}-%{release}
+
+# java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons
+# and this change was brought into RHEL-4. java-1.5.0-ibm packages
+# also included the epoch in their virtual provides. This created a
+# situation where in-the-wild java-1.5.0-ibm packages provided "java =
+# 1:1.5.0". In RPM terms, "1.6.0 < 1:1.5.0" since 1.6.0 is
+# interpreted as 0:1.6.0. So the "java >= 1.6.0" requirement would be
+# satisfied by the 1:1.5.0 packages. Thus we need to set the epoch in
+# JDK package >= 1.6.0 to 1, and packages referring to JDK virtual
+# provides >= 1.6.0 must specify the epoch, "java >= 1:1.6.0".
+Epoch:   1
+Summary: %{origin_nice} %{featurever} Runtime Environment
+# Groups are only used up to RHEL 8 and on Fedora versions prior to F30
+%if (0%{?rhel} > 0 && 0%{?rhel} <= 8) || (0%{?fedora} >= 0 && 0%{?fedora} < 30)
+Group:   Development/Languages
+%endif
+
+# HotSpot code is licensed under GPLv2
+# JDK library code is licensed under GPLv2 with the Classpath exception
+# The Apache license is used in code taken from Apache projects (primarily xalan & xerces)
+# DOM levels 2 & 3 and the XML digital signature schemas are licensed under the W3C Software License
+# The JSR166 concurrency code is in the public domain
+# The BSD and MIT licenses are used for a number of third-party libraries (see ADDITIONAL_LICENSE_INFO)
+# The OpenJDK source tree includes:
+# - JPEG library (IJG), zlib & libpng (zlib), giflib (MIT), harfbuzz (ISC),
+# - freetype (FTL), jline (BSD) and LCMS (MIT)
+# - jquery (MIT), jdk.crypto.cryptoki PKCS 11 wrapper (RSA)
+# - public_suffix_list.dat from publicsuffix.org (MPLv2.0)
+# The test code includes copies of NSS under the Mozilla Public License v2.0
+# The PCSClite headers are under a BSD with advertising license
+# The elliptic curve cryptography (ECC) source code is licensed under the LGPLv2.1 or any later version
+# Automatically converted from old format: ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib and ISC and FTL and RSA - review is highly recommended.
+License:  Apache-1.1 AND Apache-2.0 AND LicenseRef-Callaway-BSD AND LicenseRef-Callaway-BSD-with-advertising AND GPL-1.0-or-later AND GPL-2.0-only AND LicenseRef-Callaway-GPLv2-with-exceptions AND IJG AND LicenseRef-Callaway-LGPLv2+ AND LicenseRef-Callaway-MIT AND MPL-2.0 AND LicenseRef-Callaway-Public-Domain AND W3C AND Zlib AND ISC AND FTL AND LicenseRef-RSA
+URL:      http://openjdk.java.net/
+
+# Check if pandoc was available to generate docs (including man pages)
+%if 0%{?rhel} == 8 || 0%{?epel} > 0 || 0%{?fedora} > 0
+%global pandoc_available 1
+%else
+%global pandoc_available 0
+%endif
+
 # RPM conditionals so as to be able to dynamically produce
 # slowdebug/release builds. See:
 # http://rpm.org/user_doc/conditional_builds.html
@@ -80,23 +183,24 @@
 %global normal_build %{nil}
 %endif
 
-# We have hardcoded list of files, which  is appearing in alternatives, and in files
-# in alternatives those are slaves and master, very often triplicated by man pages
-# in files all masters and slaves are ghosted
-# the ghosts are here to allow installation via query like `dnf install /usr/bin/java`
-# you can list those files, with appropriate sections: cat *.spec | grep -e --install -e --slave -e post_ -e alternatives
+# We have a hardcoded list of files, which appears in alternatives and in files
+# In alternatives, those are slaves and master, very often triplicated by man pages
+# In files, all masters and slaves are ghosted
+# The ghosts are here to allow installation via query like `dnf install /usr/bin/java`
+# You can list those files, with appropriate sections: cat *.spec | grep -e --install -e --slave -e post_ -e alternatives
 # TODO - fix those hardcoded lists via single list
-# Those files must *NOT* be ghosted for *slowdebug* packages
+# Those files must *NOT* be ghosted for *debug* packages
 # FIXME - if you are moving jshell or jlink or similar, always modify all three sections
-# you can check via headless and devels:
+# You can check via headless and devels:
 #    rpm -ql --noghost java-11-openjdk-headless-11.0.1.13-8.fc29.x86_64.rpm  | grep bin
 # == rpm -ql           java-11-openjdk-headless-slowdebug-11.0.1.13-8.fc29.x86_64.rpm  | grep bin
 # != rpm -ql           java-11-openjdk-headless-11.0.1.13-8.fc29.x86_64.rpm  | grep bin
-# similarly for other %%{_jvmdir}/{jre,java} and %%{_javadocdir}/{java,java-zip}
+# and similarly for other packages.
+
 %define is_release_build() %( if [ "%{?1}" == "%{debug_suffix_unquoted}" -o "%{?1}" == "%{fastdebug_suffix_unquoted}" ]; then echo "0" ; else echo "1"; fi )
 
-# while JDK is a techpreview(is_system_jdk=0), some provides are turned off. Once jdk stops to be an techpreview, move it to 1
-# as sytem JDK, we mean any JDK which can run whole system java stack without issues (like bytecode issues, module issues, dependencies...)
+# Indicates whether this is the default JDK on this version of RHEL
+# Only the default/system JDK provides unversioned Provides like 'java', 'jre' and 'java-devel'
 %global is_system_jdk 1
 
 %global aarch64         aarch64 arm64 armv8
@@ -113,6 +217,8 @@
 %global jit_arches      %{arm} %{aarch64} %{ix86} %{power64} s390x sparcv9 sparc64 x86_64 riscv64
 # Set of architectures which use the Zero assembler port (!jit_arches)
 %global zero_arches ppc s390
+# Set of architectures which run a full bootstrap cycle
+%global bootstrap_arches %{jit_arches}
 # Set of architectures which support SystemTap tapsets
 %global systemtap_arches %{jit_arches}
 # Set of architectures with a Ahead-Of-Time (AOT) compiler
@@ -199,13 +305,6 @@
 %global static_libs_target %{nil}
 %endif
 
-# VM variant being built
-%ifarch %{zero_arches}
-%global vm_variant zero
-%else
-%global vm_variant server
-%endif
-
 # debugedit tool for rewriting ELF file paths
 %global debugedit %( if [ -f "%{_rpmconfigdir}/debugedit"  ]; then echo "%{_rpmconfigdir}/debugedit" ; else echo "/usr/bin/debugedit"; fi )
 
@@ -261,7 +360,7 @@
 %endif
 %ifarch riscv64
 %global archinstall riscv64
-%global stapinstall %{_target_cpu}
+%global stapinstall riscv64
 %endif
 # 32 bit sparc, optimized for v9
 %ifarch sparcv9
@@ -284,12 +383,6 @@
 %else
 %global with_systemtap 0
 %endif
-
-# New Version-String scheme-style defines
-%global featurever 21
-%global interimver 0
-%global updatever 12
-%global patchver 0
 
 # We don't add any LTS designator for STS packages (Fedora and EPEL).
 # We need to explicitly exclude EPEL as it would have the %%{rhel} macro defined.
@@ -320,25 +413,8 @@
 %endif
 %endif
 %endif
-%global oj_vendor_version (Red_Hat-%{version}-%{release})
+%global oj_vendor_version (Red_Hat-%{version}-%{portablerelease})
 
-# Define IcedTea version used for SystemTap tapsets and desktop file
-%global icedteaver      6.0.0pre00-c848b93a8598
-# Define JDK versions
-%global newjavaver %{featurever}.%{interimver}.%{updatever}.%{patchver}
-%global javaver         %{featurever}
-# Strip up to 6 trailing zeros in newjavaver, as the JDK does, to get the correct version used in filenames
-%global filever %(svn=%{newjavaver}; for i in 1 2 3 4 5 6 ; do svn=${svn%%.0} ; done; echo ${svn})
-# The tag used to create the OpenJDK tarball
-%global vcstag jdk-%{filever}+%{buildver}%{?tagsuffix:-%{tagsuffix}}
-
-# Standard JPackage naming and versioning defines
-%global origin          openjdk
-%global origin_nice     OpenJDK
-%global top_level_dir_name   %{vcstag}
-%global top_level_dir_name_backup %{top_level_dir_name}-backup
-%global buildver        8
-%global rpmrelease      2
 # Priority must be 8 digits in total; up to openjdk 1.8, we were using 18..... so when we moved to 11, we had to add another digit
 %if %is_system_jdk
 # Using 10 digits may overflow the int used for priority, so we combine the patch and build versions
@@ -352,31 +428,10 @@
 %global priority %( printf '%08d' 1 )
 %endif
 
-# Define milestone (EA for pre-releases, GA for releases)
-# Release will be (where N is usually a number starting at 1):
-# - 0.N%%{?extraver}%%{?dist} for EA releases,
-# - N%%{?extraver}{?dist} for GA releases
-%global is_ga           1
-%if %{is_ga}
-%global build_type GA
-%global ea_designator ""
-%global ea_designator_zip %{nil}
-%global extraver %{nil}
-%global eaprefix %{nil}
-%else
-%global build_type EA
-%global ea_designator ea
-%global ea_designator_zip -%{ea_designator}
-%global extraver .%{ea_designator}
-%global eaprefix 0.
-%endif
-
 # parametrized macros are order-sensitive
-%global compatiblename  java-%{featurever}-%{origin}
-%define fullversion()     %{expand:%{compatiblename}%{?1}-%{version}-%{release}}
-# images directories from upstream build
-%global jdkimage                jdk
-%global static_libs_image       static-libs
+
+# output dir stub for nssadapter and proeprties
+%define installoutputdir() %{expand:jdk%{featurever}.install-nsscp%{?1}}
 # installation directory for static libraries
 %global static_libs_root        lib/static
 %global static_libs_arch_dir    %{static_libs_root}/linux-%{archinstall}
@@ -407,6 +462,12 @@
 %global __requires_exclude ^(%{_privatelibs}|%{_publiclibs})$
 %endif
 
+# VM variant being built
+%ifarch %{zero_arches}
+%global vm_variant zero
+%else
+%global vm_variant server
+%endif
 
 %global etcjavasubdir     %{_sysconfdir}/java/java-%{javaver}-%{origin}
 %define etcjavadir()      %{expand:%{etcjavasubdir}/%{uniquesuffix -- %{?1}}}
@@ -422,8 +483,8 @@
 %global rpm_state_dir %{_localstatedir}/lib/rpm-state/
 %global repack_file repack.info
 
-# For flatpack builds hard-code dependency paths,
-# otherwise use relative paths.
+# For flatpack builds hard-code /usr/sbin/alternatives,
+# otherwise use _sbindir relative path.
 %if 0%{?flatpak}
 %global alternatives_requires /usr/sbin/alternatives
 %global javazidir /usr/share/javazi-1.8
@@ -488,11 +549,18 @@ alternatives --install %{_bindir}/java java %{jrebindir -- %{?1}}/java %{priorit
   --slave %{_jvmdir}/jre jre %{_jvmdir}/%{sdkdir -- %{?1}} \\
   --slave %{_bindir}/%{alt_java_name} %{alt_java_name} %{jrebindir -- %{?1}}/%{alt_java_name} \\
   --slave %{_bindir}/keytool keytool %{jrebindir -- %{?1}}/keytool \\
-  --slave %{_bindir}/rmiregistry rmiregistry %{jrebindir -- %{?1}}/rmiregistry \\
-  --slave %{_mandir}/man1/java.1%{man_comp} java.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/java.1 \\
-  --slave %{_mandir}/man1/%{alt_java_name}.1%{man_comp} %{alt_java_name}.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/%{alt_java_name}.1 \\
-  --slave %{_mandir}/man1/keytool.1%{man_comp} keytool.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/keytool.1 \\
-  --slave %{_mandir}/man1/rmiregistry.1%{man_comp} rmiregistry.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/rmiregistry.1
+  --slave %{_bindir}/rmiregistry rmiregistry %{jrebindir -- %{?1}}/rmiregistry
+%if %{pandoc_available}
+alternatives --add-slave java %{jrebindir -- %{?1}}/java \\
+  %{_mandir}/man1/java.1%{man_comp} java.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/java.1
+alternatives --add-slave java %{jrebindir -- %{?1}}/java \\
+  %{_mandir}/man1/%{alt_java_name}.1%{man_comp} %{alt_java_name}.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/%{alt_java_name}.1
+alternatives --add-slave java %{jrebindir -- %{?1}}/java \\
+  %{_mandir}/man1/keytool.1%{man_comp} keytool.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/keytool.1
+alternatives --add-slave java %{jrebindir -- %{?1}}/java \\
+  %{_mandir}/man1/rmiregistry.1%{man_comp} rmiregistry.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/rmiregistry.1
+%endif
+  
 alternatives --install %{_jvmdir}/jre-%{origin} jre_%{origin} %{_jvmdir}/%{sdkdir -- %{?1}} %{priority_for -- %{?1}}
 alternatives --install %{_jvmdir}/jre-%{javaver} jre_%{javaver} %{_jvmdir}/%{sdkdir -- %{?1}} %{priority_for -- %{?1}}
 alternatives --install %{_jvmdir}/jre-%{javaver}-%{origin} jre_%{javaver}_%{origin} %{_jvmdir}/%{sdkdir -- %{?1}} %{priority_for -- %{?1}}
@@ -588,26 +656,49 @@ alternatives --install %{_bindir}/javac javac %{sdkbindir -- %{?1}}/javac %{prio
   --slave %{_bindir}/jstat jstat %{sdkbindir -- %{?1}}/jstat \\
   --slave %{_bindir}/jstatd jstatd %{sdkbindir -- %{?1}}/jstatd \\
   --slave %{_bindir}/jwebserver jwebserver %{sdkbindir -- %{?1}}/jwebserver \\
-  --slave %{_bindir}/serialver serialver %{sdkbindir -- %{?1}}/serialver \\
-  --slave %{_mandir}/man1/jar.1%{man_comp} jar.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jar.1 \\
-  --slave %{_mandir}/man1/jarsigner.1%{man_comp} jarsigner.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jarsigner.1 \\
-  --slave %{_mandir}/man1/javac.1%{man_comp} javac.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/javac.1 \\
-  --slave %{_mandir}/man1/javadoc.1%{man_comp} javadoc.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/javadoc.1 \\
-  --slave %{_mandir}/man1/javap.1%{man_comp} javap.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/javap.1 \\
-  --slave %{_mandir}/man1/jcmd.1%{man_comp} jcmd.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jcmd.1 \\
-  --slave %{_mandir}/man1/jconsole.1%{man_comp} jconsole.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jconsole.1 \\
-  --slave %{_mandir}/man1/jdb.1%{man_comp} jdb.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jdb.1 \\
-  --slave %{_mandir}/man1/jdeps.1%{man_comp} jdeps.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jdeps.1 \\
-  --slave %{_mandir}/man1/jinfo.1%{man_comp} jinfo.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jinfo.1 \\
-  --slave %{_mandir}/man1/jmap.1%{man_comp} jmap.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jmap.1 \\
-  --slave %{_mandir}/man1/jps.1%{man_comp} jps.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jps.1 \\
-  --slave %{_mandir}/man1/jpackage.1%{man_comp} jpackage.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jpackage.1 \\
-  --slave %{_mandir}/man1/jrunscript.1%{man_comp} jrunscript.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jrunscript.1 \\
-  --slave %{_mandir}/man1/jstack.1%{man_comp} jstack.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jstack.1 \\
-  --slave %{_mandir}/man1/jstat.1%{man_comp} jstat.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jstat.1 \\
-  --slave %{_mandir}/man1/jwebserver.1%{man_comp} jwebserver.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jwebserver.1 \\
-  --slave %{_mandir}/man1/jstatd.1%{man_comp} jstatd.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jstatd.1 \\
-  --slave %{_mandir}/man1/serialver.1%{man_comp} serialver.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/serialver.1
+  --slave %{_bindir}/serialver serialver %{sdkbindir -- %{?1}}/serialver
+%if %{pandoc_available}
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jar.1%{man_comp} jar.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jar.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jarsigner.1%{man_comp} jarsigner.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jarsigner.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/javac.1%{man_comp} javac.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/javac.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/javadoc.1%{man_comp} javadoc.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/javadoc.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/javap.1%{man_comp} javap.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/javap.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jcmd.1%{man_comp} jcmd.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jcmd.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jconsole.1%{man_comp} jconsole.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jconsole.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jdb.1%{man_comp} jdb.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jdb.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jdeps.1%{man_comp} jdeps.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jdeps.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jinfo.1%{man_comp} jinfo.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jinfo.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jmap.1%{man_comp} jmap.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jmap.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jnativescan.1%{man_comp} jnativescan.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jnativescan.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jps.1%{man_comp} jps.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jps.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jpackage.1%{man_comp} jpackage.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jpackage.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jrunscript.1%{man_comp} jrunscript.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jrunscript.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jstack.1%{man_comp} jstack.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jstack.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jstat.1%{man_comp} jstat.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jstat.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jwebserver.1%{man_comp} jwebserver.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jwebserver.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/jstatd.1%{man_comp} jstatd.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jstatd.1
+alternatives --add-slave javac %{sdkbindir -- %{?1}}/javac \\
+  %{_mandir}/man1/serialver.1%{man_comp} serialver.1%{man_comp} %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/serialver.1
+%endif
 alternatives --install %{_jvmdir}/java-%{origin} java_sdk_%{origin} %{_jvmdir}/%{sdkdir -- %{?1}} %{priority_for -- %{?1}}
 alternatives --install %{_jvmdir}/java-%{javaver} java_sdk_%{javaver} %{_jvmdir}/%{sdkdir -- %{?1}} %{priority_for -- %{?1}}
 }
@@ -697,7 +788,7 @@ fi
 }
 
 %define files_jre_headless() %{expand:
-%doc %{_defaultdocdir}/%{uniquejavadocdir --   %{?1}}/%{fullversion -- %{nil}}.specfile
+%doc %{_defaultdocdir}/%{uniquejavadocdir --   %{?1}}/%{fullversion}.specfile
 %license %{_jvmdir}/%{sdkdir -- %{?1}}/legal
 %doc %{_jvmdir}/%{sdkdir -- %{?1}}/NEWS	
 %doc %{_defaultdocdir}/%{uniquejavadocdir -- %{?1}}/NEWS
@@ -854,7 +945,9 @@ fi
 %ifarch %{sa_arches}
 %ifnarch %{zero_arches}
 %{_jvmdir}/%{sdkdir -- %{?1}}/bin/jhsdb
+%if %{pandoc_available}
 %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jhsdb.1
+%endif
 %endif
 %endif
 %{_jvmdir}/%{sdkdir -- %{?1}}/bin/jinfo
@@ -876,6 +969,8 @@ fi
 %{_jvmdir}/%{sdkdir -- %{?1}}/tapset
 %endif
 %{_datadir}/applications/*jconsole%{?1}.desktop
+
+%if %{pandoc_available}
 %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jar.1
 %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jarsigner.1
 %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/javac.1
@@ -900,6 +995,7 @@ fi
 %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jstatd.1
 %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/jwebserver.1
 %{_jvmdir}/%{sdkdir -- %{?1}}/man/man1/serialver.1
+%endif
 
 %if %{with_systemtap}
 %dir %{tapsetroot}
@@ -1008,6 +1104,10 @@ OrderWithRequires: %{name}-headless%{?1}%{?_isa} = %{epoch}:%{version}-%{release
 %if 0%{?rhel} >= 8 || 0%{?fedora} > 0
 Recommends: gtk3%{?_isa}
 %endif
+# Recommend PipeWire for screenshots under Wayland.
+%if 0%{?rhel} >= 9 || 0%{?fedora} > 0
+Recommends: pipewire%{?_isa}
+%endif
 
 Provides: java-%{javaver}-%{origin}%{?1} = %{epoch}:%{version}-%{release}
 
@@ -1029,8 +1129,8 @@ Requires: ca-certificates
 # Require javapackages-filesystem for ownership of /usr/lib/jvm/ and macros
 Requires: javapackages-filesystem
 # Require zone-info data provided by tzdata-java sub-package
-# 2024a required as of JDK-8325150
-Requires: tzdata-java >= 2024a
+# 2026a required as of JDK-8379035
+Requires: tzdata-java >= 2026a
 # for support of kernel stream control
 # libsctp.so.1 is being `dlopen`ed on demand
 Requires: lksctp-tools%{?_isa}
@@ -1151,43 +1251,6 @@ Provides: java-%{origin}-src%{?1} = %{epoch}:%{version}-%{release}
 # the version must match, but sometmes we need to more precise, so including release
 %global portable_version %{version}-1
 
-Name:    java-%{javaver}-%{origin}
-Version: %{newjavaver}.%{buildver}
-Release: 0.1%{?dist}
-# java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons
-# and this change was brought into RHEL-4. java-1.5.0-ibm packages
-# also included the epoch in their virtual provides. This created a
-# situation where in-the-wild java-1.5.0-ibm packages provided "java =
-# 1:1.5.0". In RPM terms, "1.6.0 < 1:1.5.0" since 1.6.0 is
-# interpreted as 0:1.6.0. So the "java >= 1.6.0" requirement would be
-# satisfied by the 1:1.5.0 packages. Thus we need to set the epoch in
-# JDK package >= 1.6.0 to 1, and packages referring to JDK virtual
-# provides >= 1.6.0 must specify the epoch, "java >= 1:1.6.0".
-
-Epoch:   1
-Summary: %{origin_nice} %{featurever} Runtime Environment
-# Groups are only used up to RHEL 8 and on Fedora versions prior to F30
-%if (0%{?rhel} > 0 && 0%{?rhel} <= 8) || (0%{?fedora} >= 0 && 0%{?fedora} < 30)
-Group:   Development/Languages
-%endif
-
-# HotSpot code is licensed under GPLv2
-# JDK library code is licensed under GPLv2 with the Classpath exception
-# The Apache license is used in code taken from Apache projects (primarily xalan & xerces)
-# DOM levels 2 & 3 and the XML digital signature schemas are licensed under the W3C Software License
-# The JSR166 concurrency code is in the public domain
-# The BSD and MIT licenses are used for a number of third-party libraries (see ADDITIONAL_LICENSE_INFO)
-# The OpenJDK source tree includes:
-# - JPEG library (IJG), zlib & libpng (zlib), giflib (MIT), harfbuzz (ISC),
-# - freetype (FTL), jline (BSD) and LCMS (MIT)
-# - jquery (MIT), jdk.crypto.cryptoki PKCS 11 wrapper (RSA)
-# - public_suffix_list.dat from publicsuffix.org (MPLv2.0)
-# The test code includes copies of NSS under the Mozilla Public License v2.0
-# The PCSClite headers are under a BSD with advertising license
-# The elliptic curve cryptography (ECC) source code is licensed under the LGPLv2.1 or any later version
-# Automatically converted from old format: ASL 1.1 and ASL 2.0 and BSD and BSD with advertising and GPL+ and GPLv2 and GPLv2 with exceptions and IJG and LGPLv2+ and MIT and MPLv2.0 and Public Domain and W3C and zlib and ISC and FTL and RSA - review is highly recommended.
-License:  Apache-1.1 AND Apache-2.0 AND LicenseRef-Callaway-BSD AND LicenseRef-Callaway-BSD-with-advertising AND GPL-1.0-or-later AND GPL-2.0-only AND LicenseRef-Callaway-GPLv2-with-exceptions AND IJG AND LicenseRef-Callaway-LGPLv2+ AND LicenseRef-Callaway-MIT AND MPL-2.0 AND LicenseRef-Callaway-Public-Domain AND W3C AND Zlib AND ISC AND FTL AND LicenseRef-RSA
-URL:      http://openjdk.java.net/
 
 # Use 'icedtea_sync.sh' to update the following
 # They are based on code contained in the IcedTea project (6.x).
@@ -1259,19 +1322,19 @@ BuildRequires: systemtap-sdt-devel
 %endif
 
 # Version in src/java.desktop/share/legal/freetype.md
-Provides: bundled(freetype) = 2.13.2
+Provides: bundled(freetype) = 2.14.3
 # Version in src/java.desktop/share/native/libsplashscreen/giflib/gif_lib.h
-Provides: bundled(giflib) = 5.2.2
+Provides: bundled(giflib) = 6.1.3
 # Version in src/java.desktop/share/native/libharfbuzz/hb-version.h
-Provides: bundled(harfbuzz) = 8.2.2
+Provides: bundled(harfbuzz) = 14.2.0
 # Version in src/java.desktop/share/native/liblcms/lcms2.h
-Provides: bundled(lcms2) = 2.16.0
+Provides: bundled(lcms2) = 2.19.1
 # Version in src/java.desktop/share/native/libjavajpeg/jpeglib.h
 Provides: bundled(libjpeg) = 6b
 # Version in src/java.desktop/share/native/libsplashscreen/libpng/png.h
-Provides: bundled(libpng) = 1.6.51
+Provides: bundled(libpng) = 1.6.58
 # Version in src/java.base/share/native/libzip/zlib/zlib.h
-Provides: bundled(zlib) = 1.3.1
+Provides: bundled(zlib) = 1.3.2
 
 # this is always built, also during debug-only build
 # when it is built in debug-only this package is just placeholder
@@ -1678,7 +1741,7 @@ echo "Used %{version}.*portable:" >> %{repack_file}
 ls -l %{portablejvmdir} | grep "%{version}.*portable" >> %{repack_file} || echo "Not found!" >> %{repack_file}
 echo "Used portable.*%{version}:" >> %{repack_file}
 rpm -qa | grep "portable.*%{version}" >> %{repack_file} || echo "Not found!" >> %{repack_file}
-echo "Where this is %{fullversion %{nil}}" >> %{repack_file}
+echo "Where this is %{fullversion}" >> %{repack_file}
 portableNvr=`rpm -qa | grep %{name}-portable-misc-%{version} | sed "s/-misc-/-/" | sed "s/.%{_arch}.*//"`
 if [ "x${portableNvr}" == x ] ; then
   portableNvr=`rpm -qa | grep %{name}-portable-misc- | sed "s/-misc-/-/" | sed "s/.%{_arch}.*//"`" #incorrect!"
@@ -1950,7 +2013,7 @@ cp -a ${src_image} $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir -- $suffix}/full_sources
 cp -a ${misc_image}/%{generated_sources_name} $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir -- $suffix}
 cp -a ${misc_image}/alt-java $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir -- $suffix}/bin
 install -d -m 755 $RPM_BUILD_ROOT%{_defaultdocdir}/%{uniquejavadocdir -- $suffix}
-cp %{repack_file} $RPM_BUILD_ROOT%{_defaultdocdir}/%{uniquejavadocdir --  $suffix}/%{fullversion -- %{nil}}.specfile
+cp %{repack_file} $RPM_BUILD_ROOT%{_defaultdocdir}/%{uniquejavadocdir --  $suffix}/%{fullversion}.specfile
 
 pushd ${jdk_image}
 
