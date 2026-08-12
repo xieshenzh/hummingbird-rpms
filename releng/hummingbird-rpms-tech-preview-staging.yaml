@@ -216,6 +216,8 @@ spec:
           contentType: rpm
         - name: dns-root-data-main
           contentType: rpm
+        - name: dosfstools-main
+          contentType: rpm
         - name: dotnet10-0-main
           contentType: rpm
         - name: dotnet8-0-main

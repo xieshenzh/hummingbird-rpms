@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "19",
+  "release_monitoring_project_id": 455,
+  "sha": "c996fcd3624f0db455115fbef611d4c5558adc9b",
+  "source": "https://src.fedoraproject.org/rpms/dosfstools.git",
+  "version": "4.2"
+}
