@@ -1,0 +1,90 @@
+---
+- hosts: localhost
+  tags: [ always ]
+  tasks:
+  - set_fact:
+      our_required_packages:
+        - iproute           # multiple tests need ip command
+        - iputils           # multiple tests need ping/ping6 commands
+        - iptables          # multiple tests need iptables/ip6tables commands
+        - iptables-services # multiple tests need iptables/ip6tables config files
+        - initscripts       # multiple tests need system command
+        - libcgroup-tools   # backport-iptables-add-libxt-cgroup-frontend needs cg* commands
+        - ipset             # multiple tests need ipset command
+        - strace            # xtables-tools-locking-vulnerable-to-local-DoS needs strace command
+        - policycoreutils   # initscript-sanity needs restorecon command
+
+- hosts: localhost
+  tags:
+    - rhts-all
+  roles:
+  - role: standard-test-rhts
+    tests:
+#    - backport-iptables-add-libxt-cgroup-frontend
+    - initscript-sanity
+    - ip6tables-do-not-accept-dst-or-src-direction-on-ip6sets
+    - ip6tables-service-does-not-allow-dhcpv6-client-by
+    - ip6tables-t-nat-A-POSTROUTING-OUTPUT-with-DROP
+    - iptables-rule-deletion-fails-for-rules-that-use
+    - iptables-save-cuts-space-before-j
+    - iptables-save-modprobe-option
+    - NFQUEUE-queue-bypass
+    - RFE-Enable-the-missing-IPv6-SET-target
+    - RFE-iptables-add-C-option-to-iptables-in-RHEL6
+    - TRACE-target-of-iptables-can-t-work-in
+    - xtables-tools-locking-vulnerable-to-local-DoS
+    required_packages: "{{ our_required_packages }}"
+
+- hosts: localhost
+  tags:
+    - classic
+    - beakerlib-all
+  roles:
+  - role: standard-test-beakerlib
+    tests:
+#    - backport-iptables-add-libxt-cgroup-frontend
+    - initscript-sanity
+    - ip6tables-do-not-accept-dst-or-src-direction-on-ip6sets
+    - ip6tables-service-does-not-allow-dhcpv6-client-by
+    - ip6tables-t-nat-A-POSTROUTING-OUTPUT-with-DROP
+    - iptables-rule-deletion-fails-for-rules-that-use
+    - iptables-save-cuts-space-before-j
+    - iptables-save-modprobe-option
+    - NFQUEUE-queue-bypass
+    - RFE-Enable-the-missing-IPv6-SET-target
+    - RFE-iptables-add-C-option-to-iptables-in-RHEL6
+    - TRACE-target-of-iptables-can-t-work-in
+    - xtables-tools-locking-vulnerable-to-local-DoS
+    required_packages: "{{ our_required_packages }}"
+
+- hosts: localhost
+  tags:
+    - container
+  roles:
+  - role: standard-test-beakerlib
+    tests:
+    #- backport-iptables-add-libxt-cgroup-frontend # journaling/logging issues?
+    - ip6tables-do-not-accept-dst-or-src-direction-on-ip6sets
+    - ip6tables-service-does-not-allow-dhcpv6-client-by
+    - ip6tables-t-nat-A-POSTROUTING-OUTPUT-with-DROP
+    - iptables-rule-deletion-fails-for-rules-that-use
+    - iptables-save-cuts-space-before-j
+    - iptables-save-modprobe-option
+    - NFQUEUE-queue-bypass
+    - RFE-Enable-the-missing-IPv6-SET-target
+    - RFE-iptables-add-C-option-to-iptables-in-RHEL6
+    - xtables-tools-locking-vulnerable-to-local-DoS
+    required_packages: "{{ our_required_packages }}"
+
+- hosts: localhost
+  tags:
+    - atomic
+  roles:
+  - role: standard-test-beakerlib
+    tests:
+    - ip6tables-service-does-not-allow-dhcpv6-client-by
+    - iptables-save-cuts-space-before-j
+    - iptables-save-modprobe-option
+    - NFQUEUE-queue-bypass
+    - RFE-iptables-add-C-option-to-iptables-in-RHEL6
+    - xtables-tools-locking-vulnerable-to-local-DoS

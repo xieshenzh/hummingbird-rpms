@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Sanity/initscript-sanity
+Description: initscript-sanity
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: Can not "service iptables save": restorecon not found

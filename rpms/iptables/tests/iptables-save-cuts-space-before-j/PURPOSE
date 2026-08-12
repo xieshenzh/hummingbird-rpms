@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Regression/iptables-save-cuts-space-before-j
+Description: Test for iptables-save cuts space before -j
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: iptables-save cuts space before -j

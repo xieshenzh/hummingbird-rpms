@@ -1,0 +1,10 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "1",
+  "release_monitoring_project_id": 9989,
+  "sha": "4c18519ae432381e9cb18e105f0f15c46537e81c",
+  "source": "https://src.fedoraproject.org/rpms/firewalld.git",
+  "upstream_repo": "https://github.com/firewalld/firewalld",
+  "version": "2.5.1"
+}

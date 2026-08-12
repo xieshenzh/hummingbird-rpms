@@ -1,0 +1,10 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "release_monitoring_project_id": 372091,
+  "sha": "f35c9aa3389928a085b7b7a45aa7f1f412834182",
+  "source": "https://src.fedoraproject.org/rpms/passt.git",
+  "upstream_repo": "https://passt.top/passt",
+  "version": "0^20260728.gf8df3f1"
+}

@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/iptables/Regression/ip6tables-service-does-not-allow-dhcpv6-client-by
+Description: Test for ip6tables service does not allow dhcpv6-client by
+Author: Tomas Dolezal <todoleza@redhat.com>
+Bug summary: ip6tables service does not allow dhcpv6-client by default

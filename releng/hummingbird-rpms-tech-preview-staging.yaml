@@ -74,6 +74,8 @@ spec:
       defaults:
         pushSourceContainer: true
       components:
+        - name: networkmanager-main
+          contentType: rpm
         - name: pyyaml-main
           contentType: rpm
         - name: r-rpm-macros-main
@@ -258,6 +260,8 @@ spec:
           contentType: rpm
         - name: findutils-main
           contentType: rpm
+        - name: firewalld-main
+          contentType: rpm
         - name: fmt-main
           contentType: rpm
         - name: fontconfig-main
@@ -381,6 +385,8 @@ spec:
         - name: ima-evm-utils-main
           contentType: rpm
         - name: iproute-main
+          contentType: rpm
+        - name: iptables-main
           contentType: rpm
         - name: jaeger-main
           contentType: rpm
@@ -511,6 +517,14 @@ spec:
         - name: libmodulemd-main
           contentType: rpm
         - name: libmpc-main
+          contentType: rpm
+        - name: libndp-main
+          contentType: rpm
+        - name: libnetfilter-conntrack-main
+          contentType: rpm
+        - name: libnfnetlink-main
+          contentType: rpm
+        - name: libnftnl-main
           contentType: rpm
         - name: libnl3-main
           contentType: rpm
@@ -646,6 +660,8 @@ spec:
           contentType: rpm
         - name: nettle-main
           contentType: rpm
+        - name: nftables-main
+          contentType: rpm
         - name: nghttp2-main
           contentType: rpm
         - name: nghttp3-main
@@ -723,6 +739,8 @@ spec:
         - name: package-notes-main
           contentType: rpm
         - name: pam-main
+          contentType: rpm
+        - name: passt-main
           contentType: rpm
         - name: patch-main
           contentType: rpm
