@@ -1,0 +1,162 @@
+"""Unit tests for .cursor/skills/cve/cve_helper.py probe helpers."""
+
+from __future__ import annotations
+
+import importlib.util
+import json
+import sys
+import time
+from pathlib import Path
+from types import SimpleNamespace
+
+ROOT = Path(__file__).resolve().parent.parent
+HELPER_PATH = ROOT / ".cursor" / "skills" / "cve" / "cve_helper.py"
+
+
+def _load_helper():
+    spec = importlib.util.spec_from_file_location("cve_helper", HELPER_PATH)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["cve_helper"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+helper = _load_helper()
+
+
+def test_normalize_argv_inserts_show_for_bare_tickets() -> None:
+    assert helper.normalize_argv(["HUM-1234", "--title-only"]) == [
+        "show",
+        "HUM-1234",
+        "--title-only",
+    ]
+    assert helper.normalize_argv(["bot-mrs", "boost"]) == ["bot-mrs", "boost"]
+
+
+def test_pulp_sbom_package_dir_replaces_dots() -> None:
+    assert helper.pulp_sbom_package_dir("grafana13.1") == "grafana13-1-main"
+    assert helper.pulp_sbom_package_dir("boost") == "boost-main"
+
+
+def test_parse_glab_mr_list() -> None:
+    output = "\n".join(
+        [
+            "!3905  grafana13.1: Update axios (renovate) (renovate/axios)",
+            "No open merge requests match your search",
+            "!12  plain title",
+        ]
+    )
+    entries = helper._parse_glab_mr_list(output, "open")
+    assert [e.iid for e in entries] == ["3905", "12"]
+    assert entries[0].web_url.endswith("/merge_requests/3905")
+    assert "axios" in entries[0].title
+
+
+def test_search_sbom_file_structured_hits(tmp_path: Path) -> None:
+    sbom = {
+        "components": [
+            {
+                "type": "library",
+                "name": "brace-expansion",
+                "version": "2.0.1",
+                "purl": "pkg:npm/brace-expansion@2.0.1",
+                "scope": "required",
+            },
+            {
+                "type": "library",
+                "name": "unrelated",
+                "version": "1.0.0",
+            },
+        ]
+    }
+    path = tmp_path / "pkg.sbom.json"
+    path.write_text(json.dumps(sbom), encoding="utf-8")
+    hits = helper.search_sbom_file(path, ["brace-expansion"])
+    assert len(hits) == 1
+    assert hits[0].name == "brace-expansion"
+    assert hits[0].version == "2.0.1"
+    assert hits[0].scope == "required"
+
+
+def test_search_sbom_file_text_fallback(tmp_path: Path) -> None:
+    path = tmp_path / "plain.sbom.json"
+    path.write_text('not-json but mentions EvilLib somewhere', encoding="utf-8")
+    hits = helper.search_sbom_file(path, ["EvilLib"])
+    assert hits
+    assert hits[0].path == "text"
+    assert "EvilLib" in hits[0].snippet
+
+
+def test_probe_spec_deps_bundled_and_component(tmp_path: Path, monkeypatch) -> None:
+    pkg = "fakepkg"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "\n".join(
+            [
+                "Name: fakepkg",
+                "Provides: bundled(golang.org/x/text) = 0.21.0",
+                "Source0: https://example.com/fakepkg.tar.gz",
+                "# mentions golang.org/x/text again",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    hits = helper.probe_spec_deps(pkg, "golang.org/x/text")
+    kinds = {h.kind for h in hits}
+    assert "bundled_provides" in kinds
+    bundled = next(h for h in hits if h.kind == "bundled_provides")
+    assert bundled.bundled_name == "golang.org/x/text"
+    assert bundled.bundled_version == "0.21.0"
+
+
+def test_run_rhjira_retries_transient_errors(monkeypatch) -> None:
+    calls: list[list[str]] = []
+    sleeps: list[int] = []
+
+    def fake_run(args, *, cwd=None):
+        calls.append(args)
+        if len(calls) < 3:
+            return SimpleNamespace(
+                returncode=1,
+                stdout="",
+                stderr="proxy tunnel 403 Forbidden",
+            )
+        return SimpleNamespace(returncode=0, stdout="ok", stderr="")
+
+    monkeypatch.setattr(helper, "run_command", fake_run)
+    monkeypatch.setattr(time, "sleep", lambda s: sleeps.append(s))
+    result = helper.run_rhjira(["show", "HUM-1"])
+    assert result.returncode == 0
+    assert len(calls) == 3
+    assert sleeps == [2, 4]
+
+
+def test_run_rhjira_does_not_retry_non_transient(monkeypatch) -> None:
+    calls: list[list[str]] = []
+
+    def fake_run(args, *, cwd=None):
+        calls.append(args)
+        return SimpleNamespace(returncode=1, stdout="", stderr="issue not found")
+
+    monkeypatch.setattr(helper, "run_command", fake_run)
+    result = helper.run_rhjira(["show", "HUM-1"])
+    assert result.returncode == 1
+    assert len(calls) == 1
+
+
+def test_build_suggested_chat_title() -> None:
+    reports = [
+        helper.TicketReport(
+            "HUM-1",
+            "CVE-2026-12345 pkg: x",
+            "New",
+            "Bug",
+            "me",
+            "pscomponent:pkg",
+        )
+    ]
+    assert helper.build_suggested_chat_title(reports) == "HUM-1 pkg"

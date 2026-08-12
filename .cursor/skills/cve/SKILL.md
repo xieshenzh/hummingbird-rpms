@@ -21,18 +21,23 @@ For a high-level overview, use `/cve-status`.
 
 ### Preparation: Run Jira commands reliably (HUM-4821)
 
-Use `rhjira` directly for all Jira reads and writes. Do not wrap
-routine `/cve` Jira operations in Python subprocess wrappers,
-background polling workers, or long-running retry loops.
+Use `rhjira` (or `cve_helper.py`, which wraps it) for all Jira reads
+and writes. Do not invent ad-hoc Python subprocess wrappers,
+background polling workers, or long-running retry loops in the agent
+session.
+
+`cve_helper.py` already retries transient Jira/proxy failures for its
+own `rhjira` calls. Prefer the helper subcommands below for repeated
+probes so the agent does not re-paste shell boilerplate.
 
 `/cve` workflows require outbound internet access for tools like
-`rhjira`, `glab`, and `curl` (Jira/GitLab/SBOM endpoints). Running
-these commands in a sandboxed/no-network context can produce false
-failures (auth/proxy/timeout/connection errors) and block ticket
-automation. Use an internet-enabled execution context for these tool
-calls.
+`rhjira`, `glab`, and SBOM/Pulp endpoints. Running these commands in a
+sandboxed/no-network context can produce false failures
+(auth/proxy/timeout/connection errors) and block ticket automation.
+Use an internet-enabled execution context for these tool calls.
 
-Use this bounded retry helper for transient Jira/proxy failures:
+For **direct** `rhjira` writes still done in the shell (comment, edit,
+status), use this bounded retry helper:
 
 ```bash
 rhjira_retry() {
@@ -71,13 +76,15 @@ rhjira_retry() {
 
 Rules for using the helper:
 
-1. Use `rhjira_retry` for direct Jira calls.
-2. For write operations (comment, status/resolution changes, field
+1. Prefer `python .cursor/skills/cve/cve_helper.py …` for ticket show,
+   bot-MR, SBOM, and spec probes.
+2. Use `rhjira_retry` for direct Jira write calls in the shell.
+3. For write operations (comment, status/resolution changes, field
    updates), always pass `--noeditor`.
-3. Avoid long polling loops (`while ... sleep 30`). After a write,
+4. Avoid long polling loops (`while ... sleep 30`). After a write,
    do at most one verify read through `rhjira_retry`; if Jira is
    still unavailable, fail fast.
-4. Report per-ticket Jira status clearly before stopping, for
+5. Report per-ticket Jira status clearly before stopping, for
    example:
 
    ```text
@@ -91,17 +98,8 @@ Before manual remediation, check whether the automation bot already has
 an update MR:
 
 ```bash
-# Bot username is project-specific (project ID 73447720)
-# Verify if needed: glab api projects/73447720 | jq -r '.name'
-BOT_USER="project_73447720_bot_6f7c574289c710ebc9ab9ee76059d959"
-
-# Check for open bot MRs
-glab mr list --repo redhat/hummingbird/rpms \
-  --author "$BOT_USER" --search "<package>" --per-page 5
-
-# If no open MR found, check recently merged ones
-glab mr list --repo redhat/hummingbird/rpms --merged \
-  --author "$BOT_USER" --search "<package>" --per-page 5
+python .cursor/skills/cve/cve_helper.py bot-mrs <package>
+# optional: --json  --per-page 5
 ```
 
 **Evaluating a bot MR:**
@@ -127,6 +125,7 @@ treat them as HUM tickets by prepending `HUM-`.
 
 ```bash
 python .cursor/skills/cve/cve_helper.py HUM-XXXX
+# equivalent: python .cursor/skills/cve/cve_helper.py show HUM-XXXX
 ```
 
 For multiple tickets, pass them in one call:
@@ -136,6 +135,9 @@ python .cursor/skills/cve/cve_helper.py HUM-1234 1235 1236 \
   --json-out /tmp/cve-triage.json
 ```
 
+After the ticket summary, run the deterministic probes for the
+package(s) under investigation (Step 0 bot-mrs, plus Step 2d/2e as
+needed) before doing ad-hoc shell greps.
 **Finding Related Tickets:** `cve_helper.py` automatically discovers all open
 HUM tickets with the same CVE IDs — this is on by default so you get the full
 set in one invocation. Use `--no-find-related` to opt out:
@@ -280,7 +282,7 @@ the CVE are already applied, the package is fixed.
 The `cve_helper.py` output already shows `Vendored deps: yes (go-vendor-tools)`
 for any package with a `go-vendor-tools.toml` — use this as a first check.
 
-For module-level presence, use SBOM verification (Step 2d) which identifies
+For module-level presence, use SBOM verification (Step 2e) which identifies
 the specific vendored module, its version, and whether it's runtime-installed.
 
 If not vendored by any package, the ticket is misfiled.
@@ -290,11 +292,14 @@ If not vendored by any package, the ticket is misfiled.
 For product-mismatch CVEs, check the spec file for bundled dependencies:
 
 ```bash
-grep -i "<component-name>" rpms/<package>/<package>.spec
+python .cursor/skills/cve/cve_helper.py spec-deps <package> \
+  --component "<component-name>"
+# optional: --json
 ```
 
-Look for `Provides: bundled(...)` lines showing vendored dependencies
-and their versions. If found, compare against the CVE affected range.
+This reports `Provides: bundled(...)` lines and other component
+mentions with line numbers. If found, compare against the CVE
+affected range.
 
 #### 2e: SBOM verification
 
@@ -322,42 +327,29 @@ under investigation.
 2. Check the ticket Attachments list from `rhjira show` (or the
    Attachments section already visible after Step 1) for
    `{nvr}.sbom.json`.
-3. If a matching attachment exists, download it from Jira:
+3. Fetch and search with the helper (Jira attachment first when
+   `--ticket` and `--nvr` are set, else Pulp):
 
    ```bash
-   # rhjira writes to the current directory using the attachment name
-   (cd /tmp && rhjira_retry attach -d HUM-XXXX "<nvr>.sbom.json")
-   # optional stable path for later rg/jq:
-   cp -f "/tmp/<nvr>.sbom.json" /tmp/<package>.sbom.json
-   ```
-
-4. Only if no matching `{nvr}.sbom.json` attachment is present (or
-   the attached NVR is not the version you need), fetch from Pulp:
-
-   ```bash
-   SBOM_BASE="https://packages.redhat.com/api/pulp-content/public-hummingbird/metadata/sboms/<package>-main/"
-   # Pulp directory names replace dots in the package name with hyphens
-   # (e.g. grafana13.1 -> grafana13-1-main)
-   SBOM_FILE=$(curl -fsSL "$SBOM_BASE" | rg -o 'sha256-[^"]+\.sbom' | sort -u | tail -1)
-   curl -fsSL "${SBOM_BASE}${SBOM_FILE}" -o /tmp/<package>.sbom.json
+   python .cursor/skills/cve/cve_helper.py sbom <package> \
+     --ticket HUM-XXXX \
+     --nvr <nvr> \
+     --search "<cve-product>" \
+     --search "<module>" \
+     --out /tmp/<package>.sbom.json
+   # optional: --json
    ```
 
 When multiple `*.sbom.json` attachments exist, use the one whose
 NVR matches the target from step 1 — do not assume the newest
 attachment filename is correct without that check. If the attached
-NVR does not match the version being investigated, fall back to
-Pulp.
+NVR does not match the version being investigated, omit `--nvr` /
+`--ticket` so the helper falls back to Pulp.
 
-Then inspect SBOM contents for the CVE product/component:
-
-```bash
-rg -ni "<cve-product>|<module>|<library-name>" /tmp/<package>.sbom.json
-```
-
-When the component is found, determine whether it is actually
-installed in shipped binary RPMs vs only used during build/test.
-Use SBOM fields such as `type`, `scope`, `purl`, `properties`,
-`metadata.component`, and package relationships.
+The helper prints structured hits (name/version/purl/scope/type)
+when present. Use those fields — plus any follow-up inspection of
+`metadata.component` / package relationships — to decide whether the
+component is runtime-installed vs build/test-only.
 
 If the component's role is unclear from SBOM metadata, search to clarify its purpose.
 
@@ -537,10 +529,8 @@ contains the fix:
    fix isolated so multiple can be in flight at once:
 
    ```bash
-   REPO_ROOT=$(git rev-parse --show-toplevel)
-   mkdir -p "${REPO_ROOT}/../worktrees"
-   git worktree add "${REPO_ROOT}/../worktrees/HUM-YYYY" \
-     -b HUM-YYYY main
+   python .cursor/skills/cve/cve_helper.py worktree HUM-YYYY
+   # prints WORKTREE=/…/worktrees/HUM-YYYY
    ```
 
    Then move the agent workspace into the worktree:
