@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/sudo/Sanity/fully-qualified-hostnames
+Description: checks if sudo works correctly when FQDN is used in /etc/sudoers
+Author: Milos Malik <mmalik@redhat.com>

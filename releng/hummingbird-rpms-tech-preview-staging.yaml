@@ -132,6 +132,8 @@ spec:
           contentType: rpm
         - name: btrfs-progs-main
           contentType: rpm
+        - name: bubblewrap-main
+          contentType: rpm
         - name: buildah-main
           contentType: rpm
         - name: busybox-main
@@ -159,6 +161,8 @@ spec:
         - name: chunkah-main
           contentType: rpm
         - name: cloud-init-main
+          contentType: rpm
+        - name: cloud-utils-main
           contentType: rpm
         - name: cmake-main
           contentType: rpm
@@ -198,6 +202,8 @@ spec:
           contentType: rpm
         - name: dbus-broker-main
           contentType: rpm
+        - name: dbus-python-main
+          contentType: rpm
         - name: debugedit-main
           contentType: rpm
         - name: dex-main
@@ -212,6 +218,8 @@ spec:
           contentType: rpm
         - name: dns-root-data-main
           contentType: rpm
+        - name: dosfstools-main
+          contentType: rpm
         - name: dotnet10-0-main
           contentType: rpm
         - name: dotnet8-0-main
@@ -223,6 +231,8 @@ spec:
         - name: dracut-main
           contentType: rpm
         - name: drpm-main
+          contentType: rpm
+        - name: duktape-main
           contentType: rpm
         - name: dwz-main
           contentType: rpm
@@ -584,6 +594,8 @@ spec:
           contentType: rpm
         - name: libxcrypt-main
           contentType: rpm
+        - name: libxkbcommon-main
+          contentType: rpm
         - name: libxml2-main
           contentType: rpm
         - name: libxslt-main
@@ -844,6 +856,8 @@ spec:
           contentType: rpm
         - name: policycoreutils-main
           contentType: rpm
+        - name: polkit-main
+          contentType: rpm
         - name: poppler-main
           contentType: rpm
         - name: popt-main
@@ -869,6 +883,8 @@ spec:
         - name: publicsuffix-list-main
           contentType: rpm
         - name: pyopenssl-main
+          contentType: rpm
+        - name: pygobject3-main
           contentType: rpm
         - name: pyproject-rpm-macros-main
           contentType: rpm
@@ -1038,6 +1054,8 @@ spec:
           contentType: rpm
         - name: subversion-main
           contentType: rpm
+        - name: sudo-main
+          contentType: rpm
         - name: svt-av1-main
           contentType: rpm
         - name: swift-lang-main
@@ -1105,6 +1123,8 @@ spec:
         - name: which-main
           contentType: rpm
         - name: xcaddy-main
+          contentType: rpm
+        - name: xkeyboard-config-main
           contentType: rpm
         - name: xmlsec1-main
           contentType: rpm

@@ -1,0 +1,45 @@
+From ec5ede886a5f8ca36474fd2990adc2d3e2c1a056 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pavol=20=C5=BD=C3=A1=C4=8Dik?= <pzacik@redhat.com>
+Date: Mon, 11 May 2026 15:17:33 +0200
+Subject: [PATCH] Fix OpenSSL 4.0 compatibility
+
+Use ASN1_STRING accessor functions and adjust constness.
+---
+ lib/iolog/hostcheck.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/iolog/hostcheck.c b/lib/iolog/hostcheck.c
+index efb016c..cba3a0f 100644
+--- a/lib/iolog/hostcheck.c
++++ b/lib/iolog/hostcheck.c
+@@ -188,8 +188,8 @@ validate_name(const char *hostname, ASN1_STRING *certname_asn1)
+ static HostnameValidationResult
+ matches_common_name(const char *hostname, const char *ipaddr, const X509 *cert, int resolve)
+ {
+-	X509_NAME_ENTRY *common_name_entry = NULL;
+-	ASN1_STRING *common_name_asn1 = NULL;
++	const X509_NAME_ENTRY *common_name_entry = NULL;
++	const ASN1_STRING *common_name_asn1 = NULL;
+  	int common_name_loc;
+ 	debug_decl(matches_common_name, SUDO_DEBUG_UTIL);
+ 
+@@ -323,14 +323,14 @@ matches_subject_alternative_name(const char *hostname, const char *ipaddr, const
+ #endif
+ 
+             /* IPV4 address */
+-            if(current_name->d.iPAddress->length == 4) {
++            if(ASN1_STRING_length(current_name->d.iPAddress) == 4) {
+                 if (inet_ntop(AF_INET, san_ip, san_ip_str, INET_ADDRSTRLEN) == NULL) {
+                     result = MalformedCertificate;
+                     break;
+                 }
+ #if defined(HAVE_STRUCT_IN6_ADDR)
+             /* IPV6 address */
+-            } else if (current_name->d.iPAddress->length == 16) {
++            } else if (ASN1_STRING_length(current_name->d.iPAddress) == 16) {
+                 if (inet_ntop(AF_INET6, san_ip, san_ip_str, INET6_ADDRSTRLEN) == NULL) {
+                     result = MalformedCertificate;
+                     break;
+-- 
+2.53.0
+

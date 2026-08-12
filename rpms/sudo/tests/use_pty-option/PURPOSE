@@ -1,0 +1,4 @@
+PURPOSE of /CoreOS/sudo/Sanity/use_pty-option
+Description: checks if use_pty option in /etc/sudoers works as expected
+Author: Milos Malik <mmalik@redhat.com>
+

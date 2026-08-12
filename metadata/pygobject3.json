@@ -1,0 +1,10 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "6",
+  "release_monitoring_project_id": 13158,
+  "sha": "0607f29668b7fd4e4d998cb2d57fd17fed71d258",
+  "source": "https://src.fedoraproject.org/rpms/pygobject3.git",
+  "upstream_repo": "https://gitlab.gnome.org/GNOME/pygobject",
+  "version": "3.57.0"
+}
