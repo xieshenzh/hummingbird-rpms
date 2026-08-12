@@ -86,8 +86,11 @@ dex:
 distribution:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
-dracut:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+dotnet10.0:
+  timeout_hours: 12
+  build_platforms:
+    - "linux-d160-c8xlarge/arm64"
+    - "linux-d160-c8xlarge/amd64"
 
 dotnet8.0:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
@@ -102,16 +105,13 @@ dotnet9.0:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
-dotnet10.0:
-  timeout_hours: 12
-  build_platforms:
-    - "linux-d160-c8xlarge/arm64"
-    - "linux-d160-c8xlarge/amd64"
-
-etcd:
+dracut:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 erlang27:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+etcd:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 expat:
@@ -121,12 +121,6 @@ fftw:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 fontconfig:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-go-fdo-client:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-git-sync:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 gcc:
@@ -150,12 +144,18 @@ gettext:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+git-sync:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 glibc:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
   timeout_hours: 16
   build_platforms:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
+
+go-fdo-client:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 gorget:
   # Native Hummingbird package -- no Fedora dist-git history to fall back to.
@@ -202,6 +202,13 @@ hugo:
 jaeger:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+java-17-openjdk-portable:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+  timeout_hours: 8
+  build_platforms:
+    - "linux-d160-c8xlarge/arm64"
+    - "linux-d160-c8xlarge/amd64"
+
 java-21-openjdk-portable:
   timeout_hours: 8
   build_platforms:
@@ -219,6 +226,12 @@ java-25-openjdk-portable:
   build_platforms:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
+
+k6v1:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+k6v2:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 kube-state-metrics:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
@@ -256,12 +269,6 @@ llvm21:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
-k6v1:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-k6v2:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
 loki3.6:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
@@ -269,6 +276,12 @@ loki3.7:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 memcached:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+nats-server2.12:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+nats-server2.14:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 nodejs20:
@@ -304,6 +317,13 @@ openblas:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+openssl:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+openssl-fips-provider:
+  # Use hummingbird lookaside cache instead of Fedora
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 opentelemetry-collector:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
@@ -319,13 +339,6 @@ opentelemetry-collector-k8s:
     - "linux-m2xlarge/arm64"
     - "linux-m2xlarge/amd64"
 
-openssl:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-openssl-fips-provider:
-  # Use hummingbird lookaside cache instead of Fedora
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
 opentofu1.10:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
@@ -335,31 +348,13 @@ opentofu1.11:
 opentofu1.12:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
-nats-server2.12:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-nats-server2.14:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-prometheus3.13:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-prometheus3.5:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-php-patchwork-jsqueeze:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-protobuf:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
-prrte:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
-
 oras:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 pgbouncer:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+php-patchwork-jsqueeze:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 pmix:
@@ -368,8 +363,28 @@ pmix:
 poppler:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+prometheus3.13:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+prometheus3.5:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+protobuf:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+prrte:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 python-pip:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+python-rpm-lockfile-prototype:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+python-sentry-sdk:
+  build_platforms:
+    - "linux-d160-c8xlarge/arm64"
+    - "linux-d160-c8xlarge/amd64"
 
 python3.13:
   build_platforms:
@@ -380,14 +395,6 @@ python3.14:
   build_platforms:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
-
-python-sentry-sdk:
-  build_platforms:
-    - "linux-d160-c8xlarge/arm64"
-    - "linux-d160-c8xlarge/amd64"
-
-python-rpm-lockfile-prototype:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 rabbitmq-server4.2:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
@@ -431,6 +438,9 @@ spire1.14:
 spire1.15:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+sqlite:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 swift-lang:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
   timeout_hours: 24
@@ -447,9 +457,6 @@ swift-lang:
               memory: 10Gi
             limits:
               memory: 10Gi
-
-sqlite:
-  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 syft:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
