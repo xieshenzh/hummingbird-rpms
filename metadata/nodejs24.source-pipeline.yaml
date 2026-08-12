@@ -50,26 +50,18 @@ transform:
     discovered-outputs: "gorget-discovered.tsv"
 
   # Regenerate packaging-scripts.tar.gz from files already in --package-dir.
-  # Deterministic flags so this reproduces identical bytes release-over-release
-  # (rather than flagging a re-publication checksum change on every run just
-  # because tar/gzip embed a fresh mtime by default).
-  - type: run
-    target: "node-v${VERSION}.tar.gz"
-    command:
-      - "tar"
-      - "--sort=name"
-      - "--mtime=@0"
-      - "--owner=0"
-      - "--group=0"
-      - "--numeric-owner"
-      - "-czf"
-      - "packaging-scripts.tar.gz"
-      - "-C"
-      - "${PACKAGE_DIR}"
+  # gorget's own pack: step builds it with Python's tarfile/gzip modules, not
+  # the system tar/gzip binaries: gzip's DEFLATE output isn't uniquely
+  # determined by its input, so different tar/gzip builds compressed
+  # byte-identical, identically-timestamped content into different bytes --
+  # a real CI run once produced a different checksum than the one recorded
+  # here, purely from a tar/gzip version difference between environments.
+  - type: pack
+    files:
       - "Makefile"
       - "packaging/make-nodejs-tarball.sh"
       - "packaging/fill-versions.sh"
-    outputs: ["packaging-scripts.tar.gz"]
+    output: "packaging-scripts.tar.gz"
 
 post:
   - type: run
@@ -84,5 +76,5 @@ post:
 
 accepted-checksums:
   - file: "packaging-scripts.tar.gz"
-    checksum: "d5104637532bbbed7d32212ed565470523de342e3e0c43fbeb66566e894f5f313f8f830377b31ed365a31ead7ddb97d41169c0f2d807d562e255842ed7704116"
-    reason: "One-time transition: now regenerated deterministically by gorget's own pipeline from packaging/*.sh + Makefile (already in git), instead of a manually maintained lookaside blob. Content is identical; only tar/gzip metadata differs."
+    checksum: "61e6cb6154734971319b5d57112fcb4796c239b3006bfa48f3ad91c53ad3b009bff19099a3fe0e8aa6d36c3ff7e72625d07537563d1f9572e4a4388f5be9c71c"
+    reason: "One-time transition: now built by gorget's own pack: step (Python tarfile/gzip) instead of a run: step shelling out to the system tar/gzip binaries, whose compressed output isn't byte-reproducible across environments. Content is identical; only the archive's container bytes differ."
