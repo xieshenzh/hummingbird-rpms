@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Added gorget source-pipeline.yaml (HUM-5841; pattern from HUM-4622): a fresh fetch of Source0's bash-5.3.tar.gz no longer matches the recorded checksum -- upstream re-published the base tarball (translation file + build stamp only, GPG signature re-verified against the already-trusted key) -- so Fedora's cache no longer serves bytes matching the corrected checksum",
+  "modification_status": "modified",
   "release": "2",
   "sha": "2768211b5135c7169f513965d79e9f89e0ca6124",
   "source": "https://src.fedoraproject.org/rpms/bash.git",

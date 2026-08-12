@@ -6,9 +6,11 @@
 Version: %{baseversion}.%{patchlevel}
 Name: bash
 Summary: The GNU Bourne Again shell
-Release: 2%{?dist}
+Release: 2.1%{?dist}
 License: GPL-3.0-or-later
 Url: https://www.gnu.org/software/bash
+# Fetched (from the more reliable ftpmirror.gnu.org, not this literal URL)
+# by metadata/bash.source-pipeline.yaml.
 Source0: https://ftp.gnu.org/gnu/bash/bash-%{baseversion}.tar.gz
 # For now there isn't any doc
 #Source2: ftp://ftp.gnu.org/gnu/bash/bash-doc-%%{version}.tar.gz

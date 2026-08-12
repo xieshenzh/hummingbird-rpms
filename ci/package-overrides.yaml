@@ -47,6 +47,9 @@ aom:
 attr:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+bash:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 bind:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
