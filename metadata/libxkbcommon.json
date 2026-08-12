@@ -5,5 +5,6 @@
   "release_monitoring_project_id": 1780,
   "sha": "fec9c82cff917d5513853c610b4fdd1d6c0df446",
   "source": "https://src.fedoraproject.org/rpms/libxkbcommon.git",
+  "upstream_repo": "https://github.com/xkbcommon/libxkbcommon",
   "version": "1.13.1"
 }

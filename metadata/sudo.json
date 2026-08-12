@@ -5,5 +5,6 @@
   "release_monitoring_project_id": 4906,
   "sha": "73b278971be774e690770ba07c639dd440061f9a",
   "source": "https://src.fedoraproject.org/rpms/sudo.git",
+  "upstream_repo": "https://github.com/sudo-project/sudo",
   "version": "1.9.17"
 }

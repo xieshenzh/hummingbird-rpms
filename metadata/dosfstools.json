@@ -5,5 +5,6 @@
   "release_monitoring_project_id": 455,
   "sha": "c996fcd3624f0db455115fbef611d4c5558adc9b",
   "source": "https://src.fedoraproject.org/rpms/dosfstools.git",
+  "upstream_repo": "https://github.com/dosfstools/dosfstools",
   "version": "4.2"
 }

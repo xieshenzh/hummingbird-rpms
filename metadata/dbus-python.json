@@ -5,5 +5,6 @@
   "release_monitoring_project_id": 402,
   "sha": "f5854ef149eb54794cfa90220bc4576aca41759b",
   "source": "https://src.fedoraproject.org/rpms/dbus-python.git",
+  "upstream_repo": "https://gitlab.freedesktop.org/dbus/dbus-python",
   "version": "1.4.0"
 }
