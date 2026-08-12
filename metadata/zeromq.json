@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Added gorget source-pipeline.yaml (HUM-5842; pattern from HUM-4622): Source0's archive/vX.Y.Z/ URL was the non-reproducible GitHub auto-generated tag snapshot, not the real upstream release asset -- repointed at the actual GitHub Release asset (github.com/zeromq/libzmq/releases/download/), which matches Fedora's existing recorded checksum exactly with no drift",
+  "modification_status": "modified",
   "release": "23",
   "release_monitoring_project_id": 16245,
   "sha": "2b568b01363eff740cc72599500094aab3073dc8",

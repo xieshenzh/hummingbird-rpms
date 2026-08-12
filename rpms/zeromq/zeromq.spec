@@ -3,12 +3,15 @@
 
 Name:           zeromq
 Version:        4.3.5
-Release:        23%{?dist}
+Release:        23.1%{?dist}
 Summary:        Software library for fast, message-based applications
 
 License:        MPL-2.0 AND BSD-3-Clause AND MIT
 URL:            https://zeromq.org
-Source0:        https://github.com/%{name}/libzmq/archive/v%{version}/%{name}-%{version}.tar.gz
+# Fetched from the GitHub Release asset (not the auto-generated
+# archive/vX.Y.Z/ tag snapshot, which is a different, non-reproducible
+# artifact) by metadata/zeromq.source-pipeline.yaml.
+Source0:        https://github.com/%{name}/libzmq/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Patch1:         zeromq-configure-c99.patch
 
 BuildRequires:  make
