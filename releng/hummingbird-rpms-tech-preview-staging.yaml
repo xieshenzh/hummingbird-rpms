@@ -196,6 +196,8 @@ spec:
           contentType: rpm
         - name: dbus-broker-main
           contentType: rpm
+        - name: dbus-python-main
+          contentType: rpm
         - name: debugedit-main
           contentType: rpm
         - name: dex-main
