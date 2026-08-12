@@ -830,6 +830,8 @@ spec:
           contentType: rpm
         - name: policycoreutils-main
           contentType: rpm
+        - name: polkit-main
+          contentType: rpm
         - name: poppler-main
           contentType: rpm
         - name: popt-main
