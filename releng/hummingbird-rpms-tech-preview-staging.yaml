@@ -858,6 +858,8 @@ spec:
           contentType: rpm
         - name: pyopenssl-main
           contentType: rpm
+        - name: pygobject3-main
+          contentType: rpm
         - name: pyproject-rpm-macros-main
           contentType: rpm
         - name: pytest-main
