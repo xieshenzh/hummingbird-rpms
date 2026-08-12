@@ -6,7 +6,7 @@
 
 Name:		libssh2
 Version:	1.11.1
-Release:	10.3%{?dist}
+Release:	10.4%{?dist}
 Summary:	A library implementing the SSH2 protocol
 License:	BSD-3-Clause
 URL:		https://www.libssh2.org/
@@ -23,6 +23,7 @@ Patch5:		5e4776146552-libssh2-1.11.1-CVE-2026-66032.patch
 Patch6:		a13bb6c773f0-libssh2-1.11.1-CVE-2026-66034.patch
 Patch7:		a2ed82d40964bbc0-libssh2-1.11.1-CVE-2026-66033.patch
 Patch8:		libssh2-1.11.1-CVE-2026-66035.patch
+Patch9:		libssh2-1.11.1-CVE-2026-58050.patch
 
 BuildRequires:	coreutils
 BuildRequires:	findutils
@@ -109,6 +110,10 @@ developing applications that use libssh2.
 # CVE-2026-66035: heap buffer overflow on ETM decrypt in transport.c
 # https://github.com/libssh2/libssh2/commit/42e33d81577ed4b95d4b4f6f845e5ee8efe5eeb4
 %patch -p1 -P8
+
+# CVE-2026-58050: heap buffer overflow via integer overflow in publickey attrs alloc
+# https://github.com/libssh2/libssh2/commit/34497525929b9a47f03dfb81887ac896202b7e12
+%patch -p1 -P9
 
 # Replace hard wired port number in the test suite to avoid collisions
 # between 32-bit and 64-bit builds running on a single build-host
