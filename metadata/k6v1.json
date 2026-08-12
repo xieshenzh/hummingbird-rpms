@@ -4,5 +4,5 @@
   "release_monitoring_project_id": 382606,
   "track_upstream": "1",
   "upstream_repo": "https://github.com/grafana/k6",
-  "version": "1.8.0"
+  "version": "1.8.1"
 }
