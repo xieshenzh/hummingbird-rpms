@@ -1,7 +1,7 @@
 %bcond check 1
 
 %global goipath go.k6.io/k6
-Version: 1.8.0
+Version: 1.8.1
 
 %gometa -L
 
