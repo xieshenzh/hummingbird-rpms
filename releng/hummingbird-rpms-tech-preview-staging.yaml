@@ -570,6 +570,8 @@ spec:
           contentType: rpm
         - name: libxcrypt-main
           contentType: rpm
+        - name: libxkbcommon-main
+          contentType: rpm
         - name: libxml2-main
           contentType: rpm
         - name: libxslt-main
