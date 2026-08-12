@@ -160,6 +160,8 @@ spec:
           contentType: rpm
         - name: cloud-init-main
           contentType: rpm
+        - name: cloud-utils-main
+          contentType: rpm
         - name: cmake-main
           contentType: rpm
         - name: composefs-main
