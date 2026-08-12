@@ -81,10 +81,10 @@ index 2a17c891dd..64017c666c 100644
  }
  #endif
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 8589a28b72..9aaeb5e5b4 100644
+index 2363b99a25..f1a07645f0 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -3153,3 +3153,6 @@ MODULE__MULTIBYTECODEC_DEPS=$(srcdir)/Modules/cjkcodecs/multibytecodec.h
+@@ -3159,3 +3159,6 @@ MODULE__MULTIBYTECODEC_DEPS=$(srcdir)/Modules/cjkcodecs/multibytecodec.h
  # Local Variables:
  # mode: makefile
  # End:
@@ -92,10 +92,10 @@ index 8589a28b72..9aaeb5e5b4 100644
 +# Fedora-specific, downstream only
 +PY_STDMODULE_CFLAGS += -D_PyHack_check_version_on_modinit=1
 diff --git a/Modules/_cursesmodule.c b/Modules/_cursesmodule.c
-index e6b5271357..e536ab51af 100644
+index 1996488a0e..cfdffd8ec4 100644
 --- a/Modules/_cursesmodule.c
 +++ b/Modules/_cursesmodule.c
-@@ -4783,6 +4783,12 @@ curses_destructor(PyObject *op)
+@@ -5011,6 +5011,12 @@ curses_destructor(PyObject *op)
  PyMODINIT_FUNC
  PyInit__curses(void)
  {
@@ -109,10 +109,10 @@ index e6b5271357..e536ab51af 100644
  
      /* Initialize object type */
 diff --git a/Modules/_tkinter.c b/Modules/_tkinter.c
-index de93994aa0..10f95215bd 100644
+index 4e8d75e8e1..32e58755aa 100644
 --- a/Modules/_tkinter.c
 +++ b/Modules/_tkinter.c
-@@ -3432,6 +3432,12 @@ static struct PyModuleDef _tkintermodule = {
+@@ -3499,6 +3499,12 @@ static struct PyModuleDef _tkintermodule = {
  PyMODINIT_FUNC
  PyInit__tkinter(void)
  {
