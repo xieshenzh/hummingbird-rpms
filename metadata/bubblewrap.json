@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "release_monitoring_project_id": 10937,
+  "sha": "e2cf5866797d49ca5dee46ed9413b40cb0fe05f3",
+  "source": "https://src.fedoraproject.org/rpms/bubblewrap.git",
+  "version": "0.11.2"
+}

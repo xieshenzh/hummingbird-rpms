@@ -130,6 +130,8 @@ spec:
           contentType: rpm
         - name: btrfs-progs-main
           contentType: rpm
+        - name: bubblewrap-main
+          contentType: rpm
         - name: buildah-main
           contentType: rpm
         - name: busybox-main
