@@ -130,6 +130,7 @@ git-sync:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 gcc:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
   # Larger builders are required for the build to complete in a reasonable time
   timeout_hours: 12
   build_platforms:

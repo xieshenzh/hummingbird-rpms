@@ -1,6 +1,6 @@
 {
   "branch": "f44",
-  "modification_reason": "Disable non-essential language frontends",
+  "modification_reason": "Disable non-essential language frontends; migrated to gorget source-pipeline.yaml (HUM-5620): all four sources (gcc, nvptx-tools, newlib-cygwin, isl) now fetched by the pipeline instead of update-gcc.sh/manual recipes, with changelog/PR extraction replicated by rpms/gcc/gorget-update-changelog.sh's post: step.",
   "modification_status": "modified",
   "release": "1",
   "sha": "1a52c6782d7534a652605321198e0dc61c5df742",
