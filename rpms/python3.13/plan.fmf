@@ -24,10 +24,11 @@ discover:
       test: "PYTHON=python${pybasever}d TOX=false VERSION=${pybasever} CYTHON=false ./venv.sh"
     - name: selftest
       path: /selftest
-      test: "VERSION=${pybasever} X='-i test_check_probes' ./parallel.sh"
+      # test_subparser_inherits_reparse_deferral fails on EPEL9: https://github.com/python/cpython/issues/155485
+      test: "VERSION=${pybasever} X='-i test_check_probes -i test_subparser_inherits_reparse_deferral' ./parallel.sh"
     - name: debugtest
       path: /selftest
-      test: "VERSION=${pybasever} PYTHON=python${pybasever}d X='-i test_check_probes' ./parallel.sh"
+      test: "VERSION=${pybasever} PYTHON=python${pybasever}d X='-i test_check_probes -i test_subparser_inherits_reparse_deferral' ./parallel.sh"
     - name: optimizedflags
       path: /flags
       test: "python${pybasever} ./assertflags.py -O3 CFLAGS PY_BUILTIN_MODULE_CFLAGS PY_CFLAGS PY_CORE_CFLAGS PY_CFLAGS_NODIST PY_STDMODULE_CFLAGS"
@@ -43,6 +44,9 @@ discover:
     - name: marshalparser
       path: /marshalparser
       test: "VERSION=${pybasever} SAMPLE=10 ./test_marshalparser_compatibility.sh"
+    - name: required_symbols
+      path: /required-symbols
+      test: "VERSION=${pybasever} ./check.sh"
 
 prepare:
   - name: Install dependencies
@@ -62,8 +66,9 @@ prepare:
     - virtualenv  # for virtualenv tests
     - glibc-all-langpacks # for locale tests
     - marshalparser  # for testing compatibility (magic numbers) with marshalparser
+    - binutils  # for nm (symbol inspection)
     - rpm  # for debugging
-    - dnf  # for upgrade
+    - dnf  # for upgrade and downgrade
   - name: Update packages
     how: shell
     script: dnf upgrade -y
