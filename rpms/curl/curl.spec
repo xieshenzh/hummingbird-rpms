@@ -13,7 +13,7 @@
 Summary: A utility for getting files from remote servers (FTP, HTTP, and others)
 Name: curl
 Version: 8.21.0
-Release: 0.1.1%{?dist}
+Release: 5%{?dist}
 License: curl
 Source0: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz
 Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
@@ -21,6 +21,9 @@ Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
 # to Daniel's address page https://daniel.haxx.se/address.html for the GPG Key,
 # which points to the GPG key as of April 7th 2016 of https://daniel.haxx.se/mykey.asc
 Source2: mykey.asc
+
+# add multi_wakeup_internal for threaded resolving (#2509107)
+Patch001: 0001-curl-8.21.0-lib-add-multi_wakeup_internal.patch
 
 # patch making libcurl multilib ready
 Patch101: 0101-curl-7.32.0-multilib.patch
@@ -45,7 +48,6 @@ BuildRequires: automake
 BuildRequires: brotli-devel
 BuildRequires: coreutils
 BuildRequires: gcc
-BuildRequires: groff
 BuildRequires: krb5-devel
 BuildRequires: libidn2-devel
 BuildRequires: libnghttp2-devel
@@ -55,6 +57,7 @@ BuildRequires: libnghttp3-devel
 BuildRequires: libpsl-devel
 BuildRequires: libssh-devel
 BuildRequires: libtool
+BuildRequires: libzstd-devel
 BuildRequires: make
 %if %{with http3}
 BuildRequires: ngtcp2-crypto-ossl-devel
@@ -76,9 +79,6 @@ BuildRequires: zlib-devel
 
 # For gpg verification of source tarball
 BuildRequires: gnupg2
-
-# needed to compress content of tool_hugehelp.c after changing curl.1 man page
-BuildRequires: perl(IO::Compress::Gzip)
 
 # needed for generation of shell completions
 BuildRequires: perl(Getopt::Long)
@@ -174,13 +174,17 @@ Requires: libcurl%{?_isa} >= %{version}-%{release}
 # (we need to translate 4.0.0-beta1 -> 4.0.0~beta1 though)
 %global openssl_version %({ pkg-config --modversion openssl 2>/dev/null || echo 0;} | sed 's|-|~|')
 
+# require at least the version of libzstd that we were built against,
+# to ensure that we have the necessary symbols available
+%global libzstd_version %(pkg-config --modversion libzstd 2>/dev/null || echo 0)
+
 %description
 curl is a command line tool for transferring data with URL syntax, supporting
 FTP, FTPS, HTTP, HTTPS, SCP, SFTP, TFTP, TELNET, DICT, LDAP, LDAPS, FILE, IMAP,
 SMTP, POP3 and RTSP.  curl supports SSL certificates, HTTP POST, HTTP PUT, FTP
 uploading, HTTP form based upload, proxies, cookies, user+password
 authentication (Basic, Digest, NTLM, Negotiate, kerberos...), file transfer
-resume, proxy tunneling and a busload of other useful tricks. 
+resume, proxy tunneling and a busload of other useful tricks.
 
 %package -n libcurl
 Summary: A library for getting files from web servers
@@ -196,6 +200,7 @@ Requires: ngtcp2%{?_isa} >= %{ngtcp2_version}
 Requires: openssl-libs%{?_isa} >= 1:%{openssl_version}
 Provides: libcurl-full = %{version}-%{release}
 Provides: libcurl-full%{?_isa} = %{version}-%{release}
+Requires: libzstd%{?_isa} >= %{libzstd_version}
 
 %description -n libcurl
 libcurl is a free and easy-to-use client-side URL transfer library, supporting
@@ -264,7 +269,8 @@ printf "609\n610\n611\n612\n613\n614\n615\n616\n617\n618\n" >>tests/data/DISABLE
 printf "619\n620\n621\n622\n623\n624\n625\n626\n627\n628\n" >>tests/data/DISABLED
 printf "629\n630\n631\n633\n634\n635\n636\n637\n638\n639\n" >>tests/data/DISABLED
 printf "640\n641\n642\n656\n664\n665\n" >>tests/data/DISABLED
-printf "1446\n1459\n1583\n2004\n2007\n" >>tests/data/DISABLED
+printf "1446\n1459\n1583\n1725\n2004\n2007\n" >>tests/data/DISABLED
+printf "3021\n3022\n" >>tests/data/DISABLED
 %endif
 
 # test3026: avoid pthread_create() failure due to resource exhaustion on i386
@@ -302,7 +308,6 @@ export common_configure_opts="          \
     --enable-ipv6                       \
     --enable-symbol-hiding              \
     --enable-threaded-resolver          \
-    --without-zstd                      \
     --with-gssapi                       \
     --with-libidn2                      \
     --with-nghttp2                      \
@@ -332,7 +337,10 @@ export common_configure_opts="          \
         --disable-websockets            \
         --without-brotli                \
         --without-libpsl                \
-        --without-libssh
+        --without-libssh                \
+        --without-nghttp3               \
+        --without-ngtcp2                \
+        --without-zstd
 )
 
 # configure full build
@@ -357,6 +365,7 @@ export common_configure_opts="          \
         --with-brotli                   \
         --with-libpsl                   \
         --with-libssh                   \
+        --with-zstd                     \
 %if %{with http3}
         --with-nghttp3                  \
         --with-ngtcp2                   \
@@ -392,7 +401,7 @@ for size in minimal full; do (
     export LD_LIBRARY_PATH="${PWD}/lib/.libs"
 
     # tests that must run in serial to avoid intermittent failures under parallel execution
-    serial_tests="766 1399 2402 2404 2500 2502 3300"
+    serial_tests="766 1399 2402 2404 2500 2502 3300 3301"
     serial_excludes=$(for t in $serial_tests; do printf ' !%s' "$t"; done)
     # run the bulk of tests in parallel, excluding serial ones
     # cap at 64 jobs to avoid overwhelming system resources on high-CPU machines
@@ -472,6 +481,39 @@ rm -f ${RPM_BUILD_ROOT}%{_mandir}/man1/wcurl.1*
 %{_libdir}/libcurl.so.4.[0-9].[0-9].minimal
 
 %changelog
+* Thu Aug 06 2026 Jan Macku <jamacku@redhat.com> - 8.21.0-5
+- add multi_wakeup_internal for threaded resolving (#2509107)
+
+* Tue Jul 21 2026 Owen Zimmerman <owen@fyralabs.com> - 8.21.0-4
+- Enable zstd in full config
+
+* Mon Jul 20 2026 Jan Macku <jamacku@redhat.com> - 8.21.0-3
+- explicitly disable HTTP/3 support in the minimal build
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 8.21.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 24 2026 Jan Macku <jamacku@redhat.com> - 8.21.0-1
+- new upstream release
+
+* Thu Jun 18 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 8.21.0~rc3-3
+- Rebuilt for openssl 4.0
+
+* Thu Jun 18 2026 Jan Macku <jamacku@redhat.com> - 8.21.0~rc3-2
+- fix multi_fdset must not report only the wakeup socket (#2460719)
+
+* Wed Jun 17 2026 Jan Macku <jamacku@redhat.com> - 8.21.0~rc3-1
+- new upstream release candidate
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 8.21.0~rc2-2
+- Rebuilt for openssl 4.0
+
+* Tue Jun 09 2026 Jan Macku <jamacku@redhat.com> - 8.21.0~rc2-1
+- new upstream release candidate
+
+* Fri Jun 05 2026 Jan Macku <jamacku@redhat.com> - 8.21.0~rc1-1
+- new upstream release candidate
+
 * Mon May 18 2026 Jan Macku <jamacku@redhat.com> - 8.20.0-2
 - Fix potential 100% CPU usage in curl_multi_socket()
 
