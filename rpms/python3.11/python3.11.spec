@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 5.5%{?dist}
+Release: 7%{?dist}
 License: Python-2.0.1
 
 
@@ -485,6 +485,13 @@ Patch494: 00494-cve-2026-4360.patch
 #
 # gh-152674: Avoid quadratic behavior in xml.etree.ElementPath index predicates
 Patch495: 00495-cve-2026-6879.patch
+
+# 00491 # ac14737379922303720216b61803474c84f291ef
+# gh-149776: Skip UDP Lite tests if it's not supported
+#
+# Fix test_socket on Linux kernel 7.1 and newer: skip UDP Lite tests if
+# it's not supported.
+Patch491: 00491-gh-149776-skip-udp-lite-tests-if-it-s-not-supported.patch
 
 # (New patches go here ^^^)
 #
@@ -1809,6 +1816,13 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Jul 30 2026 Miro Hrončok <mhroncok@redhat.com> - 3.11.15-7
+ - Skip UDP Lite tests if it's not supported
+ - Fixes FTBFS on Linux kernel 7.1 and newer
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.11.15-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Thu Jul 02 2026 Miro Hrončok <mhroncok@redhat.com> - 3.11.15-5
 - Fix ssl.SSLError: [ASN1: NOT_ENOUGH_DATA] not enough data with OpenSSL 3.5.7+
 
