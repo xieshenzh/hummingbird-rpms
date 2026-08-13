@@ -8,7 +8,7 @@ Version:                3.5.5
 %gometa -L -f
 
 Name:           prometheus3.5
-Release:        0.7%{?dist}
+Release:        0.8%{?dist}
 Summary:        Monitoring system and time series database
 License:        Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL:            %{gourl}
@@ -23,6 +23,7 @@ Patch1:         0002-Backport-x-text-security-update.patch
 Patch2:         0003-Make-bigzero-average-test-tolerant.patch
 Patch3:         0004-cve-2026-53669-bump-react-router-to-7.18.0.patch
 Patch4:         0005-cve-2026-69153-bump-postcss-to-8.5.19.patch
+Patch5:         0006-cve-2026-73086-bump-nanoid-to-3.3.12.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.23
@@ -200,7 +201,6 @@ Provides:       bundled(npm(moment)) = 2.30.1
 Provides:       bundled(npm(moment-timezone)) = 0.5.48
 Provides:       bundled(npm(ms)) = 2.1.3
 Provides:       bundled(npm(nanoid)) = 3.3.12
-Provides:       bundled(npm(nanoid)) = 3.3.8
 Provides:       bundled(npm(node-addon-api)) = 7.1.1
 Provides:       bundled(npm(object-assign)) = 4.1.1
 Provides:       bundled(npm(object-is)) = 1.1.6
