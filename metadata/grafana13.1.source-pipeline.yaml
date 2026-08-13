@@ -16,7 +16,7 @@ transform:
       - |
         set -euo pipefail
         # Apply every patch %prep will (in the same order), not just
-        # grafana-yarn-cache.patch: the nanoid/axios CVE patches also bump
+        # grafana-yarn-cache.patch: the nanoid/axios/browserslist CVE patches also bump
         # yarn.lock/package.json entries. Populating the cache from the
         # pristine (pre-CVE-patch) lockfile leaves it missing whatever
         # versions those patches bump to, so %build's own
@@ -28,6 +28,7 @@ transform:
         patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache.patch"
         patch -p1 < "${PACKAGE_DIR}/grafana-nanoid-cve.patch"
         patch -p1 < "${PACKAGE_DIR}/grafana-axios-cve.patch"
+        patch -p1 < "${PACKAGE_DIR}/grafana-browserslist-cve.patch"
         # Must apply after the CVE patches above: pins compressionLevel and
         # carries the resulting full yarn.lock checksum regeneration (see
         # grafana-yarn-cache-compression.patch's own header comment).
@@ -49,12 +50,10 @@ transform:
     outputs:
       - "grafana-yarn-cache-${VERSION}.tar.bz2"
 
-# No accepted-checksums needed as of 13.1.3: both Source1 and the yarn
-# cache archive embed the version in their own filename, so a version bump
-# is always a "new file" to gorget's re-publication check, never a same-name
-# checksum collision. The 13.1.2-specific entries this section used to carry
-# (gorget 0.1.16's vendor-layout fix; the ip-address CVE bump's yarn.lock
-# effect) are gone along with that filename -- both are already reflected
-# directly in the regenerated grafana-13.1.3-vendor.tar.bz2 and
-# grafana-yarn-cache-13.1.3.tar.bz2 verified above, not called out as
-# exceptions here.
+# Same-version yarn-cache regeneration (CVE npm bump) changes the archive
+# checksum while keeping the filename, so gorget needs an accepted-checksums
+# exception for the new hash.
+accepted-checksums:
+  - file: "grafana-yarn-cache-13.1.3.tar.bz2"
+    checksum: "4456b4073d61c053d0abc05dcb79675d34872cb2a80f497381fc3299397099aecff3d64a46320884644139c233114e087a27e530ba60f3bed5bd05bfe3f97043"
+    reason: "grafana-browserslist-cve.patch bumps browserslist 4.28.1->4.28.7 for CVE-2026-73088/73089; grafana-yarn-cache-compression.patch regenerated to reflect yarn.lock changes"
