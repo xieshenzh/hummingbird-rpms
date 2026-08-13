@@ -1,0 +1,10 @@
+{
+  "modification_status": "native",
+  "release": "0.1",
+  "release_monitoring_project_id": 235001,
+  "track_upstream": "17",
+  "upstream_repo": "https://github.com/openjdk/jdk17u",
+  "upstream_version_transform": "openjdk_to_rpm",
+  "version": "17.0.20.0.8",
+  "version_transform": "openjdk_to_oracle"
+}

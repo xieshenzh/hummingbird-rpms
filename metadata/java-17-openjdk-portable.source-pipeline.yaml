@@ -1,0 +1,59 @@
+fetch:
+  - type: spec-update
+    set-version: false
+    reset-release: "0.1"
+    substitutions:
+      - pattern: "^%global interimver\\s+.*"
+        replacement: "%global interimver %(echo ${VERSION} | cut -d. -f2)"
+      - pattern: "^%global updatever\\s+.*"
+        replacement: "%global updatever ${VERSION_PATCH}"
+      - pattern: "^%global patchver\\s+.*"
+        replacement: "%global patchver %(echo ${VERSION} | cut -d. -f4)"
+      - pattern: "^%global buildver\\s+.*"
+        replacement: "%global buildver %(echo ${VERSION} | cut -d. -f5)"
+  - type: spec-source
+    index: 0
+
+transform:
+  - type: run
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+
+        source_root="$(find . -mindepth 1 -maxdepth 1 -type d -name 'jdk-*' -print -quit)"
+        if [ -z "${source_root}" ]; then
+          echo "OpenJDK source root not found" >&2
+          exit 1
+        fi
+
+        "${PACKAGE_DIR}/get_bundle_versions.sh" "${source_root}" |
+          sed -n '/^# Version in /,$p' > java-17-openjdk-portable-bundled-provides.txt
+
+        temurin_version="17.0.20"
+        temurin_build="8"
+        : > gorget-discovered.tsv
+        for temurin_arch in x64 aarch64; do
+          temurin_filename="OpenJDK17U-jdk_${temurin_arch}_linux_hotspot_${temurin_version}_${temurin_build}.tar.gz"
+          curl --fail --location --retry 3 \
+            --output "${temurin_filename}" \
+            "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-${temurin_version}+${temurin_build}/${temurin_filename}"
+          printf '%s\t%s\n' "${temurin_filename}" "${temurin_filename}" >> gorget-discovered.tsv
+        done
+    outputs:
+      - java-17-openjdk-portable-bundled-provides.txt
+    discovered-outputs: gorget-discovered.tsv
+
+post:
+  - type: run
+    artifacts:
+      - java-17-openjdk-portable-bundled-provides.txt
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        UPDATE_SPEC_FILE="${SPEC_FILE}" \
+          ./update_bundled_provides.sh java-17-openjdk-portable-bundled-provides.txt
+        rm -f java-17-openjdk-portable-bundled-provides.txt

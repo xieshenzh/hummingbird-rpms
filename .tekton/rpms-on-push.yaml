@@ -11368,6 +11368,77 @@ spec:
     - name: git-auth
       secret:
         secretName: '{{git_auth_secret}}'
+# --- java-17-openjdk-portable ---
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/redhat/hummingbird/rpms/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-event: "[push]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/java-17-openjdk-portable/***]"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: rpms-main
+    appstudio.openshift.io/component: java-17-openjdk-portable-main
+    pipelines.appstudio.openshift.io/type: build
+  name: java-17-openjdk-portable-main-on-push
+  namespace: hummingbird-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
+    - name: ociStorage
+      value: quay.io/redhat-user-workloads/hummingbird-tenant/java-17-openjdk-portable-main:{{revision}}
+    - name: package-name
+      value: java-17-openjdk-portable
+    - name: target-branch
+      value: '{{target_branch}}'
+    - name: build-architectures
+      value:
+        - aarch64
+        - x86_64
+    - name: build-platforms
+      value:
+        - "linux-d160-c8xlarge/arm64"
+        - "linux-d160-c8xlarge/amd64"
+    - name: specfile
+      value: "java-17-openjdk-portable.spec"
+    - name: monorepo-subdir
+      value: "rpms/java-17-openjdk-portable"
+    - name: mock-config-template-filename-in-sources
+      value: "mock/mock.cfg"
+    - name: dist-git-client-configdir
+      value: "mock/"
+    - name: forked-from
+      value: "https://gitlab.com/redhat/hummingbird/rpms"
+  pipelineRef:
+    resolver: bundles
+    params:
+      - name: name
+        value: build-rpm-package
+      - name: kind
+        value: pipeline
+      - name: bundle
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-java-17-openjdk-portable-main
+  timeouts:
+    pipeline: 8h
+    tasks: 8h
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{git_auth_secret}}'
 # --- java-21-openjdk ---
 ---
 apiVersion: tekton.dev/v1
