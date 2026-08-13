@@ -1,12 +1,12 @@
 {
   "branch": "f44",
-  "modification_reason": "Update to upstream version 17.10",
+  "modification_reason": "Update to upstream version 17.11",
   "modification_status": "modified",
-  "release": "1",
+  "release": "0.1",
   "sha": "34700e63c88ffab8a3822d2e8ee966397ca74dee",
   "source": "https://src.fedoraproject.org/rpms/postgresql17.git",
   "track_upstream": "17",
   "upstream_branch": "REL_17_STABLE",
   "upstream_repo": "https://github.com/postgres/postgres",
-  "version": "17.10"
+  "version": "17.11"
 }
