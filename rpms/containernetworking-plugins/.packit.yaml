@@ -1,0 +1,36 @@
+---
+specfile_path: containernetworking-plugins.spec
+upstream_package_name: plugins
+upstream_project_url: https://github.com/containernetworking/plugins
+downstream_package_name: containernetworking-plugins
+upstream_tag_template: v{version}
+allowed_pr_authors:
+  - packit
+
+jobs:
+  # Fedora Rawhide follows the latest version
+  - job: pull_from_upstream
+    trigger: release
+    dist_git_branches:
+      - fedora-rawhide
+  #  upstream_tag_include: "^v1.6.+"
+
+  # Run Koji builds when Packit pull requests are merged
+  - job: koji_build
+    trigger: commit
+    dist_git_branches:
+      - fedora-rawhide
+
+  # Create Bodhi updates in all Fedora stable versions
+  # - job: bodhi_update
+  #  trigger: commit
+  #  dist_git_branches: fedora-all
+
+actions:
+  post-modifications:
+    - bash -c 'cd "${PACKIT_DOWNSTREAM_REPO}"; \
+      go_vendor_archive create --config go-vendor-tools.toml containernetworking-plugins.spec'
+
+  changelog-entry:
+    - bash -c "echo - New release ${PACKIT_PROJECT_VERSION}"
+...

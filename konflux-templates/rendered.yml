@@ -1951,6 +1951,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- containernetworking-plugins ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: containernetworking-plugins-main
+spec:
+  application: rpms-main
+  componentName: containernetworking-plugins-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/containernetworking-plugins-main
+  source:
+    git:
+      context: rpms/containernetworking-plugins
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: containernetworking-plugins-main
+  name: containernetworking-plugins-main
+spec:
+  image:
+    name: hummingbird-tenant/containernetworking-plugins-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- containers-common ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1
