@@ -14,13 +14,13 @@
 
 # upstream can produce releases with a different tag than the SDK version
 #%%global upstream_tag v%%{runtime_version}
-%global upstream_tag v10.0.110
+%global upstream_tag v10.0.111
 %global upstream_tag_without_v %(echo %{upstream_tag} | sed -e 's|^v||')
 
 %global hostfxr_version %{runtime_version}
-%global runtime_version 10.0.10
-%global aspnetcore_runtime_version 10.0.10
-%global sdk_version 10.0.110
+%global runtime_version 10.0.11
+%global aspnetcore_runtime_version 10.0.11
+%global sdk_version 10.0.111
 %global sdk_feature_band_version %(echo %{sdk_version} | cut -d '-' -f 1 | sed -e 's|[[:digit:]][[:digit:]]$|00|')
 %global templates_version %{aspnetcore_runtime_version}
 #%%global templates_version %%(echo %%{runtime_version} | awk 'BEGIN { FS="."; OFS="." } {print $1, $2, $3+1 }')
@@ -77,7 +77,7 @@
 
 Name:           dotnet%{dotnetver}
 Version:        %{sdk_rpm_version}
-Release:        2.1%{?dist}
+Release:        1%{?dist}
 Summary:        .NET %{dotnetver} Runtime and SDK
 License:        0BSD AND Apache-2.0 AND (Apache-2.0 WITH LLVM-exception) AND APSL-2.0 AND BSD-2-Clause AND BSD-3-Clause AND BSD-4-Clause AND BSL-1.0 AND bzip2-1.0.6 AND CC0-1.0 AND CC-BY-3.0 AND CC-BY-4.0 AND CC-PDDC AND CNRI-Python AND EPL-1.0 AND GPL-2.0-only AND (GPL-2.0-only WITH GCC-exception-2.0) AND GPL-2.0-or-later AND GPL-3.0-only AND ICU AND ISC AND LGPL-2.1-only AND LGPL-2.1-or-later AND LicenseRef-Fedora-Public-Domain AND LicenseRef-ISO-8879 AND MIT AND MIT-Wu AND MS-PL AND MS-RL AND NCSA AND OFL-1.1 AND OpenSSL AND Unicode-DFS-2015 AND Unicode-DFS-2016 AND W3C-19980720 AND X11 AND Zlib
 
@@ -157,7 +157,7 @@ BuildRequires:  llvm-libunwind-devel
 BuildRequires:  lttng-ust-devel
 %endif
 BuildRequires:  make
-%if 0%{?fedora} >= 45
+%if 0%{?fedora} >= 45 || 0%{?rhel} >= 11
 BuildRequires:  openssl3-devel
 %else
 BuildRequires:  openssl-devel
@@ -430,7 +430,7 @@ Requires:       dotnet-sdk-%{dotnetver}%{?_isa} >= %{sdk_rpm_version}-%{release}
 # -lbrotlidec -lz ...`.
 Requires:       brotli-devel%{?_isa}
 Requires:       clang%{?_isa}
-%if 0%{?fedora} >= 45
+%if 0%{?fedora} >= 45 || 0%{?rhel} >= 11
 Requires:       openssl3-devel%{?_isa}
 %else
 Requires:       openssl-devel%{?_isa}
@@ -693,6 +693,8 @@ function retry_until_success {
     set +e
     while [[ $exit_code != 0 ]] && [[ $tries != 0 ]]; do
         (( tries = tries - 1 ))
+        # Clean stale build state so retries start fresh.
+        rm -rf .packages $(find . -name artifacts -type d)
         "$@"
         exit_code=$?
     done
@@ -700,6 +702,64 @@ function retry_until_success {
     return $exit_code
 }
 
+# Runs a command and kills it if it produces no output.
+# Use a longer timeout on machines with fewer cores since builds are slower.
+function output_timeout {
+    # 30m on machines with more than 4 cores, 60m on smaller machines where builds are slower.
+    # The aarch64 Neoverse N1 CI machines have 4 cores and need the longer timeout.
+    local nprocs=$(nproc)
+    local idle_timeout=1800
+    if (( nprocs <= 4 )); then
+        idle_timeout=3600
+    fi
+
+    # Create a pipe we'll read the output from for timeout detection.
+    local fifo=$(mktemp -u)
+    mkfifo "$fifo"
+
+    # Create a process group so we can kill every process including children.
+    # And use a long timeout (5h) in (the unlikely) case output timeout detection continues to be triggered.
+    setsid timeout --foreground 5h "$@" &> "$fifo" &
+    local cmd_pid=$!
+
+    # Read lines from the output with a timeout.
+    # Disable tracing to avoid 'set -x' noise from the read loop appearing in the output.
+    local timed_out=false
+    local traceflags=$-
+    set +x
+    while true; do
+        local rc=0
+        IFS= read -t $idle_timeout -r line || rc=$?
+        if (( rc == 0 )); then
+            printf '%s\n' "$line"
+        elif (( rc > 128 )); then
+            echo "output_timeout: no output for ${idle_timeout}s" >&2
+            timed_out=true
+            break
+        else
+            [[ -z $line ]] || printf '%s\n' "$line"
+            break
+        fi
+    done < "$fifo"
+    [[ $traceflags != *x* ]] || set -x
+
+    if $timed_out; then
+        # Hang detected: kill the process group, then collect the exit code.
+        kill -9 -- -$cmd_pid 2>/dev/null || true
+        wait $cmd_pid 2>/dev/null
+        local exit_code=$?
+    else
+        # Normal exit: collect the real exit code, then clean up any orphaned processes.
+        wait $cmd_pid 2>/dev/null
+        local exit_code=$?
+        kill -9 -- -$cmd_pid 2>/dev/null || true
+    fi
+
+    # Cleanup.
+    rm -f "$fifo"
+
+    return $exit_code
+}
 
 cat >dotnet-rpm-build.sh <<EOF
 #!/bin/bash
@@ -732,7 +792,7 @@ EOF
 chmod +x dotnet-rpm-build.sh
 
 VERBOSE=1 retry_until_success $max_attempts \
-    timeout 5h \
+    output_timeout \
     ./dotnet-rpm-build.sh
 
 
@@ -949,6 +1009,9 @@ export COMPlus_LTTng=0
 
 
 %changelog
+* Tue Aug 11 2026 Omair Majid <omajid@redhat.com> - 10.0.111-1
+- Update to .NET SDK 10.0.111 and Runtime 10.0.11
+
 * Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 10.0.110-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
 
