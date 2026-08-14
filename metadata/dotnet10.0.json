@@ -3,11 +3,11 @@
   "cve_product": "Microsoft / .NET 10.0",
   "modification_reason": "Disable MSBuild node reuse and build server to fix mock chroot teardown busy on /dev/urandom",
   "modification_status": "modified",
-  "release": "2",
-  "sha": "6f6d5c35011b5e4281b8fbea64bd593232e121a7",
+  "release": "1",
+  "sha": "f0526712367ee1757748bdd0a7df266338fd688c",
   "source": "https://src.fedoraproject.org/rpms/dotnet10.0.git",
   "upstream_branch": "release/10.0",
   "upstream_repo": "https://github.com/dotnet/runtime",
-  "version": "10.0.110",
+  "version": "10.0.111",
   "version_transform": "dotnet_sdk_to_runtime"
 }
