@@ -170,6 +170,8 @@ spec:
           contentType: rpm
         - name: composer-main
           contentType: rpm
+        - name: conmon-main
+          contentType: rpm
         - name: container-selinux-main
           contentType: rpm
         - name: containers-common-main

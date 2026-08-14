@@ -3396,6 +3396,76 @@ spec:
     - name: git-auth
       secret:
         secretName: '{{git_auth_secret}}'
+# --- conmon ---
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/redhat/hummingbird/rpms/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/conmon/***]"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: rpms-main
+    appstudio.openshift.io/component: conmon-main
+    pipelines.appstudio.openshift.io/type: build
+  name: conmon-main-on-pull-request
+  namespace: hummingbird-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
+    - name: image-expires-after
+      value: "5d"
+    - name: ociStorage
+      value: quay.io/redhat-user-workloads/hummingbird-tenant/conmon-main:on-mr-{{pull_request_number}}-{{revision}}
+    - name: package-name
+      value: conmon
+    - name: target-branch
+      value: '{{target_branch}}'
+    - name: build-architectures
+      value:
+        - aarch64
+        - x86_64
+    - name: build-platforms
+      value:
+        - "linux/x86_64"
+        - "linux/arm64"
+    - name: specfile
+      value: "conmon.spec"
+    - name: monorepo-subdir
+      value: "rpms/conmon"
+    - name: mock-config-template-filename-in-sources
+      value: "mock/mock.cfg"
+  pipelineRef:
+    resolver: bundles
+    params:
+      - name: name
+        value: build-rpm-package
+      - name: kind
+        value: pipeline
+      - name: bundle
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-conmon-main
+  timeouts:
+    pipeline: 4h
+    tasks: 4h
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{git_auth_secret}}'
 # --- container-selinux ---
 ---
 apiVersion: tekton.dev/v1

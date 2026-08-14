@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "sha": "2af4800cbc0e590ebefc534dc7c0dc4b2755aedb",
+  "source": "https://src.fedoraproject.org/rpms/conmon.git",
+  "upstream_repo": "https://github.com/containers/conmon",
+  "version": "2.2.1"
+}
