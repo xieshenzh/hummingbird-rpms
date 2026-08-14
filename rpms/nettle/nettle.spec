@@ -3,17 +3,12 @@
 %global hogweed_so_ver 7
 
 # Set to 1 when building a bootstrap for a bumped so-name.
-%global bootstrap 1
+%global bootstrap 0
 
 %if 0%{?bootstrap}
-# HUM-5994: bootstrap the 3.10.1 -> 4.0 soname bump (libnettle.so.8 -> .so.9,
-# libhogweed.so.6 -> .so.7). Unlike the historical 3.5.1 bootstrap, this uses
-# the plain upstream 3.10.1 release tarball (not a FIPS-hobbled variant) since
-# these old-soname libraries are only a transient compat shim for the
-# buildroot/base-image's existing gnutls, not a FIPS module boundary artifact.
-%global version_old 3.10.1
-%global nettle_so_ver_old 8
-%global hogweed_so_ver_old 6
+%global version_old 3.5.1
+%global nettle_so_ver_old 7
+%global hogweed_so_ver_old 5
 %endif
 
 # * In RHEL nettle is included in the gnutls FIPS module boundary,
@@ -29,7 +24,7 @@
 
 Name:           nettle
 Version:        4.0
-Release:        5.1%{?dist}
+Release:        5.2%{?dist}
 Summary:        A low-level cryptographic library
 
 License:        LGPL-3.0-or-later OR GPL-2.0-or-later
@@ -38,7 +33,8 @@ Source0:	http://www.lysator.liu.se/~nisse/archive/%{name}-%{version}.tar.gz
 Source1:	http://www.lysator.liu.se/~nisse/archive/%{name}-%{version}.tar.gz.sig
 Source2:	nettle-release-keyring.gpg
 %if 0%{?bootstrap}
-Source100:	http://www.lysator.liu.se/~nisse/archive/%{name}-%{version_old}.tar.gz
+Source100:	%{name}-%{version_old}-hobbled.tar.xz
+Source101:	nettle-3.5-remove-ecc-testsuite.patch
 %endif
 Patch:		nettle-4.0-zeroize-stack.patch
 Patch:		nettle-4.0-hobble-to-configure.patch
@@ -101,15 +97,15 @@ sed -i '/^Libs.private:/d' hogweed.pc.in
 %endif
 
 %if 0%{?bootstrap}
-# HUM-5994: plain upstream %{version_old} source (not a FIPS-hobbled variant,
-# see comment above %{version_old} definition) - no ecc-testsuite/Makefile.in
-# patching needed since none of that source was removed.
 mkdir -p bootstrap_ver
 pushd bootstrap_ver
 tar --strip-components=1 -xf %{SOURCE100}
+patch -p1 < %{SOURCE101}
 
 # Disable -ggdb3 which makes debugedit unhappy
 sed s/ggdb3/g/ -i configure
+sed 's/ecc-192.c//g' -i Makefile.in
+sed 's/ecc-224.c//g' -i Makefile.in
 popd
 %endif
 
