@@ -16,10 +16,13 @@ import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
+import yaml
+
 # Import from dist_git.py
 sys.path.insert(0, str(Path(__file__).parent))
 from dist_git import (
     METADATA_DIR,
+    PACKAGE_OVERRIDES_YAML,
     RPMS_DIR,
     ROOT_DIR,
     PackageMetadata,
@@ -466,6 +469,30 @@ def validate_package(package_name: str, check_actual_state: bool = True) -> tupl
     if status == 'native':
         if 'source' in metadata or 'branch' in metadata or 'sha' in metadata:
             return False, f"{package_name}: Native package should not have source/branch/sha fields"
+
+        # Check 3.1: A native package with a non-empty `sources` file has
+        # remote sources that need fetching at build time. It has no Fedora
+        # dist-git history, so that fetch needs forked_from (fetch from
+        # hummingbird's own lookaside cache instead) or lookaside_cache_url
+        # (bypass dist-git-client entirely) in ci/package-overrides.yaml.
+        # Without either, the build silently falls back to Fedora's lookaside
+        # cache, where a native package's sources were never uploaded, and
+        # fails. Packages with no `sources` file (e.g. hummingbird-release)
+        # ship all their Source files locally and never hit this fetch path.
+        sources_file = RPMS_DIR / package_name / 'sources'
+        if sources_file.exists() and sources_file.read_text().strip():
+            overrides: dict = {}
+            if PACKAGE_OVERRIDES_YAML.exists():
+                overrides = yaml.safe_load(PACKAGE_OVERRIDES_YAML.read_text()) or {}
+            pkg_override = overrides.get(package_name) or {}
+            if not pkg_override.get('forked_from') and not pkg_override.get('lookaside_cache_url'):
+                return False, (
+                    f"{package_name}: Native package is missing forked_from (or "
+                    f"lookaside_cache_url) in ci/package-overrides.yaml -- without "
+                    f"one of these, the build will try to fetch sources from "
+                    f"Fedora's lookaside cache, where they don't exist."
+                )
+
         # Native packages don't need further validation
         return True, None
 
