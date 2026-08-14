@@ -7,6 +7,7 @@ import types
 from pathlib import Path
 
 import pytest
+import yaml
 
 
 #
@@ -25,6 +26,7 @@ def validator(tmp_path: Path):
 
     (tmp_path / 'rpms').mkdir()
     (tmp_path / 'metadata').mkdir()
+    (tmp_path / 'ci').mkdir()
 
     subprocess.run(['git', 'add', '.'], cwd=tmp_path, check=True)
     subprocess.run(['git', 'commit', '-m', 'Initial commit', '--allow-empty'],
@@ -46,6 +48,7 @@ def validator(tmp_path: Path):
     dg.ROOT_DIR = tmp_path  # type: ignore[attr-defined]
     dg.RPMS_DIR = tmp_path / 'rpms'  # type: ignore[attr-defined]
     dg.METADATA_DIR = tmp_path / 'metadata'  # type: ignore[attr-defined]
+    dg.PACKAGE_OVERRIDES_YAML = tmp_path / 'ci' / 'package-overrides.yaml'  # type: ignore[attr-defined]
 
     module = types.ModuleType('validate_package_modifications')
     module.__file__ = str(script_path)
@@ -56,6 +59,7 @@ def validator(tmp_path: Path):
     module.METADATA_DIR = tmp_path / 'metadata'  # type: ignore[attr-defined]
     module.RPMS_DIR = tmp_path / 'rpms'  # type: ignore[attr-defined]
     module.ROOT_DIR = tmp_path  # type: ignore[attr-defined]
+    module.PACKAGE_OVERRIDES_YAML = tmp_path / 'ci' / 'package-overrides.yaml'  # type: ignore[attr-defined]
 
     module._tmp_path = tmp_path  # type: ignore[attr-defined]
     return module
@@ -172,6 +176,91 @@ def test_track_upstream_integer_rejected(validator) -> None:
     assert not valid
     assert 'track_upstream' in error
     assert 'int' in error
+
+
+#
+# Tests — native packages require forked_from/lookaside_cache_url
+#
+
+
+def _write_overrides(root: Path, overrides: dict) -> None:
+    (root / 'ci' / 'package-overrides.yaml').write_text(yaml.safe_dump(overrides))
+
+
+def _write_sources(root: Path, name: str, content: str) -> None:
+    (root / 'rpms' / name / 'sources').write_text(content)
+
+
+def test_native_package_missing_lookaside_override_rejected(validator) -> None:
+    """A native package with remote sources but no forked_from/
+    lookaside_cache_url override fails.
+
+    Without one of these, the build's source-fetch step defaults to Fedora's
+    lookaside cache, where a native package's sources were never uploaded.
+    """
+    root = validator._tmp_path
+    _create_package(root, 'pkg', {'modification_status': 'native'})
+    _write_sources(root, 'pkg', 'SHA512 (pkg-1.0.tar.gz) = abc123\n')
+    _write_overrides(root, {})
+
+    valid, error = validator.validate_package('pkg', check_actual_state=False)
+    assert not valid
+    assert 'forked_from' in error
+
+
+def test_native_package_with_no_overrides_file_and_sources_rejected(validator) -> None:
+    """A native package with sources but no overrides file at all still fails.
+
+    Exercises the PACKAGE_OVERRIDES_YAML.exists() == False branch, which
+    falls back to an empty overrides dict rather than erroring out.
+    """
+    root = validator._tmp_path
+    _create_package(root, 'pkg', {'modification_status': 'native'})
+    _write_sources(root, 'pkg', 'SHA512 (pkg-1.0.tar.gz) = abc123\n')
+    # Deliberately do NOT write ci/package-overrides.yaml
+
+    valid, error = validator.validate_package('pkg', check_actual_state=False)
+    assert not valid
+    assert 'forked_from' in error
+
+
+def test_native_package_with_forked_from_accepted(validator) -> None:
+    """A native package with forked_from set passes validation."""
+    root = validator._tmp_path
+    _create_package(root, 'pkg', {'modification_status': 'native'})
+    _write_sources(root, 'pkg', 'SHA512 (pkg-1.0.tar.gz) = abc123\n')
+    _write_overrides(root, {
+        'pkg': {'forked_from': 'https://gitlab.com/redhat/hummingbird/rpms'},
+    })
+
+    valid, error = validator.validate_package('pkg', check_actual_state=False)
+    assert valid, f"Expected valid but got: {error}"
+
+
+def test_native_package_with_lookaside_cache_url_accepted(validator) -> None:
+    """A native package with lookaside_cache_url set passes validation."""
+    root = validator._tmp_path
+    _create_package(root, 'pkg', {'modification_status': 'native'})
+    _write_sources(root, 'pkg', 'SHA512 (pkg-1.0.tar.gz) = abc123\n')
+    _write_overrides(root, {
+        'pkg': {'lookaside_cache_url': 'https://example.cloudfront.net/'},
+    })
+
+    valid, error = validator.validate_package('pkg', check_actual_state=False)
+    assert valid, f"Expected valid but got: {error}"
+
+
+def test_native_package_with_no_sources_file_accepted(validator) -> None:
+    """A native package with no `sources` file (all Source files shipped
+    locally, e.g. hummingbird-release) never hits the lookaside fetch path,
+    so it doesn't need forked_from/lookaside_cache_url.
+    """
+    root = validator._tmp_path
+    _create_package(root, 'pkg', {'modification_status': 'native'})
+    _write_overrides(root, {})
+
+    valid, error = validator.validate_package('pkg', check_actual_state=False)
+    assert valid, f"Expected valid but got: {error}"
 
 
 #
