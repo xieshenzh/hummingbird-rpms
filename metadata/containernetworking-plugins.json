@@ -1,0 +1,10 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "5",
+  "release_monitoring_project_id": 20784,
+  "sha": "b75ff28cbae163bcd3f96dbd9634be38337fbac1",
+  "source": "https://src.fedoraproject.org/rpms/containernetworking-plugins.git",
+  "upstream_repo": "https://github.com/containernetworking/plugins",
+  "version": "1.9.1"
+}

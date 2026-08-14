@@ -172,6 +172,8 @@ spec:
           contentType: rpm
         - name: container-selinux-main
           contentType: rpm
+        - name: containernetworking-plugins-main
+          contentType: rpm
         - name: containers-common-main
           contentType: rpm
         - name: coreutils-main
