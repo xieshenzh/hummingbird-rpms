@@ -230,6 +230,13 @@ def check_git_history_state(package_name: str, last_sync_sha: str | None) -> tup
     # Reverted once GCC 16 published to Pulp.
     bad_commits = [line for line in bad_commits if not line.startswith('5c111d84c07cc9ca1e8ae714f19687f47a5d4051 ')]
 
+    # nettle temporary bootstrap: dual-soname build (3.10.1 libnettle.so.8/libhogweed.so.6 +
+    # 4.0 libnettle.so.9/libhogweed.so.7) to unblock gnutls/chrony against the nettle 4.0
+    # soname bump (HUM-5994). Reverted once gnutls 3.8.13-1.2.hum1 (linked to .so.9/.so.7)
+    # was rebuilt and published; current spec matches Fedora upstream exactly.
+    bad_commits = [line for line in bad_commits if not line.startswith('620ed1b9214113cb470f768fbb8f8e3e14a5db84 ')]
+    bad_commits = [line for line in bad_commits if not line.startswith('9cdb789007c07689b1b5c74f27266819f1fa7d41 ')]
+
     # attr HUM-2789 CVE fix (update to 2.6.0) and GPG key cleanup were both superseded by
     # Fedora update a44cbf54, which restored the original Fedora spec; current spec matches Fedora.
     bad_commits = [line for line in bad_commits if not line.startswith('2cf72f98ca36af5376b55db3f543fa3d434b98bd ')]
