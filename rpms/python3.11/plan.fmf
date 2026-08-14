@@ -34,6 +34,9 @@ discover:
     - name: marshalparser
       path: /marshalparser
       test: "VERSION=${pybasever} SAMPLE=10 ./test_marshalparser_compatibility.sh"
+    - name: required_symbols
+      path: /required-symbols
+      test: "VERSION=${pybasever} ./check.sh"
 
 prepare:
   - name: Install dependencies
@@ -51,8 +54,9 @@ prepare:
     - virtualenv  # for virtualenv tests
     - glibc-all-langpacks # for locale tests
     - marshalparser  # for testing compatibility (magic numbers) with marshalparser
+    - binutils  # for nm (symbol inspection)
     - rpm  # for debugging
-    - dnf  # for upgrade
+    - dnf  # for upgrade and downgrade
   - name: Update packages
     how: shell
     script: dnf upgrade -y

@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 5.5%{?dist}
+Release: 7%{?dist}
 License: Python-2.0.1
 
 
@@ -450,7 +450,7 @@ Patch489: 00489-cve-2026-6019.patch
 # (cherry-picked from commit f50bf13566189c8d0ce5a814f33eff3d89951896)
 Patch490: 00490-cve-2026-11972.patch
 
-# 00491 # 008af720a5f6f98ed3feb8ebdbf88ab9dea4db22
+# 00600 # 008af720a5f6f98ed3feb8ebdbf88ab9dea4db22
 # Use BIO_eof to detect EOF for SSL_FILETYPE_ASN1
 #
 # In PEM, we need to parse until error and then suppress `PEM_R_NO_START_LINE`, because PEM allows arbitrary leading and trailing data. DER, however, does not. Parsing until error and suppressing `ASN1_R_HEADER_TOO_LONG` doesn't quite work because that error also covers some cases that should be rejected.
@@ -460,7 +460,7 @@ Patch490: 00490-cve-2026-11972.patch
 # This fixes https://github.com/python/cpython/issues/151504 and adds compatibility with OpenSSL 3.5.7+
 #
 # (cherry-picked from commit acfe02f3b05436658d92add6b168538b30f357f0)
-Patch491: 00491-openssl-3.5.7.patch
+Patch600: 00600-openssl-3.5.7.patch
 
 # 00492 # bcf98ddbc40ec9b3ee87da0124a5660b19b7e606
 # CVE-2026-15308
@@ -485,6 +485,13 @@ Patch494: 00494-cve-2026-4360.patch
 #
 # gh-152674: Avoid quadratic behavior in xml.etree.ElementPath index predicates
 Patch495: 00495-cve-2026-6879.patch
+
+# 00491 # ac14737379922303720216b61803474c84f291ef
+# gh-149776: Skip UDP Lite tests if it's not supported
+#
+# Fix test_socket on Linux kernel 7.1 and newer: skip UDP Lite tests if
+# it's not supported.
+Patch491: 00491-gh-149776-skip-udp-lite-tests-if-it-s-not-supported.patch
 
 # (New patches go here ^^^)
 #
@@ -1809,6 +1816,13 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Jul 30 2026 Miro Hrončok <mhroncok@redhat.com> - 3.11.15-7
+ - Skip UDP Lite tests if it's not supported
+ - Fixes FTBFS on Linux kernel 7.1 and newer
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.11.15-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Thu Jul 02 2026 Miro Hrončok <mhroncok@redhat.com> - 3.11.15-5
 - Fix ssl.SSLError: [ASN1: NOT_ENOUGH_DATA] not enough data with OpenSSL 3.5.7+
 
