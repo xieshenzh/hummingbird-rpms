@@ -4,5 +4,5 @@
   "release_monitoring_project_id": 381994,
   "track_upstream": "3.0",
   "upstream_repo": "https://github.com/grafana/tempo",
-  "version": "3.0.2"
+  "version": "3.0.3"
 }
