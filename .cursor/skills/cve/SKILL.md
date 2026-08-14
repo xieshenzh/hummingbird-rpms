@@ -234,6 +234,18 @@ cve_analysis block), local code, SBOM, metadata. The flaw
 description usually names the specific vulnerable sub-component
 and often resolves mismatch cases without any web search.
 
+**Fix verification priority:**
+
+  1. cve_helper.py probes + local source (see 2a–2d),
+  2. download upstream tarball and grep WHATS_NEW/CHANGELOG,
+  3. curl Fedora spec for patches,
+  4. web search for component relationships only.
+
+For same-day CVEs, skip web searches for fix info, check changelog directly.
+If no fix mention and no upstream fix commit is known, proceed to Step 3f.
+If a fix commit exists but isn't in the changelog, continue with Step 2f to
+verify the commit date against the SRPM release tag.
+
 When you do search:
 
 - **Product mismatch** (CVE vendor/product differs from Hummingbird package):
@@ -336,9 +348,13 @@ under investigation.
      --nvr <nvr> \
      --search "<cve-product>" \
      --search "<module>" \
-     --out /tmp/<package>.sbom.json
-   # optional: --json
+     --out /tmp/<package>.sbom.json \
+     --json
    ```
+
+   Include `--json` in the first call to get structured output. If runtime
+   vs build-time determination requires deeper SBOM inspection, consolidate
+   jq queries instead of making multiple separate calls.
 
 When multiple `*.sbom.json` attachments exist, use the one whose
 NVR matches the target from step 1 — do not assume the newest
