@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 3.21.3",
+  "modification_reason": "Update to upstream version 3.21.4",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 15046,
@@ -8,5 +8,5 @@
   "source": "https://src.fedoraproject.org/rpms/helm3.git",
   "track_upstream": "3",
   "upstream_repo": "https://github.com/helm/helm",
-  "version": "3.21.3"
+  "version": "3.21.4"
 }
