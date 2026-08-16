@@ -2,9 +2,9 @@
   "branch": "rawhide",
   "modification_reason": "Disable git auto-maintenance in check; races git lfs prune under git 2.55 t-prune external-diff test",
   "modification_status": "modified",
-  "release": "4",
+  "release": "6",
   "release_monitoring_project_id": 11551,
-  "sha": "51f0fd08ac02f7aa2f126dbb88a679e59fbfcbb1",
+  "sha": "07a19b0f5e841934354eafe2282bb0c1633a244a",
   "source": "https://src.fedoraproject.org/rpms/git-lfs.git",
   "upstream_repo": "https://github.com/git-lfs/git-lfs",
   "version": "3.7.1"
