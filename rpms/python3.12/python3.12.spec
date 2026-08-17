@@ -13,11 +13,11 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.13
+%global general_version %{pybasever}.14
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 6%{?dist}
+Release: 1%{?dist}
 License: Python-2.0.1
 
 
@@ -400,23 +400,6 @@ Patch461: 00461-downstream-only-install-wheel-in-test-venvs-when-setuptools-71.p
 # stressed on OpenSSL 3.5.
 Patch462: 00462-fix-pyssl_seterror-handling-ssl_error_syscall.patch
 
-# 00464 # 1c713e02a26bf8865bb6421749d19d0766cac178
-# Enable PAC and BTI protections for aarch64
-#
-# Apply protection against ROP/JOP attacks for aarch64 on asm_trampoline.S
-#
-# The BTI flag must be applied in the assembler sources for this class
-# of attacks to be mitigated on newer aarch64 processors.
-#
-# Upstream PR: https://github.com/python/cpython/pull/130864/files
-#
-# The upstream patch is incomplete but only for the case where
-# frame pointers are not used on 3.13+.
-#
-# Since on Fedora we always compile with frame pointers the BTI/PAC
-# hardware protections can be enabled without losing Perf unwinding.
-Patch464: 00464-enable-pac-and-bti-protections-for-aarch64.patch
-
 # 00474 # 837ddca0372fa87ff9cee47142200caa21e77def
 # CVE-2025-15366
 #
@@ -433,6 +416,13 @@ Patch474: 00474-cve-2025-15366.patch
 # (cherry-picked from commit b234a2b67539f787e191d2ef19a7cbdce32874e7)
 Patch475: 00475-cve-2025-15367.patch
 
+<<<<<<< HEAD
+# 00494 # 430aab133397ed44cc9ee621fd311e02fee317b5
+# Increase the timeout of test_large_content_length_truncated
+#
+# It has started to fail randomly when run on s390x architecture.
+Patch494: 00494-increase-the-timeout-of-test_large_content_length_truncated.patch
+=======
 # 00329 #
 # Support OpenSSL FIPS mode
 # - In FIPS mode, OpenSSL wrappers are always used in hashlib
@@ -529,6 +519,7 @@ Patch490: 00490-cve-2026-15308.patch
 # Fix test_socket on Linux kernel 7.1 and newer: skip UDP Lite tests if
 # it's not supported.
 Patch491: 00491-gh-149776-skip-udp-lite-tests-if-it-s-not-supported.patch
+>>>>>>> hummingbird-local
 
 # 00492 # c250d10145d6ca61bf104c3475ccab78be5585bd
 # CVE-2026-11972
@@ -1884,6 +1875,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Aug 13 2026 Karolina Surma <ksurma@redhat.com> - 3.12.14-1
+- Update to Python 3.12.14
+
 * Tue Jul 28 2026 Lukáš Zachar <lzachar@redhat.com> - 3.12.13-6
 - Security fix for CVE-2026-15308
 Resolves: rhbz#2498688
