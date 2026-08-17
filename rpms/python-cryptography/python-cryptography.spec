@@ -5,8 +5,8 @@
 %global srcname cryptography
 
 Name:           python-%{srcname}
-Version:        49.0.0
-Release:        3%{?dist}
+Version:        50.0.0
+Release:        1%{?dist}
 Summary:        PyCA's cryptography library
 
 # cryptography is dual licensed under the Apache-2.0 and BSD-3-Clause,
