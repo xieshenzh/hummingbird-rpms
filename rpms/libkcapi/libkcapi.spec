@@ -1,7 +1,7 @@
 # Shared object version of libkcapi.
 %global vmajor            1
 %global vminor            5
-%global vpatch            0
+%global vpatch            1
 
 # Do we build the replacements packages?
 %bcond_with replace_coreutils
@@ -118,7 +118,7 @@ lib_path=%{buildroot}%{_libdir}                                  \
 
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        11%{?dist}
+Release:        0.1%{?dist}
 Summary:        User space interface to the Linux Kernel Crypto API
 
 License:        BSD-3-Clause OR GPL-2.0-only
@@ -127,9 +127,6 @@ Source0:        https://www.chronox.de/%{name}/releases/%{version}/%{name}-%{ver
 Source1:        https://www.chronox.de/%{name}/releases/%{version}/%{name}-%{version}.tar.xz.asc
 Source2:        sha512hmac-openssl.sh
 Source3:        fipshmac-openssl.sh
-
-Patch:          %{giturl}/commit/735f55ed1289cd6eb6510f32b8b1c7b39c2e38d1.patch#/001-remove-ansi_cprng.patch
-Patch:          %{giturl}/commit/d8c4c8ad67c13fb3ae011f4dfb7d64f7441ce61f.patch#/002-remove-unused.patch
 
 BuildRequires:  bash
 BuildRequires:  coreutils
