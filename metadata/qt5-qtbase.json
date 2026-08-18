@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Added gorget source-pipeline.yaml (HUM-4620 audit finding): Qt moved the 5.15 LTS line out of official_releases -- repointed Source0 at the archive mirror (download.qt.io/archive/qt/5.15/...), which matches the existing recorded checksum exactly, no content change.",
+  "modification_status": "modified",
   "release": "5",
   "sha": "6e6b075076302c6882da943e4d29f4fad57ca155",
   "source": "https://src.fedoraproject.org/rpms/qt5-qtbase.git",

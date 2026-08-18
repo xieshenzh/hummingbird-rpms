@@ -1,0 +1,9 @@
+# ${VERSION_MAJOR}/${VERSION_MINOR} are documented gorget substitution
+# variables (see gorget's README, "Variable substitution" section), not a
+# repo-local convention -- this is just the first pipeline in this repo to
+# need the major.minor prefix Qt's archive layout uses. Verified with a
+# real gorget run: fetch/verify/emit succeeded, checksum matched `sources`
+# exactly.
+fetch:
+  - type: url
+    url: "https://download.qt.io/archive/qt/${VERSION_MAJOR}.${VERSION_MINOR}/${VERSION}/submodules/qtbase-everywhere-opensource-src-${VERSION}.tar.xz"
