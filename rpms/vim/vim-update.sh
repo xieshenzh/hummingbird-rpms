@@ -1,12 +1,12 @@
 #!/bin/bash
 debug=""
 #debug="echo "
-branches=( "rawhide" "f44" "f43" )
-releases=( "fc45" "fc44" "fc43" )
+branches=( "rawhide" "f45" "f44" "f43" )
+releases=( "fc46" "fc45" "fc44" "fc43" )
 # the first bodhi enabled release is the last without \| - all
 # others need to have \|
-regexps=( "fc45" "fc44" "\|fc43" )
-bodhi_enabled=( "0" "1" "1" )
+regexps=( "fc46" "fc45" "fc44" "\|fc43" )
+bodhi_enabled=( "0" "0" "1" "1" )
 needs_update=()
 #releases_regexp=fc28\\\|fc27\\\|fc28
 
