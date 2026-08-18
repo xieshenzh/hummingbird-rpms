@@ -292,9 +292,6 @@ Auxiliary scripts for testing %{name}.
 %prep
 %autosetup -p 1 -S git
 
-# Undo the version bump that is part of the first patch
-sed -i 's/m4_define(\[__KCAPI_PATCHLEVEL\], \[1\])/m4_define([__KCAPI_PATCHLEVEL], [0])/' configure.ac
-
 # Work around https://bugzilla.redhat.com/show_bug.cgi?id=2258240
 sed -i -e 's|XML V45|XML V4.1.2|' -e 's|/xml/4\.5/|/xml/4.1.2/|' \
     lib/doc/libkcapi.tmpl
