@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "10",
-  "sha": "3ff54c54ffcf2b13bba1f825a69ea79ca0d03e2e",
+  "release": "1",
+  "sha": "2b5bca57a47f98e271a94e8bc955294bbe500e89",
   "source": "https://src.fedoraproject.org/rpms/dnf5.git",
   "upstream_repo": "https://github.com/rpm-software-management/dnf5",
-  "version": "5.4.2.1"
+  "version": "5.4.3.0"
 }
