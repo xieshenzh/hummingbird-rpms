@@ -37,7 +37,7 @@
 Summary: Apache Portable Runtime Utility library
 Name: apr-util
 Version: 1.6.3
-Release: 29%{?dist}
+Release: 29.1%{?dist}
 # Apache-2.0:  everything
 # RSA-MD:      https://gitlab.com/fedora/legal/fedora-legal-docs/-/merge_requests/187
 #              include\apr_md5.h, passwd\apr_md5.c, crypto\apr_md4.c, include\apr_md4.h
@@ -47,7 +47,7 @@ Release: 29%{?dist}
 # OLDAP-2.7 AND BSD-4.3RENO:       ldap/apr_ldap_url.c
 License: Apache-2.0 AND (Beerware AND LicenseRef-Fedora-Public-Domain AND OLDAP-2.7 AND BSD-4.3RENO)
 URL: https://apr.apache.org/
-Source0: https://www.apache.org/dist/apr/%{name}-%{version}.tar.bz2
+Source0: https://archive.apache.org/dist/apr/%{name}-%{version}.tar.bz2
 Patch1: apr-util-1.2.7-pkgconf.patch
 Patch2: apr-util-1.4.1-private.patch
 Patch3: apr-util-1.6.3-allow-ipv6.patch

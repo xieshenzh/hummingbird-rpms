@@ -1,0 +1,3 @@
+fetch:
+  - type: url
+    url: "https://archive.apache.org/dist/apr/apr-util-${VERSION}.tar.bz2"

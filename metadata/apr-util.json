@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Added gorget source-pipeline.yaml (HUM-4620 audit finding): Source0 pointed at Apache's live dist mirror (www.apache.org/dist), which prunes older releases -- repointed at the permanent archive.apache.org/dist mirror, which matches the existing recorded checksum exactly, no content change.",
+  "modification_status": "modified",
   "release": "29",
   "sha": "bbc6c1d9cd65ab58084f219f606937ffebf3684c",
   "source": "https://src.fedoraproject.org/rpms/apr-util.git",
