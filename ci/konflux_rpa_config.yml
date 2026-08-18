@@ -21,7 +21,7 @@ rpas:
     pulp_signed_domain: public-hummingbird
     pulp_secret_name: hummingbird-pulp-credentials-production-secret
     pipeline_url: "https://github.com/konflux-ci/release-service-catalog.git"
-    pipeline_revision: development
+    pipeline_revision: 76f024becf8ab053f9af16c886e67d68de2d2556
     skip_pyxis_mr: true  # Set to true to skip pyxis-repo-configs MR for this RPA
     component_filter:
       path_prefix: rpms/  # Only components from this directory (e.g., images/, rpms/)
@@ -38,7 +38,7 @@ rpas:
     pulp_signed_domain: private-hummingbird-example
     pulp_secret_name: hummingbird-pulp-credentials-private-production-secret
     pipeline_url: "https://github.com/konflux-ci/release-service-catalog.git"
-    pipeline_revision: development
+    pipeline_revision: 76f024becf8ab053f9af16c886e67d68de2d2556
     private_product: example
     component_filter:
       path_prefix: rpms/
