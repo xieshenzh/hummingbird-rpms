@@ -111,6 +111,9 @@ dotnet9.0:
 dracut:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+efi-rpm-macros:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 erlang27:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
