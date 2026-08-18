@@ -3,7 +3,7 @@
 
 %global goipath         k8s.io/kube-state-metrics/v2
 %global forgeurl        https://github.com/kubernetes/kube-state-metrics
-Version:                2.19.1
+Version:                2.20.0
 
 %gometa -L -f
 
