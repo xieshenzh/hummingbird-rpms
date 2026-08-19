@@ -204,7 +204,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 37.1%{?dist}
+Release: 37.2%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -316,6 +316,9 @@ Patch9: rdoc-pr1531-fix-mutilple-document-installation.patch
 # Fix heap buffer overflow when streaming JSON to an IO (CVE-2026-54696).
 # https://github.com/ruby/json/security/advisories/GHSA-x2f5-4prf-w687
 Patch10: ruby-4.0.6-json-CVE-2026-54696-fbuffer-capa.patch
+# Fix format string injection in JSON.parse with allow_duplicate_key: false (CVE-2026-33210).
+# https://github.com/ruby/json/security/advisories/GHSA-3m6g-2423-7cp3
+Patch11: ruby-4.0.6-json-CVE-2026-33210-format-string.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -854,6 +857,7 @@ popd
 %patch 7 -p1
 %patch 8 -p1
 %patch 10 -p1
+%patch 11 -p1
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
