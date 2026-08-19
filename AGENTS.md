@@ -20,7 +20,7 @@ dependencies (`specfile`, `packaging`, `jinja2`) that are installed there.
 | `./ci/dist_git.py mark-modified <pkg> --modified --reason "..."` | Mark a package as locally modified so it isn't auto-updated |
 | `./ci/dist_git.py mark-modified <pkg> --clean` | Clear the modified flag to allow auto-updates again |
 | `./ci/dist_git.py set-upstream <pkg> --track-version <prefix>` | Pin a versioned package to a version line (e.g., `1.26`) |
-| `./ci/dist_git.py list [--clean\|--modified\|--native\|--prerelease]` | List packages by status |
+| `./ci/dist_git.py list [--clean\|--modified\|--independent\|--prerelease]` | List packages by status |
 | `./ci/dist_git.py diff [<pkg>…\|--all]` | Show what changed locally vs Fedora upstream |
 | `./ci/dist_git.py ls-sources <pkg>` | Inspect source archives for a package |
 | `./ci/dist_git.py update-releases` | Refresh `upstream-releases.json` from Bodhi |
@@ -41,7 +41,7 @@ Common operational tasks that users or AI agents may need to perform:
 | Operation                      | `dist_git.py` command                                           | Documentation                                                                                   | When to use                                                            |
 |--------------------------------|-----------------------------------------------------------------|-------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
 | Import dist-git package        | `import fedora/<pkg>`                                           | [Updating Dist-git Packages](documentation/operating/updating-dist-git-packages.md)             | Add a new package from Fedora dist-git                                 |
-| Add native package             | _(manual — not from Fedora)_                                    | [Adding Native Packages](documentation/operating/adding-native-packages.md)                     | Add new package not imported from Fedora                               |
+| Add independent package        | _(manual — not from Fedora)_                                    | [Adding Independent Packages](documentation/operating/adding-independent-packages.md)           | Add new package not imported from Fedora                               |
 | Rebuild package (no-change)    | `rebuild <pkg> --reason "..."` (or `--all --exclude pkg1,pkg2`) | [Rebuilding Packages](documentation/operating/rebuilding-packages.md)                           | Faulty RPM published; need to bump Release for rebuild                 |
 | Backport a patch               | `mark-modified` then edit spec                                  | [Rebuilding Packages](documentation/operating/rebuilding-packages.md)                           | Fast-track an upstream fix not yet in Fedora                           |
 | Configure metadata fields      | _(edit `metadata/<pkg>.json`)_                                  | [Package Metadata Fields](documentation/operating/package-metadata-fields.md)                   | Understand `release` and `modification_status` configuration           |
@@ -64,7 +64,7 @@ Common operational tasks that users or AI agents may need to perform:
 
 ## Post-Import / Post-Add Requirements
 
-After importing a new SRPM (`dist_git.py import`) or adding a native package, the `upstream_repo`
+After importing a new SRPM (`dist_git.py import`) or adding an independent package, the `upstream_repo`
 field **must** be populated in `metadata/<package>.json` before CI will pass. The `dist_git.py
 import` command does not set this field automatically.
 

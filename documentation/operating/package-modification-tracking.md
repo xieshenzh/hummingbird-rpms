@@ -13,7 +13,7 @@ patches or custom modifications.
 ## Modification Status
 
 Each package metadata file (`metadata/<package>.json`) has a `modification_status` of `clean`,
-`modified`, or `native`. That field (and related `modification_reason` / `release` configuration)
+`modified`, or `independent`. That field (and related `modification_reason` / `release` configuration)
 is documented in [Package Metadata Fields](package-metadata-fields.md). This page covers the
 workflows for checking status, marking packages, viewing diffs, and configuring update hooks.
 
@@ -82,7 +82,7 @@ To see what changes exist in a modified package compared to upstream Fedora:
 
 - **Modified packages**: Shows the differences
 - **Clean packages**: Shows nothing (useful for verification)
-- **Native packages**: Skips with message "no upstream to diff against"
+- **Independent packages**: Skips with message "no upstream to diff against"
 
 ## Marking Packages
 
@@ -322,7 +322,7 @@ updating packages:
 
 - **clean packages**: Updated automatically when new Fedora versions are available
 - **modified packages**: Automatically merged with upstream changes (conflicts create draft MRs)
-- **native packages**: Update blocked (not sourced from Fedora)
+- **independent packages**: Update blocked (not sourced from Fedora)
 - **version-constrained packages**: Skipped if upstream version doesn't match `track_upstream`
   prefix
 
@@ -521,10 +521,10 @@ The CI pipeline validates modification status consistency using `make check`, wh
 This validation ensures:
 
 1. All packages have a `modification_status` field
-2. The value is one of: `clean`, `modified`, `native`
+2. The value is one of: `clean`, `modified`, `independent`
 3. If `track_upstream` is present, it must be a string (`"latest"` or a version prefix)
 4. Modified packages have a `modification_reason`
-5. Native packages do not have source/branch/sha fields (Hummingbird-native only)
+5. Independent packages do not have source/branch/sha fields (Hummingbird-independent only)
 6. Git commit history matches the declared modification status
 
 The validation runs on every merge request and push to main, failing the build if metadata is
@@ -616,7 +616,7 @@ When importing packages, modification status is set automatically:
 # Fedora package → marked as "clean"
 ./ci/dist_git.py import fedora/neofetch
 
-# Hummingbird-native package → marked as "native"
+# Hummingbird-independent package → marked as "independent"
 ./ci/dist_git.py import hummingbird/custom-tool
 ```
 

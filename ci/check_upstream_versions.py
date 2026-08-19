@@ -870,8 +870,8 @@ def mark_package_modified(
         logger.error(f"{package}: failed to read metadata: {e}")
         return
 
-    if data.get("modification_status") == "native":
-        logger.info(f"{package}: native package, skipping modification tracking")
+    if data.get("modification_status") == "independent":
+        logger.info(f"{package}: independent package, skipping modification tracking")
     else:
         data["modification_status"] = "modified"
         data["modification_reason"] = reason

@@ -673,7 +673,7 @@ contains the fix:
      lookaside instead of Fedora's.
    - Run `make generate` to regenerate the `.tekton/` YAML
      files with the new `forked-from` pipeline parameter
-     (see `documentation/operating/adding-native-packages.md`
+     (see `documentation/operating/adding-independent-packages.md`
      step 5).
    - Include `.tekton/` and `package-overrides.yaml` in the
      commit.
@@ -683,9 +683,9 @@ contains the fix:
    for `modification_status`, `modification_reason`, and metadata
    `release`). Read `metadata/<package>.json` first:
 
-   - **`native`:** Do **not** run `mark-modified`. Leave
-     `modification_status` as `native` and do **not** add
-     `modification_reason`. Native packages have no Fedora
+   - **`independent`:** Do **not** run `mark-modified`. Leave
+     `modification_status` as `independent` and do **not** add
+     `modification_reason`. Independent packages have no Fedora
      auto-update to block; the CVE fix is tracked in the
      spec/patch and git history.
    - **`clean` or `modified` (Fedora-imported):** Mark modified so
@@ -874,8 +874,8 @@ version bump is not appropriate:
    `documentation/operating/package-metadata-fields.md`. Read
    `metadata/<package>.json` first:
 
-   - **`native`:** Do **not** run `mark-modified`. Keep
-     `modification_status: "native"` and do **not** add
+   - **`independent`:** Do **not** run `mark-modified`. Keep
+     `modification_status: "independent"` and do **not** add
      `modification_reason`.
    - **`clean` or `modified` (Fedora-imported):** Mark modified
      with a short explanation that includes the CVE ID (append
@@ -1046,7 +1046,7 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
     ID (e.g. `"Backport CVE-YYYY-NNNNN"`), matching
     `documentation/operating/package-metadata-fields.md`. Append
     additional CVEs with `; CVE-YYYY-MMMMM`. Never add
-    `modification_reason` to a `native` package.
+    `modification_reason` to an `independent` package.
 
 14. **Metadata `release` follows
     `documentation/operating/package-metadata-fields.md`.** Do

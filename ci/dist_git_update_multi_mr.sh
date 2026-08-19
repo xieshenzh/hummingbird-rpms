@@ -8,8 +8,8 @@
 #   ./ci/dist_git_update_multi_mr.sh --clone --max-packages=10     # Clone to /tmp, check first 10 packages, dry-run
 #   ./ci/dist_git_update_multi_mr.sh --clone --max-updates=3 --create-mrs  # Clone to /tmp, check all packages, create up to 3 MRs
 #   ./ci/dist_git_update_multi_mr.sh --max-updates=100            # Check all packages, create up to 100 MRs (in current repo)
-#   ./ci/dist_git_update_multi_mr.sh --clean-only         # Check only clean packages (skip modified/native)
-#   ./ci/dist_git_update_multi_mr.sh --modified-only      # Check only modified packages (skip clean/native)
+#   ./ci/dist_git_update_multi_mr.sh --clean-only         # Check only clean packages (skip modified/independent)
+#   ./ci/dist_git_update_multi_mr.sh --modified-only      # Check only modified packages (skip clean/independent)
 #   ./ci/dist_git_update_multi_mr.sh --clean-only --max-updates=10     # Check clean packages, create up to 10 MRs
 #   ./ci/dist_git_update_multi_mr.sh --clone --clean-only      # Clone mode, check only clean packages
 #   ./ci/dist_git_update_multi_mr.sh --max-packages=50 --max-updates=10  # Check first 50 packages, create up to 10 MRs
@@ -235,7 +235,7 @@ if [[ ${MAX_UPDATES} -gt 0 ]]; then
 fi
 echo ""
 
-# Filter packages based on modification status; always skip native
+# Filter packages based on modification status; always skip independent
 # By default: try to update clean and modified packages, but check --*-only flags
 echo "Filtering packages..."
 filtered_packages=()

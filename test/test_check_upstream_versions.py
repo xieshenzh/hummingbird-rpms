@@ -340,18 +340,18 @@ def test_mark_package_modified(cuv_module, workdir: Path) -> None:
     assert data['modification_reason'] == 'Update to upstream version 2.0'
 
 
-def test_mark_package_modified_preserves_native(cuv_module, workdir: Path) -> None:
-    """Does not overwrite native status with modified."""
+def test_mark_package_modified_preserves_independent(cuv_module, workdir: Path) -> None:
+    """Does not overwrite independent status with modified."""
     _create_package(workdir, 'pkg', '1.0',
                     metadata={'version': '1.0', 'release': '1',
-                              'modification_status': 'native'})
+                              'modification_status': 'independent'})
     cuv_module.METADATA_DIR = workdir / 'metadata'
     cuv_module.mark_package_modified('pkg', 'Update to upstream version 2.0',
                                      version='2.0', release='1')
 
     with open(workdir / 'metadata' / 'pkg.json') as f:
         data = json.load(f)
-    assert data['modification_status'] == 'native'
+    assert data['modification_status'] == 'independent'
     assert 'modification_reason' not in data
     assert data['version'] == '2.0'
     assert data['release'] == '1'

@@ -12,7 +12,7 @@ Hummingbird treats local changes and rebuilds relative to Fedora:
 | Field | Purpose |
 | ----- | ------- |
 | `modification_status` | Whether the package may be auto-updated from Fedora |
-| `release` | Base release without dist tag — Fedora/rawhide baseline, or a local base (natives / ahead-of-Fedora) |
+| `release` | Base release without dist tag — Fedora/rawhide baseline, or a local base (independents / ahead-of-Fedora) |
 
 This page is the canonical reference for configuring those fields. For day-to-day workflows
 (marking packages, rebuilding, importing), see the related docs at the end.
@@ -20,13 +20,13 @@ This page is the canonical reference for configuring those fields. For day-to-da
 ## `modification_status`
 
 `modification_status` records whether a package still matches its Fedora upstream import, has
-local source-level changes, or is Hummingbird-native (not from Fedora).
+local source-level changes, or is Hummingbird-independent (not from Fedora).
 
-| Status     | Meaning                                      | Auto-updates from Fedora |
-| ---------- | -------------------------------------------- | ------------------------ |
-| `clean`    | Unmodified Fedora import                     | Allowed                  |
-| `modified` | Local changes (patches, spec modifications)  | Blocked                  |
-| `native`   | Hummingbird-native package (not from Fedora) | Blocked                  |
+| Status        | Meaning                                           | Auto-updates from Fedora |
+| ------------- | ------------------------------------------------- | ------------------------ |
+| `clean`       | Unmodified Fedora import                          | Allowed                  |
+| `modified`    | Local changes (patches, spec modifications)       | Blocked                  |
+| `independent` | Hummingbird-independent package (not from Fedora) | Blocked                  |
 
 ### When to use each value
 
@@ -34,10 +34,10 @@ local source-level changes, or is Hummingbird-native (not from Fedora).
   Fedora updates are allowed. Conflicts with `modification_reason` (must be absent).
 - **`modified`**: Use after backports, custom patches, or other spec/source edits that must not be
   overwritten by an automatic update. Requires `modification_reason`.
-- **`native`**: Required for packages that are not imported from Fedora. These packages have no
+- **`independent`**: Required for packages that are not imported from Fedora. These packages have no
   `source` / `branch` / `sha` fields. Conflicts with `modification_reason` (must be absent).
 
-Imports set the status automatically (`clean` for Fedora imports, `native` for Hummingbird-native
+Imports set the status automatically (`clean` for Fedora imports, `independent` for Hummingbird-independent
 imports). After local source changes, set status with `dist_git.py mark-modified` — see
 [Package Modification Tracking](package-modification-tracking.md).
 
@@ -51,7 +51,7 @@ When `modification_status` is `modified`, `modification_reason` is required. It 
 explanation of why the package cannot be auto-updated (for example, a CVE backport or a custom
 spec change). Clear the reason when marking the package clean again.
 
-`modification_reason` applies only to `modified` packages. Do not add it for `clean` or `native`
+`modification_reason` applies only to `modified` packages. Do not add it for `clean` or `independent`
 packages — see [When not to update these fields](#when-not-to-update-these-fields).
 
 ## `release`
@@ -63,11 +63,11 @@ tag such as `.fc42` or `.hum1`):
 1. **Fedora/rawhide base** — the upstream Fedora release this package was imported or last synced
    from (dist suffix stripped). Used while Hummingbird still tracks a Fedora build of the current
    version.
-2. **Local base** — a Hummingbird-chosen base for packages with no Fedora upstream (`native`), or
-   for Fedora-imported packages that Hummingbird has version-bumped ahead of Fedora. In the
-   ahead-of-Fedora case this is typically `0.1` — a locally invented placeholder so a later Fedora
-   import with `Release >= 1` sorts higher; it is **not** a value confirmed from an actual Fedora
-   build.
+2. **Local base** — a Hummingbird-chosen base for packages with no Fedora upstream
+   (`independent`), or for Fedora-imported packages that Hummingbird has version-bumped ahead of
+   Fedora. In the ahead-of-Fedora case this is typically `0.1` — a locally invented placeholder so
+   a later Fedora import with `Release >= 1` sorts higher; it is **not** a value confirmed from an
+   actual Fedora build.
 
 `dist_git.py rebuild` uses this base (when a Fedora `source` is present) to compute the next `.N`
 micro-bump on the spec `Release:` line.
@@ -82,7 +82,7 @@ micro-bump on the spec `Release:` line.
 | Writer | When | Value stored |
 | ------ | ---- | ------------ |
 | `dist_git.py import` / `update` / `sync` | Fedora import or refresh | Resolved Fedora release with dist suffix stripped (e.g. `5` from `5.fc42`) |
-| Native package creation | Adding a package not from Fedora | Initial local base (e.g. `1` or `0.1`) |
+| Independent package creation | Adding a package not from Fedora | Initial local base (e.g. `1` or `0.1`) |
 | `check_upstream_versions.py` | Local upstream version bump (`check --update`) | Resolved base from the updated spec — typically the local `0.1` placeholder, not a Fedora-confirmed release |
 
 ### Fedora-imported packages
@@ -103,16 +103,16 @@ For packages with a Fedora `source`:
   in the local spec with that value plus `%{?dist}`. For rebuilds that still see `%autorelease`,
   follow [Rebuilding Packages](rebuilding-packages.md).
 
-### Native packages
+### Independent packages
 
-For Hummingbird-native packages (`modification_status: "native"`, no `source` field):
+For Hummingbird-independent packages (`modification_status: "independent"`, no `source` field):
 
 - There is no Fedora upstream release. Set `release` to a local base such as `1` or `0.1` when
   adding the package (no dist tag — same storage convention as Fedora-imported packages).
 - The `.hum1` suffix comes from the spec `Release:` line via `%{?dist}` (for example
   `Release: 1%{?dist}`), not from metadata `release`.
 - `dist_git.py rebuild` does not treat metadata `release` as an upstream Fedora baseline for
-  native packages (it only uses that baseline when a `source` field is present).
+  independent packages (it only uses that baseline when a `source` field is present).
 
 ### Spec `Release:` vs metadata `release`
 
@@ -129,7 +129,7 @@ package's relationship to Fedora actually changed.
 
 | Situation | Do not change | Why |
 | --------- | ------------- | --- |
-| Native package gets a CVE patch, backport, or other source edit | `modification_status`, `modification_reason` | Status stays `native`. There is no Fedora auto-update to block, so do not switch to `modified` or add a `modification_reason`. |
+| Independent package gets a CVE patch, backport, or other source edit | `modification_status`, `modification_reason` | Status stays `independent`. There is no Fedora auto-update to block, so do not switch to `modified` or add a `modification_reason`. |
 | No-change rebuild (spec `Release:` bump only) | `modification_status`, `modification_reason`, metadata `release` | Rebuilds are ephemeral. Status stays `clean` (or whatever it was); metadata `release` still records the current base (Fedora/rawhide or local). |
 | Fedora-imported package gets a local patch or backport | metadata `release` | Mark the package `modified` with a reason, but keep metadata `release` as the current base (last Fedora baseline, or the local `0.1` placeholder if already ahead of Fedora). Only bump the **spec** `Release:` if needed. |
 | Package is already `modified` and you add another local change | `modification_status` | Leave status as `modified`. Update `modification_reason` only if the existing reason no longer describes why auto-updates must stay blocked. |
@@ -137,11 +137,11 @@ package's relationship to Fedora actually changed.
 
 ### Examples
 
-**Native package + CVE fix:** Edit the spec and add the patch. Keep:
+**Independent package + CVE fix:** Edit the spec and add the patch. Keep:
 
 ```json
 {
-  "modification_status": "native",
+  "modification_status": "independent",
   "release": "1",
   "version": "1.3.0"
 }
@@ -167,5 +167,6 @@ Do not edit metadata `release` as part of that change.
   check status, validation, and update hooks
 - [Rebuilding Packages](rebuilding-packages.md) — bump spec `Release:` for no-change rebuilds and
   backports
-- [Adding Native Packages](adding-native-packages.md) — create metadata for packages not from Fedora
+- [Adding Independent Packages](adding-independent-packages.md) — create metadata for packages
+  not from Fedora
 - [Updating Dist-git Packages](updating-dist-git-packages.md) — import and update from Fedora

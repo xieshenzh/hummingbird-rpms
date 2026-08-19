@@ -179,7 +179,7 @@ def test_track_upstream_integer_rejected(validator) -> None:
 
 
 #
-# Tests — native packages require forked_from/lookaside_cache_url
+# Tests — independent packages require forked_from/lookaside_cache_url
 #
 
 
@@ -191,15 +191,15 @@ def _write_sources(root: Path, name: str, content: str) -> None:
     (root / 'rpms' / name / 'sources').write_text(content)
 
 
-def test_native_package_missing_lookaside_override_rejected(validator) -> None:
-    """A native package with remote sources but no forked_from/
+def test_independent_package_missing_lookaside_override_rejected(validator) -> None:
+    """An independent package with remote sources but no forked_from/
     lookaside_cache_url override fails.
 
     Without one of these, the build's source-fetch step defaults to Fedora's
-    lookaside cache, where a native package's sources were never uploaded.
+    lookaside cache, where an independent package's sources were never uploaded.
     """
     root = validator._tmp_path
-    _create_package(root, 'pkg', {'modification_status': 'native'})
+    _create_package(root, 'pkg', {'modification_status': 'independent'})
     _write_sources(root, 'pkg', 'SHA512 (pkg-1.0.tar.gz) = abc123\n')
     _write_overrides(root, {})
 
@@ -208,14 +208,14 @@ def test_native_package_missing_lookaside_override_rejected(validator) -> None:
     assert 'forked_from' in error
 
 
-def test_native_package_with_no_overrides_file_and_sources_rejected(validator) -> None:
-    """A native package with sources but no overrides file at all still fails.
+def test_independent_package_with_no_overrides_file_and_sources_rejected(validator) -> None:
+    """An independent package with sources but no overrides file at all still fails.
 
     Exercises the PACKAGE_OVERRIDES_YAML.exists() == False branch, which
     falls back to an empty overrides dict rather than erroring out.
     """
     root = validator._tmp_path
-    _create_package(root, 'pkg', {'modification_status': 'native'})
+    _create_package(root, 'pkg', {'modification_status': 'independent'})
     _write_sources(root, 'pkg', 'SHA512 (pkg-1.0.tar.gz) = abc123\n')
     # Deliberately do NOT write ci/package-overrides.yaml
 
@@ -224,10 +224,10 @@ def test_native_package_with_no_overrides_file_and_sources_rejected(validator) -
     assert 'forked_from' in error
 
 
-def test_native_package_with_forked_from_accepted(validator) -> None:
-    """A native package with forked_from set passes validation."""
+def test_independent_package_with_forked_from_accepted(validator) -> None:
+    """An independent package with forked_from set passes validation."""
     root = validator._tmp_path
-    _create_package(root, 'pkg', {'modification_status': 'native'})
+    _create_package(root, 'pkg', {'modification_status': 'independent'})
     _write_sources(root, 'pkg', 'SHA512 (pkg-1.0.tar.gz) = abc123\n')
     _write_overrides(root, {
         'pkg': {'forked_from': 'https://gitlab.com/redhat/hummingbird/rpms'},
@@ -237,10 +237,10 @@ def test_native_package_with_forked_from_accepted(validator) -> None:
     assert valid, f"Expected valid but got: {error}"
 
 
-def test_native_package_with_lookaside_cache_url_accepted(validator) -> None:
-    """A native package with lookaside_cache_url set passes validation."""
+def test_independent_package_with_lookaside_cache_url_accepted(validator) -> None:
+    """An independent package with lookaside_cache_url set passes validation."""
     root = validator._tmp_path
-    _create_package(root, 'pkg', {'modification_status': 'native'})
+    _create_package(root, 'pkg', {'modification_status': 'independent'})
     _write_sources(root, 'pkg', 'SHA512 (pkg-1.0.tar.gz) = abc123\n')
     _write_overrides(root, {
         'pkg': {'lookaside_cache_url': 'https://example.cloudfront.net/'},
@@ -250,13 +250,13 @@ def test_native_package_with_lookaside_cache_url_accepted(validator) -> None:
     assert valid, f"Expected valid but got: {error}"
 
 
-def test_native_package_with_no_sources_file_accepted(validator) -> None:
-    """A native package with no `sources` file (all Source files shipped
+def test_independent_package_with_no_sources_file_accepted(validator) -> None:
+    """An independent package with no `sources` file (all Source files shipped
     locally, e.g. hummingbird-release) never hits the lookaside fetch path,
     so it doesn't need forked_from/lookaside_cache_url.
     """
     root = validator._tmp_path
-    _create_package(root, 'pkg', {'modification_status': 'native'})
+    _create_package(root, 'pkg', {'modification_status': 'independent'})
     _write_overrides(root, {})
 
     valid, error = validator.validate_package('pkg', check_actual_state=False)

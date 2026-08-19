@@ -177,7 +177,7 @@ golang1.27:
     - "linux-d160-c8xlarge/arm64"
 
 gorget:
-  # Native Hummingbird package -- no Fedora dist-git history to fall back to.
+  # Independent Hummingbird package -- no Fedora dist-git history to fall back to.
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 grafana12.4:
