@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Use cmake macros for Ninja generator compatibility (cmake-rpm-macros 4.x)",
+  "modification_reason": "Use cmake macros for Ninja generator compatibility (cmake-rpm-macros 4.x). Also added gorget source-pipeline.yaml (HUM-6096 audit finding): Source0's releases/download/ URL pattern has never actually resolved (none of snappy's GitHub releases have ever had uploaded assets) -- repointed at a git fetch of the release tag; confirmed the empty third_party/ submodule dirs a plain fetch leaves behind are never referenced (snappy-thirdparty.patch removes the add_subdirectory() calls that would have used them).",
   "modification_status": "modified",
   "release": "6",
   "sha": "4c21b8dd2a38169b5993c5ab4aef32a16fedc429",
