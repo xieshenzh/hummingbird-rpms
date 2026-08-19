@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "9142f82b25a8bf12d9ba2059d46f4269badc4892",
+  "release": "1",
+  "sha": "706e793ff9a4747b7518b733a24b33a58eeed43e",
   "source": "https://src.fedoraproject.org/rpms/aardvark-dns.git",
   "upstream_repo": "https://github.com/containers/aardvark-dns",
-  "version": "2.0.0"
+  "version": "2.1.0"
 }
