@@ -2,9 +2,9 @@
 %global featurever 25
 %global interimver 0
 %global updatever 4
-%global patchver 0
-%global buildver 7
-%global portablerelease 2
+%global patchver 1
+%global buildver 1
+%global portablerelease 0
 %global rpmrelease 0
 
 # Define IcedTea version used for SystemTap tapsets and desktop file
@@ -52,7 +52,7 @@
 
 Name:    java-25-%{origin}-portable%{?pkgos:-%{pkgos}}
 Version: %{newjavaver}.%{buildver}
-Release: %{?eaprefix}%{portablerelease}.%{rpmrelease}%{?extraver}.2%{?dist}
+Release: %{?eaprefix}%{rpmrelease}%{?extraver}.1%{?dist}
 
 %global fullversion     %{compatiblename}-%{version}-%{release}
 
@@ -707,8 +707,6 @@ Patch1001: fips-%{featurever}u-%{fipsver}.patch
 
 # JDK-8347901: C2 should remove unused leaf / pure runtime calls
 Patch2002: jdk8347901-c2_unused_leaf_removal.patch
-# JDK-83787313: C2: performance regression due to missing constant folding for Math.pow()
-Patch2003: jdk8378713-c2_missing_pow_constant_folding.patch
 
 #############################################
 #
@@ -988,7 +986,6 @@ pushd %{top_level_dir_name}
 %patch -P1001 -p1
 # Add C2 patches
 %patch -P2002 -p1
-%patch -P2003 -p1
 popd # openjdk
 
 echo "Generating %{alt_java_name} man page"
