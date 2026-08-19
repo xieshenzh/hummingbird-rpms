@@ -98,7 +98,7 @@
 # Comment out go_prerelease and go_patch as needed
 %global go_api 1.25
 #global go_prerelease rc2
-%global go_patch 13
+%global go_patch 14
 
 %global go_version %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease:~%{go_prerelease}}
 %global go_source %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease}
@@ -110,7 +110,7 @@
 
 Name:           %{basepackagename}1.25
 Version:        %{go_version}
-Release:        3%{?dist}
+Release:        0.1%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
@@ -143,7 +143,7 @@ Provides: bundled(golang(github.com/ianlancetaylor/demangle)) = 0.0.0.2024091220
 Provides: bundled(golang(golang.org/x/arch)) = 0.18.1.0.20250605182141.b2f4e2807dec
 Provides: bundled(golang(golang.org/x/build)) = 0.0.0.20250606033421.8c8ff6f34a83
 Provides: bundled(golang(golang.org/x/crypto)) = 0.39.0
-Provides: bundled(golang(golang.org/x/mod)) = 0.25.0
+Provides: bundled(golang(golang.org/x/mod)) = 0.25.1.0.20260813213422.9be67dd65223
 Provides: bundled(golang(golang.org/x/net)) = 0.41.1.0.20260708234123.5ef02b8d6d76
 Provides: bundled(golang(golang.org/x/sync)) = 0.15.0
 Provides: bundled(golang(golang.org/x/sys)) = 0.33.1.0.20260225210015.e0c9f78de999
