@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "cve_product": "Oracle Corporation / Oracle Java SE",
-  "modification_reason": "Add changelog separator to spec file",
+  "modification_reason": "Add changelog separator to spec file; CVE-2026-60589; CVE-2026-61308; CVE-2026-70907; CVE-2026-70906",
   "modification_status": "modified",
-  "release": "2.0",
+  "release": "0.1",
   "release_monitoring_project_id": 378887,
   "sha": "5a268016ad909c415222f9453d4b2bcf17a48561",
   "source": "https://src.fedoraproject.org/rpms/java-25-openjdk-portable.git",
@@ -11,6 +11,6 @@
   "upstream_repo": "https://github.com/openjdk/jdk25u",
   "source_availability_check": "openjdk_osci",
   "upstream_version_transform": "openjdk_to_rpm",
-  "version": "25.0.4.0.7",
+  "version": "25.0.4.1.1",
   "version_transform": "openjdk_to_oracle"
 }
