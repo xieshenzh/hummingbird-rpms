@@ -7,6 +7,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 TARGET_BRANCH=${CI_COMMIT_BRANCH:-main}
 
+# Standing work item for autonomous MRs (HUM-6140 / HUM-6146).
+STANDING_JIRA_NOTE='Jira: [HUM-6146](https://redhat.atlassian.net/browse/HUM-6146)'
+
 # Parse arguments
 AUTO_MERGE=
 MR_DESCRIPTION=
@@ -81,15 +84,18 @@ if [[ "${CURRENT_BRANCH}" != "${BRANCH_NAME}" ]]; then
     git switch --quiet --create "${BRANCH_NAME}"
 fi
 
+if [[ -z "${MR_DESCRIPTION}" ]]; then
+    MR_DESCRIPTION="${STANDING_JIRA_NOTE}"
+else
+    MR_DESCRIPTION="${MR_DESCRIPTION}\\n\\n${STANDING_JIRA_NOTE}"
+fi
+
 push_options=(
     --push-option merge_request.create
     --push-option "merge_request.title=${MR_TITLE}"
+    --push-option "merge_request.description=${MR_DESCRIPTION}"
     --push-option merge_request.remove_source_branch
 )
-
-if [[ -n ${MR_DESCRIPTION} ]]; then
-    push_options+=(--push-option "merge_request.description=${MR_DESCRIPTION}")
-fi
 
 if [[ -n ${MARK_AS_DRAFT} ]]; then
     push_options+=(--push-option merge_request.draft)
