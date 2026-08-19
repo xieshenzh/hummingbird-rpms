@@ -440,6 +440,9 @@ rabbitmq-server4.2:
 rabbitmq-server4.3:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+rekor:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 ruff:
   timeout_hours: 8
   build_platforms:
