@@ -157,7 +157,9 @@ a second invocation.
 
 Use the script output as the primary source for:
 
-- CVE IDs and package guess
+- CVE IDs and package guess (extracted via 3-tier fallback: summary
+  `CVE-XXXX pkgname:` pattern → `pscomponent:` label → Fixed in Build
+  name prefix)
 - Status, severity, labels, fixed-in-build
 - Linked HUM tickets and linked task MR URLs
 - Flaw description (vulnerability details from the ticket Description)
