@@ -249,6 +249,9 @@ kubernetes1.36:
 libfabric:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+libkcapi:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 libpng:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
