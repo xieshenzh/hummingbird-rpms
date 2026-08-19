@@ -86,7 +86,7 @@ fi
 
 if [[ -z "${MR_DESCRIPTION}" ]]; then
     MR_DESCRIPTION="${STANDING_JIRA_NOTE}"
-elif [[ "${MR_DESCRIPTION}" != *HUM-6146* ]]; then
+else
     MR_DESCRIPTION="${MR_DESCRIPTION}\\n\\n${STANDING_JIRA_NOTE}"
 fi
 
