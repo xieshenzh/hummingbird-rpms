@@ -6,6 +6,29 @@
   repositories
 - We choose the domain prefix of `public-` to ensure that the repositories are publicly available
 
+## Prerequisites
+
+Install the Pulp CLI with the `console` plugin, which provides the
+`pulp console populated-domain create` command this script uses to create domains:
+
+```bash
+pip install "pulp-cli-console>=0.1.5.dev0"
+```
+
+> **Note:** `pulp-cli-console` only publishes pre-release versions on PyPI, so the version
+> specifier above is required — a plain `pip install pulp-cli-console` will not find a
+> matching distribution. This also pulls in a compatible `pulp-cli`; RPM support is built
+> into the base `pulp-cli` package, so no separate RPM plugin is needed. Note that pip may
+> need to **downgrade** an existing newer `pulp-cli` install to satisfy `pulp-cli-console`'s
+> pinned dependency — this is expected.
+
+Verify the install — `pulp console --help` should show the `populated-domain` command group
+(the `console` plugin does not appear under `pulp --version`'s Plugin Versions list):
+
+```bash
+pulp console --help
+```
+
 ## Setup
 
 ### Using existing credentials

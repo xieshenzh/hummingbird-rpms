@@ -1,0 +1,25 @@
+From e4d48c7bfd63022ee6cb272a65f0fa6c41c365d7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Stan=C4=9Bk?= <jstanek@redhat.com>
+Date: Tue, 13 Jan 2026 17:18:16 +0100
+Subject: [PATCH] Fix missing cstdint include
+
+Signed-off-by: rpm-build <rpm-build>
+---
+ src/inspector/worker_inspector.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/inspector/worker_inspector.h b/src/inspector/worker_inspector.h
+index 24403bb..335251c 100644
+--- a/src/inspector/worker_inspector.h
++++ b/src/inspector/worker_inspector.h
+@@ -10,6 +10,7 @@
+ #include <string>
+ #include <unordered_map>
+ #include <unordered_set>
++#include <cstdint>
+ 
+ namespace node {
+ namespace inspector {
+-- 
+2.52.0
+
