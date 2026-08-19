@@ -148,6 +148,46 @@ def test_run_rhjira_does_not_retry_non_transient(monkeypatch) -> None:
     assert len(calls) == 1
 
 
+def test_read_local_spec_nvr(tmp_path: Path, monkeypatch) -> None:
+    pkg = "mypkg"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    # Spec with a %global and an external-override conditional pattern
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "\n".join([
+            "%global mainver 2.5.1",
+            "Name: mypkg",
+            "Version: %{?ver_override}%{!?ver_override:%{mainver}}",
+            "Release: 3%{?dist}",
+            "",
+            "%description",
+            "A package.",
+        ]) + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    assert helper.read_local_spec_nvr(pkg) == "mypkg-2.5.1-3"
+    # Missing package returns empty string
+    assert helper.read_local_spec_nvr("nonexistent") == ""
+
+
+def test_search_cve_in_spec_and_patches(tmp_path: Path, monkeypatch) -> None:
+    pkg = "testpkg"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    (pkg_dir / f"{pkg}.spec").write_text("Name: testpkg\nVersion: 1.0\n", encoding="utf-8")
+    (pkg_dir / "fix-cve.patch").write_text(
+        "# Backport for CVE-2024-12345\n--- a/foo.c\n+++ b/foo.c\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    # Found in patch
+    assert helper.search_cve_in_spec_and_patches(pkg, ["CVE-2024-12345"]) is True
+    # Not found
+    assert helper.search_cve_in_spec_and_patches(pkg, ["CVE-2099-99999"]) is False
+    # Missing package dir
+    assert helper.search_cve_in_spec_and_patches("ghost", ["CVE-2024-12345"]) is False
+
+
 def test_build_suggested_chat_title() -> None:
     reports = [
         helper.TicketReport(
