@@ -4061,3 +4061,45 @@ def test_add_private_product_already_assigned(workdir: Path, upstream_repos: dic
     )
     assert result.returncode != 0
     assert 'already has private_product' in result.stderr
+
+
+def test_add_private_product_preserves_formatting(workdir: Path, upstream_repos: dict[str, Path],
+                                                   mock_infra_repo: Path, dist_git_module) -> None:
+    """A real (non-dry-run) run must only add lines, not reformat/strip comments from
+    ci/package-overrides.yaml or ci/konflux_rpa_config.yml (regression test for a bug where
+    a full yaml.load/yaml.dump round-trip silently dropped every comment in both files)."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["chocolate"]}'],
+        cwd=workdir, capture_output=True, check=True, text=True,
+    )
+
+    overrides_path = workdir / 'ci' / 'package-overrides.yaml'
+    rpa_config_path = workdir / 'ci' / 'konflux_rpa_config.yml'
+    overrides_before_lines = overrides_path.read_text().splitlines()
+    rpa_before_lines = rpa_config_path.read_text().splitlines()
+
+    dist_git_module.ROOT_DIR = workdir
+    dist_git_module.PACKAGE_OVERRIDES_YAML = overrides_path
+
+    with patch.object(dist_git_module.subprocess, 'run'):
+        dist_git_module.add_private_product(
+            'testprod', ['chocolate'], None,
+            'hummingbird-pulp-credentials-production-secret', str(mock_infra_repo), False,
+        )
+
+    overrides_after_lines = overrides_path.read_text().splitlines()
+    rpa_after_lines = rpa_config_path.read_text().splitlines()
+
+    # Every original line (including comments) must still be present verbatim.
+    for line in overrides_before_lines:
+        assert line in overrides_after_lines
+    for line in rpa_before_lines:
+        assert line in rpa_after_lines
+
+    # Only the new package/RPA lines were appended.
+    assert len(overrides_after_lines) - len(overrides_before_lines) == 3
+    assert any('private_product: testprod' in line for line in overrides_after_lines)
+
+    with open(rpa_config_path) as f:
+        rpa_config = yaml.safe_load(f)
+    assert any(r.get('private_product') == 'testprod' for r in rpa_config['rpas'])

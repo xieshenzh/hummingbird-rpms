@@ -504,15 +504,85 @@ def update_releases() -> None:
     logging.info("Updated upstream-releases.json")
 
 
+_TOP_LEVEL_YAML_KEY_RE = re.compile(r'^([A-Za-z0-9_.+-]+):')
+
+
+def _find_top_level_yaml_block(lines: list[str], key: str) -> tuple[int, int] | None:
+    """Find a top-level '<key>:' mapping entry in a flat YAML file's lines.
+
+    Returns the (start, end) line-index range (end exclusive), or None if not found.
+    Only zero-indent lines count as top-level; indented/blank lines are continuations.
+    """
+    start = None
+    for i, line in enumerate(lines):
+        m = _TOP_LEVEL_YAML_KEY_RE.match(line)
+        if m and m.group(1) == key:
+            start = i
+            break
+    if start is None:
+        return None
+    end = len(lines)
+    for i in range(start + 1, len(lines)):
+        line = lines[i]
+        if line.strip() == '' or line[0] in (' ', '\t'):
+            continue
+        end = i
+        break
+    return start, end
+
+
+def _insert_top_level_yaml_block(lines: list[str], key: str, block_text: str) -> list[str]:
+    """Insert a new top-level '<key>: ...' block in alphabetical position.
+
+    Preserves the file's one-blank-line-between-entries convention by editing only the
+    inserted lines, unlike a full yaml.load/yaml.dump round-trip (which drops comments
+    and reformats everything else in the file).
+    """
+    insert_at = len(lines)
+    i = 0
+    n = len(lines)
+    while i < n:
+        m = _TOP_LEVEL_YAML_KEY_RE.match(lines[i])
+        if not m:
+            i += 1
+            continue
+        if m.group(1) > key:
+            insert_at = i
+            break
+        i += 1
+        while i < n and (lines[i].strip() == '' or lines[i][0] in (' ', '\t')):
+            i += 1
+
+    block_lines = block_text.splitlines(keepends=True)
+    if block_lines and not block_lines[-1].endswith('\n'):
+        block_lines[-1] += '\n'
+
+    if insert_at == len(lines):
+        if lines and lines[-1].strip() != '':
+            return lines + ['\n'] + block_lines
+        return lines + block_lines
+    return lines[:insert_at] + block_lines + ['\n'] + lines[insert_at:]
+
+
+def _append_key_to_yaml_block(lines: list[str], start: int, end: int, line_text: str) -> list[str]:
+    """Append a line to an existing YAML block, before any trailing blank separator lines."""
+    insert_at = end
+    while insert_at > start + 1 and lines[insert_at - 1].strip() == '':
+        insert_at -= 1
+    if not line_text.endswith('\n'):
+        line_text += '\n'
+    return lines[:insert_at] + [line_text] + lines[insert_at:]
+
+
 def update_package_overrides(original_name: str, new_name: str) -> None:
     """Update package name in package-overrides.yaml."""
-    with open(PACKAGE_OVERRIDES_YAML, 'r') as f:
-        overrides = yaml.safe_load(f) or {}
-    if original_name in overrides:
-        # Rename the key while preserving order
-        overrides[new_name] = overrides.pop(original_name)
-        with open(PACKAGE_OVERRIDES_YAML, 'w') as f:
-            yaml.dump(overrides, f, default_flow_style=False, sort_keys=False)
+    lines = PACKAGE_OVERRIDES_YAML.read_text().splitlines(keepends=True)
+    block = _find_top_level_yaml_block(lines, original_name)
+    if block is not None:
+        start, _end = block
+        rest = lines[start][len(f"{original_name}:"):]
+        lines[start] = f"{new_name}:{rest}"
+        PACKAGE_OVERRIDES_YAML.write_text(''.join(lines))
         logging.info(f"Renamed {original_name} to {new_name} in {PACKAGE_OVERRIDES_YAML}")
 
 
@@ -2193,21 +2263,34 @@ def add_private_product(product: str, packages: list[str], pulp_config: str | No
     if dry_run:
         logging.info(f"Dry run: would add RPA entry: {new_rpa['name']}")
     else:
-        rpa_config['rpas'].append(new_rpa)
-        with open(rpa_config_path, 'w') as f:
-            yaml.dump(rpa_config, f, default_flow_style=False, sort_keys=False)
+        # Render only the new entry with yaml.dump and append it as text, rather than
+        # dumping the whole file, so existing comments and formatting are left untouched.
+        rpa_yaml = yaml.dump([new_rpa], default_flow_style=False, sort_keys=False)
+        rpa_block = ''.join(f"  {line}\n" if line else "\n" for line in rpa_yaml.splitlines())
+        rpa_block = re.sub(r'^(\s*pipeline_url: )(\S+)$', r'\1"\2"', rpa_block, flags=re.MULTILINE)
+        rpa_lines = rpa_config_path.read_text().splitlines(keepends=True)
+        if rpa_lines and rpa_lines[-1].strip() != '':
+            rpa_lines.append('\n')
+        rpa_lines.extend(rpa_block.splitlines(keepends=True))
+        rpa_config_path.write_text(''.join(rpa_lines))
         logging.info(f"Added RPA entry: {new_rpa['name']}")
 
     if dry_run:
         logging.info(f"Dry run: would assign packages to product '{product}': {', '.join(packages)}")
     else:
+        overrides_lines = overrides_path.read_text().splitlines(keepends=True)
         for pkg in packages:
-            if pkg in overrides:
-                overrides[pkg]['private_product'] = product
+            block = _find_top_level_yaml_block(overrides_lines, pkg)
+            if block is None:
+                new_block = yaml.dump({pkg: {'private_product': product}},
+                                       default_flow_style=False, sort_keys=False)
+                overrides_lines = _insert_top_level_yaml_block(overrides_lines, pkg, new_block)
             else:
-                overrides[pkg] = {'private_product': product}
-        with open(overrides_path, 'w') as f:
-            yaml.dump(overrides, f, default_flow_style=False, sort_keys=False)
+                start, end = block
+                overrides_lines = _append_key_to_yaml_block(
+                    overrides_lines, start, end, f"  private_product: {product}\n",
+                )
+        overrides_path.write_text(''.join(overrides_lines))
         logging.info(f"Assigned packages to product '{product}': {', '.join(packages)}")
 
     _setup_infra_repo(product, Path(infra_repo), dry_run)

@@ -125,7 +125,9 @@ Pulp credentials.
 ### 2. Create Pulp infrastructure
 
 Use the existing Pulp setup script to create the private domains, RPM repositories, and
-file repositories (for SBOMs and attestations):
+file repositories (for SBOMs and attestations). See
+[ci/pulp-setup/README.md](../../ci/pulp-setup/README.md#prerequisites) for the required
+`pulp-cli-console` plugin install before running these commands:
 
 ```bash
 # Unsigned (staging) - RPM repos

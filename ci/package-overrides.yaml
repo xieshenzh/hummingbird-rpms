@@ -294,6 +294,17 @@ nats-server2.14:
 nodejs20:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+nodejs20-lts:
+  private_product: nodejs20
+  lookaside_cache_url: *private_lookaside_cache_url
+  # Needed once redhat/hummingbird/pipelines/rpmbuild-pipeline!28 lands: that
+  # MR makes process-sources's dist-git-client call unconditional (it no
+  # longer special-cases lookaside_cache_url at all), so it needs
+  # forked_from to resolve mock/dist-git-client.ini's [hummingbird] section
+  # -- otherwise it falls back to process-sources's Fedora default and 404s.
+  # Harmless no-op against the currently-deployed pipeline bundle.
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 nodejs22:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

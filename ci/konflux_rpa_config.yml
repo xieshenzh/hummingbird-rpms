@@ -42,3 +42,19 @@ rpas:
     private_product: example
     component_filter:
       path_prefix: rpms/
+
+  - name: hummingbird-rpms-private-nodejs20
+    target_file: config/kflux-prd-rh03.nnv1.p1/product/ReleasePlanAdmission/hummingbird/hummingbird-rpms-private-nodejs20.yaml
+    template: macros/releng/release-plan-admission.yml.j2
+    application_prefix: private-nodejs20-rpms
+    release_org: registry.stage.redhat.io/hummingbird-tech-preview
+    single_component_mode: true
+    service_account_name: hummingbird-rpm-release-staging
+    pulp_unsigned_domain: private-hummingbird-nodejs20-unsigned
+    pulp_signed_domain: private-hummingbird-nodejs20
+    pulp_secret_name: hummingbird-pulp-credentials-private-production-secret
+    pipeline_url: "https://github.com/scoheb/release-service-catalog.git"
+    pipeline_revision: HUM-2609-remove-oversized-task-results
+    private_product: nodejs20
+    component_filter:
+      path_prefix: rpms/

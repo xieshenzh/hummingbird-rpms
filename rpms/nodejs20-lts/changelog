@@ -1,0 +1,29 @@
+* Thu Aug 13 2026 Avinash Singh <avsingh@redhat.com>
+- Update to Node.js 20.20.3
+- https://gitlab.com/redhat/hummingbird/src/nodejs-lts/-/releases/v20.20.3 
+
+* Fri Jun 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.4.0-1
+- Update to Node.js 18.4.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V18.md#18.4.0
+
+* Thu Jun 09 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.3.0-2
+- Fix conflict between x86_64 and i686 installs of nodejs-devel
+
+* Tue Jun 07 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.3.0-1
+- Update to Node.js 18.3.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V18.md#18.3.0
+
+* Tue May 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.2.0-1
+- Update to Node.js 18.2.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V18.md#18.2.0
+
+* Fri May 06 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.1.0-2
+- Fix incorrect epoch in v8-devel dependency
+
+* Thu May 05 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.1.0-1
+- Update to Node.js 18.1.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V18.md#18.1.0
+
+* Thu Apr 28 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.0.0-1
+- First release of Node.js 18.x
+

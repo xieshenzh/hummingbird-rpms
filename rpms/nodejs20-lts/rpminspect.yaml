@@ -1,0 +1,45 @@
+# This check is disabled because rpminspect has issues with 
+# macro nesting and autorelease macro
+# which led to continuos need to waive or ignore the failure of the test
+# e.g:https://artifacts.dev.testing-farm.io/07049d23-04ed-451c-99f6-eed73e369d28/
+inspections:
+  disttag: off
+# Multiple annochecks are disabled because they are creating Verify type failures
+annocheck:
+  extra_opts:
+    # Issue: https://github.com/nodejs/node/issues/40368
+    # skip test for link time optimalization 
+    # test fails because nodejs is compiled without LTO. 
+    # This is on purpose as it creates issues.
+    hardened: --skip-lto
+    #  Temporarily disabled
+    #  skip test for GNU Property notes formatting
+    #  test fails because it's missing CET notes
+    #  feature is unsopported by upstream
+    #  See RHEL-85793 for details
+    hardened: --skip-property-note
+    hardened: --skip-cf-protection
+    #  Temporarily disabled
+    # skip test for dynamic tags
+    # BTI_PLT protection feature is missing from dynamic tags
+    # libnode.so.127 lacks this feature
+    # See RHEL-85837 for details
+    hardened: --skip-dynamic-tags
+
+# This check was disabled because it fails the inspection for inet_net_pton
+# inet_net_pton is considered depricated, 
+# but not officially - it just not as widely used and it isn't standardized in POSIX.
+#
+# It's prefered to use alternative like inet_pton,
+# but inet_pton doesn't support translation from CIDR which inet_net_pton does.
+#
+# This is used by cares in nodejs, they expect CIRDR as possible input.
+#    
+# Man-pages for the functions:
+#   https://man7.org/linux/man-pages/man3/inet_net_pton.3.html
+# cares usage in nodejs:
+#   https://github.com/nodejs/node/blob/b4280ef72c9a05aef118406c23fd90dc4a237510/deps/cares/src/lib/inet_net_pton.c#L363
+badfuncs:
+  allowed:
+    /usr/lib*/libnode.so.*:
+      - inet_net_pton

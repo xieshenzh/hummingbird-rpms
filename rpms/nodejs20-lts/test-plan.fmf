@@ -1,0 +1,47 @@
+---
+# shared metadata between plans
+environment:
+  NODEJS_MAIN_PACKAGE: nodejs20-lts
+  NODEJS_DEVEL_PACKAGE: nodejs20-lts-devel
+  NODEJS_BIN_PACKAGE: nodejs20-lts-bin
+  NPM_BIN_PACKAGE: nodejs20-lts-npm-bin
+  NODE_BIN: /usr/bin/node-20
+  NPM_BIN: /usr/bin/npm-20
+  NODE_INCLUDE_PATH: /usr/include/node
+discover:
+  how: fmf
+  url: https://gitlab.com/redhat/centos-stream/tests/nodejs
+execute:
+  how: tmt
+
+/main:
+  summary: Package test suite
+  discover+:
+    filter: "component:nodejs20-lts & tag:-bins"
+  prepare:
+    - name: install tested packages
+      how: install
+      package: ['${NODEJS_MAIN_PACKAGE}', '${NODEJS_DEVEL_PACKAGE}' ]
+
+/bin-packages-integration:
+  summary: Testing different install/swap scenarios
+  environment+:
+    OTHER_VERSION_TO_TEST_SWAPS: 22
+  prepare:
+  - name: remove nodejs from previous tests
+    how: shell
+    script: dnf remove -y 'nodejs*'
+  - name: remove tsflags
+    summary: Those prevent dnf from downloading any docs (minimal container stuff)
+    how: shell
+    script: sed -i 's/tsflags=nodocs/# tsflags=nodocs/' /etc/dnf/dnf.conf
+  - name: install man-db
+    how: install
+    package:
+      - man-db
+  - name: build-man-index
+    how: shell
+    script: mandb -c
+  discover+:
+    filter: 'tag:bins'
+...

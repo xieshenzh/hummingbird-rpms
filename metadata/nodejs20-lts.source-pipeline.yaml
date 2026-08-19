@@ -1,0 +1,43 @@
+fetch:
+  - type: spec-update
+    set-version: "${VERSION}"
+    reset-release: "1"
+  - type: git
+    repo: "https://gitlab.com/redhat/hummingbird/src/nodejs-lts.git"
+    ref: "v${VERSION}"
+    shallow: true
+    archive_name: "node-v${VERSION}.tar.gz"
+  - type: spec-source
+    index: 1
+  - type: spec-source
+    index: 2
+
+transform:
+  - type: strip-tarball
+    target: "node-v${VERSION}.tar.gz"
+    paths:
+      - "*/deps/openssl/*"
+  - type: run
+    artifacts: ["node-v${VERSION}.tar.gz"]
+    command: ["mv", "node-v${VERSION}.tar.gz", "node-v${VERSION}-stripped.tar.gz"]
+    outputs:
+      - "node-v${VERSION}-stripped.tar.gz"
+  # Matches rpms/nodejs20-lts/Makefile's packaging-scripts.tar.gz target --
+  # version-independent packaging helper scripts, Source100 in the spec.
+  - type: pack
+    files:
+      - "Makefile"
+      - "packaging/make-nodejs-tarball.sh"
+      - "packaging/fill-versions.sh"
+    output: "packaging-scripts.tar.gz"
+
+accepted-checksums:
+  - file: "packaging-scripts.tar.gz"
+    checksum: "e009e82ad71024017d22417e93b58a571dc8396f8d6567db39daf0dee48f024f87bf6d506b5bba036680c9c3a96e524f54560652bc6e9cb2f5feaadd7f239e83"
+    reason: >-
+      First run of the new pack: step for this file (previously produced by
+      Makefile's own `tar -czf`, outside gorget). Same three input files
+      (Makefile, packaging/make-nodejs-tarball.sh, packaging/fill-versions.sh,
+      confirmed unchanged), but gorget's own deterministic tar/gzip packing
+      produces different compressed bytes than the old raw tar invocation --
+      content is identical, only the compression differs.
