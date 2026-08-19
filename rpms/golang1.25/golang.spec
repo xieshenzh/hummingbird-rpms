@@ -110,7 +110,7 @@
 
 Name:           %{basepackagename}1.25
 Version:        %{go_version}
-Release:        0.1%{?dist}
+Release:        3%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD-3-Clause AND LicenseRef-Fedora-Public-Domain
@@ -162,8 +162,16 @@ Patch1:         0001-Modify-go.env.patch
 Patch5:         0005-Skip-TestCrashDumpsAllThreads.patch
 # Related to https://gcc.gnu.org/PR118497
 Patch8:         fix_cgo_panic-with-gcc15-in-368.patch
+# Related to https://github.com/golang/go/issues/74476
+Patch9:         skip_lsan_tests.patch
+
+# Related to the regeneration of `_gen/` in the build phase:
+# git format-patch -1 5d5c7ff1f0 --stdout -- ':!src/cmd/compile/internal/ssa/opGen.go' > fix-s390x-mergelocals.patch
+Patch10:	fix-s390x-mergelocals.patch
+Patch11:	fix-ppc64le-maddld.patch
+
 # TestTerminalSignal hangs in mock (podman --init)
-Patch10:        0010-Skip-TestTerminalSignal.patch
+Patch12:        0010-Skip-TestTerminalSignal.patch
 # Embed CMVP #5247 certified FIPS module by default with host-auto detection.
 # FIPS activates automatically on FIPS-enabled hosts, stays off otherwise.
 # Users can override with GODEBUG=fips140=on or godebug fips140=auto in go.mod.
@@ -335,6 +343,10 @@ export GO_LDFLAGS="-linkmode internal"
 %if !%{cgo_enabled}
 export CGO_ENABLED=0
 %endif
+# Regenerate `_gen/` before building
+pushd cmd/compile/internal/ssa/_gen
+GOROOT=%{goroot} %{goroot}/bin/go run .
+popd
 ./make.bash -v
 popd
 
