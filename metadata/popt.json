@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Backport CVE-2026-18743; CVE-2026-18739",
+  "modification_status": "modified",
   "release": "11",
   "sha": "917f314a08e3d6515cd71ef21785cc6658228655",
   "source": "https://src.fedoraproject.org/rpms/popt.git",
