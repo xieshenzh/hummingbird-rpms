@@ -2,10 +2,10 @@
   "branch": "rawhide",
   "modification_reason": "CVE-2026-4360; CVE-2026-6879",
   "modification_status": "modified",
-  "release": "4",
-  "sha": "b4205523e70d79d5be55bc4d9368bbe1cbceddcb",
+  "release": "1",
+  "sha": "daba5b738caf36d3903f98c1c65be5efbcfa658a",
   "source": "https://src.fedoraproject.org/rpms/python3.10.git",
   "upstream_branch": "3.10",
   "upstream_repo": "https://github.com/python/cpython",
-  "version": "3.10.20"
+  "version": "3.10.21"
 }
