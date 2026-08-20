@@ -1,0 +1,6 @@
+fetch:
+  # spec-source resolves Source0 via real rpm macro expansion, preserving
+  # %{version_no_tilde}'s stripping of a ~rcN pre-release suffix -- a hand-written
+  # ${VERSION} substitution would not reproduce that and would 404 on pre-releases.
+  - type: spec-source
+    index: 0
