@@ -122,7 +122,7 @@ python .cursor/skills/cve/cve_helper.py HUM-1234 --no-find-related
 ```
 
 After the ticket summary, run the deterministic probes for the
-package(s) under investigation (Step 0 bot-mrs, plus Step 2d/2e as
+package(s) under investigation (Step 0 bot-mrs, plus Step 2a/2e as
 needed) before doing ad-hoc shell greps.
 
 **Finding Related Tickets:** `cve_helper.py` automatically discovers all open
@@ -272,13 +272,44 @@ When you do search:
 - **Avoid over-specific quoted searches**: If a quoted search returns no results,
   immediately fall back to fewer quotes/broader terms rather than trying variations
 
-#### 2a: Version comparison
+#### 2a: Spec file bundled dependency check
+
+For product-mismatch CVEs, check the spec file for bundled dependencies
+before doing anything else — including version comparison:
+
+```bash
+python .cursor/skills/cve/cve_helper.py spec-deps <package> \
+  --component "<component-name>"
+# optional: --json
+```
+
+This reports `Provides: bundled(...)` lines and other component
+mentions with line numbers. If the component is not found here, the
+SBOM match is a false positive — treat as not present and close as NAB
+without proceeding to version comparison or SBOM verification.
+
+If found, compare against the CVE affected range and continue to Step 2c.
+
+#### 2b: Vendored dependency check (Go packages)
+
+The `cve_helper.py` output already shows `Vendored deps: yes (go-vendor-tools)`
+for any package with a `go-vendor-tools.toml` — use this as a first check.
+
+For module-level presence, use SBOM verification (Step 2e) which identifies
+the specific vendored module, its version, and whether it's runtime-installed.
+
+If not vendored by any package, the ticket is misfiled.
+
+#### 2c: Version comparison
 
 Compare the Hummingbird SRPM version against the CVE affected range.
 If the SRPM version is above the fix version, the package *may* be
 fixed -- but see the critical rule in Step 2e before concluding.
 
-#### 2b: Code inspection
+For product-mismatch CVEs, only reach this step after Step 2a confirms
+the component is actually present.
+
+#### 2d: Code inspection
 
 Check the Hummingbird package source for the vulnerable code:
 
@@ -289,29 +320,33 @@ ls rpms/<package>/
 Read the spec file and any existing patches. If patches addressing
 the CVE are already applied, the package is fixed.
 
-#### 2c: Vendored dependency check (Go packages)
+**For bundled dependencies:** Extract from the CVE description the specific
+vulnerable code configuration or pattern (e.g., specific function calls,
+configuration options, or preconditions). Verify it is NOT used:
 
-The `cve_helper.py` output already shows `Vendored deps: yes (go-vendor-tools)`
-for any package with a `go-vendor-tools.toml` — use this as a first check.
+1. Search the package source comprehensively:
 
-For module-level presence, use SBOM verification (Step 2e) which identifies
-the specific vendored module, its version, and whether it's runtime-installed.
+   ```bash
+   grep -r "<vulnerable_pattern>" rpms/<package>/ --include="*.ts" --include="*.js" --include="*.py" --include="*.go"
+   grep -r "<vulnerable_pattern>" rpms/<package>/ --include="*.md" --include="*.txt"
+   ```
 
-If not vendored by any package, the ticket is misfiled.
+2. Check test files, examples, and documentation:
 
-#### 2d: Spec file bundled dependency check
+   ```bash
+   find rpms/<package>/ -type f \( -name "*test*" -o -name "*example*" -o -name "*doc*" \) \
+     -exec grep -l "<vulnerable_pattern>" {} \;
+   ```
 
-For product-mismatch CVEs, check the spec file for bundled dependencies:
+3. If the package imports or vendors the component, download the upstream source
+   and verify the pattern is not invoked there either.
 
-```bash
-python .cursor/skills/cve/cve_helper.py spec-deps <package> \
-  --component "<component-name>"
-# optional: --json
-```
+4. If still unclear, web search the package name + vulnerable pattern to confirm
+   the feature is not supported.
 
-This reports `Provides: bundled(...)` lines and other component
-mentions with line numbers. If found, compare against the CVE
-affected range.
+If the vulnerable pattern is NOT found across all sources and references,
+the code path is unreachable and you can close as NAB "Vulnerable Code not Present"
+without version checks.
 
 #### 2e: SBOM verification
 
@@ -376,8 +411,10 @@ Decision guidance:
 - If component appears only in build/test toolchain paths and is
   not present in installed runtime binary RPM contents, treat as
   not runtime-affected.
-- If SBOM evidence is ambiguous, do not close the ticket based on
-  component absence alone; continue manual investigation.
+- If the binary check is unknown (`mismatch_binary_unknown`) or SBOM
+  evidence is ambiguous, cross-check with the spec file (Step 2a)
+  before concluding. If spec-deps shows no bundled reference to the
+  component, the SBOM match is a false positive — treat as not present.
 
 For any `Not a Bug` recommendation based on product mismatch,
 include SBOM evidence in the Jira comment:
@@ -475,7 +512,7 @@ When the CVE does not apply (wrong product, component not present,
 disputed):
 
 1. For product-mismatch or component-absence cases, perform SBOM
-   verification first (Step 2d) and capture runtime-vs-build-time
+   verification first (Step 2e) and capture runtime-vs-build-time
    evidence for binary RPM installation status.
 2. **Name the specific component** extracted from the CVE description
    in the closing comment. State why it was checked and why it is
@@ -983,9 +1020,11 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
 8. **Always pass `--noeditor` on Jira writes.** This includes comment,
    transition, and field-update operations.
 
-9. **Do not close mismatch tickets without SBOM evidence.** For
-   `Component not Present` or related mismatch decisions, verify
-   component presence in SBOM and determine runtime-installed vs
+9. **Do not close mismatch tickets without SBOM evidence**, unless
+   Step 2a (spec-deps) shows no bundled reference to the component —
+   in that case spec-deps absence is the evidence and SBOM verification
+   can be skipped. For all other `Component not Present` decisions,
+   verify component presence in SBOM and determine runtime-installed vs
    build-time-only before closing (unless the user explicitly
    approves an SBOM-unavailable override).
 
