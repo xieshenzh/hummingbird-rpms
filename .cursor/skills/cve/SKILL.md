@@ -6,6 +6,7 @@ description: >-
   backporting patches, setting Fixed in Build, and closing misfiled
   tickets. Use when the user says /cve, "let's look at HUM-XXXX"
   (a CVE tracker), or asks to investigate/fix a specific CVE.
+  "/cve HUM-XXXX only" skips same-CVE sibling discovery.
 ---
 
 # CVE Tracker Investigation
@@ -123,6 +124,11 @@ the bot MR's version doesn't include the CVE fix.
 If the user provides bare numbers (e.g. "2875" or "/cve 2875"),
 treat them as HUM tickets by prepending `HUM-`.
 
+**`only` keyword:** If the user writes `only` with the ticket list
+(e.g. `/cve HUM-1234 only` or `/cve HUM-1234 HUM-1235 only`), pass
+`--no-find-related` and restrict analysis and writes to those keys.
+Do not recap same-CVE siblings.
+
 ```bash
 python .cursor/skills/cve/cve_helper.py HUM-XXXX
 # equivalent: python .cursor/skills/cve/cve_helper.py show HUM-XXXX
@@ -135,25 +141,41 @@ python .cursor/skills/cve/cve_helper.py HUM-1234 1235 1236 \
   --json-out /tmp/cve-triage.json
 ```
 
+With `only`:
+
+```bash
+python .cursor/skills/cve/cve_helper.py HUM-1234 --no-find-related
+```
+
 After the ticket summary, run the deterministic probes for the
 package(s) under investigation (Step 0 bot-mrs, plus Step 2d/2e as
 needed) before doing ad-hoc shell greps.
+
 **Finding Related Tickets:** `cve_helper.py` automatically discovers all open
-HUM tickets with the same CVE IDs — this is on by default so you get the full
-set in one invocation. Use `--no-find-related` to opt out:
+HUM tickets with the same CVE IDs — this is on by default (unless the
+user said `only`) so you get the full set in one invocation:
 
 ```bash
 # Default: shows HUM-1234 + any open tickets sharing its CVEs
 python .cursor/skills/cve/cve_helper.py HUM-1234
 
-# Opt out: show only HUM-1234
+# User said "only": show only HUM-1234
 python .cursor/skills/cve/cve_helper.py HUM-1234 --no-find-related
 ```
 
-This is especially useful for batch resolution across versioned packages
-(e.g., ruby3.3, ruby4.0, llvm, llvm21) — investigate once, apply to all.
-The related tickets are fetched during the initial show so there's no need for
-a second invocation.
+Related tickets are useful context for versioned packages (e.g.
+ruby3.3/ruby4.0, llvm/llvm21). **User-named tickets are in-scope for
+Step 3. Discovered tickets are context only until the user says
+otherwise.** After Step 2h, if extras exist, ask:
+
+```text
+Related: HUM-A (pkgA), HUM-B (pkgB). Apply this to all, or only the
+tickets you named?
+```
+
+A "Yes please" on the named set is **not** approval for discovered
+siblings. The related tickets are fetched during the initial show so
+there is no need for a second invocation.
 
 Use the script output as the primary source for:
 
@@ -204,11 +226,13 @@ llvm/llvm21), investigate once but **verify each package individually**:
    (spec file bundled deps, SBOM, code inspection). Do not assume uniformity.
 3. **Group by outcome:** Collect tickets by resolution (NAB/component-absent,
    FIB, needs-update).
-4. **Batch actions by outcome:**
-   - **Same resolution:** Write one comment template, post to each ticket in a loop,
-     create one task linking all trackers, set FIB on each if applicable.
-   - **Mixed outcomes:** Handle each group independently. Close unaffected ones
-     directly, create tasks for those needing fixes.
+4. **Batch actions by outcome** (only after the user confirms
+   scope — named tickets vs all related):
+   - **Same resolution:** Write one comment template, post to each
+     in-scope ticket in a loop, create one task linking those
+     trackers, set FIB on each if applicable.
+   - **Mixed outcomes:** Handle each group independently. Close
+     unaffected ones directly, create tasks for those needing fixes.
 
 > IMPORTANT: If a patch is required, handle each ticket separately.
 
@@ -961,7 +985,9 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
 
 12. When the user provides the package name and multiple HUM ticket
     keys together (e.g. "let's look at ruby4.0 HUM-2648 HUM-2645"),
-    investigate all tickets for that package as a batch.
+    investigate all **named** tickets for that package as a batch.
+    Same-CVE tickets discovered by find-related stay context until
+    the user confirms them. `only` means named tickets only.
 
 13. **`modification_reason` must identify the CVE**, and only for
     Fedora-imported packages that are (or become) `modified`.
