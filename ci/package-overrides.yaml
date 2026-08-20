@@ -523,6 +523,9 @@ userspace-rcu:
 valkey:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+vim:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 xcaddy:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

@@ -9420,7 +9420,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:b69745228950a3915c08e013d238a63e3d2b2c9c1dbd7d192533199bff0b7d66"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:bf43eccaf6669073b4ef441555c004a7ae263a1ec027530decdba2f3714f23ae"
   taskRunTemplate:
     serviceAccountName: build-pipeline-golang1-27-main
   timeouts:
@@ -36249,6 +36249,10 @@ spec:
       value: "rpms/vim"
     - name: mock-config-template-filename-in-sources
       value: "mock/mock.cfg"
+    - name: dist-git-client-configdir
+      value: "mock/"
+    - name: forked-from
+      value: "https://gitlab.com/redhat/hummingbird/rpms"
   pipelineRef:
     resolver: bundles
     params:

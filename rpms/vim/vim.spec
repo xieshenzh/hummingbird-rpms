@@ -30,6 +30,8 @@
 %define bugurl %(source /etc/os-release; echo ${BUG_REPORT_URL})
 %define patchlevel 967
 %define vimdir vim92
+# metadata/vim.source-pipeline.yaml is pinned to git tag v9.2.0967 (zero-padded
+# patchlevel, unlike baseversion/patchlevel above) -- update both together.
 
 %if %{with desktop_file}
 %define desktop_file_utils_version 0.2.93
@@ -40,7 +42,7 @@ Summary: The VIM editor
 URL:     https://www.vim.org/
 Name: vim
 Version: %{baseversion}.%{patchlevel}
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 Epoch: 2
 # swift.vim contains Apache 2.0 with runtime library exception:
 # which is taken as Apache-2.0 WITH Swift-exception - reported to legal as https://gitlab.com/fedora/legal/fedora-license-data/-/issues/188
@@ -51,7 +53,7 @@ Epoch: 2
 # resolution: take it as OPUBL-1.0, the license won't be added to allowed license list, but if a project uses it for documentation
 # and don't use license options mentioned in the OPUBL 1.0 license text (which both are the case for Vim), the license is allowed
 License: Vim AND LGPL-2.1-or-later AND MIT AND GPL-1.0-only AND (GPL-2.0-only OR Vim) AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND GPL-2.0-or-later AND GPL-3.0-or-later AND OPUBL-1.0 AND Apache-2.0 WITH Swift-exception
-Source0: ftp://ftp.vim.org/pub/vim/unix/vim-%{baseversion}-%{patchlevel}.tar.bz2
+Source0: %{vimdir}.tar.gz
 Source1: virc
 Source2: vimrc
 Source3: gvim16.png
