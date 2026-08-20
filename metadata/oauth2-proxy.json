@@ -1,9 +1,9 @@
 {
-  "modification_reason": "backport fix for CVE-2026-56852",
+  "modification_reason": "Update to upstream version 7.15.4",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 242710,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/oauth2-proxy/oauth2-proxy",
-  "version": "7.15.3"
+  "version": "7.15.4"
 }
