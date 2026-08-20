@@ -1,0 +1,3 @@
+fetch:
+  - type: url
+    url: "https://cpan.metacpan.org/authors/id/C/CH/CHRISN/Net-SSLeay-${VERSION}.tar.gz"
