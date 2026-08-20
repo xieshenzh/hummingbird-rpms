@@ -1,7 +1,7 @@
 {
   "branch": "f43",
   "cve_product": "ruby-lang / ruby",
-  "modification_reason": "CVE-2026-42245; CVE-2026-42246; CVE-2026-42256; CVE-2026-47242; CVE-2026-54696",
+  "modification_reason": "CVE-2026-42245; CVE-2026-42246; CVE-2026-42256; CVE-2026-47242; CVE-2026-54696; added gorget source-pipeline.yaml (HUM-4620 audit finding): Source0's %{name} macro resolves to the versioned package name (ruby3.4), but cache.ruby-lang.org's archive path uses the bare base name 'ruby' -- checksum matches the existing recorded checksum exactly, no content change.",
   "modification_status": "modified",
   "release": "31",
   "sha": "13ec45290ca2daff61ce739ade287a78e753a2d0",
