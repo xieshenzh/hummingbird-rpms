@@ -348,6 +348,8 @@ spec:
           contentType: rpm
         - name: golang1-26-main
           contentType: rpm
+        - name: golang1-27-main
+          contentType: rpm
         - name: golist-main
           contentType: rpm
         - name: google-noto-fonts-main

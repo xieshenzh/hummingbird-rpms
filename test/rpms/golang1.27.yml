@@ -1,0 +1,322 @@
+---
+# Tests for golang1.27: verify the toolchain ships the CMVP #5247 validated
+# FIPS 140-3 module source, that the certified module is embedded by default,
+# and that FIPS activation works via host-auto detection, GODEBUG override,
+# and explicit GOFIPS140 builds.
+
+fips-module-source-present:
+  command: |
+    # The CMVP #5247 validated module archive (v1.0.0-c2097c7c.zip) must be
+    # present with the exact SHA-256 from the security policy §11.1.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "golang1.27" ]]; then
+      echo "Skipping: only runs on golang1.27 (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y golang1.27
+
+        goroot=$(go env GOROOT)
+        fips_zip=$(ls "${goroot}"/lib/fips140/v1.0.0-*.zip 2>/dev/null || true)
+        if [[ -z "${fips_zip}" ]]; then
+          echo "FAIL: v1.0.0 archive not found in ${goroot}/lib/fips140/"
+          exit 1
+        fi
+
+        # Same CMVP #5247 v1.0.0-c2097c7c.zip as golang1.25; update if golang1.27 ships a newer module.
+        expected="daf3614e0406f67ae6323c902db3f953a1effb199142362a039e7526dfb9368b"
+        actual=$(sha256sum "${fips_zip}" | cut -d" " -f1)
+        if [[ "${actual}" != "${expected}" ]]; then
+          echo "FAIL: SHA-256 mismatch (expected: ${expected}, got: ${actual})"
+          exit 1
+        fi
+        echo "PASS: CMVP #5247 validated module present (${fips_zip})"
+      '
+
+fips-certified-default:
+  command: |
+    # Verify the patched toolchain defaults: certified module embedded,
+    # FIPS off on non-FIPS hosts, activates via host-auto and GODEBUG override.
+    # One build, four runtime checks.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "golang1.27-bin" ]]; then
+      echo "Skipping: only runs on golang1.27-bin (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    test_files_dir="${TEST_FILES_DIR:-$(git rev-parse --show-toplevel)/test/rpms/golang1.27}"
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      -v "${test_files_dir}:/tmp/test-files:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y golang1.27-bin golang1.27 golang1.27-src gcc
+
+        export HOME=/tmp GOPATH=/tmp/gopath GOCACHE=/tmp/gocache
+
+        # Build two binaries: one for build-info checks, one for crypto tests
+        mkdir -p /tmp/build-info /tmp/build-crypto
+        cp /tmp/test-files/fips_default_off_test.go /tmp/build-info/main.go
+        cp /tmp/test-files/fips_test.go /tmp/build-crypto/main.go
+
+        cd /tmp/build-info && go mod init fips-default-test && go build -o ./testbin .
+        cd /tmp/build-crypto && go mod init fips-test && go build -o ./testbin .
+
+        # 1. Certified module embedded by default (no GOFIPS140 env var)
+        gofips=$(go version -m /tmp/build-info/testbin | sed -n "s/.*GOFIPS140=//p")
+        if [[ -z "${gofips}" || "${gofips}" != v1.0.0-* ]]; then
+          echo "FAIL: GOFIPS140=${gofips:-missing}, expected v1.0.0-*"
+          exit 1
+        fi
+        echo "PASS: certified module embedded by default (GOFIPS140=${gofips})"
+
+        # 2. FIPS off on non-FIPS host (auto resolves to off)
+        /tmp/build-info/testbin
+        echo "PASS: FIPS disabled on non-FIPS host"
+
+        # 3. Host-auto detection via GOLANG_NATIVE_HOSTFIPS_OVERRIDE
+        GOLANG_NATIVE_HOSTFIPS_OVERRIDE=1 /tmp/build-crypto/testbin
+        echo "PASS: host-auto activates FIPS (same crypto as GODEBUG path)"
+
+        # 4. Runtime activation via GODEBUG=fips140=on
+        GODEBUG=fips140=on /tmp/build-crypto/testbin
+        echo "PASS: GODEBUG=fips140=on activates FIPS"
+      '
+
+fips-explicit-build:
+  command: |
+    # Explicit GOFIPS140 builds must still work — both the pinned version
+    # (v1.0.0) and the certified alias. Tests CGO on and off.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "golang1.27-bin" ]]; then
+      echo "Skipping: only runs on golang1.27-bin (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    test_files_dir="${TEST_FILES_DIR:-$(git rev-parse --show-toplevel)/test/rpms/golang1.27}"
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      -v "${test_files_dir}:/tmp/test-files:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y golang1.27-bin golang1.27 golang1.27-src gcc
+
+        export HOME=/tmp GOPATH=/tmp/gopath GOCACHE=/tmp/gocache
+
+        mkdir -p /tmp/build
+        cp /tmp/test-files/fips_test.go /tmp/build/main.go
+        cd /tmp/build
+        go mod init fips-test
+
+        # 1. Pinned version (v1.0.0) with CGO — must activate FIPS explicitly
+        #    since our default is fips140=auto (off on non-FIPS hosts)
+        GOFIPS140=v1.0.0 go build -o ./testbin-pinned .
+        GODEBUG=fips140=on ./testbin-pinned
+        echo "PASS: GOFIPS140=v1.0.0 (pinned)"
+
+        # 2. Certified alias — resolves to current certified version
+        GOFIPS140=certified go build -o ./testbin-certified .
+        GODEBUG=fips140=on ./testbin-certified
+        echo "PASS: GOFIPS140=certified (alias)"
+
+        # 3. CGO_ENABLED=0 (static, no cgo — proves native FIPS works without OpenSSL)
+        CGO_ENABLED=0 GOFIPS140=certified go build -o ./testbin-static .
+        GODEBUG=fips140=on ./testbin-static
+        echo "PASS: GOFIPS140=certified with CGO_ENABLED=0 (static)"
+      '
+
+fips-strict-mode:
+  command: |
+    # GODEBUG=fips140=only must reject non-approved algorithms (MD5).
+    # Tests both default builds and explicit GOFIPS140 builds.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "golang1.27-bin" ]]; then
+      echo "Skipping: only runs on golang1.27-bin (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    test_files_dir="${TEST_FILES_DIR:-$(git rev-parse --show-toplevel)/test/rpms/golang1.27}"
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      -v "${test_files_dir}:/tmp/test-files:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -e
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y golang1.27-bin golang1.27 golang1.27-src gcc
+
+        export HOME=/tmp GOPATH=/tmp/gopath GOCACHE=/tmp/gocache
+
+        mkdir -p /tmp/build
+        cp /tmp/test-files/fips_nonapproved_test.go /tmp/build/main.go
+        cd /tmp/build
+        go mod init fips-nonapproved-test
+
+        # Build both default and explicit
+        go build -o ./testbin-default .
+        GOFIPS140=v1.0.0 go build -o ./testbin-explicit .
+
+        for bin in testbin-default testbin-explicit; do
+          label=${bin#testbin-}
+
+          # Non-strict: MD5 should work
+          if ./${bin}; then
+            echo "PASS: MD5 works in non-strict mode (${label} build)"
+          else
+            echo "FAIL: MD5 should work in non-strict mode (${label} build)"
+            exit 1
+          fi
+
+          # Strict: MD5 must be rejected
+          if GODEBUG=fips140=only ./${bin}; then
+            echo "FAIL: MD5 should be rejected in fips140=only (${label} build)"
+            exit 1
+          else
+            echo "PASS: MD5 rejected in fips140=only (${label} build)"
+          fi
+        done
+      '
+
+fips-go-get-resolves-std:
+  command: |
+    # Regression test for https://github.com/golang/go/issues/73649
+    # go get must resolve crypto/internal/fips140 snapshot packages when
+    # GOFIPS140 defaults to certified. This broke xcaddy and any workflow
+    # that uses "go get" to add modules importing crypto/tls.
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "golang1.27-bin" ]]; then
+      echo "Skipping: only runs on golang1.27-bin (got: ${rpm_name})"
+      exit 0
+    fi
+
+    build_dir=$(mktemp -d)
+    cleanup() { rm -rf "${build_dir}"; }
+    trap cleanup EXIT
+
+    mkdir -p "${build_dir}/local-repo"
+    if [[ -n ${TEST_REPO_DIR:-} ]]; then
+      cp "${TEST_REPO_DIR}"/*.rpm "${build_dir}/local-repo/"
+    else
+      cp "${TEST_RPM}" "${build_dir}/local-repo/"
+    fi
+    createrepo_c "${build_dir}/local-repo" || \
+      "${TEST_ENGINE}" run --rm --user 0 -v "${build_dir}/local-repo:/repo:z" \
+        quay.io/hummingbird-ci/hummingbird-builder:latest createrepo_c /repo
+
+    "${TEST_ENGINE}" run --rm \
+      -v "${build_dir}/local-repo:/tmp/local-repo:ro,z" \
+      quay.io/hummingbird-ci/hummingbird-builder:latest \
+      bash -c '
+        set -euo pipefail
+        printf "[local-repo]\nname=Local\nbaseurl=file:///tmp/local-repo\nenabled=1\ngpgcheck=0\npriority=1\n" \
+          > /etc/yum.repos.d/local.repo
+        dnf install -y golang1.27-bin golang1.27 golang1.27-src gcc
+
+        export HOME=/tmp GOPATH=/tmp/gopath GOCACHE=/tmp/gocache
+
+        # Verify GOFIPS140 defaults to certified (precondition)
+        gofips=$(go env GOFIPS140)
+        if [[ "${gofips}" != "certified" ]]; then
+          echo "FAIL: GOFIPS140 should default to certified, got: ${gofips}"
+          exit 1
+        fi
+
+        # Test: go get a module that imports crypto/tls (triggers fips140 resolution)
+        mkdir -p /tmp/goget-test && cd /tmp/goget-test
+        go mod init goget-test
+
+        # go get must not emit "is not in std" errors for fips140 packages
+        if ! go get golang.org/x/crypto/ssh 2>stderr.log; then
+          if grep -q "is not in std" stderr.log; then
+            echo "FAIL: go get cannot resolve fips140 snapshot packages:"
+            cat stderr.log
+            exit 1
+          fi
+          echo "FAIL: go get failed (non-fips error):"
+          cat stderr.log
+          exit 1
+        fi
+        echo "PASS: go get resolves fips140 packages with GOFIPS140=certified"
+
+        # Test: go build after go get must also succeed
+        cat > main.go <<GOEOF
+        package main
+        import _ "golang.org/x/crypto/ssh"
+        func main() {}
+        GOEOF
+        go build -o /dev/null .
+        echo "PASS: go build succeeds after go get with GOFIPS140=certified"
+      '
