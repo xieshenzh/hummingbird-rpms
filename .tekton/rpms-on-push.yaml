@@ -9220,72 +9220,7 @@ spec:
 # --- gobject-introspection ---
 # PENDING
 # --- golang ---
----
-apiVersion: tekton.dev/v1
-kind: PipelineRun
-metadata:
-  annotations:
-    build.appstudio.openshift.io/repo: https://gitlab.com/redhat/hummingbird/rpms/-/tree/{{revision}}
-    build.appstudio.redhat.com/commit_sha: '{{revision}}'
-    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
-    pipelinesascode.tekton.dev/on-target-branch: "[main]"
-    pipelinesascode.tekton.dev/cancel-in-progress: "false"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-event: "[push]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/golang/***]"
-  creationTimestamp: null
-  labels:
-    appstudio.openshift.io/application: rpms-main
-    appstudio.openshift.io/component: golang-main
-    pipelines.appstudio.openshift.io/type: build
-  name: golang-main-on-push
-  namespace: hummingbird-tenant
-spec:
-  params:
-    - name: git-url
-      value: '{{source_url}}'
-    - name: revision
-      value: '{{revision}}'
-    - name: purl-rpm-namespace
-      value: "redhat"
-    - name: ociStorage
-      value: quay.io/redhat-user-workloads/hummingbird-tenant/golang-main:{{revision}}
-    - name: package-name
-      value: golang
-    - name: target-branch
-      value: '{{target_branch}}'
-    - name: build-architectures
-      value:
-        - aarch64
-        - x86_64
-    - name: build-platforms
-      value:
-        - "linux/x86_64"
-        - "linux/arm64"
-    - name: specfile
-      value: "golang.spec"
-    - name: monorepo-subdir
-      value: "rpms/golang"
-    - name: mock-config-template-filename-in-sources
-      value: "mock/mock.cfg"
-  pipelineRef:
-    resolver: bundles
-    params:
-      - name: name
-        value: build-rpm-package
-      - name: kind
-        value: pipeline
-      - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:b69745228950a3915c08e013d238a63e3d2b2c9c1dbd7d192533199bff0b7d66"
-  taskRunTemplate:
-    serviceAccountName: build-pipeline-golang-main
-  timeouts:
-    pipeline: 4h
-    tasks: 4h
-  workspaces:
-    - name: git-auth
-      secret:
-        secretName: '{{git_auth_secret}}'
+# PENDING
 # --- golang1.25 ---
 ---
 apiVersion: tekton.dev/v1
@@ -9413,6 +9348,73 @@ spec:
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:b69745228950a3915c08e013d238a63e3d2b2c9c1dbd7d192533199bff0b7d66"
   taskRunTemplate:
     serviceAccountName: build-pipeline-golang1-26-main
+  timeouts:
+    pipeline: 4h
+    tasks: 4h
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{git_auth_secret}}'
+# --- golang1.27 ---
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://gitlab.com/redhat/hummingbird/rpms/-/tree/{{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-event: "[push]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/golang1.27/***]"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: rpms-main
+    appstudio.openshift.io/component: golang1-27-main
+    pipelines.appstudio.openshift.io/type: build
+  name: golang1-27-main-on-push
+  namespace: hummingbird-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: purl-rpm-namespace
+      value: "redhat"
+    - name: ociStorage
+      value: quay.io/redhat-user-workloads/hummingbird-tenant/golang1-27-main:{{revision}}
+    - name: package-name
+      value: golang
+    - name: target-branch
+      value: '{{target_branch}}'
+    - name: build-architectures
+      value:
+        - aarch64
+        - x86_64
+    - name: build-platforms
+      value:
+        - "linux/x86_64"
+        - "linux/arm64"
+    - name: specfile
+      value: "golang.spec"
+    - name: monorepo-subdir
+      value: "rpms/golang1.27"
+    - name: mock-config-template-filename-in-sources
+      value: "mock/mock.cfg"
+  pipelineRef:
+    resolver: bundles
+    params:
+      - name: name
+        value: build-rpm-package
+      - name: kind
+        value: pipeline
+      - name: bundle
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:b69745228950a3915c08e013d238a63e3d2b2c9c1dbd7d192533199bff0b7d66"
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-golang1-27-main
   timeouts:
     pipeline: 4h
     tasks: 4h

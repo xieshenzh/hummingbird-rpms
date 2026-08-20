@@ -2,6 +2,7 @@
   "erlang27": "erlang",
   "golang1.25": "golang",
   "golang1.26": "golang",
+  "golang1.27": "golang",
   "helm4": "helm",
   "rabbitmq-server4.3": "rabbitmq-server",
   "ruby3.3": "ruby",
