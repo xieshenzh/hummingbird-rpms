@@ -6,6 +6,7 @@ description: >-
   backporting patches, setting Fixed in Build, and closing misfiled
   tickets. Use when the user says /cve, "let's look at HUM-XXXX"
   (a CVE tracker), or asks to investigate/fix a specific CVE.
+  "/cve HUM-XXXX only" skips same-CVE sibling discovery.
 ---
 
 # CVE Tracker Investigation
@@ -37,58 +38,32 @@ sandboxed/no-network context can produce false failures
 Use an internet-enabled execution context for these tool calls.
 
 For **direct** `rhjira` writes still done in the shell (comment, edit,
-status), use this bounded retry helper:
-
-```bash
-rhjira_retry() {
-  local max_attempts=3
-  local backoff=2
-  local attempt=1 output rc
-
-  while [ "$attempt" -le "$max_attempts" ]; do
-    output="$(rhjira "$@" 2>&1)"
-    rc=$?
-    if [ "$rc" -eq 0 ]; then
-      printf '%s\n' "$output"
-      return 0
-    fi
-
-    if ! printf '%s\n' "$output" | grep -qiE \
-      "proxy|tunnel|timed out|timeout|temporar|502|503|504|connection reset|eof"; then
-      printf '%s\n' "$output" >&2
-      return "$rc"
-    fi
-
-    if [ "$attempt" -eq "$max_attempts" ]; then
-      printf 'ERROR: rhjira failed after %s attempts: rhjira %s\n' "$max_attempts" "$*" >&2
-      printf '%s\n' "$output" >&2
-      return "$rc"
-    fi
-
-    printf 'WARN: transient Jira/proxy error (attempt %s/%s); retrying in %ss\n' \
-      "$attempt" "$max_attempts" "$backoff" >&2
-    sleep "$backoff"
-    backoff=$((backoff + 2))
-    attempt=$((attempt + 1))
-  done
-}
-```
-
-Rules for using the helper:
+status):
 
 1. Prefer `python .cursor/skills/cve/cve_helper.py …` for ticket show,
    bot-MR, SBOM, and spec probes.
-2. Use `rhjira_retry` for direct Jira write calls in the shell.
-3. For write operations (comment, status/resolution changes, field
-   updates), always pass `--noeditor`.
-4. Avoid long polling loops (`while ... sleep 30`). After a write,
-   do at most one verify read through `rhjira_retry`; if Jira is
-   still unavailable, fail fast.
+2. Always pass `--noeditor` on writes.
+3. Do not paste a retry function into the session. `cve_helper.py`
+   already retries transient Jira/proxy failures for reads (ticket show,
+   bot-MR, SBOM, spec probes). For raw `rhjira` writes, run once with
+   `--noeditor`; if it fails for a non-auth reason, report it and stop.
+   No polling loops (`while ... sleep 30`).
+4. On `login failure` / invalid token, source credentials once and
+   retry a single time:
+
+   ```bash
+   set -a
+   source ~/.config/rhjira/agent.env
+   set +a
+   ```
+
+   If it still fails, stop and tell the user. Do not debug rhjira
+   further in the session.
 5. Report per-ticket Jira status clearly before stopping, for
    example:
 
    ```text
-   HUM-1234: jira_unavailable (proxy tunnel 403 after 3 attempts; no changes applied)
+   HUM-1234: jira_unavailable (proxy tunnel 403; no changes applied)
    HUM-1235: read_ok
    ```
 
@@ -123,6 +98,11 @@ the bot MR's version doesn't include the CVE fix.
 If the user provides bare numbers (e.g. "2875" or "/cve 2875"),
 treat them as HUM tickets by prepending `HUM-`.
 
+**`only` keyword:** If the user writes `only` with the ticket list
+(e.g. `/cve HUM-1234 only` or `/cve HUM-1234 HUM-1235 only`), pass
+`--no-find-related` and restrict analysis and writes to those keys.
+Do not recap same-CVE siblings.
+
 ```bash
 python .cursor/skills/cve/cve_helper.py HUM-XXXX
 # equivalent: python .cursor/skills/cve/cve_helper.py show HUM-XXXX
@@ -135,25 +115,41 @@ python .cursor/skills/cve/cve_helper.py HUM-1234 1235 1236 \
   --json-out /tmp/cve-triage.json
 ```
 
+With `only`:
+
+```bash
+python .cursor/skills/cve/cve_helper.py HUM-1234 --no-find-related
+```
+
 After the ticket summary, run the deterministic probes for the
 package(s) under investigation (Step 0 bot-mrs, plus Step 2d/2e as
 needed) before doing ad-hoc shell greps.
+
 **Finding Related Tickets:** `cve_helper.py` automatically discovers all open
-HUM tickets with the same CVE IDs — this is on by default so you get the full
-set in one invocation. Use `--no-find-related` to opt out:
+HUM tickets with the same CVE IDs — this is on by default (unless the
+user said `only`) so you get the full set in one invocation:
 
 ```bash
 # Default: shows HUM-1234 + any open tickets sharing its CVEs
 python .cursor/skills/cve/cve_helper.py HUM-1234
 
-# Opt out: show only HUM-1234
+# User said "only": show only HUM-1234
 python .cursor/skills/cve/cve_helper.py HUM-1234 --no-find-related
 ```
 
-This is especially useful for batch resolution across versioned packages
-(e.g., ruby3.3, ruby4.0, llvm, llvm21) — investigate once, apply to all.
-The related tickets are fetched during the initial show so there's no need for
-a second invocation.
+Related tickets are useful context for versioned packages (e.g.
+ruby3.3/ruby4.0, llvm/llvm21). **User-named tickets are in-scope for
+Step 3. Discovered tickets are context only until the user says
+otherwise.** After Step 2h, if extras exist, ask:
+
+```text
+Related: HUM-A (pkgA), HUM-B (pkgB). Apply this to all, or only the
+tickets you named?
+```
+
+A "Yes please" on the named set is **not** approval for discovered
+siblings. The related tickets are fetched during the initial show so
+there is no need for a second invocation.
 
 Use the script output as the primary source for:
 
@@ -204,11 +200,13 @@ llvm/llvm21), investigate once but **verify each package individually**:
    (spec file bundled deps, SBOM, code inspection). Do not assume uniformity.
 3. **Group by outcome:** Collect tickets by resolution (NAB/component-absent,
    FIB, needs-update).
-4. **Batch actions by outcome:**
-   - **Same resolution:** Write one comment template, post to each ticket in a loop,
-     create one task linking all trackers, set FIB on each if applicable.
-   - **Mixed outcomes:** Handle each group independently. Close unaffected ones
-     directly, create tasks for those needing fixes.
+4. **Batch actions by outcome** (only after the user confirms
+   scope — named tickets vs all related):
+   - **Same resolution:** Write one comment template, post to each
+     in-scope ticket in a loop, create one task linking those
+     trackers, set FIB on each if applicable.
+   - **Mixed outcomes:** Handle each group independently. Close
+     unaffected ones directly, create tasks for those needing fixes.
 
 > IMPORTANT: If a patch is required, handle each ticket separately.
 
@@ -417,13 +415,28 @@ date and hash against the fix, not the version number.
 #### 2h: Resolution Summary
 
 After completing your Step 2 investigation, **state your recommended
-resolution to the user**:
+resolution to the user**. Lead the recap with:
 
+- Assignee (the user vs the Jira bot)
+- Labels
+- Fixed in Build (set or unset)
 - Which resolution path applies (e.g., "3a: Already fixed — set FIB",
-  "3b: Not affected — close as NAB", "3d: Needs version bump")
+  "3b: Not affected — close as NAB", "3d: Needs version bump",
+  "3f: Affected, no upstream fix — cve-next-release")
 - Why (brief justification based on your investigation)
 - What evidence supports it (version comparison, SBOM findings, code
   inspection results, upstream fix verification)
+
+If FIB is already set and a task/MR already exists, recommend leaving
+the ticket for advisory automation. Do not re-investigate from scratch
+or set FIB again unless the user asks.
+
+If FIB is set but no task/MR exists yet, flag this to the user and ask
+whether to create the task before proceeding.
+
+If related tickets were discovered (and the user did not say `only`),
+list them and ask whether to apply the same resolution to all or only
+the named tickets.
 
 Then wait for the user's direction before proceeding with Step 3 actions.
 
@@ -598,12 +611,16 @@ contains the fix:
    Fedora):** When Fedora has not yet released this version,
    the tarball must be served from the Hummingbird lookaside
    cache instead of Fedora's. Three things are required:
-   - Upload the tarball (and signature if listed in `sources`)
-     to the Hummingbird lookaside:
+   - Copy the tarball (and signature if listed in `sources`) to
+     `/tmp` and print the upload commands using the **RPM package
+     name** (e.g. `grafana13.1`, not `grafana13`). Do **not** run
+     the upload unless the user asks:
 
      ```bash
-     ./ci/upload-to-lookaside-cache.sh -f <tarball> -p <package>
-     ./ci/upload-to-lookaside-cache.sh -f <sig-file> -p <package>
+     cp <tarball> /tmp/
+     # Give the user these commands; wait unless they ask you to run them:
+     ./ci/upload-to-lookaside-cache.sh -f /tmp/<tarball> -p <package>
+     ./ci/upload-to-lookaside-cache.sh -f /tmp/<sig-file> -p <package>
      ```
 
    - Add a `forked_from` entry for the package in
@@ -868,16 +885,31 @@ version bump is not appropriate:
    `test/test_govendortools_gomod_patch_sync.py` checks for this
    drift, but treat it as a safety net, not a substitute for doing
    this yourself. After patching, regenerate the vendor tarball with
-   `go-vendor-tools` and upload to lookaside.
+   `go-vendor-tools`, copy it to `/tmp`, and print the lookaside
+   upload command (same as the version-bump path step 7). Do not
+   upload unless the user asks.
 
 4. **Commit, validate, build, push, MR** (same as the
    version-bump path step 9).
 
-#### 3f: No upstream fix yet
+#### 3f: No upstream fix yet -- `cve-next-release`
 
-When no fix exists upstream, add a comment noting the current
-status and leave the ticket in its current state. Create a HUM
-task only if active investigation or a custom patch is planned.
+When no fix exists upstream (or a fix exists but is not yet in a
+release we can consume):
+
+1. Add a comment that Hummingbird is affected and waiting on an
+   upstream fix.
+2. Label the ticket (`rhjira edit` supports label changes):
+
+   ```bash
+   rhjira edit HUM-XXXX --noeditor \
+     --label-add cve-next-release \
+     --label-remove cve-needs-attention
+   ```
+
+3. Leave the ticket In Progress. Do not create a HUM task unless
+   active investigation or a custom patch is planned.
+4. Rename the chat (see Step 1) with `--title-prefix "next-rel"`.
 
 <!-- markdownlint-enable MD029 -->
 
@@ -915,6 +947,7 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
 | Vendored dep fixed | Done-Errata | (not set) |
 | Backport patch applied | Done-Errata | (not set) |
 | Duplicate of versioned ticket | Duplicate | (not set) |
+| Affected, no upstream fix yet | In Progress | (not set; `cve-next-release`) |
 
 ## Important rules
 
@@ -937,12 +970,15 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
    Atlassian MCP or Python subprocess wrappers for routine `/cve`
    ticket work.
 
-6. **Use bounded retries only for transient failures.** Use
-   `rhjira_retry` with short backoff (2s, 4s) and a 3-attempt cap.
-   Do not use unbounded retries or long sleep/poll loops.
+6. **Do not paste a retry helper into the session.** `cve_helper.py`
+   already retries transient Jira/proxy failures. For raw `rhjira`
+   writes, run once with `--noeditor`. On login failure, source
+   `~/.config/rhjira/agent.env` once and retry once. Do not use
+   unbounded retries or long sleep/poll loops.
 
-7. **rhjira edit does NOT support label changes.** Label additions
-   or removals must be done manually in the Jira web UI.
+7. **`rhjira edit` supports label changes.** Use `--label-add` and
+   `--label-remove`. Do not tell the user to use the Jira UI for
+   labels.
 
 8. **Always pass `--noeditor` on Jira writes.** This includes comment,
    transition, and field-update operations.
@@ -961,7 +997,9 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
 
 12. When the user provides the package name and multiple HUM ticket
     keys together (e.g. "let's look at ruby4.0 HUM-2648 HUM-2645"),
-    investigate all tickets for that package as a batch.
+    investigate all **named** tickets for that package as a batch.
+    Same-CVE tickets discovered by find-related stay context until
+    the user confirms them. `only` means named tickets only.
 
 13. **`modification_reason` must identify the CVE**, and only for
     Fedora-imported packages that are (or become) `modified`.
