@@ -2,8 +2,8 @@
 %global featurever 25
 %global interimver 0
 %global updatever 4
-%global patchver 0
-%global buildver 7
+%global patchver 1
+%global buildver 1
 %global portablerelease 1
 %global rpmrelease 1
 
@@ -56,7 +56,7 @@
 
 Name:    %{compatiblename}
 Version: %{newjavaver}.%{buildver}
-Release: %{?eaprefix}%{portablerelease}.%{rpmrelease}%{?extraver}.1%{?dist}
+Release: %{?eaprefix}%{portablerelease}.%{rpmrelease}%{?extraver}%{?dist}
 
 %global fullversion     %{compatiblename}-%{version}-%{release}
 
@@ -95,7 +95,7 @@ License:  Apache-1.1 AND Apache-2.0 AND LicenseRef-Callaway-BSD AND LicenseRef-C
 URL:      http://openjdk.java.net/
 
 # Check if pandoc was available to generate docs (including man pages)
-%if 0%{?rhel} == 8 || 0%{?epel} > 0 || 0%{?fedora} > 0
+%if 0%{?rhel} == 8 || 0%{?epel} > 0 || 0%{?fedora} > 0 || 0%{?eln} > 0
 %global pandoc_available 1
 %else
 %global pandoc_available 0
