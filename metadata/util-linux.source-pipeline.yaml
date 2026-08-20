@@ -1,0 +1,3 @@
+fetch:
+  - type: url
+    url: "https://www.kernel.org/pub/linux/utils/util-linux/v${VERSION_MAJOR}.${VERSION_MINOR}/util-linux-${VERSION}.tar.xz"
