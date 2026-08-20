@@ -102,7 +102,7 @@
 # Comment out go_prerelease and go_patch as needed
 %global go_api 1.26
 #global go_prerelease rc3
-%global go_patch 6
+%global go_patch 7
 
 %global go_version %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease:~%{go_prerelease}}
 %global go_source %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease}
@@ -143,7 +143,7 @@ Provides: bundled(golang(github.com/ianlancetaylor/demangle)) = 0.0.0.2025041719
 Provides: bundled(golang(golang.org/x/arch)) = 0.23.0
 Provides: bundled(golang(golang.org/x/build)) = 0.0.0.20251128064159.b9bfd88b30e8
 Provides: bundled(golang(golang.org/x/crypto)) = 0.46.1.0.20251210140736.7dacc380ba00
-Provides: bundled(golang(golang.org/x/mod)) = 0.30.1.0.20251115032019.269c237cf350
+Provides: bundled(golang(golang.org/x/mod)) = 0.30.1.0.20260813213631.9239cba97fbe
 Provides: bundled(golang(golang.org/x/net)) = 0.47.1.0.20260731170545.cb1d721f7fb3
 Provides: bundled(golang(golang.org/x/sync)) = 0.19.0
 Provides: bundled(golang(golang.org/x/sys)) = 0.39.0

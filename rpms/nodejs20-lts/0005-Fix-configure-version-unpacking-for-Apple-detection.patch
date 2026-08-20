@@ -1,0 +1,34 @@
+From: Avinash Singh <avsingh@redhat.com>
+Subject: [PATCH] build: fix configure.py version unpacking for Apple detection
+
+The try_check_compiler function returns a 5-tuple after the addition of
+is_apple detection, but gcc_version_ge and clang_version_ge were still
+unpacking only 4 values, causing a ValueError on GCC 16+.
+
+---
+ configure.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.py b/configure.py
+index c9bcc98dbab..3e76776fe78 100755
+--- a/configure.py
++++ b/configure.py
+@@ -1326,7 +1326,7 @@ def configure_zos(o):
+
+ def clang_version_ge(version_checked):
+   for compiler in [(CC, 'c'), (CXX, 'c++')]:
+-    _, is_clang, clang_version, _1 = (
++    _, is_clang, clang_version, _1, _2 = (
+       try_check_compiler(compiler[0], compiler[1])
+     )
+     if is_clang and clang_version >= version_checked:
+@@ -1335,7 +1335,7 @@ def clang_version_ge(version_checked):
+
+ def gcc_version_ge(version_checked):
+   for compiler in [(CC, 'c'), (CXX, 'c++')]:
+-    _, is_clang, _1, gcc_version = (
++    _, is_clang, _1, gcc_version, _2 = (
+       try_check_compiler(compiler[0], compiler[1])
+     )
+     if is_clang or gcc_version < version_checked:
+--

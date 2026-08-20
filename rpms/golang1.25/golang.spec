@@ -98,7 +98,7 @@
 # Comment out go_prerelease and go_patch as needed
 %global go_api 1.25
 #global go_prerelease rc2
-%global go_patch 13
+%global go_patch 14
 
 %global go_version %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease:~%{go_prerelease}}
 %global go_source %{go_api}%{?go_patch:.%{go_patch}}%{?go_prerelease}
@@ -143,7 +143,7 @@ Provides: bundled(golang(github.com/ianlancetaylor/demangle)) = 0.0.0.2024091220
 Provides: bundled(golang(golang.org/x/arch)) = 0.18.1.0.20250605182141.b2f4e2807dec
 Provides: bundled(golang(golang.org/x/build)) = 0.0.0.20250606033421.8c8ff6f34a83
 Provides: bundled(golang(golang.org/x/crypto)) = 0.39.0
-Provides: bundled(golang(golang.org/x/mod)) = 0.25.0
+Provides: bundled(golang(golang.org/x/mod)) = 0.25.1.0.20260813213422.9be67dd65223
 Provides: bundled(golang(golang.org/x/net)) = 0.41.1.0.20260708234123.5ef02b8d6d76
 Provides: bundled(golang(golang.org/x/sync)) = 0.15.0
 Provides: bundled(golang(golang.org/x/sys)) = 0.33.1.0.20260225210015.e0c9f78de999
@@ -162,8 +162,16 @@ Patch1:         0001-Modify-go.env.patch
 Patch5:         0005-Skip-TestCrashDumpsAllThreads.patch
 # Related to https://gcc.gnu.org/PR118497
 Patch8:         fix_cgo_panic-with-gcc15-in-368.patch
+# Related to https://github.com/golang/go/issues/74476
+Patch9:         skip_lsan_tests.patch
+
+# Related to the regeneration of `_gen/` in the build phase:
+# git format-patch -1 5d5c7ff1f0 --stdout -- ':!src/cmd/compile/internal/ssa/opGen.go' > fix-s390x-mergelocals.patch
+Patch10:	fix-s390x-mergelocals.patch
+Patch11:	fix-ppc64le-maddld.patch
+
 # TestTerminalSignal hangs in mock (podman --init)
-Patch10:        0010-Skip-TestTerminalSignal.patch
+Patch12:        0010-Skip-TestTerminalSignal.patch
 # Embed CMVP #5247 certified FIPS module by default with host-auto detection.
 # FIPS activates automatically on FIPS-enabled hosts, stays off otherwise.
 # Users can override with GODEBUG=fips140=on or godebug fips140=auto in go.mod.
@@ -335,6 +343,10 @@ export GO_LDFLAGS="-linkmode internal"
 %if !%{cgo_enabled}
 export CGO_ENABLED=0
 %endif
+# Regenerate `_gen/` before building
+pushd cmd/compile/internal/ssa/_gen
+GOROOT=%{goroot} %{goroot}/bin/go run .
+popd
 ./make.bash -v
 popd
 

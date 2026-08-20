@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Pre-existing modification - requires review",
+  "modification_reason": "Pre-existing modification - requires review; Backport CVE-2026-14456",
   "modification_status": "modified",
   "release": "1",
   "sha": "1ca5a5357a764c48972f417bd3f5a142aed43458",

@@ -348,6 +348,8 @@ spec:
           contentType: rpm
         - name: golang1-26-main
           contentType: rpm
+        - name: golang1-27-main
+          contentType: rpm
         - name: golist-main
           contentType: rpm
         - name: google-noto-fonts-main
@@ -1163,9 +1165,9 @@ spec:
     pipelineRef:
       params:
         - name: url
-          value: https://github.com/scoheb/release-service-catalog.git
+          value: https://github.com/konflux-ci/release-service-catalog.git
         - name: revision
-          value: HUM-2609-remove-oversized-task-results
+          value: 76f024becf8ab053f9af16c886e67d68de2d2556
         - name: pathInRepo
           value: "pipelines/managed/push-rpms-to-pulp/push-rpms-to-pulp.yaml"
       resolver: git

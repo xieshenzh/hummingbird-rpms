@@ -111,6 +111,9 @@ dotnet9.0:
 dracut:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+efi-rpm-macros:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 erlang27:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
@@ -160,6 +163,12 @@ glibc:
 
 go-fdo-client:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+golang1.27:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+  build_platforms:
+    - "linux-d160-c8xlarge/amd64"
+    - "linux-d160-c8xlarge/arm64"
 
 gorget:
   # Native Hummingbird package -- no Fedora dist-git history to fall back to.
@@ -214,6 +223,7 @@ java-17-openjdk-portable:
     - "linux-d160-c8xlarge/amd64"
 
 java-21-openjdk-portable:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
   timeout_hours: 8
   build_platforms:
     - "linux-d160-c8xlarge/arm64"
@@ -226,6 +236,7 @@ java-25-openjdk:
     - "linux-d160-c8xlarge/amd64"
 
 java-25-openjdk-portable:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
   timeout_hours: 8
   build_platforms:
     - "linux-d160-c8xlarge/arm64"
@@ -247,6 +258,9 @@ kubernetes1.36:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 libfabric:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+libkcapi:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 libpng:
@@ -289,6 +303,17 @@ nats-server2.14:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 nodejs20:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+nodejs20-lts:
+  private_product: nodejs20
+  lookaside_cache_url: *private_lookaside_cache_url
+  # Needed once redhat/hummingbird/pipelines/rpmbuild-pipeline!28 lands: that
+  # MR makes process-sources's dist-git-client call unconditional (it no
+  # longer special-cases lookaside_cache_url at all), so it needs
+  # forked_from to resolve mock/dist-git-client.ini's [hummingbird] section
+  # -- otherwise it falls back to process-sources's Fedora default and 404s.
+  # Harmless no-op against the currently-deployed pipeline bundle.
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 nodejs22:
@@ -434,6 +459,9 @@ rust-rpm-sequoia:
   forked_from: "https://gitlab.com/redhat/centos-stream/rpms"
 
 scap-security-guide:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+snappy:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 spire1.14:

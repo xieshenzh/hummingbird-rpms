@@ -48,7 +48,7 @@
 Summary: PostgreSQL client programs
 Name: %{majorname}%{majorversion}
 Version: %{majorversion}.11
-Release: 0.1%{?dist}
+Release: 1%{?dist}
 
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
@@ -60,7 +60,7 @@ Url: http://www.postgresql.org/
 # that this be kept up with the latest minor release of the previous series;
 # but update when bugs affecting pg_dump output are fixed.
 %global prevmajorversion 16
-%global prevversion %{prevmajorversion}.14
+%global prevversion %{prevmajorversion}.15
 %global prev_prefix %{_libdir}/pgsql/postgresql-%{prevmajorversion}
 %global precise_version %{?epoch:%epoch:}%version-%release
 
@@ -1344,6 +1344,10 @@ make -C postgresql-setup-%{setup_version} check
 
 
 %changelog
+* Thu Aug 13 2026 Packit <hello@packit.dev> - 17.11-1
+- Update to version 17.11
+- Resolves: rhbz#2515355
+
 * Thu May 14 2026 Packit <hello@packit.dev> - 17.10-1
 - Update to version 17.10
 - Resolves: rhbz#2477453

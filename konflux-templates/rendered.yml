@@ -5416,6 +5416,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- golang1.27 ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: golang1-27-main
+spec:
+  application: rpms-main
+  componentName: golang1-27-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/golang1-27-main
+  source:
+    git:
+      context: rpms/golang1.27
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: golang1-27-main
+  name: golang1-27-main
+spec:
+  image:
+    name: hummingbird-tenant/golang1-27-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- golist ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1
@@ -12334,6 +12373,45 @@ metadata:
 spec:
   image:
     name: hummingbird-tenant/nodejs20-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
+# --- nodejs20-lts ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: nodejs20-lts-main
+spec:
+  application: private-nodejs20-rpms-main
+  componentName: nodejs20-lts-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/nodejs20-lts-main
+  source:
+    git:
+      context: rpms/nodejs20-lts
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: private-nodejs20-rpms-main
+    appstudio.redhat.com/component: nodejs20-lts-main
+  name: nodejs20-lts-main
+spec:
+  image:
+    name: hummingbird-tenant/nodejs20-lts-main
     visibility: public
   notifications:
   - config:

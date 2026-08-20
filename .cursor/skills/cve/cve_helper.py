@@ -35,8 +35,7 @@ MR_URL_RE = re.compile(
 )
 BOT_USER = "project_73447720_bot_6f7c574289c710ebc9ab9ee76059d959"
 PULP_SBOM_BASE = (
-    "https://packages.redhat.com/api/pulp-content/public-hummingbird/"
-    "metadata/sboms"
+    "https://packages.redhat.com/api/pulp-content/public-hummingbird/metadata/sboms"
 )
 GITLAB_RPMS_REPO = "redhat/hummingbird/rpms"
 TRANSIENT_RHJIRA_RE = re.compile(
@@ -79,9 +78,41 @@ TICKET_DETAIL = {
     "link_error": "  Link: {ticket} ERROR {error}",
     "component": "  Upstream component: {0}",
     "vendored": "  Vendored deps: yes (go-vendor-tools)",
+    "local_nvr": "  Local: {0}",
+    "cve_in_spec": "  CVE ref in spec/patches: {0}",
+    "analysis_component": "  Component: {0}",
 }
 
 ### Dataclasses ###
+
+
+@dataclass
+class BotMrEntry:
+    iid: str
+    title: str
+    state: str
+    web_url: str = ""
+
+
+@dataclass
+class SbomHit:
+    term: str
+    path: str
+    name: str = ""
+    version: str = ""
+    purl: str = ""
+    scope: str = ""
+    component_type: str = ""
+    snippet: str = ""
+
+
+@dataclass
+class SpecDepHit:
+    kind: str
+    line_no: int
+    text: str
+    bundled_name: str = ""
+    bundled_version: str = ""
 
 
 @dataclass
@@ -153,6 +184,10 @@ def repo_root() -> Path:
     return Path(__file__).resolve().parent.parent.parent.parent
 
 
+def _pkg_dir(package: str) -> Path:
+    return repo_root() / "rpms" / package
+
+
 def run_command(
     args: list[str],
     *,
@@ -194,8 +229,7 @@ def run_rhjira(
 
 
 def uses_vendored_deps(package: str) -> bool:
-    go_vendor_path = repo_root() / "rpms" / package / "go-vendor-tools.toml"
-    return go_vendor_path.exists()
+    return (_pkg_dir(package) / "go-vendor-tools.toml").exists()
 
 
 def normalize_hum_key(value: str) -> str:
@@ -220,7 +254,7 @@ def _json_str(data: dict[str, Any], *path: str, default: str = "") -> str:
         current = current.get(key)
         if current is None:
             return default
-    return str(current) if current is not None else default
+    return str(current)
 
 
 def find_related_tickets(initial_cve_ids: list[str]) -> list[str]:
@@ -229,9 +263,7 @@ def find_related_tickets(initial_cve_ids: list[str]) -> list[str]:
 
     or_clauses = " OR ".join(f'text ~ "{c}"' for c in initial_cve_ids)
     jql = f'project = HUM AND status not in (Closed, "CLOSED (invalid)", Done, Resolved, "Won\'t Fix") AND ({or_clauses})'
-    result = run_rhjira(
-        ["list", jql, "--fields", "key", "--rawoutput", "--noheader"]
-    )
+    result = run_rhjira(["list", jql, "--fields", "key", "--rawoutput", "--noheader"])
     if result.returncode != 0:
         print(
             f"Warning: Failed to search for related tickets: {result.stderr}",
@@ -565,6 +597,17 @@ def print_ticket(report: TicketReport) -> None:
         print(TICKET_DETAIL["component"].format(report.upstream_component))
     if report.package_guess and uses_vendored_deps(report.package_guess):
         print(TICKET_DETAIL["vendored"])
+    if report.package_guess:
+        nvr = read_local_spec_nvr(report.package_guess)
+        if nvr:
+            print(TICKET_DETAIL["local_nvr"].format(nvr))
+        if report.cve_ids:
+            found = search_cve_in_spec_and_patches(report.package_guess, report.cve_ids)
+            print(TICKET_DETAIL["cve_in_spec"].format("yes" if found else "no"))
+    if report.cve_analysis_block:
+        comp = extract_vendor_field(report.cve_analysis_block, "Component")
+        if comp:
+            print(TICKET_DETAIL["analysis_component"].format(comp))
     if report.description:
         if flaw := _extract_flaw_summary(report.description):
             print()
@@ -590,36 +633,7 @@ def apply_title_prefix(title: str, prefix: str) -> str:
     return " ".join(filter(None, [prefix.strip(), title.strip()]))
 
 
-### Probe helpers (bot-mrs / sbom / spec-deps / worktree) ###
-
-
-@dataclass
-class BotMrEntry:
-    iid: str
-    title: str
-    state: str
-    web_url: str = ""
-
-
-@dataclass
-class SbomHit:
-    term: str
-    path: str
-    name: str = ""
-    version: str = ""
-    purl: str = ""
-    scope: str = ""
-    component_type: str = ""
-    snippet: str = ""
-
-
-@dataclass
-class SpecDepHit:
-    kind: str
-    line_no: int
-    text: str
-    bundled_name: str = ""
-    bundled_version: str = ""
+### Probes ###
 
 
 def _parse_glab_mr_list(output: str, state: str) -> list[BotMrEntry]:
@@ -689,26 +703,23 @@ def print_bot_mrs(package: str, mrs: dict[str, list[BotMrEntry]]) -> None:
             print(f"  {entry.web_url}")
 
 
-def http_get_text(url: str, timeout: float = 60.0) -> str:
+def _http_read(url: str, timeout: float) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": "hummingbird-cve-helper"})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.read().decode("utf-8", errors="replace")
+            return resp.read()
     except urllib.error.HTTPError as err:
         raise RuntimeError(f"HTTP {err.code} fetching {url}") from err
     except urllib.error.URLError as err:
         raise RuntimeError(f"Failed fetching {url}: {err}") from err
 
 
+def http_get_text(url: str, timeout: float = 60.0) -> str:
+    return _http_read(url, timeout).decode("utf-8", errors="replace")
+
+
 def http_download(url: str, dest: Path, timeout: float = 120.0) -> None:
-    req = urllib.request.Request(url, headers={"User-Agent": "hummingbird-cve-helper"})
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            dest.write_bytes(resp.read())
-    except urllib.error.HTTPError as err:
-        raise RuntimeError(f"HTTP {err.code} downloading {url}") from err
-    except urllib.error.URLError as err:
-        raise RuntimeError(f"Failed downloading {url}: {err}") from err
+    dest.write_bytes(_http_read(url, timeout))
 
 
 def latest_pulp_sbom_filename(package: str) -> tuple[str, str]:
@@ -822,8 +833,9 @@ def search_sbom_file(path: Path, terms: list[str]) -> list[SbomHit]:
 
     def consider(term: str, node: dict[str, Any], json_path: str) -> None:
         fields = _component_fields(node)
+        term_lower = term.lower()
         blob = " ".join(fields.values()).lower()
-        if term.lower() not in blob and term.lower() not in json.dumps(node).lower():
+        if term_lower not in blob and term_lower not in json.dumps(node).lower():
             return
         key = (term, fields["name"], fields["version"], fields["purl"])
         if key in seen:
@@ -863,18 +875,14 @@ def search_sbom_file(path: Path, terms: list[str]) -> list[SbomHit]:
     # Text fallback (non-JSON or no structured component matches)
     for term in terms:
         pattern = re.compile(re.escape(term), re.IGNORECASE)
+        count = 0
         for match in pattern.finditer(text):
             start = max(0, match.start() - 80)
             end = min(len(text), match.end() + 80)
             snippet = text[start:end].replace("\n", " ")
-            hits.append(
-                SbomHit(
-                    term=term,
-                    path="text",
-                    snippet=snippet,
-                )
-            )
-            if sum(1 for h in hits if h.term == term) >= 10:
+            hits.append(SbomHit(term=term, path="text", snippet=snippet))
+            count += 1
+            if count >= 10:
                 break
     return hits
 
@@ -913,18 +921,98 @@ def print_sbom_result(
             print(f"  snippet: {hit.snippet}")
 
 
+_MACRO_BODY = r"([^{}]*(?:\{[^{}]*\}[^{}]*)*)"  # body allowing one level of nested {}
+
+
+def _expand_macros(value: str, macros: dict[str, str]) -> str:
+    for _ in range(10):
+        prev = value
+        # %{!?name:body} — body if name NOT defined
+        value = re.sub(
+            r"%\{!\?(\w+):" + _MACRO_BODY + r"\}",
+            lambda m: "" if m.group(1) in macros else m.group(2),
+            value,
+        )
+        # %{?name:body} — body if name IS defined
+        value = re.sub(
+            r"%\{\?(\w+):" + _MACRO_BODY + r"\}",
+            lambda m: m.group(2) if m.group(1) in macros else "",
+            value,
+        )
+        # %{?name} — value if defined, else empty
+        value = re.sub(r"%\{\?(\w+)\}", lambda m: macros.get(m.group(1), ""), value)
+        # %{name} — simple expansion if defined, else leave literal
+        value = re.sub(
+            r"%\{(\w+)\}", lambda m: macros.get(m.group(1), m.group(0)), value
+        )
+        if value == prev:
+            break
+    return value
+
+
+def read_local_spec_nvr(package: str) -> str:
+    spec_path = _pkg_dir(package) / f"{package}.spec"
+    if not spec_path.is_file():
+        return ""
+    text = spec_path.read_text(encoding="utf-8", errors="replace")
+    # Only read the preamble — stop at the first section header
+    preamble = re.split(
+        r"^%(?:description|package|prep|build|install|files|changelog)\b",
+        text,
+        maxsplit=1,
+        flags=re.MULTILINE,
+    )[0]
+    macros: dict[str, str] = {}
+    for m in re.finditer(
+        r"^%(?:global|define)\s+(\w+)\s+(.+)$", preamble, re.MULTILINE
+    ):
+        macros[m.group(1)] = m.group(2).strip()
+
+    def get_field(field: str) -> str:
+        m = re.search(rf"^{field}:\s*(.+)$", preamble, re.MULTILINE | re.IGNORECASE)
+        return m.group(1).strip() if m else ""
+
+    name = _expand_macros(get_field("Name"), macros)
+    version = _expand_macros(get_field("Version"), macros)
+    if not name or not version:
+        return ""
+    macros["version"] = version
+    release = _expand_macros(get_field("Release"), macros)
+    return f"{name}-{version}-{release}" if release else f"{name}-{version}"
+
+
+def search_cve_in_spec_and_patches(package: str, cve_ids: list[str]) -> bool:
+    pkg_dir = _pkg_dir(package)
+    if not pkg_dir.is_dir() or not cve_ids:
+        return False
+    pattern = re.compile("|".join(re.escape(c) for c in cve_ids), re.IGNORECASE)
+    files = [pkg_dir / f"{package}.spec"] + sorted(pkg_dir.glob("*.patch"))
+    for path in files:
+        if path.is_file() and pattern.search(
+            path.read_text(encoding="utf-8", errors="replace")
+        ):
+            return True
+    return False
+
+
 def probe_spec_deps(package: str, component: str = "") -> list[SpecDepHit]:
-    spec_path = repo_root() / "rpms" / package / f"{package}.spec"
+    spec_path = _pkg_dir(package) / f"{package}.spec"
     if not spec_path.is_file():
         raise RuntimeError(f"Spec not found: {spec_path}")
     hits: list[SpecDepHit] = []
     lines = spec_path.read_text(encoding="utf-8", errors="replace").splitlines()
-    component_re = re.compile(re.escape(component), re.IGNORECASE) if component else None
+    component_re = (
+        re.compile(re.escape(component), re.IGNORECASE) if component else None
+    )
     for idx, line in enumerate(lines, start=1):
         bundled = BUNDLED_PROVIDES_RE.search(line)
         if bundled:
             name, version = bundled.group(1), bundled.group(2) or ""
-            if component_re is None or component_re.search(name) or component_re.search(line):
+            if (
+                component_re is None
+                or component_re.search(name)
+                or component_re.search(line)
+            ):
                 hits.append(
                     SpecDepHit(
                         kind="bundled_provides",
@@ -947,7 +1035,7 @@ def probe_spec_deps(package: str, component: str = "") -> list[SpecDepHit]:
 
 
 def print_spec_deps(package: str, component: str, hits: list[SpecDepHit]) -> None:
-    spec_path = repo_root() / "rpms" / package / f"{package}.spec"
+    spec_path = _pkg_dir(package) / f"{package}.spec"
     print(f"Spec: {spec_path}")
     if component:
         print(f"Component: {component}")
@@ -974,7 +1062,9 @@ def create_task_worktree(ticket: str, *, base: str = "main") -> Path:
         raise RuntimeError(f"Worktree path already exists: {dest}")
     # Prefer origin/<base> when available
     ref = base
-    remote_check = run_command(["git", "rev-parse", "--verify", f"origin/{base}"], cwd=root)
+    remote_check = run_command(
+        ["git", "rev-parse", "--verify", f"origin/{base}"], cwd=root
+    )
     if remote_check.returncode == 0:
         ref = f"origin/{base}"
     proc = run_command(
@@ -1051,7 +1141,9 @@ def build_parser() -> argparse.ArgumentParser:
         "bot-mrs",
         help="List open and merged automation bot MRs for a package.",
     )
-    bot.add_argument("package", help="Package name to search in bot MR titles/branches.")
+    bot.add_argument(
+        "package", help="Package name to search in bot MR titles/branches."
+    )
     bot.add_argument(
         "--per-page",
         type=int,
@@ -1287,7 +1379,7 @@ def cmd_spec_deps(args: argparse.Namespace) -> int:
                 {
                     "package": args.package,
                     "component": args.component,
-                    "spec": str(repo_root() / "rpms" / args.package / f"{args.package}.spec"),
+                    "spec": str(_pkg_dir(args.package) / f"{args.package}.spec"),
                     "hits": [asdict(h) for h in hits],
                 },
                 indent=2,
@@ -1301,10 +1393,11 @@ def cmd_spec_deps(args: argparse.Namespace) -> int:
 
 def cmd_worktree(args: argparse.Namespace) -> int:
     dest = create_task_worktree(args.ticket, base=args.base)
+    ticket_key = normalize_hum_key(args.ticket)
     payload = {
-        "ticket": normalize_hum_key(args.ticket),
+        "ticket": ticket_key,
         "path": str(dest),
-        "branch": normalize_hum_key(args.ticket),
+        "branch": ticket_key,
     }
     if args.json:
         print(json.dumps(payload, indent=2, sort_keys=True))

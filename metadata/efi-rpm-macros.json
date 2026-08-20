@@ -1,7 +1,8 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
-  "release": "9",
+  "modification_reason": "Added gorget source-pipeline.yaml (HUM-6095 audit finding): the release-6 GitHub release asset was deleted upstream after Fedora fetched it -- repointed at a git fetch of the same tag, content verified equivalent by cross-checking against release 5's still-surviving asset (identical file list vs. a plain git checkout, aside from a self-referential spec-file copy this build doesn't use).",
+  "modification_status": "modified",
+  "release": "9.1",
   "sha": "529203ca5a2cdf43227171ed34f8ce6b949deb90",
   "source": "https://src.fedoraproject.org/rpms/efi-rpm-macros.git",
   "upstream_repo": "https://github.com/rhboot/efi-rpm-macros",
