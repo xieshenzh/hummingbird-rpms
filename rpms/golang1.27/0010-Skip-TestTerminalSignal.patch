@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valentin Rothberg <vrothberg@redhat.com>
+Date: Thu, 9 Jan 2026 12:00:00 +0100
+Subject: [PATCH] Skip TestTerminalSignal in podman containers
+
+The test hangs in the podman container used by mock. Let the RPM build
+set an environment variable to skip the test in that environment.
+---
+ src/os/signal/signal_cgo_test.go | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/os/signal/signal_cgo_test.go b/src/os/signal/signal_cgo_test.go
+index cfc6f3d..a9a03a1 100644
+--- a/src/os/signal/signal_cgo_test.go
++++ b/src/os/signal/signal_cgo_test.go
+@@ -76,6 +76,10 @@ func TestTerminalSignal(t *testing.T) {
+ 	if runtime.GOOS == "dragonfly" {
+ 		t.Skip("skipping: wait hangs on dragonfly; see https://go.dev/issue/56132")
+ 	}
++	if os.Getenv("GOLANG_SKIP_TERMINAL_SIGNAL_TEST") == "1" {
++		t.Skip("skipping: terminal signal test hangs in podman containers")
++	}
++
+ 
+ 	scale := 1
+ 	if s := os.Getenv("GO_TEST_TIMEOUT_SCALE"); s != "" {
+-- 
+2.50.1

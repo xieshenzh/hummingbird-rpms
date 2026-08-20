@@ -9780,7 +9780,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/golang1.27/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/golang1.27/***, test/rpms/golang1.27.yml]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
@@ -9801,7 +9801,7 @@ spec:
     - name: ociStorage
       value: quay.io/redhat-user-workloads/hummingbird-tenant/golang1-27-main:on-mr-{{pull_request_number}}-{{revision}}
     - name: package-name
-      value: golang
+      value: golang1.27
     - name: target-branch
       value: '{{target_branch}}'
     - name: build-architectures
@@ -9810,14 +9810,18 @@ spec:
         - x86_64
     - name: build-platforms
       value:
-        - "linux/x86_64"
-        - "linux/arm64"
+        - "linux-d160-c8xlarge/amd64"
+        - "linux-d160-c8xlarge/arm64"
     - name: specfile
       value: "golang.spec"
     - name: monorepo-subdir
       value: "rpms/golang1.27"
     - name: mock-config-template-filename-in-sources
       value: "mock/mock.cfg"
+    - name: dist-git-client-configdir
+      value: "mock/"
+    - name: forked-from
+      value: "https://gitlab.com/redhat/hummingbird/rpms"
   pipelineRef:
     resolver: bundles
     params:

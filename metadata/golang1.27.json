@@ -1,13 +1,14 @@
 {
   "branch": "rawhide",
   "cve_product": "Go ",
-  "modification_status": "clean",
-  "release": "2",
+  "modification_reason": "Update to upstream version 1.27.0",
+  "modification_status": "modified",
+  "release": "0.1",
   "release_monitoring_project_id": 1227,
   "sha": "2ba0092327f971a0d8f5706d8e9a1d194d85d00a",
   "source": "https://src.fedoraproject.org/rpms/golang.git",
   "track_upstream": "1.27",
   "upstream_branch": "release-branch.go1.27",
   "upstream_repo": "https://github.com/golang/go",
-  "version": "1.27~rc2"
+  "version": "1.27.0"
 }
