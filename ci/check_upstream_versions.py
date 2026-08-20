@@ -372,7 +372,9 @@ def _check_source_exists(url: str) -> bool:
     req = urllib.request.Request(
         url,
         method="HEAD",
-        headers={"User-Agent": "hummingbird-rpms-version-checker/1.0"},
+        headers={
+            "User-Agent": "Mozilla/5.0 (compatible; hummingbird-rpms-version-checker/1.0)"
+        },
     )
     try:
         with urllib.request.urlopen(req, timeout=10):
@@ -385,8 +387,16 @@ def _check_source_exists(url: str) -> bool:
 
 def _download_file(url: str, dest: Path) -> None:
     """Download a file from a URL to a local path."""
+    # SourceForge (and likely other hosts with simplistic bot-detection) 403s
+    # any User-Agent that doesn't start with "Mozilla/5.0" -- confirmed
+    # against sourceforge.net directly. Keep the identifying token (same
+    # convention as e.g. Googlebot's UA) so the request is still
+    # self-identifying, just not blocked.
     req = urllib.request.Request(
-        url, headers={"User-Agent": "hummingbird-rpms-version-checker/1.0"}
+        url,
+        headers={
+            "User-Agent": "Mozilla/5.0 (compatible; hummingbird-rpms-version-checker/1.0)"
+        },
     )
     with urllib.request.urlopen(req, timeout=120) as response:
         with open(dest, "wb") as f:
