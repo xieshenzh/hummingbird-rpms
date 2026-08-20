@@ -416,13 +416,12 @@ Patch474: 00474-cve-2025-15366.patch
 # (cherry-picked from commit b234a2b67539f787e191d2ef19a7cbdce32874e7)
 Patch475: 00475-cve-2025-15367.patch
 
-<<<<<<< HEAD
 # 00494 # 430aab133397ed44cc9ee621fd311e02fee317b5
 # Increase the timeout of test_large_content_length_truncated
 #
 # It has started to fail randomly when run on s390x architecture.
 Patch494: 00494-increase-the-timeout-of-test_large_content_length_truncated.patch
-=======
+
 # 00329 #
 # Support OpenSSL FIPS mode
 # - In FIPS mode, OpenSSL wrappers are always used in hashlib
@@ -438,59 +437,11 @@ Patch494: 00494-increase-the-timeout-of-test_large_content_length_truncated.patc
 #   The argument must be specified (instead of defaulting to 'md5').
 Patch329: 00329-fips.patch
 
-# 00478 # eb93352dc8e31f4d52546b84daad875e6ff7f29e
-# CVE-2026-4519
-#
-# Reject leading dashes in webbrowser URLs (GH-146360)
-Patch478: 00478-cve-2026-4519.patch
-
-# 00479 # 97404b2cf62e545c2d41be7ccfed4e74da9ee665
-# CVE-2026-1502
-#
-# Reject CR/LF in HTTP tunnel request headers
-Patch479: 00479-cve-2026-1502.patch
-
-# 00480 # 6f4eef3ba4d9818a53698e994550ee8db17a1e2e
-# CVE-2026-4786
-#
-# Fix webbrowser `%%action` substitution bypass of dash-prefix check
-Patch480: 00480-cve-2026-4786.patch
-
-# 00482 # 69f14bc306fc62400d45565faa980b77858b9151
-# CVE-2026-6100
-#
-# Fix a possible UAF in {LZMA,BZ2,_Zlib}Decompressor
-Patch482: 00482-cve-2026-6100.patch
-
-# 00483 # 577c595137ce6ff92158ddaf2d7b7ea86437825d
-# CVE-2026-2297
-#
-# Logging Bypass in Legacy .pyc File Handling
-Patch483: 00483-cve-2026-2297.patch
-
-# 00484 # 8b5133c1ab17a060cd134bea2a4b6e1831c47fed
-# CVE-2026-3644
-#
-# Incomplete control character validation in http.cookies
-Patch484: 00484-cve-2026-3644.patch
-
-# 00485 # 12a5b206676927bcee131ab4f2bd6783d2f5914a
-# CVE-2026-4224
-#
-# Stack overflow parsing XML with deeply nested DTD content models
-Patch485: 00485-cve-2026-4224.patch
-
 # 00486 # 1f9958f909c1b41a4ffc0b613ef8ec8fa5e7c474
 # CVE-2026-3446
 #
 # gh-145264: Do not ignore excess Base64 data after the first padded quad
 Patch486: 00486-cve-2026-3446.patch
-
-# 00487 # ae99fe3a33b43e303a05f012815cef60b611a9c7
-# CVE-2025-13462
-#
-# gh-141707: Skip TarInfo DIRTYPE normalization during GNU long name handling
-Patch487: 00487-cve-2025-13462.patch
 
 # 00488 # d786d59a8f7196bb630100a869f28ad13436b59c
 # CVE-2026-3479
@@ -503,48 +454,6 @@ Patch488: 00488-cve-2026-3479.patch
 #
 # gh-90309: Base64-encode cookie values embedded in JS
 Patch489: 00489-cve-2026-6019.patch
-
-# 00490 # 3e8c5ad70d6a515107352d8779269240a0553f54
-# gh-153030: Fix quadratic complexity in incremental parsing in HTMLParser
-#
-# When an unterminated construct (e.g. a tag or comment) spanned many
-# feed() calls, rescanning the growing buffer and concatenating new data
-# onto it were both quadratic.  New data is now accumulated in a list and
-# only joined and parsed once enough has piled up.
-Patch490: 00490-cve-2026-15308.patch
-
-# 00491 # 1ad95144c42a6933283352245c5df5a4c142e75f
-# gh-149776: Skip UDP Lite tests if it's not supported
-#
-# Fix test_socket on Linux kernel 7.1 and newer: skip UDP Lite tests if
-# it's not supported.
-Patch491: 00491-gh-149776-skip-udp-lite-tests-if-it-s-not-supported.patch
->>>>>>> hummingbird-local
-
-# 00492 # c250d10145d6ca61bf104c3475ccab78be5585bd
-# CVE-2026-11972
-#
-# gh-151981: Make tarfile._Stream.seek break at EOF
-Patch492: 00492-cve-2026-11972.patch
-
-# 00493 # d0ba16dce6df2f68e8968699d5c247eddeef9960
-# CVE-2026-11940
-#
-# gh-151558: Fix symlink escape via tarfile hardlink-extraction fallback
-Patch493: 00493-cve-2026-11940.patch
-
-# 00494 # 61d17f4516bc3284b59c6ec01ee2e81da619f4ff
-# CVE-2026-4360
-#
-# gh-151987: Pass filter_function to TarFile._extract_one() during .extract()
-# (from open upstream PR #152611 until it merges)
-Patch494: 00494-cve-2026-4360.patch
-
-# 00495 # 165b26307b609608753fcd622ccecbfb921667cc
-# CVE-2026-6879
-#
-# gh-152674: Avoid quadratic behavior in xml.etree.ElementPath index predicates
-Patch495: 00495-cve-2026-6879.patch
 
 # (New patches go here ^^^)
 #
