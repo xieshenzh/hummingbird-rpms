@@ -611,12 +611,16 @@ contains the fix:
    Fedora):** When Fedora has not yet released this version,
    the tarball must be served from the Hummingbird lookaside
    cache instead of Fedora's. Three things are required:
-   - Upload the tarball (and signature if listed in `sources`)
-     to the Hummingbird lookaside:
+   - Copy the tarball (and signature if listed in `sources`) to
+     `/tmp` and print the upload commands using the **RPM package
+     name** (e.g. `grafana13.1`, not `grafana13`). Do **not** run
+     the upload unless the user asks:
 
      ```bash
-     ./ci/upload-to-lookaside-cache.sh -f <tarball> -p <package>
-     ./ci/upload-to-lookaside-cache.sh -f <sig-file> -p <package>
+     cp <tarball> /tmp/
+     # Give the user these commands; wait unless they ask you to run them:
+     ./ci/upload-to-lookaside-cache.sh -f /tmp/<tarball> -p <package>
+     ./ci/upload-to-lookaside-cache.sh -f /tmp/<sig-file> -p <package>
      ```
 
    - Add a `forked_from` entry for the package in
@@ -881,7 +885,9 @@ version bump is not appropriate:
    `test/test_govendortools_gomod_patch_sync.py` checks for this
    drift, but treat it as a safety net, not a substitute for doing
    this yourself. After patching, regenerate the vendor tarball with
-   `go-vendor-tools` and upload to lookaside.
+   `go-vendor-tools`, copy it to `/tmp`, and print the lookaside
+   upload command (same as the version-bump path step 7). Do not
+   upload unless the user asks.
 
 4. **Commit, validate, build, push, MR** (same as the
    version-bump path step 9).
