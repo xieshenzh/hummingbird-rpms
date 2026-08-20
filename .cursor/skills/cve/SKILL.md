@@ -441,13 +441,28 @@ date and hash against the fix, not the version number.
 #### 2h: Resolution Summary
 
 After completing your Step 2 investigation, **state your recommended
-resolution to the user**:
+resolution to the user**. Lead the recap with:
 
+- Assignee (the user vs the Jira bot)
+- Labels
+- Fixed in Build (set or unset)
 - Which resolution path applies (e.g., "3a: Already fixed — set FIB",
-  "3b: Not affected — close as NAB", "3d: Needs version bump")
+  "3b: Not affected — close as NAB", "3d: Needs version bump",
+  "3f: Affected, no upstream fix — cve-next-release")
 - Why (brief justification based on your investigation)
 - What evidence supports it (version comparison, SBOM findings, code
   inspection results, upstream fix verification)
+
+If FIB is already set and a task/MR already exists, recommend leaving
+the ticket for advisory automation. Do not re-investigate from scratch
+or set FIB again unless the user asks.
+
+If FIB is set but no task/MR exists yet, flag this to the user and ask
+whether to create the task before proceeding.
+
+If related tickets were discovered (and the user did not say `only`),
+list them and ask whether to apply the same resolution to all or only
+the named tickets.
 
 Then wait for the user's direction before proceeding with Step 3 actions.
 
