@@ -24,7 +24,7 @@
 
 Name: ucx
 Version: 1.22.0
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 Summary: UCX is a communication library implementing high-performance messaging
 
 License: BSD-3-Clause AND MIT AND CC-PDDC AND (BSD-3-Clause OR Apache-2.0)
@@ -117,7 +117,6 @@ Provides header files and examples for developing with UCX.
 
 %prep
 %setup -q
-%patch -P0 -p1
 # https://github.com/openucx/ucx/issues/10542
 # With ROCm 6.3+ libhsakmt is bundled with libhsa-runtime64
 # Remove this nonexistent library
