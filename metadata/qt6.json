@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "cdd0ecb98ee5bb54819a8708f023b4a1a8c4874e",
+  "release": "1",
+  "sha": "9db3592ebcf4c0e3e0ac6b3ec56191b493493826",
   "source": "https://src.fedoraproject.org/rpms/qt6.git",
   "upstream_repo": "https://code.qt.io/qt/qtbase.git",
-  "version": "6.11.1"
+  "version": "6.11.2"
 }
