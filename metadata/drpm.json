@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Added gorget source-pipeline.yaml (HUM-6094 audit finding): the 0.5.3 GitHub release asset was deleted upstream after Fedora fetched it -- repointed at a git fetch of the same tag, content verified equivalent by cross-checking against 0.5.2's still-surviving asset (identical file list vs. a plain git checkout).",
+  "modification_status": "modified",
   "release": "4",
   "sha": "54241367c7c8115dc6f1a12b79b955cabe209fa3",
   "source": "https://src.fedoraproject.org/rpms/drpm.git",
