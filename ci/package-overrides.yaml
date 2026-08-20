@@ -248,6 +248,9 @@ k6v1:
 k6v2:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+kbd:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 kube-state-metrics:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 

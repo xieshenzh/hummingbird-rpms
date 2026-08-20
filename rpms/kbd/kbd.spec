@@ -5,12 +5,14 @@
 
 Name:           kbd
 Version:        2.10.0
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        Tools for configuring the console (keyboard, virtual terminals, etc.)
 License:        GPL-2.0-or-later
 URL:            http://www.kbd-project.org/
 
-Source0:        ftp://ftp.altlinux.org/pub/people/legion/kbd/kbd-%{version}.tar.xz
+# Fetched via git (ftp.altlinux.org is dead) by
+# metadata/kbd.source-pipeline.yaml.
+Source0:        kbd-%{version}.tar.xz
 Source1:        kbd-latsun-fonts.tar.bz2
 Source2:        kbd-latarcyrheb-32.tar.bz2
 Source3:        xml2lst.pl
