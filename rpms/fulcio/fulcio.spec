@@ -43,7 +43,11 @@ install -Dp -m 0755 ./fulcio-server %{buildroot}%{_bindir}/fulcio-server
 %go_vendor_license_check -c %{S:2}
 [[ "$(./fulcio-server version 2>&1)" == *"v%{version}"* ]] || exit 1
 %if %{with check}
-%gocheck2
+# hack/tools/go.mod is a Go 1.24+ "tool" directive module pinning
+# codegen tool versions (protoc-gen-*, api-linter) for developers. It has
+# no .go sources and isn't vendored, so following it makes gocheck2 try
+# to fetch its dependencies over the network in the hermetic build.
+%gocheck2 -F
 %endif
 
 %files -f %{go_vendor_license_filelist}
