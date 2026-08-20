@@ -3,7 +3,7 @@
 
 Name:           libxml2
 Version:        2.15.3
-Release:        0.1.2%{?dist}
+Release:        0.1.3%{?dist}
 Summary:        Library providing XML and HTML support
 
 # list.c, dict.c and few others use ISC-Veillard
@@ -18,6 +18,7 @@ Patch0:         libxml2-multilib.patch
 # See:  https://bugzilla.gnome.org/show_bug.cgi?id=789714
 Patch1:         libxml2-python3-unicode-errors.patch
 Patch2:         CVE-2026-11979.patch
+Patch3:         CVE-2026-76781.patch
 
 BuildRequires:  cmake-rpm-macros
 BuildRequires:  gcc
