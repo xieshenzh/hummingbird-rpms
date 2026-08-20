@@ -38,58 +38,32 @@ sandboxed/no-network context can produce false failures
 Use an internet-enabled execution context for these tool calls.
 
 For **direct** `rhjira` writes still done in the shell (comment, edit,
-status), use this bounded retry helper:
-
-```bash
-rhjira_retry() {
-  local max_attempts=3
-  local backoff=2
-  local attempt=1 output rc
-
-  while [ "$attempt" -le "$max_attempts" ]; do
-    output="$(rhjira "$@" 2>&1)"
-    rc=$?
-    if [ "$rc" -eq 0 ]; then
-      printf '%s\n' "$output"
-      return 0
-    fi
-
-    if ! printf '%s\n' "$output" | grep -qiE \
-      "proxy|tunnel|timed out|timeout|temporar|502|503|504|connection reset|eof"; then
-      printf '%s\n' "$output" >&2
-      return "$rc"
-    fi
-
-    if [ "$attempt" -eq "$max_attempts" ]; then
-      printf 'ERROR: rhjira failed after %s attempts: rhjira %s\n' "$max_attempts" "$*" >&2
-      printf '%s\n' "$output" >&2
-      return "$rc"
-    fi
-
-    printf 'WARN: transient Jira/proxy error (attempt %s/%s); retrying in %ss\n' \
-      "$attempt" "$max_attempts" "$backoff" >&2
-    sleep "$backoff"
-    backoff=$((backoff + 2))
-    attempt=$((attempt + 1))
-  done
-}
-```
-
-Rules for using the helper:
+status):
 
 1. Prefer `python .cursor/skills/cve/cve_helper.py …` for ticket show,
    bot-MR, SBOM, and spec probes.
-2. Use `rhjira_retry` for direct Jira write calls in the shell.
-3. For write operations (comment, status/resolution changes, field
-   updates), always pass `--noeditor`.
-4. Avoid long polling loops (`while ... sleep 30`). After a write,
-   do at most one verify read through `rhjira_retry`; if Jira is
-   still unavailable, fail fast.
+2. Always pass `--noeditor` on writes.
+3. Do not paste a retry function into the session. `cve_helper.py`
+   already retries transient Jira/proxy failures for reads (ticket show,
+   bot-MR, SBOM, spec probes). For raw `rhjira` writes, run once with
+   `--noeditor`; if it fails for a non-auth reason, report it and stop.
+   No polling loops (`while ... sleep 30`).
+4. On `login failure` / invalid token, source credentials once and
+   retry a single time:
+
+   ```bash
+   set -a
+   source ~/.config/rhjira/agent.env
+   set +a
+   ```
+
+   If it still fails, stop and tell the user. Do not debug rhjira
+   further in the session.
 5. Report per-ticket Jira status clearly before stopping, for
    example:
 
    ```text
-   HUM-1234: jira_unavailable (proxy tunnel 403 after 3 attempts; no changes applied)
+   HUM-1234: jira_unavailable (proxy tunnel 403; no changes applied)
    HUM-1235: read_ok
    ```
 
@@ -990,9 +964,11 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
    Atlassian MCP or Python subprocess wrappers for routine `/cve`
    ticket work.
 
-6. **Use bounded retries only for transient failures.** Use
-   `rhjira_retry` with short backoff (2s, 4s) and a 3-attempt cap.
-   Do not use unbounded retries or long sleep/poll loops.
+6. **Do not paste a retry helper into the session.** `cve_helper.py`
+   already retries transient Jira/proxy failures. For raw `rhjira`
+   writes, run once with `--noeditor`. On login failure, source
+   `~/.config/rhjira/agent.env` once and retry once. Do not use
+   unbounded retries or long sleep/poll loops.
 
 7. **`rhjira edit` supports label changes.** Use `--label-add` and
    `--label-remove`. Do not tell the user to use the Jira UI for
