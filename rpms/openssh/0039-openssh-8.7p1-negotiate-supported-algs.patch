@@ -1,4 +1,4 @@
-From caab11e7840ce22b21e88fdd6fac693cb897c0a8 Mon Sep 17 00:00:00 2001
+From d02ea85237706cc925f8c118d5ed6df86d30db99 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 39/54] openssh-8.7p1-negotiate-supported-algs

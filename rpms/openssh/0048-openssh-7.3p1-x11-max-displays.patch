@@ -1,4 +1,4 @@
-From 764fa7ebd0f6d5f77ca501d0bd1feec71f811911 Mon Sep 17 00:00:00 2001
+From f442f305469242d587cdebc28e31ac5ad5252643 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Fri, 12 Dec 2025 15:35:14 +0100
 Subject: [PATCH 48/54] openssh-7.3p1-x11-max-displays

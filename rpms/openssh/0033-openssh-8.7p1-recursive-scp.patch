@@ -1,4 +1,4 @@
-From 1e6712a333655da6dd01f2b9d8b0b2688f99082a Mon Sep 17 00:00:00 2001
+From 96429d71685df973ecd1681527e25f34225088b8 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 33/54] openssh-8.7p1-recursive-scp

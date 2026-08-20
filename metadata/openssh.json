@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Added gorget source-pipeline.yaml (HUM-4620 audit finding): Source0's ftp://ftp.openbsd.org is unreliable/FTP-blocked in modern build environments -- repointed at OpenBSD's own HTTPS mirror (cdn.openbsd.org), which matches the existing recorded checksum exactly, no content change.",
   "modification_status": "modified",
-  "release": "3",
-  "sha": "6bb4bc6e5b0af66ce9956e90bf2424bf28a63096",
+  "release": "4",
+  "sha": "e67cea1502609918f09ecc5ce280de3bb4fb7f57",
   "source": "https://src.fedoraproject.org/rpms/openssh.git",
   "upstream_repo": "https://github.com/openssh/openssh-portable",
   "version": "10.4p1"

@@ -1,4 +1,4 @@
-From a19debf855d417dc8c309ff93ed6a98c61418b66 Mon Sep 17 00:00:00 2001
+From dd2ebdcbf7486fc9caf1f8f0edd52dbb372c19c6 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 18/54] openssh-6.4p1-fromto-remote

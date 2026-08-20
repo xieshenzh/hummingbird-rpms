@@ -1,4 +1,4 @@
-From c4d7da173ac8b84dfef9d2310d615c0249bcd37a Mon Sep 17 00:00:00 2001
+From 54d6489ff716f31a156edcd9a027756f1d9131ea Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
 Subject: [PATCH 13/54] openssh-9.6p1-gssapi-keyex
@@ -14,7 +14,7 @@ Subject: [PATCH 13/54] openssh-9.6p1-gssapi-keyex
  canohost.h      |   3 +
  clientloop.c    |  12 +
  configure.ac    |  24 ++
- gss-genr.c      | 312 ++++++++++++++++++++-
+ gss-genr.c      | 313 ++++++++++++++++++++-
  gss-serv-krb5.c |  97 ++++++-
  gss-serv.c      | 200 ++++++++++++--
  kex-names.c     |  67 ++++-
@@ -46,7 +46,7 @@ Subject: [PATCH 13/54] openssh-9.6p1-gssapi-keyex
  sshd_config.5   |  43 ++-
  sshkey.c        |  72 ++++-
  sshkey.h        |   1 +
- 42 files changed, 3007 insertions(+), 80 deletions(-)
+ 42 files changed, 3008 insertions(+), 80 deletions(-)
  create mode 100644 kexgssc.c
  create mode 100644 kexgsss.c
 
@@ -436,7 +436,7 @@ index d7e911e81..321adbab1 100644
  	AC_CHECK_DECL([AU_IPv4], [],
  	    AC_DEFINE([AU_IPv4], [0], [System only supports IPv4 audit records])
 diff --git a/gss-genr.c b/gss-genr.c
-index 7088d93b4..a07dbf512 100644
+index 7088d93b4..ec2c9c6dd 100644
 --- a/gss-genr.c
 +++ b/gss-genr.c
 @@ -42,9 +42,33 @@
@@ -473,7 +473,7 @@ index 7088d93b4..a07dbf512 100644
  /* sshbuf_get for gss_buffer_desc */
  int
  ssh_gssapi_get_buffer_desc(struct sshbuf *b, gss_buffer_desc *g)
-@@ -60,6 +84,169 @@ ssh_gssapi_get_buffer_desc(struct sshbuf *b, gss_buffer_desc *g)
+@@ -60,6 +84,170 @@ ssh_gssapi_get_buffer_desc(struct sshbuf *b, gss_buffer_desc *g)
  	return 0;
  }
  
@@ -571,8 +571,9 @@ index 7088d93b4..a07dbf512 100644
 +			enclen = __b64_ntop(digest,
 +			    ssh_digest_bytes(SSH_DIGEST_MD5), encoded,
 +			    ssh_digest_bytes(SSH_DIGEST_MD5) * 2);
-+
++#pragma GCC diagnostic ignored "-Wstringop-overflow"
 +			cp = strncpy(s, kex, strlen(kex));
++#pragma GCC diagnostic pop
 +			for ((p = strsep(&cp, ",")); p && *p != '\0';
 +				(p = strsep(&cp, ","))) {
 +				if (sshbuf_len(buf) != 0 &&
@@ -643,7 +644,7 @@ index 7088d93b4..a07dbf512 100644
  /* Check that the OID in a data stream matches that in the context */
  int
  ssh_gssapi_check_oid(Gssctxt *ctx, void *data, size_t len)
-@@ -168,6 +355,7 @@ ssh_gssapi_build_ctx(Gssctxt **ctx)
+@@ -168,6 +356,7 @@ ssh_gssapi_build_ctx(Gssctxt **ctx)
  	(*ctx)->creds = GSS_C_NO_CREDENTIAL;
  	(*ctx)->client = GSS_C_NO_NAME;
  	(*ctx)->client_creds = GSS_C_NO_CREDENTIAL;
@@ -651,7 +652,7 @@ index 7088d93b4..a07dbf512 100644
  }
  
  /* Delete our context, providing it has been built correctly */
-@@ -193,6 +381,12 @@ ssh_gssapi_delete_ctx(Gssctxt **ctx)
+@@ -193,6 +382,12 @@ ssh_gssapi_delete_ctx(Gssctxt **ctx)
  		gss_release_name(&ms, &(*ctx)->client);
  	if ((*ctx)->client_creds != GSS_C_NO_CREDENTIAL)
  		gss_release_cred(&ms, &(*ctx)->client_creds);
@@ -664,7 +665,7 @@ index 7088d93b4..a07dbf512 100644
  
  	free(*ctx);
  	*ctx = NULL;
-@@ -216,7 +410,7 @@ ssh_gssapi_init_ctx(Gssctxt *ctx, int deleg_creds, gss_buffer_desc *recv_tok,
+@@ -216,7 +411,7 @@ ssh_gssapi_init_ctx(Gssctxt *ctx, int deleg_creds, gss_buffer_desc *recv_tok,
  	}
  
  	ctx->major = gss_init_sec_context(&ctx->minor,
@@ -673,7 +674,7 @@ index 7088d93b4..a07dbf512 100644
  	    GSS_C_MUTUAL_FLAG | GSS_C_INTEG_FLAG | deleg_flag,
  	    0, NULL, recv_tok, NULL, send_tok, flags, NULL);
  
-@@ -245,9 +439,43 @@ ssh_gssapi_import_name(Gssctxt *ctx, const char *host)
+@@ -245,9 +440,43 @@ ssh_gssapi_import_name(Gssctxt *ctx, const char *host)
  	return (ctx->major);
  }
  
@@ -717,7 +718,7 @@ index 7088d93b4..a07dbf512 100644
  	if ((ctx->major = gss_get_mic(&ctx->minor, ctx->context,
  	    GSS_C_QOP_DEFAULT, buffer, hash)))
  		ssh_gssapi_error(ctx);
-@@ -255,6 +483,19 @@ ssh_gssapi_sign(Gssctxt *ctx, gss_buffer_t buffer, gss_buffer_t hash)
+@@ -255,6 +484,19 @@ ssh_gssapi_sign(Gssctxt *ctx, gss_buffer_t buffer, gss_buffer_t hash)
  	return (ctx->major);
  }
  
@@ -737,7 +738,7 @@ index 7088d93b4..a07dbf512 100644
  void
  ssh_gssapi_buildmic(struct sshbuf *b, const char *user, const char *service,
      const char *context, const struct sshbuf *session_id)
-@@ -271,11 +512,16 @@ ssh_gssapi_buildmic(struct sshbuf *b, const char *user, const char *service,
+@@ -271,11 +513,16 @@ ssh_gssapi_buildmic(struct sshbuf *b, const char *user, const char *service,
  }
  
  int
@@ -755,7 +756,7 @@ index 7088d93b4..a07dbf512 100644
  
  	/* RFC 4462 says we MUST NOT do SPNEGO */
  	if (oid->length == spnego_oid.length &&
-@@ -285,6 +531,10 @@ ssh_gssapi_check_mechanism(Gssctxt **ctx, gss_OID oid, const char *host)
+@@ -285,6 +532,10 @@ ssh_gssapi_check_mechanism(Gssctxt **ctx, gss_OID oid, const char *host)
  	ssh_gssapi_build_ctx(ctx);
  	ssh_gssapi_set_oid(*ctx, oid);
  	major = ssh_gssapi_import_name(*ctx, host);
@@ -766,7 +767,7 @@ index 7088d93b4..a07dbf512 100644
  	if (!GSS_ERROR(major)) {
  		major = ssh_gssapi_init_ctx(*ctx, 0, GSS_C_NO_BUFFER, &token,
  		    NULL);
-@@ -294,10 +544,66 @@ ssh_gssapi_check_mechanism(Gssctxt **ctx, gss_OID oid, const char *host)
+@@ -294,10 +545,66 @@ ssh_gssapi_check_mechanism(Gssctxt **ctx, gss_OID oid, const char *host)
  			    GSS_C_NO_BUFFER);
  	}
  

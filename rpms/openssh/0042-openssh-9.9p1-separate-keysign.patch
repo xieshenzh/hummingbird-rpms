@@ -1,4 +1,4 @@
-From cdea86618b12a8fbe9a6e57c8b56c15732a08ab0 Mon Sep 17 00:00:00 2001
+From 7f74e6176165e85858c1991b9f96d6da398c9e01 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:29 +0200
 Subject: [PATCH 42/54] openssh-9.9p1-separate-keysign

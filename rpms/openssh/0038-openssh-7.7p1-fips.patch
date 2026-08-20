@@ -1,4 +1,4 @@
-From eb6be743509407de959ef3a5e95cd76815b48dca Mon Sep 17 00:00:00 2001
+From c52dd2530ff1ca90224cac3ecf9527b91f9b2b0a Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 28 Aug 2025 14:01:38 +0200
 Subject: [PATCH 38/54] openssh-7.7p1-fips
