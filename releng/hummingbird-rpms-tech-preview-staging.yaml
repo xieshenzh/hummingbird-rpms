@@ -344,6 +344,8 @@ spec:
           contentType: rpm
         - name: go-rpm-macros-main
           contentType: rpm
+        - name: golang-main
+          contentType: rpm
         - name: golang1-25-main
           contentType: rpm
         - name: golang1-26-main

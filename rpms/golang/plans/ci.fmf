@@ -1,0 +1,6 @@
+summary: CI Gating Plan
+discover:
+    how: fmf
+    url: https://src.fedoraproject.org/tests/golang
+execute:
+    how: tmt
