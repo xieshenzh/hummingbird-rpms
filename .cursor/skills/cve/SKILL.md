@@ -897,11 +897,24 @@ version bump is not appropriate:
 4. **Commit, validate, build, push, MR** (same as the
    version-bump path step 9).
 
-#### 3f: No upstream fix yet
+#### 3f: No upstream fix yet -- `cve-next-release`
 
-When no fix exists upstream, add a comment noting the current
-status and leave the ticket in its current state. Create a HUM
-task only if active investigation or a custom patch is planned.
+When no fix exists upstream (or a fix exists but is not yet in a
+release we can consume):
+
+1. Add a comment that Hummingbird is affected and waiting on an
+   upstream fix.
+2. Label the ticket (`rhjira edit` supports label changes):
+
+   ```bash
+   rhjira edit HUM-XXXX --noeditor \
+     --label-add cve-next-release \
+     --label-remove cve-needs-attention
+   ```
+
+3. Leave the ticket In Progress. Do not create a HUM task unless
+   active investigation or a custom patch is planned.
+4. Rename the chat (see Step 1) with `--title-prefix "next-rel"`.
 
 <!-- markdownlint-enable MD029 -->
 
@@ -939,6 +952,7 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
 | Vendored dep fixed | Done-Errata | (not set) |
 | Backport patch applied | Done-Errata | (not set) |
 | Duplicate of versioned ticket | Duplicate | (not set) |
+| Affected, no upstream fix yet | In Progress | (not set; `cve-next-release`) |
 
 ## Important rules
 
@@ -965,8 +979,9 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
    `rhjira_retry` with short backoff (2s, 4s) and a 3-attempt cap.
    Do not use unbounded retries or long sleep/poll loops.
 
-7. **rhjira edit does NOT support label changes.** Label additions
-   or removals must be done manually in the Jira web UI.
+7. **`rhjira edit` supports label changes.** Use `--label-add` and
+   `--label-remove`. Do not tell the user to use the Jira UI for
+   labels.
 
 8. **Always pass `--noeditor` on Jira writes.** This includes comment,
    transition, and field-update operations.
