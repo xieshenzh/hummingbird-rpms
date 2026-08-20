@@ -4,11 +4,7 @@
 %global updatever 4
 %global patchver 1
 %global buildver 1
-<<<<<<< HEAD
 %global portablerelease 1
-=======
-%global portablerelease 0
->>>>>>> hummingbird-local
 %global rpmrelease 0
 
 # Define IcedTea version used for SystemTap tapsets and desktop file
