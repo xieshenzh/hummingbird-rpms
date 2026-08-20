@@ -6,7 +6,7 @@ import types
 import urllib.error
 from email.message import Message
 from pathlib import Path
-from unittest.mock import call, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 
@@ -910,6 +910,28 @@ def test_check_source_exists(cuv_module) -> None:
             cuv_module._check_source_exists('https://example.com/a.tar.xz')
 
 
+def test_check_source_exists_user_agent_starts_with_mozilla(cuv_module) -> None:
+    """_check_source_exists's User-Agent starts with 'Mozilla/5.0'.
+
+    Same rationale as _download_file's identical test: SourceForge (and
+    likely other hosts with simplistic bot-detection) 403s any User-Agent
+    that doesn't start with 'Mozilla/5.0'. _check_source_exists HEAD-probes
+    arbitrary upstream URLs, so it's just as exposed to this as _download_file.
+    """
+    captured_request = None
+
+    def fake_urlopen(request, timeout=None):
+        nonlocal captured_request
+        captured_request = request
+        return MagicMock()
+
+    with patch.object(cuv_module.urllib.request, 'urlopen', side_effect=fake_urlopen):
+        cuv_module._check_source_exists('https://example.com/a.tar.xz')
+
+    assert captured_request is not None
+    assert captured_request.get_header('User-agent').startswith('Mozilla/5.0')
+
+
 def test_check_package_version_skips_unavailable_source(
     cuv_module, workdir: Path,
 ) -> None:
@@ -1192,6 +1214,42 @@ def test_download_new_sources_download_failure(cuv_module, workdir: Path) -> Non
         cuv_module.RPMS_DIR = workdir / 'rpms'
         with pytest.raises(Exception, match='network error'):
             cuv_module.download_new_sources('pkg', '1.0', '2.0')
+
+
+def test_download_file_user_agent_starts_with_mozilla(
+    cuv_module, tmp_path: Path
+) -> None:
+    """_download_file's User-Agent starts with 'Mozilla/5.0'.
+
+    SourceForge (and likely other hosts with simplistic bot-detection) 403s
+    any User-Agent that doesn't start with 'Mozilla/5.0', confirmed directly
+    against sourceforge.net. Regression test for that specific requirement --
+    an identifying-but-not-Mozilla-prefixed UA (e.g. the previous
+    'hummingbird-rpms-version-checker/1.0') silently breaks downloads from
+    such hosts.
+    """
+    captured_request = None
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def read(self, size):
+            return b''
+
+    def fake_urlopen(request, timeout=None):
+        nonlocal captured_request
+        captured_request = request
+        return FakeResponse()
+
+    with patch.object(cuv_module.urllib.request, 'urlopen', side_effect=fake_urlopen):
+        cuv_module._download_file('https://example.com/file.tar.gz', tmp_path / 'file.tar.gz')
+
+    assert captured_request is not None
+    assert captured_request.get_header('User-agent').startswith('Mozilla/5.0')
 
 
 def test_download_new_sources_refuses_empty_source_discovery(
