@@ -1,0 +1,34 @@
+# ftp.vim.org has been fully decommissioned (NXDOMAIN) with no HTTPS/mirror
+# replacement -- the original release tarball (vim-9.2-967.tar.bz2) is
+# permanently unavailable, so unlike other packages in this migration there
+# is no way to verify byte-identical content against it. Fetches the
+# equivalent git tag instead, and manually confirmed the extracted tree is
+# genuinely vim 9.2.967 (src/version.c's included_patches[] top entry is
+# 967, matching this package's patchlevel).
+#
+# vim's git tags zero-pad the patchlevel (v9.2.0967) but this package's
+# metadata `version` does not (9.2.967), so the ref can't be templated from
+# ${VERSION} -- pinned literally instead, same manual-update model as
+# glibc's source-pipeline.yaml: update `ref` here together with
+# `baseversion`/`patchlevel` in vim.spec on each version bump.
+#
+# archive_name matches vim.spec's `%{vimdir}` macro (vim92) so
+# `%setup -n %{vimdir}` finds the expected directory name; this stays
+# "vim92" for the whole 9.2.x series and only changes when baseversion does.
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "v9.2.0967"
+    archive_name: "vim92.tar.gz"
+
+accepted-checksums:
+  - file: "vim92.tar.gz"
+    checksum: "76a02091664426f69f87e6e1adca1d7b1a939164d9a5a0203c25553702f836b75f9fab85e423796af99831692dee0e5502a4be5bca6b70df071553bdcb96e5cb"
+    reason: "One-time transition from ftp.vim.org (decommissioned, no
+      mirror) to gorget's git-based fetch. Unlike other transitions in
+      this migration, the original artifact could not be retrieved for a
+      byte-for-byte diff -- verified instead by confirming the extracted
+      tree's src/version.c included_patches[] top entry is 967, matching
+      this package's patchlevel. Checksum re-verified stable across two
+      independent gorget runs."
+
