@@ -1,0 +1,5 @@
+fetch:
+  - type: url
+    url: "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${VERSION}.tar.gz"
+  - type: url
+    url: "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${VERSION}.tar.gz.asc"
