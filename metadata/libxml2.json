@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to 2.15.3 (ahead of Fedora); Backport fix for CVE-2026-11979; CVE-2026-76781",
+  "modification_reason": "Update to 2.15.3 (ahead of Fedora); Backport fix for CVE-2026-11979; CVE-2026-76781; added gorget source-pipeline.yaml (HUM-4620 audit finding): %{majorminor} is computed via a %global-before-Version shell-eval macro that captures the un-truncated version instead of major.minor, so Source0 404s -- checksum matches the existing recorded checksum exactly, no content change.",
   "modification_status": "modified",
   "release": "0.1",
   "sha": "93d41c31ba576bf339d17ba20537fffd45c0af46",

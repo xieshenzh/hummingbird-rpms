@@ -1,9 +1,13 @@
 %global soversion 16
-%global majorminor %(echo %{version} | cut -d. -f1-2)
 
 Name:           libxml2
 Version:        2.15.3
-Release:        0.1.3%{?dist}
+# Placed after Version: so %{version} is defined when this shell-eval macro
+# runs -- a %global before Version: silently captures the un-truncated
+# version instead of major.minor (see metadata/libxml2.source-pipeline.yaml
+# and HUM-6191 for how this broke Source0).
+%global majorminor %(echo %{version} | cut -d. -f1-2)
+Release:        0.1.4%{?dist}
 Summary:        Library providing XML and HTML support
 
 # list.c, dict.c and few others use ISC-Veillard
