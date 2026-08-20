@@ -1,0 +1,16 @@
+# java-25-openjdk has no primary source of its own -- it repackages
+# pre-built artifacts from the java-25-openjdk-portable BuildRequires (see
+# %prep: %setup -q -c -T then untars from %{portablejvmdir}). That content
+# is out of scope here; it belongs to java-25-openjdk-portable's own
+# pipeline (see java-17-openjdk-portable's for the established pattern).
+#
+# The one exception is Source31 (nssadapter, RHEL-128413's FIPS support
+# library), which is a real, independently-fetchable release asset.
+# nssadapter_version (0.1.1) is tracked independently of java-25-openjdk's
+# own ${VERSION} -- no gorget substitution variable applies, so it's
+# hardcoded here and needs a manual bump alongside the spec's
+# %global nssadapter_version whenever RH-OpenJDK cuts a new nssadapter
+# release.
+fetch:
+  - type: url
+    url: "https://github.com/rh-openjdk/nss-native-fips-key-import-export-adapter/releases/download/0.1.1/nssadapter-0.1.1.tar.xz"

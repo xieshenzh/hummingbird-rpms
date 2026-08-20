@@ -7892,7 +7892,7 @@ spec:
       - name: kind
         value: pipeline
       - name: bundle
-        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:52f07d3f94e906d57d08cf77244ffcf39effe08ffbcdaa0dada3f8b5a87af1f4"
+        value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:bf43eccaf6669073b4ef441555c004a7ae263a1ec027530decdba2f3714f23ae"
   taskRunTemplate:
     serviceAccountName: build-pipeline-fulcio-main
   timeouts:
