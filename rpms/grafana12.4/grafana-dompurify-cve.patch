@@ -1,0 +1,65 @@
+From: Hummingbird <hummingbird@redhat.com>
+Subject: [PATCH] Bump DOMPurify to 3.4.12 for XSS CVEs
+
+CVE-2026-65911, CVE-2026-65914, CVE-2026-65898, CVE-2026-65913,
+CVE-2026-65912, CVE-2026-65901, CVE-2026-65902, CVE-2026-65899
+
+diff --git a/package.json b/package.json
+index 203edaaf3b9c..dc6376c16721 100644
+--- a/package.json
++++ b/package.json
+@@ -477,7 +477,7 @@
+     "@grafana/plugin-e2e/@grafana/e2e-selectors": "workspace:*",
+     "@grafana/scenes/@grafana/e2e-selectors": "workspace:*",
+     "@grafana/scenes-react/@grafana/e2e-selectors": "workspace:*",
+-    "swagger-ui-react/dompurify": "3.3.0",
++    "swagger-ui-react/dompurify": "3.4.12",
+     "refractor/prismjs": "^1.27.0",
+     "@mapbox/jsonlint-lines-primitives": "github:mapbox/jsonlint#commit=e31b7289baedf3e1000d7ae7edd42268212c9954",
+     "get-document": "github:webmodules/get-document#commit=a04ccb499d6e0433a368c3bb150b4899b698461f",
+diff --git a/packages/grafana-data/package.json b/packages/grafana-data/package.json
+index eb79520df55b..ef8770ae4aa2 100644
+--- a/packages/grafana-data/package.json
++++ b/packages/grafana-data/package.json
+@@ -73,7 +73,7 @@
+     "d3-interpolate": "3.0.1",
+     "d3-scale-chromatic": "3.1.0",
+     "date-fns": "4.1.0",
+-    "dompurify": "3.3.0",
++    "dompurify": "3.4.12",
+     "eventemitter3": "5.0.1",
+     "fast_array_intersect": "1.1.0",
+     "history": "4.10.1",
+diff --git a/yarn.lock b/yarn.lock
+index 484af51b1f85..c5e206258060 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -3446,7 +3446,7 @@ __metadata:
+     d3-interpolate: "npm:3.0.1"
+     d3-scale-chromatic: "npm:3.1.0"
+     date-fns: "npm:4.1.0"
+-    dompurify: "npm:3.3.0"
++    dompurify: "npm:3.4.12"
+     esbuild: "npm:0.25.8"
+     eventemitter3: "npm:5.0.1"
+     fast_array_intersect: "npm:1.1.0"
+@@ -17318,15 +17318,15 @@ __metadata:
+   languageName: node
+   linkType: hard
+ 
+-"dompurify@npm:3.3.0":
+-  version: 3.3.0
+-  resolution: "dompurify@npm:3.3.0"
++"dompurify@npm:3.4.12":
++  version: 3.4.12
++  resolution: "dompurify@npm:3.4.12"
+   dependencies:
+     "@types/trusted-types": "npm:^2.0.7"
+   dependenciesMeta:
+     "@types/trusted-types":
+       optional: true
+-  checksum: 10/d8782b10a0454344476936c91038d06c9450b3e3ada2ceb8f722525e6b54e64d847939b9f35bf385facd4139f0a2eaf7f5553efce351f8e9295620570875f002
++  checksum: 10/f826b68920887eb75115a162facb42380d1c3fac441548217b30068c9fadeed14f63fa1f7a1d2ab6f63613e5a0f897aa245c9224d4abf7939cd8ae58c04646af
+   languageName: node
+   linkType: hard
+ 
