@@ -506,8 +506,10 @@ When the fix is confirmed present in the shipped SRPM:
 2. Set Fixed in Build:
 
    ```bash
-   rhjira edit HUM-XXXX --noeditor \
-     --fixedinbuild "<name>-<version>-<release>.src.rpm"
+   python .cursor/skills/cve/cve_helper.py comment HUM-XXXX \
+     -f /tmp/cve-comment.txt
+   python .cursor/skills/cve/cve_helper.py set-fib HUM-XXXX \
+     <name>-<version>-<release>.src.rpm --package <package>
    ```
 
 3. Rename the chat (see Step 1) with `--title-prefix "FIB"`.
@@ -535,26 +537,19 @@ disputed):
 4. Post the comment:
 
    ```bash
-   rhjira comment HUM-XXXX --noeditor -f /tmp/close-comment.txt
+   python .cursor/skills/cve/cve_helper.py comment HUM-XXXX \
+     -f /tmp/close-comment.txt
    ```
 
 5. **Ask the user for approval before closing.** Then use the
    appropriate VEX justification:
 
    ```bash
-   # If the CVE product is not in Hummingbird at all:
-   rhjira edit HUM-XXXX --noeditor \
-     --assignee <user>@redhat.com \
-     --status Closed \
-     --resolution "Not a Bug" \
-     --vexjustification "Component not Present"
+   python .cursor/skills/cve/cve_helper.py close-nab HUM-XXXX \
+     --vex "Component not Present" -f /tmp/close-comment.txt
 
-   # If the CVE targets a different product or is disputed:
-   rhjira edit HUM-XXXX --noeditor \
-     --assignee <user>@redhat.com \
-     --status Closed \
-     --resolution "Not a Bug" \
-     --vexjustification "Vulnerable Code not Present"
+   python .cursor/skills/cve/cve_helper.py close-nab HUM-XXXX \
+     --vex "Vulnerable Code not Present" -f /tmp/close-comment.txt
    ```
 
 6. Rename the chat (see Step 1) with `--title-prefix "NAB"`.
@@ -950,12 +945,11 @@ release we can consume):
 
 1. Add a comment that Hummingbird is affected and waiting on an
    upstream fix.
-2. Label the ticket (`rhjira edit` supports label changes):
+2. Label the ticket:
 
    ```bash
-   rhjira edit HUM-XXXX --noeditor \
-     --label-add cve-next-release \
-     --label-remove cve-needs-attention
+   python .cursor/skills/cve/cve_helper.py next-release HUM-XXXX \
+     -m "Affected; waiting on an upstream fix."
    ```
 
 3. Leave the ticket In Progress. Do not create a HUM task unless
@@ -981,10 +975,8 @@ Use Jira wiki markup in comments (`{noformat}`, `*bold*`,
 `{{monospace}}`).
 
 ```bash
-cat > /tmp/cve-comment.txt << 'EOF'
-<comment text>
-EOF
-rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
+python .cursor/skills/cve/cve_helper.py comment HUM-XXXX \
+  -f /tmp/cve-comment.txt
 ```
 
 ## Resolution and VEX justification reference
@@ -1029,9 +1021,9 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
    `~/.config/rhjira/agent.env` once and retry once. Do not use
    unbounded retries or long sleep/poll loops.
 
-7. **`rhjira edit` supports label changes.** Use `--label-add` and
-   `--label-remove`. Do not tell the user to use the Jira UI for
-   labels.
+7. **Label changes go through `cve_helper.py next-release`** (or
+   `jira_client.add_jira_label` / `remove_jira_label`). Do not tell
+   the user to use the Jira UI for labels.
 
 8. **Always pass `--noeditor` on Jira writes.** This includes comment,
    transition, and field-update operations.

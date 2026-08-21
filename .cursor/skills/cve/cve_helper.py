@@ -12,6 +12,10 @@ Subcommands:
   spec-deps       Probe a package .spec for a component / bundled Provides
   worktree        Create an isolated git worktree for a HUM task ticket
   deps            Check Jira auth and hummingbird_cve_analysis import
+  comment         Post a Jira comment via jira_client
+  next-release    Comment + cve-next-release label, leave In Progress
+  set-fib         Set Fixed in Build after a Pulp NVR check
+  close-nab       Comment, set VEX, close as Not a Bug
 
 Jira writes import hummingbird_cve_analysis.lib (jira_client, pulp). Auth
 is JIRA_TOKEN plus JIRA_URL or rhjira's JIRA_SERVER / JIRA_EMAIL from
@@ -40,6 +44,7 @@ from cve_analysis_bridge import (  # noqa: E402
     AnalysisImportError,
     jira_client_module,
     load_jira_auth,
+    pulp_module,
 )
 
 CVE_RE = re.compile(r"CVE-\d{4}-\d{4,8}")
@@ -56,7 +61,18 @@ TRANSIENT_RHJIRA_RE = re.compile(
     r"proxy|tunnel|timed out|timeout|temporar|502|503|504|connection reset|\beof\b",
     re.IGNORECASE,
 )
-COMMANDS = ("show", "bot-mrs", "sbom", "spec-deps", "worktree", "deps")
+COMMANDS = (
+    "show",
+    "bot-mrs",
+    "sbom",
+    "spec-deps",
+    "worktree",
+    "deps",
+    "comment",
+    "next-release",
+    "set-fib",
+    "close-nab",
+)
 SBOM_FILE_RE = re.compile(r"sha256-[a-fA-F0-9]+\.sbom")
 BUNDLED_PROVIDES_RE = re.compile(
     r"(?i)^\s*Provides:\s*bundled\(([^)]+)\)(?:\s*=\s*(\S+))?"
@@ -1091,6 +1107,95 @@ def create_task_worktree(ticket: str, *, base: str = "main") -> Path:
     return dest
 
 
+def normalize_nvr(nvr: str) -> str:
+    name = Path(nvr.strip()).name
+    return name.removesuffix(".src.rpm")
+
+
+def pulp_has_nvr(package: str, nvr: str) -> tuple[bool, str]:
+    """Return whether the SRPM NVR is listed in Hummingbird Pulp."""
+    wanted = normalize_nvr(nvr)
+    wanted_file = f"{wanted}.src.rpm"
+    pulp = pulp_module()
+    index = pulp.fetch_srpm_listing_index(package)
+    if index is not None:
+        nvrs = list(getattr(index, "nvrs", []) or [])
+        files = set(getattr(index, "srpm_filenames", []) or [])
+        if wanted in nvrs or wanted_file in files:
+            return True, f"{wanted_file} is in the Pulp listing for {package}"
+    latest = pulp.fetch_hummingbird_latest_srpm(package)
+    if latest and (latest == wanted_file or wanted in str(latest)):
+        return True, f"Pulp latest SRPM for {package} is {latest}"
+    latest_note = f" (latest {latest})" if latest else ""
+    return False, f"{wanted_file} not published in Pulp for {package}{latest_note}"
+
+
+def _jira_auth_call(method: str, ticket: str, *args: Any, **kwargs: Any) -> Any:
+    jc = jira_client_module()
+    auth = load_jira_auth()
+    fn = getattr(jc, method)
+    try:
+        return fn(
+            auth.base_url,
+            auth.token,
+            ticket,
+            *args,
+            basic_auth_user=auth.basic_auth_user,
+            **kwargs,
+        )
+    except (OSError, urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError) as err:
+        raise RuntimeError(f"Jira {method} failed for {ticket}: {err}") from err
+
+
+def post_comment(ticket: str, body: str) -> bool:
+    return bool(_jira_auth_call("jira_add_comment", ticket, body))
+
+
+def apply_next_release(ticket: str, body: str) -> None:
+    post_comment(ticket, body)
+    _jira_auth_call("add_jira_label", ticket, "cve-next-release")
+    _jira_auth_call("remove_jira_label", ticket, "cve-needs-attention")
+
+
+def set_fixed_in_build(
+    ticket: str,
+    nvr: str,
+    package: str,
+    *,
+    force: bool = False,
+) -> str:
+    published, detail = pulp_has_nvr(package, nvr)
+    if not published and not force:
+        raise RuntimeError(
+            f"Refusing to set Fixed in Build: {detail}. "
+            "Pass --force only if the user confirmed a Pulp override."
+        )
+    fib = f"{normalize_nvr(nvr)}.src.rpm"
+    _jira_auth_call("set_fixed_in_build", ticket, fib)
+    return detail if published else f"forced; {detail}"
+
+
+def close_not_a_bug(ticket: str, body: str, vex: str) -> None:
+    post_comment(ticket, body)
+    if not _jira_auth_call("set_vex_justification", ticket, vex):
+        raise RuntimeError(f"Failed to set VEX justification on {ticket}")
+    if not _jira_auth_call(
+        "jira_resolve_issue",
+        ticket,
+        "Closed",
+        "Not a Bug",
+    ):
+        raise RuntimeError(f"Failed to close {ticket} as Not a Bug")
+
+
+def _comment_text(message: str, file: Path | None) -> str:
+    if file is not None:
+        return file.read_text(encoding="utf-8").rstrip() + "\n"
+    if message:
+        return message.rstrip() + "\n"
+    raise ValueError("Provide --message or --file")
+
+
 ### CLI ###
 
 
@@ -1243,6 +1348,74 @@ def build_parser() -> argparse.ArgumentParser:
         "--json",
         action="store_true",
         help="Print JSON instead of text.",
+    )
+
+    comment = subparsers.add_parser(
+        "comment",
+        help="Post a Jira comment via hummingbird_cve_analysis.lib.jira_client.",
+    )
+    comment.add_argument("tickets", nargs="+", help="HUM ticket key(s).")
+    comment.add_argument("-m", "--message", default="", help="Comment body.")
+    comment.add_argument(
+        "-f",
+        "--file",
+        type=Path,
+        dest="comment_file",
+        help="Read comment body from file.",
+    )
+
+    nxt = subparsers.add_parser(
+        "next-release",
+        help="Comment, add cve-next-release, remove cve-needs-attention.",
+    )
+    nxt.add_argument("tickets", nargs="+", help="HUM ticket key(s).")
+    nxt.add_argument("-m", "--message", default="", help="Comment body.")
+    nxt.add_argument(
+        "-f",
+        "--file",
+        type=Path,
+        dest="comment_file",
+        help="Read comment body from file.",
+    )
+
+    fib = subparsers.add_parser(
+        "set-fib",
+        help="Set Fixed in Build after verifying the NVR exists in Pulp.",
+    )
+    fib.add_argument("ticket", help="HUM CVE tracker key.")
+    fib.add_argument("nvr", help="NVR or foo-1.2-3.src.rpm")
+    fib.add_argument(
+        "--package",
+        required=True,
+        help="SRPM package name used for the Pulp listing (e.g. grafana13.1).",
+    )
+    fib.add_argument(
+        "--force",
+        action="store_true",
+        help="Set FIB even if Pulp does not list the NVR (user override).",
+    )
+
+    nab = subparsers.add_parser(
+        "close-nab",
+        help="Comment, set VEX, and close as Not a Bug. Ask the user first.",
+    )
+    nab.add_argument("tickets", nargs="+", help="HUM ticket key(s).")
+    nab.add_argument(
+        "--vex",
+        required=True,
+        choices=(
+            "Component not Present",
+            "Vulnerable Code not Present",
+        ),
+        help="VEX justification.",
+    )
+    nab.add_argument("-m", "--message", default="", help="Closing comment.")
+    nab.add_argument(
+        "-f",
+        "--file",
+        type=Path,
+        dest="comment_file",
+        help="Read closing comment from file.",
     )
     return parser
 
@@ -1483,6 +1656,42 @@ def cmd_deps(args: argparse.Namespace) -> int:
     return 0 if auth_ok and analysis_ok else 1
 
 
+def cmd_comment(args: argparse.Namespace) -> int:
+    body = _comment_text(args.message, args.comment_file)
+    for raw in args.tickets:
+        ticket = normalize_hum_key(raw)
+        posted = post_comment(ticket, body)
+        print(f"{ticket}: {'comment posted' if posted else 'duplicate comment skipped'}")
+    return 0
+
+
+def cmd_next_release(args: argparse.Namespace) -> int:
+    body = _comment_text(args.message, args.comment_file)
+    for raw in args.tickets:
+        ticket = normalize_hum_key(raw)
+        apply_next_release(ticket, body)
+        print(f"{ticket}: cve-next-release; left In Progress")
+    return 0
+
+
+def cmd_set_fib(args: argparse.Namespace) -> int:
+    ticket = normalize_hum_key(args.ticket)
+    detail = set_fixed_in_build(
+        ticket, args.nvr, args.package, force=args.force
+    )
+    print(f"{ticket}: Fixed in Build set ({detail})")
+    return 0
+
+
+def cmd_close_nab(args: argparse.Namespace) -> int:
+    body = _comment_text(args.message, args.comment_file)
+    for raw in args.tickets:
+        ticket = normalize_hum_key(raw)
+        close_not_a_bug(ticket, body, args.vex)
+        print(f"{ticket}: closed Not a Bug ({args.vex})")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = normalize_argv(list(argv) if argv is not None else sys.argv[1:])
     parser = build_parser()
@@ -1498,6 +1707,10 @@ def main(argv: list[str] | None = None) -> int:
         "spec-deps": cmd_spec_deps,
         "worktree": cmd_worktree,
         "deps": cmd_deps,
+        "comment": cmd_comment,
+        "next-release": cmd_next_release,
+        "set-fib": cmd_set_fib,
+        "close-nab": cmd_close_nab,
     }
     return handlers[args.command](args)
 

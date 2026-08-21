@@ -286,3 +286,107 @@ def test_cmd_deps_reports_missing_analysis(monkeypatch) -> None:
     rc = helper.cmd_deps(SimpleNamespace(json=False))
     assert rc == 1
 
+
+def _fake_auth():
+    return SimpleNamespace(
+        token="tok",
+        base_url="https://redhat.atlassian.net",
+        basic_auth_user="user@redhat.com",
+    )
+
+
+def test_pulp_has_nvr_uses_listing_index(monkeypatch) -> None:
+    index = SimpleNamespace(
+        nvrs=["grafana13.1-13.1.1-1"],
+        srpm_filenames={"grafana13.1-13.1.1-1.src.rpm"},
+    )
+    pulp = SimpleNamespace(
+        fetch_srpm_listing_index=lambda pkg: index,
+        fetch_hummingbird_latest_srpm=lambda pkg: "grafana13.1-13.1.0-1.src.rpm",
+    )
+    monkeypatch.setattr(helper, "pulp_module", lambda: pulp)
+    ok, detail = helper.pulp_has_nvr("grafana13.1", "grafana13.1-13.1.1-1.src.rpm")
+    assert ok
+    assert "Pulp listing" in detail
+
+
+def test_set_fixed_in_build_refuses_unpublished_nvr(monkeypatch) -> None:
+    monkeypatch.setattr(helper, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    try:
+        helper.set_fixed_in_build("HUM-1", "pkg-1.0-1.src.rpm", "pkg")
+    except RuntimeError as err:
+        assert "Refusing" in str(err)
+    else:
+        raise AssertionError("expected RuntimeError")
+
+
+def test_set_fixed_in_build_force_skips_pulp(monkeypatch) -> None:
+    calls: list[tuple] = []
+
+    def set_fib(base, token, ticket, build, *, basic_auth_user=None):
+        calls.append((ticket, build, basic_auth_user))
+
+    monkeypatch.setattr(helper, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(
+        helper,
+        "jira_client_module",
+        lambda: SimpleNamespace(set_fixed_in_build=set_fib),
+    )
+    detail = helper.set_fixed_in_build(
+        "HUM-1", "pkg-1.0-1.src.rpm", "pkg", force=True
+    )
+    assert "forced" in detail
+    assert calls[0][0] == "HUM-1"
+    assert calls[0][1] == "pkg-1.0-1.src.rpm"
+
+
+def test_apply_next_release_labels(monkeypatch) -> None:
+    calls: list[str] = []
+
+    def add_comment(*_a, **_k):
+        calls.append("comment")
+        return True
+
+    def add_label(*a, **_k):
+        calls.append(f"add:{a[3]}")
+
+    def remove_label(*a, **_k):
+        calls.append(f"remove:{a[3]}")
+
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(
+        helper,
+        "jira_client_module",
+        lambda: SimpleNamespace(
+            jira_add_comment=add_comment,
+            add_jira_label=add_label,
+            remove_jira_label=remove_label,
+        ),
+    )
+    helper.apply_next_release("HUM-9", "waiting on upstream\n")
+    assert calls == [
+        "comment",
+        "add:cve-next-release",
+        "remove:cve-needs-attention",
+    ]
+
+
+def test_close_not_a_bug(monkeypatch) -> None:
+    calls: list[str] = []
+
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(
+        helper,
+        "jira_client_module",
+        lambda: SimpleNamespace(
+            jira_add_comment=lambda *_a, **_k: calls.append("comment") or True,
+            set_vex_justification=lambda *_a, **_k: calls.append("vex") or True,
+            jira_resolve_issue=lambda *_a, **_k: calls.append("resolve") or True,
+        ),
+    )
+    helper.close_not_a_bug("HUM-2", "not present\n", "Component not Present")
+    assert calls == ["comment", "vex", "resolve"]
+
+
