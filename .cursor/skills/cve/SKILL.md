@@ -22,10 +22,24 @@ For a high-level overview, use `/cve-status`.
 
 ### Preparation: Run Jira commands reliably (HUM-4821)
 
-Use `rhjira` (or `cve_helper.py`, which wraps it) for all Jira reads
-and writes. Do not invent ad-hoc Python subprocess wrappers,
-background polling workers, or long-running retry loops in the agent
-session.
+Use `cve_helper.py` for Jira reads and writes. Ticket show/bot-MR/SBOM
+still use `rhjira`/`glab` under the helper. Writes import
+`hummingbird_cve_analysis.lib.jira_client` (HUM-6002). Do not invent
+ad-hoc Python subprocess wrappers, background polling workers, or
+long-running retry loops in the agent session.
+
+`cve_helper.py deps` checks that Jira auth and the analysis package
+import. Auth is the existing rhjira file: `JIRA_TOKEN` plus `JIRA_SERVER`
+mapped to `JIRA_URL`, and `JIRA_EMAIL` as Basic-auth user. Source
+`~/.config/rhjira/agent.env` is loaded automatically when `JIRA_TOKEN`
+is unset. Do not create a second Jira token.
+
+Install the analysis package, or point at a tools checkout:
+
+```bash
+export HUMMINGBIRD_TOOLS_ROOT=/path/to/hummingbird/tools
+python .cursor/skills/cve/cve_helper.py deps
+```
 
 `cve_helper.py` already retries transient Jira/proxy failures for its
 own `rhjira` calls. Prefer the helper subcommands below for repeated
@@ -1003,9 +1017,11 @@ rhjira comment HUM-XXXX --noeditor -f /tmp/cve-comment.txt
 4. **Create HUM tasks** for any backport or update work. Link them
    to the CVE tracker(s) with blockers.
 
-5. **Use `rhjira` directly** for all Jira operations. Do not use the
-   Atlassian MCP or Python subprocess wrappers for routine `/cve`
-   ticket work.
+5. **Use `cve_helper.py` for Jira writes.** It imports
+   `hummingbird_cve_analysis.lib.jira_client` and loads credentials
+   from the environment or `~/.config/rhjira/agent.env`. Do not use
+   the Atlassian MCP, and do not paste REST or `rhjira` write recipes
+   into the session.
 
 6. **Do not paste a retry helper into the session.** `cve_helper.py`
    already retries transient Jira/proxy failures. For raw `rhjira`

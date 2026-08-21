@@ -200,3 +200,89 @@ def test_build_suggested_chat_title() -> None:
         )
     ]
     assert helper.build_suggested_chat_title(reports) == "HUM-1 pkg"
+
+
+def test_parse_agent_env_strips_quotes() -> None:
+    import cve_analysis_bridge as bridge
+
+    parsed = bridge.parse_agent_env(
+        "\n".join(
+            [
+                "export JIRA_TOKEN='tok'",
+                'export JIRA_EMAIL="user@redhat.com"',
+                "export JIRA_SERVER=https://redhat.atlassian.net",
+                "# comment",
+                "not an assignment",
+            ]
+        )
+    )
+    assert parsed["JIRA_TOKEN"] == "tok"
+    assert parsed["JIRA_EMAIL"] == "user@redhat.com"
+    assert parsed["JIRA_SERVER"] == "https://redhat.atlassian.net"
+    assert "not" not in parsed
+
+
+def test_load_jira_auth_maps_rhjira_server_and_email(tmp_path: Path, monkeypatch) -> None:
+    import cve_analysis_bridge as bridge
+
+    agent = tmp_path / "agent.env"
+    agent.write_text(
+        "\n".join(
+            [
+                "export JIRA_TOKEN=from-file",
+                "export JIRA_EMAIL=prarit@redhat.com",
+                "export JIRA_SERVER=https://redhat.atlassian.net",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("JIRA_TOKEN", raising=False)
+    monkeypatch.delenv("JIRA_URL", raising=False)
+    monkeypatch.delenv("JIRA_SERVER", raising=False)
+    monkeypatch.delenv("JIRA_EMAIL", raising=False)
+    auth = bridge.load_jira_auth(environ={}, agent_env_path=agent)
+    assert auth.token == "from-file"
+    assert auth.base_url == "https://redhat.atlassian.net"
+    assert auth.basic_auth_user == "prarit@redhat.com"
+    assert str(agent) in auth.source
+
+
+def test_load_jira_auth_prefers_process_env(tmp_path: Path) -> None:
+    import cve_analysis_bridge as bridge
+
+    agent = tmp_path / "agent.env"
+    agent.write_text("export JIRA_TOKEN=file-token\n", encoding="utf-8")
+    auth = bridge.load_jira_auth(
+        environ={
+            "JIRA_TOKEN": "env-token",
+            "JIRA_URL": "https://example.invalid",
+        },
+        agent_env_path=agent,
+    )
+    assert auth.token == "env-token"
+    assert auth.base_url == "https://example.invalid"
+    assert auth.source == "env"
+
+
+def test_cmd_deps_reports_missing_analysis(monkeypatch) -> None:
+    import cve_analysis_bridge as bridge
+
+    monkeypatch.setattr(
+        helper,
+        "load_jira_auth",
+        lambda: bridge.JiraAuth(
+            token="x",
+            base_url="https://redhat.atlassian.net",
+            basic_auth_user="a@b.c",
+            source="env",
+        ),
+    )
+
+    def _boom():
+        raise bridge.AnalysisImportError("not installed")
+
+    monkeypatch.setattr(helper, "jira_client_module", _boom)
+    rc = helper.cmd_deps(SimpleNamespace(json=False))
+    assert rc == 1
+

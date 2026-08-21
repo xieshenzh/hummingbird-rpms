@@ -11,6 +11,11 @@ Subcommands:
   sbom            Fetch package SBOM (Jira attachment or Pulp) and search it
   spec-deps       Probe a package .spec for a component / bundled Provides
   worktree        Create an isolated git worktree for a HUM task ticket
+  deps            Check Jira auth and hummingbird_cve_analysis import
+
+Jira writes import hummingbird_cve_analysis.lib (jira_client, pulp). Auth
+is JIRA_TOKEN plus JIRA_URL or rhjira's JIRA_SERVER / JIRA_EMAIL from
+~/.config/rhjira/agent.env — no extra token is required if rhjira works.
 """
 
 from __future__ import annotations
@@ -28,6 +33,15 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
 
+_SKILL_DIR = Path(__file__).resolve().parent
+if str(_SKILL_DIR) not in sys.path:
+    sys.path.insert(0, str(_SKILL_DIR))
+from cve_analysis_bridge import (  # noqa: E402
+    AnalysisImportError,
+    jira_client_module,
+    load_jira_auth,
+)
+
 CVE_RE = re.compile(r"CVE-\d{4}-\d{4,8}")
 HUM_RE = re.compile(r"HUM-\d{3,6}")
 MR_URL_RE = re.compile(
@@ -42,7 +56,7 @@ TRANSIENT_RHJIRA_RE = re.compile(
     r"proxy|tunnel|timed out|timeout|temporar|502|503|504|connection reset|\beof\b",
     re.IGNORECASE,
 )
-COMMANDS = ("show", "bot-mrs", "sbom", "spec-deps", "worktree")
+COMMANDS = ("show", "bot-mrs", "sbom", "spec-deps", "worktree", "deps")
 SBOM_FILE_RE = re.compile(r"sha256-[a-fA-F0-9]+\.sbom")
 BUNDLED_PROVIDES_RE = re.compile(
     r"(?i)^\s*Provides:\s*bundled\(([^)]+)\)(?:\s*=\s*(\S+))?"
@@ -1220,6 +1234,16 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print JSON instead of text.",
     )
+
+    deps = subparsers.add_parser(
+        "deps",
+        help="Check Jira auth mapping and hummingbird_cve_analysis import.",
+    )
+    deps.add_argument(
+        "--json",
+        action="store_true",
+        help="Print JSON instead of text.",
+    )
     return parser
 
 
@@ -1408,6 +1432,57 @@ def cmd_worktree(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_deps(args: argparse.Namespace) -> int:
+    """Report Jira auth source and whether hummingbird_cve_analysis imports."""
+    auth_ok = True
+    auth_error = ""
+    auth_source = ""
+    auth_url = ""
+    auth_user = ""
+    try:
+        auth = load_jira_auth()
+        auth_source = auth.source
+        auth_url = auth.base_url
+        auth_user = auth.basic_auth_user or ""
+    except RuntimeError as err:
+        auth_ok = False
+        auth_error = str(err)
+
+    analysis_ok = True
+    analysis_error = ""
+    try:
+        jira_client_module()
+    except AnalysisImportError as err:
+        analysis_ok = False
+        analysis_error = str(err)
+
+    payload = {
+        "jira_auth_ok": auth_ok,
+        "jira_auth_source": auth_source,
+        "jira_url": auth_url,
+        "jira_user": auth_user,
+        "jira_auth_error": auth_error,
+        "hummingbird_cve_analysis_ok": analysis_ok,
+        "hummingbird_cve_analysis_error": analysis_error,
+    }
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        auth_state = "ok" if auth_ok else f"missing ({auth_error})"
+        extra = ""
+        if auth_ok:
+            extra = f" url={auth_url}"
+            if auth_user:
+                extra += f" user={auth_user}"
+            extra += f" source={auth_source}"
+        print(f"jira_auth: {auth_state}{extra}")
+        if analysis_ok:
+            print("hummingbird_cve_analysis: ok")
+        else:
+            print(f"hummingbird_cve_analysis: missing ({analysis_error})")
+    return 0 if auth_ok and analysis_ok else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = normalize_argv(list(argv) if argv is not None else sys.argv[1:])
     parser = build_parser()
@@ -1422,6 +1497,7 @@ def main(argv: list[str] | None = None) -> int:
         "sbom": cmd_sbom,
         "spec-deps": cmd_spec_deps,
         "worktree": cmd_worktree,
+        "deps": cmd_deps,
     }
     return handlers[args.command](args)
 

@@ -4,5 +4,9 @@ dev = [
 ]
 
 [[tool.mypy.overrides]]
-module = "cki_lib.*"
+module = [
+  "cki_lib.*",
+  "cve_analysis_bridge",
+  "hummingbird_cve_analysis.*",
+]
 ignore_missing_imports = true
