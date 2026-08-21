@@ -4,5 +4,5 @@
   "release_monitoring_project_id": 381827,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/sigstore/rekor",
-  "version": "1.5.3"
+  "version": "1.5.4"
 }
