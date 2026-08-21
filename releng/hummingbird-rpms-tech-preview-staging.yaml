@@ -1008,6 +1008,8 @@ spec:
           contentType: rpm
         - name: redhat-rpm-config-main
           contentType: rpm
+        - name: rekor-main
+          contentType: rpm
         - name: rootfiles-main
           contentType: rpm
         - name: rpm-main

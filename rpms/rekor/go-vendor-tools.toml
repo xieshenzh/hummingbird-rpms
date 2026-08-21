@@ -1,0 +1,20 @@
+[archive]
+compression_type = "bz2"
+
+[licensing]
+detector = "askalono"
+
+# go-yaml v3's LICENSE file combines MIT (for files ported from libyaml)
+# and Apache-2.0 (for the rest of the project) in one document, which
+# askalono can't confidently resolve to a single SPDX identifier.
+# Both go.yaml.in/yaml/v3 and gopkg.in/yaml.v3 ship the identical file
+# (same sha256sum, confirmed via `cat`/`sha256sum` on both).
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "Apache-2.0 AND MIT"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "Apache-2.0 AND MIT"
