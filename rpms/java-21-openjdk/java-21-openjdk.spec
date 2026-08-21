@@ -2,10 +2,10 @@
 %global featurever 21
 %global interimver 0
 %global updatever 12
-%global patchver 0
-%global buildver 8
+%global patchver 1
+%global buildver 1
 %global portablerelease 1
-%global rpmrelease 1
+%global rpmrelease 0
 
 # Define IcedTea version used for SystemTap tapsets and desktop file
 %global icedteaver      6.0.0pre00-c848b93a8598
