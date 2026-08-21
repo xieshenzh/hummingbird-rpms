@@ -469,21 +469,21 @@ def validate_package(package_name: str, check_actual_state: bool = True) -> tupl
     status = metadata['modification_status']
 
     # Check 2: Must be valid value
-    if status not in ['clean', 'modified', 'native']:
+    if status not in ['clean', 'modified', 'independent']:
         return False, f"{package_name}: Invalid modification_status '{status}'"
 
-    # Check 3: Native packages should not have source/branch/sha fields
-    if status == 'native':
+    # Check 3: Independent packages should not have source/branch/sha fields
+    if status == 'independent':
         if 'source' in metadata or 'branch' in metadata or 'sha' in metadata:
-            return False, f"{package_name}: Native package should not have source/branch/sha fields"
+            return False, f"{package_name}: Independent package should not have source/branch/sha fields"
 
-        # Check 3.1: A native package with a non-empty `sources` file has
+        # Check 3.1: An independent package with a non-empty `sources` file has
         # remote sources that need fetching at build time. It has no Fedora
         # dist-git history, so that fetch needs forked_from (fetch from
         # hummingbird's own lookaside cache instead) or lookaside_cache_url
         # (bypass dist-git-client entirely) in ci/package-overrides.yaml.
         # Without either, the build silently falls back to Fedora's lookaside
-        # cache, where a native package's sources were never uploaded, and
+        # cache, where an independent package's sources were never uploaded, and
         # fails. Packages with no `sources` file (e.g. hummingbird-release)
         # ship all their Source files locally and never hit this fetch path.
         sources_file = RPMS_DIR / package_name / 'sources'
@@ -494,13 +494,13 @@ def validate_package(package_name: str, check_actual_state: bool = True) -> tupl
             pkg_override = overrides.get(package_name) or {}
             if not pkg_override.get('forked_from') and not pkg_override.get('lookaside_cache_url'):
                 return False, (
-                    f"{package_name}: Native package is missing forked_from (or "
+                    f"{package_name}: Independent package is missing forked_from (or "
                     f"lookaside_cache_url) in ci/package-overrides.yaml -- without "
                     f"one of these, the build will try to fetch sources from "
                     f"Fedora's lookaside cache, where they don't exist."
                 )
 
-        # Native packages don't need further validation
+        # Independent packages don't need further validation
         return True, None
 
     # Find the last Sync/Import commit once (used by multiple checks below)

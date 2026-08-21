@@ -78,12 +78,12 @@ sign_off: bool = False
 
 class PackageMetadata(TypedDict):
     """Metadata stored in metadata/<package>.json for each package."""
-    source: NotRequired[str]  # Not present for native packages
-    branch: NotRequired[str]  # Not present for native packages
-    sha: NotRequired[str]  # Not present for native packages
+    source: NotRequired[str]  # Not present for independent packages
+    branch: NotRequired[str]  # Not present for independent packages
+    sha: NotRequired[str]  # Not present for independent packages
     version: str
     release: str
-    modification_status: NotRequired[Literal["clean", "modified", "native"]]
+    modification_status: NotRequired[Literal["clean", "modified", "independent"]]
     modification_reason: NotRequired[str]  # Only for 'modified'
     track_upstream: NotRequired[str]  # "latest" or version prefix (e.g., "1.26")
     release_monitoring_project_id: NotRequired[int | str]  # Anitya project ID (int) or upstream name (str)
@@ -373,9 +373,9 @@ def ls_sources(package: str) -> None:
     try:
         source_url = metadata['source']
     except KeyError:
-        # Native packages don't have a source URL - use Hummingbird lookaside
-        if metadata.get('modification_status') != 'native':
-            logging.error(f"Package {package} has no source URL and is not marked as native")
+        # Independent packages don't have a source URL - use Hummingbird lookaside
+        if metadata.get('modification_status') != 'independent':
+            logging.error(f"Package {package} has no source URL and is not marked as independent")
             sys.exit(1)
         source_url = f'https://gitlab.com/redhat/hummingbird/rpms/{package}.git'
 
@@ -1038,7 +1038,7 @@ def import_(url: str, branch: str, ref: str | None = None, directory: str | None
 
     # Set modification_status based on source
     if 'gitlab.com/redhat/hummingbird' in url:
-        metadata['modification_status'] = 'native'
+        metadata['modification_status'] = 'independent'
     else:
         metadata['modification_status'] = 'clean'
 
@@ -1578,10 +1578,10 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
 
     metadata = imports[package_name]
 
-    # Block native packages from being updated (they have no upstream)
+    # Block independent packages from being updated (they have no upstream)
     status = metadata.get('modification_status', 'clean')
-    if status == 'native':
-        sys.exit(f"ERROR: Cannot update native package {package_name}\n")
+    if status == 'independent':
+        sys.exit(f"ERROR: Cannot update independent package {package_name}\n")
 
     if not all(key in metadata for key in ('source', 'branch', 'sha')):
         logging.info("Skipping %s: no Fedora upstream configured", package_name)
@@ -1902,14 +1902,14 @@ def rebuild_package(package_name: str, reason: str, dry_run: bool = False) -> No
 
     logging.info("Rebuilding %s: %s", package_name, reason)
 
-    # Handle %autorelease if present (only for non-native packages)
+    # Handle %autorelease if present (only for non-independent packages)
     if uses_autorelease(package_dir):
         metadata = load_package_metadata(package_name)
         if not metadata:
             sys.exit(f"ERROR: Could not load metadata for {package_name}")
-        # Native packages don't have 'source' field and can't query MDAPI
+        # Independent packages don't have 'source' field and can't query MDAPI
         if 'source' not in metadata:
-            sys.exit(f"ERROR: Package {package_name} is native and uses %autorelease - "
+            sys.exit(f"ERROR: Package {package_name} is independent and uses %autorelease - "
                      f"cannot resolve via MDAPI. Please handle this rebuild manually.")
         else:
             branch = metadata.get('branch', 'rawhide')
@@ -1931,7 +1931,7 @@ def rebuild_package(package_name: str, reason: str, dry_run: bool = False) -> No
     # This allows us to distinguish between:
     # - Base is 3.1 -> first rebuild should be 3.1.1
     # - We already rebuilt base 3 to 3.1 -> next rebuild should be 3.2
-    # For native packages, don't pass a base — they have no Fedora upstream.
+    # For independent packages, don't pass a base — they have no Fedora upstream.
     upstream_release = metadata.get('release') if 'source' in metadata else None
 
     # Bump release with base-release awareness
@@ -2063,8 +2063,8 @@ def diff_package(package_name: str, output_mode: str = 'full', raw: bool = False
         capture: If True and output_mode='full', return diff text instead of printing
 
     Returns:
-        When capture=False: True if differences exist, False if clean, None if native
-        When capture=True: diff string if differences exist, '' if clean, None if native
+        When capture=False: True if differences exist, False if clean, None if independent
+        When capture=True: diff string if differences exist, '' if clean, None if independent
     """
     if capture and output_mode != 'full':
         raise ValueError(f"capture=True is only supported with output_mode='full', got {output_mode!r}")
@@ -2073,9 +2073,9 @@ def diff_package(package_name: str, output_mode: str = 'full', raw: bool = False
     if not metadata:
         sys.exit(f"ERROR: Package {package_name} not found")
 
-    # Skip native packages
-    if metadata.get('modification_status') == 'native':
-        print(f"{package_name}: Native package (no upstream to diff against)")
+    # Skip independent packages
+    if metadata.get('modification_status') == 'independent':
+        print(f"{package_name}: Independent package (no upstream to diff against)")
         return None
 
     # Clone upstream to temp directory
@@ -2321,7 +2321,7 @@ def list_packages(status_filter: str | None = None, prerelease_filter: bool = Fa
     """List packages with their modification status.
 
     Args:
-        status_filter: Filter by status ('clean', 'modified', 'native', or None for all)
+        status_filter: Filter by status ('clean', 'modified', 'independent', or None for all)
         prerelease_filter: If True, show only packages with pre-release versions
         name_only: If True, show only package names without formatting (useful for shell scripting)
     """
@@ -2384,7 +2384,7 @@ def list_packages(status_filter: str | None = None, prerelease_filter: bool = Fa
         status_indicator = {
             'clean': '✓',
             'modified': '⚠',
-            'native': '●',
+            'independent': '●',
         }.get(status, '?')
 
         if prerelease_filter:
@@ -2723,8 +2723,8 @@ Examples:
                             help='Show only clean packages')
     list_filter.add_argument('--modified', action='store_true',
                             help='Show only modified packages')
-    list_filter.add_argument('--native', action='store_true',
-                            help='Show only native packages')
+    list_filter.add_argument('--independent', action='store_true',
+                            help='Show only independent packages')
     list_filter.add_argument('--prerelease', action='store_true',
                             help='Show only packages with pre-release versions')
     list_parser.add_argument('--name-only', action='store_true',
@@ -2884,8 +2884,8 @@ Examples:
                 status_filter = 'clean'
             elif args.modified:
                 status_filter = 'modified'
-            elif args.native:
-                status_filter = 'native'
+            elif args.independent:
+                status_filter = 'independent'
             list_packages(status_filter, prerelease_filter=args.prerelease, name_only=args.name_only)
         case 'diff':
             # Determine output mode

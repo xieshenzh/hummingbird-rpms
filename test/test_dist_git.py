@@ -1935,44 +1935,44 @@ def test_update_skips_upstream_without_spec(
     assert metadata['version'] == '1.0'
 
 
-def test_native_package_blocks_update(workdir: Path, upstream_repos: dict[str, Path]) -> None:
-    """Verify that native packages block automatic updates."""
-    # Create a native package manually
-    native_dir = workdir / 'rpms' / 'native-pkg'
-    native_dir.mkdir()
-    (native_dir / 'native-pkg.spec').write_text("""Name: native-pkg
+def test_independent_package_blocks_update(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Verify that independent packages block automatic updates."""
+    # Create an independent package manually
+    independent_dir = workdir / 'rpms' / 'independent-pkg'
+    independent_dir.mkdir()
+    (independent_dir / 'independent-pkg.spec').write_text("""Name: independent-pkg
 Version: 1.0
 Release: 1
-Summary: Native package
+Summary: Independent package
 License: MIT
 
 %description
-Native package
+Independent package
 
 %files
 """)
 
-    # Create metadata for native package
-    metadata_file = workdir / 'metadata' / 'native-pkg.json'
+    # Create metadata for independent package
+    metadata_file = workdir / 'metadata' / 'independent-pkg.json'
     with open(metadata_file, 'w') as f:
         json.dump({
             'version': '1.0',
             'release': '1',
-            'modification_status': 'native',
+            'modification_status': 'independent',
         }, f, indent=2)
 
     subprocess.run(['git', 'add', '.'], cwd=workdir, check=True)
-    subprocess.run(['git', 'commit', '-m', 'Add native package'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add independent package'], cwd=workdir, check=True)
 
     # Update should fail
     result = subprocess.run(
-        [str(workdir / 'ci' / 'dist_git.py'), 'update', 'native-pkg'],
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', 'independent-pkg'],
         cwd=workdir, capture_output=True, text=True,
     )
 
     # Should exit with error
     assert result.returncode != 0
-    assert "Cannot update native package native-pkg" in result.stderr
+    assert "Cannot update independent package independent-pkg" in result.stderr
 
 
 def test_list_all_packages(workdir: Path, upstream_repos: dict[str, Path]) -> None:
@@ -1983,31 +1983,31 @@ def test_list_all_packages(workdir: Path, upstream_repos: dict[str, Path]) -> No
         cwd=workdir, check=True,
     )
 
-    # Create a native package
-    native_dir = workdir / 'rpms' / 'native-pkg'
-    native_dir.mkdir()
-    (native_dir / 'native-pkg.spec').write_text("""Name: native-pkg
+    # Create an independent package
+    independent_dir = workdir / 'rpms' / 'independent-pkg'
+    independent_dir.mkdir()
+    (independent_dir / 'independent-pkg.spec').write_text("""Name: independent-pkg
 Version: 1.0
 Release: 1
-Summary: Native package
+Summary: Independent package
 License: MIT
 
 %description
-Native package
+Independent package
 
 %files
 """)
 
-    metadata_file = workdir / 'metadata' / 'native-pkg.json'
+    metadata_file = workdir / 'metadata' / 'independent-pkg.json'
     with open(metadata_file, 'w') as f:
         json.dump({
             'version': '1.0',
             'release': '1',
-            'modification_status': 'native',
+            'modification_status': 'independent',
         }, f, indent=2)
 
     subprocess.run(['git', 'add', '.'], cwd=workdir, check=True)
-    subprocess.run(['git', 'commit', '-m', 'Add native package'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add independent package'], cwd=workdir, check=True)
 
     # List all packages
     result = subprocess.run(
@@ -2018,9 +2018,9 @@ Native package
     # Should show both packages
     assert 'ALL PACKAGES (2)' in result.stdout
     assert 'vanilla' in result.stdout
-    assert 'native-pkg' in result.stdout
+    assert 'independent-pkg' in result.stdout
     assert '[clean]' in result.stdout
-    assert '[native]' in result.stdout
+    assert '[independent]' in result.stdout
 
 
 def test_list_modified_only(workdir: Path, upstream_repos: dict[str, Path]) -> None:
@@ -2091,50 +2091,50 @@ def test_list_clean_only(workdir: Path, upstream_repos: dict[str, Path]) -> None
     assert 'vanilla' not in result.stdout
 
 
-def test_list_native_only(workdir: Path, upstream_repos: dict[str, Path]) -> None:
-    """Test list --native shows only native packages."""
+def test_list_independent_only(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Test list --independent shows only independent packages."""
     # Import vanilla package (clean)
     subprocess.run(
         [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
         cwd=workdir, check=True,
     )
 
-    # Create a native package
-    native_dir = workdir / 'rpms' / 'native-pkg'
-    native_dir.mkdir()
-    (native_dir / 'native-pkg.spec').write_text("""Name: native-pkg
+    # Create an independent package
+    independent_dir = workdir / 'rpms' / 'independent-pkg'
+    independent_dir.mkdir()
+    (independent_dir / 'independent-pkg.spec').write_text("""Name: independent-pkg
 Version: 1.0
 Release: 1
-Summary: Native package
+Summary: Independent package
 License: MIT
 
 %description
-Native package
+Independent package
 
 %files
 """)
 
-    metadata_file = workdir / 'metadata' / 'native-pkg.json'
+    metadata_file = workdir / 'metadata' / 'independent-pkg.json'
     with open(metadata_file, 'w') as f:
         json.dump({
             'version': '1.0',
             'release': '1',
-            'modification_status': 'native',
+            'modification_status': 'independent',
         }, f, indent=2)
 
     subprocess.run(['git', 'add', '.'], cwd=workdir, check=True)
-    subprocess.run(['git', 'commit', '-m', 'Add native package'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add independent package'], cwd=workdir, check=True)
 
-    # List native packages
+    # List independent packages
     result = subprocess.run(
-        [str(workdir / 'ci' / 'dist_git.py'), 'list', '--native'],
+        [str(workdir / 'ci' / 'dist_git.py'), 'list', '--independent'],
         cwd=workdir, capture_output=True, text=True, check=True,
     )
 
-    # Should show only native package
-    assert 'NATIVE PACKAGES (1)' in result.stdout
-    assert 'native-pkg' in result.stdout
-    assert '[native]' in result.stdout
+    # Should show only independent package
+    assert 'INDEPENDENT PACKAGES (1)' in result.stdout
+    assert 'independent-pkg' in result.stdout
+    assert '[independent]' in result.stdout
     assert 'vanilla' not in result.stdout
 
 
@@ -2191,43 +2191,43 @@ def test_diff_clean_package(workdir: Path, upstream_repos: dict[str, Path]) -> N
     assert result.stdout.strip() == ''
 
 
-def test_diff_native_package(workdir: Path) -> None:
-    """Test diff skips native packages with message."""
-    # Create a native package
-    native_dir = workdir / 'rpms' / 'native-pkg'
-    native_dir.mkdir()
-    (native_dir / 'native-pkg.spec').write_text("""Name: native-pkg
+def test_diff_independent_package(workdir: Path) -> None:
+    """Test diff skips independent packages with message."""
+    # Create an independent package
+    independent_dir = workdir / 'rpms' / 'independent-pkg'
+    independent_dir.mkdir()
+    (independent_dir / 'independent-pkg.spec').write_text("""Name: independent-pkg
 Version: 1.0
 Release: 1
-Summary: Native package
+Summary: Independent package
 License: MIT
 
 %description
-Native package
+Independent package
 
 %files
 """)
 
-    metadata_file = workdir / 'metadata' / 'native-pkg.json'
+    metadata_file = workdir / 'metadata' / 'independent-pkg.json'
     with open(metadata_file, 'w') as f:
         json.dump({
             'version': '1.0',
             'release': '1',
-            'modification_status': 'native',
+            'modification_status': 'independent',
         }, f, indent=2)
 
     subprocess.run(['git', 'add', '.'], cwd=workdir, check=True)
-    subprocess.run(['git', 'commit', '-m', 'Add native package'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add independent package'], cwd=workdir, check=True)
 
     # Run diff command
     result = subprocess.run(
-        [str(workdir / 'ci' / 'dist_git.py'), 'diff', 'native-pkg'],
+        [str(workdir / 'ci' / 'dist_git.py'), 'diff', 'independent-pkg'],
         cwd=workdir, capture_output=True, text=True, check=True,
     )
 
     # Should skip with message
     assert result.returncode == 0
-    assert 'Native package (no upstream to diff against)' in result.stdout
+    assert 'Independent package (no upstream to diff against)' in result.stdout
 
 
 def test_diff_raw_mode(workdir: Path, upstream_repos: dict[str, Path]) -> None:
@@ -3759,55 +3759,55 @@ def test_rebuild_all_continues_on_failure(workdir: Path, upstream_repos: dict[st
     assert 'Release: %{broken_macro}' in vanilla_spec.read_text()
 
 
-def test_rebuild_native_package(workdir: Path) -> None:
-    """Test that rebuilding a native package bumps release correctly."""
-    # Create a native package manually
-    native_dir = workdir / 'rpms' / 'native-pkg'
-    native_dir.mkdir()
+def test_rebuild_independent_package(workdir: Path) -> None:
+    """Test that rebuilding an independent package bumps release correctly."""
+    # Create an independent package manually
+    independent_dir = workdir / 'rpms' / 'independent-pkg'
+    independent_dir.mkdir()
 
     # Create spec file with Release: 0.1%{?dist}
-    native_spec = native_dir / 'native-pkg.spec'
-    native_spec.write_text("""Name: native-pkg
+    independent_spec = independent_dir / 'independent-pkg.spec'
+    independent_spec.write_text("""Name: independent-pkg
 Version: 1.0
 Release: 0.1%{?dist}
-Summary: Test native package
+Summary: Test independent package
 License: MIT
 
 %description
-Test native package
+Test independent package
 
 %files
 """)
 
-    # Create metadata for native package (no 'source' field)
-    metadata_file = workdir / 'metadata' / 'native-pkg.json'
+    # Create metadata for independent package (no 'source' field)
+    metadata_file = workdir / 'metadata' / 'independent-pkg.json'
     metadata = {
         'version': '1.0',
         'release': '0.1',
-        'modification_status': 'native'
+        'modification_status': 'independent'
     }
     with open(metadata_file, 'w') as f:
         json.dump(metadata, f, indent=2)
         f.write('\n')
 
-    # Commit the native package
-    subprocess.run(['git', 'add', 'rpms/native-pkg', 'metadata/native-pkg.json'], cwd=workdir, check=True)
-    subprocess.run(['git', 'commit', '-m', 'Add native package'], cwd=workdir, check=True)
+    # Commit the independent package
+    subprocess.run(['git', 'add', 'rpms/independent-pkg', 'metadata/independent-pkg.json'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add independent package'], cwd=workdir, check=True)
 
-    # Rebuild the native package
+    # Rebuild the independent package
     subprocess.run(
-        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'native-pkg',
-         '--reason', 'test native rebuild'],
+        [str(workdir / 'ci' / 'dist_git.py'), 'rebuild', 'independent-pkg',
+         '--reason', 'test independent rebuild'],
         cwd=workdir, check=True,
     )
 
     # Verify Release was bumped to 0.2, not 0.1.1
-    spec_content = native_spec.read_text()
+    spec_content = independent_spec.read_text()
     assert 'Release: 0.2%{?dist}' in spec_content, f"Expected '0.2', got spec:\n{spec_content}"
 
     # Verify commit message
     subject, _ = get_last_commit_info(workdir)
-    assert subject == 'Rebuild native-pkg: test native rebuild'
+    assert subject == 'Rebuild independent-pkg: test independent rebuild'
 
 
 def test_rebuild_rev_deps_direct(workdir: Path, upstream_repos: dict[str, Path]) -> None:

@@ -324,7 +324,7 @@ def cmd_prepare(args: argparse.Namespace) -> None:
 
         diff_text = get_diff_output(pkg)
         if diff_text is None:
-            print('DIFF: (native package — no upstream)')
+            print('DIFF: (independent package — no upstream)')
         elif diff_text == '':
             print('DIFF: (empty — no differences found)')
             print('NOTE: This package has no diff. Classify as "no-diff".')
@@ -590,7 +590,7 @@ def cmd_jira_template(args: argparse.Namespace) -> None:
 
     diff_text = get_diff_output(package)
     if diff_text is None:
-        diff_text = '(native package — no upstream)'
+        diff_text = '(independent package — no upstream)'
     elif diff_text == '':
         diff_text = '(no differences found)'
 

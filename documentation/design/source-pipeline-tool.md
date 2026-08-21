@@ -782,7 +782,7 @@ Hummingbird-specific wiring.
 | System | Packages | Source of tarballs | Hook system |
 | ------ | -------- | ------------------ | ----------- |
 | `dist_git.py update` | 450 (clean + modified) | Fedora lookaside cache (via `sources` file copied from Fedora dist-git) | None |
-| `check_upstream_versions.py` | 22 (native) | Upstream URLs (via `download_sources` hooks or default spec URL download) | Yes: `update_spec`, `download_sources`, `post_update` |
+| `check_upstream_versions.py` | 22 (independent) | Upstream URLs (via `download_sources` hooks or default spec URL download) | Yes: `update_spec`, `download_sources`, `post_update` |
 
 **`dist_git.py update` flow:**
 
@@ -817,7 +817,7 @@ Configured in `mock/dist-git-client.ini`:
 | ------- | ----------- | ------- |
 | Fedora | `src.fedoraproject.org/repo/pkgs/rpms/{name}/{filename}/{hashtype}/{hash}/{filename}` | ~410 packages (default) |
 | CentOS Stream | `sources.stream.centos.org/sources/rpms/{name}/...` | 1 package (`rust-rpm-sequoia`) |
-| Hummingbird | `d1766whheab9hg.cloudfront.net/rpms/{name}/...` (S3: `arr-hummingbird-prod-dist-git-cache`) | ~40 packages (native + forked) |
+| Hummingbird | `d1766whheab9hg.cloudfront.net/rpms/{name}/...` (S3: `arr-hummingbird-prod-dist-git-cache`) | ~40 packages (independent + forked) |
 
 The `forked_from` field in `ci/package-overrides.yaml` determines which cache a package uses at
 build time. Packages without `forked_from` default to Fedora's cache.
@@ -837,7 +837,7 @@ appropriate cache, then runs `mock` to build RPMs.
 
 ### Existing source generation patterns
 
-Some native packages already have tarball generation scripts:
+Some independent packages already have tarball generation scripts:
 
 - `rpms/opentelemetry-collector-contrib/create-vendor-tarball.sh` — downloads upstream release,
   runs OCB to generate source code, vendors Go dependencies
@@ -960,9 +960,9 @@ podman run --rm \
 
 ## Migration Path
 
-### Phase 1: Native Go packages
+### Phase 1: Independent Go packages
 
-Migrate the 22 native packages that already fetch from upstream. Convert their existing
+Migrate the 22 independent packages that already fetch from upstream. Convert their existing
 `create-vendor-tarball.sh` scripts and `download_sources` hooks into pipeline YAML definitions.
 Validates the tool against known-good packages.
 

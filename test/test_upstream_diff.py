@@ -68,8 +68,8 @@ def sample_metadata(upstream_diff_module, tmp_path):
             'version': '6.0.3',
             'release': '1',
         },
-        'native-pkg': {
-            'modification_status': 'native',
+        'independent-pkg': {
+            'modification_status': 'independent',
             'version': '1.0',
             'release': '1',
         },
@@ -160,10 +160,10 @@ class TestGetBatch:
         assert 'automake' in batch
         assert 'curl' in batch
 
-    def test_skips_clean_and_native(self, upstream_diff_module, sample_metadata):
+    def test_skips_clean_and_independent(self, upstream_diff_module, sample_metadata):
         metadata = upstream_diff_module.get_all_modified_metadata()
         assert 'PyYAML' not in metadata
-        assert 'native-pkg' not in metadata
+        assert 'independent-pkg' not in metadata
 
     def test_skips_cached_current(self, upstream_diff_module, sample_metadata, sample_cache):
         cache = upstream_diff_module.load_cache()

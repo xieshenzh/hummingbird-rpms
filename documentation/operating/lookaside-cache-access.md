@@ -86,5 +86,5 @@ no explicit package arguments are given. To see all packages and their upstream 
 
 ## See Also
 
-- [Adding Native Packages](adding-native-packages.md) - Adding new packages with source tarballs
+- [Adding Independent Packages](adding-independent-packages.md) - Adding new packages with source tarballs
 - [Rebuilding Packages](rebuilding-packages.md) - Rebuilding existing packages

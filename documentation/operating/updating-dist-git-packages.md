@@ -19,10 +19,10 @@ automatically approved and merged when CI passes.
 # Check only a specific package (for testing/debugging)
 ./ci/dist_git_update_multi_mr.sh --clone --only-package=libgcrypt
 
-# Check only clean packages (skip modified/native)
+# Check only clean packages (skip modified/independent)
 ./ci/dist_git_update_multi_mr.sh --clone --clean-only
 
-# Check only modified packages (skip clean/native)
+# Check only modified packages (skip clean/independent)
 ./ci/dist_git_update_multi_mr.sh --clone --modified-only
 
 # Create up to 3 test MRs (checks all packages, stops after finding 3 updates)
@@ -33,7 +33,7 @@ export CHORE_MR_GITLAB_TOKEN="glpat-xxxxxxxxxxxxxxxxxxxx"
 export CHORE_MR_GITLAB_TOKEN="glpat-xxxxxxxxxxxxxxxxxxxx"
 ./ci/dist_git_update_multi_mr.sh --clone --max-packages=10 --max-updates=3 --create-mrs
 
-# Create MRs only for clean packages (skip modified/native)
+# Create MRs only for clean packages (skip modified/independent)
 export CHORE_MR_GITLAB_TOKEN="glpat-xxxxxxxxxxxxxxxxxxxx"
 ./ci/dist_git_update_multi_mr.sh --clone --clean-only --create-mrs
 ```
@@ -52,28 +52,28 @@ export CHORE_MR_GITLAB_TOKEN="glpat-xxxxxxxxxxxxxxxxxxxx"
 - `--max-updates=N` - Stop after finding N updates (limits output MRs created)
 - `--create-mrs` - Actually create MRs (requires token)
 - `--only-package=NAME` - Check only the specified package (for testing/debugging specific packages)
-- `--clean-only` - Skip packages with `modification_status` of 'modified' or 'native', only process
+- `--clean-only` - Skip packages with `modification_status` of 'modified' or 'independent', only process
   clean packages
-- `--modified-only` - Skip packages with `modification_status` of 'clean' or 'native', only process
+- `--modified-only` - Skip packages with `modification_status` of 'clean' or 'independent', only process
   modified packages (mutually exclusive with `--clean-only`)
 
 ### Using --clean-only
 
-The `--clean-only` flag filters out packages marked as 'modified' or 'native' before attempting
+The `--clean-only` flag filters out packages marked as 'modified' or 'independent' before attempting
 updates. This is useful for:
 
 1. **Better failure detection** - Exit code 1 indicates real update failures, not expected errors
-   from modified/native packages
+   from modified/independent packages
 2. **Cleaner output** - No error messages for packages that can't be auto-updated by design
 3. **Efficient CI** - Focus on packages that should update automatically
 4. **Performance** - Avoids invoking `dist_git.py` for packages that will fail
 
-Without `--clean-only`, the script attempts to update all packages. Modified/native packages fail
+Without `--clean-only`, the script attempts to update all packages. Modified/independent packages fail
 with:
 
 ```text
 ERROR: Cannot auto-update <package>
-       Status: modified/native
+       Status: modified/independent
        Reason: <reason>
        Use 'sync' to force update or 'mark-modified --clean' to allow updates
 ```
@@ -84,7 +84,7 @@ failures.
 ### Using --modified-only
 
 The `--modified-only` flag filters to only process packages marked as 'modified', skipping clean and
-native packages. This is useful for checking the merge logic, as well as getting an overview of
+independent packages. This is useful for checking the merge logic, as well as getting an overview of
 current merge conflicts.
 
 ## Auto-Merge and Auto-Approval

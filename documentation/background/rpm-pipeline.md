@@ -45,8 +45,8 @@ and any associated source files or patches.
 
 | Method | Description | Modification Status |
 | -------- | ------------- | --------------------- |
-| Automated Fedora sync | `ci/dist_git.py update` merges upstream Fedora changes | No `native` packages |
-| Upstream version update | `ci/check_upstream_versions.py --update` bumps to new upstream release | No `native` packages |
+| Automated Fedora sync | `ci/dist_git.py update` merges upstream Fedora changes | No `independent` packages |
+| Upstream version update | `ci/check_upstream_versions.py --update` bumps to new upstream release | No `independent` packages |
 | Manual patch backport | Developer adds a CVE patch and references it in the `.spec` | Marked `modified` afterward |
 | No-change rebuild | `ci/dist_git.py rebuild <package>` bumps the Release field | Status unchanged |
 | Reverse dependency rebuild | `ci/dist_git.py rebuild-rev-deps <package>` rebuilds all dependents | Status unchanged |
@@ -78,9 +78,9 @@ Key fields:
 
 | Field | Purpose |
 | ------- | --------- |
-| `modification_status` | `clean` (auto-updates enabled), `modified` (auto-updates blocked), or `native` (no upstream) |
+| `modification_status` | `clean` (auto-updates enabled), `modified` (auto-updates blocked), or `independent` (no upstream) |
 | `modification_reason` | Explanation of local modifications (when `modified`) |
-| `release` | Base release without dist tag — Fedora/rawhide baseline, or a local base (natives / ahead-of-Fedora) |
+| `release` | Base release without dist tag — Fedora/rawhide baseline, or a local base (independents / ahead-of-Fedora) |
 | `upstream_repo` | Canonical upstream git repository URL |
 | `track_upstream` | Version prefix constraint (e.g., `"1.26"` for golang1.26) |
 | `version_transform` | Version mapping rule for CVE analysis (e.g., `dotnet_sdk_to_runtime`) |

@@ -1,13 +1,13 @@
 ---
-title: Adding Native Packages
+title: Adding Independent Packages
 description: How to add packages that originate in the Hummingbird repository
 weight: 45
 ---
 
-Native packages are packages that originate in the Hummingbird repository rather than being imported
+Independent packages are packages that originate in the Hummingbird repository rather than being imported
 from Fedora dist-git.
 
-## Steps to Add a Native Package
+## Steps to Add an Independent Package
 
 ### 1. Create Package Directory
 
@@ -49,7 +49,7 @@ Create `metadata/<package-name>.json`:
 
 ```json
 {
-  "modification_status": "native",
+  "modification_status": "independent",
   "release": "1",
   "upstream_repo": "https://github.com/example/project",
   "version": "1.3.0"
@@ -58,7 +58,7 @@ Create `metadata/<package-name>.json`:
 
 Fields:
 
-- **`modification_status`**: Must be `"native"` for packages not imported from Fedora (see
+- **`modification_status`**: Must be `"independent"` for packages not imported from Fedora (see
   [Package Metadata Fields](package-metadata-fields.md))
 - **`upstream_repo`**: Canonical upstream git repository URL (required — CI enforces this). If no
   upstream repo exists, use `https://src.fedoraproject.org/rpms/<name>` as a fallback.
@@ -114,7 +114,7 @@ sha512sum --tag oras-1.3.0.tar.gz oras-1.3.0-vendor.tar.bz2 > sources
 # 4. Create metadata
 cat > ../../metadata/oras.json << 'EOF'
 {
-  "modification_status": "native",
+  "modification_status": "independent",
   "release": "1",
   "upstream_repo": "https://github.com/oras-project/oras",
   "version": "1.3.0"

@@ -119,7 +119,7 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
             # When forked_from points to hummingbird, we use the directory name
             # since the hummingbird lookaside cache uses hummingbird package names.
             #
-            # Native packages (Hummingbird-specific) have no source URL in metadata,
+            # Independent packages (Hummingbird-specific) have no source URL in metadata,
             # so we use the directory name directly.
             metadata_file = ROOT_DIR / "metadata" / f"{dname}.json"
             metadata = load_yaml_file(metadata_file)
@@ -128,8 +128,8 @@ def build_pac_variables(branch: str, tenant: str, resource_type: str) -> dict:
             forked_from = pkg_config.get("forked_from", "")
             is_hummingbird = "hummingbird" in forked_from
 
-            if metadata and metadata.get("modification_status") == "native":
-                # Native packages: Use directory name (no upstream source)
+            if metadata and metadata.get("modification_status") == "independent":
+                # Independent packages: Use directory name (no upstream source)
                 # Examples: chunkah, hummingbird-release, openssl-fips-provider
                 upstream_name = dname
             elif is_hummingbird:
