@@ -1,11 +1,11 @@
 {
   "branch": "f43",
-  "modification_reason": "Add FIPS mode support (00329-fips.patch) - OpenSSL FIPS mode compliance for hashlib and hmac; backport security patches including CVE-2026-6019; backport fix for CVE-2026-11972; backport fix for CVE-2026-15308; backport fix for CVE-2026-11940; CVE-2026-4360; CVE-2026-6879",
+  "modification_reason": "Add FIPS mode support (00329-fips.patch) - OpenSSL FIPS mode compliance for hashlib and hmac; backport fix for CVE-2026-3446; backport fix for CVE-2026-3479; backport fix for CVE-2026-6019",
   "modification_status": "modified",
-  "release": "6",
-  "sha": "06f5d3454fc8d2b6950a9334598d833ee8aa292b",
+  "release": "1",
+  "sha": "5590da14924ea625a8d1a40684162b9482b5578a",
   "source": "https://src.fedoraproject.org/rpms/python3.12.git",
   "upstream_branch": "3.12",
   "upstream_repo": "https://github.com/python/cpython",
-  "version": "3.12.13"
+  "version": "3.12.14"
 }
