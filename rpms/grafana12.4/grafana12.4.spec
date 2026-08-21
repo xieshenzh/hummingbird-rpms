@@ -2105,8 +2105,8 @@ go_vendor_license -c %{S:2} \
 export GOFLAGS="-mod=vendor -buildvcs=false"
 export TMPDIR="${PWD}/test-tmp"
 mkdir -p "${TMPDIR}"
-# pkg/util/xorm is compiled at Go 1.21 language version during %gotest but
-# calls rand.Int64N (Go 1.22+). %build uses go 1.26.5 and succeeds.
+# pkg/util/xorm is compiled at Go 1.21 language version during the check
+# phase but calls rand.Int64N (Go 1.22+). The build uses go 1.26.5 and succeeds.
 skip_packages=(
     '/pkg/util/xorm'
 )
