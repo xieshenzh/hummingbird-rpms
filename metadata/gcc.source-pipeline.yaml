@@ -15,10 +15,22 @@
 #
 #       git log -1 --format=%cd --date=format:%Y%m%d <new-gitrev>
 #
-#     Whoever refreshes this pin: pick the new gitrev, run the above
-#     against it, then invoke gorget with
-#     --version "<gcc_version>-<that date>" and update fetch.ref and the
-#     post: step's literal gitrev argument below together.
+#     As of HUM-4621, dist_git.py update automates this: see
+#     metadata/gcc.json's version_from_ref ({"type": "commit-date"}) and
+#     ci/dist_git.py's _refresh_fixed_ref_pin. It detects when this pin no
+#     longer matches the merged spec, runs the above against the new
+#     gitrev, and rewrites fetch.ref here automatically. Falls back to
+#     routing the update to a draft, manual-review MR if that fails (e.g.
+#     upstream unreachable) -- never silently commits an unverified pin.
+#
+#     upstream_repo (metadata/gcc.json) points at gcc.gnu.org's read-only
+#     mirror on googlesource.com, not gcc.gnu.org itself: gcc.gnu.org's git
+#     server aggressively rate-limits clone/fetch operations (confirmed
+#     repeatedly while both migrating and manually unblocking !4170, even
+#     from a residential VPN), while gnu.googlesource.com serves the same
+#     content reliably -- same commit SHAs, content-addressed identically.
+#     This affects Source0's fetch here (repo: "${UPSTREAM_REPO}") but not
+#     Source1/Source2 below, which pin their own separate hosts directly.
 #
 #   Source1 (nvptx-tools) / Source2 (newlib-cygwin): pinned to their own
 #     %global *_gitrev macros, simple git snapshots, no changelog logic.
