@@ -61,6 +61,7 @@ Common operational tasks that users or AI agents may need to perform:
 | Private RPM repositories       | _(package-overrides + RPA config)_                              | [Private RPM Repositories](documentation/operating/private-rpm-repositories.md)                 | Route packages to private per-product Pulp repos                       |
 | Add private product            | `add-private-product <product> --packages ...`                  | [Private RPM Repositories](documentation/operating/private-rpm-repositories.md)                 | Create a private product with Pulp repos, RPA, and packages            |
 | Rebase buildroot to new Fedora | _(multi-step; see runbook)_                                     | [Rebasing Buildroot to New Fedora](documentation/operating/rebasing-buildroot-to-new-fedora.md) | Move mock.cfg, core toolchain, and package set to a new Fedora release |
+| Add/rotate GPG source keys     | _(edit `metadata/gpg-keys/` + pipeline YAML)_                   | [GPG Source Verification](documentation/operating/gpg-source-verification.md)                   | Add, rotate, or revoke an upstream signing key for source verification |
 
 ## Post-Import / Post-Add Requirements
 
