@@ -228,6 +228,41 @@ skipped in favour of the next available version. Available checkers:
 }
 ```
 
+### `version_from_ref` (fixed-ref, no-tagged-release packages)
+
+Most gorget `source-pipeline.yaml` fetch steps are version-templated (`ref: "v${VERSION}"`), so
+`dist_git.py update` can invoke gorget with `metadata/<package>.json`'s own `version` directly. A
+few packages instead pin a fixed git-snapshot commit with no tagged upstream release at all (gcc,
+glibc, libyuv, php-patchwork-jsqueeze, vim) -- their `version` field doesn't change when the pinned
+commit does, so it can't drive gorget's `--version` argument.
+
+`version_from_ref` tells `dist_git.py update` how to derive gorget's `--version` string from a
+newly-pinned commit, instead of requiring someone to compute it by hand every time (the previous
+process, documented as a manual step in each such package's `source-pipeline.yaml` comments).
+
+Currently one `type` is supported:
+
+- **`commit-date`** (used by gcc): `"<metadata.json's version>-<commit's own YYYYMMDD date>"`, where
+  the date comes from `git log -1 --format=%cd --date=format:%Y%m%d <ref>` run against the newly-pinned
+  commit.
+
+```json
+{
+  "version_from_ref": {"type": "commit-date"}
+}
+```
+
+**Currently gcc-only.** `dist_git.py update` only fully automates a fixed-ref pin refresh for gcc's
+simple case (a full 40-char commit SHA lives directly in a spec `%global`). The other four
+packages pin via a `git describe`-style string (e.g. glibc's `%{glibcsrcdir}` macro,
+`glibc-2.43-47-gbc95068f5f`) whose trailing hash is only a 10-character abbreviation -- resolving
+that back to a full SHA needs a local clone containing the commit object, real extra network work
+with its own failure modes (ambiguous hashes, upstream unavailability), not yet implemented (see
+HUM-4621's "Remaining work"). For those four, `dist_git.py update` detects when the pipeline's
+pinned `ref:` no longer matches the merged spec and refuses to auto-commit -- it's routed to a
+draft, `no-test`-labeled MR for manual resolution instead, the same way a real git merge conflict
+is, rather than silently committing a `sources` file gorget was never actually run against.
+
 ## Per-Package Update Hooks
 
 When `check_upstream_versions.py check --update` updates a package, by default it sets `Version:` to

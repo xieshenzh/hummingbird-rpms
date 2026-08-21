@@ -406,13 +406,21 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
         continue
     fi
 
-    # Check for conflict markers
+    # Check for conflict markers, or a needs-manual-gorget-run commit (no git
+    # merge conflict, but dist_git.py update couldn't verify/re-fetch sources
+    # via gorget on its own -- see HUM-4621). Both need the same human-review
+    # treatment: draft, no-test, don't auto-merge.
     CONFLICT_FILES=$(git grep -l "^<<<<<<< HEAD" -- "rpms/${PACKAGE}/" 2>/dev/null | sed "s|rpms/${PACKAGE}/||" | tr '\n' ', ' | sed 's/, $//' || true)
     if [[ -n "${CONFLICT_FILES}" ]]; then
         HAS_CONFLICT=true
         echo "  ⚠ Has conflicts: ${CONFLICT_FILES}"
         MR_TITLE="CONFLICT: chore(rpms): ${COMMIT_MSG}"
         MR_DESCRIPTION="**Merge conflicts in:**\n${CONFLICT_FILES}\n\nLook for conflict markers in the files above. Resolve and push updates to this branch."
+    elif [[ "${COMMIT_MSG}" == "NEEDS MANUAL GORGET RUN:"* ]]; then
+        HAS_CONFLICT=true
+        echo "  ⚠ Needs manual gorget run (no git conflict, but gorget verification failed)"
+        MR_TITLE="CONFLICT: chore(rpms): ${COMMIT_MSG#NEEDS MANUAL GORGET RUN: }"
+        MR_DESCRIPTION="**Needs a manual gorget run:**\nSee the commit message on this branch for details. gorget must be re-run (and its output uploaded to the lookaside cache) before this can merge."
     else
         HAS_CONFLICT=false
         MR_TITLE="chore(rpms): ${COMMIT_MSG}"
