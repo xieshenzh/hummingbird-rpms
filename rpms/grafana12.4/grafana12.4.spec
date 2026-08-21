@@ -2105,7 +2105,13 @@ go_vendor_license -c %{S:2} \
 export GOFLAGS="-mod=vendor -buildvcs=false"
 export TMPDIR="${PWD}/test-tmp"
 mkdir -p "${TMPDIR}"
-%gotest -short -timeout=30m ./...
+# pkg/util/xorm is compiled at Go 1.21 language version during %gotest but
+# calls rand.Int64N (Go 1.22+). %build uses go 1.26.5 and succeeds.
+skip_packages=(
+    '/pkg/util/xorm'
+)
+skip_package_pattern=$(IFS='|'; echo "${skip_packages[*]}")
+%gotest -short -timeout=30m $(go list ./... | grep -Ev "${skip_package_pattern}")
 %endif
 
 %files -f %{go_vendor_license_filelist}
