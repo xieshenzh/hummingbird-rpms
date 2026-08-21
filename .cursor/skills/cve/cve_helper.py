@@ -1186,15 +1186,24 @@ def set_fixed_in_build(
 
 
 def close_not_a_bug(ticket: str, body: str, vex: str) -> None:
+    """Comment, set VEX, and close as Not a Bug.
+
+    jira_client raises on HTTP errors. set_vex_justification and
+    jira_resolve_issue return False when the field/transition is missing.
+    None (or any other non-False value) is treated as success so a 204-style
+    empty body cannot abort after the comment was posted.
+    """
     post_comment(ticket, body)
-    if not _jira_auth_call("set_vex_justification", ticket, vex):
+    vex_ok = _jira_auth_call("set_vex_justification", ticket, vex)
+    if vex_ok is False:
         raise RuntimeError(f"Failed to set VEX justification on {ticket}")
-    if not _jira_auth_call(
+    resolved = _jira_auth_call(
         "jira_resolve_issue",
         ticket,
         "Closed",
         "Not a Bug",
-    ):
+    )
+    if resolved is False:
         raise RuntimeError(f"Failed to close {ticket} as Not a Bug")
 
 
@@ -2243,7 +2252,7 @@ def cmd_investigate(args: argparse.Namespace) -> int:
     if packages:
         print("### Probes")
         for package in packages:
-            print(f"bot-mrs {package}:", file=sys.stderr)
+            print(f"bot-mrs {package}:")
             mrs = probes["bot_mrs"].get(package) or {}
             if "error" in mrs:
                 print(f"  bot-mrs error: {mrs['error']}")

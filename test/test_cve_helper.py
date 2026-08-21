@@ -402,6 +402,39 @@ def test_close_not_a_bug(monkeypatch) -> None:
     assert calls == ["comment", "vex", "resolve"]
 
 
+def test_close_not_a_bug_none_return_is_success(monkeypatch) -> None:
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(
+        helper,
+        "jira_client_module",
+        lambda: SimpleNamespace(
+            jira_add_comment=lambda *_a, **_k: True,
+            set_vex_justification=lambda *_a, **_k: None,
+            jira_resolve_issue=lambda *_a, **_k: None,
+        ),
+    )
+    helper.close_not_a_bug("HUM-3", "not present\n", "Component not Present")
+
+
+def test_close_not_a_bug_false_return_raises(monkeypatch) -> None:
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(
+        helper,
+        "jira_client_module",
+        lambda: SimpleNamespace(
+            jira_add_comment=lambda *_a, **_k: True,
+            set_vex_justification=lambda *_a, **_k: False,
+            jira_resolve_issue=lambda *_a, **_k: True,
+        ),
+    )
+    try:
+        helper.close_not_a_bug("HUM-4", "not present\n", "Component not Present")
+    except RuntimeError as err:
+        assert "VEX justification" in str(err)
+    else:
+        raise AssertionError("expected RuntimeError")
+
+
 def test_parse_created_issue_key() -> None:
     assert (
         helper.parse_created_issue_key(
