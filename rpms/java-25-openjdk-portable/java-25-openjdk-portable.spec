@@ -4,7 +4,7 @@
 %global updatever 4
 %global patchver 1
 %global buildver 1
-%global portablerelease 0
+%global portablerelease 1
 %global rpmrelease 0
 
 # Define IcedTea version used for SystemTap tapsets and desktop file
@@ -52,7 +52,7 @@
 
 Name:    java-25-%{origin}-portable%{?pkgos:-%{pkgos}}
 Version: %{newjavaver}.%{buildver}
-Release: %{?eaprefix}%{rpmrelease}%{?extraver}.1%{?dist}
+Release: %{?eaprefix}%{portablerelease}.%{rpmrelease}%{?extraver}%{?dist}
 
 %global fullversion     %{compatiblename}-%{version}-%{release}
 
@@ -932,6 +932,7 @@ The %{origin_nice} %{featurever} full patched sources of portable JDK to build, 
 # Using the echo macro breaks rpmdev-bumpspec, as it parses the first line of stdout :-(
 echo "Preparing %{oj_vendor_version}"
 echo "System is RHEL=%{?rhel}%{!?rhel:0}, CentOS=%{?centos}%{!?centos:0}, EPEL=%{?epel}%{!?epel:0}, Fedora=%{?fedora}%{!?fedora:0}"
+echo "Portable suffix is %{?pkgos}%{!?pkgos:unset}"
 echo "Build JDK version is %{buildjdkver}, bootstrap JDK package is %{bootjdkpkg}"
 
 %if 0%{?_build_cpu:1}
@@ -1182,8 +1183,8 @@ function buildjdk() {
     mkdir -p ${outputdir}
     pushd ${outputdir}
 
-    # Note: zlib and freetype use %{link_type}
-    # rather than ${link_opt} as the system versions
+    # Note: zlib and freetype use link_type (macro)
+    # rather than link_opt (shell var) as the system versions
     # are always used in a system_libs build, even
     # for the static library build
     LD_LIBRARY_PATH=${LIBPATH} \
