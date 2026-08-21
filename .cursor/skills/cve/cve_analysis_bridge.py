@@ -40,7 +40,12 @@ class JiraAuth:
 
 
 def parse_agent_env(text: str) -> dict[str, str]:
-    """Parse `export KEY=VALUE` lines from rhjira agent.env without executing it."""
+    """Parse `export KEY=VALUE` lines from rhjira agent.env without executing it.
+
+    Strips matching outer single- or double-quotes only. Nested or escaped
+    quotes within values are not handled; this matches typical agent.env
+    content.
+    """
     parsed: dict[str, str] = {}
     for raw_line in text.splitlines():
         line = raw_line.strip()

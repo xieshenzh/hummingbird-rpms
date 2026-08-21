@@ -312,7 +312,6 @@ def test_pulp_has_nvr_uses_listing_index(monkeypatch) -> None:
 
 def test_set_fixed_in_build_refuses_unpublished_nvr(monkeypatch) -> None:
     monkeypatch.setattr(helper, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
     try:
         helper.set_fixed_in_build("HUM-1", "pkg-1.0-1.src.rpm", "pkg")
     except RuntimeError as err:
