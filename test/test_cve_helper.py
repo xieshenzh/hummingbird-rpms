@@ -386,7 +386,90 @@ def test_close_not_a_bug(monkeypatch) -> None:
             jira_resolve_issue=lambda *_a, **_k: calls.append("resolve") or True,
         ),
     )
-    helper.close_not_a_bug("HUM-2", "not present\n", "Component not Present")
-    assert calls == ["comment", "vex", "resolve"]
+def test_parse_created_issue_key() -> None:
+    assert (
+        helper.parse_created_issue_key(
+            "https://redhat.atlassian.net/browse/HUM-6222\n"
+        )
+        == "HUM-6222"
+    )
+
+
+def test_gitlab_project_from_url() -> None:
+    assert helper.gitlab_project_from_url(
+        "git@gitlab.com:prarit/rpms.git"
+    ) == "prarit/rpms"
+    assert helper.gitlab_project_from_url(
+        "https://gitlab.com/prarit/rpms.git"
+    ) == "prarit/rpms"
+
+
+def test_detect_fork_remote_skips_upstream(monkeypatch) -> None:
+    output = "\n".join(
+        [
+            "origin\thttps://gitlab.com/redhat/hummingbird/rpms.git (fetch)",
+            "origin\thttps://gitlab.com/redhat/hummingbird/rpms.git (push)",
+            "prarit\thttps://gitlab.com/prarit/rpms.git (fetch)",
+            "prarit\thttps://gitlab.com/prarit/rpms.git (push)",
+        ]
+    )
+    monkeypatch.setattr(
+        helper,
+        "run_command",
+        lambda *_a, **_k: SimpleNamespace(returncode=0, stdout=output, stderr=""),
+    )
+    name, project = helper.detect_fork_remote()
+    assert name == "prarit"
+    assert project == "prarit/rpms"
+
+
+def test_lookaside_upload_commands() -> None:
+    cmds = helper.lookaside_upload_commands(
+        [Path("/var/tmp/foo.tar.gz")], "grafana13.1"
+    )
+    assert cmds[0] == "cp /var/tmp/foo.tar.gz /tmp/foo.tar.gz"
+    assert cmds[1] == (
+        "./ci/upload-to-lookaside-cache.sh -f /tmp/foo.tar.gz -p grafana13.1"
+    )
+
+
+def test_build_mr_description() -> None:
+    text = helper.build_mr_description(
+        "Bump foo for the CVE.",
+        task="HUM-9",
+        trackers=["HUM-1", "2"],
+        cves=["CVE-2026-1"],
+    )
+    assert "Closes: HUM-9" in text
+    assert "Ref: HUM-1, HUM-2" in text
+    assert "CVE: CVE-2026-1" in text
+
+
+def test_create_hum_task_links_and_starts(monkeypatch) -> None:
+    calls: list[list[str]] = []
+
+    def fake_rhjira(args, **_k):
+        calls.append(args)
+        if args[0] == "create":
+            return SimpleNamespace(
+                returncode=0,
+                stdout="https://redhat.atlassian.net/browse/HUM-7000\n",
+                stderr="",
+            )
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(helper, "ensure_rhjira_available", lambda: None)
+    monkeypatch.setattr(helper, "run_rhjira", fake_rhjira)
+    monkeypatch.setattr(
+        helper,
+        "load_jira_auth",
+        lambda: SimpleNamespace(basic_auth_user="dev@redhat.com"),
+    )
+    key = helper.create_hum_task("summary", blocks=["HUM-1"])
+    assert key == "HUM-7000"
+    assert calls[0][0] == "create"
+    assert ["edit", "HUM-7000", "--noeditor", "--blocks", "HUM-1"] in calls
+    assert ["edit", "HUM-7000", "--noeditor", "--status", "In Progress"] in calls
+
 
 

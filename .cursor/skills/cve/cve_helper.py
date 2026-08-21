@@ -16,6 +16,9 @@ Subcommands:
   next-release    Comment + cve-next-release label, leave In Progress
   set-fib         Set Fixed in Build after a Pulp NVR check
   close-nab       Comment, set VEX, close as Not a Bug
+  create-task     Create a HUM Task, link blockers, set In Progress
+  open-mr         Push the fork and open a package fix MR
+  lookaside-cmd   Print lookaside upload commands; do not upload
 
 Jira writes import hummingbird_cve_analysis.lib (jira_client, pulp). Auth
 is JIRA_TOKEN plus JIRA_URL or rhjira's JIRA_SERVER / JIRA_EMAIL from
@@ -72,6 +75,9 @@ COMMANDS = (
     "next-release",
     "set-fib",
     "close-nab",
+    "create-task",
+    "open-mr",
+    "lookaside-cmd",
 )
 SBOM_FILE_RE = re.compile(r"sha256-[a-fA-F0-9]+\.sbom")
 BUNDLED_PROVIDES_RE = re.compile(
@@ -1196,6 +1202,204 @@ def _comment_text(message: str, file: Path | None) -> str:
     raise ValueError("Provide --message or --file")
 
 
+CREATED_TICKET_RE = re.compile(
+    r"https://redhat\.atlassian\.net/browse/(HUM-\d{3,6})|(?:^|\b)(HUM-\d{3,6})\b"
+)
+UPSTREAM_RPMS = "redhat/hummingbird/rpms"
+
+
+def parse_created_issue_key(text: str) -> str:
+    matches = CREATED_TICKET_RE.findall(text)
+    keys = [a or b for a, b in matches]
+    if not keys:
+        raise RuntimeError(f"Could not parse created HUM ticket from:\n{text}")
+    return keys[-1]
+
+
+def gitlab_project_from_url(url: str) -> str:
+    cleaned = url.strip()
+    cleaned = re.sub(r"^git@gitlab\.com:", "https://gitlab.com/", cleaned)
+    cleaned = cleaned.removesuffix(".git").rstrip("/")
+    if "gitlab.com/" not in cleaned:
+        raise RuntimeError(f"Not a gitlab.com remote URL: {url}")
+    return cleaned.split("gitlab.com/", 1)[1]
+
+
+def detect_fork_remote(cwd: Path | str | None = None) -> tuple[str, str]:
+    """Return (remote_name, gitlab project path) for the user's fork."""
+    proc = run_command(["git", "remote", "-v"], cwd=cwd)
+    if proc.returncode != 0:
+        raise RuntimeError(proc.stderr or "git remote -v failed")
+    for line in proc.stdout.splitlines():
+        parts = line.split()
+        if len(parts) < 3 or parts[-1] != "(push)":
+            continue
+        name, url = parts[0], parts[1]
+        try:
+            project = gitlab_project_from_url(url)
+        except RuntimeError:
+            continue
+        if project.rstrip("/") == UPSTREAM_RPMS:
+            continue
+        return name, project
+    raise RuntimeError(
+        "Could not detect a fork remote. Check `git remote -v` "
+        f"(need a push remote other than {UPSTREAM_RPMS})."
+    )
+
+
+def lookaside_upload_commands(files: list[Path], package: str) -> list[str]:
+    cmds: list[str] = []
+    for src in files:
+        staged = Path("/tmp") / src.name
+        cmds.append(f"cp {src} {staged}")
+        cmds.append(
+            f"./ci/upload-to-lookaside-cache.sh -f {staged} -p {package}"
+        )
+    return cmds
+
+
+def create_hum_task(
+    summary: str,
+    *,
+    blocks: list[str],
+    assignee: str = "",
+    components: str = "A2: CVE & Scanners",
+) -> str:
+    ensure_rhjira_available()
+    if not assignee:
+        auth = load_jira_auth()
+        assignee = auth.basic_auth_user or ""
+    if not assignee:
+        raise ValueError("Pass --assignee; JIRA_EMAIL is not set")
+    create = run_rhjira(
+        [
+            "create",
+            "--noeditor",
+            "--project",
+            "HUM",
+            "--tickettype",
+            "Task",
+            "--summary",
+            summary,
+            "--assignee",
+            assignee,
+            "--components",
+            components,
+        ]
+    )
+    if create.returncode != 0:
+        raise RuntimeError(
+            (create.stderr or create.stdout or "rhjira create failed").strip()
+        )
+    key = parse_created_issue_key(f"{create.stdout}\n{create.stderr}")
+    for tracker in blocks:
+        link = run_rhjira(
+            ["edit", key, "--noeditor", "--blocks", normalize_hum_key(tracker)]
+        )
+        if link.returncode != 0:
+            raise RuntimeError(
+                (link.stderr or link.stdout or f"failed to link {tracker}").strip()
+            )
+    status = run_rhjira(["edit", key, "--noeditor", "--status", "In Progress"])
+    if status.returncode != 0:
+        raise RuntimeError(
+            (status.stderr or status.stdout or "failed to set In Progress").strip()
+        )
+    return key
+
+
+def build_mr_description(
+    summary: str,
+    *,
+    task: str,
+    trackers: list[str],
+    cves: list[str],
+) -> str:
+    tracker_list = ", ".join(normalize_hum_key(t) for t in trackers)
+    cve_list = ", ".join(cves)
+    return (
+        f"{summary.rstrip()}\n\n"
+        f"Closes: {normalize_hum_key(task)}\n"
+        f"Ref: {tracker_list}\n"
+        f"CVE: {cve_list}\n"
+    )
+
+
+def open_package_mr(
+    *,
+    title: str,
+    description: str,
+    task: str,
+    source_branch: str,
+    cwd: Path | str | None = None,
+    push: bool = True,
+    trigger_review: bool = True,
+) -> str:
+    ensure_glab_available()
+    fork_remote, fork_project = detect_fork_remote(cwd=cwd)
+    if push:
+        pushed = run_command(
+            ["git", "push", "-u", fork_remote, source_branch], cwd=cwd
+        )
+        if pushed.returncode != 0:
+            raise RuntimeError(
+                (pushed.stderr or pushed.stdout or "git push failed").strip()
+            )
+    created = run_command(
+        [
+            "glab",
+            "mr",
+            "create",
+            "--source-branch",
+            source_branch,
+            "--target-branch",
+            "main",
+            "--head",
+            fork_project,
+            "--repo",
+            GITLAB_RPMS_REPO,
+            "--title",
+            title,
+            "--description",
+            description,
+        ],
+        cwd=cwd,
+    )
+    if created.returncode != 0:
+        raise RuntimeError(
+            (created.stderr or created.stdout or "glab mr create failed").strip()
+        )
+    urls = MR_URL_RE.findall(f"{created.stdout}\n{created.stderr}")
+    if not urls:
+        # glab may print a short /merge_requests/N path
+        tail = (created.stdout or created.stderr or "").strip().splitlines()
+        last = tail[-1] if tail else ""
+        if last.startswith("http"):
+            mr_url = last.strip()
+        else:
+            raise RuntimeError(f"Could not parse MR URL from glab output:\n{created.stdout}")
+    else:
+        mr_url = urls[-1]
+    post_comment(normalize_hum_key(task), f"MR: {mr_url}\n")
+    if trigger_review:
+        iid = mr_url.rstrip("/").rsplit("/", 1)[-1]
+        run_command(
+            [
+                "glab",
+                "mr",
+                "note",
+                iid,
+                "--repo",
+                GITLAB_RPMS_REPO,
+                "-m",
+                "/hummingbird code-review",
+            ],
+            cwd=cwd,
+        )
+    return mr_url
+
+
 ### CLI ###
 
 
@@ -1416,6 +1620,95 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         dest="comment_file",
         help="Read closing comment from file.",
+    )
+
+    task = subparsers.add_parser(
+        "create-task",
+        help="Create a HUM Task, link CVE trackers with --blocks, set In Progress.",
+    )
+    task.add_argument("--summary", required=True, help="Task summary.")
+    task.add_argument(
+        "--blocks",
+        action="append",
+        default=[],
+        help="CVE tracker this task blocks (repeatable).",
+    )
+    task.add_argument("--assignee", default="", help="Assignee email (default: JIRA_EMAIL).")
+    task.add_argument(
+        "--components",
+        default="A2: CVE & Scanners",
+        help="Jira component (default: A2: CVE & Scanners).",
+    )
+    task.add_argument(
+        "--worktree",
+        action="store_true",
+        help="Also create ../worktrees/<task> after the ticket exists.",
+    )
+    task.add_argument("--base", default="main", help="Worktree base branch.")
+
+    mr = subparsers.add_parser(
+        "open-mr",
+        help="Push the fork branch and create a package fix MR (not advisory_handler).",
+    )
+    mr.add_argument("--task", required=True, help="HUM task ticket to Closes.")
+    mr.add_argument(
+        "--tracker",
+        action="append",
+        default=[],
+        dest="trackers",
+        help="CVE tracker keys for Ref: (repeatable).",
+    )
+    mr.add_argument(
+        "--cve",
+        action="append",
+        default=[],
+        dest="cves",
+        help="CVE IDs for the CVE: trailer (repeatable).",
+    )
+    mr.add_argument("--title", required=True, help="MR title.")
+    mr.add_argument(
+        "-m",
+        "--message",
+        default="",
+        help="MR summary paragraph (trailers are appended).",
+    )
+    mr.add_argument(
+        "-f",
+        "--file",
+        type=Path,
+        dest="description_file",
+        help="MR summary from file (trailers still appended unless file has them).",
+    )
+    mr.add_argument(
+        "--source-branch",
+        default="",
+        help="Branch to push (default: the task key).",
+    )
+    mr.add_argument("--no-push", action="store_true", help="Skip git push.")
+    mr.add_argument(
+        "--no-review",
+        action="store_true",
+        help="Do not post /hummingbird code-review on the MR.",
+    )
+
+    lookaside = subparsers.add_parser(
+        "lookaside-cmd",
+        help="Print lookaside copy/upload commands; do not upload.",
+    )
+    lookaside.add_argument(
+        "-f",
+        "--file",
+        action="append",
+        dest="files",
+        required=True,
+        type=Path,
+        help="Artifact to stage (repeatable).",
+    )
+    lookaside.add_argument(
+        "-p",
+        "--package",
+        required=True,
+        help="RPM package name (e.g. grafana13.1, not grafana13).",
     )
     return parser
 
@@ -1692,6 +1985,63 @@ def cmd_close_nab(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_create_task(args: argparse.Namespace) -> int:
+    if not args.blocks:
+        raise ValueError("Pass at least one --blocks HUM-XXXX CVE tracker")
+    key = create_hum_task(
+        args.summary,
+        blocks=args.blocks,
+        assignee=args.assignee,
+        components=args.components,
+    )
+    print(f"TASK={key}")
+    if args.worktree:
+        dest = create_task_worktree(key, base=args.base)
+        print(f"WORKTREE={dest}")
+        print("Move the agent workspace into this worktree before editing files.")
+    return 0
+
+
+def cmd_open_mr(args: argparse.Namespace) -> int:
+    if not args.trackers:
+        raise ValueError("Pass at least one --tracker HUM-XXXX")
+    if not args.cves:
+        raise ValueError("Pass at least one --cve CVE-YYYY-NNNNN")
+    summary = args.message
+    if args.description_file is not None:
+        summary = args.description_file.read_text(encoding="utf-8")
+    if not summary.strip():
+        raise ValueError("Provide --message or --file with the MR summary")
+    task = normalize_hum_key(args.task)
+    description = build_mr_description(
+        summary,
+        task=task,
+        trackers=args.trackers,
+        cves=args.cves,
+    )
+    branch = args.source_branch or task
+    url = open_package_mr(
+        title=args.title,
+        description=description,
+        task=task,
+        source_branch=branch,
+        push=not args.no_push,
+        trigger_review=not args.no_review,
+    )
+    print(f"MR={url}")
+    return 0
+
+
+def cmd_lookaside(args: argparse.Namespace) -> int:
+    missing = [str(path) for path in args.files if not path.is_file()]
+    if missing:
+        raise RuntimeError(f"File not found: {', '.join(missing)}")
+    print("Do not upload unless the user asks. Copy to /tmp then run:")
+    for line in lookaside_upload_commands(args.files, args.package):
+        print(line)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = normalize_argv(list(argv) if argv is not None else sys.argv[1:])
     parser = build_parser()
@@ -1711,6 +2061,9 @@ def main(argv: list[str] | None = None) -> int:
         "next-release": cmd_next_release,
         "set-fib": cmd_set_fib,
         "close-nab": cmd_close_nab,
+        "create-task": cmd_create_task,
+        "open-mr": cmd_open_mr,
+        "lookaside-cmd": cmd_lookaside,
     }
     return handlers[args.command](args)
 

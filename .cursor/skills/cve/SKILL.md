@@ -584,23 +584,14 @@ is too risky (e.g. glibc, binutils).
 When the package is affected and a newer upstream release
 contains the fix:
 
-1. **Create a HUM task ticket** and link it to the CVE tracker(s):
+1. **Create a HUM task ticket** and link it to the CVE tracker(s).
+   `--worktree` also creates the isolated checkout:
 
    ```bash
-   rhjira create --noeditor --project HUM --tickettype Task \
+   python .cursor/skills/cve/cve_helper.py create-task \
      --summary "<package>: Update to <version> for <CVE-ID>" \
-     --assignee <user>@redhat.com
+     --blocks HUM-XXXX --worktree
    ```
-
-   Then link and activate (one `--blocks` per edit call):
-
-   ```bash
-   rhjira edit HUM-YYYY --noeditor --blocks HUM-XXXX
-   rhjira edit HUM-YYYY --noeditor --status "In Progress"
-   ```
-
-   Either `--blocks` or `--isblockedby` works for linking;
-   both patterns appear in practice.
 
 2. **Create a worktree** for the task. This keeps each CVE
    fix isolated so multiple can be in flight at once:
@@ -663,10 +654,10 @@ contains the fix:
      the upload unless the user asks:
 
      ```bash
-     cp <tarball> /tmp/
-     # Give the user these commands; wait unless they ask you to run them:
-     ./ci/upload-to-lookaside-cache.sh -f /tmp/<tarball> -p <package>
-     ./ci/upload-to-lookaside-cache.sh -f /tmp/<sig-file> -p <package>
+     python .cursor/skills/cve/cve_helper.py lookaside-cmd \
+       -f <tarball> -p <package>
+     python .cursor/skills/cve/cve_helper.py lookaside-cmd \
+       -f <sig-file> -p <package>
      ```
 
    - Add a `forked_from` entry for the package in
@@ -725,55 +716,19 @@ contains the fix:
    ./ci/build_rpms.sh <package>
    ```
 
-   Push the branch and create an MR. The MR description
-   must include:
-   - A 1-3 sentence summary of what was changed and why
-   - `Closes: HUM-YYYY` (the task ticket -- **never** the CVE
-     tracker ticket)
-   - `Ref: HUM-XXXX, HUM-ZZZZ` (comma-separated CVE tracker
-     ticket keys)
-   - `CVE: CVE-YYYY-NNNNN, CVE-YYYY-MMMMM` (comma-separated
-     CVE IDs)
-
-   Use `-F` with a file because `-m` does not support multiple
-   paragraphs:
-
-   Detect the user's fork remote and derive the GitLab project
-   path for `--head` (do not hardcode `origin` or a username):
+   Push the branch and create an MR (`Closes` is the task, never the
+   CVE tracker):
 
    ```bash
-   FORK_REMOTE=$(git remote -v | grep '(push)' | grep -v "redhat/hummingbird/rpms" | head -1 | awk '{print $1}')
-   if [ -z "$FORK_REMOTE" ]; then
-     echo "ERROR: Could not detect fork remote. Check 'git remote -v'." >&2
-     exit 1
-   fi
-   FORK_URL=$(git remote get-url "$FORK_REMOTE")
-   FORK_PROJECT=$(echo "$FORK_URL" | sed 's|.*gitlab\.com[:/]||; s|\.git$||; s|/$||')
-   git push -u "$FORK_REMOTE" HUM-YYYY
-   ```
-
-   Then create the MR using `glab`:
-
-   ```bash
-   cat > /tmp/mr-description.txt << 'EOF'
-   HUM-YYYY: <package>: <short title>
-
-   <1-3 sentence description of the change: what was backported
-   or updated, where the fix came from, and why>
-
-   Closes: HUM-YYYY
-   Ref: HUM-XXXX, HUM-ZZZZ
-   CVE: CVE-YYYY-NNNNN, CVE-YYYY-MMMMM
-   EOF
-   MR_URL=$(glab mr create \
-     --source-branch HUM-YYYY \
-     --target-branch main \
-     --head "$FORK_PROJECT" \
-     --repo redhat/hummingbird/rpms \
+   python .cursor/skills/cve/cve_helper.py open-mr \
+     --task HUM-YYYY \
+     --tracker HUM-XXXX \
+     --cve CVE-YYYY-NNNNN \
      --title "HUM-YYYY: <package>: <short title>" \
-     --description "$(tail -n +3 /tmp/mr-description.txt)")
-   MR_IID=$(echo "$MR_URL" | tail -1 | grep -oE '[0-9]+$')
+     -m "<1-3 sentence description of the change>"
    ```
+
+   Do not use `advisory_handler` or `gitlab_sync` for package MRs.
 
   After creating the MR, rename the chat title to include the MR ID:
 
@@ -785,27 +740,6 @@ contains the fix:
   CallMcpTool: cursor-app-control / rename_chat
     title: "<value from MR_TITLE, e.g. !1234 HUM-6789 foo>"
   ```
-
-   Add the MR link as a comment on the HUM task ticket so
-   future lookups can see the work is already in review:
-
-   ```bash
-   rhjira comment HUM-YYYY --noeditor \
-     -m "MR: https://gitlab.com/redhat/hummingbird/rpms/-/merge_requests/${MR_IID}"
-   ```
-
-   After the MR pipeline has started, trigger the automated code
-   review. Check the pipeline status first:
-
-   ```bash
-   glab ci status --branch HUM-YYYY --repo redhat/hummingbird/rpms
-   ```
-
-   Once the pipeline is running, trigger the review:
-
-   ```bash
-   glab mr note "$MR_IID" --repo redhat/hummingbird/rpms -m "/hummingbird code-review"
-   ```
 
 10. **Close the task ticket.** After the MR is created (do not
    wait for it to merge), transition the HUM task ticket to
