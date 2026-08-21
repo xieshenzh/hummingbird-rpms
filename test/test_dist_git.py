@@ -44,9 +44,15 @@ def workdir(tmp_path: Path) -> Path:
     subprocess.run(['git', 'config', 'user.name', 'Test'], cwd=rpms_dir, check=True)
     subprocess.run(['git', 'config', 'user.email', 'test@example.com'], cwd=rpms_dir, check=True)
 
-    # Copy ci/, config, and templates
-    shutil.copytree(project_root / 'ci', rpms_dir / 'ci')
+    # Copy ci/, config, and templates. Excludes any stale __pycache__ from the
+    # real checkout (e.g. dist_git.py now imports check_upstream_versions.py
+    # as a sibling module, so running it -- even just once, in a prior local
+    # `./ci/dist_git.py ...` invocation -- populates ci/__pycache__/ in the
+    # real repo, which would otherwise leak into every test's "clean" copy).
+    shutil.copytree(project_root / 'ci', rpms_dir / 'ci',
+                     ignore=shutil.ignore_patterns('__pycache__'))
     shutil.copy(project_root / 'target-packages.yml', rpms_dir / 'target-packages.yml')
+    shutil.copy(project_root / '.gitignore', rpms_dir / '.gitignore')
     shutil.copytree(project_root / '.tekton', rpms_dir / '.tekton')
     shutil.copytree(project_root / 'konflux-templates', rpms_dir / 'konflux-templates')
 
@@ -1436,6 +1442,438 @@ def test_update_merge_version_bump(workdir: Path, upstream_repos: dict[str, Path
     assert '# Upstream comment' in merged_spec, "Upstream change should be merged in"
     assert 'Version: 2.0' in merged_spec or '<<<<<<< HEAD' in merged_spec, \
         "Upstream version or conflict markers should be present"
+
+
+#
+# Tests -- gorget re-invocation after a dist-git merge (HUM-4621)
+#
+
+def _write_pipeline(path: Path, fetch_steps: list[dict]) -> None:
+    path.write_text(yaml.dump({'fetch': fetch_steps}, default_flow_style=False, sort_keys=False))
+
+
+def test_fixed_pipeline_git_refs_filters_version_templated(dist_git_module) -> None:
+    pipeline = {
+        'fetch': [
+            {'type': 'git', 'repo': '${UPSTREAM_REPO}', 'ref': 'v${VERSION}'},
+            {'type': 'git', 'repo': '${UPSTREAM_REPO}', 'ref': 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef'},
+            {'type': 'url', 'url': 'https://example.com/x-${VERSION}.tar.gz'},
+        ],
+    }
+    assert dist_git_module._fixed_pipeline_git_refs(pipeline) == [
+        'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+    ]
+
+
+def test_fixed_pipeline_git_refs_empty_when_no_fetch(dist_git_module) -> None:
+    assert dist_git_module._fixed_pipeline_git_refs({}) == []
+
+
+def test_spec_has_custom_setup_override_true_for_non_default_n(dist_git_module) -> None:
+    spec_text = "%prep\n%setup -n %{glibcsrcdir}\n"
+    assert dist_git_module._spec_has_custom_setup_override(spec_text) is True
+
+
+def test_spec_has_custom_setup_override_false_for_default_n(dist_git_module) -> None:
+    spec_text = "%prep\n%autosetup -n %{name}-%{version}\n"
+    assert dist_git_module._spec_has_custom_setup_override(spec_text) is False
+
+
+def test_spec_has_custom_setup_override_false_for_no_setup(dist_git_module) -> None:
+    assert dist_git_module._spec_has_custom_setup_override("%prep\n") is False
+
+
+def test_fixed_ref_pipeline_drift_detects_stale_ref(tmp_path: Path, dist_git_module) -> None:
+    """A fixed ref whose short SHA no longer appears in the spec, with a
+    custom -n override present, is reported as drifted."""
+    package_dir = tmp_path / 'gcc'
+    package_dir.mkdir()
+    (package_dir / 'gcc.spec').write_text(
+        "%prep\n%setup -q -c -n %{uniquesuffix}\n%global gitrev deadbeefdeadbeefdeadbeefdeadbeefdeadbeef\n"
+    )
+    pipeline = {'fetch': [{'type': 'git', 'repo': '${UPSTREAM_REPO}',
+                           'ref': '0000000000000000000000000000000000000000'}]}
+    drifted = dist_git_module._fixed_ref_pipeline_drift(package_dir, pipeline)
+    assert drifted == ['0000000000000000000000000000000000000000']
+
+
+def test_fixed_ref_pipeline_drift_no_drift_when_ref_matches(tmp_path: Path, dist_git_module) -> None:
+    package_dir = tmp_path / 'gcc'
+    package_dir.mkdir()
+    (package_dir / 'gcc.spec').write_text(
+        "%prep\n%setup -q -c -n %{uniquesuffix}\n%global gitrev deadbeefdeadbeefdeadbeefdeadbeefdeadbeef\n"
+    )
+    pipeline = {'fetch': [{'type': 'git', 'repo': '${UPSTREAM_REPO}',
+                           'ref': 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef'}]}
+    assert dist_git_module._fixed_ref_pipeline_drift(package_dir, pipeline) == []
+
+
+def test_fixed_ref_pipeline_drift_skips_without_custom_override(tmp_path: Path, dist_git_module) -> None:
+    """No custom -n override -- default naming carries no identifier that
+    could drift, so no false-positive drift is reported even though the ref
+    doesn't appear anywhere in the spec."""
+    package_dir = tmp_path / 'somepkg'
+    package_dir.mkdir()
+    (package_dir / 'somepkg.spec').write_text("%prep\n%autosetup\n")
+    pipeline = {'fetch': [{'type': 'git', 'repo': '${UPSTREAM_REPO}',
+                           'ref': '0000000000000000000000000000000000000000'}]}
+    assert dist_git_module._fixed_ref_pipeline_drift(package_dir, pipeline) == []
+
+
+def test_fixed_ref_pipeline_drift_ignores_changelog_only_match(tmp_path: Path, dist_git_module) -> None:
+    """A stale ref's short SHA appearing only in %changelog (history) doesn't
+    count as still-referenced."""
+    package_dir = tmp_path / 'gcc'
+    package_dir.mkdir()
+    (package_dir / 'gcc.spec').write_text(
+        "%prep\n%setup -q -c -n %{uniquesuffix}\n%global gitrev deadbeefdeadbeefdeadbeefdeadbeefdeadbeef\n"
+        "%changelog\n* Mon Jan 01 2024 Test <test@example.com>\n- mentions 0000000 here\n"
+    )
+    pipeline = {'fetch': [{'type': 'git', 'repo': '${UPSTREAM_REPO}',
+                           'ref': '0000000000000000000000000000000000000000'}]}
+    drifted = dist_git_module._fixed_ref_pipeline_drift(package_dir, pipeline)
+    assert drifted == ['0000000000000000000000000000000000000000']
+
+
+def _fake_pin_refresh_git(commit_date: str):
+    """Fake subprocess.run for _refresh_fixed_ref_pin's git init/fetch/log calls."""
+    def fake_run(cmd, **kwargs):
+        if cmd[:2] == ['git', 'log']:
+            return subprocess.CompletedProcess(cmd, 0, stdout=commit_date + "\n", stderr="")
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+    return fake_run
+
+
+_GCC_VERSION_FROM_REF = {'type': 'commit-date'}
+_GCC_UPSTREAM_REPO = 'https://gcc.gnu.org/git/gcc.git'
+
+
+def test_refresh_fixed_ref_pin_success(tmp_path: Path, dist_git_module) -> None:
+    package_dir = tmp_path / 'gcc'
+    package_dir.mkdir()
+    (package_dir / 'gcc.spec').write_text(
+        "%global gitrev 1111111111111111111111111111111111111111\n"
+    )
+    pipeline_file = tmp_path / 'gcc.source-pipeline.yaml'
+    pipeline_file.write_text(
+        '# a carefully-written comment that must survive\n'
+        'fetch:\n'
+        '  - type: git\n'
+        '    repo: "${UPSTREAM_REPO}"\n'
+        '    ref: "0000000000000000000000000000000000000000"\n'
+        '    archive_name: "gcc-${VERSION}.tar.xz"\n'
+    )
+    pipeline = yaml.safe_load(pipeline_file.read_text())
+
+    with patch.object(dist_git_module.subprocess, 'run',
+                       side_effect=_fake_pin_refresh_git('20260819')):
+        result = dist_git_module._refresh_fixed_ref_pin(
+            'gcc', package_dir, pipeline_file, pipeline,
+            _GCC_UPSTREAM_REPO, _GCC_VERSION_FROM_REF, '16.2.1',
+        )
+
+    assert result == '16.2.1-20260819'
+    updated_text = pipeline_file.read_text()
+    assert 'ref: "1111111111111111111111111111111111111111"' in updated_text
+    assert '0000000000000000000000000000000000000000' not in updated_text
+    # Comment and unrelated keys must survive a targeted text substitution,
+    # not a yaml.safe_load/dump round-trip (which would strip comments).
+    assert 'a carefully-written comment that must survive' in updated_text
+    assert 'archive_name: "gcc-${VERSION}.tar.xz"' in updated_text
+
+
+def test_refresh_fixed_ref_pin_unsupported_type_returns_none(tmp_path: Path, dist_git_module) -> None:
+    package_dir = tmp_path / 'glibc'
+    package_dir.mkdir()
+    pipeline_file = tmp_path / 'glibc.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'git', 'repo': '${UPSTREAM_REPO}',
+                                     'ref': '0000000000000000000000000000000000000000'}])
+    pipeline = yaml.safe_load(pipeline_file.read_text())
+
+    result = dist_git_module._refresh_fixed_ref_pin(
+        'glibc', package_dir, pipeline_file, pipeline,
+        'https://sourceware.org/git/glibc.git', {'type': 'git-describe', 'match': 'glibc-*'},
+        '2.43',
+    )
+    assert result is None
+
+
+def test_refresh_fixed_ref_pin_missing_upstream_repo_returns_none(tmp_path: Path, dist_git_module) -> None:
+    package_dir = tmp_path / 'gcc'
+    package_dir.mkdir()
+    pipeline_file = tmp_path / 'gcc.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'git', 'repo': '${UPSTREAM_REPO}',
+                                     'ref': '0000000000000000000000000000000000000000'}])
+    pipeline = yaml.safe_load(pipeline_file.read_text())
+
+    result = dist_git_module._refresh_fixed_ref_pin(
+        'gcc', package_dir, pipeline_file, pipeline, None, _GCC_VERSION_FROM_REF, '16.2.1',
+    )
+    assert result is None
+
+
+def test_refresh_fixed_ref_pin_no_gitrev_in_spec(tmp_path: Path, dist_git_module) -> None:
+    package_dir = tmp_path / 'gcc'
+    package_dir.mkdir()
+    (package_dir / 'gcc.spec').write_text("Name: gcc\n")
+    pipeline_file = tmp_path / 'gcc.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'git', 'repo': '${UPSTREAM_REPO}',
+                                     'ref': '0000000000000000000000000000000000000000'}])
+    pipeline = yaml.safe_load(pipeline_file.read_text())
+
+    result = dist_git_module._refresh_fixed_ref_pin(
+        'gcc', package_dir, pipeline_file, pipeline, _GCC_UPSTREAM_REPO,
+        _GCC_VERSION_FROM_REF, '16.2.1',
+    )
+    assert result is None
+
+
+def test_refresh_fixed_ref_pin_network_failure_returns_none(tmp_path: Path, dist_git_module) -> None:
+    package_dir = tmp_path / 'gcc'
+    package_dir.mkdir()
+    (package_dir / 'gcc.spec').write_text(
+        "%global gitrev 1111111111111111111111111111111111111111\n"
+    )
+    pipeline_file = tmp_path / 'gcc.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'git', 'repo': '${UPSTREAM_REPO}',
+                                     'ref': '0000000000000000000000000000000000000000'}])
+    pipeline = yaml.safe_load(pipeline_file.read_text())
+
+    def raise_fetch_error(cmd, **kwargs):
+        if cmd[:2] == ['git', 'fetch']:
+            raise subprocess.CalledProcessError(128, cmd, stderr="429")
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+    with patch.object(dist_git_module.subprocess, 'run', side_effect=raise_fetch_error):
+        result = dist_git_module._refresh_fixed_ref_pin(
+            'gcc', package_dir, pipeline_file, pipeline,
+            _GCC_UPSTREAM_REPO, _GCC_VERSION_FROM_REF, '16.2.1',
+        )
+    assert result is None
+    # Pipeline file must be untouched on failure.
+    assert '0000000000000000000000000000000000000000' in pipeline_file.read_text()
+
+
+def test_refresh_fixed_ref_pin_no_op_when_ref_unchanged(tmp_path: Path, dist_git_module) -> None:
+    """The spec's gitrev already matches the pipeline's ref -- nothing to refresh,
+    and no network calls should be made."""
+    package_dir = tmp_path / 'gcc'
+    package_dir.mkdir()
+    (package_dir / 'gcc.spec').write_text(
+        "%global gitrev 0000000000000000000000000000000000000000\n"
+    )
+    pipeline_file = tmp_path / 'gcc.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'git', 'repo': '${UPSTREAM_REPO}',
+                                     'ref': '0000000000000000000000000000000000000000'}])
+    pipeline = yaml.safe_load(pipeline_file.read_text())
+
+    with patch.object(dist_git_module.subprocess, 'run') as mock_run:
+        result = dist_git_module._refresh_fixed_ref_pin(
+            'gcc', package_dir, pipeline_file, pipeline,
+            _GCC_UPSTREAM_REPO, _GCC_VERSION_FROM_REF, '16.2.1',
+        )
+    assert result is None
+    mock_run.assert_not_called()
+
+
+def test_run_gorget_for_updated_package_no_pipeline_is_noop(tmp_path: Path, dist_git_module) -> None:
+    with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=None), \
+         patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget:
+        result = dist_git_module._run_gorget_for_updated_package(
+            'somepkg', tmp_path, '1.0', '2.0', {},
+        )
+    assert result is None
+    mock_gorget.assert_not_called()
+
+
+def test_run_gorget_for_updated_package_version_templated_calls_gorget(
+        tmp_path: Path, dist_git_module) -> None:
+    package_dir = tmp_path / 'somepkg'
+    package_dir.mkdir()
+    (package_dir / 'somepkg.spec').write_text("%prep\n%autosetup\n")
+    pipeline_file = tmp_path / 'somepkg.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'url', 'url': 'https://example.com/x-${VERSION}.tar.gz'}])
+
+    with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
+         patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget:
+        result = dist_git_module._run_gorget_for_updated_package(
+            'somepkg', package_dir, '1.0', '2.0', {},
+        )
+    assert result is None
+    mock_gorget.assert_called_once_with('somepkg', '1.0', '2.0', pipeline_file)
+
+
+def test_run_gorget_for_updated_package_version_unchanged_skips_gorget(
+        tmp_path: Path, dist_git_module) -> None:
+    package_dir = tmp_path / 'somepkg'
+    package_dir.mkdir()
+    (package_dir / 'somepkg.spec').write_text("%prep\n%autosetup\n")
+    pipeline_file = tmp_path / 'somepkg.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'url', 'url': 'https://example.com/x-${VERSION}.tar.gz'}])
+
+    with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
+         patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget:
+        result = dist_git_module._run_gorget_for_updated_package(
+            'somepkg', package_dir, '1.0', '1.0', {},
+        )
+    assert result is None
+    mock_gorget.assert_not_called()
+
+
+def test_run_gorget_for_updated_package_gorget_failure_returns_reason(
+        tmp_path: Path, dist_git_module) -> None:
+    package_dir = tmp_path / 'somepkg'
+    package_dir.mkdir()
+    (package_dir / 'somepkg.spec').write_text("%prep\n%autosetup\n")
+    pipeline_file = tmp_path / 'somepkg.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'url', 'url': 'https://example.com/x-${VERSION}.tar.gz'}])
+
+    with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
+         patch.object(dist_git_module.cuv, '_run_gorget_pipeline',
+                       side_effect=RuntimeError('boom')):
+        result = dist_git_module._run_gorget_for_updated_package(
+            'somepkg', package_dir, '1.0', '2.0', {},
+        )
+    assert result is not None
+    assert 'boom' in result
+
+
+def test_run_gorget_for_updated_package_fixed_ref_drift_gcc_auto_fix(
+        tmp_path: Path, dist_git_module) -> None:
+    package_dir = tmp_path / 'gcc'
+    package_dir.mkdir()
+    (package_dir / 'gcc.spec').write_text(
+        "%prep\n%setup -q -c -n %{uniquesuffix}\n%global gitrev 1111111111111111111111111111111111111111\n"
+    )
+    # Written with literal double-quoted refs, matching real
+    # metadata/*.source-pipeline.yaml files' convention -- yaml.dump's
+    # default single-quoting would silently defeat _refresh_fixed_ref_pin's
+    # targeted text substitution.
+    pipeline_file = tmp_path / 'gcc.source-pipeline.yaml'
+    pipeline_file.write_text(
+        'fetch:\n'
+        '  - type: git\n'
+        '    repo: "${UPSTREAM_REPO}"\n'
+        '    ref: "0000000000000000000000000000000000000000"\n'
+        '    archive_name: "gcc-${VERSION}.tar.xz"\n'
+    )
+    metadata = {'version_from_ref': _GCC_VERSION_FROM_REF, 'upstream_repo': _GCC_UPSTREAM_REPO}
+
+    with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
+         patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget, \
+         patch.object(dist_git_module.subprocess, 'run', side_effect=_fake_pin_refresh_git('20260819')):
+        result = dist_git_module._run_gorget_for_updated_package(
+            'gcc', package_dir, '16.2.1', '16.2.1', metadata,
+        )
+
+    assert result is None
+    mock_gorget.assert_called_once_with('gcc', '16.2.1', '16.2.1-20260819', pipeline_file)
+    assert '1111111111111111111111111111111111111111' in pipeline_file.read_text()
+
+
+def test_run_gorget_for_updated_package_fixed_ref_drift_no_version_from_ref_needs_manual_run(
+        tmp_path: Path, dist_git_module) -> None:
+    """glibc (and the other packages with no version_from_ref configured) don't
+    get automatic pin resolution -- drift must fail loudly, not silently proceed."""
+    package_dir = tmp_path / 'glibc'
+    package_dir.mkdir()
+    (package_dir / 'glibc.spec').write_text(
+        "%prep\n%autosetup -n %{glibcsrcdir}\n%global glibcsrcdir glibc-2.43-48-gaaaaaaaaaa\n"
+    )
+    pipeline_file = tmp_path / 'glibc.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'git', 'repo': '${UPSTREAM_REPO}',
+                                     'ref': 'bc95068f5f9d7f57d0f01757fed0900893b122b8'}])
+
+    with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
+         patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget:
+        result = dist_git_module._run_gorget_for_updated_package(
+            'glibc', package_dir, '2.43', '2.43',
+            {'upstream_repo': 'https://sourceware.org/git/glibc.git'},
+        )
+
+    assert result is not None
+    assert 'glibc' in result
+    assert 'manually' in result
+    mock_gorget.assert_not_called()
+
+
+def test_update_no_pipeline_file_unaffected(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Regression check: a package with no source-pipeline.yaml behaves
+    exactly as before -- update() must not even look for gorget."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+    upstream_spec = upstream_repos['vanilla'] / 'vanilla.spec'
+    upstream_spec.write_text(upstream_spec.read_text().replace('Version: 1.0', 'Version: 2.0')
+                              .replace('Release: 1', 'Release: 1'))
+    subprocess.run(['git', 'commit', '-a', '-m', 'Bump version'],
+                   cwd=upstream_repos['vanilla'], check=True)
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--skip-build-check', 'vanilla'],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, f"Update failed: {result.stderr}"
+    subject, _ = get_last_commit_info(workdir)
+    assert subject.startswith('Update vanilla from')
+    assert 'NEEDS MANUAL GORGET RUN' not in subject
+
+
+def test_update_version_templated_pipeline_failure_needs_manual_run(
+        workdir: Path, upstream_repos: dict[str, Path], tmp_path: Path) -> None:
+    """End-to-end (real subprocess): a package with a source-pipeline.yaml
+    whose gorget run fails must not silently commit -- it needs to fall back
+    to the same conflict-style, exit(2), needs-manual-resolution path, with a
+    commit message dist_git_update_multi_mr.sh can recognize.
+
+    Uses a fake `gorget` on PATH that always fails, rather than mocking
+    Python internals -- update() runs as a real subprocess here, same as
+    every other update() test in this file, so there's nothing to patch."""
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{upstream_repos["vanilla"]}'],
+        cwd=workdir, check=True,
+    )
+    pipeline_file = workdir / 'metadata' / 'vanilla.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'url', 'url': 'https://example.com/vanilla-${VERSION}.tar.gz'}])
+    subprocess.run(['git', 'add', '-A'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add source-pipeline.yaml'], cwd=workdir, check=True)
+
+    upstream_spec = upstream_repos['vanilla'] / 'vanilla.spec'
+    upstream_spec.write_text(upstream_spec.read_text().replace('Version: 1.0', 'Version: 2.0'))
+    subprocess.run(['git', 'commit', '-a', '-m', 'Bump version'],
+                   cwd=upstream_repos['vanilla'], check=True)
+
+    fake_bin = tmp_path / 'fake-bin'
+    fake_bin.mkdir()
+    fake_gorget = fake_bin / 'gorget'
+    fake_gorget.write_text("#!/bin/sh\necho 'simulated upstream fetch failure' >&2\nexit 1\n")
+    fake_gorget.chmod(0o755)
+
+    commits_before = subprocess.run(
+        ['git', 'rev-list', '--count', 'HEAD'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    ).stdout.strip()
+
+    env = {**os.environ, 'PATH': f"{fake_bin}:{os.environ['PATH']}"}
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--skip-build-check', 'vanilla'],
+        cwd=workdir, capture_output=True, text=True, env=env,
+    )
+
+    assert result.returncode == 2, f"Expected exit code 2, got {result.returncode}: {result.stderr}"
+    state_file = workdir / '.dist_git_update_state.json'
+    assert state_file.exists()
+    state = json.loads(state_file.read_text())
+    assert state['commit_msg'].startswith('NEEDS MANUAL GORGET RUN:')
+    assert 'gorget pipeline failed' in state['commit_msg']
+
+    # No commit was created -- same guarantee as a real git merge conflict.
+    commits_after = subprocess.run(
+        ['git', 'rev-list', '--count', 'HEAD'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    assert commits_after == commits_before, "No commit should have been created"
 
 
 def test_update_skips_package_without_upstream_metadata(workdir: Path) -> None:
