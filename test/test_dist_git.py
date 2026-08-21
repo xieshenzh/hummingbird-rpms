@@ -4387,6 +4387,56 @@ def test_update_continue_legacy_state(workdir: Path, upstream_repos: dict[str, P
     assert not state_file.exists()
 
 
+def test_update_continue_with_pipeline_calls_gorget(
+        workdir: Path, upstream_repos: dict[str, Path], tmp_path: Path) -> None:
+    """A resolved git conflict for a package with a source-pipeline.yaml must
+    still get gorget-verified before --continue commits (HUM-4621 follow-up):
+    resolving the git-level conflict alone says nothing about whether
+    `sources` is actually gorget-verified -- exactly how the original !4170
+    gcc incident happened."""
+    pipeline_file = workdir / 'metadata' / 'chocolate.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'url', 'url': 'https://example.com/chocolate-${VERSION}.tar.gz'}])
+    subprocess.run(['git', 'add', '-A'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add source-pipeline.yaml'], cwd=workdir, check=True)
+
+    _create_conflict(workdir, upstream_repos)
+
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    spec_content = chocolate_spec.read_text()
+    resolved = re.sub(r'<<<<<<< HEAD\n.*?=======\n(.*?)>>>>>>> hummingbird-local\n',
+                      r'\1', spec_content, flags=re.DOTALL)
+    chocolate_spec.write_text(resolved)
+
+    fake_bin = tmp_path / 'fake-bin'
+    fake_bin.mkdir()
+    fake_gorget = fake_bin / 'gorget'
+    fake_gorget.write_text("#!/bin/sh\necho 'simulated upstream fetch failure' >&2\nexit 1\n")
+    fake_gorget.chmod(0o755)
+    env = {**os.environ, 'PATH': f"{fake_bin}:{os.environ['PATH']}"}
+
+    commits_before = subprocess.run(
+        ['git', 'rev-list', '--count', 'HEAD'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    ).stdout.strip()
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--continue'],
+        cwd=workdir, capture_output=True, text=True, env=env,
+    )
+
+    assert result.returncode != 0, "Should not succeed when gorget fails"
+    assert 'gorget pipeline failed' in result.stderr
+
+    # State preserved for retry -- never silently committed a
+    # gorget-unverified sources file.
+    assert (workdir / '.dist_git_update_state.json').exists()
+    commits_after = subprocess.run(
+        ['git', 'rev-list', '--count', 'HEAD'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    assert commits_after == commits_before, "No commit should have been created"
+
+
 @pytest.fixture
 def mock_infra_repo(tmp_path: Path) -> Path:
     """Create a mock infrastructure repo with rpms-main templates."""
