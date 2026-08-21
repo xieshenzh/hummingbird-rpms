@@ -118,9 +118,14 @@ treat them as HUM tickets by prepending `HUM-`.
 Do not recap same-CVE siblings.
 
 ```bash
-python .cursor/skills/cve/cve_helper.py HUM-XXXX
-# equivalent: python .cursor/skills/cve/cve_helper.py show HUM-XXXX
+python .cursor/skills/cve/cve_helper.py investigate HUM-XXXX
+# `/cve HUM-XXXX only` or:
+python .cursor/skills/cve/cve_helper.py investigate HUM-XXXX only
 ```
+
+After the ticket summary, run the deterministic probes for the
+package(s) under investigation (included in `investigate`; or Step 0
+bot-mrs plus Step 2d/2e as needed) before doing ad-hoc shell greps.
 
 For multiple tickets, pass them in one call:
 

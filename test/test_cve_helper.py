@@ -472,4 +472,36 @@ def test_create_hum_task_links_and_starts(monkeypatch) -> None:
     assert ["edit", "HUM-7000", "--noeditor", "--status", "In Progress"] in calls
 
 
+def test_strip_only_keyword() -> None:
+    tickets, only = helper.strip_only_keyword(["HUM-1", "HUM-2", "only"])
+    assert tickets == ["HUM-1", "HUM-2"]
+    assert only is True
+    tickets, only = helper.strip_only_keyword(["HUM-1"])
+    assert tickets == ["HUM-1"]
+    assert only is False
+
+
+def test_recap_lines_asks_before_discovered() -> None:
+    named = helper.TicketReport(
+        "HUM-1", "CVE-2026-1 pkg: foo", "In Progress", "Bug", "me", "cve-needs-attention"
+    )
+    named.fixed_in_build = "foo-1-1.src.rpm"
+    extra = helper.TicketReport(
+        "HUM-2", "CVE-2026-1 pkg: bar", "New", "Bug", "bot", ""
+    )
+    extra.package_guess = "bar"
+    gathered = helper.GatheredTickets(
+        reports=[named, extra],
+        user_provided=["HUM-1"],
+        discovered=["HUM-2"],
+    )
+    text = "\n".join(helper.recap_lines(gathered))
+    assert "HUM-1 [user_provided]" in text
+    assert "HUM-2 [discovered]" in text
+    assert "FIB is set but no task/MR is linked" in text
+    assert "Related: HUM-2 (bar)" in text
+    assert "Yes please" in text
+
+
+
 

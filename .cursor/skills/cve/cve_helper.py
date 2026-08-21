@@ -19,6 +19,7 @@ Subcommands:
   create-task     Create a HUM Task, link blockers, set In Progress
   open-mr         Push the fork and open a package fix MR
   lookaside-cmd   Print lookaside upload commands; do not upload
+  investigate     One-shot show + probes + related-ticket recap
 
 Jira writes import hummingbird_cve_analysis.lib (jira_client, pulp). Auth
 is JIRA_TOKEN plus JIRA_URL or rhjira's JIRA_SERVER / JIRA_EMAIL from
@@ -29,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -45,6 +47,7 @@ if str(_SKILL_DIR) not in sys.path:
     sys.path.insert(0, str(_SKILL_DIR))
 from cve_analysis_bridge import (  # noqa: E402
     AnalysisImportError,
+    gitlab_client_module,
     jira_client_module,
     load_jira_auth,
     pulp_module,
@@ -78,6 +81,7 @@ COMMANDS = (
     "create-task",
     "open-mr",
     "lookaside-cmd",
+    "investigate",
 )
 SBOM_FILE_RE = re.compile(r"sha256-[a-fA-F0-9]+\.sbom")
 BUNDLED_PROVIDES_RE = re.compile(
@@ -1400,6 +1404,153 @@ def open_package_mr(
     return mr_url
 
 
+def strip_only_keyword(tickets: list[str]) -> tuple[list[str], bool]:
+    """Honor a trailing `only` token: named tickets, no find-related."""
+    if tickets and tickets[-1].lower() == "only":
+        named = tickets[:-1]
+        if not named:
+            raise ValueError("`only` must follow at least one ticket key")
+        return named, True
+    return tickets, False
+
+
+@dataclass
+class GatheredTickets:
+    reports: list[TicketReport]
+    user_provided: list[str]
+    discovered: list[str]
+
+
+def gather_ticket_reports(
+    tickets: list[str],
+    *,
+    find_related: bool,
+    max_linked: int,
+) -> GatheredTickets:
+    ensure_rhjira_available()
+    initial_keys = [normalize_hum_key(key) for key in tickets]
+    initial_set = set(initial_keys)
+    ticket_keys = list(initial_keys)
+    initial_reports: dict[str, TicketReport] = {}
+    for key in initial_keys:
+        try:
+            fields = fetch_json(key)
+        except RuntimeError as err:
+            print(f"Warning: failed to fetch {key}: {err}", file=sys.stderr)
+            continue
+        print(f"Processing {key}...", file=sys.stderr, end="\r")
+        initial_reports[key] = parse_ticket_json(key, fields)  # type: ignore[arg-type]
+
+    if find_related:
+        print("Finding related tickets...", file=sys.stderr)
+        initial_cve_ids: set[str] = set()
+        for report in initial_reports.values():
+            initial_cve_ids.update(report.cve_ids)
+        if initial_cve_ids:
+            related_keys = find_related_tickets(list(initial_cve_ids))
+            new_keys = set(related_keys) - initial_set
+            ticket_keys = list(dict.fromkeys(ticket_keys + related_keys))
+            print(
+                f"Found {len(ticket_keys)} total tickets ({len(new_keys)} newly discovered)\n",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                "Warning: Could not extract any CVE IDs from initial tickets; "
+                "--find-related had no effect.",
+                file=sys.stderr,
+            )
+
+    discovered_keys = [k for k in ticket_keys if k not in initial_set]
+    discovered_reports: dict[str, TicketReport] = {}
+    if discovered_keys:
+        print(
+            f"Batch-fetching {len(discovered_keys)} discovered tickets...",
+            file=sys.stderr,
+        )
+        discovered_reports = batch_fetch_tickets(discovered_keys)
+
+    reports: list[TicketReport] = []
+    for key, parsed in {**initial_reports, **discovered_reports}.items():
+        parsed.linked_ticket_details = inspect_linked_tickets(
+            current_ticket=key,
+            linked_keys=parsed.linked_keys,
+            max_linked=max_linked,
+        )
+        reports.append(parsed)
+    return GatheredTickets(
+        reports=reports,
+        user_provided=[k for k in initial_keys if k in initial_reports],
+        discovered=discovered_keys,
+    )
+
+
+def search_repo_fix_mrs(cve_ids: list[str]) -> list[dict[str, Any]]:
+    try:
+        gl_mod = gitlab_client_module()
+    except AnalysisImportError as err:
+        print(f"Warning: skipping GitLab MR search: {err}", file=sys.stderr)
+        return []
+    token = os.environ.get("GITLAB_TOKEN")
+    hits: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for cve_id in cve_ids:
+        try:
+            found = gl_mod.search_gitlab_mrs(
+                "gitlab.com", GITLAB_RPMS_REPO, cve_id, token
+            )
+        except (OSError, urllib.error.URLError, urllib.error.HTTPError, TypeError) as err:
+            print(f"Warning: GitLab MR search failed for {cve_id}: {err}", file=sys.stderr)
+            continue
+        for hit in found or []:
+            url = str(hit.get("html_url") or "")
+            if url and url not in seen:
+                seen.add(url)
+                hits.append(hit)
+    return hits
+
+
+def recap_lines(gathered: GatheredTickets) -> list[str]:
+    user_set = set(gathered.user_provided)
+    lines: list[str] = ["Recap:"]
+    for report in gathered.reports:
+        origin = "user_provided" if report.ticket in user_set else "discovered"
+        lines.append(
+            f"{report.ticket} [{origin}] {report.ticket_type} {report.status} | "
+            f"assignee={report.assignee or '(unassigned)'} | "
+            f"labels={report.labels or '(none)'} | "
+            f"fib={report.fixed_in_build or '(unset)'} | "
+            f"pkg={report.package_guess or '?'}"
+        )
+        has_task_or_mr = bool(report.linked_ticket_details) or bool(
+            report.mr_links_in_ticket
+        )
+        if report.fixed_in_build and has_task_or_mr:
+            lines.append(
+                "  FIB is set and a task/MR exists; leave for advisory automation "
+                "unless the user asks."
+            )
+        elif report.fixed_in_build:
+            lines.append(
+                "  FIB is set but no task/MR is linked; ask whether to create the task."
+            )
+    if gathered.discovered:
+        related = []
+        by_ticket = {r.ticket: r for r in gathered.reports}
+        for key in gathered.discovered:
+            pkg = getattr(by_ticket.get(key), "package_guess", "") or "?"
+            related.append(f"{key} ({pkg})")
+        lines.append(
+            "Related: "
+            + ", ".join(related)
+            + ". Apply this to all, or only the tickets you named?"
+        )
+        lines.append(
+            'A "Yes please" on the named set is not approval for discovered siblings.'
+        )
+    return lines
+
+
 ### CLI ###
 
 
@@ -1710,6 +1861,22 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="RPM package name (e.g. grafana13.1, not grafana13).",
     )
+
+    inv = subparsers.add_parser(
+        "investigate",
+        help="One-shot ticket recap plus bot-mrs, spec-deps, and GitLab MR search.",
+    )
+    _add_show_arguments(inv)
+    inv.add_argument(
+        "--only",
+        action="store_true",
+        help="Skip find-related (same as a trailing `only` token).",
+    )
+    inv.add_argument(
+        "--sbom",
+        action="store_true",
+        help="Also fetch and search the package SBOM.",
+    )
     return parser
 
 
@@ -1729,72 +1896,20 @@ def cmd_show(args: argparse.Namespace) -> int:
         print("--max-linked must be >= 0", file=sys.stderr)
         return 2
 
-    ensure_rhjira_available()
-
-    initial_keys: list[str] = [normalize_hum_key(key) for key in args.tickets]
-    ticket_keys: list[str] = list(initial_keys)
-    initial_set = set(initial_keys)
-
-    # Full JSON fetch for user-provided tickets (need custom fields, comments)
-    initial_reports: dict[str, TicketReport] = {}
-    for key in initial_keys:
-        try:
-            fields = fetch_json(key)
-        except RuntimeError as e:
-            print(f"Warning: failed to fetch {key}: {e}", file=sys.stderr)
-            continue
-        print(f"Processing {key}...", file=sys.stderr, end="\r")
-        initial_reports[key] = parse_ticket_json(key, fields)  # type: ignore[arg-type] - Can't be None, fetch_json would raise
-
-    if args.find_related:
-        print("Finding related tickets...", file=sys.stderr)
-        initial_cve_ids: set[str] = set()
-        for report in initial_reports.values():
-            initial_cve_ids.update(report.cve_ids)
-
-        if initial_cve_ids:
-            related_keys = find_related_tickets(list(initial_cve_ids))
-            new_keys = set(related_keys) - initial_set
-            ticket_keys = list(dict.fromkeys(ticket_keys + related_keys))
-            print(
-                f"Found {len(ticket_keys)} total tickets ({len(new_keys)} newly discovered)\n",
-                file=sys.stderr,
-            )
-        else:
-            print(
-                "Warning: Could not extract any CVE IDs from initial tickets; "
-                "--find-related had no effect.",
-                file=sys.stderr,
-            )
-
-    reports: list[TicketReport] = []
-
-    # Batch fetch discovered tickets
-    discovered_keys = [k for k in ticket_keys if k not in initial_set]
-    discovered_reports: dict[str, TicketReport] = {}
-    if discovered_keys:
-        print(
-            f"Batch-fetching {len(discovered_keys)} discovered tickets...",
-            file=sys.stderr,
-        )
-        discovered_reports = batch_fetch_tickets(discovered_keys)
-
-    # Merge and attach linked ticket details
-    all_reports = {**initial_reports, **discovered_reports}
-
-    for key, parsed in all_reports.items():
-        parsed.linked_ticket_details = inspect_linked_tickets(
-            current_ticket=key,
-            linked_keys=parsed.linked_keys,
-            max_linked=args.max_linked,
-        )
-        reports.append(parsed)
+    tickets, only = strip_only_keyword(list(args.tickets))
+    find_related = args.find_related and not only
+    gathered = gather_ticket_reports(
+        tickets, find_related=find_related, max_linked=args.max_linked
+    )
+    reports = gathered.reports
 
     suggested_chat_title = build_suggested_chat_title(reports)
     suggested_chat_title = apply_title_prefix(suggested_chat_title, args.title_prefix)
     payload: dict[str, Any] = {
         "suggested_chat_title": suggested_chat_title,
         "tickets": [asdict(r) for r in reports],
+        "user_provided": gathered.user_provided,
+        "discovered": gathered.discovered,
     }
 
     if args.json_out:
@@ -2042,6 +2157,118 @@ def cmd_lookaside(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_investigate(args: argparse.Namespace) -> int:
+    if args.max_linked < 0:
+        print("--max-linked must be >= 0", file=sys.stderr)
+        return 2
+    tickets, only_token = strip_only_keyword(list(args.tickets))
+    find_related = args.find_related and not only_token and not args.only
+    gathered = gather_ticket_reports(
+        tickets, find_related=find_related, max_linked=args.max_linked
+    )
+    cve_ids: list[str] = []
+    for report in gathered.reports:
+        for cve_id in report.cve_ids:
+            if cve_id not in cve_ids:
+                cve_ids.append(cve_id)
+
+    probes: dict[str, Any] = {"bot_mrs": {}, "spec_deps": {}, "sbom": {}, "gitlab_mrs": []}
+    packages = []
+    for report in gathered.reports:
+        if report.ticket in gathered.user_provided and report.package_guess:
+            if report.package_guess not in packages:
+                packages.append(report.package_guess)
+
+    for package in packages:
+        try:
+            probes["bot_mrs"][package] = {
+                state: [asdict(entry) for entry in entries]
+                for state, entries in list_bot_mrs(package).items()
+            }
+        except RuntimeError as err:
+            probes["bot_mrs"][package] = {"error": str(err)}
+        component = ""
+        for report in gathered.reports:
+            if report.package_guess == package and report.upstream_component:
+                component = report.upstream_component
+                break
+        probes["spec_deps"][package] = [
+            asdict(hit) for hit in probe_spec_deps(package, component)
+        ]
+        if args.sbom:
+            nvr = ""
+            ticket = ""
+            for report in gathered.reports:
+                if report.package_guess == package:
+                    ticket = report.ticket
+                    nvr = report.fixed_in_build
+                    break
+            try:
+                meta = fetch_sbom(package, nvr=nvr, ticket=ticket)
+                terms = [component] if component else []
+                hits = search_sbom_file(Path(meta["path"]), terms) if terms else []
+                probes["sbom"][package] = {
+                    **meta,
+                    "hits": [asdict(h) for h in hits],
+                }
+            except (OSError, RuntimeError, urllib.error.URLError) as err:
+                probes["sbom"][package] = {"error": str(err)}
+
+    if cve_ids:
+        probes["gitlab_mrs"] = search_repo_fix_mrs(cve_ids)
+
+    recap = recap_lines(gathered)
+    payload = {
+        "user_provided": gathered.user_provided,
+        "discovered": gathered.discovered,
+        "tickets": [asdict(r) for r in gathered.reports],
+        "probes": probes,
+        "recap": recap,
+        "suggested_chat_title": build_suggested_chat_title(gathered.reports),
+    }
+    if args.json_out:
+        args.json_out.write_text(
+            json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
+        )
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    for report in gathered.reports:
+        origin = (
+            "user_provided" if report.ticket in gathered.user_provided else "discovered"
+        )
+        print(f"### {report.ticket} [{origin}]")
+        print_ticket(report)
+        print()
+    if packages:
+        print("### Probes")
+        for package in packages:
+            print(f"bot-mrs {package}:", file=sys.stderr)
+            mrs = probes["bot_mrs"].get(package) or {}
+            if "error" in mrs:
+                print(f"  bot-mrs error: {mrs['error']}")
+            else:
+                print(
+                    f"  bot-mrs open={len(mrs.get('open', []))} "
+                    f"merged={len(mrs.get('merged', []))}"
+                )
+            print(f"  spec-deps hits={len(probes['spec_deps'].get(package, []))}")
+            if args.sbom:
+                sbom = probes["sbom"].get(package) or {}
+                if "error" in sbom:
+                    print(f"  sbom error: {sbom['error']}")
+                else:
+                    print(f"  sbom hits={len(sbom.get('hits', []))}")
+        print(f"  gitlab fix MRs: {len(probes['gitlab_mrs'])}")
+        for hit in probes["gitlab_mrs"]:
+            print(f"    {hit.get('state')}: {hit.get('html_url')}")
+        print()
+    print("\n".join(recap))
+    print(f"\nSuggested chat title: {payload['suggested_chat_title']}")
+    print("Wait for the user after this recap before Step 3 writes.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = normalize_argv(list(argv) if argv is not None else sys.argv[1:])
     parser = build_parser()
@@ -2064,6 +2291,7 @@ def main(argv: list[str] | None = None) -> int:
         "create-task": cmd_create_task,
         "open-mr": cmd_open_mr,
         "lookaside-cmd": cmd_lookaside,
+        "investigate": cmd_investigate,
     }
     return handlers[args.command](args)
 
