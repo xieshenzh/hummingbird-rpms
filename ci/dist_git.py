@@ -1814,6 +1814,7 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
                         'package': package_name,
                         'commit_msg': commit_msg,
                         'metadata': imports[package_name],
+                        'old_version': old_version,
                     }, f)
 
                 logging.warning(
@@ -1860,6 +1861,24 @@ def continue_update(dry_run: bool = False) -> None:
             if '<<<<<<<' in content:
                 sys.exit(f"ERROR: Unresolved conflicts in {path.relative_to(ROOT_DIR)}\n"
                          f"       Resolve all conflicts, then run: ./ci/dist_git.py update --continue")
+
+    # A resolved git-level conflict only fixes the merge -- it says nothing
+    # about whether `sources` is actually gorget-verified (this is exactly
+    # how the original !4170 gcc incident happened: a human textually
+    # resolved a `sources` conflict without re-running gorget). Re-run the
+    # same check update() does on a clean merge before committing here too.
+    gorget_failure_reason = None
+    if not dry_run and 'metadata' in state and 'old_version' in state:
+        gorget_failure_reason = _run_gorget_for_updated_package(
+            package_name, package_dir, state['old_version'],
+            state['metadata']['version'], cast(PackageMetadata, state['metadata']),
+        )
+        if gorget_failure_reason:
+            sys.exit(
+                f"ERROR: {gorget_failure_reason}\n"
+                f"       State preserved -- fix the issue above, then re-run: "
+                f"./ci/dist_git.py update --continue"
+            )
 
     if not dry_run:
         # Restore the updated metadata saved during the conflict exit
