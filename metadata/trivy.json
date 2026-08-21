@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 0.73.0",
+  "modification_reason": "Update to upstream version 0.74.0",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 141362,
@@ -8,5 +8,5 @@
   "source": "https://src.fedoraproject.org/rpms/trivy.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/aquasecurity/trivy",
-  "version": "0.73.0"
+  "version": "0.74.0"
 }
