@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "2",
-  "sha": "879c8b28a62251ab556b68fc1c7a4736056ff76f",
+  "release": "1",
+  "sha": "606ad796b8504affc046ba2cbe8ee551de691245",
   "source": "https://src.fedoraproject.org/rpms/qt6-qtsvg.git",
   "upstream_repo": "https://github.com/qt/qtsvg",
-  "version": "6.11.1"
+  "version": "6.11.2"
 }
