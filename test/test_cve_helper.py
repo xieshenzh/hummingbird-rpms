@@ -376,16 +376,32 @@ def test_apply_next_release_labels(monkeypatch) -> None:
 def test_close_not_a_bug(monkeypatch) -> None:
     calls: list[str] = []
 
+    def add_comment(*_a: object, **_k: object) -> bool:
+        calls.append("comment")
+        return True
+
+    def set_vex(*_a: object, **_k: object) -> bool:
+        calls.append("vex")
+        return True
+
+    def resolve(*_a: object, **_k: object) -> bool:
+        calls.append("resolve")
+        return True
+
     monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
         helper,
         "jira_client_module",
         lambda: SimpleNamespace(
-            jira_add_comment=lambda *_a, **_k: calls.append("comment") or True,
-            set_vex_justification=lambda *_a, **_k: calls.append("vex") or True,
-            jira_resolve_issue=lambda *_a, **_k: calls.append("resolve") or True,
+            jira_add_comment=add_comment,
+            set_vex_justification=set_vex,
+            jira_resolve_issue=resolve,
         ),
     )
+    helper.close_not_a_bug("HUM-2", "not present\n", "Component not Present")
+    assert calls == ["comment", "vex", "resolve"]
+
+
 def test_parse_created_issue_key() -> None:
     assert (
         helper.parse_created_issue_key(
