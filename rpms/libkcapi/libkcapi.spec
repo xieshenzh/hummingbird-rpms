@@ -118,7 +118,7 @@ lib_path=%{buildroot}%{_libdir}                                  \
 
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        0.1%{?dist}
+Release:        2%{?dist}
 Summary:        User space interface to the Linux Kernel Crypto API
 
 License:        BSD-3-Clause OR GPL-2.0-only
@@ -127,6 +127,9 @@ Source0:        https://www.chronox.de/%{name}/releases/%{version}/%{name}-%{ver
 Source1:        https://www.chronox.de/%{name}/releases/%{version}/%{name}-%{version}.tar.xz.asc
 Source2:        sha512hmac-openssl.sh
 Source3:        fipshmac-openssl.sh
+
+# From https://github.com/smuellerDD/libkcapi/pull/199/
+Patch:          %{giturl}/commit/780d6fd0d94ba921724d6db64fc1aedb32d7cf46.patch#/001-fix-test.patch
 
 BuildRequires:  bash
 BuildRequires:  coreutils

@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Update to 1.5.1 for CVE-2026-71225, CVE-2026-71226, CVE-2026-71227",
   "modification_status": "modified",
-  "release": "0.1",
-  "sha": "56ef731769887813f4a98bce920f2ed480c25382",
+  "release": "2",
+  "sha": "af20f4943914f131f03b8b26e864d929976690b5",
   "source": "https://src.fedoraproject.org/rpms/libkcapi.git",
   "upstream_repo": "https://github.com/smuellerDD/libkcapi",
   "version": "1.5.1"
