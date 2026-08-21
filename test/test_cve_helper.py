@@ -200,3 +200,356 @@ def test_build_suggested_chat_title() -> None:
         )
     ]
     assert helper.build_suggested_chat_title(reports) == "HUM-1 pkg"
+
+
+def test_parse_agent_env_strips_quotes() -> None:
+    import cve_analysis_bridge as bridge
+
+    parsed = bridge.parse_agent_env(
+        "\n".join(
+            [
+                "export JIRA_TOKEN='tok'",
+                'export JIRA_EMAIL="user@redhat.com"',
+                "export JIRA_SERVER=https://redhat.atlassian.net",
+                "# comment",
+                "not an assignment",
+            ]
+        )
+    )
+    assert parsed["JIRA_TOKEN"] == "tok"
+    assert parsed["JIRA_EMAIL"] == "user@redhat.com"
+    assert parsed["JIRA_SERVER"] == "https://redhat.atlassian.net"
+    assert "not" not in parsed
+
+
+def test_load_jira_auth_maps_rhjira_server_and_email(tmp_path: Path, monkeypatch) -> None:
+    import cve_analysis_bridge as bridge
+
+    agent = tmp_path / "agent.env"
+    agent.write_text(
+        "\n".join(
+            [
+                "export JIRA_TOKEN=from-file",
+                "export JIRA_EMAIL=prarit@redhat.com",
+                "export JIRA_SERVER=https://redhat.atlassian.net",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("JIRA_TOKEN", raising=False)
+    monkeypatch.delenv("JIRA_URL", raising=False)
+    monkeypatch.delenv("JIRA_SERVER", raising=False)
+    monkeypatch.delenv("JIRA_EMAIL", raising=False)
+    auth = bridge.load_jira_auth(environ={}, agent_env_path=agent)
+    assert auth.token == "from-file"
+    assert auth.base_url == "https://redhat.atlassian.net"
+    assert auth.basic_auth_user == "prarit@redhat.com"
+    assert str(agent) in auth.source
+
+
+def test_load_jira_auth_prefers_process_env(tmp_path: Path) -> None:
+    import cve_analysis_bridge as bridge
+
+    agent = tmp_path / "agent.env"
+    agent.write_text("export JIRA_TOKEN=file-token\n", encoding="utf-8")
+    auth = bridge.load_jira_auth(
+        environ={
+            "JIRA_TOKEN": "env-token",
+            "JIRA_URL": "https://example.invalid",
+        },
+        agent_env_path=agent,
+    )
+    assert auth.token == "env-token"
+    assert auth.base_url == "https://example.invalid"
+    assert auth.source == "env"
+
+
+def test_cmd_deps_reports_missing_analysis(monkeypatch) -> None:
+    import cve_analysis_bridge as bridge
+
+    monkeypatch.setattr(
+        helper,
+        "load_jira_auth",
+        lambda: bridge.JiraAuth(
+            token="x",
+            base_url="https://redhat.atlassian.net",
+            basic_auth_user="a@b.c",
+            source="env",
+        ),
+    )
+
+    def _boom():
+        raise bridge.AnalysisImportError("not installed")
+
+    monkeypatch.setattr(helper, "jira_client_module", _boom)
+    rc = helper.cmd_deps(SimpleNamespace(json=False))
+    assert rc == 1
+
+
+def _fake_auth():
+    return SimpleNamespace(
+        token="tok",
+        base_url="https://redhat.atlassian.net",
+        basic_auth_user="user@redhat.com",
+    )
+
+
+def test_pulp_has_nvr_uses_listing_index(monkeypatch) -> None:
+    index = SimpleNamespace(
+        nvrs=["grafana13.1-13.1.1-1"],
+        srpm_filenames={"grafana13.1-13.1.1-1.src.rpm"},
+    )
+    pulp = SimpleNamespace(
+        fetch_srpm_listing_index=lambda pkg: index,
+        fetch_hummingbird_latest_srpm=lambda pkg: "grafana13.1-13.1.0-1.src.rpm",
+    )
+    monkeypatch.setattr(helper, "pulp_module", lambda: pulp)
+    ok, detail = helper.pulp_has_nvr("grafana13.1", "grafana13.1-13.1.1-1.src.rpm")
+    assert ok
+    assert "Pulp listing" in detail
+
+
+def test_set_fixed_in_build_refuses_unpublished_nvr(monkeypatch) -> None:
+    monkeypatch.setattr(helper, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
+    try:
+        helper.set_fixed_in_build("HUM-1", "pkg-1.0-1.src.rpm", "pkg")
+    except RuntimeError as err:
+        assert "Refusing" in str(err)
+    else:
+        raise AssertionError("expected RuntimeError")
+
+
+def test_set_fixed_in_build_force_skips_pulp(monkeypatch) -> None:
+    calls: list[tuple] = []
+
+    def set_fib(base, token, ticket, build, *, basic_auth_user=None):
+        calls.append((ticket, build, basic_auth_user))
+
+    monkeypatch.setattr(helper, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(
+        helper,
+        "jira_client_module",
+        lambda: SimpleNamespace(set_fixed_in_build=set_fib),
+    )
+    detail = helper.set_fixed_in_build(
+        "HUM-1", "pkg-1.0-1.src.rpm", "pkg", force=True
+    )
+    assert "forced" in detail
+    assert calls[0][0] == "HUM-1"
+    assert calls[0][1] == "pkg-1.0-1.src.rpm"
+
+
+def test_apply_next_release_labels(monkeypatch) -> None:
+    calls: list[str] = []
+
+    def add_comment(*_a, **_k):
+        calls.append("comment")
+        return True
+
+    def add_label(*a, **_k):
+        calls.append(f"add:{a[3]}")
+
+    def remove_label(*a, **_k):
+        calls.append(f"remove:{a[3]}")
+
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(
+        helper,
+        "jira_client_module",
+        lambda: SimpleNamespace(
+            jira_add_comment=add_comment,
+            add_jira_label=add_label,
+            remove_jira_label=remove_label,
+        ),
+    )
+    helper.apply_next_release("HUM-9", "waiting on upstream\n")
+    assert calls == [
+        "comment",
+        "add:cve-next-release",
+        "remove:cve-needs-attention",
+    ]
+
+
+def test_close_not_a_bug(monkeypatch) -> None:
+    calls: list[str] = []
+
+    def add_comment(*_a: object, **_k: object) -> bool:
+        calls.append("comment")
+        return True
+
+    def set_vex(*_a: object, **_k: object) -> bool:
+        calls.append("vex")
+        return True
+
+    def resolve(*_a: object, **_k: object) -> bool:
+        calls.append("resolve")
+        return True
+
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(
+        helper,
+        "jira_client_module",
+        lambda: SimpleNamespace(
+            jira_add_comment=add_comment,
+            set_vex_justification=set_vex,
+            jira_resolve_issue=resolve,
+        ),
+    )
+    helper.close_not_a_bug("HUM-2", "not present\n", "Component not Present")
+    assert calls == ["comment", "vex", "resolve"]
+
+
+def test_close_not_a_bug_none_return_is_success(monkeypatch) -> None:
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(
+        helper,
+        "jira_client_module",
+        lambda: SimpleNamespace(
+            jira_add_comment=lambda *_a, **_k: True,
+            set_vex_justification=lambda *_a, **_k: None,
+            jira_resolve_issue=lambda *_a, **_k: None,
+        ),
+    )
+    helper.close_not_a_bug("HUM-3", "not present\n", "Component not Present")
+
+
+def test_close_not_a_bug_false_return_raises(monkeypatch) -> None:
+    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(
+        helper,
+        "jira_client_module",
+        lambda: SimpleNamespace(
+            jira_add_comment=lambda *_a, **_k: True,
+            set_vex_justification=lambda *_a, **_k: False,
+            jira_resolve_issue=lambda *_a, **_k: True,
+        ),
+    )
+    try:
+        helper.close_not_a_bug("HUM-4", "not present\n", "Component not Present")
+    except RuntimeError as err:
+        assert "VEX justification" in str(err)
+    else:
+        raise AssertionError("expected RuntimeError")
+
+
+def test_parse_created_issue_key() -> None:
+    assert (
+        helper.parse_created_issue_key(
+            "https://redhat.atlassian.net/browse/HUM-6222\n"
+        )
+        == "HUM-6222"
+    )
+
+
+def test_gitlab_project_from_url() -> None:
+    assert helper.gitlab_project_from_url(
+        "git@gitlab.com:prarit/rpms.git"
+    ) == "prarit/rpms"
+    assert helper.gitlab_project_from_url(
+        "https://gitlab.com/prarit/rpms.git"
+    ) == "prarit/rpms"
+
+
+def test_detect_fork_remote_skips_upstream(monkeypatch) -> None:
+    output = "\n".join(
+        [
+            "origin\thttps://gitlab.com/redhat/hummingbird/rpms.git (fetch)",
+            "origin\thttps://gitlab.com/redhat/hummingbird/rpms.git (push)",
+            "prarit\thttps://gitlab.com/prarit/rpms.git (fetch)",
+            "prarit\thttps://gitlab.com/prarit/rpms.git (push)",
+        ]
+    )
+    monkeypatch.setattr(
+        helper,
+        "run_command",
+        lambda *_a, **_k: SimpleNamespace(returncode=0, stdout=output, stderr=""),
+    )
+    name, project = helper.detect_fork_remote()
+    assert name == "prarit"
+    assert project == "prarit/rpms"
+
+
+def test_lookaside_upload_commands() -> None:
+    cmds = helper.lookaside_upload_commands(
+        [Path("/var/tmp/foo.tar.gz")], "grafana13.1"
+    )
+    assert cmds[0] == "cp /var/tmp/foo.tar.gz /tmp/foo.tar.gz"
+    assert cmds[1] == (
+        "./ci/upload-to-lookaside-cache.sh -f /tmp/foo.tar.gz -p grafana13.1"
+    )
+
+
+def test_build_mr_description() -> None:
+    text = helper.build_mr_description(
+        "Bump foo for the CVE.",
+        task="HUM-9",
+        trackers=["HUM-1", "2"],
+        cves=["CVE-2026-1"],
+    )
+    assert "Closes: HUM-9" in text
+    assert "Ref: HUM-1, HUM-2" in text
+    assert "CVE: CVE-2026-1" in text
+
+
+def test_create_hum_task_links_and_starts(monkeypatch) -> None:
+    calls: list[list[str]] = []
+
+    def fake_rhjira(args, **_k):
+        calls.append(args)
+        if args[0] == "create":
+            return SimpleNamespace(
+                returncode=0,
+                stdout="https://redhat.atlassian.net/browse/HUM-7000\n",
+                stderr="",
+            )
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(helper, "ensure_rhjira_available", lambda: None)
+    monkeypatch.setattr(helper, "run_rhjira", fake_rhjira)
+    monkeypatch.setattr(
+        helper,
+        "load_jira_auth",
+        lambda: SimpleNamespace(basic_auth_user="dev@redhat.com"),
+    )
+    key = helper.create_hum_task("summary", blocks=["HUM-1"])
+    assert key == "HUM-7000"
+    assert calls[0][0] == "create"
+    assert ["edit", "HUM-7000", "--noeditor", "--blocks", "HUM-1"] in calls
+    assert ["edit", "HUM-7000", "--noeditor", "--status", "In Progress"] in calls
+
+
+def test_strip_only_keyword() -> None:
+    tickets, only = helper.strip_only_keyword(["HUM-1", "HUM-2", "only"])
+    assert tickets == ["HUM-1", "HUM-2"]
+    assert only is True
+    tickets, only = helper.strip_only_keyword(["HUM-1"])
+    assert tickets == ["HUM-1"]
+    assert only is False
+
+
+def test_recap_lines_asks_before_discovered() -> None:
+    named = helper.TicketReport(
+        "HUM-1", "CVE-2026-1 pkg: foo", "In Progress", "Bug", "me", "cve-needs-attention"
+    )
+    named.fixed_in_build = "foo-1-1.src.rpm"
+    extra = helper.TicketReport(
+        "HUM-2", "CVE-2026-1 pkg: bar", "New", "Bug", "bot", ""
+    )
+    extra.package_guess = "bar"
+    gathered = helper.GatheredTickets(
+        reports=[named, extra],
+        user_provided=["HUM-1"],
+        discovered=["HUM-2"],
+    )
+    text = "\n".join(helper.recap_lines(gathered))
+    assert "HUM-1 [user_provided]" in text
+    assert "HUM-2 [discovered]" in text
+    assert "FIB is set but no task/MR is linked" in text
+    assert "Related: HUM-2 (bar)" in text
+    assert "Yes please" in text
+
+
+
+

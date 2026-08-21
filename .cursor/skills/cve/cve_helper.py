@@ -11,12 +11,26 @@ Subcommands:
   sbom            Fetch package SBOM (Jira attachment or Pulp) and search it
   spec-deps       Probe a package .spec for a component / bundled Provides
   worktree        Create an isolated git worktree for a HUM task ticket
+  deps            Check Jira auth and hummingbird_cve_analysis import
+  comment         Post a Jira comment via jira_client
+  next-release    Comment + cve-next-release label, leave In Progress
+  set-fib         Set Fixed in Build after a Pulp NVR check
+  close-nab       Comment, set VEX, close as Not a Bug
+  create-task     Create a HUM Task, link blockers, set In Progress
+  open-mr         Push the fork and open a package fix MR
+  lookaside-cmd   Print lookaside upload commands; do not upload
+  investigate     One-shot show + probes + related-ticket recap
+
+Jira writes import hummingbird_cve_analysis.lib (jira_client, pulp). Auth
+is JIRA_TOKEN plus JIRA_URL or rhjira's JIRA_SERVER / JIRA_EMAIL from
+~/.config/rhjira/agent.env — no extra token is required if rhjira works.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -27,6 +41,17 @@ import urllib.request
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
+
+_SKILL_DIR = Path(__file__).resolve().parent
+if str(_SKILL_DIR) not in sys.path:
+    sys.path.insert(0, str(_SKILL_DIR))
+from cve_analysis_bridge import (  # noqa: E402
+    AnalysisImportError,
+    gitlab_client_module,
+    jira_client_module,
+    load_jira_auth,
+    pulp_module,
+)
 
 CVE_RE = re.compile(r"CVE-\d{4}-\d{4,8}")
 HUM_RE = re.compile(r"HUM-\d{3,6}")
@@ -42,7 +67,22 @@ TRANSIENT_RHJIRA_RE = re.compile(
     r"proxy|tunnel|timed out|timeout|temporar|502|503|504|connection reset|\beof\b",
     re.IGNORECASE,
 )
-COMMANDS = ("show", "bot-mrs", "sbom", "spec-deps", "worktree")
+COMMANDS = (
+    "show",
+    "bot-mrs",
+    "sbom",
+    "spec-deps",
+    "worktree",
+    "deps",
+    "comment",
+    "next-release",
+    "set-fib",
+    "close-nab",
+    "create-task",
+    "open-mr",
+    "lookaside-cmd",
+    "investigate",
+)
 SBOM_FILE_RE = re.compile(r"sha256-[a-fA-F0-9]+\.sbom")
 BUNDLED_PROVIDES_RE = re.compile(
     r"(?i)^\s*Provides:\s*bundled\(([^)]+)\)(?:\s*=\s*(\S+))?"
@@ -1077,6 +1117,449 @@ def create_task_worktree(ticket: str, *, base: str = "main") -> Path:
     return dest
 
 
+def normalize_nvr(nvr: str) -> str:
+    name = Path(nvr.strip()).name
+    return name.removesuffix(".src.rpm")
+
+
+def pulp_has_nvr(package: str, nvr: str) -> tuple[bool, str]:
+    """Return whether the SRPM NVR is listed in Hummingbird Pulp."""
+    wanted = normalize_nvr(nvr)
+    wanted_file = f"{wanted}.src.rpm"
+    pulp = pulp_module()
+    index = pulp.fetch_srpm_listing_index(package)
+    if index is not None:
+        nvrs = list(getattr(index, "nvrs", []) or [])
+        files = set(getattr(index, "srpm_filenames", []) or [])
+        if wanted in nvrs or wanted_file in files:
+            return True, f"{wanted_file} is in the Pulp listing for {package}"
+    latest = pulp.fetch_hummingbird_latest_srpm(package)
+    if latest and (latest == wanted_file or wanted in str(latest)):
+        return True, f"Pulp latest SRPM for {package} is {latest}"
+    latest_note = f" (latest {latest})" if latest else ""
+    return False, f"{wanted_file} not published in Pulp for {package}{latest_note}"
+
+
+def _jira_auth_call(method: str, ticket: str, *args: Any, **kwargs: Any) -> Any:
+    jc = jira_client_module()
+    auth = load_jira_auth()
+    fn = getattr(jc, method)
+    try:
+        return fn(
+            auth.base_url,
+            auth.token,
+            ticket,
+            *args,
+            basic_auth_user=auth.basic_auth_user,
+            **kwargs,
+        )
+    except (OSError, urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError) as err:
+        raise RuntimeError(f"Jira {method} failed for {ticket}: {err}") from err
+
+
+def post_comment(ticket: str, body: str) -> bool:
+    return bool(_jira_auth_call("jira_add_comment", ticket, body))
+
+
+def apply_next_release(ticket: str, body: str) -> None:
+    post_comment(ticket, body)
+    _jira_auth_call("add_jira_label", ticket, "cve-next-release")
+    _jira_auth_call("remove_jira_label", ticket, "cve-needs-attention")
+
+
+def set_fixed_in_build(
+    ticket: str,
+    nvr: str,
+    package: str,
+    *,
+    force: bool = False,
+) -> str:
+    published, detail = pulp_has_nvr(package, nvr)
+    if not published and not force:
+        raise RuntimeError(
+            f"Refusing to set Fixed in Build: {detail}. "
+            "Pass --force only if the user confirmed a Pulp override."
+        )
+    fib = f"{normalize_nvr(nvr)}.src.rpm"
+    _jira_auth_call("set_fixed_in_build", ticket, fib)
+    return detail if published else f"forced; {detail}"
+
+
+def close_not_a_bug(ticket: str, body: str, vex: str) -> None:
+    """Comment, set VEX, and close as Not a Bug.
+
+    jira_client raises on HTTP errors. set_vex_justification and
+    jira_resolve_issue return False when the field/transition is missing.
+    None (or any other non-False value) is treated as success so a 204-style
+    empty body cannot abort after the comment was posted.
+    """
+    post_comment(ticket, body)
+    vex_ok = _jira_auth_call("set_vex_justification", ticket, vex)
+    if vex_ok is False:
+        raise RuntimeError(f"Failed to set VEX justification on {ticket}")
+    resolved = _jira_auth_call(
+        "jira_resolve_issue",
+        ticket,
+        "Closed",
+        "Not a Bug",
+    )
+    if resolved is False:
+        raise RuntimeError(f"Failed to close {ticket} as Not a Bug")
+
+
+def _comment_text(message: str, file: Path | None) -> str:
+    if file is not None:
+        return file.read_text(encoding="utf-8").rstrip() + "\n"
+    if message:
+        return message.rstrip() + "\n"
+    raise ValueError("Provide --message or --file")
+
+
+CREATED_TICKET_RE = re.compile(
+    r"https://redhat\.atlassian\.net/browse/(HUM-\d{3,6})|(?:^|\b)(HUM-\d{3,6})\b"
+)
+UPSTREAM_RPMS = "redhat/hummingbird/rpms"
+
+
+def parse_created_issue_key(text: str) -> str:
+    matches = CREATED_TICKET_RE.findall(text)
+    keys = [a or b for a, b in matches]
+    if not keys:
+        raise RuntimeError(f"Could not parse created HUM ticket from:\n{text}")
+    return keys[-1]
+
+
+def gitlab_project_from_url(url: str) -> str:
+    cleaned = url.strip()
+    cleaned = re.sub(r"^git@gitlab\.com:", "https://gitlab.com/", cleaned)
+    cleaned = cleaned.removesuffix(".git").rstrip("/")
+    if "gitlab.com/" not in cleaned:
+        raise RuntimeError(f"Not a gitlab.com remote URL: {url}")
+    return cleaned.split("gitlab.com/", 1)[1]
+
+
+def detect_fork_remote(cwd: Path | str | None = None) -> tuple[str, str]:
+    """Return (remote_name, gitlab project path) for the user's fork."""
+    proc = run_command(["git", "remote", "-v"], cwd=cwd)
+    if proc.returncode != 0:
+        raise RuntimeError(proc.stderr or "git remote -v failed")
+    for line in proc.stdout.splitlines():
+        parts = line.split()
+        if len(parts) < 3 or parts[-1] != "(push)":
+            continue
+        name, url = parts[0], parts[1]
+        try:
+            project = gitlab_project_from_url(url)
+        except RuntimeError:
+            continue
+        if project.rstrip("/") == UPSTREAM_RPMS:
+            continue
+        return name, project
+    raise RuntimeError(
+        "Could not detect a fork remote. Check `git remote -v` "
+        f"(need a push remote other than {UPSTREAM_RPMS})."
+    )
+
+
+def lookaside_upload_commands(files: list[Path], package: str) -> list[str]:
+    cmds: list[str] = []
+    for src in files:
+        staged = Path("/tmp") / src.name
+        cmds.append(f"cp {src} {staged}")
+        cmds.append(
+            f"./ci/upload-to-lookaside-cache.sh -f {staged} -p {package}"
+        )
+    return cmds
+
+
+def create_hum_task(
+    summary: str,
+    *,
+    blocks: list[str],
+    assignee: str = "",
+    components: str = "A2: CVE & Scanners",
+) -> str:
+    ensure_rhjira_available()
+    if not assignee:
+        auth = load_jira_auth()
+        assignee = auth.basic_auth_user or ""
+    if not assignee:
+        raise ValueError("Pass --assignee; JIRA_EMAIL is not set")
+    create = run_rhjira(
+        [
+            "create",
+            "--noeditor",
+            "--project",
+            "HUM",
+            "--tickettype",
+            "Task",
+            "--summary",
+            summary,
+            "--assignee",
+            assignee,
+            "--components",
+            components,
+        ]
+    )
+    if create.returncode != 0:
+        raise RuntimeError(
+            (create.stderr or create.stdout or "rhjira create failed").strip()
+        )
+    key = parse_created_issue_key(f"{create.stdout}\n{create.stderr}")
+    for tracker in blocks:
+        link = run_rhjira(
+            ["edit", key, "--noeditor", "--blocks", normalize_hum_key(tracker)]
+        )
+        if link.returncode != 0:
+            raise RuntimeError(
+                (link.stderr or link.stdout or f"failed to link {tracker}").strip()
+            )
+    status = run_rhjira(["edit", key, "--noeditor", "--status", "In Progress"])
+    if status.returncode != 0:
+        raise RuntimeError(
+            (status.stderr or status.stdout or "failed to set In Progress").strip()
+        )
+    return key
+
+
+def build_mr_description(
+    summary: str,
+    *,
+    task: str,
+    trackers: list[str],
+    cves: list[str],
+) -> str:
+    tracker_list = ", ".join(normalize_hum_key(t) for t in trackers)
+    cve_list = ", ".join(cves)
+    return (
+        f"{summary.rstrip()}\n\n"
+        f"Closes: {normalize_hum_key(task)}\n"
+        f"Ref: {tracker_list}\n"
+        f"CVE: {cve_list}\n"
+    )
+
+
+def open_package_mr(
+    *,
+    title: str,
+    description: str,
+    task: str,
+    source_branch: str,
+    cwd: Path | str | None = None,
+    push: bool = True,
+    trigger_review: bool = True,
+) -> str:
+    ensure_glab_available()
+    fork_remote, fork_project = detect_fork_remote(cwd=cwd)
+    if push:
+        pushed = run_command(
+            ["git", "push", "-u", fork_remote, source_branch], cwd=cwd
+        )
+        if pushed.returncode != 0:
+            raise RuntimeError(
+                (pushed.stderr or pushed.stdout or "git push failed").strip()
+            )
+    created = run_command(
+        [
+            "glab",
+            "mr",
+            "create",
+            "--source-branch",
+            source_branch,
+            "--target-branch",
+            "main",
+            "--head",
+            fork_project,
+            "--repo",
+            GITLAB_RPMS_REPO,
+            "--title",
+            title,
+            "--description",
+            description,
+        ],
+        cwd=cwd,
+    )
+    if created.returncode != 0:
+        raise RuntimeError(
+            (created.stderr or created.stdout or "glab mr create failed").strip()
+        )
+    urls = MR_URL_RE.findall(f"{created.stdout}\n{created.stderr}")
+    if not urls:
+        # glab may print a short /merge_requests/N path
+        tail = (created.stdout or created.stderr or "").strip().splitlines()
+        last = tail[-1] if tail else ""
+        if last.startswith("http"):
+            mr_url = last.strip()
+        else:
+            raise RuntimeError(f"Could not parse MR URL from glab output:\n{created.stdout}")
+    else:
+        mr_url = urls[-1]
+    post_comment(normalize_hum_key(task), f"MR: {mr_url}\n")
+    if trigger_review:
+        iid = mr_url.rstrip("/").rsplit("/", 1)[-1]
+        run_command(
+            [
+                "glab",
+                "mr",
+                "note",
+                iid,
+                "--repo",
+                GITLAB_RPMS_REPO,
+                "-m",
+                "/hummingbird code-review",
+            ],
+            cwd=cwd,
+        )
+    return mr_url
+
+
+def strip_only_keyword(tickets: list[str]) -> tuple[list[str], bool]:
+    """Honor a trailing `only` token: named tickets, no find-related."""
+    if tickets and tickets[-1].lower() == "only":
+        named = tickets[:-1]
+        if not named:
+            raise ValueError("`only` must follow at least one ticket key")
+        return named, True
+    return tickets, False
+
+
+@dataclass
+class GatheredTickets:
+    reports: list[TicketReport]
+    user_provided: list[str]
+    discovered: list[str]
+
+
+def gather_ticket_reports(
+    tickets: list[str],
+    *,
+    find_related: bool,
+    max_linked: int,
+) -> GatheredTickets:
+    ensure_rhjira_available()
+    initial_keys = [normalize_hum_key(key) for key in tickets]
+    initial_set = set(initial_keys)
+    ticket_keys = list(initial_keys)
+    initial_reports: dict[str, TicketReport] = {}
+    for key in initial_keys:
+        try:
+            fields = fetch_json(key)
+        except RuntimeError as err:
+            print(f"Warning: failed to fetch {key}: {err}", file=sys.stderr)
+            continue
+        print(f"Processing {key}...", file=sys.stderr, end="\r")
+        initial_reports[key] = parse_ticket_json(key, fields)  # type: ignore[arg-type]
+
+    if find_related:
+        print("Finding related tickets...", file=sys.stderr)
+        initial_cve_ids: set[str] = set()
+        for report in initial_reports.values():
+            initial_cve_ids.update(report.cve_ids)
+        if initial_cve_ids:
+            related_keys = find_related_tickets(list(initial_cve_ids))
+            new_keys = set(related_keys) - initial_set
+            ticket_keys = list(dict.fromkeys(ticket_keys + related_keys))
+            print(
+                f"Found {len(ticket_keys)} total tickets ({len(new_keys)} newly discovered)\n",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                "Warning: Could not extract any CVE IDs from initial tickets; "
+                "--find-related had no effect.",
+                file=sys.stderr,
+            )
+
+    discovered_keys = [k for k in ticket_keys if k not in initial_set]
+    discovered_reports: dict[str, TicketReport] = {}
+    if discovered_keys:
+        print(
+            f"Batch-fetching {len(discovered_keys)} discovered tickets...",
+            file=sys.stderr,
+        )
+        discovered_reports = batch_fetch_tickets(discovered_keys)
+
+    reports: list[TicketReport] = []
+    for key, parsed in {**initial_reports, **discovered_reports}.items():
+        parsed.linked_ticket_details = inspect_linked_tickets(
+            current_ticket=key,
+            linked_keys=parsed.linked_keys,
+            max_linked=max_linked,
+        )
+        reports.append(parsed)
+    return GatheredTickets(
+        reports=reports,
+        user_provided=[k for k in initial_keys if k in initial_reports],
+        discovered=discovered_keys,
+    )
+
+
+def search_repo_fix_mrs(cve_ids: list[str]) -> list[dict[str, Any]]:
+    try:
+        gl_mod = gitlab_client_module()
+    except AnalysisImportError as err:
+        print(f"Warning: skipping GitLab MR search: {err}", file=sys.stderr)
+        return []
+    token = os.environ.get("GITLAB_TOKEN")
+    hits: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for cve_id in cve_ids:
+        try:
+            found = gl_mod.search_gitlab_mrs(
+                "gitlab.com", GITLAB_RPMS_REPO, cve_id, token
+            )
+        except (OSError, urllib.error.URLError, urllib.error.HTTPError, TypeError) as err:
+            print(f"Warning: GitLab MR search failed for {cve_id}: {err}", file=sys.stderr)
+            continue
+        for hit in found or []:
+            url = str(hit.get("html_url") or "")
+            if url and url not in seen:
+                seen.add(url)
+                hits.append(hit)
+    return hits
+
+
+def recap_lines(gathered: GatheredTickets) -> list[str]:
+    user_set = set(gathered.user_provided)
+    lines: list[str] = ["Recap:"]
+    for report in gathered.reports:
+        origin = "user_provided" if report.ticket in user_set else "discovered"
+        lines.append(
+            f"{report.ticket} [{origin}] {report.ticket_type} {report.status} | "
+            f"assignee={report.assignee or '(unassigned)'} | "
+            f"labels={report.labels or '(none)'} | "
+            f"fib={report.fixed_in_build or '(unset)'} | "
+            f"pkg={report.package_guess or '?'}"
+        )
+        has_task_or_mr = bool(report.linked_ticket_details) or bool(
+            report.mr_links_in_ticket
+        )
+        if report.fixed_in_build and has_task_or_mr:
+            lines.append(
+                "  FIB is set and a task/MR exists; leave for advisory automation "
+                "unless the user asks."
+            )
+        elif report.fixed_in_build:
+            lines.append(
+                "  FIB is set but no task/MR is linked; ask whether to create the task."
+            )
+    if gathered.discovered:
+        related = []
+        by_ticket = {r.ticket: r for r in gathered.reports}
+        for key in gathered.discovered:
+            pkg = getattr(by_ticket.get(key), "package_guess", "") or "?"
+            related.append(f"{key} ({pkg})")
+        lines.append(
+            "Related: "
+            + ", ".join(related)
+            + ". Apply this to all, or only the tickets you named?"
+        )
+        lines.append(
+            'A "Yes please" on the named set is not approval for discovered siblings.'
+        )
+    return lines
+
+
 ### CLI ###
 
 
@@ -1220,6 +1703,189 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print JSON instead of text.",
     )
+
+    deps = subparsers.add_parser(
+        "deps",
+        help="Check Jira auth mapping and hummingbird_cve_analysis import.",
+    )
+    deps.add_argument(
+        "--json",
+        action="store_true",
+        help="Print JSON instead of text.",
+    )
+
+    comment = subparsers.add_parser(
+        "comment",
+        help="Post a Jira comment via hummingbird_cve_analysis.lib.jira_client.",
+    )
+    comment.add_argument("tickets", nargs="+", help="HUM ticket key(s).")
+    comment.add_argument("-m", "--message", default="", help="Comment body.")
+    comment.add_argument(
+        "-f",
+        "--file",
+        type=Path,
+        dest="comment_file",
+        help="Read comment body from file.",
+    )
+
+    nxt = subparsers.add_parser(
+        "next-release",
+        help="Comment, add cve-next-release, remove cve-needs-attention.",
+    )
+    nxt.add_argument("tickets", nargs="+", help="HUM ticket key(s).")
+    nxt.add_argument("-m", "--message", default="", help="Comment body.")
+    nxt.add_argument(
+        "-f",
+        "--file",
+        type=Path,
+        dest="comment_file",
+        help="Read comment body from file.",
+    )
+
+    fib = subparsers.add_parser(
+        "set-fib",
+        help="Set Fixed in Build after verifying the NVR exists in Pulp.",
+    )
+    fib.add_argument("ticket", help="HUM CVE tracker key.")
+    fib.add_argument("nvr", help="NVR or foo-1.2-3.src.rpm")
+    fib.add_argument(
+        "--package",
+        required=True,
+        help="SRPM package name used for the Pulp listing (e.g. grafana13.1).",
+    )
+    fib.add_argument(
+        "--force",
+        action="store_true",
+        help="Set FIB even if Pulp does not list the NVR (user override).",
+    )
+
+    nab = subparsers.add_parser(
+        "close-nab",
+        help="Comment, set VEX, and close as Not a Bug. Ask the user first.",
+    )
+    nab.add_argument("tickets", nargs="+", help="HUM ticket key(s).")
+    nab.add_argument(
+        "--vex",
+        required=True,
+        choices=(
+            "Component not Present",
+            "Vulnerable Code not Present",
+        ),
+        help="VEX justification.",
+    )
+    nab.add_argument("-m", "--message", default="", help="Closing comment.")
+    nab.add_argument(
+        "-f",
+        "--file",
+        type=Path,
+        dest="comment_file",
+        help="Read closing comment from file.",
+    )
+
+    task = subparsers.add_parser(
+        "create-task",
+        help="Create a HUM Task, link CVE trackers with --blocks, set In Progress.",
+    )
+    task.add_argument("--summary", required=True, help="Task summary.")
+    task.add_argument(
+        "--blocks",
+        action="append",
+        default=[],
+        help="CVE tracker this task blocks (repeatable).",
+    )
+    task.add_argument("--assignee", default="", help="Assignee email (default: JIRA_EMAIL).")
+    task.add_argument(
+        "--components",
+        default="A2: CVE & Scanners",
+        help="Jira component (default: A2: CVE & Scanners).",
+    )
+    task.add_argument(
+        "--worktree",
+        action="store_true",
+        help="Also create ../worktrees/<task> after the ticket exists.",
+    )
+    task.add_argument("--base", default="main", help="Worktree base branch.")
+
+    mr = subparsers.add_parser(
+        "open-mr",
+        help="Push the fork branch and create a package fix MR (not advisory_handler).",
+    )
+    mr.add_argument("--task", required=True, help="HUM task ticket to Closes.")
+    mr.add_argument(
+        "--tracker",
+        action="append",
+        default=[],
+        dest="trackers",
+        help="CVE tracker keys for Ref: (repeatable).",
+    )
+    mr.add_argument(
+        "--cve",
+        action="append",
+        default=[],
+        dest="cves",
+        help="CVE IDs for the CVE: trailer (repeatable).",
+    )
+    mr.add_argument("--title", required=True, help="MR title.")
+    mr.add_argument(
+        "-m",
+        "--message",
+        default="",
+        help="MR summary paragraph (trailers are appended).",
+    )
+    mr.add_argument(
+        "-f",
+        "--file",
+        type=Path,
+        dest="description_file",
+        help="MR summary from file (trailers still appended unless file has them).",
+    )
+    mr.add_argument(
+        "--source-branch",
+        default="",
+        help="Branch to push (default: the task key).",
+    )
+    mr.add_argument("--no-push", action="store_true", help="Skip git push.")
+    mr.add_argument(
+        "--no-review",
+        action="store_true",
+        help="Do not post /hummingbird code-review on the MR.",
+    )
+
+    lookaside = subparsers.add_parser(
+        "lookaside-cmd",
+        help="Print lookaside copy/upload commands; do not upload.",
+    )
+    lookaside.add_argument(
+        "-f",
+        "--file",
+        action="append",
+        dest="files",
+        required=True,
+        type=Path,
+        help="Artifact to stage (repeatable).",
+    )
+    lookaside.add_argument(
+        "-p",
+        "--package",
+        required=True,
+        help="RPM package name (e.g. grafana13.1, not grafana13).",
+    )
+
+    inv = subparsers.add_parser(
+        "investigate",
+        help="One-shot ticket recap plus bot-mrs, spec-deps, and GitLab MR search.",
+    )
+    _add_show_arguments(inv)
+    inv.add_argument(
+        "--only",
+        action="store_true",
+        help="Skip find-related (same as a trailing `only` token).",
+    )
+    inv.add_argument(
+        "--sbom",
+        action="store_true",
+        help="Also fetch and search the package SBOM.",
+    )
     return parser
 
 
@@ -1239,72 +1905,20 @@ def cmd_show(args: argparse.Namespace) -> int:
         print("--max-linked must be >= 0", file=sys.stderr)
         return 2
 
-    ensure_rhjira_available()
-
-    initial_keys: list[str] = [normalize_hum_key(key) for key in args.tickets]
-    ticket_keys: list[str] = list(initial_keys)
-    initial_set = set(initial_keys)
-
-    # Full JSON fetch for user-provided tickets (need custom fields, comments)
-    initial_reports: dict[str, TicketReport] = {}
-    for key in initial_keys:
-        try:
-            fields = fetch_json(key)
-        except RuntimeError as e:
-            print(f"Warning: failed to fetch {key}: {e}", file=sys.stderr)
-            continue
-        print(f"Processing {key}...", file=sys.stderr, end="\r")
-        initial_reports[key] = parse_ticket_json(key, fields)  # type: ignore[arg-type] - Can't be None, fetch_json would raise
-
-    if args.find_related:
-        print("Finding related tickets...", file=sys.stderr)
-        initial_cve_ids: set[str] = set()
-        for report in initial_reports.values():
-            initial_cve_ids.update(report.cve_ids)
-
-        if initial_cve_ids:
-            related_keys = find_related_tickets(list(initial_cve_ids))
-            new_keys = set(related_keys) - initial_set
-            ticket_keys = list(dict.fromkeys(ticket_keys + related_keys))
-            print(
-                f"Found {len(ticket_keys)} total tickets ({len(new_keys)} newly discovered)\n",
-                file=sys.stderr,
-            )
-        else:
-            print(
-                "Warning: Could not extract any CVE IDs from initial tickets; "
-                "--find-related had no effect.",
-                file=sys.stderr,
-            )
-
-    reports: list[TicketReport] = []
-
-    # Batch fetch discovered tickets
-    discovered_keys = [k for k in ticket_keys if k not in initial_set]
-    discovered_reports: dict[str, TicketReport] = {}
-    if discovered_keys:
-        print(
-            f"Batch-fetching {len(discovered_keys)} discovered tickets...",
-            file=sys.stderr,
-        )
-        discovered_reports = batch_fetch_tickets(discovered_keys)
-
-    # Merge and attach linked ticket details
-    all_reports = {**initial_reports, **discovered_reports}
-
-    for key, parsed in all_reports.items():
-        parsed.linked_ticket_details = inspect_linked_tickets(
-            current_ticket=key,
-            linked_keys=parsed.linked_keys,
-            max_linked=args.max_linked,
-        )
-        reports.append(parsed)
+    tickets, only = strip_only_keyword(list(args.tickets))
+    find_related = args.find_related and not only
+    gathered = gather_ticket_reports(
+        tickets, find_related=find_related, max_linked=args.max_linked
+    )
+    reports = gathered.reports
 
     suggested_chat_title = build_suggested_chat_title(reports)
     suggested_chat_title = apply_title_prefix(suggested_chat_title, args.title_prefix)
     payload: dict[str, Any] = {
         "suggested_chat_title": suggested_chat_title,
         "tickets": [asdict(r) for r in reports],
+        "user_provided": gathered.user_provided,
+        "discovered": gathered.discovered,
     }
 
     if args.json_out:
@@ -1408,6 +2022,262 @@ def cmd_worktree(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_deps(args: argparse.Namespace) -> int:
+    """Report Jira auth source and whether hummingbird_cve_analysis imports."""
+    auth_ok = True
+    auth_error = ""
+    auth_source = ""
+    auth_url = ""
+    auth_user = ""
+    try:
+        auth = load_jira_auth()
+        auth_source = auth.source
+        auth_url = auth.base_url
+        auth_user = auth.basic_auth_user or ""
+    except RuntimeError as err:
+        auth_ok = False
+        auth_error = str(err)
+
+    analysis_ok = True
+    analysis_error = ""
+    try:
+        jira_client_module()
+    except AnalysisImportError as err:
+        analysis_ok = False
+        analysis_error = str(err)
+
+    payload = {
+        "jira_auth_ok": auth_ok,
+        "jira_auth_source": auth_source,
+        "jira_url": auth_url,
+        "jira_user": auth_user,
+        "jira_auth_error": auth_error,
+        "hummingbird_cve_analysis_ok": analysis_ok,
+        "hummingbird_cve_analysis_error": analysis_error,
+    }
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        auth_state = "ok" if auth_ok else f"missing ({auth_error})"
+        extra = ""
+        if auth_ok:
+            extra = f" url={auth_url}"
+            if auth_user:
+                extra += f" user={auth_user}"
+            extra += f" source={auth_source}"
+        print(f"jira_auth: {auth_state}{extra}")
+        if analysis_ok:
+            print("hummingbird_cve_analysis: ok")
+        else:
+            print(f"hummingbird_cve_analysis: missing ({analysis_error})")
+    return 0 if auth_ok and analysis_ok else 1
+
+
+def cmd_comment(args: argparse.Namespace) -> int:
+    body = _comment_text(args.message, args.comment_file)
+    for raw in args.tickets:
+        ticket = normalize_hum_key(raw)
+        posted = post_comment(ticket, body)
+        print(f"{ticket}: {'comment posted' if posted else 'duplicate comment skipped'}")
+    return 0
+
+
+def cmd_next_release(args: argparse.Namespace) -> int:
+    body = _comment_text(args.message, args.comment_file)
+    for raw in args.tickets:
+        ticket = normalize_hum_key(raw)
+        apply_next_release(ticket, body)
+        print(f"{ticket}: cve-next-release; left In Progress")
+    return 0
+
+
+def cmd_set_fib(args: argparse.Namespace) -> int:
+    ticket = normalize_hum_key(args.ticket)
+    detail = set_fixed_in_build(
+        ticket, args.nvr, args.package, force=args.force
+    )
+    print(f"{ticket}: Fixed in Build set ({detail})")
+    return 0
+
+
+def cmd_close_nab(args: argparse.Namespace) -> int:
+    body = _comment_text(args.message, args.comment_file)
+    for raw in args.tickets:
+        ticket = normalize_hum_key(raw)
+        close_not_a_bug(ticket, body, args.vex)
+        print(f"{ticket}: closed Not a Bug ({args.vex})")
+    return 0
+
+
+def cmd_create_task(args: argparse.Namespace) -> int:
+    if not args.blocks:
+        raise ValueError("Pass at least one --blocks HUM-XXXX CVE tracker")
+    key = create_hum_task(
+        args.summary,
+        blocks=args.blocks,
+        assignee=args.assignee,
+        components=args.components,
+    )
+    print(f"TASK={key}")
+    if args.worktree:
+        dest = create_task_worktree(key, base=args.base)
+        print(f"WORKTREE={dest}")
+        print("Move the agent workspace into this worktree before editing files.")
+    return 0
+
+
+def cmd_open_mr(args: argparse.Namespace) -> int:
+    if not args.trackers:
+        raise ValueError("Pass at least one --tracker HUM-XXXX")
+    if not args.cves:
+        raise ValueError("Pass at least one --cve CVE-YYYY-NNNNN")
+    summary = args.message
+    if args.description_file is not None:
+        summary = args.description_file.read_text(encoding="utf-8")
+    if not summary.strip():
+        raise ValueError("Provide --message or --file with the MR summary")
+    task = normalize_hum_key(args.task)
+    description = build_mr_description(
+        summary,
+        task=task,
+        trackers=args.trackers,
+        cves=args.cves,
+    )
+    branch = args.source_branch or task
+    url = open_package_mr(
+        title=args.title,
+        description=description,
+        task=task,
+        source_branch=branch,
+        push=not args.no_push,
+        trigger_review=not args.no_review,
+    )
+    print(f"MR={url}")
+    return 0
+
+
+def cmd_lookaside(args: argparse.Namespace) -> int:
+    missing = [str(path) for path in args.files if not path.is_file()]
+    if missing:
+        raise RuntimeError(f"File not found: {', '.join(missing)}")
+    print("Do not upload unless the user asks. Copy to /tmp then run:")
+    for line in lookaside_upload_commands(args.files, args.package):
+        print(line)
+    return 0
+
+
+def cmd_investigate(args: argparse.Namespace) -> int:
+    if args.max_linked < 0:
+        print("--max-linked must be >= 0", file=sys.stderr)
+        return 2
+    tickets, only_token = strip_only_keyword(list(args.tickets))
+    find_related = args.find_related and not only_token and not args.only
+    gathered = gather_ticket_reports(
+        tickets, find_related=find_related, max_linked=args.max_linked
+    )
+    cve_ids: list[str] = []
+    for report in gathered.reports:
+        for cve_id in report.cve_ids:
+            if cve_id not in cve_ids:
+                cve_ids.append(cve_id)
+
+    probes: dict[str, Any] = {"bot_mrs": {}, "spec_deps": {}, "sbom": {}, "gitlab_mrs": []}
+    packages = []
+    for report in gathered.reports:
+        if report.ticket in gathered.user_provided and report.package_guess:
+            if report.package_guess not in packages:
+                packages.append(report.package_guess)
+
+    for package in packages:
+        try:
+            probes["bot_mrs"][package] = {
+                state: [asdict(entry) for entry in entries]
+                for state, entries in list_bot_mrs(package).items()
+            }
+        except RuntimeError as err:
+            probes["bot_mrs"][package] = {"error": str(err)}
+        component = ""
+        for report in gathered.reports:
+            if report.package_guess == package and report.upstream_component:
+                component = report.upstream_component
+                break
+        probes["spec_deps"][package] = [
+            asdict(hit) for hit in probe_spec_deps(package, component)
+        ]
+        if args.sbom:
+            nvr = ""
+            ticket = ""
+            for report in gathered.reports:
+                if report.package_guess == package:
+                    ticket = report.ticket
+                    nvr = report.fixed_in_build
+                    break
+            try:
+                meta = fetch_sbom(package, nvr=nvr, ticket=ticket)
+                terms = [component] if component else []
+                hits = search_sbom_file(Path(meta["path"]), terms) if terms else []
+                probes["sbom"][package] = {
+                    **meta,
+                    "hits": [asdict(h) for h in hits],
+                }
+            except (OSError, RuntimeError, urllib.error.URLError) as err:
+                probes["sbom"][package] = {"error": str(err)}
+
+    if cve_ids:
+        probes["gitlab_mrs"] = search_repo_fix_mrs(cve_ids)
+
+    recap = recap_lines(gathered)
+    payload = {
+        "user_provided": gathered.user_provided,
+        "discovered": gathered.discovered,
+        "tickets": [asdict(r) for r in gathered.reports],
+        "probes": probes,
+        "recap": recap,
+        "suggested_chat_title": build_suggested_chat_title(gathered.reports),
+    }
+    if args.json_out:
+        args.json_out.write_text(
+            json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
+        )
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    for report in gathered.reports:
+        origin = (
+            "user_provided" if report.ticket in gathered.user_provided else "discovered"
+        )
+        print(f"### {report.ticket} [{origin}]")
+        print_ticket(report)
+        print()
+    if packages:
+        print("### Probes")
+        for package in packages:
+            print(f"bot-mrs {package}:")
+            mrs = probes["bot_mrs"].get(package) or {}
+            if "error" in mrs:
+                print(f"  bot-mrs error: {mrs['error']}")
+            else:
+                print(
+                    f"  bot-mrs open={len(mrs.get('open', []))} "
+                    f"merged={len(mrs.get('merged', []))}"
+                )
+            print(f"  spec-deps hits={len(probes['spec_deps'].get(package, []))}")
+            if args.sbom:
+                sbom = probes["sbom"].get(package) or {}
+                if "error" in sbom:
+                    print(f"  sbom error: {sbom['error']}")
+                else:
+                    print(f"  sbom hits={len(sbom.get('hits', []))}")
+        print(f"  gitlab fix MRs: {len(probes['gitlab_mrs'])}")
+        for hit in probes["gitlab_mrs"]:
+            print(f"    {hit.get('state')}: {hit.get('html_url')}")
+        print()
+    print("\n".join(recap))
+    print(f"\nSuggested chat title: {payload['suggested_chat_title']}")
+    print("Wait for the user after this recap before Step 3 writes.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = normalize_argv(list(argv) if argv is not None else sys.argv[1:])
     parser = build_parser()
@@ -1422,6 +2292,15 @@ def main(argv: list[str] | None = None) -> int:
         "sbom": cmd_sbom,
         "spec-deps": cmd_spec_deps,
         "worktree": cmd_worktree,
+        "deps": cmd_deps,
+        "comment": cmd_comment,
+        "next-release": cmd_next_release,
+        "set-fib": cmd_set_fib,
+        "close-nab": cmd_close_nab,
+        "create-task": cmd_create_task,
+        "open-mr": cmd_open_mr,
+        "lookaside-cmd": cmd_lookaside,
+        "investigate": cmd_investigate,
     }
     return handlers[args.command](args)
 
