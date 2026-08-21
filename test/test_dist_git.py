@@ -1572,14 +1572,23 @@ def test_refresh_fixed_ref_pin_success(tmp_path: Path, dist_git_module) -> None:
             _GCC_UPSTREAM_REPO, _GCC_VERSION_FROM_REF, '16.2.1',
         )
 
-    assert result == '16.2.1-20260819'
-    updated_text = pipeline_file.read_text()
+    assert result is not None
+    version, tmp_pipeline_file = result
+    assert version == '16.2.1-20260819'
+
+    # The real pipeline_file must be untouched -- only the returned temp
+    # copy has the ref rewrite, until a caller confirms gorget actually
+    # succeeded against it (see _run_gorget_for_updated_package).
+    assert '0000000000000000000000000000000000000000' in pipeline_file.read_text()
+
+    updated_text = tmp_pipeline_file.read_text()
     assert 'ref: "1111111111111111111111111111111111111111"' in updated_text
     assert '0000000000000000000000000000000000000000' not in updated_text
     # Comment and unrelated keys must survive a targeted text substitution,
     # not a yaml.safe_load/dump round-trip (which would strip comments).
     assert 'a carefully-written comment that must survive' in updated_text
     assert 'archive_name: "gcc-${VERSION}.tar.xz"' in updated_text
+    tmp_pipeline_file.unlink()
 
 
 def test_refresh_fixed_ref_pin_unsupported_type_returns_none(tmp_path: Path, dist_git_module) -> None:
@@ -1767,7 +1776,61 @@ def test_run_gorget_for_updated_package_fixed_ref_drift_gcc_auto_fix(
         )
 
     assert result is None
-    mock_gorget.assert_called_once_with('gcc', '16.2.1', '16.2.1-20260819', pipeline_file)
+    # gorget was called against a staged temp copy, not the real file directly.
+    mock_gorget.assert_called_once()
+    call_args = mock_gorget.call_args[0]
+    assert call_args[:3] == ('gcc', '16.2.1', '16.2.1-20260819')
+    assert call_args[3] != pipeline_file
+    # Only after gorget succeeded does the real pipeline file get the rewrite.
+    assert '1111111111111111111111111111111111111111' in pipeline_file.read_text()
+    # The temp file is cleaned up afterward.
+    assert not call_args[3].exists()
+
+
+def test_run_gorget_for_updated_package_fixed_ref_retry_after_gorget_failure_still_retries(
+        tmp_path: Path, dist_git_module) -> None:
+    """Regression test: a gorget failure must NOT leave the real pipeline
+    file looking "already fixed" -- otherwise a retry sees no more drift,
+    silently skips re-running gorget, and the caller ends up committing
+    whatever was already in `sources` unverified (exactly what happened on
+    a real gcc update despite this whole safety net)."""
+    package_dir = tmp_path / 'gcc'
+    package_dir.mkdir()
+    (package_dir / 'gcc.spec').write_text(
+        "%prep\n%setup -q -c -n %{uniquesuffix}\n%global gitrev 1111111111111111111111111111111111111111\n"
+    )
+    pipeline_file = tmp_path / 'gcc.source-pipeline.yaml'
+    pipeline_file.write_text(
+        'fetch:\n'
+        '  - type: git\n'
+        '    repo: "${UPSTREAM_REPO}"\n'
+        '    ref: "0000000000000000000000000000000000000000"\n'
+        '    archive_name: "gcc-${VERSION}.tar.xz"\n'
+    )
+    metadata = {'version_from_ref': _GCC_VERSION_FROM_REF, 'upstream_repo': _GCC_UPSTREAM_REPO}
+
+    # First attempt: gorget fails (e.g. the binary is missing).
+    with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
+         patch.object(dist_git_module.cuv, '_run_gorget_pipeline',
+                       side_effect=FileNotFoundError("No such file or directory: 'gorget'")), \
+         patch.object(dist_git_module.subprocess, 'run', side_effect=_fake_pin_refresh_git('20260819')):
+        first_result = dist_git_module._run_gorget_for_updated_package(
+            'gcc', package_dir, '16.2.1', '16.2.1', metadata,
+        )
+    assert first_result is not None
+    # The real pipeline file must be untouched by the failed attempt.
+    assert '0000000000000000000000000000000000000000' in pipeline_file.read_text()
+
+    # Second attempt (retry): must detect the SAME drift again and actually
+    # invoke gorget -- not silently short-circuit as "nothing to do".
+    with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
+         patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget, \
+         patch.object(dist_git_module.subprocess, 'run', side_effect=_fake_pin_refresh_git('20260819')):
+        second_result = dist_git_module._run_gorget_for_updated_package(
+            'gcc', package_dir, '16.2.1', '16.2.1', metadata,
+        )
+    assert second_result is None
+    mock_gorget.assert_called_once()
     assert '1111111111111111111111111111111111111111' in pipeline_file.read_text()
 
 

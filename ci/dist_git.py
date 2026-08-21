@@ -1413,19 +1413,29 @@ _GITREV_RE = re.compile(r"^%global\s+gitrev\s+([0-9a-fA-F]{40})\s*$", re.MULTILI
 
 def _refresh_fixed_ref_pin(package_name: str, package_dir: Path, pipeline_file: Path,
                             pipeline: dict, upstream_repo: str | None,
-                            version_from_ref: dict[str, str], old_version: str) -> str | None:
+                            version_from_ref: dict[str, str],
+                            old_version: str) -> tuple[str, Path] | None:
     """Attempt to fully automate a fixed-ref pin refresh, per
     metadata/<package>.json's `version_from_ref` config (see
     documentation/operating/package-modification-tracking.md): extract the
     new pin from the just-merged spec, compute gorget's --version string, and
-    update the pipeline YAML's fetch ref to match -- via a targeted text
-    substitution, not a yaml.safe_load/dump round-trip, so the pipeline's
-    extensive comments survive untouched.
+    stage the pipeline YAML's fetch ref update to a *temporary copy* -- via a
+    targeted text substitution, not a yaml.safe_load/dump round-trip, so the
+    pipeline's extensive comments survive untouched.
 
-    Returns the computed --version string on success, or None if any step
-    fails (network error, unparseable spec, unsupported version_from_ref
-    type, etc.) -- callers should fall back to the generic fixed-ref safety
-    net (treat as needing manual resolution) rather than guessing.
+    Deliberately does not touch the real pipeline_file yet: the caller must
+    only overwrite it with the returned temp copy after confirming gorget
+    actually succeeded against that copy. Writing the real file eagerly
+    would make a failed gorget run look "already fixed" to a later retry
+    (the drift check only compares the pin against the spec, not whether
+    gorget ever actually ran) -- exactly how a real gcc update briefly
+    committed an unverified `sources` file despite this whole safety net.
+
+    Returns (computed --version string, path to the staged pipeline copy)
+    on success, or None if any step fails (network error, unparseable spec,
+    unsupported version_from_ref type, etc.) -- callers should fall back to
+    the generic fixed-ref safety net (treat as needing manual resolution)
+    rather than guessing.
     """
     ref_type = version_from_ref.get('type')
     if ref_type != 'commit-date':
@@ -1499,9 +1509,15 @@ def _refresh_fixed_ref_pin(package_name: str, package_dir: Path, pipeline_file: 
         logging.warning("%s: could not find ref: %s in %s to update",
                          package_name, old_gitrev, pipeline_file)
         return None
-    pipeline_file.write_text(new_pipeline_text)
 
-    return f"{old_version}-{commit_date}"
+    tmp_fd, tmp_path_str = tempfile.mkstemp(
+        prefix=f"{package_name}-pipeline-", suffix='.yaml',
+    )
+    tmp_pipeline_file = Path(tmp_path_str)
+    with os.fdopen(tmp_fd, 'w') as f:
+        f.write(new_pipeline_text)
+
+    return f"{old_version}-{commit_date}", tmp_pipeline_file
 
 
 def _run_gorget_for_updated_package(package_name: str, package_dir: Path,
@@ -1527,19 +1543,31 @@ def _run_gorget_for_updated_package(package_name: str, package_dir: Path,
     if drifted:
         version_from_ref = metadata.get('version_from_ref')
         if version_from_ref:
-            gorget_version = _refresh_fixed_ref_pin(
+            refresh_result = _refresh_fixed_ref_pin(
                 package_name, package_dir, pipeline_file, pipeline,
                 metadata.get('upstream_repo'), version_from_ref, old_version,
             )
-            if gorget_version is None:
+            if refresh_result is None:
                 return (f"{package_name}: pipeline ref(s) {', '.join(drifted)} no longer "
                         f"match the merged spec, and automatic pin refresh failed (see log "
                         f"for details) -- gorget must be re-run manually")
+            gorget_version, tmp_pipeline_file = refresh_result
             try:
-                cuv._run_gorget_pipeline(package_name, old_version, gorget_version, pipeline_file)
+                cuv._run_gorget_pipeline(package_name, old_version, gorget_version, tmp_pipeline_file)
             except (RuntimeError, OSError) as exc:
                 return f"{package_name}: gorget pipeline failed after pin refresh: {exc}"
-            return None
+            else:
+                # Only commit the ref rewrite to the real pipeline file once
+                # gorget has actually run against it successfully -- on
+                # failure the real file is left untouched so a retry still
+                # sees the original drift and tries the whole thing again,
+                # instead of concluding "already fixed" from the stale ref
+                # match alone (this exact gap let an unverified `sources`
+                # slip through on a real gcc update despite this check).
+                pipeline_file.write_text(tmp_pipeline_file.read_text())
+                return None
+            finally:
+                tmp_pipeline_file.unlink(missing_ok=True)
 
         return (f"{package_name}: pipeline ref(s) {', '.join(drifted)} no longer match the "
                 f"merged spec -- gorget must be re-run manually (see "
@@ -1824,7 +1852,14 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
                 sys.exit(2)
 
             save_package_metadata(package_name, imports[package_name])
-            run_git('add', '-f', f'rpms/{package_name}', f'metadata/{package_name}.json', cwd=ROOT_DIR)
+            add_paths = [f'rpms/{package_name}', f'metadata/{package_name}.json']
+            pipeline_file = cuv._load_source_pipeline(package_name)
+            if pipeline_file is not None:
+                # A successful fixed-ref pin refresh (_run_gorget_for_updated_package
+                # -> _refresh_fixed_ref_pin) rewrites this file in place; without
+                # staging it here that rewrite is left uncommitted indefinitely.
+                add_paths.append(str(pipeline_file.relative_to(ROOT_DIR)))
+            run_git('add', '-f', *add_paths, cwd=ROOT_DIR)
             verb = "Sync" if sync else "Update"
             branch_suffix = f" ({old_branch} -> {effective_branch})" if branch_changed else ""
             commit_msg = f"{verb} {package_name} from {old_version}-{old_release} to {version}-{release}{branch_suffix}\n\nUpstream: {latest_sha}"
@@ -1885,7 +1920,14 @@ def continue_update(dry_run: bool = False) -> None:
         if 'metadata' in state:
             save_package_metadata(package_name, cast(PackageMetadata, state['metadata']))
 
-        run_git('add', '-f', f'rpms/{package_name}', f'metadata/{package_name}.json', cwd=ROOT_DIR)
+        add_paths = [f'rpms/{package_name}', f'metadata/{package_name}.json']
+        pipeline_file = cuv._load_source_pipeline(package_name)
+        if pipeline_file is not None:
+            # See the matching comment in update()'s clean-merge commit path:
+            # a successful fixed-ref pin refresh rewrites this file in place,
+            # and it must be staged here or the rewrite is left uncommitted.
+            add_paths.append(str(pipeline_file.relative_to(ROOT_DIR)))
+        run_git('add', '-f', *add_paths, cwd=ROOT_DIR)
         run_git_commit('-m', commit_msg, cwd=ROOT_DIR)
         UPDATE_STATE_FILE.unlink()
         logging.info("Committed resolved update for %s", package_name)
