@@ -164,6 +164,9 @@ dist_git_update:
   environment:
     name: chore-mr
     action: access
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
   allow_failure: true
   before_script:
     - |
@@ -179,6 +182,10 @@ dist_git_update:
       git branch --quiet --force "${CI_COMMIT_BRANCH:-$CI_DEFAULT_BRANCH}" "origin/${CI_COMMIT_BRANCH:-$CI_DEFAULT_BRANCH}"
   script:
     - |
+      printenv GITLAB_OIDC_TOKEN > /tmp/oidc-token
+      export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/oidc-token
+      export AWS_ROLE_ARN="arn:aws:iam::${LOOKASIDE_UPLOAD_AWS_ACCOUNT_ID}:role/${LOOKASIDE_UPLOAD_AWS_ROLE_NAME}"
+      export AWS_ROLE_SESSION_NAME="gitlab-ci-${CI_JOB_ID}"
       ./ci/dist_git_update_multi_mr.sh
   after_script: *notify_schedule_failure
   rules:
