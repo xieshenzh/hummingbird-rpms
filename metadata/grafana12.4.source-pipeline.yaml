@@ -60,6 +60,12 @@ transform:
 # go.mod/go.sum/go.work alongside vendor/, which changes this archive's own
 # checksum without changing any dependency's resolved version or content.
 accepted-checksums:
+  - file: "grafana-12.4.9-vendor.tar.bz2"
+    checksum: "1417dec255c3009116e00711783ebc2b08c7a0331989de64b108ff67bf9ceb013bf6b75af45afa679695997b0505d2538aecdc64413badd36df9c429c0fe4a5d"
+    reason: "gorget 0.1.18 normalizes uid/gid/uname/gname in generated archives; dependency content is unchanged"
+  - file: "grafana-yarn-cache-12.4.9.tar.bz2"
+    checksum: "c6b84b3f7ee6e62a9edbf257eb6ea315557a18379e310be713dee9c9c063a5f64961c6e4411b6434601330c1f452a96963e80efb3c632c33448f7b58d4b5bfdb"
+    reason: "grafana-dompurify-cve.patch bumps DOMPurify 3.3.0->3.4.12 for CVE-2026-65902/65899/65898/65901; yarn cache regenerated to include the patched dependency"
   - file: "grafana-12.4.8-vendor.tar.bz2"
     checksum: "ce08014af2e030665f58d5234558d9d72283856bbe6b2b667e49daf23343d600e851d5c76db96fd9883825d753e918f2f11e5a4ec4226bd73df5413a4cf1c478"
     reason: "gorget 0.1.16 fixes vendor archive layout (gorget-project/gorget#32); go.mod/go.sum/go.work added alongside vendor/, no dependency content changed"
