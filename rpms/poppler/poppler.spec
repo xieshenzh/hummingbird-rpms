@@ -10,8 +10,8 @@
 
 Summary: PDF rendering library
 Name:    poppler
-Version: 26.06.0
-Release: 0.1.1%{?dist}
+Version: 26.08.0
+Release: 1%{?dist}
 License: (GPL-2.0-only OR GPL-3.0-only) AND GPL-2.0-or-later AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND MIT
 URL:     https://poppler.freedesktop.org/
 Source0: https://poppler.freedesktop.org/poppler-%{version}.tar.xz
@@ -235,7 +235,7 @@ test "$(pkg-config --modversion poppler-qt6)" = "%{version}"
 %files
 %doc README.md
 %license COPYING
-%{_libdir}/libpoppler.so.161*
+%{_libdir}/libpoppler.so.163*
 
 %files devel
 %{_libdir}/pkgconfig/poppler.pc
