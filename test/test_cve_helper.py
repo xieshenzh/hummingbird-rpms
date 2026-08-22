@@ -551,5 +551,75 @@ def test_recap_lines_asks_before_discovered() -> None:
     assert "Yes please" in text
 
 
+def test_split_nvr_and_version_cmp() -> None:
+    assert helper.split_nvr("grafana13.1-13.1.1-0.5.src.rpm") == (
+        "grafana13.1",
+        "13.1.1",
+        "0.5",
+    )
+    assert helper.split_nvr("foo-1.2") == ("foo", "1.2", "")
+    assert helper.version_cmp("1.2.3", "1.2.4") == -1
+    assert helper.version_cmp("1.3", "1.2.9") == 1
+    assert helper.version_cmp("v1.0.0", "1.0.0") == 0
+    assert helper.version_cmp("not-a-version", "1.0") is None
+
+
+def test_parse_affected_constraints_and_satisfies() -> None:
+    constraints = helper.parse_affected_constraints("< 1.2.3")
+    assert constraints == [("<", "1.2.3")]
+    assert helper.version_satisfies("1.2.2", constraints) is True
+    assert helper.version_satisfies("1.2.3", constraints) is False
+    span = helper.parse_affected_constraints("1.0 through 1.2.2")
+    assert helper.version_satisfies("1.1.0", span) is True
+    assert helper.version_satisfies("1.3.0", span) is False
+    both = helper.parse_affected_constraints(">= 1.0, < 1.5")
+    assert helper.version_satisfies("1.4.9", both) is True
+    assert helper.version_satisfies("1.5.0", both) is False
+    assert helper.parse_affected_constraints("") == []
+    assert helper.version_satisfies("1.0", []) is None
+
+
+def test_version_check_payload_hints(tmp_path: Path, monkeypatch) -> None:
+    pkg = "foo"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "Name: foo\nVersion: 1.2.2\nRelease: 3%{?dist}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    below = helper.version_check_payload(
+        pkg, affected="< 1.2.3", fixed="1.2.3"
+    )
+    assert below["local_nvr"] == "foo-1.2.2-3"
+    assert below["vs_fixed"] == "below"
+    assert below["vs_affected"] == "in_range"
+    assert below["hint"] == "possibly_below_fix"
+    above = helper.version_check_payload(
+        pkg, local_nvr="foo-1.2.3-1", fixed="1.2.3", affected="< 1.2.3"
+    )
+    assert above["vs_fixed"] == "at_or_above"
+    assert above["vs_affected"] == "not_in_range"
+    assert above["hint"] == "possibly_at_or_above_fix"
+    conflicting = helper.version_check_payload(
+        pkg, local_nvr="foo-1.5.0-1", fixed="1.5.0", affected=">= 1.0, <= 2.0"
+    )
+    assert conflicting["vs_fixed"] == "at_or_above"
+    assert conflicting["vs_affected"] == "in_range"
+    assert conflicting["hint"] == "conflicting_signals"
+    assert "broad CVE range" in conflicting["note"]
+
+
+def test_extract_analysis_nvr() -> None:
+    block = "\n".join(
+        [
+            "ASSESSMENT: maybe",
+            "  Hummingbird SRPM version: foo-1.2-3.src.rpm",
+            "  Affected: < 1.3",
+        ]
+    )
+    assert helper.extract_analysis_nvr(block) == "foo-1.2-3"
+
+
 
 

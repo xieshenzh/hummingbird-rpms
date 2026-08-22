@@ -20,6 +20,7 @@ Subcommands:
   open-mr         Push the fork and open a package fix MR
   lookaside-cmd   Print lookaside upload commands; do not upload
   investigate     One-shot show + probes + related-ticket recap
+  version-check   Compare local NVR vs CVE range / FIB / analysis NVR
 
 Jira writes import hummingbird_cve_analysis.lib (jira_client, pulp). Auth
 is JIRA_TOKEN plus JIRA_URL or rhjira's JIRA_SERVER / JIRA_EMAIL from
@@ -82,6 +83,7 @@ COMMANDS = (
     "open-mr",
     "lookaside-cmd",
     "investigate",
+    "version-check",
 )
 SBOM_FILE_RE = re.compile(r"sha256-[a-fA-F0-9]+\.sbom")
 BUNDLED_PROVIDES_RE = re.compile(
@@ -1122,6 +1124,185 @@ def normalize_nvr(nvr: str) -> str:
     return name.removesuffix(".src.rpm")
 
 
+def split_nvr(nvr: str) -> tuple[str, str, str]:
+    """Split an NVR into (name, version, release). Release may be empty."""
+    cleaned = normalize_nvr(nvr)
+    if not cleaned:
+        return "", "", ""
+    parts = cleaned.rsplit("-", 2)
+    if len(parts) == 3:
+        return parts[0], parts[1], parts[2]
+    if len(parts) == 2:
+        return parts[0], parts[1], ""
+    return cleaned, "", ""
+
+
+def parse_version_key(value: str) -> tuple[int, ...] | None:
+    """Numeric tuple from a dotted version; None if there are no digits."""
+    text = (value or "").strip().lstrip("vV")
+    parts = re.findall(r"\d+", text)
+    if not parts:
+        return None
+    return tuple(int(p) for p in parts)
+
+
+def version_cmp(left: str, right: str) -> int | None:
+    """Return -1/0/1, or None when either side is not a dotted version."""
+    left_key = parse_version_key(left)
+    right_key = parse_version_key(right)
+    if left_key is None or right_key is None:
+        return None
+    if left_key < right_key:
+        return -1
+    if left_key > right_key:
+        return 1
+    return 0
+
+
+def parse_affected_constraints(affected: str) -> list[tuple[str, str]]:
+    """Parse a CVE affected-range string into (op, version) constraints."""
+    text = (affected or "").strip()
+    if not text:
+        return []
+    constraints: list[tuple[str, str]] = []
+    span_re = re.compile(
+        r"(?i)(v?\d[\w.*+-]*)\s+through\s+(v?\d[\w.*+-]*)"
+    )
+    for match in span_re.finditer(text):
+        constraints.append((">=", match.group(1)))
+        constraints.append(("<=", match.group(2)))
+    text = span_re.sub(" ", text)
+    op_re = re.compile(
+        r"(?i)(?:^|[\s,])(<=|>=|<|>|=|before|prior\s+to|through)\s+(v?\d[\w.*+-]*)"
+    )
+    mapped = {
+        "before": "<",
+        "prior to": "<",
+        "through": "<=",
+    }
+    for match in op_re.finditer(text):
+        raw_op = re.sub(r"\s+", " ", match.group(1).lower())
+        constraints.append((mapped.get(raw_op, raw_op), match.group(2)))
+    return constraints
+
+
+def version_satisfies(version: str, constraints: list[tuple[str, str]]) -> bool | None:
+    """True if version matches every constraint; None if any side is incomparable."""
+    if not constraints:
+        return None
+    ops = {
+        "<": lambda cmp_val: cmp_val < 0,
+        "<=": lambda cmp_val: cmp_val <= 0,
+        ">": lambda cmp_val: cmp_val > 0,
+        ">=": lambda cmp_val: cmp_val >= 0,
+        "=": lambda cmp_val: cmp_val == 0,
+    }
+    for op, bound in constraints:
+        pred = ops.get(op)
+        if pred is None:
+            return None
+        cmp_val = version_cmp(version, bound)
+        if cmp_val is None:
+            return None
+        if not pred(cmp_val):
+            return False
+    return True
+
+
+def extract_analysis_nvr(block: str) -> str:
+    if not block:
+        return ""
+    for field in (
+        "Hummingbird SRPM version",
+        "Hummingbird NVR",
+        "NVR",
+    ):
+        value = extract_vendor_field(block, field)
+        if value:
+            return normalize_nvr(value)
+    match = re.search(
+        r"\b([A-Za-z0-9+_.-]+-\d[\w.+]*-\d[\w.+]*)(?:\.src\.rpm)?\b",
+        block,
+    )
+    return normalize_nvr(match.group(1)) if match else ""
+
+
+def version_check_payload(
+    package: str,
+    *,
+    local_nvr: str = "",
+    fib: str = "",
+    affected: str = "",
+    fixed: str = "",
+    analysis_nvr: str = "",
+) -> dict[str, Any]:
+    if not local_nvr:
+        local_nvr = read_local_spec_nvr(package)
+    _name, local_version, _rel = split_nvr(local_nvr) if local_nvr else ("", "", "")
+    fib_nvr = normalize_nvr(fib) if fib else ""
+    _fib_name, fib_version, _fib_rel = split_nvr(fib_nvr) if fib_nvr else ("", "", "")
+    analysis_nvr = normalize_nvr(analysis_nvr) if analysis_nvr else ""
+
+    vs_fixed = ""
+    if local_version and fixed:
+        cmp_val = version_cmp(local_version, fixed)
+        if cmp_val is None:
+            vs_fixed = "unknown"
+        elif cmp_val < 0:
+            vs_fixed = "below"
+        else:
+            vs_fixed = "at_or_above"
+
+    vs_affected = ""
+    constraints = parse_affected_constraints(affected)
+    if local_version and constraints:
+        matched = version_satisfies(local_version, constraints)
+        if matched is None:
+            vs_affected = "unknown"
+        elif matched:
+            vs_affected = "in_range"
+        else:
+            vs_affected = "not_in_range"
+
+    if vs_fixed == "at_or_above" and vs_affected == "in_range":
+        hint = "conflicting_signals"
+    elif vs_fixed == "at_or_above":
+        hint = "possibly_at_or_above_fix"
+    elif vs_fixed == "below" or vs_affected == "in_range":
+        hint = "possibly_below_fix"
+    elif vs_affected == "not_in_range":
+        hint = "possibly_not_in_affected_range"
+    else:
+        hint = "unknown"
+
+    note = (
+        "Do not conclude Done-Errata from versions alone; "
+        "compare the fix commit date against the upstream tag."
+    )
+    if hint == "conflicting_signals":
+        note = (
+            "vs_fixed is at_or_above but vs_affected is still in_range "
+            "(broad CVE range that includes the fix version). Do not treat "
+            "this as below-fix; compare the fix commit date against the "
+            "upstream tag before Done-Errata."
+        )
+
+    return {
+        "package": package,
+        "local_nvr": local_nvr,
+        "local_version": local_version,
+        "fib": fib_nvr,
+        "fib_version": fib_version,
+        "analysis_nvr": analysis_nvr,
+        "affected": affected,
+        "fixed": fixed,
+        "vs_fixed": vs_fixed,
+        "vs_affected": vs_affected,
+        "hint": hint,
+        "note": note,
+    }
+
+
 def pulp_has_nvr(package: str, nvr: str) -> tuple[bool, str]:
     """Return whether the SRPM NVR is listed in Hummingbird Pulp."""
     wanted = normalize_nvr(nvr)
@@ -1886,6 +2067,24 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Also fetch and search the package SBOM.",
     )
+
+    vchk = subparsers.add_parser(
+        "version-check",
+        help="Compare local spec NVR vs CVE range / FIB / analysis NVR.",
+    )
+    vchk.add_argument("package", help="SRPM package name.")
+    vchk.add_argument("--ticket", default="", help="HUM tracker to read FIB/range from.")
+    vchk.add_argument("--nvr", default="", help="Override local NVR.")
+    vchk.add_argument("--fib", default="", help="Fixed in Build NVR override.")
+    vchk.add_argument("--affected", default="", help="CVE affected range override.")
+    vchk.add_argument("--fixed", default="", help="CVE fixed version override.")
+    vchk.add_argument(
+        "--analysis-nvr",
+        default="",
+        dest="analysis_nvr",
+        help="cve_analysis NVR override.",
+    )
+    vchk.add_argument("--json", action="store_true", help="Print JSON.")
     return parser
 
 
@@ -2278,6 +2477,47 @@ def cmd_investigate(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_version_check(args: argparse.Namespace) -> int:
+    fib = args.fib
+    affected = args.affected
+    fixed = args.fixed
+    analysis_nvr = args.analysis_nvr
+    if args.ticket:
+        gathered = gather_ticket_reports(
+            [args.ticket], find_related=False, max_linked=0
+        )
+        if not gathered.reports:
+            raise RuntimeError(f"Could not load {args.ticket}")
+        report = gathered.reports[0]
+        fib = fib or report.fixed_in_build
+        affected = affected or report.affected_range
+        fixed = fixed or report.fixed_version
+        analysis_nvr = analysis_nvr or extract_analysis_nvr(report.cve_analysis_block)
+    payload = version_check_payload(
+        args.package,
+        local_nvr=args.nvr,
+        fib=fib,
+        affected=affected,
+        fixed=fixed,
+        analysis_nvr=analysis_nvr,
+    )
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    print(f"package: {payload['package']}")
+    print(f"local_nvr: {payload['local_nvr'] or '(none)'}")
+    print(f"local_version: {payload['local_version'] or '(none)'}")
+    print(f"fib: {payload['fib'] or '(unset)'}")
+    print(f"analysis_nvr: {payload['analysis_nvr'] or '(none)'}")
+    print(f"affected: {payload['affected'] or '(none)'}")
+    print(f"fixed: {payload['fixed'] or '(none)'}")
+    print(f"vs_fixed: {payload['vs_fixed'] or '(n/a)'}")
+    print(f"vs_affected: {payload['vs_affected'] or '(n/a)'}")
+    print(f"hint: {payload['hint']}")
+    print(payload["note"])
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = normalize_argv(list(argv) if argv is not None else sys.argv[1:])
     parser = build_parser()
@@ -2301,6 +2541,7 @@ def main(argv: list[str] | None = None) -> int:
         "open-mr": cmd_open_mr,
         "lookaside-cmd": cmd_lookaside,
         "investigate": cmd_investigate,
+        "version-check": cmd_version_check,
     }
     return handlers[args.command](args)
 
