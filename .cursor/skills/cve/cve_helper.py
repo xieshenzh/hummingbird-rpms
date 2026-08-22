@@ -21,6 +21,7 @@ Subcommands:
   lookaside-cmd   Print lookaside upload commands; do not upload
   investigate     One-shot show + probes + related-ticket recap
   version-check   Compare local NVR vs CVE range / FIB / analysis NVR
+  upstream-fix-age  Compare fix-commit date vs upstream tag/release date
 
 Jira writes import hummingbird_cve_analysis.lib (jira_client, pulp). Auth
 is JIRA_TOKEN plus JIRA_URL or rhjira's JIRA_SERVER / JIRA_EMAIL from
@@ -40,6 +41,7 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, asdict
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -84,6 +86,7 @@ COMMANDS = (
     "lookaside-cmd",
     "investigate",
     "version-check",
+    "upstream-fix-age",
 )
 SBOM_FILE_RE = re.compile(r"sha256-[a-fA-F0-9]+\.sbom")
 BUNDLED_PROVIDES_RE = re.compile(
@@ -745,8 +748,15 @@ def print_bot_mrs(package: str, mrs: dict[str, list[BotMrEntry]]) -> None:
             print(f"  {entry.web_url}")
 
 
-def _http_read(url: str, timeout: float) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": "hummingbird-cve-helper"})
+def _http_read(
+    url: str,
+    timeout: float,
+    extra_headers: dict[str, str] | None = None,
+) -> bytes:
+    headers = {"User-Agent": "hummingbird-cve-helper"}
+    if extra_headers:
+        headers.update(extra_headers)
+    req = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return resp.read()
@@ -756,8 +766,24 @@ def _http_read(url: str, timeout: float) -> bytes:
         raise RuntimeError(f"Failed fetching {url}: {err}") from err
 
 
-def http_get_text(url: str, timeout: float = 60.0) -> str:
-    return _http_read(url, timeout).decode("utf-8", errors="replace")
+def http_get_text(
+    url: str,
+    timeout: float = 60.0,
+    extra_headers: dict[str, str] | None = None,
+) -> str:
+    return _http_read(url, timeout, extra_headers).decode("utf-8", errors="replace")
+
+
+def http_get_json(
+    url: str,
+    timeout: float = 60.0,
+    extra_headers: dict[str, str] | None = None,
+) -> Any:
+    text = http_get_text(url, timeout=timeout, extra_headers=extra_headers)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as err:
+        raise RuntimeError(f"Invalid JSON from {url}: {err}") from err
 
 
 def http_download(url: str, dest: Path, timeout: float = 120.0) -> None:
@@ -1277,14 +1303,13 @@ def version_check_payload(
 
     note = (
         "Do not conclude Done-Errata from versions alone; "
-        "compare the fix commit date against the upstream tag."
+        "use upstream-fix-age for the fix commit vs tag date."
     )
     if hint == "conflicting_signals":
         note = (
             "vs_fixed is at_or_above but vs_affected is still in_range "
             "(broad CVE range that includes the fix version). Do not treat "
-            "this as below-fix; compare the fix commit date against the "
-            "upstream tag before Done-Errata."
+            "this as below-fix; use upstream-fix-age before Done-Errata."
         )
 
     return {
@@ -1301,6 +1326,154 @@ def version_check_payload(
         "hint": hint,
         "note": note,
     }
+
+
+GITHUB_COMMIT_RE = re.compile(
+    r"https?://github\.com/([^/]+)/([^/]+)/commit/([0-9a-fA-F]{7,40})"
+)
+
+
+def parse_github_commit_ref(value: str) -> tuple[str, str, str] | None:
+    """Return (owner, repo, sha) from a GitHub commit URL, else None."""
+    match = GITHUB_COMMIT_RE.search(value or "")
+    if not match:
+        return None
+    return match.group(1), match.group(2), match.group(3)
+
+
+def parse_iso_datetime(value: str) -> datetime:
+    text = (value or "").strip()
+    if not text:
+        raise ValueError("empty datetime")
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    parsed = datetime.fromisoformat(text)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def compare_fix_age(commit_dt: datetime, tag_dt: datetime) -> dict[str, str]:
+    """Compare a fix commit timestamp to an upstream tag/release timestamp."""
+    if commit_dt <= tag_dt:
+        return {
+            "verdict": "commit_at_or_before_tag",
+            "hint": "shipped tag may include the fix; agent decides Done-Errata",
+        }
+    return {
+        "verdict": "commit_after_tag",
+        "hint": "shipped tag likely missing the fix; do not set FIB from the tag alone",
+    }
+
+
+def _github_headers() -> dict[str, str]:
+    headers = {"Accept": "application/vnd.github+json"}
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
+def fetch_github_commit_date(owner: str, repo: str, sha: str) -> datetime:
+    url = f"https://api.github.com/repos/{owner}/{repo}/commits/{sha}"
+    data = http_get_json(url, extra_headers=_github_headers())
+    date = (
+        ((data.get("commit") or {}).get("committer") or {}).get("date")
+        or ((data.get("commit") or {}).get("author") or {}).get("date")
+        or ""
+    )
+    if not date:
+        raise RuntimeError(f"GitHub commit {owner}/{repo}@{sha} has no date")
+    return parse_iso_datetime(str(date))
+
+
+def fetch_github_tag_date(owner: str, repo: str, tag: str) -> datetime:
+    tag_name = tag.removeprefix("refs/tags/")
+    release_url = (
+        f"https://api.github.com/repos/{owner}/{repo}/releases/tags/{tag_name}"
+    )
+    try:
+        release = http_get_json(release_url, extra_headers=_github_headers())
+        published = release.get("published_at") or release.get("created_at") or ""
+        if published:
+            return parse_iso_datetime(str(published))
+    except RuntimeError:
+        pass
+    ref_url = f"https://api.github.com/repos/{owner}/{repo}/git/ref/tags/{tag_name}"
+    ref = http_get_json(ref_url, extra_headers=_github_headers())
+    obj = ref.get("object") or {}
+    obj_sha = obj.get("sha") or ""
+    obj_type = obj.get("type") or ""
+    if obj_type == "tag":
+        tag_obj = http_get_json(
+            f"https://api.github.com/repos/{owner}/{repo}/git/tags/{obj_sha}",
+            extra_headers=_github_headers(),
+        )
+        date = ((tag_obj.get("tagger") or {}).get("date") or "")
+        if date:
+            return parse_iso_datetime(str(date))
+    if obj_sha:
+        return fetch_github_commit_date(owner, repo, str(obj_sha))
+    raise RuntimeError(f"GitHub tag {owner}/{repo} {tag_name} has no date")
+
+
+def resolve_fix_age_dates(
+    *,
+    commit: str = "",
+    tag: str = "",
+    repo: str = "",
+    commit_date: str = "",
+    tag_date: str = "",
+) -> tuple[datetime, datetime, dict[str, str]]:
+    """Resolve commit/tag timestamps from flags, URLs, or the GitHub API."""
+    meta = {
+        "commit": commit,
+        "tag": tag,
+        "repo": repo,
+        "commit_date_source": "",
+        "tag_date_source": "",
+    }
+    commit_dt: datetime | None = None
+    tag_dt: datetime | None = None
+    if commit_date:
+        commit_dt = parse_iso_datetime(commit_date)
+        meta["commit_date_source"] = "flag"
+    if tag_date:
+        tag_dt = parse_iso_datetime(tag_date)
+        meta["tag_date_source"] = "flag"
+
+    gh = parse_github_commit_ref(commit)
+    owner = repo_name = sha = ""
+    if gh:
+        owner, repo_name, sha = gh
+        meta["commit"] = sha
+        meta["repo"] = f"{owner}/{repo_name}"
+    elif repo:
+        parts = repo.rstrip("/").removesuffix(".git")
+        if "github.com/" in parts:
+            tail = parts.split("github.com/", 1)[1]
+            bits = [p for p in tail.split("/") if p]
+            if len(bits) >= 2:
+                owner, repo_name = bits[0], bits[1]
+        elif "/" in parts:
+            owner, repo_name = parts.split("/", 1)
+        sha = commit.strip()
+
+    if commit_dt is None:
+        if not (owner and repo_name and sha):
+            raise ValueError(
+                "Need --commit-date, or a GitHub commit URL / --commit SHA with --repo"
+            )
+        commit_dt = fetch_github_commit_date(owner, repo_name, sha)
+        meta["commit_date_source"] = "github"
+    if tag_dt is None:
+        if not tag:
+            raise ValueError("Need --tag-date or --tag")
+        if not (owner and repo_name):
+            raise ValueError("Need --tag-date, or --tag with a GitHub --repo / commit URL")
+        tag_dt = fetch_github_tag_date(owner, repo_name, tag)
+        meta["tag_date_source"] = "github"
+    return commit_dt, tag_dt, meta
 
 
 def pulp_has_nvr(package: str, nvr: str) -> tuple[bool, str]:
@@ -2085,6 +2258,35 @@ def build_parser() -> argparse.ArgumentParser:
         help="cve_analysis NVR override.",
     )
     vchk.add_argument("--json", action="store_true", help="Print JSON.")
+
+    age = subparsers.add_parser(
+        "upstream-fix-age",
+        help="Compare a fix commit date against an upstream tag/release date.",
+    )
+    age.add_argument(
+        "--commit",
+        default="",
+        help="Commit SHA or GitHub commit URL.",
+    )
+    age.add_argument("--tag", default="", help="Upstream tag or release name.")
+    age.add_argument(
+        "--repo",
+        default="",
+        help="GitHub owner/repo (or URL) when --commit is a SHA.",
+    )
+    age.add_argument(
+        "--commit-date",
+        default="",
+        dest="commit_date",
+        help="ISO-8601 commit timestamp (skips GitHub fetch).",
+    )
+    age.add_argument(
+        "--tag-date",
+        default="",
+        dest="tag_date",
+        help="ISO-8601 tag/release timestamp (skips GitHub fetch).",
+    )
+    age.add_argument("--json", action="store_true", help="Print JSON.")
     return parser
 
 
@@ -2518,6 +2720,37 @@ def cmd_version_check(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_upstream_fix_age(args: argparse.Namespace) -> int:
+    if not args.commit_date and not args.commit:
+        raise RuntimeError("Need --commit-date or --commit")
+    if not args.tag_date and not args.tag:
+        raise RuntimeError("Need --tag-date or --tag")
+    commit_dt, tag_dt, meta = resolve_fix_age_dates(
+        commit=args.commit,
+        tag=args.tag,
+        repo=args.repo,
+        commit_date=args.commit_date,
+        tag_date=args.tag_date,
+    )
+    age = compare_fix_age(commit_dt, tag_dt)
+    payload = {
+        **meta,
+        "commit_date": commit_dt.isoformat(),
+        "tag_date": tag_dt.isoformat(),
+        **age,
+    }
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    print(f"commit: {payload.get('commit') or args.commit or '(flag)'}")
+    print(f"tag: {payload.get('tag') or args.tag or '(flag)'}")
+    print(f"commit_date: {payload['commit_date']} ({payload['commit_date_source']})")
+    print(f"tag_date: {payload['tag_date']} ({payload['tag_date_source']})")
+    print(f"verdict: {payload['verdict']}")
+    print(f"hint: {payload['hint']}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = normalize_argv(list(argv) if argv is not None else sys.argv[1:])
     parser = build_parser()
@@ -2542,6 +2775,7 @@ def main(argv: list[str] | None = None) -> int:
         "lookaside-cmd": cmd_lookaside,
         "investigate": cmd_investigate,
         "version-check": cmd_version_check,
+        "upstream-fix-age": cmd_upstream_fix_age,
     }
     return handlers[args.command](args)
 

@@ -621,5 +621,43 @@ def test_extract_analysis_nvr() -> None:
     assert helper.extract_analysis_nvr(block) == "foo-1.2-3"
 
 
+def test_compare_fix_age_and_parse_github_url() -> None:
+    from datetime import datetime, timezone
+
+    commit = datetime(2026, 1, 10, tzinfo=timezone.utc)
+    tag = datetime(2026, 2, 1, tzinfo=timezone.utc)
+    before = helper.compare_fix_age(commit, tag)
+    assert before["verdict"] == "commit_at_or_before_tag"
+    after = helper.compare_fix_age(tag, commit)
+    assert after["verdict"] == "commit_after_tag"
+    parsed = helper.parse_github_commit_ref(
+        "https://github.com/foo/bar/commit/abc123def"
+    )
+    assert parsed == ("foo", "bar", "abc123def")
+    dt = helper.parse_iso_datetime("2026-01-10T00:00:00Z")
+    assert dt.tzinfo is not None
+
+
+def test_resolve_fix_age_dates_from_flags() -> None:
+    commit_dt, tag_dt, meta = helper.resolve_fix_age_dates(
+        commit_date="2026-01-01T00:00:00Z",
+        tag_date="2026-02-01T00:00:00Z",
+    )
+    assert commit_dt < tag_dt
+    assert meta["commit_date_source"] == "flag"
+    assert meta["tag_date_source"] == "flag"
+
+
+def test_fetch_github_commit_date(monkeypatch) -> None:
+    def fake_json(url, timeout=60.0, extra_headers=None):
+        assert "commits/abc123" in url
+        return {"commit": {"committer": {"date": "2026-03-01T12:00:00Z"}}}
+
+    monkeypatch.setattr(helper, "http_get_json", fake_json)
+    dt = helper.fetch_github_commit_date("foo", "bar", "abc123")
+    assert dt.year == 2026
+    assert dt.month == 3
+
+
 
 
