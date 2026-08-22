@@ -68,7 +68,6 @@ Source114:      10-kubeadm.conf
 # Source115:      kubernetes.conf
 # Source116:      % {service_name}.sysusers
 Source117:      kubelet.env
-Patch200:       CVE-2026-56852.patch
 
 ##############################################
 # main package components - installs kubelet and necessary
