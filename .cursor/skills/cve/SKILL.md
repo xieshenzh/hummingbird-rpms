@@ -37,6 +37,7 @@ Auth is the existing rhjira file (`JIRA_TOKEN`, `JIRA_SERVER` → URL,
 | `lookaside-cmd -f FILE -p PKG` | Print upload commands; do not upload |
 | `version-check PKG` | Local NVR vs CVE range / FIB / analysis NVR |
 | `upstream-fix-age` | Fix-commit date vs upstream tag/release date |
+| `release-bump PKG` | Next spec `.N` from metadata + spec; does not write |
 | `worktree HUM-YYYY` | Isolated checkout under `../worktrees/` |
 | `bot-mrs` / `sbom` / `spec-deps` / `show` | Individual probes |
 
@@ -86,9 +87,10 @@ Chat prefix `NAB`.
 `create-task --worktree`, move the agent into that worktree, then follow
 [Rebuilding Packages](../../../documentation/operating/rebuilding-packages.md)
 and [package-metadata-fields.md](../../../documentation/operating/package-metadata-fields.md).
-Do not add `%changelog`. `lookaside-cmd` prints copy/upload commands
-and waits. `open-mr` uses `Closes:` for the **task**, `Ref:` for
-trackers, `CVE:` for IDs. Chat prefix `!${MR_IID}`.
+`release-bump PKG` prints the next spec `.N`; do not change metadata
+`release` for a backport. Do not add `%changelog`. `lookaside-cmd` prints
+copy/upload commands and waits. `open-mr` uses `Closes:` for the **task**,
+`Ref:` for trackers, `CVE:` for IDs. Chat prefix `!${MR_IID}`.
 
 **No upstream fix (3f):** `next-release HUM-XXXX -m "…"`. Leaves In
 Progress. Chat prefix `next-rel`.

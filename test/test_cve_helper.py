@@ -659,5 +659,56 @@ def test_fetch_github_commit_date(monkeypatch) -> None:
     assert dt.month == 3
 
 
+def test_bump_release_matches_dist_git_rules() -> None:
+    bump = helper.bump_release
+    assert bump("3") == "3.1"
+    assert bump("3.1") == "3.2"
+    assert bump("3.1", upstream_release="3.1") == "3.1.1"
+    assert bump("3.1.1", upstream_release="3.1") == "3.1.2"
+    assert bump("3.1", upstream_release="3") == "3.2"
+    assert bump("0.1", upstream_release="0.1") == "0.1.1"
+    assert bump("8.%{revision}") == "8.%{revision}.1"
+
+
+def test_release_bump_payload(tmp_path: Path, monkeypatch) -> None:
+    pkg = "mypkg"
+    (tmp_path / "rpms" / pkg).mkdir(parents=True)
+    (tmp_path / "metadata").mkdir()
+    (tmp_path / "rpms" / pkg / f"{pkg}.spec").write_text(
+        "Name: mypkg\nVersion: 1.0\nRelease: 3.1%{?dist}\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "metadata" / f"{pkg}.json").write_text(
+        json.dumps({"modification_status": "modified", "release": "3.1"}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    payload = helper.release_bump_payload(pkg)
+    assert payload["spec_release"] == "3.1"
+    assert payload["metadata_release"] == "3.1"
+    assert payload["proposed_spec_release"] == "3.1.1"
+    assert payload["writes"] is False
+    assert payload["modification_status"] == "modified"
+
+
+def test_release_bump_autorelease(tmp_path: Path, monkeypatch) -> None:
+    pkg = "auto"
+    (tmp_path / "rpms" / pkg).mkdir(parents=True)
+    (tmp_path / "metadata").mkdir()
+    (tmp_path / "rpms" / pkg / f"{pkg}.spec").write_text(
+        "Name: auto\nVersion: 1.0\nRelease: %autorelease\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "metadata" / f"{pkg}.json").write_text(
+        json.dumps({"modification_status": "clean", "release": "5"}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    payload = helper.release_bump_payload(pkg)
+    assert payload["uses_autorelease"] is True
+    assert payload["proposed_spec_release"] == ""
+    assert "%autorelease" in payload["hint"]
+
+
 
 

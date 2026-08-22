@@ -22,6 +22,7 @@ Subcommands:
   investigate     One-shot show + probes + related-ticket recap
   version-check   Compare local NVR vs CVE range / FIB / analysis NVR
   upstream-fix-age  Compare fix-commit date vs upstream tag/release date
+  release-bump    Print the next spec .N from metadata + spec (no writes)
 
 Jira writes import hummingbird_cve_analysis.lib (jira_client, pulp). Auth
 is JIRA_TOKEN plus JIRA_URL or rhjira's JIRA_SERVER / JIRA_EMAIL from
@@ -87,6 +88,7 @@ COMMANDS = (
     "investigate",
     "version-check",
     "upstream-fix-age",
+    "release-bump",
 )
 SBOM_FILE_RE = re.compile(r"sha256-[a-fA-F0-9]+\.sbom")
 BUNDLED_PROVIDES_RE = re.compile(
@@ -1476,6 +1478,83 @@ def resolve_fix_age_dates(
     return commit_dt, tag_dt, meta
 
 
+def bump_release(current_release: str, upstream_release: str | None = None) -> str:
+    """Bump a spec Release using the .N suffix. Keep in sync with ci/dist_git.py."""
+    if upstream_release and current_release == upstream_release:
+        return f"{current_release}.1"
+    match = re.match(r"^(.+)\.(\d+)$", current_release)
+    if match:
+        base, num = match.groups()
+        return f"{base}.{int(num) + 1}"
+    return f"{current_release}.1"
+
+
+def read_package_metadata(package: str) -> dict[str, Any]:
+    path = repo_root() / "metadata" / f"{package}.json"
+    if not path.is_file():
+        raise RuntimeError(f"Metadata not found: {path}")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as err:
+        raise RuntimeError(f"Invalid JSON in {path}: {err}") from err
+    if not isinstance(data, dict):
+        raise RuntimeError(f"Metadata {path} is not an object")
+    return data
+
+
+def read_spec_release_before_dist(package: str) -> tuple[str, bool]:
+    """Return (Release value before %{?dist}, uses_autorelease)."""
+    spec_path = _pkg_dir(package) / f"{package}.spec"
+    if not spec_path.is_file():
+        raise RuntimeError(f"Spec not found: {spec_path}")
+    text = spec_path.read_text(encoding="utf-8", errors="replace")
+    preamble = re.split(
+        r"^%(?:description|package|prep|build|install|files|changelog)\b",
+        text,
+        maxsplit=1,
+        flags=re.MULTILINE,
+    )[0]
+    match = re.search(r"^Release:\s*(.+)$", preamble, re.MULTILINE | re.IGNORECASE)
+    if not match:
+        raise RuntimeError(f"No Release: line in {spec_path}")
+    raw = match.group(1).strip()
+    uses_autorelease = "%autorelease" in raw.lower() or "%{autorelease}" in raw.lower()
+    dist_match = re.search(r"^(.*)%\{\??dist\}(.*)$", raw)
+    before = dist_match.group(1).strip() if dist_match else raw
+    return before, uses_autorelease
+
+
+def release_bump_payload(package: str) -> dict[str, Any]:
+    metadata = read_package_metadata(package)
+    metadata_release = str(metadata.get("release") or "")
+    spec_release, uses_autorelease = read_spec_release_before_dist(package)
+    proposed = ""
+    if uses_autorelease:
+        hint = (
+            "spec uses %autorelease; resolve it before a .N bump "
+            "(see documentation/operating/rebuilding-packages.md)"
+        )
+    elif not spec_release:
+        hint = "could not parse spec Release:"
+    else:
+        proposed = bump_release(spec_release, metadata_release or None)
+        hint = "print only; do not write the spec or metadata release"
+    return {
+        "package": package,
+        "modification_status": metadata.get("modification_status") or "",
+        "metadata_release": metadata_release,
+        "spec_release": spec_release,
+        "uses_autorelease": uses_autorelease,
+        "proposed_spec_release": proposed,
+        "writes": False,
+        "hint": hint,
+        "note": (
+            "Do not change metadata release for backports or rebuilds; "
+            "only the spec Release: line gets the .N suffix."
+        ),
+    }
+
+
 def pulp_has_nvr(package: str, nvr: str) -> tuple[bool, str]:
     """Return whether the SRPM NVR is listed in Hummingbird Pulp."""
     wanted = normalize_nvr(nvr)
@@ -2287,6 +2366,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="ISO-8601 tag/release timestamp (skips GitHub fetch).",
     )
     age.add_argument("--json", action="store_true", help="Print JSON.")
+
+    rbump = subparsers.add_parser(
+        "release-bump",
+        help="Print the next spec .N from metadata + spec. Does not write files.",
+    )
+    rbump.add_argument("package", help="SRPM package name.")
+    rbump.add_argument("--json", action="store_true", help="Print JSON.")
     return parser
 
 
@@ -2751,6 +2837,22 @@ def cmd_upstream_fix_age(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_release_bump(args: argparse.Namespace) -> int:
+    payload = release_bump_payload(args.package)
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    print(f"package: {payload['package']}")
+    print(f"modification_status: {payload['modification_status'] or '(unset)'}")
+    print(f"metadata_release: {payload['metadata_release'] or '(unset)'}")
+    print(f"spec_release: {payload['spec_release'] or '(none)'}")
+    print(f"proposed_spec_release: {payload['proposed_spec_release'] or '(n/a)'}")
+    print("writes: no")
+    print(f"hint: {payload['hint']}")
+    print(payload["note"])
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = normalize_argv(list(argv) if argv is not None else sys.argv[1:])
     parser = build_parser()
@@ -2776,6 +2878,7 @@ def main(argv: list[str] | None = None) -> int:
         "investigate": cmd_investigate,
         "version-check": cmd_version_check,
         "upstream-fix-age": cmd_upstream_fix_age,
+        "release-bump": cmd_release_bump,
     }
     return handlers[args.command](args)
 
