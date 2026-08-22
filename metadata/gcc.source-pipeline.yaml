@@ -51,7 +51,7 @@
 fetch:
   - type: git
     repo: "${UPSTREAM_REPO}"
-    ref: "25040fb60e95bc8cb8eaa4b6706bd32591d95e7a"
+    ref: "95ef1679dd68f27b3d056a497318089d85aa0d55"
     archive_name: "gcc-${VERSION}.tar.xz"
 
   - type: git
@@ -108,3 +108,30 @@ accepted-checksums:
       (newlib/libc/sys/linux/include/rpc/) that no longer exists upstream
       and has been a silent no-op for some time); only tar/xz container
       metadata differs."
+
+  - file: "gcc-16.2.1-20260819.tar.xz"
+    checksum: "25aa8aef0a357eb6cd23256dfafecf1ae8e4b6316e076e7b3d4a680d279ccd9bd06eecac4c99e553e55cb46b5953c827ae46e83814ef01c34a6df68fc6a041d8"
+    reason: "The value already published for this file (6583ec48...) predates
+      gorget ever completing a full run for this pin (every prior attempt
+      failed before reaching upload, see HUM-6311/HUM-4621 follow-up); it
+      was never gorget-verified. Confirmed the freshly fetched checkout's
+      content is what it should be by fetching the same commit via two
+      independent methods (a plain full clone+checkout, and a targeted
+      `git init` + shallow `fetch --depth 1 <sha>` + checkout) and diffing
+      the extracted trees byte-for-byte identical; both produce this same
+      checksum when packaged."
+
+  - file: "nvptx-tools-212da2e781ed0f9423824e85eb04819958513f7a.tar.xz"
+    checksum: "91f269863c958dd3cb8a45a8d376ee8264294fa1d9f672a177e20372dbf63d09b2007149d4435d0574c95afee81844a89a405cb5711ad7b0b853747df8d80008"
+    reason: "Same unchanged ref as the 658778591164d779... entry above, but
+      gorget's packaging now produces different container bytes for it
+      (tar/xz library changes since that entry was recorded) -- reproduced
+      via two independent clone methods, diffed the extracted trees
+      byte-for-byte identical, both package to this same checksum."
+
+  - file: "newlib-cygwin-d35cc82b5ec15bb8a5fe0fe11e183d1887992e99.tar.xz"
+    checksum: "2d16ef36503c5319bafa2e05e7a0fb54b78f4358fa5546a5570dd0c8ef3379e6e8961ecb3bbd91ed9d7b67a0616cbc8420701ebe6c6188ac29754cd7b34783bd"
+    reason: "Same unchanged ref as the 18fc709488795b59... entry above, but
+      gorget's packaging now produces different container bytes for it
+      (tar/xz library changes since that entry was recorded); confirmed via
+      an independent re-fetch and repack producing this same checksum."
