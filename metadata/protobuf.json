@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 35.1",
+  "modification_reason": "Update to upstream version 36.0",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 3715,
@@ -8,5 +8,5 @@
   "source": "https://src.fedoraproject.org/rpms/protobuf.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/protocolbuffers/protobuf",
-  "version": "35.1"
+  "version": "36.0"
 }

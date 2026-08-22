@@ -16,8 +16,8 @@ Name:           protobuf
 # NOTE: perl-Alien-ProtoBuf has an exact-version dependency on the version of
 # protobuf with which it was built; it therefore needs to be rebuilt even for
 # “patch” updates of protobuf.
-Version:        35.1
-%global so_version 35
+Version:        36.0
+%global so_version 36
 Release:        0.1%{?dist}
 
 # See version.json:
@@ -52,9 +52,6 @@ Source4:        protoc.1
 # Patch:          protobuf-3.25.1-java-TypeRegistryTest-no-lambda.patch
 # Use system gtest/gmock
 Patch:          protobuf-6.31.1-system-gtest.patch
-
-# https://github.com/protocolbuffers/protobuf/pull/25363
-Patch:          protobuf-6.35.5-upb-fix-big-endian.patch
 
 BuildRequires:  cmake
 BuildRequires:  ninja-build
@@ -482,9 +479,11 @@ cd java/lite
         pom_template.xml > pom.xml
     awk -v dep="${dependencies}" -i inplace '{gsub(/\{dependencies\}/,dep)}1' pom.xml
     awk -v bld="${build1}${includes}${build2}" -i inplace '{gsub(/<build>/,"&" bld)}1' pom.xml
-    cp -p ../core/src/main/java/com/google/protobuf/{Abstract{Parser,ProtobufList},Android,ArrayDecoders,{Boolean,Int,Double,Float,Long,Protobuf}ArrayList,ByteBufferWriter,ByteOutput,ByteString,CanIgnoreReturnValue,CheckReturnValue,CodedInputStream{,Reader},CodedOutputStream{,Writer},CompileTimeConstant,DoNotInline,ExperimentalApi,ExtensionRegistryFactory,ExtensionSchema{,s},Field{Info,Set,Type},Generated{,MessageInfoFactory},InlineMe,Internal,InternalLazyField,InvalidProtobufRuntimeException,InvalidProtocolBufferException,IterableByteBufferInputStream,Java8Compatibility,JavaType,Lazy{Field,StringList},ListFieldSchema{,s},ManifestSchemaFactory,MapFieldSchema{,s},Message{Info{,Factory},{Set,}Schema},NewInstanceSchema{,s},OneofInfo,Parser,PrimitiveNonBoxingCollection,Protobuf,ProtocolStringList,ProtoSyntax,RawMessageInfo,Reader,RopeByteString,Schema{,Factory,Util},SmallSortedMap,StructuralMessageInfo,TextFormatEscaper,UninitializedMessageException,UnknownFieldSchema,UnsafeUtil,Utf8,WireFormat,Writer,*Lite*}.java src/main/java/com/google/protobuf
+    cp -p ../core/src/main/java/com/google/protobuf/{Abstract{Parser,ProtobufList},Android,ArrayDecoders,{Boolean,Int,Double,Float,Long,Protobuf}ArrayList,ByteOutput,ByteString,CanIgnoreReturnValue,CheckReturnValue,CodedInputStream{,Reader},CodedOutputStream{,Writer},CompileTimeConstant,DoNotInline,ExperimentalApi,ExtensionRegistryFactory,ExtensionSchema{,s},Field{Info,Set,Type},Generated{,MessageInfoFactory},InlineMe,Internal,InternalLazyField,InvalidProtobufRuntimeException,InvalidProtocolBufferException,IterableByteBufferInputStream,Java8Compatibility,JavaType,Lazy{Field,StringList},ListFieldSchema{,s},ManifestSchemaFactory,MapFieldSchema{,s},Message{Info{,Factory},{Set,}Schema},NewInstanceSchema{,s},OneofInfo,Parser,PrimitiveNonBoxingCollection,Protobuf,ProtocolStringList,ProtoSyntax,RawMessageInfo,RopeByteString,Schema{,Util},SmallSortedMap,StructuralMessageInfo,TextFormatEscaper,UninitializedMessageException,UnknownFieldSchema,UnsafeUtil,Utf8,WireFormat,*Lite*}.java src/main/java/com/google/protobuf
 cd -
 cd java/util
+    ../../%{_vpath_builddir}/protoc --java_out=src/main/java --proto_path=$srcdir \
+        $srcdir/google/protobuf/{json_options,json_enumvalue_options}.proto
     sed -e 's/{groupId}/com.google.protobuf/' \
         -e 's/{version}/%{version_java}/' \
         -e 's/{artifactId}/protobuf-java-util/' \
