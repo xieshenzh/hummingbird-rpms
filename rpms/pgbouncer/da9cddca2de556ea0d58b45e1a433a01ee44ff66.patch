@@ -1,0 +1,55 @@
+From da9cddca2de556ea0d58b45e1a433a01ee44ff66 Mon Sep 17 00:00:00 2001
+From: Theo Buehler <tb@openbsd.org>
+Date: Fri, 5 Dec 2025 17:03:16 +0100
+Subject: [PATCH] Avoid reaching into struct asn1_string_st
+
+OpenSSL is going to make struct asn1_string_st opaque, which is the
+struct underlying most ASN.1 types. Use accessors instead of reaching
+into it. ASN_STRING_type() and ASN1_STRING_length() have been available
+since SSLeay 0.9.0, ASN1_STRING_get0_data() is OpenSSL 1.1 API, but
+there already is compat glue for it available in tls_compat.h.
+
+https://github.com/openssl/openssl/issues/29117
+---
+ lib/usual/tls/tls_compat.c   | 8 ++++----
+ lib/usual/tls/tls_conninfo.c | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/lib/usual/tls/tls_compat.c b/lib/usual/tls/tls_compat.c
+index 756e3beb9f84..9c24bd6275e4 100644
+--- a/lib/usual/tls/tls_compat.c
++++ b/lib/usual/tls/tls_compat.c
+@@ -438,13 +438,13 @@ int tls_asn1_parse_time(struct tls *ctx, const ASN1_TIME *asn1time, time_t *dst)
+ 	*dst = 0;
+ 	if (!asn1time)
+ 		return 0;
+-	if (asn1time->type != V_ASN1_GENERALIZEDTIME &&
+-	    asn1time->type != V_ASN1_UTCTIME) {
+-		tls_set_errorx(ctx, "Invalid time object type: %d", asn1time->type);
++	if (ASN1_STRING_type(asn1time) != V_ASN1_GENERALIZEDTIME &&
++	    ASN1_STRING_type(asn1time) != V_ASN1_UTCTIME) {
++		tls_set_errorx(ctx, "Invalid time object type: %d", ASN1_STRING_type(asn1time));
+ 		return -1;
+ 	}
+ 
+-	res = asn1_time_parse((char *)asn1time->data, asn1time->length, &tm, 0);
++	res = asn1_time_parse((const char *)ASN1_STRING_get0_data(asn1time), ASN1_STRING_length(asn1time), &tm, 0);
+ 	if (res == -1) {
+ 		tls_set_errorx(ctx, "Invalid asn1 time");
+ 		return -1;
+diff --git a/lib/usual/tls/tls_conninfo.c b/lib/usual/tls/tls_conninfo.c
+index c4929518a759..0a4b14e23e11 100644
+--- a/lib/usual/tls/tls_conninfo.c
++++ b/lib/usual/tls/tls_conninfo.c
+@@ -132,9 +132,9 @@ static int tls_get_peer_cert_times(struct tls *ctx, time_t *notbefore, time_t *n
+ 			goto err;
+ 		if ((after = X509_get_notAfter(ctx->ssl_peer_cert)) == NULL)
+ 			goto err;
+-		if (asn1_time_parse((char *)before->data, before->length, &before_tm, 0) == -1)
++		if (asn1_time_parse((const char *)ASN1_STRING_get0_data(before), ASN1_STRING_length(before), &before_tm, 0) == -1)
+ 			goto err;
+-		if (asn1_time_parse((char *)after->data, after->length, &after_tm, 0) == -1)
++		if (asn1_time_parse((const char *)ASN1_STRING_get0_data(after), ASN1_STRING_length(after), &after_tm, 0) == -1)
+ 			goto err;
+ 		if ((*notbefore = timegm(&before_tm)) == -1)
+ 			goto err;
