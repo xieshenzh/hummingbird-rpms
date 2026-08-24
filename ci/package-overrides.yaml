@@ -194,6 +194,13 @@ grafana13.1:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+grafana13.2:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+  # The frontend webpack build requires more memory than the default builders provide.
+  build_platforms:
+    - "linux-d160-c8xlarge/arm64"
+    - "linux-d160-c8xlarge/amd64"
+
 grype:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
