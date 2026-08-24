@@ -436,6 +436,8 @@ spec:
           contentType: rpm
         - name: json-c-main
           contentType: rpm
+        - name: jsoncpp-main
+          contentType: rpm
         - name: k6v1-main
           contentType: rpm
         - name: k6v2-main
