@@ -538,6 +538,7 @@ packages:
   - rhash
   - rootfiles
   - rpm
+  - rpm-mpi-hooks
   - ruby
   - rubygem
   - rubypick
