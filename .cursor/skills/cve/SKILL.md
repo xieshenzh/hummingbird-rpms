@@ -31,7 +31,7 @@ Auth is the existing rhjira file (`JIRA_TOKEN`, `JIRA_SERVER` → URL,
 | --- | --- |
 | `investigate HUM-XXXX` | Show + recap + bot-mrs + spec-deps + GitLab MR search |
 | `investigate HUM-XXXX only` | Named tickets only (`--no-find-related`) |
-| `comment` / `next-release` / `set-fib` / `close-nab` | Jira writes via `jira_client` |
+| `comment` / `next-release` / `set-fib` / `close-nab` | Jira writes. `--kind nab/fib/analysis/next-release` fills wiki markup from flags or `--from-json`; `--print-only` / `--json` to review |
 | `create-task --blocks HUM-XXXX [--worktree] --summary "…"` | HUM Task — `--blocks` takes one ticket; link extras with `rhjira edit TASK --blocks HUM-XXXX --noeditor` |
 | `open-mr --task HUM-YYYY --tracker HUM-XXXX --cve CVE-… --title "…" --message "…"` | Fork push + `glab` MR (not `advisory_handler`); `--title` and `--message` are required |
 | `lookaside-cmd -f FILE -p PKG` | Print upload commands; do not upload |
@@ -71,13 +71,17 @@ vulnerable pattern; if that path is not used, close as NAB
 
 **Already fixed (3a):** `version-check PKG --ticket HUM-XXXX` then
 `upstream-fix-age --commit URL --tag TAG` (or `--commit-date` /
-`--tag-date`). Comment + `set-fib HUM-XXXX NVR --package PKG`.
+`--tag-date`). `comment --kind fib --package PKG --nvr NVR` (add
+`--from-json` / `--commit` / `--tag` when you have them) then
+`set-fib HUM-XXXX NVR --package PKG`.
 Pulp must list the NVR unless the user confirms `--force`. Do not close
 Done-Errata; advisory automation does that. Chat prefix `FIB`.
 
 **Not affected (3b):** SBOM evidence for component-absence, unless
-`spec-deps` already shows no bundled reference. Then
-`close-nab HUM-XXXX --vex "Component not Present"|"Vulnerable Code not Present" -f comment.txt`.
+`spec-deps` already shows no bundled reference. Preview with
+`comment --kind nab --print-only`, then
+`close-nab HUM-XXXX --vex "Component not Present"|"Vulnerable Code not Present"`
+with the same `--package` / `--component` / SBOM flags (or `--from-json`).
 Chat prefix `NAB`.
 
 **Duplicate versioned ticket (3c):** ask, then close as Duplicate
@@ -106,8 +110,9 @@ Pass the first tracker to `create-task --blocks`, then link the rest
 with `rhjira edit TASK --blocks HUM-XXXX --noeditor`. Pass all tracker
 keys and CVE IDs to `open-mr --tracker` and `--cve`.
 
-**No upstream fix (3f):** `next-release HUM-XXXX -m "…"`. Leaves In
-Progress. Chat prefix `next-rel`.
+**No upstream fix (3f):** `next-release HUM-XXXX --package PKG` (or
+`--kind next-release` with `--cve` / `-m`). Leaves In Progress.
+Chat prefix `next-rel`.
 
 | Scenario | Resolution | VEX |
 | --- | --- | --- |

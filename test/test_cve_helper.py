@@ -9,6 +9,8 @@ import time
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 ROOT = Path(__file__).resolve().parent.parent
 HELPER_PATH = ROOT / ".cursor" / "skills" / "cve" / "cve_helper.py"
 
@@ -31,6 +33,7 @@ import lib.sbom as lib_sbom  # noqa: E402
 import lib.spec as lib_spec  # noqa: E402
 import lib.utils as lib_utils  # noqa: E402
 import lib.vcs as lib_vcs  # noqa: E402
+import lib.comments as lib_comments  # noqa: E402
 
 
 def test_normalize_argv_inserts_show_for_bare_tickets() -> None:
@@ -715,3 +718,385 @@ def test_release_bump_autorelease(tmp_path: Path, monkeypatch) -> None:
     assert payload["uses_autorelease"] is True
     assert payload["proposed_spec_release"] == ""
     assert "%autorelease" in payload["hint"]
+
+
+def test_render_comment_kinds() -> None:
+    nab = lib_comments.render_comment(
+        "nab",
+        {
+            **lib_comments.empty_comment_fields(),
+            "package": "foo",
+            "component": "openssl",
+            "vex": "Component not Present",
+            "cve": "CVE-2024-1234",
+            "sbom_source": "jira",
+            "sbom_match": "no hits",
+            "runtime_installed": "no",
+        },
+    )
+    assert nab.startswith("h3. Not a Bug\n")
+    assert "*VEX:* Component not Present" in nab
+    assert "{{foo}}" in nab
+    assert "{{openssl}}" in nab
+    assert "*SBOM match:* no hits" in nab
+    fib = lib_comments.render_comment(
+        "fib",
+        {
+            **lib_comments.empty_comment_fields(),
+            "package": "foo",
+            "nvr": "foo-1.2.3-1",
+            "affected": "< 1.2.3",
+            "fixed": "1.2.3",
+            "commit": "abc123",
+            "commit_date": "2026-01-10",
+            "tag": "1.2.3",
+            "tag_date": "2026-02-01",
+        },
+    )
+    assert fib.startswith("h3. Already fixed\n")
+    assert "{{foo-1.2.3-1}}" in fib
+    assert "advisory automation" in fib
+    assert "abc123 (2026-01-10)" in fib
+    analysis = lib_comments.render_comment(
+        "analysis",
+        {
+            **lib_comments.empty_comment_fields(),
+            "package": "foo",
+            "nvr": "foo-1.2.2-3",
+            "assessment": "possibly_below_fix",
+            "affected": "< 1.2.3",
+        },
+    )
+    assert analysis.startswith("h3. Analysis\n")
+    assert "*Assessment:* possibly_below_fix" in analysis
+    nxt = lib_comments.render_comment(
+        "next-release",
+        {
+            **lib_comments.empty_comment_fields(),
+            "package": "foo",
+            "cve": "CVE-2024-1234",
+            "notes": "No tagged release yet.",
+        },
+    )
+    assert nxt.startswith("h3. Waiting on upstream\n")
+    assert "{{cve-next-release}}" in nxt
+    assert "No tagged release yet." in nxt
+
+
+def test_render_comment_requires_fields() -> None:
+    with pytest.raises(RuntimeError, match="--vex"):
+        lib_comments.render_comment("nab", lib_comments.empty_comment_fields())
+    with pytest.raises(RuntimeError, match="--nvr"):
+        lib_comments.render_comment(
+            "fib",
+            {**lib_comments.empty_comment_fields(), "package": "foo"},
+        )
+    with pytest.raises(RuntimeError, match="--package"):
+        lib_comments.render_comment("analysis", lib_comments.empty_comment_fields())
+
+
+def test_render_comment_rejects_invalid_vex_value() -> None:
+    with pytest.raises(RuntimeError, match="--vex must be one of"):
+        lib_comments.render_comment(
+            "nab",
+            {
+                **lib_comments.empty_comment_fields(),
+                "package": "foo",
+                "vex": "arbitrary garbage",
+            },
+        )
+
+
+def test_comment_fields_from_probe_json() -> None:
+    version_check = {
+        "package": "foo",
+        "local_nvr": "foo-1.2.2-3",
+        "affected": "< 1.2.3",
+        "fixed": "1.2.3",
+        "hint": "possibly_below_fix",
+    }
+    fields = lib_comments.comment_fields_from_payload(version_check)
+    assert fields["package"] == "foo"
+    assert fields["nvr"] == "foo-1.2.2-3"
+    assert fields["assessment"] == "possibly_below_fix"
+    investigate = {
+        "user_provided": ["HUM-100"],
+        "discovered": ["HUM-200"],
+        "tickets": [
+            {
+                "ticket": "HUM-200",
+                "package_guess": "bar",
+                "affected_range": "< 9",
+            },
+            {
+                "ticket": "HUM-100",
+                "package_guess": "foo",
+                "affected_range": "< 1.2.3",
+                "fixed_version": "1.2.3",
+                "assessment": "not affected",
+                "upstream_component": "openssl",
+                "cve_ids": ["CVE-2024-1234"],
+                "fixed_in_build": "",
+            },
+        ],
+        "probes": {
+            "sbom": {
+                "foo": {
+                    "source": "pulp",
+                    "url": "https://example.invalid/foo.sbom.json",
+                    "hits": [],
+                }
+            },
+            "spec_deps": {"foo": []},
+        },
+    }
+    picked = lib_comments.comment_fields_from_payload(investigate, ticket="HUM-100")
+    assert picked["package"] == "foo"
+    assert picked["component"] == "openssl"
+    assert picked["cve"] == "CVE-2024-1234"
+    assert picked["sbom_source"] == "pulp"
+    assert picked["sbom_match"] == "no hits"
+    assert picked["spec_deps"] == "no spec-deps hits"
+    default_user = lib_comments.comment_fields_from_payload(investigate)
+    assert default_user["package"] == "foo"
+
+
+def test_resolve_comment_body_kind_and_file(tmp_path: Path) -> None:
+    args = helper.build_parser().parse_args(
+        [
+            "comment",
+            "--kind",
+            "nab",
+            "--print-only",
+            "--package",
+            "foo",
+            "--component",
+            "openssl",
+            "--vex",
+            "Component not Present",
+            "-m",
+            "Checked spec Provides.",
+        ]
+    )
+    body = helper.resolve_comment_body(args)
+    assert "h3. Not a Bug" in body
+    assert "Checked spec Provides." in body
+    note = tmp_path / "comment.txt"
+    note.write_text("hand-written body\n", encoding="utf-8")
+    file_args = helper.build_parser().parse_args(
+        [
+            "comment",
+            "HUM-1",
+            "--kind",
+            "fib",
+            "--package",
+            "foo",
+            "--nvr",
+            "foo-1-1",
+            "-f",
+            str(note),
+        ]
+    )
+    assert helper.resolve_comment_body(file_args) == "hand-written body\n"
+
+
+def test_resolve_comment_body_from_json(tmp_path: Path) -> None:
+    path = tmp_path / "version-check.json"
+    path.write_text(
+        json.dumps(
+            {
+                "package": "foo",
+                "local_nvr": "foo-1.2.3-1",
+                "affected": "< 1.2.3",
+                "fixed": "1.2.3",
+                "hint": "possibly_at_or_above_fix",
+            }
+        ),
+        encoding="utf-8",
+    )
+    args = helper.build_parser().parse_args(
+        [
+            "comment",
+            "--kind",
+            "fib",
+            "--from-json",
+            str(path),
+            "--print-only",
+            "--commit",
+            "abc123",
+        ]
+    )
+    body = helper.resolve_comment_body(args)
+    assert "{{foo-1.2.3-1}}" in body
+    assert "possibly_at_or_above_fix" in body
+    assert "abc123" in body
+
+
+def test_resolve_comment_body_from_json_rejects_invalid_vex(tmp_path: Path) -> None:
+    path = tmp_path / "probe.json"
+    path.write_text(
+        json.dumps({"package": "foo", "vex": "arbitrary garbage"}),
+        encoding="utf-8",
+    )
+    args = helper.build_parser().parse_args(
+        [
+            "comment",
+            "--kind",
+            "nab",
+            "--from-json",
+            str(path),
+            "--print-only",
+        ]
+    )
+    with pytest.raises(RuntimeError, match="--vex must be one of"):
+        helper.resolve_comment_body(args)
+
+
+def test_cmd_comment_print_only_does_not_post(monkeypatch, capsys) -> None:
+    posted: list[tuple[str, str]] = []
+
+    def fake_post(ticket: str, body: str) -> bool:
+        posted.append((ticket, body))
+        return True
+
+    monkeypatch.setattr(helper, "post_comment", fake_post)
+    args = helper.build_parser().parse_args(
+        [
+            "comment",
+            "--kind",
+            "fib",
+            "--json",
+            "--package",
+            "foo",
+            "--nvr",
+            "foo-1.2.3-1",
+        ]
+    )
+    assert helper.cmd_comment(args) == 0
+    assert posted == []
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["kind"] == "fib"
+    assert "Already fixed" in payload["body"]
+
+
+def test_cmd_close_nab_print_only_does_not_close(monkeypatch, capsys) -> None:
+    closed: list[str] = []
+
+    def boom(*_a: object, **_k: object) -> None:
+        closed.append("closed")
+
+    monkeypatch.setattr(helper, "close_not_a_bug", boom)
+    args = helper.build_parser().parse_args(
+        [
+            "close-nab",
+            "HUM-9",
+            "--vex",
+            "Vulnerable Code not Present",
+            "--print-only",
+            "--package",
+            "foo",
+            "--component",
+            "bar",
+        ]
+    )
+    assert helper.cmd_close_nab(args) == 0
+    assert closed == []
+    out = capsys.readouterr().out
+    assert "Not a Bug" in out
+    assert "Vulnerable Code not Present" in out
+
+
+def test_cmd_next_release_defaults_to_template(monkeypatch, capsys) -> None:
+    applied: list[tuple[str, str]] = []
+
+    def fake_apply(ticket: str, body: str) -> None:
+        applied.append((ticket, body))
+
+    monkeypatch.setattr(helper, "apply_next_release", fake_apply)
+    preview = helper.build_parser().parse_args(
+        [
+            "next-release",
+            "HUM-9",
+            "--print-only",
+            "--package",
+            "foo",
+            "--cve",
+            "CVE-2024-1",
+        ]
+    )
+    assert helper.cmd_next_release(preview) == 0
+    assert applied == []
+    assert "Waiting on upstream" in capsys.readouterr().out
+    post = helper.build_parser().parse_args(
+        [
+            "next-release",
+            "HUM-9",
+            "--package",
+            "foo",
+        ]
+    )
+    assert helper.cmd_next_release(post) == 0
+    assert applied[0][0] == "HUM-9"
+    assert "cve-next-release" in applied[0][1]
+
+
+def test_comment_vex_rejects_invalid_choice() -> None:
+    with pytest.raises(SystemExit):
+        helper.build_parser().parse_args(
+            [
+                "comment",
+                "--kind",
+                "nab",
+                "--vex",
+                "arbitrary garbage",
+                "--package",
+                "foo",
+            ]
+        )
+
+
+def test_cmd_next_release_print_only_without_tickets(monkeypatch, capsys) -> None:
+    applied: list[tuple[str, str]] = []
+    monkeypatch.setattr(
+        helper, "apply_next_release", lambda t, b: applied.append((t, b))
+    )
+    args = helper.build_parser().parse_args(
+        ["next-release", "--print-only", "--package", "foo", "--cve", "CVE-2024-1"]
+    )
+    assert helper.cmd_next_release(args) == 0
+    assert applied == []
+    assert "Waiting on upstream" in capsys.readouterr().out
+
+
+def test_cmd_next_release_without_tickets_or_print_only_raises() -> None:
+    args = helper.build_parser().parse_args(
+        ["next-release", "--package", "foo", "--cve", "CVE-2024-1"]
+    )
+    with pytest.raises(RuntimeError, match="Pass HUM ticket key"):
+        helper.cmd_next_release(args)
+
+
+def test_cmd_close_nab_print_only_without_tickets(monkeypatch, capsys) -> None:
+    closed: list[str] = []
+    monkeypatch.setattr(helper, "close_not_a_bug", lambda *a, **k: closed.append("x"))
+    args = helper.build_parser().parse_args(
+        [
+            "close-nab",
+            "--vex",
+            "Vulnerable Code not Present",
+            "--print-only",
+            "--package",
+            "foo",
+        ]
+    )
+    assert helper.cmd_close_nab(args) == 0
+    assert closed == []
+    assert "Not a Bug" in capsys.readouterr().out
+
+
+def test_cmd_close_nab_without_tickets_or_print_only_raises() -> None:
+    args = helper.build_parser().parse_args(
+        ["close-nab", "--vex", "Vulnerable Code not Present", "--package", "foo"]
+    )
+    with pytest.raises(RuntimeError, match="Pass HUM ticket key"):
+        helper.cmd_close_nab(args)
