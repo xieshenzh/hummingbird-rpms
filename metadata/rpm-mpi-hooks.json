@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "14",
+  "sha": "6834ee61c40b302a6ef55e9ab931d20208075abb",
+  "source": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks.git",
+  "upstream_repo": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks",
+  "version": "8"
+}
