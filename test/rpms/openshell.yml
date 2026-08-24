@@ -1,0 +1,43 @@
+---
+# Tests specific to the openshell package
+
+openshell-cli-files:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openshell" ]]; then
+      echo "Skipping: Not the main openshell package (got: ${rpm_name})"
+      exit 0
+    fi
+
+    rpm -qlp "${TEST_RPM}" | grep -qx /usr/bin/openshell
+    rpm -qlp "${TEST_RPM}" | grep -q '^/usr/share/man/man1/openshell\.1'
+
+    echo "openshell CLI file layout test passed"
+
+openshell-gateway-files:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "openshell-gateway" ]]; then
+      echo "Skipping: Not the openshell-gateway package (got: ${rpm_name})"
+      exit 0
+    fi
+
+    rpm -qlp "${TEST_RPM}" | grep -qx /usr/bin/openshell-gateway
+    rpm -qlp "${TEST_RPM}" | grep -qx /usr/share/openshell-gateway/gateway.toml.default
+    rpm -qlp "${TEST_RPM}" | grep -qx /usr/lib/systemd/user/openshell-gateway.service
+    rpm -qlp "${TEST_RPM}" | grep -q '^/usr/share/man/man8/openshell-gateway\.8'
+
+    echo "openshell gateway file layout test passed"
+
+openshell-python-metadata:
+  command: |
+    rpm_name=$(rpm -qp --queryformat '%{NAME}' "${TEST_RPM}")
+    if [[ "${rpm_name}" != "python3-openshell" ]]; then
+      echo "Skipping: Not the python3-openshell package (got: ${rpm_name})"
+      exit 0
+    fi
+
+    rpm -qlp "${TEST_RPM}" | grep -Eq '^/usr/lib/python3\.[0-9]+/site-packages/openshell/__init__\.py$'
+    rpm -qlp "${TEST_RPM}" | grep -Eq '^/usr/lib/python3\.[0-9]+/site-packages/openshell-0\.0\.100\.dist-info/METADATA$'
+
+    echo "openshell Python metadata file layout test passed"

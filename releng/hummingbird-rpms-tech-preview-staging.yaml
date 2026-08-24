@@ -738,6 +738,8 @@ spec:
           contentType: rpm
         - name: openscap-main
           contentType: rpm
+        - name: openshell-main
+          contentType: rpm
         - name: openssh-main
           contentType: rpm
         - name: openssl-main
