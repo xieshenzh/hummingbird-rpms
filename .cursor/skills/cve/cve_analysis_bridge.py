@@ -8,8 +8,6 @@ Install one of:
   export HUMMINGBIRD_TOOLS_ROOT=/path/to/hummingbird/tools
 """
 
-from __future__ import annotations
-
 import os
 import re
 import sys
@@ -20,9 +18,7 @@ from typing import Mapping
 
 DEFAULT_JIRA_URL = "https://redhat.atlassian.net"
 DEFAULT_AGENT_ENV = Path.home() / ".config" / "rhjira" / "agent.env"
-ENV_ASSIGNMENT_RE = re.compile(
-    r"^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$"
-)
+ENV_ASSIGNMENT_RE = re.compile(r"^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$")
 TOOLS_ROOT_ENV = "HUMMINGBIRD_TOOLS_ROOT"
 PACKAGE_SUBDIR = "hummingbird-cve-analysis"
 

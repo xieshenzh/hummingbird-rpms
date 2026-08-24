@@ -32,8 +32,8 @@ Auth is the existing rhjira file (`JIRA_TOKEN`, `JIRA_SERVER` → URL,
 | `investigate HUM-XXXX` | Show + recap + bot-mrs + spec-deps + GitLab MR search |
 | `investigate HUM-XXXX only` | Named tickets only (`--no-find-related`) |
 | `comment` / `next-release` / `set-fib` / `close-nab` | Jira writes via `jira_client` |
-| `create-task --blocks HUM-XXXX [--worktree]` | HUM Task (rhjira until tools grows create-issue) |
-| `open-mr --task HUM-YYYY --tracker HUM-XXXX --cve CVE-…` | Fork push + `glab` MR (not `advisory_handler`) |
+| `create-task --blocks HUM-XXXX [--worktree] --summary "…"` | HUM Task — `--blocks` takes one ticket; link extras with `rhjira edit TASK --blocks HUM-XXXX --noeditor` |
+| `open-mr --task HUM-YYYY --tracker HUM-XXXX --cve CVE-… --title "…" --message "…"` | Fork push + `glab` MR (not `advisory_handler`); `--title` and `--message` are required |
 | `lookaside-cmd -f FILE -p PKG` | Print upload commands; do not upload |
 | `version-check PKG` | Local NVR vs CVE range / FIB / analysis NVR |
 | `upstream-fix-age` | Fix-commit date vs upstream tag/release date |
@@ -91,6 +91,20 @@ and [package-metadata-fields.md](../../../documentation/operating/package-metada
 `release` for a backport. Do not add `%changelog`. `lookaside-cmd` prints
 copy/upload commands and waits. `open-mr` uses `Closes:` for the **task**,
 `Ref:` for trackers, `CVE:` for IDs. Chat prefix `!${MR_IID}`.
+
+If `dist_git.py update` reports *"upstream branch rawhide is retired"*,
+retry with `--branch f44` (or `--branch f43`). The `--dry-run` flag is
+top-level: `./ci/dist_git.py --dry-run update PKG`.
+
+Always invoke `open-mr` from the **main repo**'s helper even when the
+agent is inside a worktree:
+`python /path/to/rpms/.cursor/skills/cve/cve_helper.py open-mr …`
+
+**Multi-CVE same-package pattern:** when multiple CVEs share the same
+package and fix version, use **one task and one MR** for all of them.
+Pass the first tracker to `create-task --blocks`, then link the rest
+with `rhjira edit TASK --blocks HUM-XXXX --noeditor`. Pass all tracker
+keys and CVE IDs to `open-mr --tracker` and `--cve`.
 
 **No upstream fix (3f):** `next-release HUM-XXXX -m "…"`. Leaves In
 Progress. Chat prefix `next-rel`.
