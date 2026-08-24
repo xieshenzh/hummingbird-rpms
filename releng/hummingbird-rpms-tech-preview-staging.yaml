@@ -438,6 +438,8 @@ spec:
           contentType: rpm
         - name: json-c-main
           contentType: rpm
+        - name: jsoncpp-main
+          contentType: rpm
         - name: k6v1-main
           contentType: rpm
         - name: k6v2-main
@@ -1011,6 +1013,8 @@ spec:
         - name: redhat-rpm-config-main
           contentType: rpm
         - name: rekor-main
+          contentType: rpm
+        - name: rhash-main
           contentType: rpm
         - name: rootfiles-main
           contentType: rpm

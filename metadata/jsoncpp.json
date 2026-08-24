@@ -1,0 +1,10 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "2",
+  "release_monitoring_project_id": 7483,
+  "sha": "73713236c8aaa04341d7db99fc9709c0b9b9be7d",
+  "source": "https://src.fedoraproject.org/rpms/jsoncpp.git",
+  "upstream_repo": "https://github.com/open-source-parsers/jsoncpp",
+  "version": "1.9.7"
+}
