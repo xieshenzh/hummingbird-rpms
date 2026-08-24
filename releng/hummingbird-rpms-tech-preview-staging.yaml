@@ -1010,6 +1010,8 @@ spec:
           contentType: rpm
         - name: rekor-main
           contentType: rpm
+        - name: rhash-main
+          contentType: rpm
         - name: rootfiles-main
           contentType: rpm
         - name: rpm-main
