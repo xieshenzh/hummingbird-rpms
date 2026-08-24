@@ -1,0 +1,11 @@
+fetch:
+  - type: url
+    url: "https://curl.se/download/curl-${VERSION}.tar.xz"
+  - type: url
+    url: "https://curl.se/download/curl-${VERSION}.tar.xz.asc"
+
+verify:
+  - type: gpg-signature
+    target: "curl-${VERSION}.tar.xz"
+    signature: "curl-${VERSION}.tar.xz.asc"
+    keyring: "curl.gpg"
