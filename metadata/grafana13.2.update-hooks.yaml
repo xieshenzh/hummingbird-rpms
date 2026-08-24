@@ -1,0 +1,7 @@
+# Fetch/vendor/yarn-cache generation is handled by gorget (see
+# metadata/grafana13.2.source-pipeline.yaml). This just refreshes the
+# bundled npm Provides block afterward, which needs write access to the
+# spec file that gorget's sandboxed run: steps don't have.
+post_update: |
+  set -euo pipefail
+  ./generate-bundled-npm-provides.py "${UPDATE_NEW_VERSION}"

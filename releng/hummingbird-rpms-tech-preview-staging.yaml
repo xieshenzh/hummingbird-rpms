@@ -368,6 +368,8 @@ spec:
           contentType: rpm
         - name: grafana13-1-main
           contentType: rpm
+        - name: grafana13-2-main
+          contentType: rpm
         - name: graphite2-main
           contentType: rpm
         - name: graphviz-main
