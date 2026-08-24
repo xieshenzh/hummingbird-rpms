@@ -5,5 +5,6 @@
   "release_monitoring_project_id": 663,
   "sha": "b4be1eef7cdd48ed0435364ef63fc773ff71889b",
   "source": "https://src.fedoraproject.org/rpms/efibootmgr.git",
+  "upstream_repo": "https://github.com/rhboot/efibootmgr",
   "version": "18"
 }
