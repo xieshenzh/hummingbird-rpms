@@ -73,7 +73,12 @@ def yarn_packages(lock, root_package, workspaces):
         overrides = [
             value
             for pattern, value in resolutions.items()
-            if pattern in (name, f"{name}@{reference}", f"{name}@npm:{reference}")
+            if pattern in (
+                name,
+                f"{name}@{reference}",
+                f"{name}@{reference.removeprefix('npm:')}",
+                f"{name}@npm:{reference}",
+            )
             or pattern == f"{parent}/{name}"
         ]
         if len(set(overrides)) == 1:

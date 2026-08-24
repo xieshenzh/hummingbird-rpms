@@ -1,0 +1,44 @@
+With the Go 1.26 toolchain, Grafana's SQL template tests render
+json.RawMessage values as JSON text rather than as decimal byte arrays.
+Update the golden SQL files to match the generated queries.  This changes
+test expectations only and does not change Grafana's runtime SQL generation.
+
+Upstream status: not submitted
+
+diff --git a/pkg/storage/unified/search/vector/testdata/postgres--vector_collection_refresh_meta-simple.sql b/pkg/storage/unified/search/vector/testdata/postgres--vector_collection_refresh_meta-simple.sql
+index 71d5100..de1986e 100644
+--- a/pkg/storage/unified/search/vector/testdata/postgres--vector_collection_refresh_meta-simple.sql
++++ b/pkg/storage/unified/search/vector/testdata/postgres--vector_collection_refresh_meta-simple.sql
+@@ -3,8 +3,8 @@ UPDATE embeddings AS e
+         "metadata"   = v.metadata::jsonb,
+         "updated_at" = CURRENT_TIMESTAMP
+     FROM (VALUES
+-        ('chunk/1', 'Thing One', '[123 34 101 109 98 101 100 100 101 100 65 116 34 58 49 55 53 48 48 48 48 48 48 48 125]'),
+-        ('chunk/2', 'Thing Two', '[123 34 101 109 98 101 100 100 101 100 65 116 34 58 49 55 53 48 48 48 48 48 48 48 125]')
++        ('chunk/1', 'Thing One', '{"embeddedAt":1750000000}'),
++        ('chunk/2', 'Thing Two', '{"embeddedAt":1750000000}')
+     ) AS v(subresource, title, metadata)
+     WHERE e."resource"  = 'things_external'
+     AND e."namespace" = 'stacks-123'
+diff --git a/pkg/storage/unified/search/vector/testdata/postgres--vector_collection_upsert-simple.sql b/pkg/storage/unified/search/vector/testdata/postgres--vector_collection_upsert-simple.sql
+index bfab76b..e4efdfb 100644
+--- a/pkg/storage/unified/search/vector/testdata/postgres--vector_collection_upsert-simple.sql
++++ b/pkg/storage/unified/search/vector/testdata/postgres--vector_collection_upsert-simple.sql
+@@ -20,7 +20,7 @@ VALUES (
+     'panel/5',
+     'folder-uid',
+     'panel title with queries',
+-    '[123 34 100 97 116 97 115 111 117 114 99 101 95 117 105 100 115 34 58 91 34 100 115 49 34 93 125]',
++    '{"datasource_uids":["ds1"]}',
+     '[0.1,0.2,0.3]',
+     3
+ )
+@@ -29,7 +29,7 @@ DO UPDATE SET
+     "title"           = 'CPU Dashboard',
+     "folder"          = 'folder-uid',
+     "content"         = 'panel title with queries',
+-    "metadata"        = '[123 34 100 97 116 97 115 111 117 114 99 101 95 117 105 100 115 34 58 91 34 100 115 49 34 93 125]',
++    "metadata"        = '{"datasource_uids":["ds1"]}',
+     "embedding"       = '[0.1,0.2,0.3]',
+     "content_version" = 3,
+     "updated_at"      = CURRENT_TIMESTAMP
