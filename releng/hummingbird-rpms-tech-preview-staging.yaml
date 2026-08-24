@@ -250,6 +250,8 @@ spec:
           contentType: rpm
         - name: efi-rpm-macros-main
           contentType: rpm
+        - name: efibootmgr-main
+          contentType: rpm
         - name: efivar-main
           contentType: rpm
         - name: elfutils-main
