@@ -551,5 +551,164 @@ def test_recap_lines_asks_before_discovered() -> None:
     assert "Yes please" in text
 
 
+def test_split_nvr_and_version_cmp() -> None:
+    assert helper.split_nvr("grafana13.1-13.1.1-0.5.src.rpm") == (
+        "grafana13.1",
+        "13.1.1",
+        "0.5",
+    )
+    assert helper.split_nvr("foo-1.2") == ("foo", "1.2", "")
+    assert helper.version_cmp("1.2.3", "1.2.4") == -1
+    assert helper.version_cmp("1.3", "1.2.9") == 1
+    assert helper.version_cmp("v1.0.0", "1.0.0") == 0
+    assert helper.version_cmp("not-a-version", "1.0") is None
+
+
+def test_parse_affected_constraints_and_satisfies() -> None:
+    constraints = helper.parse_affected_constraints("< 1.2.3")
+    assert constraints == [("<", "1.2.3")]
+    assert helper.version_satisfies("1.2.2", constraints) is True
+    assert helper.version_satisfies("1.2.3", constraints) is False
+    span = helper.parse_affected_constraints("1.0 through 1.2.2")
+    assert helper.version_satisfies("1.1.0", span) is True
+    assert helper.version_satisfies("1.3.0", span) is False
+    both = helper.parse_affected_constraints(">= 1.0, < 1.5")
+    assert helper.version_satisfies("1.4.9", both) is True
+    assert helper.version_satisfies("1.5.0", both) is False
+    assert helper.parse_affected_constraints("") == []
+    assert helper.version_satisfies("1.0", []) is None
+
+
+def test_version_check_payload_hints(tmp_path: Path, monkeypatch) -> None:
+    pkg = "foo"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "Name: foo\nVersion: 1.2.2\nRelease: 3%{?dist}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    below = helper.version_check_payload(
+        pkg, affected="< 1.2.3", fixed="1.2.3"
+    )
+    assert below["local_nvr"] == "foo-1.2.2-3"
+    assert below["vs_fixed"] == "below"
+    assert below["vs_affected"] == "in_range"
+    assert below["hint"] == "possibly_below_fix"
+    above = helper.version_check_payload(
+        pkg, local_nvr="foo-1.2.3-1", fixed="1.2.3", affected="< 1.2.3"
+    )
+    assert above["vs_fixed"] == "at_or_above"
+    assert above["vs_affected"] == "not_in_range"
+    assert above["hint"] == "possibly_at_or_above_fix"
+    conflicting = helper.version_check_payload(
+        pkg, local_nvr="foo-1.5.0-1", fixed="1.5.0", affected=">= 1.0, <= 2.0"
+    )
+    assert conflicting["vs_fixed"] == "at_or_above"
+    assert conflicting["vs_affected"] == "in_range"
+    assert conflicting["hint"] == "conflicting_signals"
+    assert "broad CVE range" in conflicting["note"]
+
+
+def test_extract_analysis_nvr() -> None:
+    block = "\n".join(
+        [
+            "ASSESSMENT: maybe",
+            "  Hummingbird SRPM version: foo-1.2-3.src.rpm",
+            "  Affected: < 1.3",
+        ]
+    )
+    assert helper.extract_analysis_nvr(block) == "foo-1.2-3"
+
+
+def test_compare_fix_age_and_parse_github_url() -> None:
+    from datetime import datetime, timezone
+
+    commit = datetime(2026, 1, 10, tzinfo=timezone.utc)
+    tag = datetime(2026, 2, 1, tzinfo=timezone.utc)
+    before = helper.compare_fix_age(commit, tag)
+    assert before["verdict"] == "commit_at_or_before_tag"
+    after = helper.compare_fix_age(tag, commit)
+    assert after["verdict"] == "commit_after_tag"
+    parsed = helper.parse_github_commit_ref(
+        "https://github.com/foo/bar/commit/abc123def"
+    )
+    assert parsed == ("foo", "bar", "abc123def")
+    dt = helper.parse_iso_datetime("2026-01-10T00:00:00Z")
+    assert dt.tzinfo is not None
+
+
+def test_resolve_fix_age_dates_from_flags() -> None:
+    commit_dt, tag_dt, meta = helper.resolve_fix_age_dates(
+        commit_date="2026-01-01T00:00:00Z",
+        tag_date="2026-02-01T00:00:00Z",
+    )
+    assert commit_dt < tag_dt
+    assert meta["commit_date_source"] == "flag"
+    assert meta["tag_date_source"] == "flag"
+
+
+def test_fetch_github_commit_date(monkeypatch) -> None:
+    def fake_json(url, timeout=60.0, extra_headers=None):
+        assert "commits/abc123" in url
+        return {"commit": {"committer": {"date": "2026-03-01T12:00:00Z"}}}
+
+    monkeypatch.setattr(helper, "http_get_json", fake_json)
+    dt = helper.fetch_github_commit_date("foo", "bar", "abc123")
+    assert dt.year == 2026
+    assert dt.month == 3
+
+
+def test_bump_release_matches_dist_git_rules() -> None:
+    bump = helper.bump_release
+    assert bump("3") == "3.1"
+    assert bump("3.1") == "3.2"
+    assert bump("3.1", upstream_release="3.1") == "3.1.1"
+    assert bump("3.1.1", upstream_release="3.1") == "3.1.2"
+    assert bump("3.1", upstream_release="3") == "3.2"
+    assert bump("0.1", upstream_release="0.1") == "0.1.1"
+    assert bump("8.%{revision}") == "8.%{revision}.1"
+
+
+def test_release_bump_payload(tmp_path: Path, monkeypatch) -> None:
+    pkg = "mypkg"
+    (tmp_path / "rpms" / pkg).mkdir(parents=True)
+    (tmp_path / "metadata").mkdir()
+    (tmp_path / "rpms" / pkg / f"{pkg}.spec").write_text(
+        "Name: mypkg\nVersion: 1.0\nRelease: 3.1%{?dist}\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "metadata" / f"{pkg}.json").write_text(
+        json.dumps({"modification_status": "modified", "release": "3.1"}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    payload = helper.release_bump_payload(pkg)
+    assert payload["spec_release"] == "3.1"
+    assert payload["metadata_release"] == "3.1"
+    assert payload["proposed_spec_release"] == "3.1.1"
+    assert payload["writes"] is False
+    assert payload["modification_status"] == "modified"
+
+
+def test_release_bump_autorelease(tmp_path: Path, monkeypatch) -> None:
+    pkg = "auto"
+    (tmp_path / "rpms" / pkg).mkdir(parents=True)
+    (tmp_path / "metadata").mkdir()
+    (tmp_path / "rpms" / pkg / f"{pkg}.spec").write_text(
+        "Name: auto\nVersion: 1.0\nRelease: %autorelease\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "metadata" / f"{pkg}.json").write_text(
+        json.dumps({"modification_status": "clean", "release": "5"}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    payload = helper.release_bump_payload(pkg)
+    assert payload["uses_autorelease"] is True
+    assert payload["proposed_spec_release"] == ""
+    assert "%autorelease" in payload["hint"]
+
+
 
 

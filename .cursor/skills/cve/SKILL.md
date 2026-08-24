@@ -35,6 +35,9 @@ Auth is the existing rhjira file (`JIRA_TOKEN`, `JIRA_SERVER` → URL,
 | `create-task --blocks HUM-XXXX [--worktree]` | HUM Task (rhjira until tools grows create-issue) |
 | `open-mr --task HUM-YYYY --tracker HUM-XXXX --cve CVE-…` | Fork push + `glab` MR (not `advisory_handler`) |
 | `lookaside-cmd -f FILE -p PKG` | Print upload commands; do not upload |
+| `version-check PKG` | Local NVR vs CVE range / FIB / analysis NVR |
+| `upstream-fix-age` | Fix-commit date vs upstream tag/release date |
+| `release-bump PKG` | Next spec `.N` from metadata + spec; does not write |
 | `worktree HUM-YYYY` | Isolated checkout under `../worktrees/` |
 | `bot-mrs` / `sbom` / `spec-deps` / `show` | Individual probes |
 
@@ -66,7 +69,9 @@ vulnerable pattern; if that path is not used, close as NAB
 
 ### Resolution commands
 
-**Already fixed (3a):** comment + `set-fib HUM-XXXX NVR --package PKG`.
+**Already fixed (3a):** `version-check PKG --ticket HUM-XXXX` then
+`upstream-fix-age --commit URL --tag TAG` (or `--commit-date` /
+`--tag-date`). Comment + `set-fib HUM-XXXX NVR --package PKG`.
 Pulp must list the NVR unless the user confirms `--force`. Do not close
 Done-Errata; advisory automation does that. Chat prefix `FIB`.
 
@@ -82,9 +87,10 @@ Chat prefix `NAB`.
 `create-task --worktree`, move the agent into that worktree, then follow
 [Rebuilding Packages](../../../documentation/operating/rebuilding-packages.md)
 and [package-metadata-fields.md](../../../documentation/operating/package-metadata-fields.md).
-Do not add `%changelog`. `lookaside-cmd` prints copy/upload commands
-and waits. `open-mr` uses `Closes:` for the **task**, `Ref:` for
-trackers, `CVE:` for IDs. Chat prefix `!${MR_IID}`.
+`release-bump PKG` prints the next spec `.N`; do not change metadata
+`release` for a backport. Do not add `%changelog`. `lookaside-cmd` prints
+copy/upload commands and waits. `open-mr` uses `Closes:` for the **task**,
+`Ref:` for trackers, `CVE:` for IDs. Chat prefix `!${MR_IID}`.
 
 **No upstream fix (3f):** `next-release HUM-XXXX -m "…"`. Leaves In
 Progress. Chat prefix `next-rel`.

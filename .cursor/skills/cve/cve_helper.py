@@ -20,6 +20,9 @@ Subcommands:
   open-mr         Push the fork and open a package fix MR
   lookaside-cmd   Print lookaside upload commands; do not upload
   investigate     One-shot show + probes + related-ticket recap
+  version-check   Compare local NVR vs CVE range / FIB / analysis NVR
+  upstream-fix-age  Compare fix-commit date vs upstream tag/release date
+  release-bump    Print the next spec .N from metadata + spec (no writes)
 
 Jira writes import hummingbird_cve_analysis.lib (jira_client, pulp). Auth
 is JIRA_TOKEN plus JIRA_URL or rhjira's JIRA_SERVER / JIRA_EMAIL from
@@ -39,6 +42,7 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, asdict
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -82,6 +86,9 @@ COMMANDS = (
     "open-mr",
     "lookaside-cmd",
     "investigate",
+    "version-check",
+    "upstream-fix-age",
+    "release-bump",
 )
 SBOM_FILE_RE = re.compile(r"sha256-[a-fA-F0-9]+\.sbom")
 BUNDLED_PROVIDES_RE = re.compile(
@@ -743,8 +750,15 @@ def print_bot_mrs(package: str, mrs: dict[str, list[BotMrEntry]]) -> None:
             print(f"  {entry.web_url}")
 
 
-def _http_read(url: str, timeout: float) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": "hummingbird-cve-helper"})
+def _http_read(
+    url: str,
+    timeout: float,
+    extra_headers: dict[str, str] | None = None,
+) -> bytes:
+    headers = {"User-Agent": "hummingbird-cve-helper"}
+    if extra_headers:
+        headers.update(extra_headers)
+    req = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return resp.read()
@@ -754,8 +768,24 @@ def _http_read(url: str, timeout: float) -> bytes:
         raise RuntimeError(f"Failed fetching {url}: {err}") from err
 
 
-def http_get_text(url: str, timeout: float = 60.0) -> str:
-    return _http_read(url, timeout).decode("utf-8", errors="replace")
+def http_get_text(
+    url: str,
+    timeout: float = 60.0,
+    extra_headers: dict[str, str] | None = None,
+) -> str:
+    return _http_read(url, timeout, extra_headers).decode("utf-8", errors="replace")
+
+
+def http_get_json(
+    url: str,
+    timeout: float = 60.0,
+    extra_headers: dict[str, str] | None = None,
+) -> Any:
+    text = http_get_text(url, timeout=timeout, extra_headers=extra_headers)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as err:
+        raise RuntimeError(f"Invalid JSON from {url}: {err}") from err
 
 
 def http_download(url: str, dest: Path, timeout: float = 120.0) -> None:
@@ -1120,6 +1150,409 @@ def create_task_worktree(ticket: str, *, base: str = "main") -> Path:
 def normalize_nvr(nvr: str) -> str:
     name = Path(nvr.strip()).name
     return name.removesuffix(".src.rpm")
+
+
+def split_nvr(nvr: str) -> tuple[str, str, str]:
+    """Split an NVR into (name, version, release). Release may be empty."""
+    cleaned = normalize_nvr(nvr)
+    if not cleaned:
+        return "", "", ""
+    parts = cleaned.rsplit("-", 2)
+    if len(parts) == 3:
+        return parts[0], parts[1], parts[2]
+    if len(parts) == 2:
+        return parts[0], parts[1], ""
+    return cleaned, "", ""
+
+
+def parse_version_key(value: str) -> tuple[int, ...] | None:
+    """Numeric tuple from a dotted version; None if there are no digits."""
+    text = (value or "").strip().lstrip("vV")
+    parts = re.findall(r"\d+", text)
+    if not parts:
+        return None
+    return tuple(int(p) for p in parts)
+
+
+def version_cmp(left: str, right: str) -> int | None:
+    """Return -1/0/1, or None when either side is not a dotted version."""
+    left_key = parse_version_key(left)
+    right_key = parse_version_key(right)
+    if left_key is None or right_key is None:
+        return None
+    if left_key < right_key:
+        return -1
+    if left_key > right_key:
+        return 1
+    return 0
+
+
+def parse_affected_constraints(affected: str) -> list[tuple[str, str]]:
+    """Parse a CVE affected-range string into (op, version) constraints."""
+    text = (affected or "").strip()
+    if not text:
+        return []
+    constraints: list[tuple[str, str]] = []
+    span_re = re.compile(
+        r"(?i)(v?\d[\w.*+-]*)\s+through\s+(v?\d[\w.*+-]*)"
+    )
+    for match in span_re.finditer(text):
+        constraints.append((">=", match.group(1)))
+        constraints.append(("<=", match.group(2)))
+    text = span_re.sub(" ", text)
+    op_re = re.compile(
+        r"(?i)(?:^|[\s,])(<=|>=|<|>|=|before|prior\s+to|through)\s+(v?\d[\w.*+-]*)"
+    )
+    mapped = {
+        "before": "<",
+        "prior to": "<",
+        "through": "<=",
+    }
+    for match in op_re.finditer(text):
+        raw_op = re.sub(r"\s+", " ", match.group(1).lower())
+        constraints.append((mapped.get(raw_op, raw_op), match.group(2)))
+    return constraints
+
+
+def version_satisfies(version: str, constraints: list[tuple[str, str]]) -> bool | None:
+    """True if version matches every constraint; None if any side is incomparable."""
+    if not constraints:
+        return None
+    ops = {
+        "<": lambda cmp_val: cmp_val < 0,
+        "<=": lambda cmp_val: cmp_val <= 0,
+        ">": lambda cmp_val: cmp_val > 0,
+        ">=": lambda cmp_val: cmp_val >= 0,
+        "=": lambda cmp_val: cmp_val == 0,
+    }
+    for op, bound in constraints:
+        pred = ops.get(op)
+        if pred is None:
+            return None
+        cmp_val = version_cmp(version, bound)
+        if cmp_val is None:
+            return None
+        if not pred(cmp_val):
+            return False
+    return True
+
+
+def extract_analysis_nvr(block: str) -> str:
+    if not block:
+        return ""
+    for field in (
+        "Hummingbird SRPM version",
+        "Hummingbird NVR",
+        "NVR",
+    ):
+        value = extract_vendor_field(block, field)
+        if value:
+            return normalize_nvr(value)
+    match = re.search(
+        r"\b([A-Za-z0-9+_.-]+-\d[\w.+]*-\d[\w.+]*)(?:\.src\.rpm)?\b",
+        block,
+    )
+    return normalize_nvr(match.group(1)) if match else ""
+
+
+def version_check_payload(
+    package: str,
+    *,
+    local_nvr: str = "",
+    fib: str = "",
+    affected: str = "",
+    fixed: str = "",
+    analysis_nvr: str = "",
+) -> dict[str, Any]:
+    if not local_nvr:
+        local_nvr = read_local_spec_nvr(package)
+    _name, local_version, _rel = split_nvr(local_nvr) if local_nvr else ("", "", "")
+    fib_nvr = normalize_nvr(fib) if fib else ""
+    _fib_name, fib_version, _fib_rel = split_nvr(fib_nvr) if fib_nvr else ("", "", "")
+    analysis_nvr = normalize_nvr(analysis_nvr) if analysis_nvr else ""
+
+    vs_fixed = ""
+    if local_version and fixed:
+        cmp_val = version_cmp(local_version, fixed)
+        if cmp_val is None:
+            vs_fixed = "unknown"
+        elif cmp_val < 0:
+            vs_fixed = "below"
+        else:
+            vs_fixed = "at_or_above"
+
+    vs_affected = ""
+    constraints = parse_affected_constraints(affected)
+    if local_version and constraints:
+        matched = version_satisfies(local_version, constraints)
+        if matched is None:
+            vs_affected = "unknown"
+        elif matched:
+            vs_affected = "in_range"
+        else:
+            vs_affected = "not_in_range"
+
+    if vs_fixed == "at_or_above" and vs_affected == "in_range":
+        hint = "conflicting_signals"
+    elif vs_fixed == "at_or_above":
+        hint = "possibly_at_or_above_fix"
+    elif vs_fixed == "below" or vs_affected == "in_range":
+        hint = "possibly_below_fix"
+    elif vs_affected == "not_in_range":
+        hint = "possibly_not_in_affected_range"
+    else:
+        hint = "unknown"
+
+    note = (
+        "Do not conclude Done-Errata from versions alone; "
+        "use upstream-fix-age for the fix commit vs tag date."
+    )
+    if hint == "conflicting_signals":
+        note = (
+            "vs_fixed is at_or_above but vs_affected is still in_range "
+            "(broad CVE range that includes the fix version). Do not treat "
+            "this as below-fix; use upstream-fix-age before Done-Errata."
+        )
+
+    return {
+        "package": package,
+        "local_nvr": local_nvr,
+        "local_version": local_version,
+        "fib": fib_nvr,
+        "fib_version": fib_version,
+        "analysis_nvr": analysis_nvr,
+        "affected": affected,
+        "fixed": fixed,
+        "vs_fixed": vs_fixed,
+        "vs_affected": vs_affected,
+        "hint": hint,
+        "note": note,
+    }
+
+
+GITHUB_COMMIT_RE = re.compile(
+    r"https?://github\.com/([^/]+)/([^/]+)/commit/([0-9a-fA-F]{7,40})"
+)
+
+
+def parse_github_commit_ref(value: str) -> tuple[str, str, str] | None:
+    """Return (owner, repo, sha) from a GitHub commit URL, else None."""
+    match = GITHUB_COMMIT_RE.search(value or "")
+    if not match:
+        return None
+    return match.group(1), match.group(2), match.group(3)
+
+
+def parse_iso_datetime(value: str) -> datetime:
+    text = (value or "").strip()
+    if not text:
+        raise ValueError("empty datetime")
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    parsed = datetime.fromisoformat(text)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def compare_fix_age(commit_dt: datetime, tag_dt: datetime) -> dict[str, str]:
+    """Compare a fix commit timestamp to an upstream tag/release timestamp."""
+    if commit_dt <= tag_dt:
+        return {
+            "verdict": "commit_at_or_before_tag",
+            "hint": "shipped tag may include the fix; agent decides Done-Errata",
+        }
+    return {
+        "verdict": "commit_after_tag",
+        "hint": "shipped tag likely missing the fix; do not set FIB from the tag alone",
+    }
+
+
+def _github_headers() -> dict[str, str]:
+    headers = {"Accept": "application/vnd.github+json"}
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
+def fetch_github_commit_date(owner: str, repo: str, sha: str) -> datetime:
+    url = f"https://api.github.com/repos/{owner}/{repo}/commits/{sha}"
+    data = http_get_json(url, extra_headers=_github_headers())
+    date = (
+        ((data.get("commit") or {}).get("committer") or {}).get("date")
+        or ((data.get("commit") or {}).get("author") or {}).get("date")
+        or ""
+    )
+    if not date:
+        raise RuntimeError(f"GitHub commit {owner}/{repo}@{sha} has no date")
+    return parse_iso_datetime(str(date))
+
+
+def fetch_github_tag_date(owner: str, repo: str, tag: str) -> datetime:
+    tag_name = tag.removeprefix("refs/tags/")
+    release_url = (
+        f"https://api.github.com/repos/{owner}/{repo}/releases/tags/{tag_name}"
+    )
+    try:
+        release = http_get_json(release_url, extra_headers=_github_headers())
+        published = release.get("published_at") or release.get("created_at") or ""
+        if published:
+            return parse_iso_datetime(str(published))
+    except RuntimeError:
+        pass
+    ref_url = f"https://api.github.com/repos/{owner}/{repo}/git/ref/tags/{tag_name}"
+    ref = http_get_json(ref_url, extra_headers=_github_headers())
+    obj = ref.get("object") or {}
+    obj_sha = obj.get("sha") or ""
+    obj_type = obj.get("type") or ""
+    if obj_type == "tag":
+        tag_obj = http_get_json(
+            f"https://api.github.com/repos/{owner}/{repo}/git/tags/{obj_sha}",
+            extra_headers=_github_headers(),
+        )
+        date = ((tag_obj.get("tagger") or {}).get("date") or "")
+        if date:
+            return parse_iso_datetime(str(date))
+    if obj_sha:
+        return fetch_github_commit_date(owner, repo, str(obj_sha))
+    raise RuntimeError(f"GitHub tag {owner}/{repo} {tag_name} has no date")
+
+
+def resolve_fix_age_dates(
+    *,
+    commit: str = "",
+    tag: str = "",
+    repo: str = "",
+    commit_date: str = "",
+    tag_date: str = "",
+) -> tuple[datetime, datetime, dict[str, str]]:
+    """Resolve commit/tag timestamps from flags, URLs, or the GitHub API."""
+    meta = {
+        "commit": commit,
+        "tag": tag,
+        "repo": repo,
+        "commit_date_source": "",
+        "tag_date_source": "",
+    }
+    commit_dt: datetime | None = None
+    tag_dt: datetime | None = None
+    if commit_date:
+        commit_dt = parse_iso_datetime(commit_date)
+        meta["commit_date_source"] = "flag"
+    if tag_date:
+        tag_dt = parse_iso_datetime(tag_date)
+        meta["tag_date_source"] = "flag"
+
+    gh = parse_github_commit_ref(commit)
+    owner = repo_name = sha = ""
+    if gh:
+        owner, repo_name, sha = gh
+        meta["commit"] = sha
+        meta["repo"] = f"{owner}/{repo_name}"
+    elif repo:
+        parts = repo.rstrip("/").removesuffix(".git")
+        if "github.com/" in parts:
+            tail = parts.split("github.com/", 1)[1]
+            bits = [p for p in tail.split("/") if p]
+            if len(bits) >= 2:
+                owner, repo_name = bits[0], bits[1]
+        elif "/" in parts:
+            owner, repo_name = parts.split("/", 1)
+        sha = commit.strip()
+
+    if commit_dt is None:
+        if not (owner and repo_name and sha):
+            raise ValueError(
+                "Need --commit-date, or a GitHub commit URL / --commit SHA with --repo"
+            )
+        commit_dt = fetch_github_commit_date(owner, repo_name, sha)
+        meta["commit_date_source"] = "github"
+    if tag_dt is None:
+        if not tag:
+            raise ValueError("Need --tag-date or --tag")
+        if not (owner and repo_name):
+            raise ValueError("Need --tag-date, or --tag with a GitHub --repo / commit URL")
+        tag_dt = fetch_github_tag_date(owner, repo_name, tag)
+        meta["tag_date_source"] = "github"
+    return commit_dt, tag_dt, meta
+
+
+def bump_release(current_release: str, upstream_release: str | None = None) -> str:
+    """Bump a spec Release using the .N suffix. Keep in sync with ci/dist_git.py."""
+    if upstream_release and current_release == upstream_release:
+        return f"{current_release}.1"
+    match = re.match(r"^(.+)\.(\d+)$", current_release)
+    if match:
+        base, num = match.groups()
+        return f"{base}.{int(num) + 1}"
+    return f"{current_release}.1"
+
+
+def read_package_metadata(package: str) -> dict[str, Any]:
+    path = repo_root() / "metadata" / f"{package}.json"
+    if not path.is_file():
+        raise RuntimeError(f"Metadata not found: {path}")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as err:
+        raise RuntimeError(f"Invalid JSON in {path}: {err}") from err
+    if not isinstance(data, dict):
+        raise RuntimeError(f"Metadata {path} is not an object")
+    return data
+
+
+def read_spec_release_before_dist(package: str) -> tuple[str, bool]:
+    """Return (Release value before %{?dist}, uses_autorelease)."""
+    spec_path = _pkg_dir(package) / f"{package}.spec"
+    if not spec_path.is_file():
+        raise RuntimeError(f"Spec not found: {spec_path}")
+    text = spec_path.read_text(encoding="utf-8", errors="replace")
+    preamble = re.split(
+        r"^%(?:description|package|prep|build|install|files|changelog)\b",
+        text,
+        maxsplit=1,
+        flags=re.MULTILINE,
+    )[0]
+    match = re.search(r"^Release:\s*(.+)$", preamble, re.MULTILINE | re.IGNORECASE)
+    if not match:
+        raise RuntimeError(f"No Release: line in {spec_path}")
+    raw = match.group(1).strip()
+    uses_autorelease = "%autorelease" in raw.lower() or "%{autorelease}" in raw.lower()
+    dist_match = re.search(r"^(.*)%\{\??dist\}(.*)$", raw)
+    before = dist_match.group(1).strip() if dist_match else raw
+    return before, uses_autorelease
+
+
+def release_bump_payload(package: str) -> dict[str, Any]:
+    metadata = read_package_metadata(package)
+    metadata_release = str(metadata.get("release") or "")
+    spec_release, uses_autorelease = read_spec_release_before_dist(package)
+    proposed = ""
+    if uses_autorelease:
+        hint = (
+            "spec uses %autorelease; resolve it before a .N bump "
+            "(see documentation/operating/rebuilding-packages.md)"
+        )
+    elif not spec_release:
+        hint = "could not parse spec Release:"
+    else:
+        proposed = bump_release(spec_release, metadata_release or None)
+        hint = "print only; do not write the spec or metadata release"
+    return {
+        "package": package,
+        "modification_status": metadata.get("modification_status") or "",
+        "metadata_release": metadata_release,
+        "spec_release": spec_release,
+        "uses_autorelease": uses_autorelease,
+        "proposed_spec_release": proposed,
+        "writes": False,
+        "hint": hint,
+        "note": (
+            "Do not change metadata release for backports or rebuilds; "
+            "only the spec Release: line gets the .N suffix."
+        ),
+    }
 
 
 def pulp_has_nvr(package: str, nvr: str) -> tuple[bool, str]:
@@ -1886,6 +2319,60 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Also fetch and search the package SBOM.",
     )
+
+    vchk = subparsers.add_parser(
+        "version-check",
+        help="Compare local spec NVR vs CVE range / FIB / analysis NVR.",
+    )
+    vchk.add_argument("package", help="SRPM package name.")
+    vchk.add_argument("--ticket", default="", help="HUM tracker to read FIB/range from.")
+    vchk.add_argument("--nvr", default="", help="Override local NVR.")
+    vchk.add_argument("--fib", default="", help="Fixed in Build NVR override.")
+    vchk.add_argument("--affected", default="", help="CVE affected range override.")
+    vchk.add_argument("--fixed", default="", help="CVE fixed version override.")
+    vchk.add_argument(
+        "--analysis-nvr",
+        default="",
+        dest="analysis_nvr",
+        help="cve_analysis NVR override.",
+    )
+    vchk.add_argument("--json", action="store_true", help="Print JSON.")
+
+    age = subparsers.add_parser(
+        "upstream-fix-age",
+        help="Compare a fix commit date against an upstream tag/release date.",
+    )
+    age.add_argument(
+        "--commit",
+        default="",
+        help="Commit SHA or GitHub commit URL.",
+    )
+    age.add_argument("--tag", default="", help="Upstream tag or release name.")
+    age.add_argument(
+        "--repo",
+        default="",
+        help="GitHub owner/repo (or URL) when --commit is a SHA.",
+    )
+    age.add_argument(
+        "--commit-date",
+        default="",
+        dest="commit_date",
+        help="ISO-8601 commit timestamp (skips GitHub fetch).",
+    )
+    age.add_argument(
+        "--tag-date",
+        default="",
+        dest="tag_date",
+        help="ISO-8601 tag/release timestamp (skips GitHub fetch).",
+    )
+    age.add_argument("--json", action="store_true", help="Print JSON.")
+
+    rbump = subparsers.add_parser(
+        "release-bump",
+        help="Print the next spec .N from metadata + spec. Does not write files.",
+    )
+    rbump.add_argument("package", help="SRPM package name.")
+    rbump.add_argument("--json", action="store_true", help="Print JSON.")
     return parser
 
 
@@ -2278,6 +2765,94 @@ def cmd_investigate(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_version_check(args: argparse.Namespace) -> int:
+    fib = args.fib
+    affected = args.affected
+    fixed = args.fixed
+    analysis_nvr = args.analysis_nvr
+    if args.ticket:
+        gathered = gather_ticket_reports(
+            [args.ticket], find_related=False, max_linked=0
+        )
+        if not gathered.reports:
+            raise RuntimeError(f"Could not load {args.ticket}")
+        report = gathered.reports[0]
+        fib = fib or report.fixed_in_build
+        affected = affected or report.affected_range
+        fixed = fixed or report.fixed_version
+        analysis_nvr = analysis_nvr or extract_analysis_nvr(report.cve_analysis_block)
+    payload = version_check_payload(
+        args.package,
+        local_nvr=args.nvr,
+        fib=fib,
+        affected=affected,
+        fixed=fixed,
+        analysis_nvr=analysis_nvr,
+    )
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    print(f"package: {payload['package']}")
+    print(f"local_nvr: {payload['local_nvr'] or '(none)'}")
+    print(f"local_version: {payload['local_version'] or '(none)'}")
+    print(f"fib: {payload['fib'] or '(unset)'}")
+    print(f"analysis_nvr: {payload['analysis_nvr'] or '(none)'}")
+    print(f"affected: {payload['affected'] or '(none)'}")
+    print(f"fixed: {payload['fixed'] or '(none)'}")
+    print(f"vs_fixed: {payload['vs_fixed'] or '(n/a)'}")
+    print(f"vs_affected: {payload['vs_affected'] or '(n/a)'}")
+    print(f"hint: {payload['hint']}")
+    print(payload["note"])
+    return 0
+
+
+def cmd_upstream_fix_age(args: argparse.Namespace) -> int:
+    if not args.commit_date and not args.commit:
+        raise RuntimeError("Need --commit-date or --commit")
+    if not args.tag_date and not args.tag:
+        raise RuntimeError("Need --tag-date or --tag")
+    commit_dt, tag_dt, meta = resolve_fix_age_dates(
+        commit=args.commit,
+        tag=args.tag,
+        repo=args.repo,
+        commit_date=args.commit_date,
+        tag_date=args.tag_date,
+    )
+    age = compare_fix_age(commit_dt, tag_dt)
+    payload = {
+        **meta,
+        "commit_date": commit_dt.isoformat(),
+        "tag_date": tag_dt.isoformat(),
+        **age,
+    }
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    print(f"commit: {payload.get('commit') or args.commit or '(flag)'}")
+    print(f"tag: {payload.get('tag') or args.tag or '(flag)'}")
+    print(f"commit_date: {payload['commit_date']} ({payload['commit_date_source']})")
+    print(f"tag_date: {payload['tag_date']} ({payload['tag_date_source']})")
+    print(f"verdict: {payload['verdict']}")
+    print(f"hint: {payload['hint']}")
+    return 0
+
+
+def cmd_release_bump(args: argparse.Namespace) -> int:
+    payload = release_bump_payload(args.package)
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    print(f"package: {payload['package']}")
+    print(f"modification_status: {payload['modification_status'] or '(unset)'}")
+    print(f"metadata_release: {payload['metadata_release'] or '(unset)'}")
+    print(f"spec_release: {payload['spec_release'] or '(none)'}")
+    print(f"proposed_spec_release: {payload['proposed_spec_release'] or '(n/a)'}")
+    print("writes: no")
+    print(f"hint: {payload['hint']}")
+    print(payload["note"])
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = normalize_argv(list(argv) if argv is not None else sys.argv[1:])
     parser = build_parser()
@@ -2301,6 +2876,9 @@ def main(argv: list[str] | None = None) -> int:
         "open-mr": cmd_open_mr,
         "lookaside-cmd": cmd_lookaside,
         "investigate": cmd_investigate,
+        "version-check": cmd_version_check,
+        "upstream-fix-age": cmd_upstream_fix_age,
+        "release-bump": cmd_release_bump,
     }
     return handlers[args.command](args)
 
