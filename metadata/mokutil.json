@@ -1,0 +1,9 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "7",
+  "release_monitoring_project_id": 246006,
+  "sha": "792347d8d84487c87fac94ed876d93367a395179",
+  "source": "https://src.fedoraproject.org/rpms/mokutil.git",
+  "version": "0.7.2"
+}

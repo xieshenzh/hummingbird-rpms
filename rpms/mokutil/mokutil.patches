@@ -1,0 +1,3 @@
+Patch0001: 0001-mokutil-remove-unused-int_to_b64.patch
+Patch0002: 0002-mokutil.c-show-help-if-no-args-or-help-even-on-unsup.patch
+Patch0003: 0003-Fix-OpenSSL-4.0-compatibility.patch

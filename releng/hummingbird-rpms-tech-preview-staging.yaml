@@ -678,6 +678,8 @@ spec:
           contentType: rpm
         - name: mkfontscale-main
           contentType: rpm
+        - name: mokutil-main
+          contentType: rpm
         - name: mpdecimal-main
           contentType: rpm
         - name: mpfr-main
