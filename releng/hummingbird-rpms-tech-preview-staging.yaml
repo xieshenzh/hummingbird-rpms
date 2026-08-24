@@ -1046,6 +1046,8 @@ spec:
           contentType: rpm
         - name: rust-archery-main
           contentType: rpm
+        - name: rust-bootupd-main
+          contentType: rpm
         - name: rust-imagequant-sys-main
           contentType: rpm
         - name: rust-podman-sequoia-main
