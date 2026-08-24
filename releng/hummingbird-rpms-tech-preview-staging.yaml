@@ -1020,6 +1020,8 @@ spec:
           contentType: rpm
         - name: rpm-main
           contentType: rpm
+        - name: rpm-mpi-hooks-main
+          contentType: rpm
         - name: ruby3-3-main
           contentType: rpm
         - name: ruby3-4-main
