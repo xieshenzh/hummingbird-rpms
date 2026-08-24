@@ -24,6 +24,14 @@ def _load_helper():
 
 helper = _load_helper()
 
+# lib modules are importable after helper is loaded (it adds the skill dir to sys.path)
+import lib.jira as lib_jira  # noqa: E402
+import lib.models as lib_models  # noqa: E402
+import lib.sbom as lib_sbom  # noqa: E402
+import lib.spec as lib_spec  # noqa: E402
+import lib.utils as lib_utils  # noqa: E402
+import lib.vcs as lib_vcs  # noqa: E402
+
 
 def test_normalize_argv_inserts_show_for_bare_tickets() -> None:
     assert helper.normalize_argv(["HUM-1234", "--title-only"]) == [
@@ -35,8 +43,8 @@ def test_normalize_argv_inserts_show_for_bare_tickets() -> None:
 
 
 def test_pulp_sbom_package_dir_replaces_dots() -> None:
-    assert helper.pulp_sbom_package_dir("grafana13.1") == "grafana13-1-main"
-    assert helper.pulp_sbom_package_dir("boost") == "boost-main"
+    assert lib_sbom.pulp_sbom_package_dir("grafana13.1") == "grafana13-1-main"
+    assert lib_sbom.pulp_sbom_package_dir("boost") == "boost-main"
 
 
 def test_parse_glab_mr_list() -> None:
@@ -47,7 +55,7 @@ def test_parse_glab_mr_list() -> None:
             "!12  plain title",
         ]
     )
-    entries = helper._parse_glab_mr_list(output, "open")
+    entries = lib_vcs._parse_glab_mr_list(output, "open")
     assert [e.iid for e in entries] == ["3905", "12"]
     assert entries[0].web_url.endswith("/merge_requests/3905")
     assert "axios" in entries[0].title
@@ -104,7 +112,7 @@ def test_probe_spec_deps_bundled_and_component(tmp_path: Path, monkeypatch) -> N
         + "\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
     hits = helper.probe_spec_deps(pkg, "golang.org/x/text")
     kinds = {h.kind for h in hits}
     assert "bundled_provides" in kinds
@@ -127,9 +135,9 @@ def test_run_rhjira_retries_transient_errors(monkeypatch) -> None:
             )
         return SimpleNamespace(returncode=0, stdout="ok", stderr="")
 
-    monkeypatch.setattr(helper, "run_command", fake_run)
+    monkeypatch.setattr(lib_jira, "run_command", fake_run)
     monkeypatch.setattr(time, "sleep", lambda s: sleeps.append(s))
-    result = helper.run_rhjira(["show", "HUM-1"])
+    result = lib_jira.run_rhjira(["show", "HUM-1"])
     assert result.returncode == 0
     assert len(calls) == 3
     assert sleeps == [2, 4]
@@ -142,8 +150,8 @@ def test_run_rhjira_does_not_retry_non_transient(monkeypatch) -> None:
         calls.append(args)
         return SimpleNamespace(returncode=1, stdout="", stderr="issue not found")
 
-    monkeypatch.setattr(helper, "run_command", fake_run)
-    result = helper.run_rhjira(["show", "HUM-1"])
+    monkeypatch.setattr(lib_jira, "run_command", fake_run)
+    result = lib_jira.run_rhjira(["show", "HUM-1"])
     assert result.returncode == 1
     assert len(calls) == 1
 
@@ -152,7 +160,6 @@ def test_read_local_spec_nvr(tmp_path: Path, monkeypatch) -> None:
     pkg = "mypkg"
     pkg_dir = tmp_path / "rpms" / pkg
     pkg_dir.mkdir(parents=True)
-    # Spec with a %global and an external-override conditional pattern
     (pkg_dir / f"{pkg}.spec").write_text(
         "\n".join([
             "%global mainver 2.5.1",
@@ -165,10 +172,9 @@ def test_read_local_spec_nvr(tmp_path: Path, monkeypatch) -> None:
         ]) + "\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
-    assert helper.read_local_spec_nvr(pkg) == "mypkg-2.5.1-3"
-    # Missing package returns empty string
-    assert helper.read_local_spec_nvr("nonexistent") == ""
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    assert lib_spec.read_local_spec_nvr(pkg) == "mypkg-2.5.1-3"
+    assert lib_spec.read_local_spec_nvr("nonexistent") == ""
 
 
 def test_search_cve_in_spec_and_patches(tmp_path: Path, monkeypatch) -> None:
@@ -179,18 +185,15 @@ def test_search_cve_in_spec_and_patches(tmp_path: Path, monkeypatch) -> None:
     (pkg_dir / "fix-cve.patch").write_text(
         "# Backport for CVE-2024-12345\n--- a/foo.c\n+++ b/foo.c\n", encoding="utf-8"
     )
-    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
-    # Found in patch
-    assert helper.search_cve_in_spec_and_patches(pkg, ["CVE-2024-12345"]) is True
-    # Not found
-    assert helper.search_cve_in_spec_and_patches(pkg, ["CVE-2099-99999"]) is False
-    # Missing package dir
-    assert helper.search_cve_in_spec_and_patches("ghost", ["CVE-2024-12345"]) is False
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    assert lib_spec.search_cve_in_spec_and_patches(pkg, ["CVE-2024-12345"]) is True
+    assert lib_spec.search_cve_in_spec_and_patches(pkg, ["CVE-2099-99999"]) is False
+    assert lib_spec.search_cve_in_spec_and_patches("ghost", ["CVE-2024-12345"]) is False
 
 
 def test_build_suggested_chat_title() -> None:
     reports = [
-        helper.TicketReport(
+        lib_models.TicketReport(
             "HUM-1",
             "CVE-2026-12345 pkg: x",
             "New",
@@ -268,6 +271,8 @@ def test_load_jira_auth_prefers_process_env(tmp_path: Path) -> None:
 def test_cmd_deps_reports_missing_analysis(monkeypatch) -> None:
     import cve_analysis_bridge as bridge
 
+    # cmd_deps is in cve_helper and uses load_jira_auth/jira_client_module
+    # from its own namespace (imported directly from cve_analysis_bridge)
     monkeypatch.setattr(
         helper,
         "load_jira_auth",
@@ -304,14 +309,14 @@ def test_pulp_has_nvr_uses_listing_index(monkeypatch) -> None:
         fetch_srpm_listing_index=lambda pkg: index,
         fetch_hummingbird_latest_srpm=lambda pkg: "grafana13.1-13.1.0-1.src.rpm",
     )
-    monkeypatch.setattr(helper, "pulp_module", lambda: pulp)
-    ok, detail = helper.pulp_has_nvr("grafana13.1", "grafana13.1-13.1.1-1.src.rpm")
+    monkeypatch.setattr(lib_jira, "pulp_module", lambda: pulp)
+    ok, detail = lib_jira.pulp_has_nvr("grafana13.1", "grafana13.1-13.1.1-1.src.rpm")
     assert ok
     assert "Pulp listing" in detail
 
 
 def test_set_fixed_in_build_refuses_unpublished_nvr(monkeypatch) -> None:
-    monkeypatch.setattr(helper, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
+    monkeypatch.setattr(lib_jira, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
     try:
         helper.set_fixed_in_build("HUM-1", "pkg-1.0-1.src.rpm", "pkg")
     except RuntimeError as err:
@@ -326,10 +331,10 @@ def test_set_fixed_in_build_force_skips_pulp(monkeypatch) -> None:
     def set_fib(base, token, ticket, build, *, basic_auth_user=None):
         calls.append((ticket, build, basic_auth_user))
 
-    monkeypatch.setattr(helper, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(lib_jira, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
+    monkeypatch.setattr(lib_jira, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "jira_client_module",
         lambda: SimpleNamespace(set_fixed_in_build=set_fib),
     )
@@ -354,9 +359,9 @@ def test_apply_next_release_labels(monkeypatch) -> None:
     def remove_label(*a, **_k):
         calls.append(f"remove:{a[3]}")
 
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(lib_jira, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "jira_client_module",
         lambda: SimpleNamespace(
             jira_add_comment=add_comment,
@@ -387,9 +392,9 @@ def test_close_not_a_bug(monkeypatch) -> None:
         calls.append("resolve")
         return True
 
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(lib_jira, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "jira_client_module",
         lambda: SimpleNamespace(
             jira_add_comment=add_comment,
@@ -402,9 +407,9 @@ def test_close_not_a_bug(monkeypatch) -> None:
 
 
 def test_close_not_a_bug_none_return_is_success(monkeypatch) -> None:
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(lib_jira, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "jira_client_module",
         lambda: SimpleNamespace(
             jira_add_comment=lambda *_a, **_k: True,
@@ -416,9 +421,9 @@ def test_close_not_a_bug_none_return_is_success(monkeypatch) -> None:
 
 
 def test_close_not_a_bug_false_return_raises(monkeypatch) -> None:
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(lib_jira, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "jira_client_module",
         lambda: SimpleNamespace(
             jira_add_comment=lambda *_a, **_k: True,
@@ -436,7 +441,7 @@ def test_close_not_a_bug_false_return_raises(monkeypatch) -> None:
 
 def test_parse_created_issue_key() -> None:
     assert (
-        helper.parse_created_issue_key(
+        lib_jira.parse_created_issue_key(
             "https://redhat.atlassian.net/browse/HUM-6222\n"
         )
         == "HUM-6222"
@@ -444,10 +449,10 @@ def test_parse_created_issue_key() -> None:
 
 
 def test_gitlab_project_from_url() -> None:
-    assert helper.gitlab_project_from_url(
+    assert lib_vcs.gitlab_project_from_url(
         "git@gitlab.com:prarit/rpms.git"
     ) == "prarit/rpms"
-    assert helper.gitlab_project_from_url(
+    assert lib_vcs.gitlab_project_from_url(
         "https://gitlab.com/prarit/rpms.git"
     ) == "prarit/rpms"
 
@@ -462,11 +467,11 @@ def test_detect_fork_remote_skips_upstream(monkeypatch) -> None:
         ]
     )
     monkeypatch.setattr(
-        helper,
+        lib_vcs,
         "run_command",
         lambda *_a, **_k: SimpleNamespace(returncode=0, stdout=output, stderr=""),
     )
-    name, project = helper.detect_fork_remote()
+    name, project = lib_vcs.detect_fork_remote()
     assert name == "prarit"
     assert project == "prarit/rpms"
 
@@ -506,10 +511,10 @@ def test_create_hum_task_links_and_starts(monkeypatch) -> None:
             )
         return SimpleNamespace(returncode=0, stdout="", stderr="")
 
-    monkeypatch.setattr(helper, "ensure_rhjira_available", lambda: None)
-    monkeypatch.setattr(helper, "run_rhjira", fake_rhjira)
+    monkeypatch.setattr(lib_jira, "ensure_rhjira_available", lambda: None)
+    monkeypatch.setattr(lib_jira, "run_rhjira", fake_rhjira)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "load_jira_auth",
         lambda: SimpleNamespace(basic_auth_user="dev@redhat.com"),
     )
@@ -530,15 +535,15 @@ def test_strip_only_keyword() -> None:
 
 
 def test_recap_lines_asks_before_discovered() -> None:
-    named = helper.TicketReport(
+    named = lib_models.TicketReport(
         "HUM-1", "CVE-2026-1 pkg: foo", "In Progress", "Bug", "me", "cve-needs-attention"
     )
     named.fixed_in_build = "foo-1-1.src.rpm"
-    extra = helper.TicketReport(
+    extra = lib_models.TicketReport(
         "HUM-2", "CVE-2026-1 pkg: bar", "New", "Bug", "bot", ""
     )
     extra.package_guess = "bar"
-    gathered = helper.GatheredTickets(
+    gathered = lib_models.GatheredTickets(
         reports=[named, extra],
         user_provided=["HUM-1"],
         discovered=["HUM-2"],
@@ -552,31 +557,31 @@ def test_recap_lines_asks_before_discovered() -> None:
 
 
 def test_split_nvr_and_version_cmp() -> None:
-    assert helper.split_nvr("grafana13.1-13.1.1-0.5.src.rpm") == (
+    assert lib_spec.split_nvr("grafana13.1-13.1.1-0.5.src.rpm") == (
         "grafana13.1",
         "13.1.1",
         "0.5",
     )
-    assert helper.split_nvr("foo-1.2") == ("foo", "1.2", "")
-    assert helper.version_cmp("1.2.3", "1.2.4") == -1
-    assert helper.version_cmp("1.3", "1.2.9") == 1
-    assert helper.version_cmp("v1.0.0", "1.0.0") == 0
-    assert helper.version_cmp("not-a-version", "1.0") is None
+    assert lib_spec.split_nvr("foo-1.2") == ("foo", "1.2", "")
+    assert lib_spec.version_cmp("1.2.3", "1.2.4") == -1
+    assert lib_spec.version_cmp("1.3", "1.2.9") == 1
+    assert lib_spec.version_cmp("v1.0.0", "1.0.0") == 0
+    assert lib_spec.version_cmp("not-a-version", "1.0") is None
 
 
 def test_parse_affected_constraints_and_satisfies() -> None:
-    constraints = helper.parse_affected_constraints("< 1.2.3")
+    constraints = lib_spec.parse_affected_constraints("< 1.2.3")
     assert constraints == [("<", "1.2.3")]
-    assert helper.version_satisfies("1.2.2", constraints) is True
-    assert helper.version_satisfies("1.2.3", constraints) is False
-    span = helper.parse_affected_constraints("1.0 through 1.2.2")
-    assert helper.version_satisfies("1.1.0", span) is True
-    assert helper.version_satisfies("1.3.0", span) is False
-    both = helper.parse_affected_constraints(">= 1.0, < 1.5")
-    assert helper.version_satisfies("1.4.9", both) is True
-    assert helper.version_satisfies("1.5.0", both) is False
-    assert helper.parse_affected_constraints("") == []
-    assert helper.version_satisfies("1.0", []) is None
+    assert lib_spec.version_satisfies("1.2.2", constraints) is True
+    assert lib_spec.version_satisfies("1.2.3", constraints) is False
+    span = lib_spec.parse_affected_constraints("1.0 through 1.2.2")
+    assert lib_spec.version_satisfies("1.1.0", span) is True
+    assert lib_spec.version_satisfies("1.3.0", span) is False
+    both = lib_spec.parse_affected_constraints(">= 1.0, < 1.5")
+    assert lib_spec.version_satisfies("1.4.9", both) is True
+    assert lib_spec.version_satisfies("1.5.0", both) is False
+    assert lib_spec.parse_affected_constraints("") == []
+    assert lib_spec.version_satisfies("1.0", []) is None
 
 
 def test_version_check_payload_hints(tmp_path: Path, monkeypatch) -> None:
@@ -587,7 +592,7 @@ def test_version_check_payload_hints(tmp_path: Path, monkeypatch) -> None:
         "Name: foo\nVersion: 1.2.2\nRelease: 3%{?dist}\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
     below = helper.version_check_payload(
         pkg, affected="< 1.2.3", fixed="1.2.3"
     )
@@ -630,11 +635,11 @@ def test_compare_fix_age_and_parse_github_url() -> None:
     assert before["verdict"] == "commit_at_or_before_tag"
     after = helper.compare_fix_age(tag, commit)
     assert after["verdict"] == "commit_after_tag"
-    parsed = helper.parse_github_commit_ref(
+    parsed = lib_vcs.parse_github_commit_ref(
         "https://github.com/foo/bar/commit/abc123def"
     )
     assert parsed == ("foo", "bar", "abc123def")
-    dt = helper.parse_iso_datetime("2026-01-10T00:00:00Z")
+    dt = lib_vcs.parse_iso_datetime("2026-01-10T00:00:00Z")
     assert dt.tzinfo is not None
 
 
@@ -653,14 +658,14 @@ def test_fetch_github_commit_date(monkeypatch) -> None:
         assert "commits/abc123" in url
         return {"commit": {"committer": {"date": "2026-03-01T12:00:00Z"}}}
 
-    monkeypatch.setattr(helper, "http_get_json", fake_json)
-    dt = helper.fetch_github_commit_date("foo", "bar", "abc123")
+    monkeypatch.setattr(lib_vcs, "http_get_json", fake_json)
+    dt = lib_vcs.fetch_github_commit_date("foo", "bar", "abc123")
     assert dt.year == 2026
     assert dt.month == 3
 
 
 def test_bump_release_matches_dist_git_rules() -> None:
-    bump = helper.bump_release
+    bump = lib_spec.bump_release
     assert bump("3") == "3.1"
     assert bump("3.1") == "3.2"
     assert bump("3.1", upstream_release="3.1") == "3.1.1"
@@ -682,7 +687,8 @@ def test_release_bump_payload(tmp_path: Path, monkeypatch) -> None:
         json.dumps({"modification_status": "modified", "release": "3.1"}),
         encoding="utf-8",
     )
-    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    monkeypatch.setattr(lib_spec, "repo_root", lambda: tmp_path)
     payload = helper.release_bump_payload(pkg)
     assert payload["spec_release"] == "3.1"
     assert payload["metadata_release"] == "3.1"
@@ -703,12 +709,9 @@ def test_release_bump_autorelease(tmp_path: Path, monkeypatch) -> None:
         json.dumps({"modification_status": "clean", "release": "5"}),
         encoding="utf-8",
     )
-    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    monkeypatch.setattr(lib_spec, "repo_root", lambda: tmp_path)
     payload = helper.release_bump_payload(pkg)
     assert payload["uses_autorelease"] is True
     assert payload["proposed_spec_release"] == ""
     assert "%autorelease" in payload["hint"]
-
-
-
-
