@@ -1,0 +1,6 @@
+*.tar.*
+clog
+*.rpm
+efivar-*/
+bodhi.template
+.build*.log
