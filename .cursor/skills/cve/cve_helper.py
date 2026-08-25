@@ -97,6 +97,7 @@ from lib.investigate import (  # noqa: E402
     resolution_hint_for_report,
     search_repo_fix_mrs,
     strip_only_keyword,
+    ticket_has_task_or_mr,
 )
 from lib.comments import (  # noqa: E402
     _add_comment_template_arguments,
@@ -837,11 +838,8 @@ def cmd_investigate(args: argparse.Namespace) -> int:
     recap = recap_lines(gathered)
     recommendations = []
     for report in gathered.reports:
-        has_task_or_mr = bool(report.linked_ticket_details) or bool(
-            report.mr_links_in_ticket
-        )
         hint, recommended_next = resolution_hint_for_report(
-            report, has_task_or_mr=has_task_or_mr
+            report, has_task_or_mr=ticket_has_task_or_mr(report)
         )
         recommendations.append(
             {

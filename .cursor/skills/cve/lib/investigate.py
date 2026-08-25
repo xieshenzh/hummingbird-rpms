@@ -1,7 +1,7 @@
 import os
 import sys
 import urllib.error
-from typing import Any
+from typing import Any, Literal
 
 from lib.models import TicketReport, GatheredTickets, GITLAB_RPMS_REPO
 from lib.utils import normalize_hum_key
@@ -130,18 +130,23 @@ def search_repo_fix_mrs(cve_ids: list[str]) -> list[dict[str, Any]]:
 
 # ---- Resolution hints ----
 
-RESOLUTION_HINTS = (
+ResolutionHint = Literal[
     "embargoed_stop",
     "fib_leave_for_advisory",
     "fib_ask_create_task",
     "needs_version_check",
     "needs_package_guess",
-)
+]
+
+
+def ticket_has_task_or_mr(report: TicketReport) -> bool:
+    """True if a linked ticket or an in-ticket MR link already exists."""
+    return bool(report.linked_ticket_details) or bool(report.mr_links_in_ticket)
 
 
 def resolution_hint_for_report(
     report: TicketReport, *, has_task_or_mr: bool
-) -> tuple[str, str]:
+) -> tuple[ResolutionHint, str]:
     """Return (resolution_hint, recommended_next) for one ticket's recap line.
 
     This is a suggestion, not a decision. It does not replace SKILL.md Step 3:
@@ -195,11 +200,8 @@ def recap_lines(gathered: GatheredTickets) -> list[str]:
             f"fib={report.fixed_in_build or '(unset)'} | "
             f"pkg={report.package_guess or '?'}"
         )
-        has_task_or_mr = bool(report.linked_ticket_details) or bool(
-            report.mr_links_in_ticket
-        )
         hint, recommended_next = resolution_hint_for_report(
-            report, has_task_or_mr=has_task_or_mr
+            report, has_task_or_mr=ticket_has_task_or_mr(report)
         )
         lines.append(f"  resolution_hint={hint}")
         lines.append(f"  recommended_next: {recommended_next}")

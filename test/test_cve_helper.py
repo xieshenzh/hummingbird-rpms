@@ -563,6 +563,20 @@ def test_recap_lines_asks_before_discovered() -> None:
     assert "Yes please" in text
 
 
+def test_recap_lines_embargoed_ticket() -> None:
+    embargoed = lib_models.TicketReport(
+        "HUM-99", "EMBARGOED CVE-2026-99 foo: x", "New", "Bug", "me", ""
+    )
+    gathered = lib_models.GatheredTickets(
+        reports=[embargoed],
+        user_provided=["HUM-99"],
+        discovered=[],
+    )
+    text = "\n".join(lib_investigate.recap_lines(gathered))
+    assert "resolution_hint=embargoed_stop" in text
+    assert "Stop; embargoed ticket" in text
+
+
 def test_resolution_hint_for_report() -> None:
     embargoed = lib_models.TicketReport(
         "HUM-1", "EMBARGOED CVE-2026-1 foo: x", "New", "Bug", "me", ""
