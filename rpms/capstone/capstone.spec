@@ -1,6 +1,6 @@
 Name:           capstone
 Version:        5.0.8
-Release:        0.2%{?dist}
+Release:        0.3%{?dist}
 Summary:        A lightweight multi-platform, multi-architecture disassembly framework
 License:        BSD-3-Clause AND BSD-4-Clause AND APSL-2.0 AND NCSA AND MIT
 URL:            http://www.capstone-engine.org/
@@ -35,6 +35,8 @@ Source1:        cstool.1
 
 # Ocaml binding is not using local path for the includes/links
 Patch1:         capstone-5.0.1-ocaml.patch
+# Fix OOB reads/writes (CVE-2026-55893, CVE-2026-55894)
+Patch2:         capstone-5.0.8-cve-2026-55893.patch
 
 
 # Build with python3 package by default
