@@ -280,6 +280,27 @@ def detect_fork_remote(cwd: Path | str | None = None) -> tuple[str, str]:
     )
 
 
+def detect_target_remote(cwd: Path | str | None = None) -> str:
+    """Return the remote name that points at GITLAB_RPMS_REPO (e.g. "origin")."""
+    proc = run_command(["git", "remote", "-v"], cwd=cwd)
+    if proc.returncode != 0:
+        raise RuntimeError(proc.stderr or "git remote -v failed")
+    for line in proc.stdout.splitlines():
+        parts = line.split()
+        if len(parts) < 3 or parts[-1] != "(push)":
+            continue
+        name, url = parts[0], parts[1]
+        try:
+            project = gitlab_project_from_url(url)
+        except RuntimeError:
+            continue
+        if project.rstrip("/") == GITLAB_RPMS_REPO:
+            return name
+    raise RuntimeError(
+        f"Could not detect a remote pointing at {GITLAB_RPMS_REPO}. Check `git remote -v`."
+    )
+
+
 # ---- Git worktree ----
 
 
@@ -352,7 +373,8 @@ def open_package_mr(
     trigger_review: bool = True,
 ) -> str:
     ensure_glab_available()
-    fork_remote, fork_project = detect_fork_remote(cwd=cwd)
+    fork_remote, _fork_project = detect_fork_remote(cwd=cwd)
+    target_remote = detect_target_remote(cwd=cwd)
     if push:
         pushed = run_command(["git", "push", "-u", fork_remote, source_branch], cwd=cwd)
         if pushed.returncode != 0:
@@ -364,18 +386,15 @@ def open_package_mr(
             "glab",
             "mr",
             "create",
-            "--source-branch",
-            source_branch,
-            "--target-branch",
+            target_remote,
             "main",
-            "--head",
-            fork_project,
-            "--repo",
-            GITLAB_RPMS_REPO,
-            "--title",
+            "--source",
+            f"{fork_remote}:{source_branch}",
+            "-m",
             title,
-            "--description",
+            "-m",
             description,
+            "--no-edit",
         ],
         cwd=cwd,
     )
@@ -404,9 +423,8 @@ def open_package_mr(
                 "glab",
                 "mr",
                 "note",
+                target_remote,
                 iid,
-                "--repo",
-                GITLAB_RPMS_REPO,
                 "-m",
                 "/hummingbird code-review",
             ],
