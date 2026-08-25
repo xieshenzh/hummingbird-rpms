@@ -1,7 +1,7 @@
 import os
 import sys
 import urllib.error
-from typing import Any
+from typing import Any, Literal
 
 from lib.models import TicketReport, GatheredTickets, GITLAB_RPMS_REPO
 from lib.utils import normalize_hum_key
@@ -128,6 +128,63 @@ def search_repo_fix_mrs(cve_ids: list[str]) -> list[dict[str, Any]]:
     return hits
 
 
+# ---- Resolution hints ----
+
+ResolutionHint = Literal[
+    "embargoed_stop",
+    "fib_leave_for_advisory",
+    "fib_ask_create_task",
+    "needs_version_check",
+    "needs_package_guess",
+]
+
+
+def ticket_has_task_or_mr(report: TicketReport) -> bool:
+    """True if a linked ticket or an in-ticket MR link already exists."""
+    return bool(report.linked_ticket_details) or bool(report.mr_links_in_ticket)
+
+
+def resolution_hint_for_report(
+    report: TicketReport, *, has_task_or_mr: bool
+) -> tuple[ResolutionHint, str]:
+    """Return (resolution_hint, recommended_next) for one ticket's recap line.
+
+    This is a suggestion, not a decision. It does not replace SKILL.md Step 3:
+    the agent still waits for the user, still gathers evidence before closing,
+    and never claims Done-Errata from versions alone.
+    """
+    if report.embargoed:
+        return "embargoed_stop", "Stop; embargoed ticket. Do not analyze or write."
+    if report.fixed_in_build and has_task_or_mr:
+        return (
+            "fib_leave_for_advisory",
+            (
+                "FIB is set and a task/MR exists; leave for advisory automation "
+                "unless the user asks."
+            ),
+        )
+    if report.fixed_in_build:
+        return (
+            "fib_ask_create_task",
+            "FIB is set but no task/MR is linked; ask whether to create the task.",
+        )
+    if report.package_guess:
+        return (
+            "needs_version_check",
+            (
+                f"version-check {report.package_guess} --ticket {report.ticket} "
+                "to compare the local NVR against the CVE range before deciding."
+            ),
+        )
+    return (
+        "needs_package_guess",
+        (
+            "No package guess; run spec-deps/sbom to identify the affected package "
+            "before version-check."
+        ),
+    )
+
+
 # ---- Recap generation ----
 
 
@@ -143,18 +200,11 @@ def recap_lines(gathered: GatheredTickets) -> list[str]:
             f"fib={report.fixed_in_build or '(unset)'} | "
             f"pkg={report.package_guess or '?'}"
         )
-        has_task_or_mr = bool(report.linked_ticket_details) or bool(
-            report.mr_links_in_ticket
+        hint, recommended_next = resolution_hint_for_report(
+            report, has_task_or_mr=ticket_has_task_or_mr(report)
         )
-        if report.fixed_in_build and has_task_or_mr:
-            lines.append(
-                "  FIB is set and a task/MR exists; leave for advisory automation "
-                "unless the user asks."
-            )
-        elif report.fixed_in_build:
-            lines.append(
-                "  FIB is set but no task/MR is linked; ask whether to create the task."
-            )
+        lines.append(f"  resolution_hint={hint}")
+        lines.append(f"  recommended_next: {recommended_next}")
     if gathered.discovered:
         related = []
         by_ticket = {r.ticket: r for r in gathered.reports}

@@ -94,8 +94,10 @@ from lib.output import (  # noqa: E402
 from lib.investigate import (  # noqa: E402
     gather_ticket_reports,
     recap_lines,
+    resolution_hint_for_report,
     search_repo_fix_mrs,
     strip_only_keyword,
+    ticket_has_task_or_mr,
 )
 from lib.comments import (  # noqa: E402
     _add_comment_template_arguments,
@@ -834,12 +836,25 @@ def cmd_investigate(args: argparse.Namespace) -> int:
         probes["gitlab_mrs"] = search_repo_fix_mrs(cve_ids)
 
     recap = recap_lines(gathered)
+    recommendations = []
+    for report in gathered.reports:
+        hint, recommended_next = resolution_hint_for_report(
+            report, has_task_or_mr=ticket_has_task_or_mr(report)
+        )
+        recommendations.append(
+            {
+                "ticket": report.ticket,
+                "resolution_hint": hint,
+                "recommended_next": recommended_next,
+            }
+        )
     payload = {
         "user_provided": gathered.user_provided,
         "discovered": gathered.discovered,
         "tickets": [asdict(r) for r in gathered.reports],
         "probes": probes,
         "recap": recap,
+        "recommendations": recommendations,
         "suggested_chat_title": build_suggested_chat_title(gathered.reports),
     }
     if args.json_out:
