@@ -34,6 +34,7 @@ import lib.spec as lib_spec  # noqa: E402
 import lib.utils as lib_utils  # noqa: E402
 import lib.vcs as lib_vcs  # noqa: E402
 import lib.comments as lib_comments  # noqa: E402
+import lib.investigate as lib_investigate  # noqa: E402
 
 
 def test_normalize_argv_inserts_show_for_bare_tickets() -> None:
@@ -555,8 +556,64 @@ def test_recap_lines_asks_before_discovered() -> None:
     assert "HUM-1 [user_provided]" in text
     assert "HUM-2 [discovered]" in text
     assert "FIB is set but no task/MR is linked" in text
+    assert "resolution_hint=fib_ask_create_task" in text
+    assert "resolution_hint=needs_version_check" in text
+    assert "recommended_next: version-check bar --ticket HUM-2" in text
     assert "Related: HUM-2 (bar)" in text
     assert "Yes please" in text
+
+
+def test_resolution_hint_for_report() -> None:
+    embargoed = lib_models.TicketReport(
+        "HUM-1", "EMBARGOED CVE-2026-1 foo: x", "New", "Bug", "me", ""
+    )
+    hint, next_step = lib_investigate.resolution_hint_for_report(
+        embargoed, has_task_or_mr=False
+    )
+    assert hint == "embargoed_stop"
+    assert "Stop" in next_step
+
+    fib_with_task = lib_models.TicketReport(
+        "HUM-2", "CVE-2026-2 foo: x", "New", "Bug", "me", ""
+    )
+    fib_with_task.fixed_in_build = "foo-1-1.src.rpm"
+    hint, next_step = lib_investigate.resolution_hint_for_report(
+        fib_with_task, has_task_or_mr=True
+    )
+    assert hint == "fib_leave_for_advisory"
+    assert "leave for advisory automation" in next_step
+
+    fib_no_task = lib_models.TicketReport(
+        "HUM-3", "CVE-2026-3 foo: x", "New", "Bug", "me", ""
+    )
+    fib_no_task.fixed_in_build = "foo-1-1.src.rpm"
+    hint, next_step = lib_investigate.resolution_hint_for_report(
+        fib_no_task, has_task_or_mr=False
+    )
+    assert hint == "fib_ask_create_task"
+    assert "ask whether to create the task" in next_step
+
+    needs_check = lib_models.TicketReport(
+        "HUM-4", "CVE-2026-4 foo: x", "New", "Bug", "me", ""
+    )
+    needs_check.package_guess = "foo"
+    hint, next_step = lib_investigate.resolution_hint_for_report(
+        needs_check, has_task_or_mr=False
+    )
+    assert hint == "needs_version_check"
+    assert next_step == (
+        "version-check foo --ticket HUM-4 to compare the local NVR against "
+        "the CVE range before deciding."
+    )
+
+    no_package = lib_models.TicketReport(
+        "HUM-5", "CVE-2026-5 something else", "New", "Bug", "me", ""
+    )
+    hint, next_step = lib_investigate.resolution_hint_for_report(
+        no_package, has_task_or_mr=False
+    )
+    assert hint == "needs_package_guess"
+    assert "No package guess" in next_step
 
 
 def test_split_nvr_and_version_cmp() -> None:
