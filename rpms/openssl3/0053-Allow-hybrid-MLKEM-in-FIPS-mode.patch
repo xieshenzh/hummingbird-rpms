@@ -148,8 +148,13 @@ index 376b3342dd..09fa003612 100644
      if (ctx == NULL
          || EVP_PKEY_encapsulate_init(ctx, NULL) <= 0
          || EVP_PKEY_encapsulate(ctx, cbuf, &encap_clen, sbuf, &encap_slen) <= 0)
-@@ -238,6 +263,7 @@ static int mlx_kem_encapsulate(void *vctx, unsigned char *ctext, size_t *clen,
+@@ -262,11 +262,12 @@ static int mlx_kem_encapsulate(void *vctx, unsigned char *ctext, size_t *clen,
+     ret = 1;
  end:
+     /* Erase any partial shared secret on failure */
+     if (ret == 0)
+         OPENSSL_cleanse(shsec,
+             ML_KEM_SHARED_SECRET_BYTES + key->xinfo->shsec_bytes);
      EVP_PKEY_free(xkey);
      EVP_PKEY_CTX_free(ctx);
 +    OPENSSL_free(adjusted_propq);
@@ -174,8 +179,13 @@ index 376b3342dd..09fa003612 100644
      if (ctx == NULL
          || EVP_PKEY_decapsulate_init(ctx, NULL) <= 0
          || EVP_PKEY_decapsulate(ctx, sbuf, &decap_slen, cbuf, decap_clen) <= 0)
-@@ -326,6 +354,7 @@ static int mlx_kem_decapsulate(void *vctx, uint8_t *shsec, size_t *slen,
+@@ -356,11 +356,12 @@ static int mlx_kem_decapsulate(void *vctx, uint8_t *shsec, size_t *slen,
+     ret = 1;
  end:
+     /* Erase any partial shared secret on failure */
+     if (ret == 0)
+         OPENSSL_cleanse(shsec,
+             ML_KEM_SHARED_SECRET_BYTES + key->xinfo->shsec_bytes);
      EVP_PKEY_CTX_free(ctx);
      EVP_PKEY_free(xkey);
 +    OPENSSL_free(adjusted_propq);
@@ -305,4 +315,3 @@ index 46ed63039e..6ce9aa3c9a 100644
          key->xinfo->group_name);
 -- 
 2.52.0
-
