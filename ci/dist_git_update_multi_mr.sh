@@ -485,14 +485,25 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
             fi
             PACKAGES_UPDATED=$((PACKAGES_UPDATED + 1))
 
-            # Track MR URL if we have GitLab info
+            # Track MR URL if we have GitLab info. Conflict MRs are annotated
+            # here since they're also listed separately below under "MRs
+            # needing manual conflict resolution" -- this avoids an unlabeled
+            # duplicate entry in the job log.
             if [[ -n "${MR_URL}" ]]; then
-                CREATED_MR_URLS+=("${MR_URL}")
+                if [[ "${HAS_CONFLICT}" == true ]]; then
+                    CREATED_MR_URLS+=("${MR_URL} (conflict)")
+                else
+                    CREATED_MR_URLS+=("${MR_URL}")
+                fi
             fi
         elif [[ ${MR_EXIT_CODE} -eq 2 ]]; then
             # MR already exists - not a failure, but don't count as created
             EXISTING_UPDATES=$((EXISTING_UPDATES + 1))
             if [[ "${HAS_CONFLICT}" == true && -n "${MR_URL}" ]]; then
+                # MR_URL here is a source_branch search link, not a direct
+                # merge_requests/<ID> link: create_mr.sh doesn't look up the
+                # existing MR's number, and finding it would need a GitLab
+                # API call. Still useful for the on-call reader to click through.
                 CONFLICT_MR_URLS+=("${PACKAGE}: ${MR_URL}")
             fi
         else
