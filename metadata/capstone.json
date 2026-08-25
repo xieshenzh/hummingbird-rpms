@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to 5.0.7 to fix CVE-2025-67873; update to 5.0.8 for CVE-2026-47143",
+  "modification_reason": "Update to 5.0.7 to fix CVE-2025-67873; update to 5.0.8 for CVE-2026-47143; backport fix for CVE-2026-55893, CVE-2026-55894",
   "modification_status": "modified",
   "release": "6",
   "sha": "796b4c0ff71585d1482d1c6339b072e48138db66",
