@@ -15,7 +15,7 @@
 
 Name:           openblas
 Version:        0.3.34
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        An optimized BLAS library based on GotoBLAS2
 
 License:        BSD-3-Clause
@@ -551,10 +551,11 @@ for lib in %{buildroot}%{_libdir}/libopenblas*.so; do
  execstack -c $lib
 done
 
+# Fix buildroot prefix baked into generated pkgconfig file
+sed -i 's|%{buildroot}||g' %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
+
 # Get rid of generated CMake config
 rm -rf %{buildroot}%{_libdir}/cmake
-# Get rid of generated pkgconfig
-rm -rf %{buildroot}%{_libdir}/pkgconfig
 
 %ldconfig_scriptlets
 
@@ -617,6 +618,7 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 
 %files devel
 %{_includedir}/%{name}/
+%{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/lib%{name}.so
 %{_libdir}/lib%{name}o.so
 %{_libdir}/lib%{name}p.so

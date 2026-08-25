@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 0.3.34",
+  "modification_reason": "Ship openblas.pc for Meson-based builds (numpy, scipy)",
   "modification_status": "modified",
   "release": "1",
   "release_monitoring_project_id": 2540,
