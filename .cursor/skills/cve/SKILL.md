@@ -53,9 +53,11 @@ loads `~/.config/rhjira/agent.env`. Do not paste retry loops.
 3. **Read the recap.** It leads with assignee (user vs bot), labels, and
    FIB. User-named tickets are in-scope. Discovered same-CVE siblings
    are context until the user says so. A "Yes please" on the named set
-   is not approval for extras. If FIB and a task/MR already exist, leave
-   for advisory automation. If FIB is set with no task/MR, ask whether
-   to create the task.
+   is not approval for extras. Each ticket line ends with a
+   `resolution_hint` tag and a `recommended_next` command — a suggestion,
+   not a decision; still gather evidence and still ask before closing.
+   If FIB and a task/MR already exist, leave for advisory automation. If
+   FIB is set with no task/MR, ask whether to create the task.
 4. **Wait** for the user's Step 3 direction.
 5. **Act** with the matching helper (below). Comment before state
    changes. Ask before any close.
