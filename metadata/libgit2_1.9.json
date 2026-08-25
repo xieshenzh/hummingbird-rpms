@@ -5,5 +5,6 @@
   "release_monitoring_project_id": 1627,
   "sha": "7be657b7b92d2ef2cf3e286991071c1669499dec",
   "source": "https://src.fedoraproject.org/rpms/libgit2_1.9.git",
+  "upstream_repo": "https://github.com/libgit2/libgit2",
   "version": "1.9.7"
 }
