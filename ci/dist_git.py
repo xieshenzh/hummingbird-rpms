@@ -1521,7 +1521,7 @@ def _run_gorget_for_updated_package(package_name: str, package_dir: Path,
     uploaded_filenames lists any new source archives gorget copied into
     package_dir and pushed to the lookaside cache -- the caller must keep
     these out of its commit (they're already in the lookaside cache, and
-    can blow past GitLab's blob-size push limit; see HUM-6398), even though
+    can blow past GitLab's blob-size push limit; see HUM-6388), even though
     it force-adds package_dir to cope with upstream dist-gits that gitignore
     their own patches.
     """
@@ -1578,7 +1578,7 @@ def _stage_package_for_commit(package_name: str, package_dir: Path,
     Fedora dist-git convention and check_upstream_versions.py's own
     lookaside-backed update flow), but must never be committed: they can
     exceed GitLab's per-blob push-rule limit, which -- unlike a normal
-    .gitignore entry -- 'add -f' would otherwise bypass (see HUM-6398).
+    .gitignore entry -- 'add -f' would otherwise bypass (see HUM-6388).
     """
     if new_source_filenames:
         cuv._update_gitignore(package_dir, new_source_filenames)

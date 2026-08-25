@@ -4511,6 +4511,84 @@ def test_update_continue_with_pipeline_calls_gorget(
     assert commits_after == commits_before, "No commit should have been created"
 
 
+def test_update_continue_with_gorget_success_excludes_tarball_from_commit(
+        workdir: Path, upstream_repos: dict[str, Path], tmp_path: Path) -> None:
+    """Regression test for HUM-6388 on the --continue path: once gorget
+    re-verifies the resolved conflict successfully, the source archive it
+    copies into the package directory for upload to the lookaside cache
+    must not be committed -- 'git add -f' would otherwise bypass the root
+    .gitignore's rpms/*/*.tar.* exclusions for it, exactly as it did for
+    NetworkManager in production.
+
+    Uses a fake `gorget` on PATH that succeeds and emits a 'sources' file
+    plus the archive it references (mirroring the real fetch's contract),
+    and a stubbed upload-to-lookaside-cache.sh so no network/AWS access is
+    needed."""
+    pipeline_file = workdir / 'metadata' / 'chocolate.source-pipeline.yaml'
+    _write_pipeline(pipeline_file, [{'type': 'url', 'url': 'https://example.com/chocolate-${VERSION}.tar.gz'}])
+    subprocess.run(['git', 'add', '-A'], cwd=workdir, check=True)
+    subprocess.run(['git', 'commit', '-m', 'Add source-pipeline.yaml'], cwd=workdir, check=True)
+
+    _create_conflict(workdir, upstream_repos)
+
+    chocolate_spec = workdir / 'rpms' / 'chocolate' / 'chocolate.spec'
+    spec_content = chocolate_spec.read_text()
+    resolved = re.sub(r'<<<<<<< HEAD\n.*?=======\n(.*?)>>>>>>> hummingbird-local\n',
+                      r'\1', spec_content, flags=re.DOTALL)
+    chocolate_spec.write_text(resolved)
+
+    # Stub the upload script so gorget's real "upload the fetched archive"
+    # step succeeds without touching AWS -- the interesting part of this
+    # test is what gets committed locally, not the upload itself.
+    upload_script = workdir / 'ci' / 'upload-to-lookaside-cache.sh'
+    upload_script.write_text("#!/bin/sh\nexit 0\n")
+    upload_script.chmod(0o755)
+
+    tarball_name = 'chocolate-11.tar.gz'
+    fake_bin = tmp_path / 'fake-bin'
+    fake_bin.mkdir()
+    fake_gorget = fake_bin / 'gorget'
+    fake_gorget.write_text(
+        "#!/bin/sh\n"
+        "outdir=\n"
+        "while [ $# -gt 0 ]; do\n"
+        "  case \"$1\" in\n"
+        "    --output-dir) outdir=\"$2\"; shift 2 ;;\n"
+        "    *) shift ;;\n"
+        "  esac\n"
+        "done\n"
+        f"printf 'x%.0s' $(seq 1 1024) > \"$outdir/{tarball_name}\"\n"
+        f"hash=$(sha512sum \"$outdir/{tarball_name}\" | cut -d' ' -f1)\n"
+        f"echo \"SHA512 ({tarball_name}) = $hash\" > \"$outdir/sources\"\n"
+        "exit 0\n"
+    )
+    fake_gorget.chmod(0o755)
+    env = {**os.environ, 'PATH': f"{fake_bin}:{os.environ['PATH']}"}
+
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--continue'],
+        cwd=workdir, capture_output=True, text=True, env=env,
+    )
+    assert result.returncode == 0, f"--continue failed: {result.stderr}"
+
+    committed_files = subprocess.run(
+        ['git', 'show', '--stat', '--format=', 'HEAD'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    ).stdout
+
+    assert f'rpms/chocolate/{tarball_name}' not in committed_files
+    assert 'rpms/chocolate/chocolate.spec' in committed_files
+
+    # The archive stays on disk (gorget put it there for the lookaside
+    # upload) but must remain untracked for future runs too.
+    assert (workdir / 'rpms' / 'chocolate' / tarball_name).exists()
+    tracked = subprocess.run(
+        ['git', 'ls-files', f'rpms/chocolate/{tarball_name}'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    assert tracked == ''
+
+
 @pytest.fixture
 def mock_infra_repo(tmp_path: Path) -> Path:
     """Create a mock infrastructure repo with rpms-main templates."""
