@@ -1,0 +1,3 @@
+# Not real spelling errors:
+addFilter(r"spelling-error \('([Bb]ackported|[Tt]ype[Gg]uard)',")
+addFilter(r"spelling-error \('(mypy|pyright)',")
