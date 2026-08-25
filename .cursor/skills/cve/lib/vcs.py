@@ -21,6 +21,14 @@ GITHUB_COMMIT_RE = re.compile(
 
 
 def ensure_glab_available() -> None:
+    """Raise if the `glab`/`lab` CLI is not on PATH.
+
+    open_package_mr() below assumes glab/lab >= 0.25.1, which uses positional
+    `mr create [target_remote [target_branch]]` and `mr note [remote] <id>`
+    syntax instead of the older --source-branch/--target-branch/--head/--repo
+    flags. If a future CLI version changes this syntax again, the "unknown
+    flag" errors will surface here first.
+    """
     if shutil.which("glab"):
         return
     raise RuntimeError("`glab` is not installed or not found in PATH.")
