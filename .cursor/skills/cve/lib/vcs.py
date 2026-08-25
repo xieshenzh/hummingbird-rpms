@@ -302,7 +302,7 @@ def detect_target_remote(cwd: Path | str | None = None) -> str:
             project = gitlab_project_from_url(url)
         except RuntimeError:
             continue
-        if project.rstrip("/") == GITLAB_RPMS_REPO:
+        if project.rstrip("/") == GITLAB_RPMS_REPO.rstrip("/"):
             return name
     raise RuntimeError(
         f"Could not detect a remote pointing at {GITLAB_RPMS_REPO}. Check `git remote -v`."
