@@ -250,6 +250,10 @@ spec:
           contentType: rpm
         - name: efi-rpm-macros-main
           contentType: rpm
+        - name: efibootmgr-main
+          contentType: rpm
+        - name: efivar-main
+          contentType: rpm
         - name: elfutils-main
           contentType: rpm
         - name: emacs-filesystem-main
@@ -674,6 +678,8 @@ spec:
           contentType: rpm
         - name: mkfontscale-main
           contentType: rpm
+        - name: mokutil-main
+          contentType: rpm
         - name: mpdecimal-main
           contentType: rpm
         - name: mpfr-main
@@ -1039,6 +1045,8 @@ spec:
         - name: rust-add-determinism-main
           contentType: rpm
         - name: rust-archery-main
+          contentType: rpm
+        - name: rust-bootupd-main
           contentType: rpm
         - name: rust-imagequant-sys-main
           contentType: rpm

@@ -1,0 +1,6 @@
+clog
+.build*.log
+*.rpm
+*.tar.*
+.build*.log
+efibootmgr-*/
