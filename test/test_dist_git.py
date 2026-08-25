@@ -1679,10 +1679,11 @@ def test_refresh_fixed_ref_pin_no_op_when_ref_unchanged(tmp_path: Path, dist_git
 def test_run_gorget_for_updated_package_no_pipeline_is_noop(tmp_path: Path, dist_git_module) -> None:
     with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=None), \
          patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget:
-        result = dist_git_module._run_gorget_for_updated_package(
+        reason, uploaded = dist_git_module._run_gorget_for_updated_package(
             'somepkg', tmp_path, '1.0', '2.0', {},
         )
-    assert result is None
+    assert reason is None
+    assert uploaded == []
     mock_gorget.assert_not_called()
 
 
@@ -1695,11 +1696,13 @@ def test_run_gorget_for_updated_package_version_templated_calls_gorget(
     _write_pipeline(pipeline_file, [{'type': 'url', 'url': 'https://example.com/x-${VERSION}.tar.gz'}])
 
     with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
-         patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget:
-        result = dist_git_module._run_gorget_for_updated_package(
+         patch.object(dist_git_module.cuv, '_run_gorget_pipeline',
+                       return_value=['x-2.0.tar.gz']) as mock_gorget:
+        reason, uploaded = dist_git_module._run_gorget_for_updated_package(
             'somepkg', package_dir, '1.0', '2.0', {},
         )
-    assert result is None
+    assert reason is None
+    assert uploaded == ['x-2.0.tar.gz']
     mock_gorget.assert_called_once_with('somepkg', '1.0', '2.0', pipeline_file)
 
 
@@ -1713,10 +1716,11 @@ def test_run_gorget_for_updated_package_version_unchanged_skips_gorget(
 
     with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
          patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget:
-        result = dist_git_module._run_gorget_for_updated_package(
+        reason, uploaded = dist_git_module._run_gorget_for_updated_package(
             'somepkg', package_dir, '1.0', '1.0', {},
         )
-    assert result is None
+    assert reason is None
+    assert uploaded == []
     mock_gorget.assert_not_called()
 
 
@@ -1731,11 +1735,12 @@ def test_run_gorget_for_updated_package_gorget_failure_returns_reason(
     with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
          patch.object(dist_git_module.cuv, '_run_gorget_pipeline',
                        side_effect=RuntimeError('boom')):
-        result = dist_git_module._run_gorget_for_updated_package(
+        reason, uploaded = dist_git_module._run_gorget_for_updated_package(
             'somepkg', package_dir, '1.0', '2.0', {},
         )
-    assert result is not None
-    assert 'boom' in result
+    assert reason is not None
+    assert 'boom' in reason
+    assert uploaded == []
 
 
 def test_run_gorget_for_updated_package_fixed_ref_drift_gcc_auto_fix(
@@ -1760,13 +1765,15 @@ def test_run_gorget_for_updated_package_fixed_ref_drift_gcc_auto_fix(
     metadata = {'version_from_ref': _GCC_VERSION_FROM_REF, 'upstream_repo': _GCC_UPSTREAM_REPO}
 
     with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
-         patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget, \
+         patch.object(dist_git_module.cuv, '_run_gorget_pipeline',
+                       return_value=['gcc-16.2.1-20260819.tar.xz']) as mock_gorget, \
          patch.object(dist_git_module.subprocess, 'run', side_effect=_fake_pin_refresh_git('20260819')):
-        result = dist_git_module._run_gorget_for_updated_package(
+        reason, uploaded = dist_git_module._run_gorget_for_updated_package(
             'gcc', package_dir, '16.2.1', '16.2.1', metadata,
         )
 
-    assert result is None
+    assert reason is None
+    assert uploaded == ['gcc-16.2.1-20260819.tar.xz']
     mock_gorget.assert_called_once_with('gcc', '16.2.1', '16.2.1-20260819', pipeline_file)
     assert '1111111111111111111111111111111111111111' in pipeline_file.read_text()
 
@@ -1786,15 +1793,82 @@ def test_run_gorget_for_updated_package_fixed_ref_drift_no_version_from_ref_need
 
     with patch.object(dist_git_module.cuv, '_load_source_pipeline', return_value=pipeline_file), \
          patch.object(dist_git_module.cuv, '_run_gorget_pipeline') as mock_gorget:
-        result = dist_git_module._run_gorget_for_updated_package(
+        reason, uploaded = dist_git_module._run_gorget_for_updated_package(
             'glibc', package_dir, '2.43', '2.43',
             {'upstream_repo': 'https://sourceware.org/git/glibc.git'},
         )
 
-    assert result is not None
-    assert 'glibc' in result
-    assert 'manually' in result
+    assert reason is not None
+    assert 'glibc' in reason
+    assert 'manually' in reason
+    assert uploaded == []
     mock_gorget.assert_not_called()
+
+
+def test_stage_package_for_commit_excludes_lookaside_sources(
+        workdir: Path, dist_git_module) -> None:
+    """Regression test for HUM-6388: a gorget-fetched (or download_new_sources
+    -fetched) source archive left in the package directory for upload to the
+    lookaside cache must never be committed, even though staging still needs
+    'git add -f' to cope with upstream dist-gits that gitignore their own
+    patches (see 66dc563797b7).
+
+    Uses the real project .gitignore (copied into workdir by the fixture),
+    which is what actually causes this: 'add -f' would otherwise bypass its
+    rpms/*/*.tar.xz etc. exclusions and let a multi-MiB tarball get committed,
+    tripping GitLab's per-blob push-size limit on every push."""
+    dist_git_module.ROOT_DIR = workdir
+    dist_git_module.RPMS_DIR = workdir / 'rpms'
+    dist_git_module.METADATA_DIR = workdir / 'metadata'
+
+    package_dir = workdir / 'rpms' / 'somepkg'
+    package_dir.mkdir()
+    (package_dir / 'somepkg.spec').write_text("Name: somepkg\n")
+    (package_dir / 'somepkg-2.0.tar.xz').write_bytes(b'\x00' * 1024)
+    (workdir / 'metadata' / 'somepkg.json').write_text('{}\n')
+
+    dist_git_module._stage_package_for_commit(
+        'somepkg', package_dir, ('metadata/somepkg.json',), ['somepkg-2.0.tar.xz'],
+    )
+
+    staged = subprocess.run(
+        ['git', 'diff', '--cached', '--name-only'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    ).stdout.splitlines()
+
+    assert 'rpms/somepkg/somepkg.spec' in staged
+    assert 'metadata/somepkg.json' in staged
+    assert 'rpms/somepkg/somepkg-2.0.tar.xz' not in staged
+    # The tarball must still exist on disk (e.g. for local inspection) --
+    # only its git tracking is excluded.
+    assert (package_dir / 'somepkg-2.0.tar.xz').exists()
+
+
+def test_stage_package_for_commit_still_force_adds_patches(
+        workdir: Path, dist_git_module) -> None:
+    """The 'findutils' case (66dc563797b7) must keep working: patch/spec
+    files that an upstream dist-git's own .gitignore hides must still be
+    force-added when they aren't in new_source_filenames."""
+    dist_git_module.ROOT_DIR = workdir
+    dist_git_module.RPMS_DIR = workdir / 'rpms'
+    dist_git_module.METADATA_DIR = workdir / 'metadata'
+
+    package_dir = workdir / 'rpms' / 'findutils'
+    package_dir.mkdir()
+    (package_dir / '.gitignore').write_text('*.patch\n')
+    (package_dir / 'own-patch.patch').write_text('diff --git a/x b/x\n')
+    (workdir / 'metadata' / 'findutils.json').write_text('{}\n')
+
+    dist_git_module._stage_package_for_commit(
+        'findutils', package_dir, ('metadata/findutils.json',), [],
+    )
+
+    staged = subprocess.run(
+        ['git', 'diff', '--cached', '--name-only'],
+        cwd=workdir, capture_output=True, text=True, check=True,
+    ).stdout.splitlines()
+
+    assert 'rpms/findutils/own-patch.patch' in staged
 
 
 def test_update_no_pipeline_file_unaffected(workdir: Path, upstream_repos: dict[str, Path]) -> None:
