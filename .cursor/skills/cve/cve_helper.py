@@ -13,6 +13,7 @@ Subcommands:
   worktree        Create an isolated git worktree for a HUM task ticket
   deps            Check Jira auth and hummingbird_cve_analysis import
   comment         Post a Jira comment via jira_client
+                  (--kind nab|fib|analysis|next-release fills wiki markup)
   next-release    Comment + cve-next-release label, leave In Progress
   set-fib         Set Fixed in Build after a Pulp NVR check
   close-nab       Comment, set VEX, close as Not a Bug
@@ -96,6 +97,12 @@ from lib.investigate import (  # noqa: E402
     search_repo_fix_mrs,
     strip_only_keyword,
 )
+from lib.comments import (  # noqa: E402
+    _add_comment_template_arguments,
+    _emit_comment_body,
+    _skip_jira_write,
+    resolve_comment_body,
+)
 
 
 # ---- CLI commands list ----
@@ -121,14 +128,6 @@ COMMANDS = (
 )
 
 
-def _comment_text(message: str, file: Path | None) -> str:
-    if file is not None:
-        return file.read_text(encoding="utf-8").rstrip() + "\n"
-    if message:
-        return message.rstrip() + "\n"
-    raise ValueError("Provide --message or --file")
-
-
 ### CLI ###
 
 
@@ -146,9 +145,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     _msg_p = argparse.ArgumentParser(add_help=False)
-    _msg_p.add_argument("-m", "--message", default="", help="Comment body.")
     _msg_p.add_argument(
-        "-f", "--file", type=Path, dest="comment_file", help="Read body from file."
+        "-m",
+        "--message",
+        default="",
+        help="Comment body, or extra notes when --kind is set.",
+    )
+    _msg_p.add_argument(
+        "-f",
+        "--file",
+        type=Path,
+        dest="comment_file",
+        help="Read body from file (overrides --kind).",
     )
 
     _show_p = argparse.ArgumentParser(add_help=False)
@@ -257,14 +265,24 @@ def build_parser() -> argparse.ArgumentParser:
         parents=[_msg_p],
         help="Post a Jira comment via hummingbird_cve_analysis.lib.jira_client.",
     )
-    comment.add_argument("tickets", nargs="+", help="HUM ticket key(s).")
+    comment.add_argument(
+        "tickets",
+        nargs="*",
+        help="HUM ticket key(s). Optional with --print-only / --json.",
+    )
+    _add_comment_template_arguments(comment)
 
     nxt = subparsers.add_parser(
         "next-release",
         parents=[_msg_p],
         help="Comment, add cve-next-release, remove cve-needs-attention.",
     )
-    nxt.add_argument("tickets", nargs="+", help="HUM ticket key(s).")
+    nxt.add_argument(
+        "tickets",
+        nargs="*",
+        help="HUM ticket key(s). Optional with --print-only / --json.",
+    )
+    _add_comment_template_arguments(nxt)
 
     fib = subparsers.add_parser(
         "set-fib", help="Set Fixed in Build after verifying the NVR exists in Pulp."
@@ -287,13 +305,18 @@ def build_parser() -> argparse.ArgumentParser:
         parents=[_msg_p],
         help="Comment, set VEX, and close as Not a Bug. Ask the user first.",
     )
-    nab.add_argument("tickets", nargs="+", help="HUM ticket key(s).")
+    nab.add_argument(
+        "tickets",
+        nargs="*",
+        help="HUM ticket key(s). Optional with --print-only / --json.",
+    )
     nab.add_argument(
         "--vex",
         required=True,
         choices=("Component not Present", "Vulnerable Code not Present"),
         help="VEX justification.",
     )
+    _add_comment_template_arguments(nab, with_vex=False)
 
     task = subparsers.add_parser(
         "create-task",
@@ -631,8 +654,15 @@ def cmd_deps(args: argparse.Namespace) -> int:
 
 
 def cmd_comment(args: argparse.Namespace) -> int:
-    body = _comment_text(args.message, args.comment_file)
-    for raw in args.tickets:
+    body = resolve_comment_body(args)
+    kind = str(getattr(args, "kind", "") or "")
+    if _skip_jira_write(args):
+        _emit_comment_body(args, body, kind)
+        return 0
+    tickets = list(args.tickets or [])
+    if not tickets:
+        raise RuntimeError("Pass HUM ticket key(s), or --print-only / --json")
+    for raw in tickets:
         ticket = normalize_hum_key(raw)
         posted = post_comment(ticket, body)
         print(
@@ -642,8 +672,15 @@ def cmd_comment(args: argparse.Namespace) -> int:
 
 
 def cmd_next_release(args: argparse.Namespace) -> int:
-    body = _comment_text(args.message, args.comment_file)
-    for raw in args.tickets:
+    body = resolve_comment_body(args, default_kind="next-release")
+    kind = str(getattr(args, "kind", "") or "") or "next-release"
+    if _skip_jira_write(args):
+        _emit_comment_body(args, body, kind)
+        return 0
+    tickets = list(args.tickets or [])
+    if not tickets:
+        raise RuntimeError("Pass HUM ticket key(s), or --print-only / --json")
+    for raw in tickets:
         ticket = normalize_hum_key(raw)
         apply_next_release(ticket, body)
         print(f"{ticket}: cve-next-release; left In Progress")
@@ -658,8 +695,15 @@ def cmd_set_fib(args: argparse.Namespace) -> int:
 
 
 def cmd_close_nab(args: argparse.Namespace) -> int:
-    body = _comment_text(args.message, args.comment_file)
-    for raw in args.tickets:
+    body = resolve_comment_body(args, default_kind="nab")
+    kind = str(getattr(args, "kind", "") or "") or "nab"
+    if _skip_jira_write(args):
+        _emit_comment_body(args, body, kind)
+        return 0
+    tickets = list(args.tickets or [])
+    if not tickets:
+        raise RuntimeError("Pass HUM ticket key(s), or --print-only / --json")
+    for raw in tickets:
         ticket = normalize_hum_key(raw)
         close_not_a_bug(ticket, body, args.vex)
         print(f"{ticket}: closed Not a Bug ({args.vex})")
