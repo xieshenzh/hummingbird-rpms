@@ -528,6 +528,8 @@ spec:
           contentType: rpm
         - name: libgit2-main
           contentType: rpm
+        - name: libgit2-1-9-main
+          contentType: rpm
         - name: libgpg-error-main
           contentType: rpm
         - name: libidn2-main

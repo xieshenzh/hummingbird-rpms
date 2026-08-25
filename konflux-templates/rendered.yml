@@ -8999,6 +8999,45 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
+# --- libgit2_1.9 ---
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    build.appstudio.openshift.io/status: '{"pac":{"state":"enabled"},"message":"done"}'
+    git-provider: gitlab
+    git-provider-url: https://gitlab.com
+    mintmaker.appstudio.redhat.com/disabled: "true"
+    test.appstudio.openshift.io/comment_strategy: disable_all
+  name: libgit2-1-9-main
+spec:
+  application: rpms-main
+  componentName: libgit2-1-9-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/libgit2-1-9-main
+  source:
+    git:
+      context: rpms/libgit2_1.9
+      revision: main
+      url: https://gitlab.com/redhat/hummingbird/rpms.git
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: ImageRepository
+metadata:
+  labels:
+    appstudio.redhat.com/application: rpms-main
+    appstudio.redhat.com/component: libgit2-1-9-main
+  name: libgit2-1-9-main
+spec:
+  image:
+    name: hummingbird-tenant/libgit2-1-9-main
+    visibility: public
+  notifications:
+  - config:
+      url: https://bombino.api.redhat.com/v1/sbom/quay/push
+    event: repo_push
+    method: webhook
+    title: SBOM-event-to-Bombino
 # --- libgpg-error ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1
