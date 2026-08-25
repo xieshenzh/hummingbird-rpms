@@ -308,7 +308,7 @@ diff --git a/test/cipherlist_test.c b/test/cipherlist_test.c
 index 9874e6bad6..76b6befbad 100644
 --- a/test/cipherlist_test.c
 +++ b/test/cipherlist_test.c
-@@ -260,7 +260,9 @@ end:
+@@ -312,7 +312,9 @@ end:
  
  int setup_tests(void)
  {
@@ -317,7 +317,6 @@ index 9874e6bad6..76b6befbad 100644
 +#endif
      ADD_TEST(test_default_cipherlist_explicit);
      ADD_TEST(test_default_cipherlist_clear);
-     ADD_TEST(test_stdname_cipherlist);
+ #ifndef OPENSSL_NO_TLS1_3
 -- 
 2.52.0
-
