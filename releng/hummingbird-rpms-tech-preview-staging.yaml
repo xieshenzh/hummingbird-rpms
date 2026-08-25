@@ -670,6 +670,8 @@ spec:
           contentType: rpm
         - name: mariadb11-8-main
           contentType: rpm
+        - name: maven3-9-main
+          contentType: rpm
         - name: mawk-main
           contentType: rpm
         - name: memcached-main

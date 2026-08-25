@@ -309,6 +309,9 @@ loki3.6:
 loki3.7:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+maven3.9:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 memcached:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
