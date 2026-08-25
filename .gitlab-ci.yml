@@ -52,8 +52,18 @@ default:
       if [ -z "$SLACK_WEBHOOK_URL" ]; then
         echo "WARNING: SLACK_WEBHOOK_URL is not set, skipping Slack notification"
       else
+        MSG="⚠️ ${CI_JOB_NAME} scheduled pipeline failed: ${CI_JOB_URL}"
+        # .ci_conflict_mrs.txt lists any MRs the job created that need manual
+        # conflict resolution (see e.g. ci/dist_git_update_multi_mr.sh); the
+        # job can still fail overall even when such MRs were created.
+        if [ -s .ci_conflict_mrs.txt ]; then
+          MSG="${MSG}\nMRs needing manual resolution:"
+          while IFS= read -r line; do
+            MSG="${MSG}\n- ${line}"
+          done < .ci_conflict_mrs.txt
+        fi
         curl -f --show-error -X POST -H 'Content-Type: application/json' \
-          --data "{\"text\": \"⚠️ ${CI_JOB_NAME} scheduled pipeline failed: ${CI_JOB_URL}\"}" \
+          --data "$(jq -n --arg text "$MSG" '{text: $text}')" \
           "$SLACK_WEBHOOK_URL"
       fi
     fi
