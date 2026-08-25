@@ -57,9 +57,12 @@ default:
         # conflict resolution (see e.g. ci/dist_git_update_multi_mr.sh); the
         # job can still fail overall even when such MRs were created.
         if [ -s .ci_conflict_mrs.txt ]; then
-          MSG="${MSG}\nMRs needing manual resolution:"
+          # $'\n' is a real newline; a plain "\n" inside double quotes is the
+          # literal two characters backslash+n, which jq would then escape as
+          # the literal text "\n" in Slack instead of a line break.
+          MSG="${MSG}"$'\n'"MRs needing manual resolution:"
           while IFS= read -r line; do
-            MSG="${MSG}\n- ${line}"
+            MSG="${MSG}"$'\n'"- ${line}"
           done < .ci_conflict_mrs.txt
         fi
         curl -f --show-error -X POST -H 'Content-Type: application/json' \
