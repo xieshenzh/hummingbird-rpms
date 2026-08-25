@@ -1,0 +1,8 @@
+{
+  "modification_status": "independent",
+  "release": "0.1",
+  "release_monitoring_project_id": 1894,
+  "track_upstream": "3.9",
+  "upstream_repo": "https://github.com/apache/maven",
+  "version": "3.9.16"
+}

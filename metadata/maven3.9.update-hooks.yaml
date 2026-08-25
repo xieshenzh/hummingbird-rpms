@@ -1,0 +1,5 @@
+# Source and vendor archive generation also refreshes the generated bundled
+# Maven Provides block in the spec file.
+download_sources: |
+  set -euo pipefail
+  ./generate-vendor.sh "${UPDATE_NEW_VERSION}"
