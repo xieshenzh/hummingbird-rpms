@@ -1,9 +1,0 @@
-{
-  "branch": "f44",
-  "modification_status": "clean",
-  "release": "1",
-  "sha": "3f5da548db4249045a5401b1c103675b86c6da94",
-  "source": "https://src.fedoraproject.org/rpms/libgit2.git",
-  "upstream_repo": "https://github.com/libgit2/libgit2",
-  "version": "1.9.7"
-}

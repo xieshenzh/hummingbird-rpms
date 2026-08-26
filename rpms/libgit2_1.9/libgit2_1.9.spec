@@ -1,13 +1,9 @@
 # libssh2 is not available on RHEL
-%if 0%{?rhel}
-%bcond_with libssh2
-%else
-%bcond_without libssh2
-%endif
+%bcond libssh2 %{undefined rhel}
 
-Name:           libgit2
+Name:           libgit2_1.9
 Version:        1.9.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        C implementation of the Git core methods as a library with a solid API
 # The main code is GPL-2.0-only WITH GCC-exception-2.0
 # The bundled PCRE implementation is BSD-3-Clause - but not used
@@ -41,22 +37,12 @@ BuildRequires:  openssl-devel
 BuildRequires:  pcre2-devel
 BuildRequires:  python3
 BuildRequires:  zlib-devel
+
 Provides:       bundled(libxdiff)
-%if 0%{?fedora} >= 37
-Obsoletes:      libgit2_0.27 < 0.27.8-4
-Obsoletes:      libgit2_0.28 < 0.28.5-9
-%endif
-%if 0%{?fedora} >= 38
-Obsoletes:      libgit2_1.3 < 1.3.2-3
-Obsoletes:      libgit2_1.4 < 1.4.6-3
-%endif
-%if 0%{?fedora} >= 41
-Obsoletes:      libgit2_1.5 < 1.5.2-7
-Obsoletes:      libgit2_1.6 < 1.6.5-3
-%endif
-%if 0%{?fedora} >= 42
-Obsoletes:      libgit2_1.7 < 1.7.2-2
-%endif
+
+# renamed in Fedora 45:
+# keep this ahead of the version of libgit2 in Fedora 44 and 43
+Obsoletes:      libgit2 < 1.9.7-2
 
 %description
 libgit2 is a portable, pure C implementation of the Git core methods
@@ -67,19 +53,13 @@ with bindings.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+
 # explicitly conflict with other libgit2 devel packages
 Conflicts:      pkgconfig(libgit2)
-%if 0%{?fedora} >= 38
-Obsoletes:      libgit2_1.3-devel < 1.3.2-3
-Obsoletes:      libgit2_1.4-devel < 1.4.6-3
-%endif
-%if 0%{?fedora} >= 41
-Obsoletes:      libgit2_1.5-devel < 1.5.2-7
-Obsoletes:      libgit2_1.6-devel < 1.6.5-3
-%endif
-%if 0%{?fedora} >= 42
-Obsoletes:      libgit2_1.7-devel < 1.7.2-2
-%endif
+
+# renamed in Fedora 45:
+# keep this ahead of the version of libgit2 in Fedora 44 and 43
+Obsoletes:      libgit2-devel < 1.9.7-2
 
 %description    devel
 This package contains libraries and header files for

@@ -526,7 +526,7 @@ spec:
           contentType: rpm
         - name: libgcrypt-main
           contentType: rpm
-        - name: libgit2-main
+        - name: libgit2-1-9-main
           contentType: rpm
         - name: libgpg-error-main
           contentType: rpm

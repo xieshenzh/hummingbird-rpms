@@ -8960,7 +8960,7 @@ spec:
     event: repo_push
     method: webhook
     title: SBOM-event-to-Bombino
-# --- libgit2 ---
+# --- libgit2_1.9 ---
 ---
 apiVersion: appstudio.redhat.com/v1alpha1
 kind: Component
@@ -8971,14 +8971,14 @@ metadata:
     git-provider-url: https://gitlab.com
     mintmaker.appstudio.redhat.com/disabled: "true"
     test.appstudio.openshift.io/comment_strategy: disable_all
-  name: libgit2-main
+  name: libgit2-1-9-main
 spec:
   application: rpms-main
-  componentName: libgit2-main
-  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/libgit2-main
+  componentName: libgit2-1-9-main
+  containerImage: quay.io/redhat-user-workloads/hummingbird-tenant/libgit2-1-9-main
   source:
     git:
-      context: rpms/libgit2
+      context: rpms/libgit2_1.9
       revision: main
       url: https://gitlab.com/redhat/hummingbird/rpms.git
 ---
@@ -8987,11 +8987,11 @@ kind: ImageRepository
 metadata:
   labels:
     appstudio.redhat.com/application: rpms-main
-    appstudio.redhat.com/component: libgit2-main
-  name: libgit2-main
+    appstudio.redhat.com/component: libgit2-1-9-main
+  name: libgit2-1-9-main
 spec:
   image:
-    name: hummingbird-tenant/libgit2-main
+    name: hummingbird-tenant/libgit2-1-9-main
     visibility: public
   notifications:
   - config:

@@ -15523,7 +15523,7 @@ spec:
     - name: git-auth
       secret:
         secretName: '{{git_auth_secret}}'
-# --- libgit2 ---
+# --- libgit2_1.9 ---
 ---
 apiVersion: tekton.dev/v1
 kind: PipelineRun
@@ -15536,13 +15536,13 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[push]"
-    pipelinesascode.tekton.dev/on-path-change: "[rpms/libgit2/***]"
+    pipelinesascode.tekton.dev/on-path-change: "[rpms/libgit2_1.9/***]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rpms-main
-    appstudio.openshift.io/component: libgit2-main
+    appstudio.openshift.io/component: libgit2-1-9-main
     pipelines.appstudio.openshift.io/type: build
-  name: libgit2-main-on-push
+  name: libgit2-1-9-main-on-push
   namespace: hummingbird-tenant
 spec:
   params:
@@ -15553,9 +15553,9 @@ spec:
     - name: purl-rpm-namespace
       value: "redhat"
     - name: ociStorage
-      value: quay.io/redhat-user-workloads/hummingbird-tenant/libgit2-main:{{revision}}
+      value: quay.io/redhat-user-workloads/hummingbird-tenant/libgit2-1-9-main:{{revision}}
     - name: package-name
-      value: libgit2
+      value: libgit2_1.9
     - name: target-branch
       value: '{{target_branch}}'
     - name: build-architectures
@@ -15567,9 +15567,9 @@ spec:
         - "linux/x86_64"
         - "linux/arm64"
     - name: specfile
-      value: "libgit2.spec"
+      value: "libgit2_1.9.spec"
     - name: monorepo-subdir
-      value: "rpms/libgit2"
+      value: "rpms/libgit2_1.9"
     - name: mock-config-template-filename-in-sources
       value: "mock/mock.cfg"
   pipelineRef:
@@ -15582,7 +15582,7 @@ spec:
       - name: bundle
         value: "quay.io/hummingbird-ci/rpmbuild-pipeline:latest@sha256:bf43eccaf6669073b4ef441555c004a7ae263a1ec027530decdba2f3714f23ae"
   taskRunTemplate:
-    serviceAccountName: build-pipeline-libgit2-main
+    serviceAccountName: build-pipeline-libgit2-1-9-main
   timeouts:
     pipeline: 4h
     tasks: 4h
