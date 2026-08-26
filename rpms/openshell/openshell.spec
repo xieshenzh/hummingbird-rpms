@@ -21,7 +21,7 @@
 
 Name:           openshell
 Version:        %{openshell_version}
-Release:        0.1%{?dist}
+Release:        0.2%{?dist}
 Summary:        Safe, sandboxed runtimes for autonomous AI agents
 
 # (MIT OR Apache-2.0) AND Unicode-3.0
@@ -150,6 +150,23 @@ export OPENSHELL_IMAGE_TAG=%{image_tag}
 # cargo-vendor.txt is consumed by an RPM generator (from cargo-rpm-macros)
 # to emit Provides: bundled(crate(...)) = version for every vendored dep.
 %cargo_vendor_manifest
+
+# cargo_vendor_manifest lists every crate in the vendor tarball (the whole
+# workspace's Cargo.lock), not just what's reachable from the binaries we
+# ship -- it reads the pre-fetched vendor sources regardless of which
+# packages/binaries the build step above actually compiled. Left unfiltered,
+# both subpackages' Provides falsely claim bundled(crate(webpki-roots))
+# even though neither binary links it (see NVIDIA/OpenShell#2324: only
+# openshell-sandbox does, and it's not part of this package). Filter to
+# the actual dependency closure of the shipped binaries before it becomes
+# license/Provides metadata.
+cargo tree -p openshell-cli -p openshell-server -e normal,build --offline --locked \
+  --prefix none --no-dedupe \
+  | sed -E 's/^([A-Za-z0-9_.+-]+) (v[0-9][^ ]*).*/\1 \2/' \
+  | sort -u > shipped-crates.txt
+grep -Fxf shipped-crates.txt cargo-vendor.txt > cargo-vendor.txt.filtered
+mv cargo-vendor.txt.filtered cargo-vendor.txt
+
 %{cargo_license_summary}
 %{cargo_license} > LICENSE.dependencies
 
