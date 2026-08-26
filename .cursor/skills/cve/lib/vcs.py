@@ -23,11 +23,14 @@ GITHUB_COMMIT_RE = re.compile(
 def ensure_glab_available() -> None:
     """Raise if the `glab`/`lab` CLI is not on PATH.
 
-    open_package_mr() below assumes glab/lab >= 0.25.1, which uses positional
-    `mr create [target_remote [target_branch]]` and `mr note [remote] <id>`
-    syntax instead of the older --source-branch/--target-branch/--head/--repo
-    flags. If a future CLI version changes this syntax again, the "unknown
-    flag" errors will surface here first.
+    open_package_mr() below assumes a `glab` CLI (verified against 1.115.0)
+    that uses explicit `--repo`/`--head`/`--source-branch`/`--target-branch`
+    flags for `mr create` (fork MRs, no local target remote checkout needed)
+    and `mr note create <id> --repo ... -m ...` for comments. Older glab/lab
+    releases used positional `mr create [target_remote [target_branch]]
+    --source fork:branch` / `mr note <remote> <id>` syntax instead; if a
+    future CLI version changes this syntax again, "unknown flag" errors will
+    surface here first.
     """
     if shutil.which("glab"):
         return
@@ -381,8 +384,10 @@ def open_package_mr(
     trigger_review: bool = True,
 ) -> str:
     ensure_glab_available()
-    fork_remote, _fork_project = detect_fork_remote(cwd=cwd)
-    target_remote = detect_target_remote(cwd=cwd)
+    fork_remote, fork_project = detect_fork_remote(cwd=cwd)
+    # Sanity-check that a remote pointing at GITLAB_RPMS_REPO exists; the
+    # actual MR create/note calls below target it by project path via --repo.
+    detect_target_remote(cwd=cwd)
     if push:
         pushed = run_command(["git", "push", "-u", fork_remote, source_branch], cwd=cwd)
         if pushed.returncode != 0:
@@ -394,15 +399,19 @@ def open_package_mr(
             "glab",
             "mr",
             "create",
-            target_remote,
+            "--repo",
+            GITLAB_RPMS_REPO,
+            "--head",
+            fork_project,
+            "--source-branch",
+            source_branch,
+            "--target-branch",
             "main",
-            "--source",
-            f"{fork_remote}:{source_branch}",
-            "-m",
+            "-t",
             title,
-            "-m",
+            "-d",
             description,
-            "--no-edit",
+            "--yes",
         ],
         cwd=cwd,
     )
@@ -431,8 +440,10 @@ def open_package_mr(
                 "glab",
                 "mr",
                 "note",
-                target_remote,
+                "create",
                 iid,
+                "--repo",
+                GITLAB_RPMS_REPO,
                 "-m",
                 "/hummingbird code-review",
             ],

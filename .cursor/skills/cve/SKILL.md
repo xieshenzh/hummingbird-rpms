@@ -37,7 +37,8 @@ Auth is the existing rhjira file (`JIRA_TOKEN`, `JIRA_SERVER` → URL,
 | `lookaside-cmd -f FILE -p PKG` | Print upload commands; do not upload |
 | `version-check PKG` | Local NVR vs CVE range / FIB / analysis NVR |
 | `upstream-fix-age` | Fix-commit date vs upstream tag/release date |
-| `release-bump PKG` | Next spec `.N` from metadata + spec; does not write |
+| `release-bump PKG` | Next spec `.N` from metadata + spec; `--apply` writes spec |
+| `log-message HUM-XXXX FILE` | Attach log/transcript file to Jira ticket |
 | `worktree HUM-YYYY` | Isolated checkout under `../worktrees/` |
 | `bot-mrs` / `sbom` / `spec-deps` / `show` | Individual probes |
 
@@ -94,10 +95,12 @@ Chat prefix `NAB`.
 (still ask first).
 
 **Version bump or backport (3d/3e):** prefer a version bump.
-`create-task --worktree`, move the agent into that worktree, then follow
+
+Then `create-task --worktree`, move the agent into that worktree, then follow
 [Rebuilding Packages](../../../documentation/operating/rebuilding-packages.md)
 and [package-metadata-fields.md](../../../documentation/operating/package-metadata-fields.md).
-`release-bump PKG` prints the next spec `.N`; do not change metadata
+`release-bump PKG` (or `release-bump PKG --apply`) prints/applies the next spec `.N`;
+do not change metadata
 `release` for a backport. Do not add `%changelog`. `lookaside-cmd` prints
 copy/upload commands and waits. `open-mr` uses `Closes:` for the **task**,
 `Ref:` for trackers, `CVE:` for IDs. Chat prefix `!${MR_IID}`.
@@ -114,11 +117,48 @@ agent is inside a worktree:
 package and fix version, use **one task and one MR** for all of them.
 Pass the first tracker to `create-task --blocks`, then link the rest
 with `rhjira edit TASK --blocks HUM-XXXX --noeditor`. Pass all tracker
-keys and CVE IDs to `open-mr --tracker` and `--cve`.
+keys and CVE IDs to `open-mr --tracker` and `--cve`. Attach conversation logs
+at the end to each tracker using `cve_helper.py log-message HUM-XXXX /path/to/log`.
 
 **No upstream fix (3f):** `next-release HUM-XXXX --package PKG` (or
 `--kind next-release` with `--cve` / `-m`). Leaves In Progress.
 Chat prefix `next-rel`.
+
+### Attaching Conversation Logs at the End
+
+Attach once your work for this ticket is done for the session (writes/MR
+sent, nothing left to do) — not after MR merge. Do it automatically, no
+need to ask:
+
+```bash
+cve_helper.py log-message HUM-XXXX /path/to/log
+```
+
+**Finding the log file by environment:**
+
+`cve_helper.py log-message` can auto-export and attach the current session
+for Claude Code, OpenCode, and Cursor directly — use these instead of
+hunting for a file path (see `lib/log.py` for the underlying format
+handling):
+
+- **Claude Code:** `cve_helper.py log-message HUM-XXXX --claude`
+  (finds the most recently modified `~/.claude/projects/<cwd>/*.jsonl`
+  session; pass an explicit `.jsonl` path as the value to target another one).
+- **OpenCode:** `cve_helper.py log-message HUM-XXXX --opencode`. There is no
+  per-session file — `~/.local/share/opencode/log/opencode.log` is one
+  shared, unbounded log across all sessions/projects and must never be
+  attached. Transcripts live in `~/.local/share/opencode/opencode.db`
+  (SQLite: `session`, `message`, `part` tables); this defaults to the most
+  recently updated session, or pass a specific `ses_...` id as the value.
+- **Cursor:** `cve_helper.py log-message HUM-XXXX --cursor`. Best-effort —
+  Cursor's on-disk chat format is undocumented and has changed across
+  releases. Defaults to the most recently updated composer session for the
+  current directory's workspace; pass a composer id as the value. If it
+  fails, omit this step rather than guessing at a manual log file.
+- **Codex:** Check `~/.codex/sessions/`, `~/.codex/logs/`, or `$CODEX_LOG`.
+- **CI / Worker Sandbox:** Use `$AGENT_LOG`, `$TRANSCRIPT_PATH`, or harness log output.
+
+If the session log file cannot be located in the current environment, omit this step.
 
 | Scenario | Resolution | VEX |
 | --- | --- | --- |
@@ -147,6 +187,10 @@ Chat prefix `next-rel`.
    `independent`.
 10. Metadata `release` follows package-metadata-fields.md; do not change
     it for FIB/advisory reasons alone.
+11. When your work on a ticket is done for the session — not waiting on
+    MR merge — attach the session log automatically:
+    `cve_helper.py log-message HUM-XXXX /path/to/log` (omit if not found,
+    no need to ask).
 
 ## Worktree cleanup
 

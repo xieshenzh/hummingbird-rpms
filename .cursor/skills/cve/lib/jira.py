@@ -62,6 +62,12 @@ _json_cache: dict[str, dict[str, Any]] = {}
 _auth_cache = None  # JiraAuth, cached after first call
 
 
+def clear_jira_auth_cache() -> None:
+    """Reset Jira auth cache (used in tests to ensure test isolation)."""
+    global _auth_cache
+    _auth_cache = None
+
+
 # ---- rhjira subprocess ----
 
 
