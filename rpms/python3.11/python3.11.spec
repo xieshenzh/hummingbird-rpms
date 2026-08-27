@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: Python-2.0.1
 
 
@@ -399,6 +399,14 @@ Patch488: 00488-cve-2026-3479.patch
 #
 # gh-90309: Base64-encode cookie values embedded in JS
 Patch489: 00489-cve-2026-6019.patch
+
+# 00495 # 1f9958f909c1b41a4ffc0b613ef8ec8fa5e7c474
+# CVE-2026-3446
+#
+# gh-145264: Do not ignore excess Base64 data after the first padded quad
+#
+# (cherry-picked from commit 1f9958f909c1b41a4ffc0b613ef8ec8fa5e7c474)
+Patch495: 00495-cve-2026-3446.patch
 
 # (New patches go here ^^^)
 #
