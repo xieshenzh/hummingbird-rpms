@@ -387,7 +387,7 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
     # Create a new branch from START_COMMIT (before updates) and cherry-pick this commit
     if ! git checkout --quiet "${START_COMMIT}"; then
         echo "  ✗ Failed to checkout starting commit"
-        PACKAGES_FAILED=$((PACKAGES_FAILED + 1))
+        MR_FAILURES=$((MR_FAILURES + 1))
         FAILED_PACKAGES+=("${PACKAGE} (checkout failed)")
         continue
     fi
@@ -397,7 +397,7 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
 
     if ! git checkout -b "${BRANCH_NAME}" 2>/dev/null; then
         echo "  ✗ Failed to create branch ${BRANCH_NAME}"
-        PACKAGES_FAILED=$((PACKAGES_FAILED + 1))
+        MR_FAILURES=$((MR_FAILURES + 1))
         FAILED_PACKAGES+=("${PACKAGE} (branch creation failed)")
         continue
     fi
@@ -405,7 +405,7 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
     # Cherry-pick the specific commit
     if ! git cherry-pick "${COMMIT_SHA}" >/dev/null 2>&1; then
         echo "  ✗ Failed to cherry-pick commit for ${PACKAGE}"
-        PACKAGES_FAILED=$((PACKAGES_FAILED + 1))
+        MR_FAILURES=$((MR_FAILURES + 1))
         FAILED_PACKAGES+=("${PACKAGE} (cherry-pick failed)")
         git cherry-pick --abort 2>/dev/null || true
         continue
@@ -470,7 +470,13 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
 
         # Prefer the real MR URL (with MR number) reported by create_mr.sh; fall
         # back to a source_branch search link if one wasn't found in its output.
-        MR_URL=$(echo "${MR_OUTPUT}" | grep -o "https://[^[:space:]]*merge_requests/[0-9]*" | head -1)
+        # NOTE: `|| true` is required. Under `set -o pipefail`, grep exiting 1 (no
+        # match) makes the whole pipeline return non-zero, which `set -e` would
+        # treat as a fatal error and abort the job mid-loop (before the summary
+        # ever prints). No match is expected whenever an MR already exists, since
+        # create_mr.sh then emits a `?source_branch=` search link rather than a
+        # numbered `merge_requests/<id>` URL.
+        MR_URL=$(echo "${MR_OUTPUT}" | grep -o "https://[^[:space:]]*merge_requests/[0-9]*" | head -1 || true)
         if [[ -z "${MR_URL}" && -n "${GITLAB_HOST:-}" && -n "${GITLAB_PROJECT:-}" ]]; then
             MR_URL="https://${GITLAB_HOST}/${GITLAB_PROJECT}/-/merge_requests?source_branch=${BRANCH_NAME}"
         fi
