@@ -10,7 +10,7 @@ aliases: [/l/gpg-source-verification]
 Some packages verify the authenticity of their upstream source tarball with a detached OpenPGP
 signature where upstream signs each release with a private key and publishes a `.asc`/`.sig` alongside
 the tarball. During source fetching, the
-[gorget source-pipeline tool](../design/source-pipeline-tool.md) checks that signature against the
+[gorget source-pipeline tool][source-pipeline-tool] checks that signature against the
 project's **public** key before the bytes are ever used in a build.
 
 The trusted public keys live centrally in **`metadata/gpg-keys/<project>.gpg`**, one keyring file
@@ -132,3 +132,5 @@ just files in one directory, rotation is a single commit:
 - **`BAD signature`** — the tarball does not match the signature. Do **not** paper over this. It
   means a corrupted download or, in the worst case, tampering. Re-fetch from the canonical source and
   if it persists, escalate rather than accepting the artifact.
+
+[source-pipeline-tool]: https://hummingbird-project.io/l/source-pipeline-tool

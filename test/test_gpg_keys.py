@@ -4,7 +4,7 @@ Packages that verify their upstream source with gorget's
 ``verify: [{type: gpg-signature}]`` step point at a keyring stored centrally
 under ``metadata/gpg-keys/<project>.gpg`` (passed to gorget as
 ``--gpg-keys-dir``; see ci/check_upstream_versions.py and
-documentation/design/source-pipeline-tool.md). Centralizing the keys makes the
+documentation/background/source-pipeline-tool.md). Centralizing the keys makes the
 full set of trusted signers auditable in one place, but only if every file
 there really is a usable public key and every pipeline that names a keyring
 actually finds it. These tests enforce both.
