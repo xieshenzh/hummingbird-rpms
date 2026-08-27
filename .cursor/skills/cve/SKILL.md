@@ -49,7 +49,8 @@ loads `~/.config/rhjira/agent.env`. Do not paste retry loops.
 1. **Embargo.** If the summary starts with `EMBARGOED`, stop. Do not
    analyze or write.
 2. **Investigate.** `cve_helper.py investigate HUM-XXXX` (add `only` if
-   the user said only those keys). Bare numbers are HUM tickets.
+   the user said only those keys). Bare numbers are HUM tickets. Call
+   `rename_chat` with the printed `Suggested chat title`.
 3. **Read the recap.** It leads with assignee (user vs bot), labels, and
    FIB. User-named tickets are in-scope. Discovered same-CVE siblings
    are context until the user says so. A "Yes please" on the named set
@@ -60,7 +61,10 @@ loads `~/.config/rhjira/agent.env`. Do not paste retry loops.
    FIB is set with no task/MR, ask whether to create the task.
 4. **Wait** for the user's Step 3 direction.
 5. **Act** with the matching helper (below). Comment before state
-   changes. Ask before any close.
+   changes. Ask before any close. After acting, call `rename_chat` again
+   with the resolution's **Chat prefix** (below) prepended — get the
+   exact string via
+   `cve_helper.py show HUM-XXXX --title-only --title-prefix "<prefix>"`.
 
 For product-mismatch CVEs, run `spec-deps` before version comparison or
 SBOM. If the component is not in the spec, treat an SBOM hit as a false
