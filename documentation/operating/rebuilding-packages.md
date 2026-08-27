@@ -579,4 +579,4 @@ Built RPMs will be in `builds/<package>/RPMS/`.
 - [Excluding Packages from Images][exclude] - temporarily block faulty packages in container builds
 
 [exclude]: https://hummingbird-project.io/l/excluding-packages-from-images
-[sharp-edge]: ../design/source-pipeline-tool.md#known-sharp-edge-patch-list-duplication
+[sharp-edge]: https://hummingbird-project.io/l/source-pipeline-tool#known-sharp-edge-patch-list-duplication

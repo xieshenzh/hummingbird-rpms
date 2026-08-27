@@ -8,7 +8,7 @@ documentation/operating/rebuilding-packages.md) is never automatically
 reflected in the pipeline YAML.
 
 This silently broke grafana12.4 and grafana13.1 (see
-documentation/design/source-pipeline-tool.md's "Known sharp edge"
+documentation/background/source-pipeline-tool.md's "Known sharp edge"
 section for the full incident writeup).
 """
 
@@ -151,5 +151,5 @@ def test_transform_patches_cover_files_they_touch(package: str) -> None:
         f"(e.g. yarn.lock, pnpm-lock.yaml, go.sum) -- otherwise the generated artifact "
         f"silently goes stale relative to what %build actually applies. Add the missing "
         f"patch(es) to the `run:` transform step in the same relative order as their "
-        f"PatchN declaration. See documentation/design/source-pipeline-tool.md."
+        f"PatchN declaration. See documentation/background/source-pipeline-tool.md."
     )

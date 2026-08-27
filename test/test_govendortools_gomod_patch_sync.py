@@ -10,7 +10,7 @@ vendor/modules.txt in the generated vendor archive can end up requiring
 different versions of the same package, which `go build -mod=vendor` rejects
 as inconsistent vendoring.
 
-This silently broke trivy (see documentation/design/source-pipeline-tool.md's
+This silently broke trivy (see documentation/background/source-pipeline-tool.md's
 "Known sharp edge" section for the full incident writeup).
 
 This is a different invariant from test_source_pipeline_patches.py (which

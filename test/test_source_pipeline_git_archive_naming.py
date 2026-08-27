@@ -151,5 +151,5 @@ def test_git_fetch_fixed_ref_matches_spec(package: str) -> None:
         f"even though the spec has a custom %setup/%autosetup -n override. "
         f"That override and the pipeline's `ref:` have drifted apart -- "
         f"update the spec and the pipeline's `ref:` together. See "
-        f"documentation/design/source-pipeline-tool.md."
+        f"documentation/background/source-pipeline-tool.md."
     )

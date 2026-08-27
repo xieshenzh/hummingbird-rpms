@@ -21,7 +21,7 @@ as go-vendor-tools/syft/cosign/etc.) runs to fetch, transform, verify,
 and emit source artifacts, which are then uploaded to the lookaside
 cache in place of the download_sources phase. Pass --skip-pipeline to
 force the legacy hook/default path even when a source-pipeline
-definition exists. See documentation/design/source-pipeline-tool.md for
+definition exists. See documentation/background/source-pipeline-tool.md for
 background on gorget; the pipeline YAML schema itself is defined by
 gorget's own src/gorget/config/schema.py
 (github.com/gorget-project/gorget), which has drifted ahead of the
@@ -564,7 +564,7 @@ def _load_source_pipeline(package: str) -> Optional[Path]:
     A source-pipeline definition takes priority over both
     metadata/<package>.update-hooks.yaml and the generic default source
     download path (see gorget's CLI interface,
-    documentation/design/source-pipeline-tool.md).
+    documentation/background/source-pipeline-tool.md).
     """
     pipeline_file = METADATA_DIR / f"{package}.source-pipeline.yaml"
     return pipeline_file if pipeline_file.is_file() else None

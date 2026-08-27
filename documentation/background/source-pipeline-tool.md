@@ -3,6 +3,7 @@ title: Source Pipeline Tool
 status: Draft
 authors: Scott Hebert
 date: 2026-07-16
+aliases: [/l/source-pipeline-tool]
 related:
   - "[HUM-793] Upstream Release Trust Verification"
   - "[HUM-4619] Independent Source Tarball Generation"
