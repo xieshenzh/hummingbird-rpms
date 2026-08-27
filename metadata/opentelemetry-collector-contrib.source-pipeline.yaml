@@ -42,6 +42,13 @@ transform:
         # upstream's own go.mod requires >= 1.13.0.
         pushd _build
         go get github.com/rabbitmq/amqp091-go@v1.13.0
+        # HUM-6526 CI: the buildroot's golang provides go1.27, but the vendored
+        # cockroachdb/swiss (as of upstream commit b0f6560f979b) gates its
+        # runtime shim (hashFn/getRuntimeHasher/fastrand64) behind a `!go1.27`
+        # build tag, so those symbols go undefined and %build fails on every
+        # arch. Pin to the upstream commit that added go1.27 support. Drop
+        # this once OCB's manifest naturally resolves >= this commit.
+        go get github.com/cockroachdb/swiss@v0.0.0-20260820225851-aa852fb3c14e
         go mod tidy
         popd
 
@@ -63,18 +70,23 @@ transform:
     modules:
       - path: "opentelemetry-collector-releases-${VERSION}/_build"
 
-# Same-version regeneration for CVE-2026-79921 (forced amqp091-go >= 1.13.0,
-# see the `go get`/`go mod tidy` lines in the transform step above) changes
-# both the generated and vendor archive checksums while keeping the 0.159.0
-# filenames, so gorget needs accepted-checksums exceptions for the new hashes.
+# Same-version regeneration for CVE-2026-79921 (forced amqp091-go >= 1.13.0)
+# and the cockroachdb/swiss go1.27 build-tag fix (both `go get`/`go mod tidy`
+# lines in the transform step above) changes both the generated and vendor
+# archive checksums while keeping the 0.159.0 filenames, so gorget needs
+# accepted-checksums exceptions for the new hashes.
 accepted-checksums:
   - file: "opentelemetry-collector-contrib-0.159.0-generated.tar.bz2"
-    checksum: "18f148e1537d3d48044f28e0b8f0f4b8be6384ec835c9e61d0ba5a4f210214d37f3a349e10468c7f11283bab3dc52c2885e41d8092ffabef099ca6df97cf9a7e"
+    checksum: "5cae0f95d1caebcaa254afefd82882f33a1941cb6c53dcb1768fb74bddca7a48e3247c9544b67d015e4de52574c0969929fca98eaf05a94f57aeaef6c9d084ed"
     reason: "CVE-2026-79921: forced amqp091-go v1.12.0 -> v1.13.0 in _build/go.mod
-      and go.sum before tarring the generated sources (HUM-6504/HUM-6526)."
+      and go.sum; also forced cockroachdb/swiss to the upstream commit that
+      added go1.27 support (map.go referenced hashFn/getRuntimeHasher/
+      fastrand64 from a runtime shim gated behind `!go1.27`, which the
+      buildroot's golang no longer satisfies) before tarring the generated
+      sources (HUM-6504/HUM-6526)."
 
   - file: "opentelemetry-collector-contrib-0.159.0-vendor.tar.bz2"
-    checksum: "05d18e11799d9fa431584aa1387c0c01014adeda812e82dec2aad6dad3a909ef2c8150581a99d52095bf7bb9dc394c07c418eda25b9c964e7593872cfd8e9248"
+    checksum: "6bd1e094b306c0d3ef4f44082790d2c62a228e79e26f26a5eebb36876212b765e0e750dd8a841966b278260fa77edfdd2610b64be2175fb9a105603f3aa7f3fa"
     reason: "CVE-2026-79921: vendor archive regenerated against the amqp091-go
-      v1.13.0 bump above, vendoring the fixed release instead of v1.12.0
-      (HUM-6504/HUM-6526)."
+      v1.13.0 and cockroachdb/swiss go1.27-support bumps above (HUM-6504/
+      HUM-6526)."
