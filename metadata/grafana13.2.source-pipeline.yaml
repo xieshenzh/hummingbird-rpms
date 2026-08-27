@@ -17,6 +17,10 @@ transform:
         set -euo pipefail
         patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache.patch"
         patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache-compression.patch"
+        # CVE-2026-76172, CVE-2026-75975, CVE-2026-75931, CVE-2026-75899: bump
+        # vendored fast-uri to 3.1.6. Must be applied here too, or the offline
+        # yarn cache this step generates goes stale on the next version bump.
+        patch -p1 < "${PACKAGE_DIR}/grafana-fast-uri-3.1.6.patch"
         if [ -n "${HTTP_PROXY-}" ]; then export YARN_HTTP_PROXY="${HTTP_PROXY-}"; fi
         if [ -n "${HTTPS_PROXY-}" ]; then export YARN_HTTPS_PROXY="${HTTPS_PROXY-}"; fi
         # Unlike grafana12.4, 13.2's yarn.lock has no Cypress dependency to
