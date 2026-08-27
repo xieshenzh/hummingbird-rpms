@@ -1,9 +1,9 @@
 {
   "branch": "rawhide",
   "modification_status": "clean",
-  "release": "3",
-  "sha": "56a72e6b42aa2acc553f1a3fcdade1a94f191d15",
+  "release": "1",
+  "sha": "f7a54473db0437cf0953cc60c278d2ed154fcd4a",
   "source": "https://src.fedoraproject.org/rpms/elfutils.git",
   "upstream_repo": "https://sourceware.org/git/elfutils.git",
-  "version": "0.195"
+  "version": "0.196"
 }
