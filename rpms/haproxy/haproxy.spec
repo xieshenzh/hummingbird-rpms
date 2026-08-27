@@ -2,7 +2,7 @@
 
 Summary:        Reliable, high-performance TCP/HTTP load-balancing reverse proxy
 Name:           haproxy
-Version:        3.0.26
+Version:        3.0.27
 Release:        0.1%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
 URL:            https://www.haproxy.org/
