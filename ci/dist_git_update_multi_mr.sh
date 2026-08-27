@@ -21,7 +21,11 @@
 #                           - Set to true to pass --skip-build-check to dist_git.py update
 #   GITLAB_REMOTE_URL        - GitLab repo URL (default: https://gitlab.com/redhat/hummingbird/rpms.git)
 
-set -euo pipefail
+set -Eeuo pipefail
+
+# Report the failing command/line before exiting so the next occurrence is
+# diagnosable from the job log alone.
+trap 'echo "ERROR: \"${BASH_COMMAND}\" failed with exit code $? at ${BASH_SOURCE[0]}:${LINENO}" >&2' ERR
 
 # Parse arguments
 CLONE_MODE=false
