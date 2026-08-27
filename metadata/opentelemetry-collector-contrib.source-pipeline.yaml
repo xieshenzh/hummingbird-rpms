@@ -34,11 +34,27 @@ transform:
 
         "/tmp/ocb-${VERSION}" --skip-compilation --config distributions/otelcol-contrib/manifest.yaml
 
+        # CVE-2026-79921: rabbitmqexporter/internal/rabbitmq still require
+        # amqp091-go < 1.13.0 as of this writing, so OCB's generated go.mod
+        # resolves to the vulnerable v1.12.0 via MVS. Force the floor up to
+        # the fixed release here, before go.mod/go.sum are tarred and handed
+        # to the vendor step, so both stay consistent. Drop this once
+        # upstream's own go.mod requires >= 1.13.0.
+        pushd _build
+        go get github.com/rabbitmq/amqp091-go@v1.13.0
+        go mod tidy
+        popd
+
         generated_files=(go.mod go.sum)
         while IFS= read -r f; do
           generated_files+=("$f")
         done < <(find _build -maxdepth 1 -name '*.go' -printf '%P\n' | sort)
-        tar -C _build -cjf "opentelemetry-collector-contrib-${VERSION}-generated.tar.bz2" "${generated_files[@]}"
+        # --sort/--mtime/--owner/--group/--numeric-owner: go.mod/go.sum/*.go are
+        # freshly written by OCB above, so a plain tar picks up wall-clock mtimes
+        # and produces a different checksum on every run even with identical
+        # content -- pin these so the archive is reproducible.
+        tar --sort=name --mtime='@0' --owner=0 --group=0 --numeric-owner \
+          -C _build -cjf "opentelemetry-collector-contrib-${VERSION}-generated.tar.bz2" "${generated_files[@]}"
     outputs:
       - "opentelemetry-collector-contrib-${VERSION}-generated.tar.bz2"
   - type: vendor
@@ -46,3 +62,19 @@ transform:
     archive_name: "opentelemetry-collector-contrib-${VERSION}-vendor.tar.bz2"
     modules:
       - path: "opentelemetry-collector-releases-${VERSION}/_build"
+
+# Same-version regeneration for CVE-2026-79921 (forced amqp091-go >= 1.13.0,
+# see the `go get`/`go mod tidy` lines in the transform step above) changes
+# both the generated and vendor archive checksums while keeping the 0.159.0
+# filenames, so gorget needs accepted-checksums exceptions for the new hashes.
+accepted-checksums:
+  - file: "opentelemetry-collector-contrib-0.159.0-generated.tar.bz2"
+    checksum: "18f148e1537d3d48044f28e0b8f0f4b8be6384ec835c9e61d0ba5a4f210214d37f3a349e10468c7f11283bab3dc52c2885e41d8092ffabef099ca6df97cf9a7e"
+    reason: "CVE-2026-79921: forced amqp091-go v1.12.0 -> v1.13.0 in _build/go.mod
+      and go.sum before tarring the generated sources (HUM-6504/HUM-6526)."
+
+  - file: "opentelemetry-collector-contrib-0.159.0-vendor.tar.bz2"
+    checksum: "05d18e11799d9fa431584aa1387c0c01014adeda812e82dec2aad6dad3a909ef2c8150581a99d52095bf7bb9dc394c07c418eda25b9c964e7593872cfd8e9248"
+    reason: "CVE-2026-79921: vendor archive regenerated against the amqp091-go
+      v1.13.0 bump above, vendoring the fixed release instead of v1.12.0
+      (HUM-6504/HUM-6526)."
