@@ -4,7 +4,7 @@
 # https://github.com/nats-io/nats-server
 %global goipath         github.com/nats-io/nats-server/v2
 %global forgeurl        https://github.com/nats-io/nats-server
-Version:                2.14.5
+Version:                2.14.6
 
 %gometa -L -f
 
