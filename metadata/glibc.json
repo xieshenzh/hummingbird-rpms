@@ -1,6 +1,6 @@
 {
   "branch": "f44",
-  "modification_reason": "Backport upstream fixes for CVE-2026-19542 (tdelete) and CVE-2026-19499 (strfmon right-justification)",
+  "modification_reason": "Backport upstream fixes for tdelete OOB write (CVE-2026-19542), strfmon right-justification overflow (CVE-2026-19499), SHIFT_JISX0213 pending-char DoS (CVE-2026-77117), and EUC_JISX0213 pending-char DoS (CVE-2026-80489)",
   "modification_status": "modified",
   "release": "8",
   "sha": "35dbb287f9fb06e287a9c703eb9da8ff63399aa6",
