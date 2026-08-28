@@ -4,6 +4,10 @@ post_commands = [
   ["cp", "-p", "vendor/github.com/mattn/go-localereader/README.md", "vendor/github.com/mattn/go-localereader/LICENSE"],
 ]
 
+[archive.dependency_overrides]
+# CVE-2026-73501
+"github.com/getkin/kin-openapi" = "v0.147.0"
+
 [licensing]
 detector = "askalono"
 exclude_files = ["vendor/modernc.org/memory/LICENSE-LOGO"]
