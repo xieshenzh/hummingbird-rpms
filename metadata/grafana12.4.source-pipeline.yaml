@@ -60,6 +60,12 @@ transform:
 # go.mod/go.sum/go.work alongside vendor/, which changes this archive's own
 # checksum without changing any dependency's resolved version or content.
 accepted-checksums:
+  - file: "grafana-yarn-cache-12.4.9.tar.bz2"
+    checksum: "a11fdff03b7f86d7e6b35439ec85b6ee647604c5efbcd800128b0e28a22236c694903702f28ffc4c703f92eef128ce93023e10f942ddb2482160f024df386277"
+    reason: "grafana-fast-uri-cve.patch bumps fast-uri 3.1.5->3.1.6 for CVE-2026-76172/75975/75931/75899; yarn cache regenerated to include the patched dependency"
+  - file: "grafana-12.4.9-vendor.tar.bz2"
+    checksum: "1d8c2c168abee1d5e4e028c487fb773df94053aa9b0a243d4d1290c1c2476bf24ebbdc7528189e00f930695c724be79c26f91f78d6c0544ba3678068cd9c8ab7"
+    reason: "go-vendor-tools.toml dependency_overrides bumps github.com/getkin/kin-openapi to v0.147.0 for CVE-2026-73501; vendor archive regenerated to include the patched dependency (also drops the now-unused woodsbury/decimal128, dropping 0BSD from the License tag)"
   - file: "grafana-12.4.9-vendor.tar.bz2"
     checksum: "1417dec255c3009116e00711783ebc2b08c7a0331989de64b108ff67bf9ceb013bf6b75af45afa679695997b0505d2538aecdc64413badd36df9c429c0fe4a5d"
     reason: "gorget 0.1.18 normalizes uid/gid/uname/gname in generated archives; dependency content is unchanged"
