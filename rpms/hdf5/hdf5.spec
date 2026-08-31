@@ -10,7 +10,7 @@
 
 Name: hdf5
 Version: 2.2.0
-Release: 0.1%{?dist}
+Release: 0.1.1%{?dist}
 Summary: A general purpose library and file format for storing scientific data
 License: BSD-3-Clause
 URL: https://www.hdfgroup.org/solutions/hdf5/
@@ -29,6 +29,9 @@ Patch: hdf5-wrappers.patch
 Patch: hdf5-jarname.patch
 # Fix Fortran module directory
 Patch: hdf5-fmoddir.patch
+# Reject chunked datasets with mismatched chunk/dataspace rank at open time
+# https://github.com/HDFGroup/hdf5/pull/6508
+Patch: hdf5-CVE-2026-19025.patch
 
 BuildRequires: cmake
 BuildRequires: gcc-gfortran
