@@ -72,6 +72,7 @@ from lib.spec import (  # noqa: E402
     probe_spec_deps,
     print_spec_deps,
     release_bump_payload,
+    apply_release_bump,
     version_check_payload,
 )
 from lib.vcs import (  # noqa: E402
@@ -93,12 +94,14 @@ from lib.output import (  # noqa: E402
 )
 from lib.investigate import (  # noqa: E402
     gather_ticket_reports,
+    log_message,
     recap_lines,
     resolution_hint_for_report,
     search_repo_fix_mrs,
     strip_only_keyword,
     ticket_has_task_or_mr,
 )
+from lib.log import export_agent_log  # noqa: E402
 from lib.comments import (  # noqa: E402
     _add_comment_template_arguments,
     _emit_comment_body,
@@ -127,6 +130,7 @@ COMMANDS = (
     "version-check",
     "upstream-fix-age",
     "release-bump",
+    "log-message",
 )
 
 
@@ -464,9 +468,67 @@ def build_parser() -> argparse.ArgumentParser:
     rbump = subparsers.add_parser(
         "release-bump",
         parents=[_json_p],
-        help="Print the next spec .N from metadata + spec. Does not write files.",
+        help="Print or apply the next spec .N from metadata + spec.",
     )
     rbump.add_argument("package", help="SRPM package name.")
+    rbump.add_argument(
+        "--apply",
+        action="store_true",
+        help="Write the bumped Release: line into rpms/<pkg>/<pkg>.spec.",
+    )
+
+    log_cmd = subparsers.add_parser(
+        "log-message",
+        help="Attach a log or transcript file to a Jira ticket.",
+    )
+    log_cmd.add_argument("ticket", help="HUM ticket key (e.g. HUM-6378).")
+    log_cmd.add_argument(
+        "file",
+        type=Path,
+        nargs="?",
+        default=None,
+        help="Path to log file (e.g. /path/to/transcript.md). Omit and use "
+        "--opencode/--claude/--cursor to auto-export a session instead.",
+    )
+    agent_group = log_cmd.add_mutually_exclusive_group()
+    agent_group.add_argument(
+        "--opencode",
+        nargs="?",
+        const="",
+        default=None,
+        metavar="SESSION_ID",
+        help="Export an OpenCode session transcript from "
+        "~/.local/share/opencode/opencode.db and attach that instead of "
+        "FILE. Defaults to the most recently updated session; pass a "
+        "specific `ses_...` id to target another one.",
+    )
+    agent_group.add_argument(
+        "--claude",
+        nargs="?",
+        const="",
+        default=None,
+        metavar="JSONL_PATH",
+        help="Export a Claude Code session transcript from "
+        "~/.claude/projects/<cwd>/*.jsonl and attach that instead of FILE. "
+        "Defaults to the most recently modified session for the current "
+        "directory; pass an explicit .jsonl path to target another one.",
+    )
+    agent_group.add_argument(
+        "--cursor",
+        nargs="?",
+        const="",
+        default=None,
+        metavar="COMPOSER_ID",
+        help="Export a Cursor chat/composer session and attach that instead "
+        "of FILE. Best-effort: Cursor's storage format is undocumented and "
+        "may not work on every version. Defaults to the most recently "
+        "updated composer for the current directory's workspace.",
+    )
+    log_cmd.add_argument(
+        "--print-only",
+        action="store_true",
+        help="Check log file without attaching to Jira.",
+    )
 
     return parser
 
@@ -973,7 +1035,10 @@ def cmd_upstream_fix_age(args: argparse.Namespace) -> int:
 
 
 def cmd_release_bump(args: argparse.Namespace) -> int:
-    payload = release_bump_payload(args.package)
+    if getattr(args, "apply", False):
+        payload = apply_release_bump(args.package)
+    else:
+        payload = release_bump_payload(args.package)
     if args.json:
         print(json.dumps(payload, indent=2, sort_keys=True))
         return 0
@@ -982,9 +1047,43 @@ def cmd_release_bump(args: argparse.Namespace) -> int:
     print(f"metadata_release: {payload['metadata_release'] or '(unset)'}")
     print(f"spec_release: {payload['spec_release'] or '(none)'}")
     print(f"proposed_spec_release: {payload['proposed_spec_release'] or '(n/a)'}")
-    print("writes: no")
+    print(f"writes: {'yes' if payload.get('writes') else 'no'}")
     print(f"hint: {payload['hint']}")
     print(payload["note"])
+    return 0
+
+
+def cmd_log_message(args: argparse.Namespace) -> int:
+    file_path = args.file
+    agent_values = {
+        "opencode": args.opencode,
+        "claude": args.claude,
+        "cursor": args.cursor,
+    }
+    selected = {name: val for name, val in agent_values.items() if val is not None}
+    if selected:
+        if file_path is not None:
+            names = "/".join(f"--{n}" for n in selected)
+            print(f"error: pass either FILE or {names}, not both", file=sys.stderr)
+            return 2
+        (agent, session_id), = selected.items()
+        file_path = export_agent_log(agent, session_id or None)
+        print(f"Exported {agent} session -> {file_path}")
+    elif file_path is None:
+        print(
+            "error: FILE or one of --opencode/--claude/--cursor is required",
+            file=sys.stderr,
+        )
+        return 2
+
+    target_file, msg = log_message(
+        ticket=args.ticket,
+        file_path=file_path,
+        print_only=args.print_only,
+    )
+    print(f"Log: {target_file}")
+    if not args.print_only:
+        print(msg)
     return 0
 
 
@@ -1014,6 +1113,7 @@ def main(argv: list[str] | None = None) -> int:
         "version-check": cmd_version_check,
         "upstream-fix-age": cmd_upstream_fix_age,
         "release-bump": cmd_release_bump,
+        "log-message": cmd_log_message,
     }
     return handlers[args.command](args)
 

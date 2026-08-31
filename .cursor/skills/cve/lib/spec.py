@@ -415,3 +415,33 @@ def release_bump_payload(package: str) -> dict[str, Any]:
             "only the spec Release: line gets the .N suffix."
         ),
     }
+
+
+def apply_release_bump(package: str) -> dict[str, Any]:
+    """Calculate and write the bumped Release line into the spec file."""
+    payload = release_bump_payload(package)
+    proposed = payload.get("proposed_spec_release")
+    if not proposed or payload.get("uses_autorelease"):
+        return payload
+    spec_path = _pkg_dir(package) / f"{package}.spec"
+    if not spec_path.is_file():
+        return payload
+    text = spec_path.read_text(encoding="utf-8")
+
+    def replace_release(m: re.Match) -> str:
+        line = m.group(0)
+        pct_idx = line.find("%")
+        if pct_idx != -1:
+            dist_part = line[pct_idx:]
+            return f"Release:        {proposed}{dist_part}"
+        return f"Release:        {proposed}"
+
+    new_text, count = re.subn(
+        r"^Release:\s*.+$", replace_release, text, count=1, flags=re.MULTILINE | re.IGNORECASE
+    )
+    if count:
+        spec_path.write_text(new_text, encoding="utf-8")
+        payload["writes"] = True
+        payload["hint"] = f"updated {spec_path.name} Release to {proposed}"
+    return payload
+

@@ -1,9 +1,14 @@
 import os
 import sys
 import urllib.error
+from pathlib import Path
 from typing import Any, Literal
 
-from lib.models import TicketReport, GatheredTickets, GITLAB_RPMS_REPO
+from lib.models import (
+    TicketReport,
+    GatheredTickets,
+    GITLAB_RPMS_REPO,
+)
 from lib.utils import normalize_hum_key
 from lib.jira import (
     ensure_rhjira_available,
@@ -12,6 +17,7 @@ from lib.jira import (
     find_related_tickets,
     batch_fetch_tickets,
     inspect_linked_tickets,
+    run_rhjira,
 )
 
 from cve_analysis_bridge import AnalysisImportError, gitlab_client_module
@@ -220,3 +226,39 @@ def recap_lines(gathered: GatheredTickets) -> list[str]:
             'A "Yes please" on the named set is not approval for discovered siblings.'
         )
     return lines
+
+
+# ---- Log / Transcript Attachment ----
+
+
+def attach_file(ticket: str, file_path: Path) -> str:
+    """Attach a log or transcript file to a Jira ticket."""
+    ticket = normalize_hum_key(ticket)
+    if not file_path.is_file():
+        raise ValueError(f"File not found: {file_path}")
+
+    result = run_rhjira(["attach", ticket, str(file_path)])
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Failed to attach {file_path} to {ticket}: "
+            f"{result.stderr or result.stdout or 'unknown error'}"
+        )
+    return f"Attached {file_path.name} to {ticket}"
+
+
+def log_message(
+    ticket: str,
+    file_path: Path,
+    *,
+    print_only: bool = False,
+) -> tuple[Path, str]:
+    """Attach an existing log or transcript file to a Jira ticket."""
+    ticket = normalize_hum_key(ticket)
+    if not file_path.is_file():
+        raise ValueError(f"Log file not found: {file_path}")
+
+    if print_only:
+        return file_path, f"Found {file_path} (print-only, not uploaded)"
+
+    msg = attach_file(ticket, file_path)
+    return file_path, msg
