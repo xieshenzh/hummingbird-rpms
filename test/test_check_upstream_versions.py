@@ -347,14 +347,27 @@ def test_mark_package_modified_preserves_independent(cuv_module, workdir: Path) 
                               'modification_status': 'independent'})
     cuv_module.METADATA_DIR = workdir / 'metadata'
     cuv_module.mark_package_modified('pkg', 'Update to upstream version 2.0',
-                                     version='2.0', release='1')
+                                     version='2.0')
 
     with open(workdir / 'metadata' / 'pkg.json') as f:
         data = json.load(f)
     assert data['modification_status'] == 'independent'
     assert 'modification_reason' not in data
     assert data['version'] == '2.0'
-    assert data['release'] == '1'
+    assert 'release' not in data
+
+
+def test_mark_package_modified_removes_fedora_release(cuv_module, workdir: Path) -> None:
+    """Removes the Fedora release after an upstream version bump."""
+    _create_package(workdir, 'pkg', '1.0', metadata={
+        'version': '1.0', 'release': '1', 'source': 'https://example.com',
+    })
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    cuv_module.mark_package_modified('pkg', 'Update to upstream version 2.0', version='2.0')
+
+    data = json.loads((workdir / 'metadata' / 'pkg.json').read_text())
+    assert data['version'] == '2.0'
+    assert 'release' not in data
 
 
 def test_mark_package_modified_no_metadata(cuv_module, workdir: Path) -> None:
@@ -1795,7 +1808,11 @@ def test_update_spec_version(cuv_module, workdir: Path) -> None:
     """Updates spec version, downloads sources, marks modified."""
     _create_package(workdir, 'pkg', '1.0',
                     sources={'pkg-1.0.tar.gz': 'oldhash'},
-                    metadata={'version': '1.0', 'release': '1'})
+                    metadata={
+                        'version': '1.0',
+                        'release': '1',
+                        'source': 'https://example.com',
+                    })
 
     cuv_module.RPMS_DIR = workdir / 'rpms'
     cuv_module.METADATA_DIR = workdir / 'metadata'
@@ -1808,13 +1825,14 @@ def test_update_spec_version(cuv_module, workdir: Path) -> None:
     assert downloaded == ['pkg-2.0.tar.gz']
     mock_dl.assert_called_once_with('pkg', '1.0', '2.0')
 
-    # Metadata should be marked as modified with updated version/release
+    # Metadata should be marked as modified with updated version. The spec's
+    # synthetic 0.1 is not persisted as a Fedora release.
     with open(workdir / 'metadata' / 'pkg.json') as f:
         data = json.load(f)
     assert data['modification_status'] == 'modified'
     assert 'Update to upstream version 2.0' in data['modification_reason']
     assert data['version'] == '2.0'
-    assert data['release'] == '0.1'
+    assert 'release' not in data
 
 
 def test_update_spec_version_sets_release_0_1(cuv_module, workdir: Path) -> None:
@@ -1833,6 +1851,27 @@ def test_update_spec_version_sets_release_0_1(cuv_module, workdir: Path) -> None
 
     spec_content = (workdir / 'rpms' / 'pkg' / 'pkg.spec').read_text()
     assert 'Release: 0.1%{?dist}' in spec_content
+
+
+def test_update_spec_version_removes_independent_release(cuv_module, workdir: Path) -> None:
+    """Independent packages do not retain a local metadata release."""
+    _create_package(workdir, 'pkg', '1.0',
+                    sources={'pkg-1.0.tar.gz': 'oldhash'},
+                    metadata={
+                        'version': '1.0',
+                        'release': '1',
+                        'modification_status': 'independent',
+                    })
+    cuv_module.RPMS_DIR = workdir / 'rpms'
+    cuv_module.METADATA_DIR = workdir / 'metadata'
+    cuv_module.ROOT_DIR = workdir
+
+    with patch.object(cuv_module, 'download_new_sources', return_value=[]):
+        cuv_module.update_spec_version('pkg', '2.0')
+
+    data = json.loads((workdir / 'metadata' / 'pkg.json').read_text())
+    assert data['modification_status'] == 'independent'
+    assert 'release' not in data
 
 
 def test_update_spec_version_ignores_matching_dependency_version(

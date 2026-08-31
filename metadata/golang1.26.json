@@ -3,7 +3,6 @@
   "cve_product": "Go ",
   "modification_reason": "Update to upstream version 1.26.7",
   "modification_status": "modified",
-  "release": "0.1",
   "release_monitoring_project_id": 1227,
   "sha": "0241d8077bf0228910b349a13b07dc867d476a41",
   "source": "https://src.fedoraproject.org/rpms/golang.git",

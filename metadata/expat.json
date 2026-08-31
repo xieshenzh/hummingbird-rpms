@@ -2,7 +2,6 @@
   "branch": "rawhide",
   "modification_reason": "Update to 2.8.2 for CVE-2026-50219 (HUM-2547); Update to 2.8.3 for CVE-2026-72522 (HUM-5926); Backport fixes for CVE-2026-76956 and CVE-2026-76957 (HUM-6424)",
   "modification_status": "modified",
-  "release": "0.1",
   "sha": "e7c4e277fa46ee92ce5bdb1e8c78a573f7304176",
   "source": "https://src.fedoraproject.org/rpms/expat.git",
   "upstream_repo": "https://github.com/libexpat/libexpat",

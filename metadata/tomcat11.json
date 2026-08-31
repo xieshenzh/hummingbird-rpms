@@ -1,7 +1,6 @@
 {
   "cve_product": "Apache Software Foundation / Apache Tomcat",
   "modification_status": "independent",
-  "release": "0.1",
   "release_monitoring_project_id": 148939,
   "track_upstream": "11",
   "upstream_branch": "main",

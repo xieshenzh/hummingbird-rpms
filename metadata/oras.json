@@ -1,6 +1,5 @@
 {
   "modification_status": "independent",
-  "release": "0.1",
   "release_monitoring_project_id": 205787,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/oras-project/oras",

@@ -2,7 +2,6 @@
   "branch": "rawhide",
   "modification_reason": "Update to upstream version 9.20.27",
   "modification_status": "modified",
-  "release": "0.1",
   "release_monitoring_project_id": 383859,
   "sha": "55c3f8e6d3577eeeaa80d74ddf2c872ce213e86d",
   "source": "https://src.fedoraproject.org/rpms/bind.git",

@@ -263,6 +263,33 @@ def test_independent_package_with_no_sources_file_accepted(validator) -> None:
     assert valid, f"Expected valid but got: {error}"
 
 
+def test_independent_package_release_rejected(validator) -> None:
+    """Independent packages cannot claim a Fedora release."""
+    root = validator._tmp_path
+    _create_package(root, 'pkg', {
+        'modification_status': 'independent',
+        'release': '1',
+    })
+
+    valid, error = validator.validate_package('pkg', check_actual_state=False)
+    assert not valid
+    assert 'should not have release field' in error
+
+
+def test_modified_package_without_source_release_rejected(validator) -> None:
+    """A modified package without a Fedora source cannot retain release."""
+    root = validator._tmp_path
+    _create_package(root, 'pkg', {
+        'modification_status': 'modified',
+        'modification_reason': 'Local change',
+        'release': '1',
+    })
+
+    valid, error = validator.validate_package('pkg', check_actual_state=False)
+    assert not valid
+    assert 'should not have release field' in error
+
+
 #
 # Tests — get_changed_packages_in_mr()
 #

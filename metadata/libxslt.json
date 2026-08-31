@@ -2,7 +2,6 @@
   "branch": "rawhide",
   "modification_reason": "Update to 1.1.45 (ahead of Fedora)",
   "modification_status": "modified",
-  "release": "0.1",
   "sha": "79d83b8d5cd5ff67383dd98fcab09bcda632ed10",
   "source": "https://src.fedoraproject.org/rpms/libxslt.git",
   "upstream_repo": "https://gitlab.gnome.org/GNOME/libxslt",

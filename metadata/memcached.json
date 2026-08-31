@@ -2,7 +2,6 @@
   "branch": "rawhide",
   "modification_reason": "Update to upstream version 1.6.45",
   "modification_status": "modified",
-  "release": "0.1",
   "release_monitoring_project_id": 1965,
   "sha": "2dea064e1455f69c595c4e6b7cbf044a96f05f4f",
   "source": "https://src.fedoraproject.org/rpms/memcached.git",

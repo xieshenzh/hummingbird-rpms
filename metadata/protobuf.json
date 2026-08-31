@@ -2,7 +2,6 @@
   "branch": "rawhide",
   "modification_reason": "Update to upstream version 36.0",
   "modification_status": "modified",
-  "release": "0.1",
   "release_monitoring_project_id": 3715,
   "sha": "823108311dd525219823c0eaaaa1b7c535215d0f",
   "source": "https://src.fedoraproject.org/rpms/protobuf.git",

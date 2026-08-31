@@ -82,7 +82,7 @@ class PackageMetadata(TypedDict):
     branch: NotRequired[str]  # Not present for independent packages
     sha: NotRequired[str]  # Not present for independent packages
     version: str
-    release: str
+    release: NotRequired[str]  # Present only when shipping Fedora's release
     modification_status: NotRequired[Literal["clean", "modified", "independent"]]
     modification_reason: NotRequired[str]  # Only for 'modified'
     track_upstream: NotRequired[str]  # "latest" or version prefix (e.g., "1.26")
@@ -1026,14 +1026,13 @@ def import_(url: str, branch: str, ref: str | None = None, directory: str | None
     # We can't have sub .git directories in our repo
     shutil.rmtree(package_dir / '.git')
 
-    # Save package metadata to import.json
-    # The source URL contains the upstream package name, so we don't need to store it separately
+    # Save package metadata to import.json. The source URL contains the
+    # upstream package name, so we don't need to store it separately.
     metadata: PackageMetadata = {
         'source': url,
         'branch': branch,
         'sha': sha,
         'version': version,
-        'release': release,
     }
 
     # Set modification_status based on source
@@ -1041,6 +1040,7 @@ def import_(url: str, branch: str, ref: str | None = None, directory: str | None
         metadata['modification_status'] = 'independent'
     else:
         metadata['modification_status'] = 'clean'
+        metadata['release'] = release
 
     # Look up Anitya (release-monitoring.org) project ID for the package
     logging.info("Looking up release-monitoring.org project ID for %s...", package_name)
@@ -1101,7 +1101,7 @@ def bump_release(current_release: str, upstream_release: str | None = None) -> s
     has a .N suffix, we increment it.
 
     This handles the edge case where the base is Release: 3.1 (e.g. Fedora ships
-    3.1%{?dist}, or a local placeholder) - we need to know if the current 3.1 is
+    3.1%{?dist}) - we need to know if the current 3.1 is
     that base (should become 3.1.1) or from our previous rebuild of base 3
     (should become 3.2).
 
@@ -1114,9 +1114,8 @@ def bump_release(current_release: str, upstream_release: str | None = None) -> s
 
     Args:
         current_release: Current release string (without %{?dist})
-        upstream_release: Base release from metadata (without %{?dist}), if
-            known. Usually the Fedora/rawhide baseline; after an
-            ahead-of-Fedora bump it may be the local ``0.1`` placeholder.
+        upstream_release: Fedora release from metadata (without %{?dist}), if
+            the package ships Fedora's release.
 
     Returns:
         Bumped release string
@@ -1667,7 +1666,7 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
             # Parse spec file to get version-release for commit message
             version, release = parse_spec_version(upstream_dir)
             upstream_package_name = Path(metadata['source']).stem
-            old_version, old_release = metadata['version'], metadata['release']
+            old_version = metadata['version']
 
         # Reset modification status to clean
         metadata['modification_status'] = 'clean'
@@ -1793,7 +1792,7 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
 
         # Capture old version-release for commit message
         old_version = metadata['version']
-        old_release = metadata['release']
+        old_release = metadata.get('release', '(none)')
 
         # Re-run gorget for packages with a source-pipeline.yaml, so `sources`
         # reflects an independently-verified fetch instead of whatever the
@@ -1975,8 +1974,7 @@ def rebuild_package(package_name: str, reason: str, dry_run: bool = False) -> No
     # Parse current version and release
     version, current_release = parse_spec_version(package_dir)
 
-    # Load metadata base release for smart .N bumping (Fedora/rawhide
-    # baseline, or local placeholder such as 0.1 when ahead of Fedora).
+    # Load the Fedora release for smart .N bumping when the package ships it.
     metadata = load_package_metadata(package_name)
     if not metadata:
         sys.exit(f"ERROR: Could not load metadata for {package_name}")

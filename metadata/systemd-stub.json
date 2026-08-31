@@ -1,7 +1,6 @@
 {
   "modification_reason": "trigger rebuild to sign the RPMs",
   "modification_status": "modified",
-  "release": "2",
   "upstream_repo": "https://github.com/systemd/systemd",
   "version": "1"
 }

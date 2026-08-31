@@ -1,6 +1,5 @@
 {
   "modification_status": "independent",
-  "release": "0.2",
   "release_monitoring_project_id": 391002,
   "track_upstream": "1.15",
   "upstream_repo": "https://github.com/spiffe/spire",
