@@ -1,0 +1,17 @@
+diff --git a/modules/frontend/mcp_tools_test.go b/modules/frontend/mcp_tools_test.go
+index ba337aba4c17..41b4e0a5258b 100644
+--- a/modules/frontend/mcp_tools_test.go
++++ b/modules/frontend/mcp_tools_test.go
+@@ -547,11 +547,7 @@ func TestAcceptHeaderIsSet(t *testing.T) {
+ 
+ func callToolRequest(args map[string]any) mcp.CallToolRequest {
+ 	return mcp.CallToolRequest{
+-		Params: struct {
+-			Name      string    "json:\"name\""
+-			Arguments any       "json:\"arguments,omitempty\""
+-			Meta      *mcp.Meta "json:\"_meta,omitempty\""
+-		}{
++		Params: mcp.CallToolParams{
+ 			Arguments: args,
+ 		},
+ 	}

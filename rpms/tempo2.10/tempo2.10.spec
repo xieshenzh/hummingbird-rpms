@@ -17,6 +17,7 @@ Patch0:         0001-tests-use-explicit-loopback-addresses.patch
 Patch1:         0002-livestore-treat-canceled-initial-offset-fetch-as-stop.patch
 Patch2:         0003-vendor-bump-apache-thrift-0.24.0.patch
 Patch3:         0004-vendor-bump-mcp-go-0.56.0.patch
+Patch4:         0005-fix-mcp-CallToolParams-test-helper.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.26
