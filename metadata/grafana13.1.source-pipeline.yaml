@@ -39,11 +39,17 @@ transform:
         # Generated against the post-DOMPurify-bump lockfile, so this comes
         # after grafana-dompurify-cve.patch (same order as Patch10 in the spec).
         patch -p1 < "${PACKAGE_DIR}/grafana-fast-uri-3.1.6-cve.patch"
+        # Generated against the post-fast-uri lockfile, so this comes after
+        # grafana-fast-uri-3.1.6-cve.patch (same order as Patch11 in the spec).
+        patch -p1 < "${PACKAGE_DIR}/grafana-qs-6.16.0-cve.patch"
         if [ -n "${HTTP_PROXY-}" ]; then export YARN_HTTP_PROXY="${HTTP_PROXY-}"; fi
         if [ -n "${HTTPS_PROXY-}" ]; then export YARN_HTTPS_PROXY="${HTTPS_PROXY-}"; fi
         # Unlike grafana12.4, 13.1's yarn.lock has no Cypress dependency to
         # suppress a binary download for.
+        # YARN_NPM_MINIMAL_AGE_GATE=0: qs 6.16.0 is newer than the 3-day gate
+        # in .yarnrc.yml (needed until 2026-09-04).
         YARN_ENABLE_GLOBAL_CACHE=false YARN_CACHE_FOLDER=.yarn/cache \
+          YARN_NPM_MINIMAL_AGE_GATE=0 \
           node .yarn/releases/yarn-*.cjs install --immutable
         # Deterministic flags: yarn's own cache writes carry live wall-clock
         # mtimes and directory listing order isn't guaranteed sorted, so a
@@ -61,5 +67,5 @@ transform:
 # exception for the new hash.
 accepted-checksums:
   - file: "grafana-yarn-cache-13.1.3.tar.bz2"
-    checksum: "53b331361461213fd95732ddf87f3369d8b3e97111b3b50fb5e8adf8b460ad2fbfe82f7d5291c9233400b4d0541ee9eee8dbe9f700d103e1fa43e9b2dbc4b28d"
-    reason: "grafana-fast-uri-3.1.6-cve.patch bumps fast-uri 3.1.5->3.1.6 for CVE-2026-76172/75975/75931/75899/CVE-2026-6322; yarn-cache regenerated to include the new zip"
+    checksum: "9c642141ea4b5e46133912a9113a9d330461c1922e2b9dabc2548385e2707809b3b1147be6c61109b5a3c290a2c55fba08ac7a145d3166a31fc2c37c20589805"
+    reason: "grafana-qs-6.16.0-cve.patch bumps qs 6.15.2->6.16.0 for CVE-2026-82562/CVE-2026-82417; yarn-cache regenerated to include qs/side-channel updates"
