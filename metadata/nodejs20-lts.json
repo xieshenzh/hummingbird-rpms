@@ -1,6 +1,5 @@
 {
   "modification_status": "independent",
-  "release": "1",
   "track_upstream": "20",
   "upstream_branch": "v20.x",
   "upstream_repo": "https://gitlab.com/redhat/hummingbird/src/nodejs-lts",

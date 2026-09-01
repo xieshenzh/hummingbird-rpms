@@ -1,6 +1,5 @@
 {
   "modification_status": "independent",
-  "release": "0.1",
   "release_monitoring_project_id": 390561,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/open-telemetry/opentelemetry-collector-releases",

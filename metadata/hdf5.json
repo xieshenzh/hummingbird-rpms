@@ -2,7 +2,6 @@
   "branch": "rawhide",
   "modification_reason": "Backport CVE-2026-19025 (mismatched chunk/dataspace rank at open); previously updated to upstream 2.2.0",
   "modification_status": "modified",
-  "release": "0.1",
   "release_monitoring_project_id": 1303,
   "sha": "1e302c76d38e567d7f856d27eb233da2b0f41fe2",
   "source": "https://src.fedoraproject.org/rpms/hdf5.git",

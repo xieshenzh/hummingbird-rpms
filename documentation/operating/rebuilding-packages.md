@@ -276,8 +276,8 @@ The diff should show only the Release line change:
 > with `sed`.
 >
 > **Important:** Do not change the `release` field in `metadata/<package>.json` during local
-> rebuilds or backports. That field is the current base release (Fedora/rawhide baseline, or a
-> local base such as `0.1` when ahead of Fedora); see
+> rebuilds or backports. That field records the Fedora release for the version currently
+> shipped and is present only while Hummingbird ships Fedora's release; see
 > [Package Metadata Fields](package-metadata-fields.md).
 
 #### 4. Verify the bump is correct

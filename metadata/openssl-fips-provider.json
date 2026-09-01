@@ -1,6 +1,5 @@
 {
   "modification_status": "independent",
-  "release": "1.2",
   "upstream_repo": "https://github.com/openssl/openssl",
   "version": "3.0.7"
 }

@@ -2,7 +2,6 @@
   "branch": "rawhide",
   "modification_reason": "Update to upstream version 9.0.6",
   "modification_status": "modified",
-  "release": "0.1",
   "release_monitoring_project_id": 371886,
   "sha": "9c1a4e3d19e753c942a611dabc517fb38d702204",
   "source": "https://src.fedoraproject.org/rpms/valkey.git",

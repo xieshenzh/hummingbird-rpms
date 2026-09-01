@@ -2,7 +2,6 @@
   "branch": "rawhide",
   "modification_reason": "Update to upstream version 24.18.1; CVE-2026-69152",
   "modification_status": "modified",
-  "release": "0.1",
   "release_monitoring_project_id": 8251,
   "sha": "b357a111ad6b3a0ee6d087906648dc9591652a3f",
   "source": "https://src.fedoraproject.org/rpms/nodejs24.git",
