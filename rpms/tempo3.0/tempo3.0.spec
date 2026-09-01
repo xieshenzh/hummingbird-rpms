@@ -18,6 +18,8 @@ Patch0:         0001-tests-use-explicit-loopback-addresses.patch
 Patch1:         0002-vendor-bump-apache-thrift-to-0.24.0.patch
 # Bump vendored github.com/mark3labs/mcp-go to v0.56.0 for CVE-2026-81092
 Patch2:         0003-vendor-bump-mcp-go-to-0.56.0.patch
+# Use named mcp.CallToolParams in tests (required by mcp-go >= 0.54)
+Patch3:         0004-mcp-tools-test-use-CallToolParams.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.26
