@@ -1,11 +1,11 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 27.3.4.16",
+  "modification_reason": "Update to upstream version 27.3.4.17",
   "modification_status": "modified",
   "release_monitoring_project_id": 707,
   "sha": "040549cfe773d01e2e04eaa7b9862c327ef2ccf0",
   "source": "https://src.fedoraproject.org/rpms/erlang.git",
   "track_upstream": "27",
   "upstream_repo": "https://github.com/erlang/otp",
-  "version": "27.3.4.16"
+  "version": "27.3.4.17"
 }
