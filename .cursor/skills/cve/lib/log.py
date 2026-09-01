@@ -23,6 +23,7 @@ import sqlite3
 import tempfile
 from collections.abc import Callable
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 # ---- OpenCode ----
 
@@ -47,7 +48,9 @@ def _opencode_format_part(part: dict) -> str | None:
         output_str = str(state.get("output", ""))
         if len(output_str) > 2000:
             output_str = output_str[:2000] + "...(truncated)"
-        return f"[tool:{tool} status={status}]\ninput: {input_str}\noutput: {output_str}"
+        return (
+            f"[tool:{tool} status={status}]\ninput: {input_str}\noutput: {output_str}"
+        )
     if part_type in ("step-start", "step-finish"):
         return None
     return f"[{part_type}] {json.dumps(part, ensure_ascii=False)[:300]}"
@@ -250,17 +253,80 @@ def export_claude_session(
 #   globalStorage/state.vscdb cursorDiskKV           key "bubbleId:<id>:<bubbleId>"
 #       -> one message: {"type": 1|2, "text"/"richText": ..., ...} (1=user, 2=assistant)
 #
+# Desktop Cursor stores this under ~/.config/Cursor/User (or macOS Application
+# Support). Remote/SSH Cursor often uses ~/.cursor-server/data/User instead,
+# and agent chats are also mirrored as JSONL under
+# ~/.cursor/projects/<slug>/agent-transcripts/<id>/<id>.jsonl. --cursor tries
+# the composer DB roots first (exact workspace path before parents), then falls
+# back to agent-transcripts.
+#
 # If any of this has changed again on the installed Cursor version, the
 # functions below raise a clear RuntimeError rather than silently producing
 # a bogus/empty transcript.
 
-if os.uname().sysname == "Darwin":
-    _CURSOR_USER_DIR = Path.home() / "Library/Application Support/Cursor/User"
-else:
-    _CURSOR_USER_DIR = Path.home() / ".config/Cursor/User"
+CURSOR_PROJECTS_DIR = Path.home() / ".cursor/projects"
 
-CURSOR_WORKSPACE_STORAGE_DIR = _CURSOR_USER_DIR / "workspaceStorage"
-CURSOR_GLOBAL_DB = _CURSOR_USER_DIR / "globalStorage/state.vscdb"
+
+def _cursor_user_dirs() -> list[Path]:
+    """Return existing Cursor User directories (desktop and remote/server)."""
+    home = Path.home()
+    candidates: list[Path] = []
+    if os.uname().sysname == "Darwin":
+        candidates.append(home / "Library/Application Support/Cursor/User")
+    else:
+        candidates.append(home / ".config/Cursor/User")
+    candidates.extend(
+        [
+            home / ".cursor-server/data/User",
+        ]
+    )
+    seen: set[Path] = set()
+    out: list[Path] = []
+    for path in candidates:
+        try:
+            resolved = path.resolve()
+        except OSError:
+            continue
+        if resolved in seen or not path.is_dir():
+            continue
+        seen.add(resolved)
+        out.append(path)
+    return out
+
+
+def _cursor_global_dbs() -> list[Path]:
+    dbs: list[Path] = []
+    seen: set[Path] = set()
+    for user_dir in _cursor_user_dirs():
+        for rel in ("globalStorage/state.vscdb",):
+            db = user_dir / rel
+            try:
+                resolved = db.resolve()
+            except OSError:
+                continue
+            if resolved in seen or not db.is_file():
+                continue
+            seen.add(resolved)
+            dbs.append(db)
+    return dbs
+
+
+# Back-compat aliases for docs / older call sites.
+_CURSOR_USER_DIRS = _cursor_user_dirs()
+_CURSOR_GLOBAL_DBS = _cursor_global_dbs()
+CURSOR_WORKSPACE_STORAGE_DIR = next(
+    (
+        user_dir / "workspaceStorage"
+        for user_dir in _CURSOR_USER_DIRS
+        if (user_dir / "workspaceStorage").is_dir()
+    ),
+    Path.home() / ".config/Cursor/User/workspaceStorage",
+)
+CURSOR_GLOBAL_DB = (
+    _CURSOR_GLOBAL_DBS[0]
+    if _CURSOR_GLOBAL_DBS
+    else Path.home() / ".config/Cursor/User/globalStorage/state.vscdb"
+)
 
 
 _SQLITE_ALLOWED_TABLES = frozenset({"ItemTable", "cursorDiskKV"})
@@ -272,7 +338,7 @@ def _sqlite_get(db_path: Path, table: str, key: str) -> str | None:
     conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
     try:
         row = conn.execute(
-            f"SELECT value FROM {table} WHERE key = ?",  # noqa: S608 (table checked above)
+            f"SELECT value FROM {table} WHERE key = ?",
             (key,),
         ).fetchone()
     finally:
@@ -280,35 +346,110 @@ def _sqlite_get(db_path: Path, table: str, key: str) -> str | None:
     return row[0] if row else None
 
 
-def _cursor_find_workspace_storage(cwd: Path) -> Path:
-    if not CURSOR_WORKSPACE_STORAGE_DIR.is_dir():
-        raise RuntimeError(
-            f"Cursor workspaceStorage not found: {CURSOR_WORKSPACE_STORAGE_DIR}"
-        )
+def _cursor_folder_to_path(folder: str) -> Path | None:
+    """Map a workspace.json folder URI to a local filesystem path."""
+    if not folder:
+        return None
+    if folder.startswith("file://"):
+        return Path(unquote(folder[len("file://") :]))
+    parsed = urlparse(folder)
+    if parsed.scheme in {"vscode-remote", "vscode-vfs"}:
+        path = unquote(parsed.path or "")
+        return Path(path) if path else None
+    if folder.startswith("/"):
+        return Path(folder)
+    return None
+
+
+def _cursor_workspace_storage_roots() -> list[Path]:
+    roots: list[Path] = []
+    seen: set[Path] = set()
+    for user_dir in _cursor_user_dirs():
+        for name in ("workspaceStorage",):
+            root = user_dir / name
+            try:
+                resolved = root.resolve()
+            except OSError:
+                continue
+            if resolved in seen or not root.is_dir():
+                continue
+            seen.add(resolved)
+            roots.append(root)
+    return roots
+
+
+def _cursor_workspace_candidates(cwd: Path) -> list[Path]:
+    """Workspace storage dirs for cwd, exact path matches before parents."""
     target = cwd.resolve()
-    for entry in CURSOR_WORKSPACE_STORAGE_DIR.iterdir():
-        workspace_json = entry / "workspace.json"
-        if not workspace_json.is_file():
-            continue
-        try:
-            data = json.loads(workspace_json.read_text())
-        except json.JSONDecodeError:
-            continue
-        folder = data.get("folder", "")
-        folder_path = Path(folder.removeprefix("file://"))
-        if folder_path == target or target.is_relative_to(folder_path):
-            return entry
-    raise RuntimeError(
-        f"No Cursor workspaceStorage entry found for {target}. "
-        "Cursor may not have been opened on this folder, or the format has "
-        "changed again."
+    exact: list[Path] = []
+    parents: list[tuple[int, Path]] = []
+    roots = _cursor_workspace_storage_roots()
+    if not roots:
+        raise RuntimeError(
+            "Cursor workspaceStorage not found under ~/.config/Cursor/User "
+            "or ~/.cursor-server/data/User"
+        )
+    for root in roots:
+        for entry in root.iterdir():
+            workspace_json = next(
+                (
+                    entry / name
+                    for name in ("workspace.json",)
+                    if (entry / name).is_file()
+                ),
+                None,
+            )
+            if workspace_json is None:
+                continue
+            try:
+                data = json.loads(workspace_json.read_text())
+            except json.JSONDecodeError:
+                continue
+            folder_path = _cursor_folder_to_path(data.get("folder", ""))
+            if folder_path is None:
+                continue
+            try:
+                folder_path = folder_path.resolve()
+            except OSError:
+                continue
+            if folder_path == target:
+                exact.append(entry)
+            else:
+                try:
+                    if target.is_relative_to(folder_path):
+                        parents.append((len(folder_path.parts), entry))
+                except (ValueError, OSError):
+                    continue
+    parents.sort(key=lambda item: item[0], reverse=True)
+    return exact + [entry for _, entry in parents]
+
+
+def _cursor_find_workspace_storage(cwd: Path) -> Path:
+    candidates = _cursor_workspace_candidates(cwd)
+    if not candidates:
+        raise RuntimeError(
+            f"No Cursor workspaceStorage entry found for {cwd.resolve()}. "
+            "Cursor may not have been opened on this folder, or the format has "
+            "changed again."
+        )
+    return candidates[0]
+
+
+def _cursor_latest_composer_id_with_mtime(
+    workspace_dir: Path,
+) -> tuple[str, str, float]:
+    state_db = next(
+        (
+            workspace_dir / name
+            for name in ("state.vscdb",)
+            if (workspace_dir / name).is_file()
+        ),
+        None,
     )
-
-
-def _cursor_latest_composer_id(workspace_dir: Path) -> tuple[str, str]:
-    state_db = workspace_dir / "state.vscdb"
-    if not state_db.is_file():
-        raise RuntimeError(f"Cursor workspace state.vscdb not found: {state_db}")
+    if state_db is None:
+        raise RuntimeError(
+            f"Cursor workspace state.vscdb not found under {workspace_dir}"
+        )
     raw = _sqlite_get(state_db, "ItemTable", "composer.composerData")
     if not raw:
         raise RuntimeError(
@@ -320,7 +461,23 @@ def _cursor_latest_composer_id(workspace_dir: Path) -> tuple[str, str]:
     if not composers:
         raise RuntimeError(f"No composer sessions recorded in {state_db}")
     latest = max(composers, key=lambda c: c.get("lastUpdatedAt", 0))
-    return latest["composerId"], latest.get("name", latest["composerId"])
+    # Cursor stores lastUpdatedAt in epoch milliseconds.
+    updated_ms = latest.get("lastUpdatedAt", 0) or 0
+    # Divide by 1000; guard against legacy builds that stored seconds instead
+    # (values < 10^10 are implausibly small for ms, so treat as seconds).
+    updated = (
+        float(updated_ms) / 1000.0 if updated_ms > 10_000_000_000 else float(updated_ms)
+    )
+    return (
+        latest["composerId"],
+        latest.get("name", latest["composerId"]),
+        updated,
+    )
+
+
+def _cursor_latest_composer_id(workspace_dir: Path) -> tuple[str, str]:
+    composer_id, name, _mtime = _cursor_latest_composer_id_with_mtime(workspace_dir)
+    return composer_id, name
 
 
 def _cursor_bubble_text(bubble: dict) -> str | None:
@@ -329,45 +486,55 @@ def _cursor_bubble_text(bubble: dict) -> str | None:
 
 
 def _render_cursor_transcript(composer_id: str, name: str) -> str:
-    if not CURSOR_GLOBAL_DB.is_file():
-        raise RuntimeError(f"Cursor global state.vscdb not found: {CURSOR_GLOBAL_DB}")
+    global_dbs = _cursor_global_dbs()
+    if not global_dbs:
+        raise RuntimeError(
+            "Cursor global state.vscdb not found under ~/.config/Cursor/User "
+            "or ~/.cursor-server/data/User"
+        )
 
-    conn = sqlite3.connect(f"file:{CURSOR_GLOBAL_DB}?mode=ro", uri=True)
-    conn.row_factory = sqlite3.Row
-    try:
-        composer_raw = conn.execute(
-            "SELECT value FROM cursorDiskKV WHERE key = ?",
-            (f"composerData:{composer_id}",),
-        ).fetchone()
-        if not composer_raw:
-            raise RuntimeError(
-                f"No composerData:{composer_id} in {CURSOR_GLOBAL_DB}; Cursor "
-                "storage schema may have changed."
+    bubbles: list[dict] = []
+    last_error: str | None = None
+    for global_db in global_dbs:
+        conn = sqlite3.connect(f"file:{global_db}?mode=ro", uri=True)
+        conn.row_factory = sqlite3.Row
+        try:
+            composer_raw = conn.execute(
+                "SELECT value FROM cursorDiskKV WHERE key = ?",
+                (f"composerData:{composer_id}",),
+            ).fetchone()
+            if not composer_raw:
+                last_error = f"No composerData:{composer_id} in {global_db}"
+                continue
+            composer_data = json.loads(composer_raw["value"])
+
+            if "conversation" in composer_data:
+                bubbles = composer_data["conversation"]
+            else:
+                headers = composer_data.get("fullConversationHeadersOnly", [])
+                for header in headers:
+                    bubble_id = header.get("bubbleId")
+                    if not bubble_id:
+                        continue
+                    bubble_raw = conn.execute(
+                        "SELECT value FROM cursorDiskKV WHERE key = ?",
+                        (f"bubbleId:{composer_id}:{bubble_id}",),
+                    ).fetchone()
+                    if bubble_raw:
+                        bubbles.append(json.loads(bubble_raw["value"]))
+            if bubbles:
+                break
+            last_error = (
+                f"No messages found for Cursor composer {composer_id} ({name}) "
+                f"in {global_db}"
             )
-        composer_data = json.loads(composer_raw["value"])
-
-        bubbles: list[dict] = []
-        if "conversation" in composer_data:
-            # Older builds embed the full conversation inline.
-            bubbles = composer_data["conversation"]
-        else:
-            headers = composer_data.get("fullConversationHeadersOnly", [])
-            for header in headers:
-                bubble_id = header.get("bubbleId")
-                if not bubble_id:
-                    continue
-                bubble_raw = conn.execute(
-                    "SELECT value FROM cursorDiskKV WHERE key = ?",
-                    (f"bubbleId:{composer_id}:{bubble_id}",),
-                ).fetchone()
-                if bubble_raw:
-                    bubbles.append(json.loads(bubble_raw["value"]))
-    finally:
-        conn.close()
+        finally:
+            conn.close()
 
     if not bubbles:
         raise RuntimeError(
-            f"No messages found for Cursor composer {composer_id} ({name})."
+            last_error
+            or f"No messages found for Cursor composer {composer_id} ({name})."
         )
 
     lines = [f"# Cursor session {composer_id}: {name}", ""]
@@ -382,6 +549,130 @@ def _render_cursor_transcript(composer_id: str, name: str) -> str:
     return "\n".join(lines)
 
 
+def _cursor_project_slug(path: Path) -> str:
+    """Map /home/prarit/rpms -> home-prarit-rpms for ~/.cursor/projects/."""
+    return str(path.resolve()).lstrip("/").replace("/", "-")
+
+
+def _cursor_agent_transcript_dirs(cwd: Path) -> list[Path]:
+    """agent-transcripts dirs for cwd, exact project slug first."""
+    projects = CURSOR_PROJECTS_DIR
+    if not projects.is_dir():
+        return []
+    target = cwd.resolve()
+    dirs: list[Path] = []
+    exact = projects / _cursor_project_slug(target) / "agent-transcripts"
+    if exact.is_dir():
+        dirs.append(exact)
+    for parent in target.parents:
+        candidate = projects / _cursor_project_slug(parent) / "agent-transcripts"
+        if candidate.is_dir() and candidate not in dirs:
+            dirs.append(candidate)
+        if parent == Path(parent.anchor):
+            break
+    return dirs
+
+
+def _safe_mtime(path: Path) -> float:
+    try:
+        return path.stat().st_mtime
+    except OSError:
+        return 0.0
+
+
+def _cursor_find_agent_transcript(cwd: Path, transcript_id: str | None = None) -> Path:
+    dirs = _cursor_agent_transcript_dirs(cwd)
+    if not dirs:
+        raise RuntimeError(
+            f"No Cursor agent-transcripts directory found for {cwd.resolve()} "
+            f"under {CURSOR_PROJECTS_DIR}"
+        )
+    if transcript_id:
+        for transcripts_dir in dirs:
+            nested = transcripts_dir / transcript_id / f"{transcript_id}.jsonl"
+            if nested.is_file():
+                return nested
+            flat = transcripts_dir / f"{transcript_id}.jsonl"
+            if flat.is_file():
+                return flat
+        raise RuntimeError(
+            f"No Cursor agent transcript {transcript_id!r} under {dirs[0]}"
+        )
+
+    candidates: list[Path] = []
+    for transcripts_dir in dirs:
+        candidates.extend(transcripts_dir.glob("*/*.jsonl"))
+        candidates.extend(transcripts_dir.glob("*.jsonl"))
+    if not candidates:
+        raise RuntimeError(f"No Cursor agent transcript JSONL files under {dirs[0]}")
+    return max(candidates, key=_safe_mtime)
+
+
+def _render_agent_transcript(jsonl_path: Path) -> str:
+    lines = [f"# Cursor agent transcript {jsonl_path.stem}", ""]
+    with open(jsonl_path) as fh:
+        for raw_line in fh:
+            raw_line = raw_line.strip()
+            if not raw_line:
+                continue
+            try:
+                entry = json.loads(raw_line)
+            except json.JSONDecodeError:
+                continue
+            role = str(entry.get("role") or "unknown").upper()
+            message = entry.get("message")
+            texts: list[str] = []
+            content = message.get("content") if isinstance(message, dict) else None
+            if isinstance(content, str):
+                if content.strip():
+                    texts.append(content.strip())
+            elif isinstance(content, list):
+                for block in content:
+                    if not isinstance(block, dict):
+                        continue
+                    if block.get("type") != "text":
+                        continue
+                    text = str(block.get("text") or "").strip()
+                    if text:
+                        texts.append(text)
+            if not texts:
+                continue
+            lines.append(f"## {role}")
+            lines.extend(texts)
+            lines.append("")
+    if len(lines) <= 2:
+        raise RuntimeError(
+            f"No text messages found in Cursor agent transcript {jsonl_path}"
+        )
+    return "\n".join(lines)
+
+
+def _export_cursor_composer_session(
+    composer_id: str | None,
+    *,
+    cwd: Path,
+    out_path: Path | None,
+) -> Path:
+    name = composer_id or ""
+    if composer_id is None:
+        errors: list[str] = []
+        for workspace_dir in _cursor_workspace_candidates(cwd):
+            try:
+                composer_id, name = _cursor_latest_composer_id(workspace_dir)
+                text = _render_cursor_transcript(composer_id, name)
+                return _write_output(text, out_path, prefix=f"cursor-{composer_id}-")
+            except RuntimeError as err:
+                errors.append(f"{workspace_dir.name}: {err}")
+                continue
+        if errors:
+            raise RuntimeError("; ".join(errors))
+        raise RuntimeError(
+            f"No Cursor workspaceStorage entry found for {cwd.resolve()}"
+        )
+    text = _render_cursor_transcript(composer_id, name)
+    return _write_output(text, out_path, prefix=f"cursor-{composer_id}-")
+
+
 def export_cursor_session(
     composer_id: str | None = None,
     *,
@@ -390,16 +681,88 @@ def export_cursor_session(
 ) -> Path:
     """Export a Cursor composer/chat session transcript. Best-effort only.
 
-    Cursor's storage format is undocumented and has changed across releases;
-    if this fails, dump raw rows from `cursorDiskKV`/`ItemTable` and adjust
-    the parsing above rather than guessing.
+    When `composer_id` is set, try it as a Composer id and then as an
+    agent-transcript uuid.
+
+    When omitted, compare the newest Composer session for this workspace with
+    the newest agent-transcript for the project slug and export whichever is
+    newer. Active agent chats therefore win over stale Composer history, while
+    remote hosts without a Composer DB still fall back to agent-transcripts.
     """
-    name = composer_id or ""
-    if composer_id is None:
-        workspace_dir = _cursor_find_workspace_storage(cwd or Path.cwd())
-        composer_id, name = _cursor_latest_composer_id(workspace_dir)
-    text = _render_cursor_transcript(composer_id, name)
-    return _write_output(text, out_path, prefix=f"cursor-{composer_id}-")
+    resolved_cwd = (cwd or Path.cwd()).resolve()
+    errors: list[str] = []
+
+    if composer_id is not None:
+        try:
+            return _export_cursor_composer_session(
+                composer_id, cwd=resolved_cwd, out_path=out_path
+            )
+        except RuntimeError as err:
+            errors.append(f"composer-db: {err}")
+        try:
+            transcript_path = _cursor_find_agent_transcript(
+                resolved_cwd, transcript_id=composer_id
+            )
+            rendered = _render_agent_transcript(transcript_path)
+            return _write_output(
+                rendered, out_path, prefix=f"cursor-agent-{transcript_path.stem}-"
+            )
+        except RuntimeError as err:
+            errors.append(f"agent-transcripts: {err}")
+        raise RuntimeError(
+            "Failed to export Cursor session via composer DB or "
+            "agent-transcripts: " + " | ".join(errors)
+        )
+
+    composer_candidate: tuple[float, str, str] | None = None
+    try:
+        found_id: str | None = None
+        found_name = ""
+        found_mtime = 0.0
+        last_err: str | None = None
+        for workspace_dir in _cursor_workspace_candidates(resolved_cwd):
+            try:
+                found_id, found_name, found_mtime = (
+                    _cursor_latest_composer_id_with_mtime(workspace_dir)
+                )
+                break
+            except RuntimeError as err:
+                last_err = f"{workspace_dir.name}: {err}"
+                continue
+        if found_id is None:
+            raise RuntimeError(last_err or "no composer workspace matched")
+        composer_text = _render_cursor_transcript(found_id, found_name)
+        composer_candidate = (found_mtime, composer_text, f"cursor-{found_id}-")
+    except RuntimeError as err:
+        errors.append(f"composer-db: {err}")
+
+    agent_candidate: tuple[float, str, str] | None = None
+    try:
+        transcript_path = _cursor_find_agent_transcript(resolved_cwd)
+        agent_text = _render_agent_transcript(transcript_path)
+        agent_candidate = (
+            float(transcript_path.stat().st_mtime),
+            agent_text,
+            f"cursor-agent-{transcript_path.stem}-",
+        )
+    except RuntimeError as err:
+        errors.append(f"agent-transcripts: {err}")
+
+    if composer_candidate is None and agent_candidate is None:
+        raise RuntimeError(
+            "Failed to export Cursor session via composer DB or "
+            "agent-transcripts: " + " | ".join(errors)
+        )
+    if agent_candidate is None:
+        assert composer_candidate is not None
+        _mtime, rendered, prefix = composer_candidate
+    elif composer_candidate is None:
+        _mtime, rendered, prefix = agent_candidate
+    else:
+        _mtime, rendered, prefix = max(
+            (composer_candidate, agent_candidate), key=lambda item: item[0]
+        )
+    return _write_output(rendered, out_path, prefix=prefix)
 
 
 # ---- Shared helpers ----
