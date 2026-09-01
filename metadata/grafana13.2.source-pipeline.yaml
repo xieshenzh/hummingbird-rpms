@@ -21,6 +21,9 @@ transform:
         # vendored fast-uri to 3.1.6. Must be applied here too, or the offline
         # yarn cache this step generates goes stale on the next version bump.
         patch -p1 < "${PACKAGE_DIR}/grafana-fast-uri-3.1.6.patch"
+        # CVE-2026-82562, CVE-2026-82417: bump vendored qs to 6.16.0. Must be
+        # applied here too, or the offline yarn cache goes stale.
+        patch -p1 < "${PACKAGE_DIR}/grafana-qs-6.16.0.patch"
         if [ -n "${HTTP_PROXY-}" ]; then export YARN_HTTP_PROXY="${HTTP_PROXY-}"; fi
         if [ -n "${HTTPS_PROXY-}" ]; then export YARN_HTTPS_PROXY="${HTTPS_PROXY-}"; fi
         # Unlike grafana12.4, 13.2's yarn.lock has no Cypress dependency to
