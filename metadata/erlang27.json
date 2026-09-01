@@ -3,9 +3,10 @@
   "modification_reason": "Update to 27.3.4.17 for CVE-2026-74835 CVE-2026-70399 CVE-2026-66835 CVE-2026-69664 CVE-2026-74994 CVE-2026-70409 CVE-2026-73270 CVE-2026-23941 CVE-2026-73812",
   "modification_status": "modified",
   "release_monitoring_project_id": 707,
-  "sha": "040549cfe773d01e2e04eaa7b9862c327ef2ccf0",
+  "sha": "6e0534e9dc3b6c1461a3cc6ac7f46a881acb528d",
   "source": "https://src.fedoraproject.org/rpms/erlang.git",
   "track_upstream": "27",
   "upstream_repo": "https://github.com/erlang/otp",
-  "version": "27.3.4.17"
+  "version": "27.3.4.17",
+  "release": "1"
 }
