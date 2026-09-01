@@ -520,9 +520,10 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         metavar="COMPOSER_ID",
         help="Export a Cursor chat/composer session and attach that instead "
-        "of FILE. Best-effort: Cursor's storage format is undocumented and "
-        "may not work on every version. Defaults to the most recently "
-        "updated composer for the current directory's workspace.",
+        "of FILE. Best-effort: searches desktop and cursor-server User dirs, "
+        "then ~/.cursor/projects/<slug>/agent-transcripts/, preferring the "
+        "newer source. Pass a composer id or agent-transcript uuid to select "
+        "a specific session.",
     )
     log_cmd.add_argument(
         "--print-only",

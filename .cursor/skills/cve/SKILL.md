@@ -152,9 +152,11 @@ handling):
   recently updated session, or pass a specific `ses_...` id as the value.
 - **Cursor:** `cve_helper.py log-message HUM-XXXX --cursor`. Best-effort —
   Cursor's on-disk chat format is undocumented and has changed across
-  releases. Defaults to the most recently updated composer session for the
-  current directory's workspace; pass a composer id as the value. If it
-  fails, omit this step rather than guessing at a manual log file.
+  releases. Searches desktop `~/.config/Cursor/User` and remote
+  `~/.cursor-server/data/User`, prefers the newer of Composer DB vs
+  `~/.cursor/projects/<slug>/agent-transcripts/`, and accepts a composer id
+  or agent-transcript uuid as the value. If it fails, omit this step rather
+  than guessing at a manual log file.
 - **Codex:** Check `~/.codex/sessions/`, `~/.codex/logs/`, or `$CODEX_LOG`.
 - **CI / Worker Sandbox:** Use `$AGENT_LOG`, `$TRANSCRIPT_PATH`, or harness log output.
 
