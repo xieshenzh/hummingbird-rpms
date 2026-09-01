@@ -98,7 +98,7 @@
 %global pstore_version 0.1.3
 %global readline_version 0.0.4
 %global reline_version 0.5.10
-%global resolv_version 0.3.1
+%global resolv_version 0.3.2
 %global resolv_replace_version 0.1.1
 %global rinda_version 0.2.0
 %global ruby2_keywords_version 0.0.5
@@ -188,7 +188,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 23.5%{?dist}
+Release: 23.6%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -314,6 +314,11 @@ Patch15: ruby-3.3.10-net-imap-0.4.25-security-fixes.patch
 # Backport upstream test fix for implementation-defined lgamma sign at poles.
 # https://bugs.ruby-lang.org/issues/21666
 Patch16: ruby-3.3.10-lgamma-unspecified-sign-tests.patch
+# Backport resolv 0.3.1 -> 0.3.2 security fixes:
+# CVE-2026-80212: resolv DoS via uncontrolled memory growth from crafted DNS responses
+# CVE-2026-80213: resolv DNS allowlist/egress bypass and cache poisoning via crafted hostnames
+# https://github.com/ruby/ruby/pull/18530
+Patch17: ruby-3.3.10-resolv-0.3.2-security-fixes.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -826,6 +831,7 @@ analysis result in RBS format, a standard type description format for Ruby
 %patch 14 -p1 -d .bundle/gems/net-imap-0.4.21
 %patch 15 -p1 -d .bundle/gems/net-imap-0.4.21
 %patch 16 -p1
+%patch 17 -p1
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
