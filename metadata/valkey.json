@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 9.0.5",
+  "modification_reason": "Update to upstream version 9.0.6",
   "modification_status": "modified",
   "release": "0.1",
   "release_monitoring_project_id": 371886,
@@ -8,5 +8,5 @@
   "source": "https://src.fedoraproject.org/rpms/valkey.git",
   "track_upstream": "9.0",
   "upstream_repo": "https://github.com/valkey-io/valkey",
-  "version": "9.0.5"
+  "version": "9.0.6"
 }
