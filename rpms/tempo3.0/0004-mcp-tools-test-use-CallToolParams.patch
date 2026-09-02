@@ -1,0 +1,31 @@
+From: Prarit Bhargava <prarit@redhat.com>
+Date: Tue, 1 Sep 2026 10:55:00 -0400
+Subject: [PATCH] frontend: use mcp.CallToolParams in callToolRequest
+
+mcp-go v0.54+ replaced the anonymous Params struct on
+mcp.CallToolRequest with a named CallToolParams type, so the inline
+anonymous struct literal no longer compiles.
+
+Adapted from grafana/tempo commit a900d17fe94e1f7eb56453c835611e398e31b0d2.
+
+---
+ modules/frontend/mcp_tools_test.go | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/modules/frontend/mcp_tools_test.go b/modules/frontend/mcp_tools_test.go
+index d939620000b..b34666c983c 100644
+--- a/modules/frontend/mcp_tools_test.go
++++ b/modules/frontend/mcp_tools_test.go
+@@ -547,11 +547,7 @@ func TestAcceptHeaderIsSet(t *testing.T) {
+ 
+ func callToolRequest(args map[string]any) mcp.CallToolRequest {
+ 	return mcp.CallToolRequest{
+-		Params: struct {
+-			Name      string    "json:\"name\""
+-			Arguments any       "json:\"arguments,omitempty\""
+-			Meta      *mcp.Meta "json:\"_meta,omitempty\""
+-		}{
++		Params: mcp.CallToolParams{
+ 			Arguments: args,
+ 		},
+ 	}
