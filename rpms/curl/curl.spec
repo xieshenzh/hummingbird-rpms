@@ -12,8 +12,8 @@
 
 Summary: A utility for getting files from remote servers (FTP, HTTP, and others)
 Name: curl
-Version: 8.21.0
-Release: 5%{?dist}
+Version: 8.22.0
+Release: 0.1%{?dist}
 License: curl
 Source0: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz
 Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
@@ -21,9 +21,6 @@ Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
 # to Daniel's address page https://daniel.haxx.se/address.html for the GPG Key,
 # which points to the GPG key as of April 7th 2016 of https://daniel.haxx.se/mykey.asc
 Source2: mykey.asc
-
-# add multi_wakeup_internal for threaded resolving (#2509107)
-Patch001: 0001-curl-8.21.0-lib-add-multi_wakeup_internal.patch
 
 # patch making libcurl multilib ready
 Patch101: 0101-curl-7.32.0-multilib.patch
@@ -251,10 +248,6 @@ printf "1801\n" >>tests/data/DISABLED
 # temporary disable test 1085 it passes on Fedora but fails on ELN
 printf "1085\n" >>tests/data/DISABLED
 
-# test 1701 (HTTP/2 POST with Upgrade) fails because our nghttpx has the
-# CVE-2026-58055 patch that rejects request bodies in Upgrade requests
-printf "1701\n" >>tests/data/DISABLED
-
 # test 303: raise timeout from 8s to 20s so it doesn't expire during TLS
 # handshake under valgrind
 %ifarch x86_64
@@ -278,9 +271,6 @@ printf "3021\n3022\n" >>tests/data/DISABLED
 sed -e 's|NUM_THREADS 1000$|NUM_THREADS 256|' \
     -i tests/libtest/lib3026.c
 %endif
-
-# adapt test 323 for updated OpenSSL
-sed -e 's|^35$|35,52|' -i tests/data/test323
 
 # use localhost6 instead of ip6-localhost in the curl test-suite
 (
@@ -465,7 +455,7 @@ rm -f ${RPM_BUILD_ROOT}%{_mandir}/man1/wcurl.1*
 %{_libdir}/libcurl.so.4.[0-9].[0-9]
 
 %files -n libcurl-devel
-%doc docs/examples/*.c docs/examples/Makefile.example docs/INTERNALS.md
+%doc docs/examples/*.c docs/examples/Makefile.example docs/DEPENDENCIES.md
 %doc docs/CONTRIBUTE.md docs/libcurl/ABI.md
 %{_bindir}/curl-config*
 %{_includedir}/curl
