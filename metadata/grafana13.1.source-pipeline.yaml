@@ -42,6 +42,9 @@ transform:
         # Generated against the post-fast-uri lockfile, so this comes after
         # grafana-fast-uri-3.1.6-cve.patch (same order as Patch11 in the spec).
         patch -p1 < "${PACKAGE_DIR}/grafana-qs-6.16.0-cve.patch"
+        # Generated against the post-qs lockfile, so this comes after
+        # grafana-qs-6.16.0-cve.patch (same order as Patch12 in the spec).
+        patch -p1 < "${PACKAGE_DIR}/grafana-js-yaml-cve.patch"
         if [ -n "${HTTP_PROXY-}" ]; then export YARN_HTTP_PROXY="${HTTP_PROXY-}"; fi
         if [ -n "${HTTPS_PROXY-}" ]; then export YARN_HTTPS_PROXY="${HTTPS_PROXY-}"; fi
         # Unlike grafana12.4, 13.1's yarn.lock has no Cypress dependency to
