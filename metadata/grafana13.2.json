@@ -3,5 +3,5 @@
   "release_monitoring_project_id": 13916,
   "track_upstream": "13.2",
   "upstream_repo": "https://github.com/grafana/grafana",
-  "version": "13.2.0"
+  "version": "13.2.1"
 }
