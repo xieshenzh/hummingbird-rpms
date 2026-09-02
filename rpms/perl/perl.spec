@@ -121,7 +121,7 @@ License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        525%{?dist}
+Release:        525.1%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
@@ -203,6 +203,10 @@ Patch203:       perl-5.42.2-regcomp_study-avoid-trie-overflow.patch
 Patch204:       CVE-2026-57432-pack-overflow-1.patch
 # https://github.com/Perl/perl5/commit/40754edc72dd
 Patch205:       CVE-2026-57432-pack-overflow-2.patch
+# https://github.com/Perl/perl5/commit/568e6fd23886
+Patch206:       CVE-2026-15534-regex-slc-countdown-unsigned.patch
+# https://github.com/Perl/perl5/commit/54cf3d44cbbe
+Patch207:       CVE-2026-15534-regex-slc-64bit-clean.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -4242,6 +4246,8 @@ you're not running VMS, this module does nothing.
 %patch -P203 -p1
 %patch -P204 -p1
 %patch -P205 -p1
+%patch -P206 -p1
+%patch -P207 -p1
 
 %if !%{defined perl_bootstrap}
 # Local patch tracking
