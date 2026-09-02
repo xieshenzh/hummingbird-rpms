@@ -91,7 +91,7 @@
 %global pstore_version 0.2.1
 %global readline_version 0.0.4
 %global reline_version 0.6.0
-%global resolv_version 0.7.1
+%global resolv_version 0.7.2
 %global ruby2_keywords_version 0.0.5
 %global securerandom_version 0.4.1
 %global set_version 1.1.1
@@ -192,7 +192,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 31.6%{?dist}
+Release: 31.7%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -303,6 +303,9 @@ Patch11: ruby-3.4.8-Skip-Socket-connect-timeout-test.patch
 # Fix heap buffer overflow when streaming JSON to an IO (CVE-2026-54696).
 # https://github.com/ruby/json/security/advisories/GHSA-x2f5-4prf-w687
 Patch12: ruby-3.4.10-json-CVE-2026-54696-fbuffer-capa.patch
+# Bump default gem resolv to 0.7.2 (CVE-2026-80212, CVE-2026-80213).
+# https://github.com/ruby/ruby/pull/18529
+Patch13: ruby-3.4.10-resolv-0.7.2-CVE-2026-80212-80213.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -825,6 +828,7 @@ analysis result in RBS format, a standard type description format for Ruby
 %patch 10 -p1
 %patch 11 -p1
 %patch 12 -p1
+%patch 13 -p1
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
