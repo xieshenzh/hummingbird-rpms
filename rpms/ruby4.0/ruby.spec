@@ -93,7 +93,7 @@
 %global prettyprint_version 0.2.0
 %global prism_version 1.8.1
 %global psych_version 5.3.1
-%global resolv_version 0.7.0
+%global resolv_version 0.7.2
 %global ruby2_keywords_version 0.0.5
 %global securerandom_version 0.4.1
 %global shellwords_version 0.2.2
@@ -204,7 +204,7 @@ Summary: An interpreter of object-oriented scripting language
 
 Name: %{basepackagename}%{major_version}.%{minor_version}
 Version: %{ruby_version}%{?development_release}
-Release: 37.2%{?dist}
+Release: 37.3%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -319,6 +319,9 @@ Patch10: ruby-4.0.6-json-CVE-2026-54696-fbuffer-capa.patch
 # Fix format string injection in JSON.parse with allow_duplicate_key: false (CVE-2026-33210).
 # https://github.com/ruby/json/security/advisories/GHSA-3m6g-2423-7cp3
 Patch11: ruby-4.0.6-json-CVE-2026-33210-format-string.patch
+# Bump default-gem resolv 0.7.0 -> 0.7.2 (CVE-2026-80212, CVE-2026-80213).
+# https://github.com/ruby/ruby/pull/18528
+Patch12: ruby-4.0.6-resolv-CVE-2026-80212-CVE-2026-80213.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -858,6 +861,7 @@ popd
 %patch 8 -p1
 %patch 10 -p1
 %patch 11 -p1
+%patch 12 -p1
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
