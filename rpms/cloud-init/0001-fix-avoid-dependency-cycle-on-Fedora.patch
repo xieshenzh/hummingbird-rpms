@@ -1,7 +1,7 @@
-From e2381f6e5e9699fb5fb4f1eb79ea1c3bffe85759 Mon Sep 17 00:00:00 2001
+From 3b1b00d564c55a345093aa39239e701cf9bb13e8 Mon Sep 17 00:00:00 2001
 From: Jeremy Cline <jeremycline@linux.microsoft.com>
 Date: Mon, 25 Aug 2025 17:06:02 -0400
-Subject: [PATCH] fix: avoid dependency cycle on Fedora
+Subject: [PATCH 1/2] fix: avoid dependency cycle on Fedora
 
 Starting with 25.2, Fedora's automated test suite began failing for
 Cloud images[0] due to a dependency loop. This was due to the
@@ -27,15 +27,15 @@ Signed-off-by: Jeremy Cline <jeremycline@linux.microsoft.com>
  3 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
-index e88b15ca2..fc8323287 100644
+index ca6dbe0a1..a417f09ae 100644
 --- a/systemd/cloud-init-local.service.tmpl
 +++ b/systemd/cloud-init-local.service.tmpl
 @@ -2,7 +2,7 @@
  [Unit]
  # https://docs.cloud-init.io/en/latest/explanation/boot.html
  Description=Cloud-init: Local Stage (pre-network)
--{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel"] %}
-+{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
+-{% if variant in ["almalinux", "azurelinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
  DefaultDependencies=no
  {% endif %}
  Wants=network-pre.target
@@ -43,8 +43,8 @@ index e88b15ca2..fc8323287 100644
 
  [Service]
  Type=oneshot
--{% if variant in ["almalinux", "cloudlinux", "rhel"] %}
-+{% if variant in ["almalinux", "cloudlinux", "rhel", "fedora"] %}
+-{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel", "fedora"] %}
  ExecStartPre=/sbin/restorecon /run/cloud-init
  {% endif %}
  # This service is a shim which preserves systemd ordering while allowing a
@@ -56,30 +56,30 @@ index 2ca6220..a1f0177 100644
  # https://www.freedesktop.org/software/systemd/man/latest/systemd-remount-fs.service.html
  [Unit]
  Description=Cloud-init: Single Process
--{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel"] %}
-+{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
+-{% if variant in ["almalinux", "azurelinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
  DefaultDependencies=no
  {% endif %}
- {% if variant in ["almalinux", "cloudlinux", "rhel"] %}
+ {% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel"] %}
 @@ -31,7 +31,7 @@ ExecStart=/usr/bin/cloud-init --all-stages
  KillMode=process
  TasksMax=infinity
  TimeoutStartSec=infinity
--{% if variant in ["almalinux", "cloudlinux", "rhel"] %}
-+{% if variant in ["almalinux", "cloudlinux", "rhel", "fedora"] %}
+-{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel", "fedora"] %}
  ExecStartPre=/sbin/restorecon /run/cloud-init
  {% endif %}
 
 diff --git a/systemd/cloud-init-network.service.tmpl b/systemd/cloud-init-network.service.tmpl
-index c284024be..dec4fc7c5 100644
+index 58a36f5df..c1a7c3f64 100644
 --- a/systemd/cloud-init-network.service.tmpl
 +++ b/systemd/cloud-init-network.service.tmpl
 @@ -2,7 +2,7 @@
  [Unit]
  # https://docs.cloud-init.io/en/latest/explanation/boot.html
  Description=Cloud-init: Network Stage
--{% if variant not in ["almalinux", "cloudlinux", "photon", "rhel"] %}
-+{% if variant not in ["almalinux", "cloudlinux", "photon", "rhel", "fedora"] %}
+-{% if variant not in ["almalinux", "azurelinux", "cloudlinux", "photon", "rhel"] %}
++{% if variant not in ["almalinux", "azurelinux", "cloudlinux", "photon", "rhel", "fedora"] %}
  DefaultDependencies=no
  {% endif %}
  Wants=cloud-init-local.service

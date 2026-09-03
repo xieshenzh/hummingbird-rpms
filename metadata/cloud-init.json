@@ -2,9 +2,9 @@
   "branch": "rawhide",
   "modification_reason": "Upgraded to 26.1 with rebased Fedora dependency cycle patch and forced fedora variant for template rendering",
   "modification_status": "modified",
-  "release": "5",
-  "sha": "b23ad86df4d333aa734bb3e413f574131277f4ba",
+  "release": "1",
+  "sha": "15b21de158dca451d4f69f58b01cca395734e440",
   "source": "https://src.fedoraproject.org/rpms/cloud-init.git",
   "upstream_repo": "https://github.com/canonical/cloud-init",
-  "version": "26.1"
+  "version": "26.2"
 }

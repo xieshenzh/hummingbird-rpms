@@ -1,7 +1,7 @@
-From 54521dfea9b805d20e3e36e5c7cc2503fa4b2edd Mon Sep 17 00:00:00 2001
+From 0ca4b8577e96ba28c1af1973f52a25fdf366f57c Mon Sep 17 00:00:00 2001
 From: Yaakov Selkowitz <yselkowi@redhat.com>
 Date: Tue, 30 Jun 2026 16:52:43 -0400
-Subject: [PATCH] feat: add ELN support to distros
+Subject: [PATCH 2/2] feat: add ELN support to distros
 
 ELN now identifies itself uniquely and more RHEL-like, rather than as a
 variant of Fedora.
@@ -9,33 +9,37 @@ variant of Fedora.
 https://github.com/fedora-eln/eln/issues/565
 
 Signed-off-by: Yaakov Selkowitz <yselkowi@redhat.com>
+Signed-off-by: Jeremy Cline <jeremycline@microsoft.com>
 ---
-Backport of https://github.com/canonical/cloud-init/pull/6922 to 26.01
+ cloudinit/config/cc_ca_certs.py         |  1 +
+ cloudinit/config/cc_ntp.py              | 12 ++++++++++++
+ cloudinit/config/cc_resolv_conf.py      |  1 +
+ cloudinit/config/cc_yum_add_repo.py     |  1 +
+ cloudinit/distros/__init__.py           |  1 +
+ cloudinit/distros/eln.py                |  7 +++++++
+ cloudinit/net/sysconfig.py              |  1 +
+ cloudinit/sources/DataSourceRbxCloud.py |  2 +-
+ cloudinit/util.py                       |  1 +
+ config/cloud.cfg.tmpl                   |  4 ++--
+ systemd/cloud-init-generator.tmpl       |  2 +-
+ systemd/cloud-init-local.service.tmpl   |  2 +-
+ systemd/cloud-init-main.service.tmpl    |  2 +-
+ systemd/cloud-init-network.service.tmpl |  2 +-
+ 14 files changed, 32 insertions(+), 7 deletions(-)
+ create mode 100644 cloudinit/distros/eln.py
 
 diff --git a/cloudinit/config/cc_ca_certs.py b/cloudinit/config/cc_ca_certs.py
-index 939b62d07..50dda5198 100644
+index 939b62d07..9266d8848 100644
 --- a/cloudinit/config/cc_ca_certs.py
 +++ b/cloudinit/config/cc_ca_certs.py
-@@ -74,17 +74,19 @@ DISTRO_FAMILY = {
-     "almalinux",
-     "centos",
-     "cloudlinux",
-+    "eln",
-     "rocky",
- ):
-     DISTRO_OVERRIDES[distro] = DISTRO_OVERRIDES["rhel"]
- 
- distros = [
-     "almalinux",
+@@ -72,6 +72,7 @@ distros = list(DISTRO_FAMILY.keys()) + [
      "aosc",
-     "centos",
-     "cloudlinux",
      "alpine",
      "debian",
 +    "eln",
-     "fedora",
      "raspberry-pi-os",
      "rhel",
+     "opensuse",
 diff --git a/cloudinit/config/cc_ntp.py b/cloudinit/config/cc_ntp.py
 index e1a27b8bc..37536dc3b 100644
 --- a/cloudinit/config/cc_ntp.py
@@ -74,7 +78,7 @@ index e1a27b8bc..37536dc3b 100644
          # Alpine-specific pool (i.e. x.alpine.pool.ntp.org) does not exist
          # so use general x.pool.ntp.org instead. The same applies to EuroLinux
 diff --git a/cloudinit/config/cc_resolv_conf.py b/cloudinit/config/cc_resolv_conf.py
-index 920c539d9..5201f4cbd 100644
+index 920c539d9..8a76e4172 100644
 --- a/cloudinit/config/cc_resolv_conf.py
 +++ b/cloudinit/config/cc_resolv_conf.py
 @@ -28,6 +28,7 @@ meta: MetaSchema = {
@@ -89,7 +93,7 @@ diff --git a/cloudinit/config/cc_yum_add_repo.py b/cloudinit/config/cc_yum_add_r
 index 66e718015..95974d223 100644
 --- a/cloudinit/config/cc_yum_add_repo.py
 +++ b/cloudinit/config/cc_yum_add_repo.py
-@@ -24,6 +24,7 @@ meta: MetaSchema = {
+@@ -25,6 +25,7 @@ meta: MetaSchema = {
          "azurelinux",
          "centos",
          "cloudlinux",
@@ -148,7 +152,7 @@ index 2fba1149d..dc21aa427 100644
      for item in items:
          try:
 diff --git a/cloudinit/util.py b/cloudinit/util.py
-index 2cdd73655..ba57898ed 100644
+index 5fa0f94c7..e2eed8536 100644
 --- a/cloudinit/util.py
 +++ b/cloudinit/util.py
 @@ -607,6 +607,7 @@ def _get_variant(info):
@@ -160,7 +164,7 @@ index 2cdd73655..ba57898ed 100644
              "fedora",
              "mariner",
 diff --git a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
-index 3926ea8b4..1b0f46672 100644
+index 3926ea8b4..fa4f72833 100644
 --- a/config/cloud.cfg.tmpl
 +++ b/config/cloud.cfg.tmpl
 @@ -2,7 +2,7 @@
@@ -172,15 +176,15 @@ index 3926ea8b4..1b0f46672 100644
                               "miraclelinux", "rhel", "rocky", "virtuozzo"] %}
  {% set gecos = ({"amazon": "EC2 Default User", "azurelinux": "Azure Linux",
                   "centos": "Cloud User", "debian": "Debian",
-@@ -25,7 +25,7 @@
- {% set shells = ({"alpine": "/bin/ash", "dragonfly": "/bin/sh",
-                   "freebsd": "/bin/tcsh", "netbsd": "/bin/sh",
+@@ -26,7 +26,7 @@
                    "openbsd": "/bin/ksh"}) %}
--{% set usernames = ({"amazon": "ec2-user", "centos": "cloud-user",
-+{% set usernames = ({"amazon": "ec2-user", "centos": "cloud-user", "eln": "cloud-user",
+ {% set usernames = ({"amazon": "ec2-user", "azurelinux": "azureuser", "centos": "cloud-user",
                       "openmandriva": "omv", "raspberry-pi-os": "pi",
-                      "rhel": "cloud-user",
+-                     "rhel": "cloud-user",
++                     "eln": "cloud-user", "rhel": "cloud-user",
                       "unknown": "ubuntu"}) %}
+ {% if is_bsd %}
+ syslog_fix_perms: root:wheel
 diff --git a/systemd/cloud-init-generator.tmpl b/systemd/cloud-init-generator.tmpl
 index 888bad535..24324f204 100644
 --- a/systemd/cloud-init-generator.tmpl
@@ -189,48 +193,50 @@ index 888bad535..24324f204 100644
  {% else %}
  CLOUD_SYSTEM_TARGET="/lib/systemd/system/cloud-init.target"
  {% endif %}
--{% if variant in ["almalinux", "centos", "cloudlinux", "eurolinux", "fedora",
-+{% if variant in ["almalinux", "centos", "cloudlinux", "eln", "eurolinux", "fedora",
+-{% if variant in ["almalinux", "azurelinux", "centos", "cloudlinux", "eurolinux", "fedora",
++{% if variant in ["almalinux", "azurelinux", "centos", "cloudlinux", "eln", "eurolinux", "fedora",
                    "miraclelinux", "openeuler", "OpenCloudOS", "openmandriva", "rhel", "rocky", "TencentOS", "virtuozzo"] %}
      dsidentify="/usr/libexec/cloud-init/ds-identify"
  {% elif variant == "benchmark" %}
 diff --git a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
-index ca6dbe0a1..00c13d84c 100644
+index a417f09ae..1e3170944 100644
 --- a/systemd/cloud-init-local.service.tmpl
 +++ b/systemd/cloud-init-local.service.tmpl
 @@ -9,7 +9,7 @@ Wants=network-pre.target
  After=hv_kvp_daemon.service
  Before=network-pre.target
  Before=shutdown.target
--{% if variant in ["almalinux", "cloudlinux", "rhel"] %}
-+{% if variant in ["almalinux", "cloudlinux", "centos", "eln", "rhel"] %}
+-{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "eln", "rhel"] %}
  Before=firewalld.target
  {% endif %}
  {% if variant in ["ubuntu", "unknown", "debian", "raspberry-pi-os"] %}
 diff --git a/systemd/cloud-init-main.service.tmpl b/systemd/cloud-init-main.service.tmpl
-index a38b2e817..8a52c2bf9 100644
+index 5bb27586d..d23a8fe2d 100644
 --- a/systemd/cloud-init-main.service.tmpl
 +++ b/systemd/cloud-init-main.service.tmpl
 @@ -11,7 +11,7 @@ Description=Cloud-init: Single Process
- {% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
+ {% if variant in ["almalinux", "azurelinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
  DefaultDependencies=no
  {% endif %}
--{% if variant in ["almalinux", "cloudlinux", "rhel"] %}
-+{% if variant in ["almalinux", "cloudlinux", "centos", "eln", "rhel"] %}
+-{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "eln", "rhel"] %}
  Requires=dbus.socket
  After=dbus.socket
  {% endif %}
 diff --git a/systemd/cloud-init-network.service.tmpl b/systemd/cloud-init-network.service.tmpl
-index 58a36f5df..203e04e4b 100644
+index c1a7c3f64..c08d8e1ec 100644
 --- a/systemd/cloud-init-network.service.tmpl
 +++ b/systemd/cloud-init-network.service.tmpl
 @@ -15,7 +15,7 @@ After=systemd-networkd-wait-online.service
  {% if variant in ["ubuntu", "unknown", "debian", "raspberry-pi-os"] %}
  After=networking.service
  {% endif %}
--{% if variant in ["almalinux", "centos", "cloudlinux", "eurolinux", "fedora",
-+{% if variant in ["almalinux", "centos", "cloudlinux", "eln", "eurolinux", "fedora",
+-{% if variant in ["almalinux", "azurelinux", "centos", "cloudlinux", "eurolinux", "fedora",
++{% if variant in ["almalinux", "azurelinux", "centos", "cloudlinux", "eln", "eurolinux", "fedora",
                    "miraclelinux", "openeuler", "OpenCloudOS", "openmandriva",
                    "rhel", "rocky", "suse", "TencentOS", "virtuozzo"] %}
  After=NetworkManager.service
----
+-- 
+2.55.0
+
