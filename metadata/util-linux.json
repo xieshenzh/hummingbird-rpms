@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "drop asciidoctor BuildRequires; added gorget source-pipeline.yaml (HUM-4620 audit finding): %{upstream_major} is computed via a %global-before-Version shell-eval macro that captures the un-truncated version instead of major.minor, so Source0 404s -- checksum matches the existing recorded checksum exactly, no content change.",
+  "modification_reason": "Backport upstream fixes for CVE-2026-78410, CVE-2026-78409, CVE-2026-78408, CVE-2026-76642 (libmount source/subdir TOCTOU and nsenter FD-leak hardening, HUM-6747); also carries prior gorget source-pipeline.yaml fix (HUM-4620): dropped asciidoctor BuildRequires and fixed the %{upstream_major} shell-eval macro that caused Source0 404s.",
   "modification_status": "modified",
   "release": "3",
   "sha": "a0317f94b5e9504715995fb11d8e8555737683cf",
