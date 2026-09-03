@@ -1,5 +1,7 @@
+{%- set ns = namespace(seen_import=false) -%}
 {%- for rpm in rpms -%}
 {%- if rpm.imported %}
+{%- set ns.seen_import = true %}
 ---
 # --- {{ rpm.dname }} ---
 {{ pipeline_run(
@@ -15,7 +17,7 @@
     forked_from=rpm.forked_from if rpm.forked_from is defined else None,
     lookaside_cache_url=rpm.lookaside_cache_url if rpm.lookaside_cache_url is defined else None,
 ) -}}
-{%- else %}
+{%- elif ns.seen_import %}
 # --- {{ rpm.dname }} ---
 # PENDING
 {%- endif %}
