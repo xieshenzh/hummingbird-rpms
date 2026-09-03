@@ -1,8 +1,8 @@
 %global develdocdir %{_docdir}/%{name}-devel
 
 Name:           libevent
-Version:        2.1.12
-Release:        19.1%{?dist}
+Version:        2.1.13
+Release:        0.1%{?dist}
 Summary:        Abstract asynchronous event notification library
 
 # arc4random.c, which is used in build, is ISC. The rest is BSD-3-Clause.
@@ -32,16 +32,6 @@ Patch03: 0001-build-add-doxygen-to-all.patch
 # issue is fixed.
 # https://github.com/transmission/transmission/issues/1437
 Patch04: 0001-Revert-Fix-checking-return-value-of-the-evdns_base_r.patch
-# CVE-2026-63383
-Patch05: 0005-evrpc-Fix-out-of-bounds-read-in-decode_tag_internal.patch
-# CVE-2026-63384
-Patch06: 0006-evrpc-Fix-integer-overflow-in-evtag_unmarshal_header.patch
-# CVE-2026-63379 (regenerated for 2.1.12; upstream 87e8e44fa774)
-Patch07: 0007-http-Discard-trailers.patch
-# CVE-2026-63388
-Patch08: 0008-bufferevent-Fix-heap-OOB-write-via-AF_UNIX-http-NDEBUG.patch
-# CVE-2026-63381
-Patch09: 0009-Fix-dangling-pointer-in-evbuffer_add_buffer_reference.patch
 
 %description
 The libevent API provides a mechanism to execute a callback function
