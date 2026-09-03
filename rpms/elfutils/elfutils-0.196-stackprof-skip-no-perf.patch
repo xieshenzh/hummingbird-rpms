@@ -1,0 +1,26 @@
+--- a/tests/stackprof-subr.sh
++++ b/tests/stackprof-subr.sh
+@@ -23,6 +23,5 @@ check_perf_event_open() {
+-    if ! testrun timeout 2 ${abs_top_builddir}/src/stackprof -v -- /bin/true > perf-test.out 2>&1; then
+-        if grep -q "perf_event_open.*failed\|Operation not permitted\|Permission denied" perf-test.out; then
+-            return 77
+-        fi
+-    fi
++    testrun timeout 2 ${abs_top_builddir}/src/stackprof -v -- /bin/true > perf-test.out 2>&1 || :
++    if grep -Eq "unable to open perf fd|perf_event_open.*failed|Operation not permitted|Permission denied" perf-test.out; then
++        return 77
++    fi
+     return 0
+--- a/tests/run-stackprof-user.sh
++++ b/tests/run-stackprof-user.sh
+@@ -48,5 +48,9 @@
+     # run on single executable, with libpfm
+     testrun ${abs_top_builddir}/src/stackprof -v -e perf::BRANCHES:freq=4000 -g -- timeout 2 /bin/sh -c "while true; do true; done" 2>&1 | tee test.out
++    if grep -q "ERROR: no perf fds opened" test.out; then
++        echo "perf event unavailable for requested event"
++        exit 77
++    fi
+     tempfiles gmon.*
+     grep "^perf_event_attr configuration type=0 config=4 sample_freq=4000" test.out
+     grep "Starting stack profile collection pid" test.out
+     grep -E "^buildid [0-9a-f]+" test.out

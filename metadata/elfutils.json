@@ -1,6 +1,7 @@
 {
   "branch": "rawhide",
-  "modification_status": "clean",
+  "modification_reason": "Skip stackprof system tests when perf_event_open is unavailable in CI",
+  "modification_status": "modified",
   "release": "1",
   "sha": "f7a54473db0437cf0953cc60c278d2ed154fcd4a",
   "source": "https://src.fedoraproject.org/rpms/elfutils.git",

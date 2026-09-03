@@ -4,7 +4,7 @@
 
 Name: elfutils
 Version: 0.196
-%global baserelease 1
+%global baserelease 1.1
 Release: %{baserelease}%{?dist}
 URL: http://elfutils.org/
 %global source_url ftp://sourceware.org/pub/elfutils/%{version}/
@@ -100,6 +100,9 @@ BuildRequires: gettext-devel
 
 # For s390x... FDO package notes are bogus.
 Patch1: elfutils-0.186-fdo-swap.patch
+
+# Skip stackprof system tests when perf_event_open is unavailable in CI.
+Patch2: elfutils-0.196-stackprof-skip-no-perf.patch
 
 %description
 Elfutils is a collection of utilities, including stack (to show
