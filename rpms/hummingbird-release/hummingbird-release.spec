@@ -5,7 +5,7 @@
 
 Name:           hummingbird-release
 Version:        20251124
-Release:        1.15%{?dist}
+Release:        1.16%{?dist}
 Summary:        %{distro} release files
 License:        GPL-2.0-or-later
 URL:            https://hummingbird-project.io/
@@ -14,15 +14,12 @@ BuildArch:      noarch
 Provides:       hummingbird-release = %{version}-%{release}
 
 Requires:       hummingbird-repos
-Provides:       hummingbird-release-eula
-Provides:       redhat-release-eula
 
 # required by dnf
 # https://github.com/rpm-software-management/dnf/blob/4.2.23/dnf/const.py.in#L26
 Provides:       system-release = %{version}-%{release}
 Conflicts:      system-release
 
-Source200:      EULA
 Source201:      LICENSE
 
 Source500:      hummingbird.repo
@@ -143,11 +140,6 @@ cat > %{buildroot}%{_rpmmacrodir}/macros.dist << EOF
 %%fc%{fedora_version} 1
 EOF
 
-# use unbranded datadir
-install -d -m 0755 %{buildroot}%{_datadir}/hummingbird-release
-ln -s hummingbird-release %{buildroot}%{_datadir}/redhat-release
-install -p -m 0644 %{SOURCE200} %{buildroot}%{_datadir}/hummingbird-release/
-
 # Create yum repos directory and stub hummingbird.repo
 install -d -m 0755 %{buildroot}%{_sysconfdir}/yum.repos.d
 touch %{buildroot}%{_sysconfdir}/yum.repos.d/hummingbird.repo
@@ -173,8 +165,6 @@ install -p -m 0644 %{SOURCE603} %{buildroot}%{_sysconfdir}/pki/rpm-gpg/
 %dir %{_sysconfdir}/yum.repos.d
 %ghost %{_sysconfdir}/yum.repos.d/hummingbird.repo
 %{_rpmmacrodir}/macros.dist
-%{_datadir}/redhat-release
-%{_datadir}/hummingbird-release
 %{_prefix}/lib/os-release
 %{_prefix}/lib/system-release-cpe
 
