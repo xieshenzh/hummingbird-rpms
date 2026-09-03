@@ -81,9 +81,9 @@ spec:
     pipelineRef:
       params:
         - name: url
-          value: https://github.com/scoheb/release-service-catalog.git
+          value: https://github.com/konflux-ci/release-service-catalog/
         - name: revision
-          value: HUM-2609-remove-oversized-task-results
+          value: production
         - name: pathInRepo
           value: "pipelines/managed/push-rpms-to-pulp/push-rpms-to-pulp.yaml"
       resolver: git

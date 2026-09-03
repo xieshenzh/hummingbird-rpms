@@ -53,8 +53,8 @@ rpas:
     pulp_unsigned_domain: private-hummingbird-nodejs20-unsigned
     pulp_signed_domain: private-hummingbird-nodejs20
     pulp_secret_name: hummingbird-pulp-credentials-private-production-secret
-    pipeline_url: "https://github.com/scoheb/release-service-catalog.git"
-    pipeline_revision: HUM-2609-remove-oversized-task-results
+    pipeline_url: "https://github.com/konflux-ci/release-service-catalog/"
+    pipeline_revision: production
     private_product: nodejs20
     component_filter:
       path_prefix: rpms/
