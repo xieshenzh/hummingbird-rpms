@@ -1,0 +1,10 @@
+{
+  "branch": "rawhide",
+  "modification_status": "clean",
+  "release": "13",
+  "release_monitoring_project_id": 664,
+  "sha": "2799a0488de229c0864c5bf3a3deff2a295ddc63",
+  "source": "https://src.fedoraproject.org/rpms/efivar.git",
+  "upstream_repo": "https://github.com/rhboot/efivar",
+  "version": "39"
+}

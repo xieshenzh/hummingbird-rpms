@@ -8,3 +8,4 @@ __pycache__
 rpms/*/*.tar.gz
 rpms/*/*.tar.bz2
 rpms/*/*.tar.xz
+rpms/*/*.tar.zst

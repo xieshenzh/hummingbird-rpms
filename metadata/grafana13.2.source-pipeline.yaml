@@ -1,0 +1,44 @@
+fetch:
+  - type: git
+    repo: "${UPSTREAM_REPO}"
+    ref: "v${VERSION}"
+    archive_name: "grafana-${VERSION}.tar.gz"
+  - type: vendor
+    ecosystem: go
+    archive_name: "grafana-${VERSION}-vendor.tar.bz2"
+
+transform:
+  - type: run
+    path: "."
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache.patch"
+        patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache-compression.patch"
+        # CVE-2026-76172, CVE-2026-75975, CVE-2026-75931, CVE-2026-75899: bump
+        # vendored fast-uri to 3.1.6. Must be applied here too, or the offline
+        # yarn cache this step generates goes stale on the next version bump.
+        patch -p1 < "${PACKAGE_DIR}/grafana-fast-uri-3.1.6.patch"
+        # CVE-2026-82562, CVE-2026-82417: bump vendored qs to 6.16.0. Must be
+        # applied here too, or the offline yarn cache goes stale.
+        patch -p1 < "${PACKAGE_DIR}/grafana-qs-6.16.0.patch"
+        # CVE-2026-84375: bump vendored js-yaml to 3.15.2 and 4.3.2.
+        patch -p1 < "${PACKAGE_DIR}/grafana-js-yaml-cve.patch"
+        if [ -n "${HTTP_PROXY-}" ]; then export YARN_HTTP_PROXY="${HTTP_PROXY-}"; fi
+        if [ -n "${HTTPS_PROXY-}" ]; then export YARN_HTTPS_PROXY="${HTTPS_PROXY-}"; fi
+        # Unlike grafana12.4, 13.2's yarn.lock has no Cypress dependency to
+        # suppress a binary download for.
+        YARN_ENABLE_GLOBAL_CACHE=false YARN_CACHE_FOLDER=.yarn/cache \
+          node .yarn/releases/yarn-*.cjs install --immutable
+        # Deterministic flags: yarn's own cache writes carry live wall-clock
+        # mtimes and directory listing order isn't guaranteed sorted, so a
+        # plain `tar -cjf` here reproduced a different checksum on every
+        # single run even with byte-identical cache contents.
+        source_date_epoch=$(git log -1 --format=%ct HEAD)
+        tar --sort=name --mtime="@${source_date_epoch}" \
+          --owner=0 --group=0 --numeric-owner \
+          -cjf "grafana-yarn-cache-${VERSION}.tar.bz2" .yarn/cache
+    outputs:
+      - "grafana-yarn-cache-${VERSION}.tar.bz2"

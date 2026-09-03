@@ -476,6 +476,8 @@ def validate_package(package_name: str, check_actual_state: bool = True) -> tupl
     if status == 'independent':
         if 'source' in metadata or 'branch' in metadata or 'sha' in metadata:
             return False, f"{package_name}: Independent package should not have source/branch/sha fields"
+        if 'release' in metadata:
+            return False, f"{package_name}: Independent package should not have release field"
 
         # Check 3.1: An independent package with a non-empty `sources` file has
         # remote sources that need fetching at build time. It has no Fedora
@@ -502,6 +504,9 @@ def validate_package(package_name: str, check_actual_state: bool = True) -> tupl
 
         # Independent packages don't need further validation
         return True, None
+
+    if 'source' not in metadata and 'release' in metadata:
+        return False, f"{package_name}: Package without Fedora source should not have release field"
 
     # Find the last Sync/Import commit once (used by multiple checks below)
     last_sync_sha = find_last_sync_commit(package_name)

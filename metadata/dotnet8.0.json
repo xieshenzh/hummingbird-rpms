@@ -3,7 +3,6 @@
   "cve_product": "Microsoft / .NET 8.0",
   "modification_reason": "update to SDK 8.0.129 / Runtime 8.0.29 for July 2026 security fixes (CVE-2026-47304 and others); update to SDK 8.0.130 / Runtime 8.0.30 for CVE-2026-62909, CVE-2026-62899, CVE-2026-62900, CVE-2026-62901",
   "modification_status": "modified",
-  "release": "0.1",
   "sha": "98f01e1fb5ecee89c6c23d02dc91f0e8aa08aeb8",
   "source": "https://src.fedoraproject.org/rpms/dotnet8.0.git",
   "upstream_branch": "release/8.0",

@@ -1,7 +1,7 @@
 {
   "branch": "f41",
   "cve_product": "ruby-lang / ruby",
-  "modification_reason": "Add unversioned Provides, use basepackagename for filesystem paths, backport net-imap 0.4.24 security fixes (CVE-2026-42246, CVE-2026-42245, CVE-2026-42256); backport net-imap 0.4.25 security fixes (CVE-2026-47240, CVE-2026-47241, CVE-2026-47242); backport ruby_3_3 lgamma test fix for unspecified sign behavior at poles (Bug #21666); added gorget source-pipeline.yaml (HUM-4620 audit finding): Source0's %{name} macro resolves to the versioned package name (ruby3.3), but cache.ruby-lang.org's archive path uses the bare base name 'ruby' -- checksum matches the existing recorded checksum exactly, no content change.",
+  "modification_reason": "Add unversioned Provides, use basepackagename for filesystem paths, backport net-imap 0.4.24 security fixes (CVE-2026-42246, CVE-2026-42245, CVE-2026-42256); backport net-imap 0.4.25 security fixes (CVE-2026-47240, CVE-2026-47241, CVE-2026-47242); backport ruby_3_3 lgamma test fix for unspecified sign behavior at poles (Bug #21666); added gorget source-pipeline.yaml (HUM-4620 audit finding): Source0's %{name} macro resolves to the versioned package name (ruby3.3), but cache.ruby-lang.org's archive path uses the bare base name 'ruby' -- checksum matches the existing recorded checksum exactly, no content change; backport resolv 0.3.2 security fixes (CVE-2026-80212, CVE-2026-80213)",
   "modification_status": "modified",
   "release": "21",
   "sha": "5716be76df6996dc455fbd319765aa0546aa80eb",

@@ -2,7 +2,6 @@
   "branch": "rawhide",
   "modification_reason": "Update to v3.14.0 to fix CVE-2026-56208, CVE-2026-56209, CVE-2026-56210, CVE-2026-56211 (HUM-2755)",
   "modification_status": "modified",
-  "release": "0.1",
   "sha": "2539e35b9e97bbcea7e629eb6a441cbe9f831ff6",
   "source": "https://src.fedoraproject.org/rpms/aom.git",
   "upstream_repo": "https://aomedia.googlesource.com/aom",

@@ -276,8 +276,8 @@ The diff should show only the Release line change:
 > with `sed`.
 >
 > **Important:** Do not change the `release` field in `metadata/<package>.json` during local
-> rebuilds or backports. That field is the current base release (Fedora/rawhide baseline, or a
-> local base such as `0.1` when ahead of Fedora); see
+> rebuilds or backports. That field records the Fedora release for the version currently
+> shipped and is present only while Hummingbird ships Fedora's release; see
 > [Package Metadata Fields](package-metadata-fields.md).
 
 #### 4. Verify the bump is correct
@@ -579,4 +579,4 @@ Built RPMs will be in `builds/<package>/RPMS/`.
 - [Excluding Packages from Images][exclude] - temporarily block faulty packages in container builds
 
 [exclude]: https://hummingbird-project.io/l/excluding-packages-from-images
-[sharp-edge]: ../design/source-pipeline-tool.md#known-sharp-edge-patch-list-duplication
+[sharp-edge]: https://hummingbird-project.io/l/source-pipeline-tool#known-sharp-edge-patch-list-duplication

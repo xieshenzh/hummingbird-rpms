@@ -21,7 +21,11 @@
 #                           - Set to true to pass --skip-build-check to dist_git.py update
 #   GITLAB_REMOTE_URL        - GitLab repo URL (default: https://gitlab.com/redhat/hummingbird/rpms.git)
 
-set -euo pipefail
+set -Eeuo pipefail
+
+# Report the failing command/line before exiting so the next occurrence is
+# diagnosable from the job log alone.
+trap 'echo "ERROR: \"${BASH_COMMAND}\" failed with exit code $? at ${BASH_SOURCE[0]}:${LINENO}" >&2' ERR
 
 # Parse arguments
 CLONE_MODE=false
@@ -191,6 +195,11 @@ EXISTING_UPDATES=0
 UPDATES_WITH_CONFLICTS=0
 FAILED_PACKAGES=()
 CREATED_MR_URLS=()
+# MRs that need a human to resolve conflicts before they can merge; surfaced
+# in the Slack failure notification (see .notify_schedule_failure).
+CONFLICT_MR_URLS=()
+ATTENTION_MRS_FILE=".ci_conflict_mrs.txt"
+rm -f "${ATTENTION_MRS_FILE}"
 
 echo "========================================"
 echo "Dist-git Multi-MR Update"
@@ -382,7 +391,7 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
     # Create a new branch from START_COMMIT (before updates) and cherry-pick this commit
     if ! git checkout --quiet "${START_COMMIT}"; then
         echo "  ✗ Failed to checkout starting commit"
-        PACKAGES_FAILED=$((PACKAGES_FAILED + 1))
+        MR_FAILURES=$((MR_FAILURES + 1))
         FAILED_PACKAGES+=("${PACKAGE} (checkout failed)")
         continue
     fi
@@ -392,7 +401,7 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
 
     if ! git checkout -b "${BRANCH_NAME}" 2>/dev/null; then
         echo "  ✗ Failed to create branch ${BRANCH_NAME}"
-        PACKAGES_FAILED=$((PACKAGES_FAILED + 1))
+        MR_FAILURES=$((MR_FAILURES + 1))
         FAILED_PACKAGES+=("${PACKAGE} (branch creation failed)")
         continue
     fi
@@ -400,7 +409,7 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
     # Cherry-pick the specific commit
     if ! git cherry-pick "${COMMIT_SHA}" >/dev/null 2>&1; then
         echo "  ✗ Failed to cherry-pick commit for ${PACKAGE}"
-        PACKAGES_FAILED=$((PACKAGES_FAILED + 1))
+        MR_FAILURES=$((MR_FAILURES + 1))
         FAILED_PACKAGES+=("${PACKAGE} (cherry-pick failed)")
         git cherry-pick --abort 2>/dev/null || true
         continue
@@ -460,25 +469,53 @@ for COMMIT_SHA in "${COMMIT_SHAS[@]}"; do
         # Create MR for this package using existing create_mr.sh
         # Exit codes: 0 = created, 2 = already exists, 1 = failure
         MR_EXIT_CODE=0
-        ./ci/create_mr.sh "${MR_ARGS[@]}" || MR_EXIT_CODE=$?
+        MR_OUTPUT=$(./ci/create_mr.sh "${MR_ARGS[@]}" 2>&1) || MR_EXIT_CODE=$?
+        echo "${MR_OUTPUT}"
+
+        # Prefer the real MR URL (with MR number) reported by create_mr.sh; fall
+        # back to a source_branch search link if one wasn't found in its output.
+        # NOTE: `|| true` is required. Under `set -o pipefail`, grep exiting 1 (no
+        # match) makes the whole pipeline return non-zero, which `set -e` would
+        # treat as a fatal error and abort the job mid-loop (before the summary
+        # ever prints). No match is expected whenever an MR already exists, since
+        # create_mr.sh then emits a `?source_branch=` search link rather than a
+        # numbered `merge_requests/<id>` URL.
+        MR_URL=$(echo "${MR_OUTPUT}" | grep -o "https://[^[:space:]]*merge_requests/[0-9]*" | head -1 || true)
+        if [[ -z "${MR_URL}" && -n "${GITLAB_HOST:-}" && -n "${GITLAB_PROJECT:-}" ]]; then
+            MR_URL="https://${GITLAB_HOST}/${GITLAB_PROJECT}/-/merge_requests?source_branch=${BRANCH_NAME}"
+        fi
 
         if [[ ${MR_EXIT_CODE} -eq 0 ]]; then
             # MR successfully created
             if [[ "${HAS_CONFLICT}" == true ]]; then
                 echo "  ✓ Created conflict MR for ${PACKAGE} (needs manual resolution)"
+                CONFLICT_MR_URLS+=("${PACKAGE}: ${MR_URL}")
             else
                 echo "  ✓ Created MR for ${PACKAGE}"
             fi
             PACKAGES_UPDATED=$((PACKAGES_UPDATED + 1))
 
-            # Track MR URL if we have GitLab info
-            if [[ -n "${GITLAB_HOST:-}" && -n "${GITLAB_PROJECT:-}" ]]; then
-                MR_URL="https://${GITLAB_HOST}/${GITLAB_PROJECT}/-/merge_requests?source_branch=${BRANCH_NAME}"
-                CREATED_MR_URLS+=("${MR_URL}")
+            # Track MR URL if we have GitLab info. Conflict MRs are annotated
+            # here since they're also listed separately below under "MRs
+            # needing manual conflict resolution" -- this avoids an unlabeled
+            # duplicate entry in the job log.
+            if [[ -n "${MR_URL}" ]]; then
+                if [[ "${HAS_CONFLICT}" == true ]]; then
+                    CREATED_MR_URLS+=("${MR_URL} (conflict)")
+                else
+                    CREATED_MR_URLS+=("${MR_URL}")
+                fi
             fi
         elif [[ ${MR_EXIT_CODE} -eq 2 ]]; then
             # MR already exists - not a failure, but don't count as created
             EXISTING_UPDATES=$((EXISTING_UPDATES + 1))
+            if [[ "${HAS_CONFLICT}" == true && -n "${MR_URL}" ]]; then
+                # MR_URL here is a source_branch search link, not a direct
+                # merge_requests/<ID> link: create_mr.sh doesn't look up the
+                # existing MR's number, and finding it would need a GitLab
+                # API call. Still useful for the on-call reader to click through.
+                CONFLICT_MR_URLS+=("${PACKAGE}: ${MR_URL}")
+            fi
         else
             # MR creation failed
             echo "  ✗ Failed to create MR for ${PACKAGE}"
@@ -529,6 +566,15 @@ if [[ ${#CREATED_MR_URLS[@]} -gt 0 ]]; then
     echo "Created MR URLs:"
     for mr_url in "${CREATED_MR_URLS[@]}"; do
         echo "  - ${mr_url}"
+    done
+fi
+
+if [[ ${#CONFLICT_MR_URLS[@]} -gt 0 ]]; then
+    echo ""
+    echo "MRs needing manual conflict resolution:"
+    for entry in "${CONFLICT_MR_URLS[@]}"; do
+        echo "  - ${entry}"
+        echo "${entry}" >> "${ATTENTION_MRS_FILE}"
     done
 fi
 echo "========================================"

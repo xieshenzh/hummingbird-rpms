@@ -183,9 +183,10 @@ index 3f8ed7f392..c3b55af3e7 100644
          || !TEST_ptr(bld_tri_nc = OSSL_PARAM_BLD_new())
          || !TEST_ptr(bld_tri = OSSL_PARAM_BLD_new())
          || !create_ec_explicit_trinomial_params_namedcurve(bld_tri_nc)
-@@ -1486,8 +1486,8 @@ int setup_tests(void)
+@@ -1486,9 +1486,9 @@ int setup_tests(void)
      TEST_info("Generating EC keys...");
      MAKE_DOMAIN_KEYS(EC, "EC", EC_params);
+ #ifndef OPENSSL_NO_EC_EXPLICIT_CURVES
      MAKE_DOMAIN_KEYS(ECExplicitPrimeNamedCurve, "EC", ec_explicit_prime_params_nc);
 -    MAKE_DOMAIN_KEYS(ECExplicitPrime2G, "EC", ec_explicit_prime_params_explicit);
 -#ifndef OPENSSL_NO_EC2M
@@ -194,8 +195,9 @@ index 3f8ed7f392..c3b55af3e7 100644
      MAKE_DOMAIN_KEYS(ECExplicitTriNamedCurve, "EC", ec_explicit_tri_params_nc);
      MAKE_DOMAIN_KEYS(ECExplicitTri2G, "EC", ec_explicit_tri_params_explicit);
  #endif
-@@ -1566,9 +1566,9 @@ int setup_tests(void)
+@@ -1566,10 +1566,10 @@ int setup_tests(void)
          ADD_TEST_SUITE_LEGACY(EC);
+ #ifndef OPENSSL_NO_EC_EXPLICIT_CURVES
          ADD_TEST_SUITE(ECExplicitPrimeNamedCurve);
          ADD_TEST_SUITE_LEGACY(ECExplicitPrimeNamedCurve);
 -        ADD_TEST_SUITE(ECExplicitPrime2G);
@@ -207,18 +209,20 @@ index 3f8ed7f392..c3b55af3e7 100644
          ADD_TEST_SUITE(ECExplicitTriNamedCurve);
          ADD_TEST_SUITE_LEGACY(ECExplicitTriNamedCurve);
          ADD_TEST_SUITE(ECExplicitTri2G);
-@@ -1644,7 +1644,7 @@ void cleanup_tests(void)
+@@ -1644,8 +1644,8 @@ void cleanup_tests(void)
  {
  #ifndef OPENSSL_NO_EC
+ #ifndef OPENSSL_NO_EC_EXPLICIT_CURVES
      OSSL_PARAM_free(ec_explicit_prime_params_nc);
 -    OSSL_PARAM_free(ec_explicit_prime_params_explicit);
 +/*    OSSL_PARAM_free(ec_explicit_prime_params_explicit);*/
      OSSL_PARAM_BLD_free(bld_prime_nc);
      OSSL_PARAM_BLD_free(bld_prime);
  #ifndef OPENSSL_NO_EC2M
-@@ -1666,8 +1666,8 @@ void cleanup_tests(void)
+@@ -1666,9 +1666,9 @@ void cleanup_tests(void)
  #ifndef OPENSSL_NO_EC
      FREE_DOMAIN_KEYS(EC);
+ #ifndef OPENSSL_NO_EC_EXPLICIT_CURVES
      FREE_DOMAIN_KEYS(ECExplicitPrimeNamedCurve);
 -    FREE_DOMAIN_KEYS(ECExplicitPrime2G);
 -#ifndef OPENSSL_NO_EC2M
@@ -252,4 +256,3 @@ index 07dc4b4298..4c47fa68c2 100644
  MGMCAQAwEAYHKoZIzj0CAQYFK4EEAA8ETDBKAgEBBBUDnQW0mLiHVha/jqFznX/K
 -- 
 2.52.0
-

@@ -87,8 +87,7 @@ index 80ae817313..1e73a1ec28 100644
  
  static uint64_t get_time_stamp(void);
  
-@@ -338,70 +340,8 @@ static ssize_t syscall_random(void *buf, size_t buflen)
-      * which is way below the OSSL_SSIZE_MAX limit. Therefore sign conversion
+@@ -339,69 +339,7 @@ static ssize_t syscall_random(void *buf, size_t buflen)
       * between size_t and ssize_t is safe even without a range check.
       */
 -
@@ -147,7 +146,7 @@ index 80ae817313..1e73a1ec28 100644
 -    return getrandom(buf, buflen, 0);
 -#elif (defined(__FreeBSD__) || defined(__NetBSD__)) && defined(KERN_ARND)
 -    return sysctl_random(buf, buflen);
--#elif defined(__wasi__)
+-#elif defined(__wasi__) || defined(__EMSCRIPTEN__)
 -    if (getentropy(buf, buflen) == 0)
 -        return (ssize_t)buflen;
 -    return -1;
@@ -162,4 +161,3 @@ index 80ae817313..1e73a1ec28 100644
  
 -- 
 2.52.0
-

@@ -59,7 +59,7 @@ def test_upstream_repo_exists(package: str) -> None:
         f"Package '{package}' has no metadata file at metadata/{package}.json. "
         f"Create the file with at least: "
         f'{{"upstream_repo": "https://github.com/example/project", '
-        f'"version": "...", "release": "...", "modification_status": "independent"}}'
+        f'"version": "...", "modification_status": "independent"}}'
     )
     val = metadata.get("upstream_repo")
     assert val is not None, MISSING_FIELD_MESSAGE.format(package=package)

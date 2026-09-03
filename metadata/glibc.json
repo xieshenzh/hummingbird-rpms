@@ -1,6 +1,6 @@
 {
   "branch": "f44",
-  "modification_reason": "Migrated to gorget source-pipeline.yaml (HUM-5619): the development-snapshot Source0 is now fetched+archived by gorget's git fetch step (git archive + xz, commit-timestamp mtime) instead of Fedora's own ad hoc snapshot process -- content is equivalent (diffed extracted trees) but the archive's tar/xz container metadata differs.",
+  "modification_reason": "Backport upstream fixes for tdelete OOB write (CVE-2026-19542), strfmon right-justification overflow (CVE-2026-19499), SHIFT_JISX0213 pending-char DoS (CVE-2026-77117), and EUC_JISX0213 pending-char DoS (CVE-2026-80489)",
   "modification_status": "modified",
   "release": "8",
   "sha": "35dbb287f9fb06e287a9c703eb9da8ff63399aa6",

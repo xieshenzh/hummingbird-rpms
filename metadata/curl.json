@@ -1,12 +1,11 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 8.21.0",
+  "modification_reason": "Update to upstream version 8.22.0",
   "modification_status": "modified",
-  "release": "5",
   "release_monitoring_project_id": 381,
   "sha": "2c2712eef598ef945ea87a70cbc1d09fdd62c25e",
   "source": "https://src.fedoraproject.org/rpms/curl.git",
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/curl/curl",
-  "version": "8.21.0"
+  "version": "8.22.0"
 }

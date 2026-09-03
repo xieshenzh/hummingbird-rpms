@@ -16,13 +16,14 @@ transform:
       - |
         set -euo pipefail
         # Apply every patch %prep will (in the same order), not just
-        # grafana-yarn-cache.patch: the fast-uri/brace-postcss/browserslist-nanoid CVE patches
-        # also bump yarn.lock/package.json entries (the other two patches
-        # only touch a Go test file, harmless to apply here too). Populating
-        # the cache from the pristine (pre-CVE-patch) lockfile leaves it
-        # missing whatever versions those patches bump to, so %build's own
-        # `yarn install --immutable` (against the post-patch lockfile) fails
-        # with "Cache entry required but missing" for exactly those packages.
+        # grafana-yarn-cache.patch: the fast-uri/brace-postcss/browserslist-nanoid/dompurify
+        # CVE patches also bump yarn.lock/package.json entries (the other two
+        # patches only touch a Go test file, harmless to apply here too).
+        # Populating the cache from the pristine (pre-CVE-patch) lockfile
+        # leaves it missing whatever versions those patches bump to, so
+        # %build's own `yarn install --immutable` (against the post-patch
+        # lockfile) fails with "Cache entry required but missing" for
+        # exactly those packages.
         patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache.patch"
         patch -p1 < "${PACKAGE_DIR}/disable-parallel-db-regression-tests.patch"
         patch -p1 < "${PACKAGE_DIR}/reset-begintx-test-deadline.patch"
@@ -30,10 +31,14 @@ transform:
         patch -p1 < "${PACKAGE_DIR}/grafana-npm-cve-brace-postcss.patch"
         patch -p1 < "${PACKAGE_DIR}/grafana-ip-address-cve.patch"
         patch -p1 < "${PACKAGE_DIR}/grafana-browserslist-nanoid-cve.patch"
+        patch -p1 < "${PACKAGE_DIR}/grafana-dompurify-cve.patch"
         # Must apply after the CVE patches above: pins compressionLevel and
         # carries the resulting full yarn.lock checksum regeneration (see
         # grafana-yarn-cache-compression.patch's own header comment).
         patch -p1 < "${PACKAGE_DIR}/grafana-yarn-cache-compression.patch"
+        # Generated against the post-compression lockfile, so this comes after
+        # grafana-yarn-cache-compression.patch (same order as Patch9 in the spec).
+        patch -p1 < "${PACKAGE_DIR}/grafana-js-yaml-cve.patch"
         if [ -n "${HTTP_PROXY-}" ]; then export YARN_HTTP_PROXY="${HTTP_PROXY-}"; fi
         if [ -n "${HTTPS_PROXY-}" ]; then export YARN_HTTPS_PROXY="${HTTPS_PROXY-}"; fi
         CYPRESS_INSTALL_BINARY=0 YARN_ENABLE_GLOBAL_CACHE=false YARN_CACHE_FOLDER=.yarn/cache \
@@ -58,9 +63,21 @@ transform:
 # go.mod/go.sum/go.work alongside vendor/, which changes this archive's own
 # checksum without changing any dependency's resolved version or content.
 accepted-checksums:
+  - file: "grafana-yarn-cache-12.4.9.tar.bz2"
+    checksum: "a11fdff03b7f86d7e6b35439ec85b6ee647604c5efbcd800128b0e28a22236c694903702f28ffc4c703f92eef128ce93023e10f942ddb2482160f024df386277"
+    reason: "grafana-fast-uri-cve.patch bumps fast-uri 3.1.5->3.1.6 for CVE-2026-76172/75975/75931/75899; yarn cache regenerated to include the patched dependency"
+  - file: "grafana-12.4.9-vendor.tar.bz2"
+    checksum: "1d8c2c168abee1d5e4e028c487fb773df94053aa9b0a243d4d1290c1c2476bf24ebbdc7528189e00f930695c724be79c26f91f78d6c0544ba3678068cd9c8ab7"
+    reason: "go-vendor-tools.toml dependency_overrides bumps github.com/getkin/kin-openapi to v0.147.0 for CVE-2026-73501; vendor archive regenerated to include the patched dependency (also drops the now-unused woodsbury/decimal128, dropping 0BSD from the License tag)"
+  - file: "grafana-12.4.9-vendor.tar.bz2"
+    checksum: "1417dec255c3009116e00711783ebc2b08c7a0331989de64b108ff67bf9ceb013bf6b75af45afa679695997b0505d2538aecdc64413badd36df9c429c0fe4a5d"
+    reason: "gorget 0.1.18 normalizes uid/gid/uname/gname in generated archives; dependency content is unchanged"
+  - file: "grafana-yarn-cache-12.4.9.tar.bz2"
+    checksum: "c6b84b3f7ee6e62a9edbf257eb6ea315557a18379e310be713dee9c9c063a5f64961c6e4411b6434601330c1f452a96963e80efb3c632c33448f7b58d4b5bfdb"
+    reason: "grafana-dompurify-cve.patch bumps DOMPurify 3.3.0->3.4.12 for CVE-2026-65902/65899/65898/65901; yarn cache regenerated to include the patched dependency"
   - file: "grafana-12.4.8-vendor.tar.bz2"
     checksum: "ce08014af2e030665f58d5234558d9d72283856bbe6b2b667e49daf23343d600e851d5c76db96fd9883825d753e918f2f11e5a4ec4226bd73df5413a4cf1c478"
     reason: "gorget 0.1.16 fixes vendor archive layout (gorget-project/gorget#32); go.mod/go.sum/go.work added alongside vendor/, no dependency content changed"
   - file: "grafana-yarn-cache-12.4.8.tar.bz2"
-    checksum: "c0784766cad3da424be7d5d08b7c3e5289960f91997de2b688fa2261e14ff7dbe567d3edfef68a2fdfd0c3331c26cfe35acbd0bcb3b31075b6e9437c698b4fab"
-    reason: "grafana-browserslist-nanoid-cve.patch bumps browserslist 4.28.1->4.28.7 and nanoid 5.1.6->5.1.16 for CVE-2026-73089/73088/73086; grafana-yarn-cache-compression.patch regenerated to reflect yarn.lock changes"
+    checksum: "557b2c824ca489dfa03a3cf52c439e59bc28f6b254aca873c7cbe2c3bbfc002af678c5a4200da508fac479f45fdf185fbb0b861045c2fdb7eaefa58846f5b721"
+    reason: "grafana-dompurify-cve.patch bumps DOMPurify 3.3.0->3.4.12 for CVE-2026-65911/65914/65898/65913/65912/65901/65902/65899; grafana-yarn-cache-compression.patch regenerated to reflect yarn.lock changes"

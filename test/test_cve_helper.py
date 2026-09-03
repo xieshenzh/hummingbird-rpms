@@ -24,6 +24,24 @@ def _load_helper():
 
 helper = _load_helper()
 
+# lib modules are importable after helper is loaded (it adds the skill dir to sys.path)
+import pytest  # noqa: E402
+import lib.comments as lib_comments  # noqa: E402
+import lib.investigate as lib_investigate  # noqa: E402
+import lib.jira as lib_jira  # noqa: E402
+import lib.models as lib_models  # noqa: E402
+import lib.sbom as lib_sbom  # noqa: E402
+import lib.spec as lib_spec  # noqa: E402
+import lib.utils as lib_utils  # noqa: E402
+import lib.vcs as lib_vcs  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _clear_jira_auth_cache():
+    lib_jira.clear_jira_auth_cache()
+    yield
+    lib_jira.clear_jira_auth_cache()
+
 
 def test_normalize_argv_inserts_show_for_bare_tickets() -> None:
     assert helper.normalize_argv(["HUM-1234", "--title-only"]) == [
@@ -35,8 +53,8 @@ def test_normalize_argv_inserts_show_for_bare_tickets() -> None:
 
 
 def test_pulp_sbom_package_dir_replaces_dots() -> None:
-    assert helper.pulp_sbom_package_dir("grafana13.1") == "grafana13-1-main"
-    assert helper.pulp_sbom_package_dir("boost") == "boost-main"
+    assert lib_sbom.pulp_sbom_package_dir("grafana13.1") == "grafana13-1-main"
+    assert lib_sbom.pulp_sbom_package_dir("boost") == "boost-main"
 
 
 def test_parse_glab_mr_list() -> None:
@@ -47,7 +65,7 @@ def test_parse_glab_mr_list() -> None:
             "!12  plain title",
         ]
     )
-    entries = helper._parse_glab_mr_list(output, "open")
+    entries = lib_vcs._parse_glab_mr_list(output, "open")
     assert [e.iid for e in entries] == ["3905", "12"]
     assert entries[0].web_url.endswith("/merge_requests/3905")
     assert "axios" in entries[0].title
@@ -81,7 +99,7 @@ def test_search_sbom_file_structured_hits(tmp_path: Path) -> None:
 
 def test_search_sbom_file_text_fallback(tmp_path: Path) -> None:
     path = tmp_path / "plain.sbom.json"
-    path.write_text('not-json but mentions EvilLib somewhere', encoding="utf-8")
+    path.write_text("not-json but mentions EvilLib somewhere", encoding="utf-8")
     hits = helper.search_sbom_file(path, ["EvilLib"])
     assert hits
     assert hits[0].path == "text"
@@ -104,7 +122,7 @@ def test_probe_spec_deps_bundled_and_component(tmp_path: Path, monkeypatch) -> N
         + "\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
     hits = helper.probe_spec_deps(pkg, "golang.org/x/text")
     kinds = {h.kind for h in hits}
     assert "bundled_provides" in kinds
@@ -127,9 +145,9 @@ def test_run_rhjira_retries_transient_errors(monkeypatch) -> None:
             )
         return SimpleNamespace(returncode=0, stdout="ok", stderr="")
 
-    monkeypatch.setattr(helper, "run_command", fake_run)
+    monkeypatch.setattr(lib_jira, "run_command", fake_run)
     monkeypatch.setattr(time, "sleep", lambda s: sleeps.append(s))
-    result = helper.run_rhjira(["show", "HUM-1"])
+    result = lib_jira.run_rhjira(["show", "HUM-1"])
     assert result.returncode == 0
     assert len(calls) == 3
     assert sleeps == [2, 4]
@@ -142,8 +160,8 @@ def test_run_rhjira_does_not_retry_non_transient(monkeypatch) -> None:
         calls.append(args)
         return SimpleNamespace(returncode=1, stdout="", stderr="issue not found")
 
-    monkeypatch.setattr(helper, "run_command", fake_run)
-    result = helper.run_rhjira(["show", "HUM-1"])
+    monkeypatch.setattr(lib_jira, "run_command", fake_run)
+    result = lib_jira.run_rhjira(["show", "HUM-1"])
     assert result.returncode == 1
     assert len(calls) == 1
 
@@ -152,45 +170,45 @@ def test_read_local_spec_nvr(tmp_path: Path, monkeypatch) -> None:
     pkg = "mypkg"
     pkg_dir = tmp_path / "rpms" / pkg
     pkg_dir.mkdir(parents=True)
-    # Spec with a %global and an external-override conditional pattern
     (pkg_dir / f"{pkg}.spec").write_text(
-        "\n".join([
-            "%global mainver 2.5.1",
-            "Name: mypkg",
-            "Version: %{?ver_override}%{!?ver_override:%{mainver}}",
-            "Release: 3%{?dist}",
-            "",
-            "%description",
-            "A package.",
-        ]) + "\n",
+        "\n".join(
+            [
+                "%global mainver 2.5.1",
+                "Name: mypkg",
+                "Version: %{?ver_override}%{!?ver_override:%{mainver}}",
+                "Release: 3%{?dist}",
+                "",
+                "%description",
+                "A package.",
+            ]
+        )
+        + "\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
-    assert helper.read_local_spec_nvr(pkg) == "mypkg-2.5.1-3"
-    # Missing package returns empty string
-    assert helper.read_local_spec_nvr("nonexistent") == ""
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    assert lib_spec.read_local_spec_nvr(pkg) == "mypkg-2.5.1-3"
+    assert lib_spec.read_local_spec_nvr("nonexistent") == ""
 
 
 def test_search_cve_in_spec_and_patches(tmp_path: Path, monkeypatch) -> None:
     pkg = "testpkg"
     pkg_dir = tmp_path / "rpms" / pkg
     pkg_dir.mkdir(parents=True)
-    (pkg_dir / f"{pkg}.spec").write_text("Name: testpkg\nVersion: 1.0\n", encoding="utf-8")
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "Name: testpkg\nVersion: 1.0\n", encoding="utf-8"
+    )
     (pkg_dir / "fix-cve.patch").write_text(
         "# Backport for CVE-2024-12345\n--- a/foo.c\n+++ b/foo.c\n", encoding="utf-8"
     )
-    monkeypatch.setattr(helper, "repo_root", lambda: tmp_path)
-    # Found in patch
-    assert helper.search_cve_in_spec_and_patches(pkg, ["CVE-2024-12345"]) is True
-    # Not found
-    assert helper.search_cve_in_spec_and_patches(pkg, ["CVE-2099-99999"]) is False
-    # Missing package dir
-    assert helper.search_cve_in_spec_and_patches("ghost", ["CVE-2024-12345"]) is False
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    assert lib_spec.search_cve_in_spec_and_patches(pkg, ["CVE-2024-12345"]) is True
+    assert lib_spec.search_cve_in_spec_and_patches(pkg, ["CVE-2099-99999"]) is False
+    assert lib_spec.search_cve_in_spec_and_patches("ghost", ["CVE-2024-12345"]) is False
 
 
 def test_build_suggested_chat_title() -> None:
     reports = [
-        helper.TicketReport(
+        lib_models.TicketReport(
             "HUM-1",
             "CVE-2026-12345 pkg: x",
             "New",
@@ -222,7 +240,9 @@ def test_parse_agent_env_strips_quotes() -> None:
     assert "not" not in parsed
 
 
-def test_load_jira_auth_maps_rhjira_server_and_email(tmp_path: Path, monkeypatch) -> None:
+def test_load_jira_auth_maps_rhjira_server_and_email(
+    tmp_path: Path, monkeypatch
+) -> None:
     import cve_analysis_bridge as bridge
 
     agent = tmp_path / "agent.env"
@@ -268,6 +288,8 @@ def test_load_jira_auth_prefers_process_env(tmp_path: Path) -> None:
 def test_cmd_deps_reports_missing_analysis(monkeypatch) -> None:
     import cve_analysis_bridge as bridge
 
+    # cmd_deps is in cve_helper and uses load_jira_auth/jira_client_module
+    # from its own namespace (imported directly from cve_analysis_bridge)
     monkeypatch.setattr(
         helper,
         "load_jira_auth",
@@ -304,14 +326,14 @@ def test_pulp_has_nvr_uses_listing_index(monkeypatch) -> None:
         fetch_srpm_listing_index=lambda pkg: index,
         fetch_hummingbird_latest_srpm=lambda pkg: "grafana13.1-13.1.0-1.src.rpm",
     )
-    monkeypatch.setattr(helper, "pulp_module", lambda: pulp)
-    ok, detail = helper.pulp_has_nvr("grafana13.1", "grafana13.1-13.1.1-1.src.rpm")
+    monkeypatch.setattr(lib_jira, "pulp_module", lambda: pulp)
+    ok, detail = lib_jira.pulp_has_nvr("grafana13.1", "grafana13.1-13.1.1-1.src.rpm")
     assert ok
     assert "Pulp listing" in detail
 
 
 def test_set_fixed_in_build_refuses_unpublished_nvr(monkeypatch) -> None:
-    monkeypatch.setattr(helper, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
+    monkeypatch.setattr(lib_jira, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
     try:
         helper.set_fixed_in_build("HUM-1", "pkg-1.0-1.src.rpm", "pkg")
     except RuntimeError as err:
@@ -326,16 +348,14 @@ def test_set_fixed_in_build_force_skips_pulp(monkeypatch) -> None:
     def set_fib(base, token, ticket, build, *, basic_auth_user=None):
         calls.append((ticket, build, basic_auth_user))
 
-    monkeypatch.setattr(helper, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(lib_jira, "pulp_has_nvr", lambda pkg, nvr: (False, "missing"))
+    monkeypatch.setattr(lib_jira, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "jira_client_module",
         lambda: SimpleNamespace(set_fixed_in_build=set_fib),
     )
-    detail = helper.set_fixed_in_build(
-        "HUM-1", "pkg-1.0-1.src.rpm", "pkg", force=True
-    )
+    detail = helper.set_fixed_in_build("HUM-1", "pkg-1.0-1.src.rpm", "pkg", force=True)
     assert "forced" in detail
     assert calls[0][0] == "HUM-1"
     assert calls[0][1] == "pkg-1.0-1.src.rpm"
@@ -354,9 +374,9 @@ def test_apply_next_release_labels(monkeypatch) -> None:
     def remove_label(*a, **_k):
         calls.append(f"remove:{a[3]}")
 
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(lib_jira, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "jira_client_module",
         lambda: SimpleNamespace(
             jira_add_comment=add_comment,
@@ -387,9 +407,9 @@ def test_close_not_a_bug(monkeypatch) -> None:
         calls.append("resolve")
         return True
 
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(lib_jira, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "jira_client_module",
         lambda: SimpleNamespace(
             jira_add_comment=add_comment,
@@ -402,9 +422,9 @@ def test_close_not_a_bug(monkeypatch) -> None:
 
 
 def test_close_not_a_bug_none_return_is_success(monkeypatch) -> None:
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(lib_jira, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "jira_client_module",
         lambda: SimpleNamespace(
             jira_add_comment=lambda *_a, **_k: True,
@@ -416,9 +436,9 @@ def test_close_not_a_bug_none_return_is_success(monkeypatch) -> None:
 
 
 def test_close_not_a_bug_false_return_raises(monkeypatch) -> None:
-    monkeypatch.setattr(helper, "load_jira_auth", _fake_auth)
+    monkeypatch.setattr(lib_jira, "load_jira_auth", _fake_auth)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "jira_client_module",
         lambda: SimpleNamespace(
             jira_add_comment=lambda *_a, **_k: True,
@@ -436,7 +456,7 @@ def test_close_not_a_bug_false_return_raises(monkeypatch) -> None:
 
 def test_parse_created_issue_key() -> None:
     assert (
-        helper.parse_created_issue_key(
+        lib_jira.parse_created_issue_key(
             "https://redhat.atlassian.net/browse/HUM-6222\n"
         )
         == "HUM-6222"
@@ -444,12 +464,14 @@ def test_parse_created_issue_key() -> None:
 
 
 def test_gitlab_project_from_url() -> None:
-    assert helper.gitlab_project_from_url(
-        "git@gitlab.com:prarit/rpms.git"
-    ) == "prarit/rpms"
-    assert helper.gitlab_project_from_url(
-        "https://gitlab.com/prarit/rpms.git"
-    ) == "prarit/rpms"
+    assert (
+        lib_vcs.gitlab_project_from_url("git@gitlab.com:prarit/rpms.git")
+        == "prarit/rpms"
+    )
+    assert (
+        lib_vcs.gitlab_project_from_url("https://gitlab.com/prarit/rpms.git")
+        == "prarit/rpms"
+    )
 
 
 def test_detect_fork_remote_skips_upstream(monkeypatch) -> None:
@@ -462,11 +484,11 @@ def test_detect_fork_remote_skips_upstream(monkeypatch) -> None:
         ]
     )
     monkeypatch.setattr(
-        helper,
+        lib_vcs,
         "run_command",
         lambda *_a, **_k: SimpleNamespace(returncode=0, stdout=output, stderr=""),
     )
-    name, project = helper.detect_fork_remote()
+    name, project = lib_vcs.detect_fork_remote()
     assert name == "prarit"
     assert project == "prarit/rpms"
 
@@ -506,10 +528,10 @@ def test_create_hum_task_links_and_starts(monkeypatch) -> None:
             )
         return SimpleNamespace(returncode=0, stdout="", stderr="")
 
-    monkeypatch.setattr(helper, "ensure_rhjira_available", lambda: None)
-    monkeypatch.setattr(helper, "run_rhjira", fake_rhjira)
+    monkeypatch.setattr(lib_jira, "ensure_rhjira_available", lambda: None)
+    monkeypatch.setattr(lib_jira, "run_rhjira", fake_rhjira)
     monkeypatch.setattr(
-        helper,
+        lib_jira,
         "load_jira_auth",
         lambda: SimpleNamespace(basic_auth_user="dev@redhat.com"),
     )
@@ -530,15 +552,20 @@ def test_strip_only_keyword() -> None:
 
 
 def test_recap_lines_asks_before_discovered() -> None:
-    named = helper.TicketReport(
-        "HUM-1", "CVE-2026-1 pkg: foo", "In Progress", "Bug", "me", "cve-needs-attention"
+    named = lib_models.TicketReport(
+        "HUM-1",
+        "CVE-2026-1 pkg: foo",
+        "In Progress",
+        "Bug",
+        "me",
+        "cve-needs-attention",
     )
     named.fixed_in_build = "foo-1-1.src.rpm"
-    extra = helper.TicketReport(
+    extra = lib_models.TicketReport(
         "HUM-2", "CVE-2026-1 pkg: bar", "New", "Bug", "bot", ""
     )
     extra.package_guess = "bar"
-    gathered = helper.GatheredTickets(
+    gathered = lib_models.GatheredTickets(
         reports=[named, extra],
         user_provided=["HUM-1"],
         discovered=["HUM-2"],
@@ -547,9 +574,643 @@ def test_recap_lines_asks_before_discovered() -> None:
     assert "HUM-1 [user_provided]" in text
     assert "HUM-2 [discovered]" in text
     assert "FIB is set but no task/MR is linked" in text
+    assert "resolution_hint=fib_ask_create_task" in text
+    assert "resolution_hint=needs_version_check" in text
+    assert "recommended_next: version-check bar --ticket HUM-2" in text
     assert "Related: HUM-2 (bar)" in text
     assert "Yes please" in text
 
 
+def test_recap_lines_embargoed_ticket() -> None:
+    embargoed = lib_models.TicketReport(
+        "HUM-99", "EMBARGOED CVE-2026-99 foo: x", "New", "Bug", "me", ""
+    )
+    gathered = lib_models.GatheredTickets(
+        reports=[embargoed],
+        user_provided=["HUM-99"],
+        discovered=[],
+    )
+    text = "\n".join(lib_investigate.recap_lines(gathered))
+    assert "resolution_hint=embargoed_stop" in text
+    assert "Stop; embargoed ticket" in text
 
 
+def test_resolution_hint_for_report() -> None:
+    embargoed = lib_models.TicketReport(
+        "HUM-1", "EMBARGOED CVE-2026-1 foo: x", "New", "Bug", "me", ""
+    )
+    hint, next_step = lib_investigate.resolution_hint_for_report(
+        embargoed, has_task_or_mr=False
+    )
+    assert hint == "embargoed_stop"
+    assert "Stop" in next_step
+
+    fib_with_task = lib_models.TicketReport(
+        "HUM-2", "CVE-2026-2 foo: x", "New", "Bug", "me", ""
+    )
+    fib_with_task.fixed_in_build = "foo-1-1.src.rpm"
+    hint, next_step = lib_investigate.resolution_hint_for_report(
+        fib_with_task, has_task_or_mr=True
+    )
+    assert hint == "fib_leave_for_advisory"
+    assert "leave for advisory automation" in next_step
+
+    fib_no_task = lib_models.TicketReport(
+        "HUM-3", "CVE-2026-3 foo: x", "New", "Bug", "me", ""
+    )
+    fib_no_task.fixed_in_build = "foo-1-1.src.rpm"
+    hint, next_step = lib_investigate.resolution_hint_for_report(
+        fib_no_task, has_task_or_mr=False
+    )
+    assert hint == "fib_ask_create_task"
+    assert "ask whether to create the task" in next_step
+
+    needs_check = lib_models.TicketReport(
+        "HUM-4", "CVE-2026-4 foo: x", "New", "Bug", "me", ""
+    )
+    needs_check.package_guess = "foo"
+    hint, next_step = lib_investigate.resolution_hint_for_report(
+        needs_check, has_task_or_mr=False
+    )
+    assert hint == "needs_version_check"
+    assert next_step == (
+        "version-check foo --ticket HUM-4 to compare the local NVR against "
+        "the CVE range before deciding."
+    )
+
+    no_package = lib_models.TicketReport(
+        "HUM-5", "CVE-2026-5 something else", "New", "Bug", "me", ""
+    )
+    hint, next_step = lib_investigate.resolution_hint_for_report(
+        no_package, has_task_or_mr=False
+    )
+    assert hint == "needs_package_guess"
+    assert "No package guess" in next_step
+
+
+def test_split_nvr_and_version_cmp() -> None:
+    assert lib_spec.split_nvr("grafana13.1-13.1.1-0.5.src.rpm") == (
+        "grafana13.1",
+        "13.1.1",
+        "0.5",
+    )
+    assert lib_spec.split_nvr("foo-1.2") == ("foo", "1.2", "")
+    assert lib_spec.version_cmp("1.2.3", "1.2.4") == -1
+    assert lib_spec.version_cmp("1.3", "1.2.9") == 1
+    assert lib_spec.version_cmp("v1.0.0", "1.0.0") == 0
+    assert lib_spec.version_cmp("not-a-version", "1.0") is None
+
+
+def test_parse_affected_constraints_and_satisfies() -> None:
+    constraints = lib_spec.parse_affected_constraints("< 1.2.3")
+    assert constraints == [("<", "1.2.3")]
+    assert lib_spec.version_satisfies("1.2.2", constraints) is True
+    assert lib_spec.version_satisfies("1.2.3", constraints) is False
+    span = lib_spec.parse_affected_constraints("1.0 through 1.2.2")
+    assert lib_spec.version_satisfies("1.1.0", span) is True
+    assert lib_spec.version_satisfies("1.3.0", span) is False
+    both = lib_spec.parse_affected_constraints(">= 1.0, < 1.5")
+    assert lib_spec.version_satisfies("1.4.9", both) is True
+    assert lib_spec.version_satisfies("1.5.0", both) is False
+    assert lib_spec.parse_affected_constraints("") == []
+    assert lib_spec.version_satisfies("1.0", []) is None
+
+
+def test_version_check_payload_hints(tmp_path: Path, monkeypatch) -> None:
+    pkg = "foo"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "Name: foo\nVersion: 1.2.2\nRelease: 3%{?dist}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    below = helper.version_check_payload(pkg, affected="< 1.2.3", fixed="1.2.3")
+    assert below["local_nvr"] == "foo-1.2.2-3"
+    assert below["vs_fixed"] == "below"
+    assert below["vs_affected"] == "in_range"
+    assert below["hint"] == "possibly_below_fix"
+    above = helper.version_check_payload(
+        pkg, local_nvr="foo-1.2.3-1", fixed="1.2.3", affected="< 1.2.3"
+    )
+    assert above["vs_fixed"] == "at_or_above"
+    assert above["vs_affected"] == "not_in_range"
+    assert above["hint"] == "possibly_at_or_above_fix"
+    conflicting = helper.version_check_payload(
+        pkg, local_nvr="foo-1.5.0-1", fixed="1.5.0", affected=">= 1.0, <= 2.0"
+    )
+    assert conflicting["vs_fixed"] == "at_or_above"
+    assert conflicting["vs_affected"] == "in_range"
+    assert conflicting["hint"] == "conflicting_signals"
+    assert "broad CVE range" in conflicting["note"]
+
+
+def test_extract_analysis_nvr() -> None:
+    block = "\n".join(
+        [
+            "ASSESSMENT: maybe",
+            "  Hummingbird SRPM version: foo-1.2-3.src.rpm",
+            "  Affected: < 1.3",
+        ]
+    )
+    assert helper.extract_analysis_nvr(block) == "foo-1.2-3"
+
+
+def test_compare_fix_age_and_parse_github_url() -> None:
+    from datetime import datetime, timezone
+
+    commit = datetime(2026, 1, 10, tzinfo=timezone.utc)
+    tag = datetime(2026, 2, 1, tzinfo=timezone.utc)
+    before = helper.compare_fix_age(commit, tag)
+    assert before["verdict"] == "commit_at_or_before_tag"
+    after = helper.compare_fix_age(tag, commit)
+    assert after["verdict"] == "commit_after_tag"
+    parsed = lib_vcs.parse_github_commit_ref(
+        "https://github.com/foo/bar/commit/abc123def"
+    )
+    assert parsed == ("foo", "bar", "abc123def")
+    dt = lib_vcs.parse_iso_datetime("2026-01-10T00:00:00Z")
+    assert dt.tzinfo is not None
+
+
+def test_resolve_fix_age_dates_from_flags() -> None:
+    commit_dt, tag_dt, meta = helper.resolve_fix_age_dates(
+        commit_date="2026-01-01T00:00:00Z",
+        tag_date="2026-02-01T00:00:00Z",
+    )
+    assert commit_dt < tag_dt
+    assert meta["commit_date_source"] == "flag"
+    assert meta["tag_date_source"] == "flag"
+
+
+def test_fetch_github_commit_date(monkeypatch) -> None:
+    def fake_json(url, timeout=60.0, extra_headers=None):
+        assert "commits/abc123" in url
+        return {"commit": {"committer": {"date": "2026-03-01T12:00:00Z"}}}
+
+    monkeypatch.setattr(lib_vcs, "http_get_json", fake_json)
+    dt = lib_vcs.fetch_github_commit_date("foo", "bar", "abc123")
+    assert dt.year == 2026
+    assert dt.month == 3
+
+
+def test_bump_release_matches_dist_git_rules() -> None:
+    bump = lib_spec.bump_release
+    assert bump("3") == "3.1"
+    assert bump("3.1") == "3.2"
+    assert bump("3.1", upstream_release="3.1") == "3.1.1"
+    assert bump("3.1.1", upstream_release="3.1") == "3.1.2"
+    assert bump("3.1", upstream_release="3") == "3.2"
+    assert bump("0.1", upstream_release="0.1") == "0.1.1"
+    assert bump("8.%{revision}") == "8.%{revision}.1"
+
+
+def test_release_bump_payload(tmp_path: Path, monkeypatch) -> None:
+    pkg = "mypkg"
+    (tmp_path / "rpms" / pkg).mkdir(parents=True)
+    (tmp_path / "metadata").mkdir()
+    (tmp_path / "rpms" / pkg / f"{pkg}.spec").write_text(
+        "Name: mypkg\nVersion: 1.0\nRelease: 3.1%{?dist}\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "metadata" / f"{pkg}.json").write_text(
+        json.dumps({"modification_status": "modified", "release": "3.1"}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    monkeypatch.setattr(lib_spec, "repo_root", lambda: tmp_path)
+    payload = helper.release_bump_payload(pkg)
+    assert payload["spec_release"] == "3.1"
+    assert payload["metadata_release"] == "3.1"
+    assert payload["proposed_spec_release"] == "3.1.1"
+    assert payload["writes"] is False
+    assert payload["modification_status"] == "modified"
+
+    applied = helper.apply_release_bump(pkg)
+    assert applied["writes"] is True
+    assert "updated mypkg.spec Release to 3.1.1" in applied["hint"]
+    spec_content = (tmp_path / "rpms" / pkg / f"{pkg}.spec").read_text(encoding="utf-8")
+    assert "Release:        3.1.1%{?dist}" in spec_content
+
+
+def test_release_bump_autorelease(tmp_path: Path, monkeypatch) -> None:
+    pkg = "auto"
+    (tmp_path / "rpms" / pkg).mkdir(parents=True)
+    (tmp_path / "metadata").mkdir()
+    (tmp_path / "rpms" / pkg / f"{pkg}.spec").write_text(
+        "Name: auto\nVersion: 1.0\nRelease: %autorelease\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "metadata" / f"{pkg}.json").write_text(
+        json.dumps({"modification_status": "clean", "release": "5"}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    monkeypatch.setattr(lib_spec, "repo_root", lambda: tmp_path)
+    payload = helper.release_bump_payload(pkg)
+    assert payload["uses_autorelease"] is True
+    assert payload["proposed_spec_release"] == ""
+    assert "%autorelease" in payload["hint"]
+
+
+
+def test_render_comment_kinds() -> None:
+    nab = lib_comments.render_comment(
+        "nab",
+        {
+            **lib_comments.empty_comment_fields(),
+            "package": "foo",
+            "component": "openssl",
+            "vex": "Component not Present",
+            "cve": "CVE-2024-1234",
+            "sbom_source": "jira",
+            "sbom_match": "no hits",
+        },
+    )
+    assert nab.startswith("h3. Not a Bug\n")
+    assert "*VEX:* Component not Present" in nab
+    assert "{{foo}}" in nab
+    assert "{{openssl}}" in nab
+    assert "*SBOM match:* no hits" in nab
+    fib = lib_comments.render_comment(
+        "fib",
+        {
+            **lib_comments.empty_comment_fields(),
+            "package": "foo",
+            "nvr": "foo-1.2.3-1",
+            "affected": "< 1.2.3",
+            "fixed": "1.2.3",
+            "commit": "abc123 (2026-01-10)",
+            "tag": "1.2.3 (2026-02-01)",
+        },
+    )
+    assert fib.startswith("h3. Already fixed\n")
+    assert "{{foo-1.2.3-1}}" in fib
+    assert "advisory automation" in fib
+    assert "abc123 (2026-01-10)" in fib
+    analysis = lib_comments.render_comment(
+        "analysis",
+        {
+            **lib_comments.empty_comment_fields(),
+            "package": "foo",
+            "nvr": "foo-1.2.2-3",
+            "assessment": "possibly_below_fix",
+            "affected": "< 1.2.3",
+        },
+    )
+    assert analysis.startswith("h3. Analysis\n")
+    assert "*Assessment:* possibly_below_fix" in analysis
+    nxt = lib_comments.render_comment(
+        "next-release",
+        {
+            **lib_comments.empty_comment_fields(),
+            "package": "foo",
+            "cve": "CVE-2024-1234",
+            "notes": "No tagged release yet.",
+        },
+    )
+    assert nxt.startswith("h3. Waiting on upstream\n")
+    assert "{{cve-next-release}}" in nxt
+    assert "No tagged release yet." in nxt
+
+
+def test_render_comment_requires_fields() -> None:
+    import pytest
+
+    with pytest.raises(RuntimeError, match="--vex"):
+        lib_comments.render_comment("nab", lib_comments.empty_comment_fields())
+    with pytest.raises(RuntimeError, match="--nvr"):
+        lib_comments.render_comment(
+            "fib",
+            {**lib_comments.empty_comment_fields(), "package": "foo"},
+        )
+    with pytest.raises(RuntimeError, match="--package"):
+        lib_comments.render_comment("analysis", lib_comments.empty_comment_fields())
+
+
+def test_comment_fields_from_probe_json() -> None:
+    version_check = {
+        "package": "foo",
+        "local_nvr": "foo-1.2.2-3",
+        "affected": "< 1.2.3",
+        "fixed": "1.2.3",
+        "hint": "possibly_below_fix",
+    }
+    fields = lib_comments.comment_fields_from_payload(version_check)
+    assert fields["package"] == "foo"
+    assert fields["nvr"] == "foo-1.2.2-3"
+    assert fields["assessment"] == "possibly_below_fix"
+    investigate = {
+        "user_provided": ["HUM-100"],
+        "discovered": ["HUM-200"],
+        "tickets": [
+            {
+                "ticket": "HUM-200",
+                "package_guess": "bar",
+                "affected_range": "< 9",
+            },
+            {
+                "ticket": "HUM-100",
+                "package_guess": "foo",
+                "affected_range": "< 1.2.3",
+                "fixed_version": "1.2.3",
+                "assessment": "not affected",
+                "upstream_component": "openssl",
+                "cve_ids": ["CVE-2024-1234"],
+                "fixed_in_build": "",
+            },
+        ],
+        "probes": {
+            "sbom": {
+                "foo": {
+                    "source": "pulp",
+                    "url": "https://example.invalid/foo.sbom.json",
+                    "hits": [],
+                }
+            },
+            "spec_deps": {"foo": []},
+        },
+    }
+    picked = lib_comments.comment_fields_from_payload(investigate, ticket="HUM-100")
+    assert picked["package"] == "foo"
+    assert picked["component"] == "openssl"
+    assert picked["cve"] == "CVE-2024-1234"
+    assert picked["sbom_source"] == "pulp"
+    assert picked["sbom_match"] == "no hits"
+    assert picked["spec_deps"] == "no spec-deps hits"
+    default_user = lib_comments.comment_fields_from_payload(investigate)
+    assert default_user["package"] == "foo"
+
+
+def test_resolve_comment_body_kind_and_file(tmp_path: Path) -> None:
+    args = helper.build_parser().parse_args(
+        [
+            "comment",
+            "--kind",
+            "nab",
+            "--print-only",
+            "--package",
+            "foo",
+            "--component",
+            "openssl",
+            "--vex",
+            "Component not Present",
+            "-m",
+            "Checked spec Provides.",
+        ]
+    )
+    body = lib_comments.resolve_comment_body(args)
+    assert "h3. Not a Bug" in body
+    assert "Checked spec Provides." in body
+    note = tmp_path / "comment.txt"
+    note.write_text("hand-written body\n", encoding="utf-8")
+    file_args = helper.build_parser().parse_args(
+        [
+            "comment",
+            "HUM-1",
+            "--kind",
+            "fib",
+            "--package",
+            "foo",
+            "--nvr",
+            "foo-1-1",
+            "-f",
+            str(note),
+        ]
+    )
+    assert lib_comments.resolve_comment_body(file_args) == "hand-written body\n"
+
+
+def test_resolve_comment_body_from_json(tmp_path: Path) -> None:
+    path = tmp_path / "version-check.json"
+    path.write_text(
+        json.dumps(
+            {
+                "package": "foo",
+                "local_nvr": "foo-1.2.3-1",
+                "affected": "< 1.2.3",
+                "fixed": "1.2.3",
+                "hint": "possibly_at_or_above_fix",
+            }
+        ),
+        encoding="utf-8",
+    )
+    args = helper.build_parser().parse_args(
+        [
+            "comment",
+            "--kind",
+            "fib",
+            "--from-json",
+            str(path),
+            "--print-only",
+            "--commit",
+            "abc123",
+        ]
+    )
+    body = lib_comments.resolve_comment_body(args)
+    assert "{{foo-1.2.3-1}}" in body
+    assert "possibly_at_or_above_fix" in body
+    assert "abc123" in body
+
+
+def test_cmd_comment_print_only_does_not_post(monkeypatch, capsys) -> None:
+    posted: list[tuple[str, str]] = []
+
+    def fake_post(ticket: str, body: str) -> bool:
+        posted.append((ticket, body))
+        return True
+
+    monkeypatch.setattr(helper, "post_comment", fake_post)
+    args = helper.build_parser().parse_args(
+        [
+            "comment",
+            "--kind",
+            "fib",
+            "--json",
+            "--package",
+            "foo",
+            "--nvr",
+            "foo-1.2.3-1",
+        ]
+    )
+    assert helper.cmd_comment(args) == 0
+    assert posted == []
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["kind"] == "fib"
+    assert "Already fixed" in payload["body"]
+
+
+def test_cmd_close_nab_print_only_does_not_close(monkeypatch, capsys) -> None:
+    closed: list[str] = []
+
+    def boom(*_a: object, **_k: object) -> None:
+        closed.append("closed")
+
+    monkeypatch.setattr(helper, "close_not_a_bug", boom)
+    args = helper.build_parser().parse_args(
+        [
+            "close-nab",
+            "HUM-9",
+            "--vex",
+            "Vulnerable Code not Present",
+            "--print-only",
+            "--package",
+            "foo",
+            "--component",
+            "bar",
+        ]
+    )
+    assert helper.cmd_close_nab(args) == 0
+    assert closed == []
+    out = capsys.readouterr().out
+    assert "Not a Bug" in out
+    assert "Vulnerable Code not Present" in out
+
+
+def test_cmd_next_release_defaults_to_template(monkeypatch, capsys) -> None:
+    applied: list[tuple[str, str]] = []
+
+    def fake_apply(ticket: str, body: str) -> None:
+        applied.append((ticket, body))
+
+    monkeypatch.setattr(helper, "apply_next_release", fake_apply)
+    preview = helper.build_parser().parse_args(
+        [
+            "next-release",
+            "HUM-9",
+            "--print-only",
+            "--package",
+            "foo",
+            "--cve",
+            "CVE-2024-1",
+        ]
+    )
+    assert helper.cmd_next_release(preview) == 0
+    assert applied == []
+    assert "Waiting on upstream" in capsys.readouterr().out
+    post = helper.build_parser().parse_args(
+        [
+            "next-release",
+            "HUM-9",
+            "--package",
+            "foo",
+        ]
+    )
+    assert helper.cmd_next_release(post) == 0
+    assert applied[0][0] == "HUM-9"
+    assert "cve-next-release" in applied[0][1]
+
+
+def test_comment_vex_rejects_invalid_choice() -> None:
+    with pytest.raises(SystemExit):
+        helper.build_parser().parse_args(
+            [
+                "comment",
+                "--kind",
+                "nab",
+                "--vex",
+                "arbitrary garbage",
+                "--package",
+                "foo",
+            ]
+        )
+
+
+def test_cmd_next_release_print_only_without_tickets(monkeypatch, capsys) -> None:
+    applied: list[tuple[str, str]] = []
+    monkeypatch.setattr(
+        helper, "apply_next_release", lambda t, b: applied.append((t, b))
+    )
+    args = helper.build_parser().parse_args(
+        ["next-release", "--print-only", "--package", "foo", "--cve", "CVE-2024-1"]
+    )
+    assert helper.cmd_next_release(args) == 0
+    assert applied == []
+    assert "Waiting on upstream" in capsys.readouterr().out
+
+
+def test_cmd_next_release_without_tickets_or_print_only_raises() -> None:
+    args = helper.build_parser().parse_args(
+        ["next-release", "--package", "foo", "--cve", "CVE-2024-1"]
+    )
+    with pytest.raises(RuntimeError, match="Pass HUM ticket key"):
+        helper.cmd_next_release(args)
+
+
+def test_cmd_close_nab_print_only_without_tickets(monkeypatch, capsys) -> None:
+    closed: list[str] = []
+    monkeypatch.setattr(helper, "close_not_a_bug", lambda *a, **k: closed.append("x"))
+    args = helper.build_parser().parse_args(
+        [
+            "close-nab",
+            "--vex",
+            "Vulnerable Code not Present",
+            "--print-only",
+            "--package",
+            "foo",
+        ]
+    )
+    assert helper.cmd_close_nab(args) == 0
+    assert closed == []
+    assert "Not a Bug" in capsys.readouterr().out
+
+
+def test_cmd_close_nab_without_tickets_or_print_only_raises() -> None:
+    args = helper.build_parser().parse_args(
+        ["close-nab", "--vex", "Vulnerable Code not Present", "--package", "foo"]
+    )
+    with pytest.raises(RuntimeError, match="Pass HUM ticket key"):
+        helper.cmd_close_nab(args)
+
+
+def test_log_message_with_existing_file(tmp_path: Path, monkeypatch) -> None:
+    log_file = tmp_path / "transcript.md"
+    log_file.write_text("# My Investigation Log\nAll steps completed.\n", encoding="utf-8")
+
+    calls: list[list[str]] = []
+
+    def fake_rhjira(args, *, cwd=None):
+        calls.append(args)
+        return SimpleNamespace(returncode=0, stdout="attached", stderr="")
+
+    monkeypatch.setattr(lib_investigate, "run_rhjira", fake_rhjira)
+
+    out_file, msg = lib_investigate.log_message("HUM-1234", log_file)
+    assert out_file == log_file
+    assert "Attached transcript.md to HUM-1234" in msg
+    assert calls[0] == ["attach", "HUM-1234", str(log_file)]
+
+
+def test_log_message_nonexistent_file_raises(tmp_path: Path) -> None:
+    missing = tmp_path / "missing.md"
+    import pytest
+
+    with pytest.raises(ValueError, match="Log file not found"):
+        lib_investigate.log_message("HUM-1234", missing)
+
+
+def test_log_message_print_only(tmp_path: Path) -> None:
+    log_file = tmp_path / "test.md"
+    log_file.write_text("content", encoding="utf-8")
+    out_file, msg = lib_investigate.log_message(
+        "HUM-9999",
+        log_file,
+        print_only=True,
+    )
+    assert out_file == log_file
+    assert "print-only" in msg.lower()
+
+
+def test_log_message_cli(tmp_path: Path) -> None:
+    log_file = tmp_path / "agent_log.txt"
+    log_file.write_text("CLI test log", encoding="utf-8")
+
+    rc = helper.main(
+        [
+            "log-message",
+            "HUM-5555",
+            str(log_file),
+            "--print-only",
+        ]
+    )
+    assert rc == 0

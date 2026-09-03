@@ -1,5 +1,5 @@
 From: Hummingbird <hummingbird@redhat.com>
-Subject: [PATCH] Bump fast-uri to 3.1.5 for CVE-2026-18446
+Subject: [PATCH] Bump fast-uri to 3.1.6 for CVE-2026-76172/75975/75931/75899
 
 --- a/package.json
 +++ b/package.json
@@ -7,7 +7,7 @@ Subject: [PATCH] Bump fast-uri to 3.1.5 for CVE-2026-18446
      "whatwg-fetch": "3.6.20"
    },
    "resolutions": {
-+    "fast-uri@npm:^3.0.1": "3.1.5",
++    "fast-uri@npm:^3.0.1": "3.1.6",
      "underscore": "1.13.7",
      "@types/slate": "0.47.11",
      "semver@npm:~7.3.5": "^7.3.5",
@@ -21,10 +21,10 @@ Subject: [PATCH] Bump fast-uri to 3.1.5 for CVE-2026-18446
 -  version: 3.1.0
 -  resolution: "fast-uri@npm:3.1.0"
 -  checksum: 10/818b2c96dc913bcf8511d844c3d2420e2c70b325c0653633f51821e4e29013c2015387944435cd0ef5322c36c9beecc31e44f71b257aeb8e0b333c1d62bb17c2
-+"fast-uri@npm:3.1.5":
-+  version: 3.1.5
-+  resolution: "fast-uri@npm:3.1.5"
-+  checksum: 10/784bef687ca3ecfb4587a05104a4d41101796f0fec72be47a9abed743b10109e69a24d1ad0854ee7d2705912dc2ca9d93e03d35b65df0a3da0339e05b5d83b5c
++"fast-uri@npm:3.1.6":
++  version: 3.1.6
++  resolution: "fast-uri@npm:3.1.6"
++  checksum: 10/de34fceafd3a1d917989a1116b092d9b6ebe6fa3c9e908a308b988a6455449fa0a0256b6ef628aa7da80f1f84031d704c290d6ba0ea4c6f4c42b7974a3bd43ae
    languageName: node
    linkType: hard
  

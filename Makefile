@@ -68,8 +68,8 @@ check-conflict-markers-host:
 .PHONY: check-host check
 check-host:
 	git ls-files -z 'ci/*.sh' | xargs -0 shellcheck --external-sources --enable=all
-	git ls-files -z 'ci/*.py' 'test/*.py' | xargs -0 -r ruff check
-	git ls-files -z 'ci/*.py' 'test/*.py' | xargs -0 -r mypy
+	git ls-files -z 'ci/*.py' 'test/*.py' '.cursor/skills/**/*.py' | xargs -0 -r ruff check
+	git ls-files -z 'ci/*.py' 'test/*.py' '.cursor/skills/**/*.py' | xargs -0 -r mypy
 	find rpms -name 'import.json' -type f -exec jq empty {} \; 2>/dev/null || \
 	  (echo "jq not installed, skipping JSON validation" || true)
 	./ci/validate_package_modifications.py --all

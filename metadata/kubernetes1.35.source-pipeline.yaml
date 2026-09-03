@@ -1,4 +1,12 @@
 fetch:
+  - type: spec-update
+    set-version: false
+    reset-release: "0.1"
+    substitutions:
+      - pattern: "^%global k8s_ver\\s+[0-9.]+"
+        replacement: "%global k8s_ver ${VERSION}"
+      - pattern: "^%global k8s_tag\\s+v[0-9.]+"
+        replacement: "%global k8s_tag v${VERSION}"
   - type: git
     repo: "${UPSTREAM_REPO}"
     ref: "v${VERSION}"

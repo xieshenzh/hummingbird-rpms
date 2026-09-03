@@ -1,0 +1,5 @@
+*.tar.*
+clog
+*.rpm
+.build*.log
+mokutil-*/

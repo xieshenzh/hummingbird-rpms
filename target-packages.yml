@@ -273,7 +273,7 @@ packages:
   - libfido2
   - libfontenc
   - libgcrypt
-  - libgit2
+  - libgit2_1.9
   - libgpg-error
   - libidn2
   - libipt
@@ -538,6 +538,7 @@ packages:
   - rhash
   - rootfiles
   - rpm
+  - rpm-mpi-hooks
   - ruby
   - rubygem
   - rubypick

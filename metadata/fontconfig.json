@@ -2,9 +2,9 @@
   "branch": "rawhide",
   "modification_reason": "Update to 2.17.1 to fix CVE-2026-34085 (off-by-one OOB write in FcFontCapabilities). Also added gorget source-pipeline.yaml (HUM-6093 audit finding): 2.17.1 was never published as an official dist tarball (freedesktop.org's release mirror stops at 2.16.0) -- repointed at a git fetch of the same tag, plus a temporary meson doc build to regenerate the man/txt/html files %install expects (a plain git checkout alone broke rpmbuild's %install: 'cannot stat doc/*.1').",
   "modification_status": "modified",
-  "release": "4",
-  "sha": "29c72e43b9bfe294d0c52f5030610e5c3e914b8c",
+  "release": "1",
+  "sha": "08533c2effae657c07bcb6c3ae63767e83726a4f",
   "source": "https://src.fedoraproject.org/rpms/fontconfig.git",
   "upstream_repo": "https://gitlab.freedesktop.org/fontconfig/fontconfig",
-  "version": "2.17.1"
+  "version": "2.18.3"
 }

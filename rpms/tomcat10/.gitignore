@@ -2,3 +2,5 @@ apache-tomcat-*-src.tar.gz*
 results_tomcat
 tomcat*.src.rpm
 apache-tomcat-*-src/
+apache-tomcat-10.1.59-src.tar.gz
+apache-tomcat-10.1.59-src.tar.gz.asc

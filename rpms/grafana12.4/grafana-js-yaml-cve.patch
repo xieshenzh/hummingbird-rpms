@@ -1,0 +1,69 @@
+From: Hummingbird <hummingbird@redhat.com>
+Subject: [PATCH] Bump js-yaml to 3.15.2 and 4.3.2 for CVE-2026-84375
+
+diff --git a/package.json b/package.json
+index 48d7c8de..a2ca5bb1 100644
+--- a/package.json
++++ b/package.json
+@@ -483,11 +483,16 @@
+     "get-document": "github:webmodules/get-document#commit=a04ccb499d6e0433a368c3bb150b4899b698461f",
+     "gitconfiglocal": "2.1.0",
+     "tmp@npm:^0.0.33": "~0.2.1",
+-    "js-yaml@npm:4.1.0": "^4.1.0",
+-    "js-yaml@npm:=4.1.0": "^4.1.0",
++    "js-yaml@npm:4.1.0": "4.3.2",
++    "js-yaml@npm:=4.1.0": "4.3.2",
+     "nodemailer": "8.0.4",
+     "@storybook/core@npm:8.6.18": "patch:@storybook/core@npm%3A8.6.18#~/.yarn/patches/@storybook-core-npm-8.6.18-cff02a3017.patch",
+-    "protobufjs@npm:8.0.0": "8.0.1"
++    "protobufjs@npm:8.0.0": "8.0.1",
++    "js-yaml@npm:^3.10.0": "3.15.2",
++    "js-yaml@npm:^3.13.1": "3.15.2",
++    "js-yaml@npm:4.1.1": "4.3.2",
++    "js-yaml@npm:=4.1.1": "4.3.2",
++    "js-yaml@npm:^4.1.0": "4.3.2"
+   },
+   "workspaces": {
+     "packages": [
+diff --git a/yarn.lock b/yarn.lock
+index d2cee044..8bf9ee8b 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -23860,26 +23860,26 @@ __metadata:
+   languageName: node
+   linkType: hard
+ 
+-"js-yaml@npm:4.1.1, js-yaml@npm:=4.1.1, js-yaml@npm:^4.1.0":
+-  version: 4.1.1
+-  resolution: "js-yaml@npm:4.1.1"
++"js-yaml@npm:3.15.2":
++  version: 3.15.2
++  resolution: "js-yaml@npm:3.15.2"
+   dependencies:
+-    argparse: "npm:^2.0.1"
++    argparse: "npm:^1.0.7"
++    esprima: "npm:^4.0.0"
+   bin:
+     js-yaml: bin/js-yaml.js
+-  checksum: 10c0/561c7d7088c40a9bb53cc75becbfb1df6ae49b34b5e6e5a81744b14ae8667ec564ad2527709d1a6e7d5e5fa6d483aa0f373a50ad98d42fde368ec4a190d4fae7
++  checksum: 10c0/e341df211dece9d4b784849647ad7568b5b6a58a9ee58ead750482316d83276387343649fe4b71522705dc6c76acf97718588f23dc19443833ef3e75033af967
+   languageName: node
+   linkType: hard
+ 
+-"js-yaml@npm:^3.10.0, js-yaml@npm:^3.13.1":
+-  version: 3.14.2
+-  resolution: "js-yaml@npm:3.14.2"
++"js-yaml@npm:4.3.2":
++  version: 4.3.2
++  resolution: "js-yaml@npm:4.3.2"
+   dependencies:
+-    argparse: "npm:^1.0.7"
+-    esprima: "npm:^4.0.0"
++    argparse: "npm:^2.0.1"
+   bin:
+     js-yaml: bin/js-yaml.js
+-  checksum: 10c0/3261f25912f5dd76605e5993d0a126c2b6c346311885d3c483706cd722efe34f697ea0331f654ce27c00a42b426e524518ec89d65ed02ea47df8ad26dcc8ce69
++  checksum: 10c0/dedd34c2e8fef1d504687f1bc94ed0ee1311a1f78770fa2800352c6d59c635ccf555009d74e9afe529ae62199da2b1ccef30e53dc84dcd8d2d8187c22574bc97
+   languageName: node
+   linkType: hard
+ 

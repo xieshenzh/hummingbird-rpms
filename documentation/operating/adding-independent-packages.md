@@ -50,7 +50,6 @@ Create `metadata/<package-name>.json`:
 ```json
 {
   "modification_status": "independent",
-  "release": "1",
   "upstream_repo": "https://github.com/example/project",
   "version": "1.3.0"
 }
@@ -63,9 +62,6 @@ Fields:
 - **`upstream_repo`**: Canonical upstream git repository URL (required — CI enforces this). If no
   upstream repo exists, use `https://src.fedoraproject.org/rpms/<name>` as a fallback.
 - **`version`**: Package version (must match spec file)
-- **`release`**: Base release number without dist tag (typically `1` or `0.1`; the `.hum1`
-  suffix comes from `%{?dist}` in the spec `Release:` line — see
-  [Package Metadata Fields](package-metadata-fields.md))
 
 ### 5. Generate Konflux Resources
 
@@ -115,7 +111,6 @@ sha512sum --tag oras-1.3.0.tar.gz oras-1.3.0-vendor.tar.bz2 > sources
 cat > ../../metadata/oras.json << 'EOF'
 {
   "modification_status": "independent",
-  "release": "1",
   "upstream_repo": "https://github.com/oras-project/oras",
   "version": "1.3.0"
 }

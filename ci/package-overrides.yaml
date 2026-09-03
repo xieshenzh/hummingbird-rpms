@@ -194,6 +194,13 @@ grafana13.1:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+grafana13.2:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+  # The frontend webpack build requires more memory than the default builders provide.
+  build_platforms:
+    - "linux-d160-c8xlarge/arm64"
+    - "linux-d160-c8xlarge/amd64"
+
 grype:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
@@ -302,6 +309,9 @@ loki3.6:
 loki3.7:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+maven3.9:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 memcached:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
@@ -355,11 +365,40 @@ openblas:
     - "linux-d160-c8xlarge/arm64"
     - "linux-d160-c8xlarge/amd64"
 
+openshell:
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+  timeout_hours: 8
+  build_platforms:
+    - "linux-d160-c8xlarge/arm64"
+    - "linux-d160-c8xlarge/amd64"
+  # run-syft OOMs on openshell's large vendored Cargo dependency tree
+  # show-sbom's default (256Mi) OOMs downloading/printing the SBOM attestation
+  task_run_specs:
+    - pipelineTaskName: rpmbuild
+      stepSpecs:
+        - name: run-syft
+          computeResources:
+            requests:
+              memory: 10Gi
+            limits:
+              memory: 10Gi
+    - pipelineTaskName: show-sbom
+      stepSpecs:
+        - name: show-sbom
+          computeResources:
+            requests:
+              memory: 1Gi
+            limits:
+              memory: 1Gi
+
 openssl:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 openssl-fips-provider:
   # Use hummingbird lookaside cache instead of Fedora
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
+openssl3:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
 opentelemetry-collector:

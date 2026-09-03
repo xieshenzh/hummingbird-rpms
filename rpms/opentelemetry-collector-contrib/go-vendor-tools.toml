@@ -5,6 +5,19 @@ post_commands = [
   ["curl", "-fSL", "-o", "vendor/bitbucket.org/atlassian/go-asap/v2/LICENSE", "https://bitbucket.org/atlassian/go-asap/raw/HEAD/LICENSE.txt"],
   ["curl", "-fSL", "-o", "vendor/modernc.org/memory/LICENSE", "https://gitlab.com/cznic/memory/-/raw/master/LICENSE"],
   ["cp", "vendor/github.com/hamba/avro/v2/LICENCE", "vendor/github.com/iskorotkov/avro/v2/LICENCE"],
+  # Go 1.27 rejects crypto.RegisterHash(Hash(0), ...). SermoDigital/jose's
+  # crypto/none.go registers the JOSE "none" alg against hash id 0 in init(),
+  # so otelcol-contrib panics at startup before main (MR !4258 Konflux
+  # functionality test). The library is unmaintained (no upstream push since
+  # ~2018), so there is no go1.27-compatible release to pin — same situation
+  # tracked in https://github.com/cloudfoundry/cli/issues/3851. Their
+  # workaround is a go.mod replace to a fork with the RegisterHash call
+  # removed (safe: "none" is installed into the jws signing-method map via a
+  # map literal, Sign/Verify are no-ops, and nothing calls Available() on
+  # it). Apply the same edit here against the vendored copy so the RPM build
+  # does not need a published fork. Drop once asapauthextension/go-asap no
+  # longer pull in SermoDigital/jose.
+  ["sed", "-i", "/crypto\\.RegisterHash(crypto\\.Hash(0), h)/d", "vendor/github.com/SermoDigital/jose/crypto/none.go"],
 ]
 
 [licensing]
@@ -58,6 +71,11 @@ sha256sum = "349fec2711443e0da8f36e388931fdfe2f874fdd4df307b9a379d01bb9764dc8"
 expression = "MIT"
 
 [[licensing.licenses]]
+path = "vendor/github.com/dgraph-io/ristretto/v2/z/LICENSE"
+sha256sum = "8444f00636d263befe4ea82fd5533df0f86347626b6ede2c07089534d96894a0"
+expression = "MIT AND Apache-2.0"
+
+[[licensing.licenses]]
 path = "vendor/github.com/shirou/gopsutil/v3/LICENSE"
 sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
 expression = "BSD-3-Clause"
@@ -96,3 +114,8 @@ expression = "MIT AND (MIT AND Apache-2.0)"
 path = "vendor/modernc.org/libc/LICENSE-3RD-PARTY.md"
 sha256sum = "f597097efe3d97021f89170746bd3a0fb9a8b6fb26b82043ed68a4e0283bee6c"
 expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/modernc.org/sqlite/LICENSE-SQLITE"
+sha256sum = "8438c9c89b849131ead81d5435cb97fcf052df5b0b286dda8a2d4c29e6cb3fd0"
+expression = "LicenseRef-Fedora-Public-Domain"

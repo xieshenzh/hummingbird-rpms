@@ -30,3 +30,13 @@ transform:
         tar -cjf "prometheus-pnpm-cache-${VERSION}.tar.bz2" -C "${root}" .pnpm .pnpm-store
     outputs:
       - "prometheus-pnpm-cache-${VERSION}.tar.bz2"
+
+post:
+  - type: run
+    artifacts: ["prometheus-${VERSION}.tar.gz"]
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -euo pipefail
+        ./generate-bundled-npm-provides.py "${VERSION}"

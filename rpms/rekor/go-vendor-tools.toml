@@ -4,6 +4,21 @@ compression_type = "bz2"
 [licensing]
 detector = "askalono"
 
+[[licensing.licenses]]
+path = "vendor/github.com/cloudflare/circl/LICENSE"
+sha256sum = "b0da1764fe4d13d610b695536fc3f2ebc362482d053a1cd258e36975bc6b97a7"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/grpc-ecosystem/go-grpc-middleware/v2/COPYRIGHT"
+sha256sum = "8befb41eac649775143c81fddaf84b7d7e1197899d968b8b51cfec405f2ff72f"
+expression = "Apache-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/xi2/xz/LICENSE"
+sha256sum = "5c640056d513f276d56635af7a0bed81cb7eac02a31b6e56d40c416557a8d8ce"
+expression = "LicenseRef-Fedora-Public-Domain"
+
 # go-yaml v3's LICENSE file combines MIT (for files ported from libyaml)
 # and Apache-2.0 (for the rest of the project) in one document, which
 # askalono can't confidently resolve to a single SPDX identifier.

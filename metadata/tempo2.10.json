@@ -1,6 +1,5 @@
 {
   "modification_status": "independent",
-  "release": "0.1",
   "release_monitoring_project_id": 381994,
   "track_upstream": "2.10",
   "upstream_repo": "https://github.com/grafana/tempo",

@@ -2,7 +2,6 @@
   "branch": "rawhide",
   "modification_reason": "Update to upstream version 1.22.0; fix orphaned %patch -P0 -p1 in %prep with no Patch0 declared (HUM-6099): the 1.22.0 version bump correctly dropped Avoid-build-failure.patch and its file (const-correctness fixes it carried are already upstream in 1.22.0, verified against the real release tarball) but left the %patch invocation in place, breaking %prep entirely -- confirmed with a real rpmbuild -bp run, fails before and succeeds after removing the orphaned line.",
   "modification_status": "modified",
-  "release": "0.1",
   "release_monitoring_project_id": 16895,
   "sha": "e55261197e56388b6403886b4f0557b04fb6e8b5",
   "source": "https://src.fedoraproject.org/rpms/ucx.git",

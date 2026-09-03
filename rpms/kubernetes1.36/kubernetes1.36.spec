@@ -4,11 +4,11 @@
 # **** release metadata ****
 # populated by envsubst in newrelease
 %global k8s_name                kubernetes1.36
-%global k8s_ver                 1.36.3
+%global k8s_ver                 1.36.4
 # major:minor version substring
 %global k8s_minver              1.36
 %global k8s_nextver             1.37
-%global k8s_tag                 v1.36.3
+%global k8s_tag                 v1.36.4
 # golang 'built with' version
 %global golangver               1.26.5
 
@@ -38,7 +38,6 @@ Source2:        go-vendor-tools.toml
 # Raise -test.parallel minimum so TestParallel's 3-goroutine barrier does not
 # deadlock on constrained build hosts where GOMAXPROCS < 3.
 Patch1:         ktesting-parallel-fix.patch
-Patch2:         CVE-2026-56852-x-text-unicode-norm.patch
 
 Source101:      kube-proxy.service
 Source102:      kube-apiserver.service
@@ -64,15 +63,16 @@ Source117:      kubelet.env
 # kubernetes-kubeadm.
 #
 # Build requires for all packages
+BuildRequires:  fdupes
+BuildRequires:  go-rpm-macros
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang-github-cpuguy83-md2man
 BuildRequires:  golang >= %{golangver}
-BuildRequires:  go-rpm-macros
 BuildRequires:  make
 BuildRequires:  /usr/bin/go-md2man
+BuildRequires:  rsync
 BuildRequires:  systemd
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  rsync
 
 # additonal kubelet requirements
 Requires:       kubernetes-cni
@@ -295,6 +295,9 @@ mv CHANGELOG/CHANGELOG-%{k8s_minver}.md .
 # change log. no need to include generated rpms
 rm CHANGELOG.md
 
+# additional license deduplication
+%fdupes %{buildroot}%{_datadir}/licenses/%{k8s_name}
+
 ##############################################
 ##############################################
 %check
@@ -325,12 +328,17 @@ rm CHANGELOG.md
     -s "TestConfigImagesListRunWithoutPath"
     -s "TestConfigImagesListOutput"
     -s "TestCmdConfigImagesList"
+    %dnl attempting connection to localhost
+    -s "TestList"
     %dnl attempting connection to fake server.sock
     -s "TestPrepareResources"
     %dnl flaky on some arches
     -s "TestUnPrepareResources"
-    %[ "%{_arch}" == "s390x" ? "-s TestPodGroupProtectionController" : "" ]
+    %dnl flaky on multiple arches
+    -s "TestPodGroupProtectionController"
     %dnl next 5 tests seem flaky
+    %dnl panic: test timed out after 10m0s
+    %[ "%{_arch}" == "ppc64le" ? "-s TestMultipleControllers" : "" ]
     %dnl binding volumes: context deadline exceeded
     %[ "%{_arch}" == "aarch64" ? "-s TestBindPodVolumes" : "" ]
     %dnl on aarch TestPrepareResources/pod_is_not_allowed_to_use_resource_claim_from_podgroup

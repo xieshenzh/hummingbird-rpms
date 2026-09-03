@@ -1,12 +1,11 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Add Conflicts: openssl-libs < 1:4.0 to openssl3-libs to prevent the shared libcrypto.so.3/libssl.so.3 file conflict with base openssl while base is < 4. Also added gorget source-pipeline.yaml (HUM-6081; pattern from HUM-4622): Source0 was a bare filename with no URL, resolved only by Fedora's own lookaside metadata -- repointed the fetch at the real GitHub release asset (github.com/openssl/openssl/releases/download/openssl-${VERSION}/), which matches the existing recorded checksum exactly, no content change.",
+  "modification_reason": "Update to upstream version 3.5.8",
   "modification_status": "modified",
-  "release": "2",
   "release_monitoring_project_id": 377610,
   "sha": "8d1c92561b3f6ca1a1bd6e72d71cb3a5fe67ec4d",
   "source": "https://src.fedoraproject.org/rpms/openssl3.git",
   "track_upstream": "3.5",
   "upstream_repo": "https://github.com/openssl/openssl",
-  "version": "3.5.7"
+  "version": "3.5.8"
 }

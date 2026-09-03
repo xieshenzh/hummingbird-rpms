@@ -250,6 +250,10 @@ spec:
           contentType: rpm
         - name: efi-rpm-macros-main
           contentType: rpm
+        - name: efibootmgr-main
+          contentType: rpm
+        - name: efivar-main
+          contentType: rpm
         - name: elfutils-main
           contentType: rpm
         - name: emacs-filesystem-main
@@ -368,6 +372,8 @@ spec:
           contentType: rpm
         - name: grafana13-1-main
           contentType: rpm
+        - name: grafana13-2-main
+          contentType: rpm
         - name: graphite2-main
           contentType: rpm
         - name: graphviz-main
@@ -435,6 +441,8 @@ spec:
         - name: jq-main
           contentType: rpm
         - name: json-c-main
+          contentType: rpm
+        - name: jsoncpp-main
           contentType: rpm
         - name: k6v1-main
           contentType: rpm
@@ -518,7 +526,7 @@ spec:
           contentType: rpm
         - name: libgcrypt-main
           contentType: rpm
-        - name: libgit2-main
+        - name: libgit2-1-9-main
           contentType: rpm
         - name: libgpg-error-main
           contentType: rpm
@@ -662,6 +670,8 @@ spec:
           contentType: rpm
         - name: mariadb11-8-main
           contentType: rpm
+        - name: maven3-9-main
+          contentType: rpm
         - name: mawk-main
           contentType: rpm
         - name: memcached-main
@@ -669,6 +679,8 @@ spec:
         - name: meson-main
           contentType: rpm
         - name: mkfontscale-main
+          contentType: rpm
+        - name: mokutil-main
           contentType: rpm
         - name: mpdecimal-main
           contentType: rpm
@@ -733,6 +745,8 @@ spec:
         - name: openmpi-main
           contentType: rpm
         - name: openscap-main
+          contentType: rpm
+        - name: openshell-main
           contentType: rpm
         - name: openssh-main
           contentType: rpm
@@ -1010,9 +1024,13 @@ spec:
           contentType: rpm
         - name: rekor-main
           contentType: rpm
+        - name: rhash-main
+          contentType: rpm
         - name: rootfiles-main
           contentType: rpm
         - name: rpm-main
+          contentType: rpm
+        - name: rpm-mpi-hooks-main
           contentType: rpm
         - name: ruby3-3-main
           contentType: rpm
@@ -1029,6 +1047,8 @@ spec:
         - name: rust-add-determinism-main
           contentType: rpm
         - name: rust-archery-main
+          contentType: rpm
+        - name: rust-bootupd-main
           contentType: rpm
         - name: rust-imagequant-sys-main
           contentType: rpm

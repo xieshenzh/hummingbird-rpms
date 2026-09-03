@@ -1,8 +1,7 @@
 {
   "modification_status": "independent",
-  "release": "0.1",
   "release_monitoring_project_id": 380418,
   "track_upstream": "latest",
   "upstream_repo": "https://github.com/anchore/grype",
-  "version": "0.117.0"
+  "version": "0.118.0"
 }

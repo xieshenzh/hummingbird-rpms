@@ -68,7 +68,6 @@ Source114:      10-kubeadm.conf
 # Source115:      kubernetes.conf
 # Source116:      % {service_name}.sysusers
 Source117:      kubelet.env
-Patch200:       CVE-2026-56852.patch
 
 ##############################################
 # main package components - installs kubelet and necessary
@@ -76,15 +75,16 @@ Patch200:       CVE-2026-56852.patch
 # kubernetes-kubeadm.
 #
 # Build requires for all packages
+BuildRequires:  fdupes
+BuildRequires:  go-rpm-macros
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang-github-cpuguy83-md2man
 BuildRequires:  golang >= %{golangver}
-BuildRequires:  go-rpm-macros
 BuildRequires:  make
-BuildRequires:  go-md2man
+BuildRequires:  /usr/bin/go-md2man
+BuildRequires:  rsync
 BuildRequires:  systemd
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  rsync
 
 # additonal kubelet requirements
 Requires:       kubernetes-cni
@@ -321,6 +321,11 @@ mv CHANGELOG/CHANGELOG-*.md .
 # change log. no need to include generated rpms
 rm CHANGELOG.md
 
+# additional license deduplication
+%fdupes %{buildroot}%{_datadir}/licenses/%{k8s_name}
+
+##############################################
+##############################################
 %check
 %go_vendor_license_check -c %{S:2}
 if [ 1 != 1 ]; then

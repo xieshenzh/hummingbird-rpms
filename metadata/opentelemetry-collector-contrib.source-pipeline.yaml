@@ -34,11 +34,38 @@ transform:
 
         "/tmp/ocb-${VERSION}" --skip-compilation --config distributions/otelcol-contrib/manifest.yaml
 
+        # CVE-2026-79921: rabbitmqexporter/internal/rabbitmq still require
+        # amqp091-go < 1.13.0 as of this writing, so OCB's generated go.mod
+        # resolves to the vulnerable v1.12.0 via MVS. Force the floor up to
+        # the fixed release here, before go.mod/go.sum are tarred and handed
+        # to the vendor step, so both stay consistent. Drop this once
+        # upstream's own go.mod requires >= 1.13.0.
+        pushd _build
+        go get github.com/rabbitmq/amqp091-go@v1.13.0
+        # HUM-6526 CI: the buildroot's golang provides go1.27, but the vendored
+        # cockroachdb/swiss (as of upstream commit b0f6560f979b) gates its
+        # runtime shim (hashFn/getRuntimeHasher/fastrand64) behind a `!go1.27`
+        # build tag, so those symbols go undefined and %build fails on every
+        # arch. Pin to the upstream commit that added go1.27 support. Drop
+        # this once OCB's manifest naturally resolves >= this commit.
+        go get github.com/cockroachdb/swiss@v0.0.0-20260820225851-aa852fb3c14e
+        go mod tidy
+        popd
+        # Go 1.27 also breaks SermoDigital/jose (RegisterHash of Hash(0) in
+        # crypto/none.go init → panic at process start). No upstream pin
+        # exists; see go-vendor-tools.toml post_commands (cloudfoundry/cli#3851
+        # workaround applied to the vendored copy).
+
         generated_files=(go.mod go.sum)
         while IFS= read -r f; do
           generated_files+=("$f")
         done < <(find _build -maxdepth 1 -name '*.go' -printf '%P\n' | sort)
-        tar -C _build -cjf "opentelemetry-collector-contrib-${VERSION}-generated.tar.bz2" "${generated_files[@]}"
+        # --sort/--mtime/--owner/--group/--numeric-owner: go.mod/go.sum/*.go are
+        # freshly written by OCB above, so a plain tar picks up wall-clock mtimes
+        # and produces a different checksum on every run even with identical
+        # content -- pin these so the archive is reproducible.
+        tar --sort=name --mtime='@0' --owner=0 --group=0 --numeric-owner \
+          -C _build -cjf "opentelemetry-collector-contrib-${VERSION}-generated.tar.bz2" "${generated_files[@]}"
     outputs:
       - "opentelemetry-collector-contrib-${VERSION}-generated.tar.bz2"
   - type: vendor
@@ -46,3 +73,26 @@ transform:
     archive_name: "opentelemetry-collector-contrib-${VERSION}-vendor.tar.bz2"
     modules:
       - path: "opentelemetry-collector-releases-${VERSION}/_build"
+
+# Same-version regeneration for CVE-2026-79921 (forced amqp091-go >= 1.13.0),
+# the cockroachdb/swiss go1.27 build-tag fix (`go get`/`go mod tidy` above),
+# and the SermoDigital/jose RegisterHash(Hash(0)) vendor post_command (see
+# go-vendor-tools.toml; cloudfoundry/cli#3851) changes archive checksums while
+# keeping the 0.159.0 filenames, so gorget needs accepted-checksums exceptions.
+accepted-checksums:
+  - file: "opentelemetry-collector-contrib-0.159.0-generated.tar.bz2"
+    checksum: "5cae0f95d1caebcaa254afefd82882f33a1941cb6c53dcb1768fb74bddca7a48e3247c9544b67d015e4de52574c0969929fca98eaf05a94f57aeaef6c9d084ed"
+    reason: "CVE-2026-79921: forced amqp091-go v1.12.0 -> v1.13.0 in _build/go.mod
+      and go.sum; also forced cockroachdb/swiss to the upstream commit that
+      added go1.27 support (map.go referenced hashFn/getRuntimeHasher/
+      fastrand64 from a runtime shim gated behind `!go1.27`, which the
+      buildroot's golang no longer satisfies) before tarring the generated
+      sources (HUM-6504/HUM-6526)."
+
+  - file: "opentelemetry-collector-contrib-0.159.0-vendor.tar.bz2"
+    checksum: "42b2b7fccc0af39ffaf429cb468f588ebec64cf74b497f47ee2e764b2441046aa8f055fb602b29a90003116abfc7c17633b7178136a274f25e9af29285f9ea78"
+    reason: "CVE-2026-79921: vendor archive regenerated against the amqp091-go
+      v1.13.0 and cockroachdb/swiss go1.27-support bumps, plus
+      go-vendor-tools.toml post_command removing SermoDigital/jose's
+      crypto.RegisterHash(Hash(0), ...) (Go 1.27 startup panic; same
+      workaround as cloudfoundry/cli#3851) (HUM-6504/HUM-6526)."

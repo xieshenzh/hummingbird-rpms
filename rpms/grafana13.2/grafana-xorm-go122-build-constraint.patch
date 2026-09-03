@@ -1,0 +1,21 @@
+The Xorm compatibility file imports math/rand/v2, which requires Go 1.22,
+but its build constraint still claims compatibility with Go 1.8.  Raise the
+constraint to match the code and allow the package tests to compile with the
+Go 1.26 toolchain used for this RPM.
+
+Upstream status: not submitted
+
+diff --git a/pkg/util/xorm/xorm.go b/pkg/util/xorm/xorm.go
+index 77837ff..1922e03 100644
+--- a/pkg/util/xorm/xorm.go
++++ b/pkg/util/xorm/xorm.go
+@@ -2,8 +2,8 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-//go:build go1.8
+-// +build go1.8
++//go:build go1.22
++// +build go1.22
+ 
+ package xorm

@@ -82,7 +82,7 @@ class PackageMetadata(TypedDict):
     branch: NotRequired[str]  # Not present for independent packages
     sha: NotRequired[str]  # Not present for independent packages
     version: str
-    release: str
+    release: NotRequired[str]  # Present only when shipping Fedora's release
     modification_status: NotRequired[Literal["clean", "modified", "independent"]]
     modification_reason: NotRequired[str]  # Only for 'modified'
     track_upstream: NotRequired[str]  # "latest" or version prefix (e.g., "1.26")
@@ -1026,14 +1026,13 @@ def import_(url: str, branch: str, ref: str | None = None, directory: str | None
     # We can't have sub .git directories in our repo
     shutil.rmtree(package_dir / '.git')
 
-    # Save package metadata to import.json
-    # The source URL contains the upstream package name, so we don't need to store it separately
+    # Save package metadata to import.json. The source URL contains the
+    # upstream package name, so we don't need to store it separately.
     metadata: PackageMetadata = {
         'source': url,
         'branch': branch,
         'sha': sha,
         'version': version,
-        'release': release,
     }
 
     # Set modification_status based on source
@@ -1041,6 +1040,7 @@ def import_(url: str, branch: str, ref: str | None = None, directory: str | None
         metadata['modification_status'] = 'independent'
     else:
         metadata['modification_status'] = 'clean'
+        metadata['release'] = release
 
     # Look up Anitya (release-monitoring.org) project ID for the package
     logging.info("Looking up release-monitoring.org project ID for %s...", package_name)
@@ -1101,7 +1101,7 @@ def bump_release(current_release: str, upstream_release: str | None = None) -> s
     has a .N suffix, we increment it.
 
     This handles the edge case where the base is Release: 3.1 (e.g. Fedora ships
-    3.1%{?dist}, or a local placeholder) - we need to know if the current 3.1 is
+    3.1%{?dist}) - we need to know if the current 3.1 is
     that base (should become 3.1.1) or from our previous rebuild of base 3
     (should become 3.2).
 
@@ -1114,9 +1114,8 @@ def bump_release(current_release: str, upstream_release: str | None = None) -> s
 
     Args:
         current_release: Current release string (without %{?dist})
-        upstream_release: Base release from metadata (without %{?dist}), if
-            known. Usually the Fedora/rawhide baseline; after an
-            ahead-of-Fedora bump it may be the local ``0.1`` placeholder.
+        upstream_release: Fedora release from metadata (without %{?dist}), if
+            the package ships Fedora's release.
 
     Returns:
         Bumped release string
@@ -1522,20 +1521,28 @@ def _refresh_fixed_ref_pin(package_name: str, package_dir: Path, pipeline_file: 
 
 def _run_gorget_for_updated_package(package_name: str, package_dir: Path,
                                      old_version: str, new_version: str,
-                                     metadata: PackageMetadata) -> str | None:
+                                     metadata: PackageMetadata) -> tuple[str | None, list[str]]:
     """After update() has merged Fedora's changes for a package with a
     metadata/<package>.source-pipeline.yaml, (re-)run gorget so `sources`
     reflects an independently-verified fetch instead of whatever survived
     the git merge of Fedora's own `sources` file.
 
-    Returns None on success (gorget ran, or wasn't needed). Returns a
-    human-readable reason string if the package needs manual resolution
-    instead -- callers should treat that exactly like a merge conflict
-    (state file + exit 2), never commit.
+    Returns (None, uploaded_filenames) on success (gorget ran, or wasn't
+    needed; uploaded_filenames is empty in the latter case). Returns a
+    human-readable reason string as the first element if the package needs
+    manual resolution instead -- callers should treat that exactly like a
+    merge conflict (state file + exit 2), never commit.
+
+    uploaded_filenames lists any new source archives gorget copied into
+    package_dir and pushed to the lookaside cache -- the caller must keep
+    these out of its commit (they're already in the lookaside cache, and
+    can blow past GitLab's blob-size push limit; see HUM-6388), even though
+    it force-adds package_dir to cope with upstream dist-gits that gitignore
+    their own patches.
     """
     pipeline_file = cuv._load_source_pipeline(package_name)
     if pipeline_file is None:
-        return None
+        return None, []
 
     pipeline = yaml.safe_load(pipeline_file.read_text())
     drifted = _fixed_ref_pipeline_drift(package_dir, pipeline)
@@ -1550,12 +1557,12 @@ def _run_gorget_for_updated_package(package_name: str, package_dir: Path,
             if refresh_result is None:
                 return (f"{package_name}: pipeline ref(s) {', '.join(drifted)} no longer "
                         f"match the merged spec, and automatic pin refresh failed (see log "
-                        f"for details) -- gorget must be re-run manually")
+                        f"for details) -- gorget must be re-run manually"), []
             gorget_version, tmp_pipeline_file = refresh_result
             try:
-                cuv._run_gorget_pipeline(package_name, old_version, gorget_version, tmp_pipeline_file)
+                uploaded = cuv._run_gorget_pipeline(package_name, old_version, gorget_version, tmp_pipeline_file)
             except (RuntimeError, OSError) as exc:
-                return f"{package_name}: gorget pipeline failed after pin refresh: {exc}"
+                return f"{package_name}: gorget pipeline failed after pin refresh: {exc}", []
             else:
                 # Only commit the ref rewrite to the real pipeline file once
                 # gorget has actually run against it successfully -- on
@@ -1565,7 +1572,7 @@ def _run_gorget_for_updated_package(package_name: str, package_dir: Path,
                 # match alone (this exact gap let an unverified `sources`
                 # slip through on a real gcc update despite this check).
                 pipeline_file.write_text(tmp_pipeline_file.read_text())
-                return None
+                return None, uploaded
             finally:
                 tmp_pipeline_file.unlink(missing_ok=True)
 
@@ -1573,16 +1580,39 @@ def _run_gorget_for_updated_package(package_name: str, package_dir: Path,
                 f"merged spec -- gorget must be re-run manually (see "
                 f"metadata/{package_name}.source-pipeline.yaml). No version_from_ref "
                 f"configured for automatic pin refresh (see "
-                f"documentation/operating/package-modification-tracking.md).")
+                f"documentation/operating/package-modification-tracking.md).", [])
 
     # Not a fixed-ref package (or its pin didn't drift): version-templated pipeline.
     if old_version == new_version:
-        return None  # nothing changed that would affect gorget's fetch
+        return None, []  # nothing changed that would affect gorget's fetch
     try:
-        cuv._run_gorget_pipeline(package_name, old_version, new_version, pipeline_file)
+        uploaded = cuv._run_gorget_pipeline(package_name, old_version, new_version, pipeline_file)
     except (RuntimeError, OSError) as exc:
-        return f"{package_name}: gorget pipeline failed: {exc}"
-    return None
+        return f"{package_name}: gorget pipeline failed: {exc}", []
+    return None, uploaded
+
+
+def _stage_package_for_commit(package_name: str, package_dir: Path,
+                               extra_paths: tuple[str, ...],
+                               new_source_filenames: list[str]) -> None:
+    """Stage a package's directory (plus extra_paths, e.g. metadata json) for
+    commit, force-adding rpms/<package> so patches survive an upstream
+    dist-git's own .gitignore (see 66dc563797b7), while still excluding any
+    source archives gorget/download_new_sources just uploaded to the
+    lookaside cache.
+
+    Those archives are intentionally left on disk in package_dir (matching
+    Fedora dist-git convention and check_upstream_versions.py's own
+    lookaside-backed update flow), but must never be committed: they can
+    exceed GitLab's per-blob push-rule limit, which -- unlike a normal
+    .gitignore entry -- 'add -f' would otherwise bypass (see HUM-6388).
+    """
+    if new_source_filenames:
+        cuv._update_gitignore(package_dir, new_source_filenames)
+    run_git('add', '-f', f'rpms/{package_name}', *extra_paths, cwd=ROOT_DIR)
+    if new_source_filenames:
+        run_git('reset', '--', *(f'rpms/{package_name}/{fn}' for fn in new_source_filenames),
+                cwd=ROOT_DIR)
 
 
 def update(package_name: str, skip_build_check: bool = False, sync: bool = False,
@@ -1664,7 +1694,7 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
             # Parse spec file to get version-release for commit message
             version, release = parse_spec_version(upstream_dir)
             upstream_package_name = Path(metadata['source']).stem
-            old_version, old_release = metadata['version'], metadata['release']
+            old_version = metadata['version']
 
         # Reset modification status to clean
         metadata['modification_status'] = 'clean'
@@ -1790,7 +1820,7 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
 
         # Capture old version-release for commit message
         old_version = metadata['version']
-        old_release = metadata['release']
+        old_release = metadata.get('release', '(none)')
 
         # Re-run gorget for packages with a source-pipeline.yaml, so `sources`
         # reflects an independently-verified fetch instead of whatever the
@@ -1800,8 +1830,9 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
         # (gorget fetches from the network and uploads to the lookaside
         # cache -- not a dry-run-safe operation).
         gorget_failure_reason = None
+        new_source_filenames: list[str] = []
         if not has_conflicts and not dry_run:
-            gorget_failure_reason = _run_gorget_for_updated_package(
+            gorget_failure_reason, new_source_filenames = _run_gorget_for_updated_package(
                 package_name, package_dir, old_version, version, metadata,
             )
             if gorget_failure_reason:
@@ -1852,14 +1883,15 @@ def update(package_name: str, skip_build_check: bool = False, sync: bool = False
                 sys.exit(2)
 
             save_package_metadata(package_name, imports[package_name])
-            add_paths = [f'rpms/{package_name}', f'metadata/{package_name}.json']
+            extra_paths = [f'metadata/{package_name}.json']
             pipeline_file = cuv._load_source_pipeline(package_name)
             if pipeline_file is not None:
                 # A successful fixed-ref pin refresh (_run_gorget_for_updated_package
                 # -> _refresh_fixed_ref_pin) rewrites this file in place; without
                 # staging it here that rewrite is left uncommitted indefinitely.
-                add_paths.append(str(pipeline_file.relative_to(ROOT_DIR)))
-            run_git('add', '-f', *add_paths, cwd=ROOT_DIR)
+                extra_paths.append(str(pipeline_file.relative_to(ROOT_DIR)))
+            _stage_package_for_commit(package_name, package_dir,
+                                       tuple(extra_paths), new_source_filenames)
             verb = "Sync" if sync else "Update"
             branch_suffix = f" ({old_branch} -> {effective_branch})" if branch_changed else ""
             commit_msg = f"{verb} {package_name} from {old_version}-{old_release} to {version}-{release}{branch_suffix}\n\nUpstream: {latest_sha}"
@@ -1903,8 +1935,9 @@ def continue_update(dry_run: bool = False) -> None:
     # resolved a `sources` conflict without re-running gorget). Re-run the
     # same check update() does on a clean merge before committing here too.
     gorget_failure_reason = None
+    new_source_filenames: list[str] = []
     if not dry_run and 'metadata' in state and 'old_version' in state:
-        gorget_failure_reason = _run_gorget_for_updated_package(
+        gorget_failure_reason, new_source_filenames = _run_gorget_for_updated_package(
             package_name, package_dir, state['old_version'],
             state['metadata']['version'], cast(PackageMetadata, state['metadata']),
         )
@@ -1920,14 +1953,15 @@ def continue_update(dry_run: bool = False) -> None:
         if 'metadata' in state:
             save_package_metadata(package_name, cast(PackageMetadata, state['metadata']))
 
-        add_paths = [f'rpms/{package_name}', f'metadata/{package_name}.json']
+        extra_paths = [f'metadata/{package_name}.json']
         pipeline_file = cuv._load_source_pipeline(package_name)
         if pipeline_file is not None:
             # See the matching comment in update()'s clean-merge commit path:
             # a successful fixed-ref pin refresh rewrites this file in place,
             # and it must be staged here or the rewrite is left uncommitted.
-            add_paths.append(str(pipeline_file.relative_to(ROOT_DIR)))
-        run_git('add', '-f', *add_paths, cwd=ROOT_DIR)
+            extra_paths.append(str(pipeline_file.relative_to(ROOT_DIR)))
+        _stage_package_for_commit(package_name, package_dir,
+                                   tuple(extra_paths), new_source_filenames)
         run_git_commit('-m', commit_msg, cwd=ROOT_DIR)
         UPDATE_STATE_FILE.unlink()
         logging.info("Committed resolved update for %s", package_name)
@@ -1982,8 +2016,7 @@ def rebuild_package(package_name: str, reason: str, dry_run: bool = False) -> No
     # Parse current version and release
     version, current_release = parse_spec_version(package_dir)
 
-    # Load metadata base release for smart .N bumping (Fedora/rawhide
-    # baseline, or local placeholder such as 0.1 when ahead of Fedora).
+    # Load the Fedora release for smart .N bumping when the package ships it.
     metadata = load_package_metadata(package_name)
     if not metadata:
         sys.exit(f"ERROR: Could not load metadata for {package_name}")
