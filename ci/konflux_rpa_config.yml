@@ -38,7 +38,7 @@ rpas:
     pulp_signed_domain: private-hummingbird-example
     pulp_secret_name: hummingbird-pulp-credentials-private-production-secret
     pipeline_url: "https://github.com/konflux-ci/release-service-catalog.git"
-    pipeline_revision: 76f024becf8ab053f9af16c886e67d68de2d2556
+    pipeline_revision: production
     private_product: example
     component_filter:
       path_prefix: rpms/
