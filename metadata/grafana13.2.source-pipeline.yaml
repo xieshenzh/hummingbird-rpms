@@ -26,6 +26,9 @@ transform:
         patch -p1 < "${PACKAGE_DIR}/grafana-qs-6.16.0.patch"
         # CVE-2026-84375: bump vendored js-yaml to 3.15.2 and 4.3.2.
         patch -p1 < "${PACKAGE_DIR}/grafana-js-yaml-cve.patch"
+        # CVE-2026-84394, CVE-2026-84292: bump vendored fast-uri to 3.1.7.
+        # Must be applied here too, or the offline yarn cache goes stale.
+        patch -p1 < "${PACKAGE_DIR}/grafana-fast-uri-3.1.7.patch"
         if [ -n "${HTTP_PROXY-}" ]; then export YARN_HTTP_PROXY="${HTTP_PROXY-}"; fi
         if [ -n "${HTTPS_PROXY-}" ]; then export YARN_HTTPS_PROXY="${HTTPS_PROXY-}"; fi
         # Unlike grafana12.4, 13.2's yarn.lock has no Cypress dependency to
@@ -42,3 +45,11 @@ transform:
           -cjf "grafana-yarn-cache-${VERSION}.tar.bz2" .yarn/cache
     outputs:
       - "grafana-yarn-cache-${VERSION}.tar.bz2"
+
+# Same-version yarn-cache regeneration (CVE npm bump) changes the archive
+# checksum while keeping the filename, so gorget needs an accepted-checksums
+# exception for the new hash.
+accepted-checksums:
+  - file: "grafana-yarn-cache-13.2.1.tar.bz2"
+    checksum: "aa24fdd6fc2453acc3a42466f33e0f86639c816fd4a04858405e02c8ef629f94767ffd7fc937bae30c9f478d9f05d2809c3f89a21a3c9c460ce03ddb14958987"
+    reason: "grafana-fast-uri-3.1.7.patch bumps fast-uri 3.1.6->3.1.7 for CVE-2026-84394/CVE-2026-84292; yarn-cache regenerated without stale fast-uri-3.1.6 zip"
