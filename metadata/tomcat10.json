@@ -1,14 +1,13 @@
 {
   "branch": "rawhide",
   "cve_product": "Apache Software Foundation / Apache Tomcat",
-  "modification_reason": "Allow supported Java runtime selection; retain systemd weak ordering",
+  "modification_reason": "Update to upstream version 10.1.59",
   "modification_status": "modified",
-  "release": "3",
   "release_monitoring_project_id": 148939,
   "sha": "c864b5c4695bbe8bc9fb4d67dbf7eca2b7ea9fd5",
   "source": "https://src.fedoraproject.org/rpms/tomcat.git",
   "track_upstream": "10.1",
   "upstream_branch": "10.1.x",
   "upstream_repo": "https://github.com/apache/tomcat",
-  "version": "10.1.57"
+  "version": "10.1.59"
 }
