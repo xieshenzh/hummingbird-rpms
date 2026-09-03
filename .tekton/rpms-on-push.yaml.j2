@@ -1,6 +1,7 @@
 {%- for rpm in rpms -%}
-# --- {{ rpm.dname }} ---
 {%- if rpm.imported %}
+---
+# --- {{ rpm.dname }} ---
 {{ pipeline_run(
     rpm=rpm,
     event_type='push',
@@ -15,6 +16,7 @@
     lookaside_cache_url=rpm.lookaside_cache_url if rpm.lookaside_cache_url is defined else None,
 ) -}}
 {%- else %}
+# --- {{ rpm.dname }} ---
 # PENDING
 {%- endif %}
 {% endfor -%}
