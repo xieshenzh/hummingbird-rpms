@@ -62,10 +62,10 @@ index 568dcf7e82..f3e2ed3c35 100644
      if (flags & BSF_NATIVE) {
          flags &= ~BSF_NATIVE;
 diff --git a/erts/emulator/drivers/common/inet_drv.c b/erts/emulator/drivers/common/inet_drv.c
-index eab69d3bcc..412c66b31e 100644
+index c84eae57b6..ab2b6c6ffb 100644
 --- a/erts/emulator/drivers/common/inet_drv.c
 +++ b/erts/emulator/drivers/common/inet_drv.c
-@@ -14343,7 +14343,7 @@ static int packet_inet_init(void)
+@@ -14348,7 +14348,7 @@ static int packet_inet_init(void)
  #ifdef AF_UNSPEC
      disassoc_sa.sa_family = AF_UNSPEC;
  #endif /* #ifdef AF_UNSPEC */
