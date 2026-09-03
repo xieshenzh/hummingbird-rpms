@@ -1,0 +1,6 @@
+# The spec's unqualified archive URL is ambiguous because the repository has
+# both a branch and a tag named 26.2. Select the release tag explicitly.
+fetch:
+  - type: url
+    url: "https://github.com/canonical/cloud-init/archive/refs/tags/${VERSION}.tar.gz"
+    filename: "cloud-init-${VERSION}.tar.gz"
