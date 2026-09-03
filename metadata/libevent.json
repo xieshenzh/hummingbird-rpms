@@ -1,10 +1,9 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Backport CVE-2026-63383 CVE-2026-63384 CVE-2026-63379 CVE-2026-63388 CVE-2026-63381 from libevent 2.1.13 (HUM-6551)",
+  "modification_reason": "Update to upstream version 2.1.13 to fix CVE-2026-63382 and CVE-2026-63385 (HUM-6801, HUM-6800)",
   "modification_status": "modified",
-  "release": "19",
   "sha": "cbd6bf4f72659eacebcff57321176e23aed3c93c",
   "source": "https://src.fedoraproject.org/rpms/libevent.git",
   "upstream_repo": "https://github.com/libevent/libevent",
-  "version": "2.1.12"
+  "version": "2.1.13"
 }

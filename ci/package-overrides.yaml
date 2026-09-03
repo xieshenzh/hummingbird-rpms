@@ -273,6 +273,12 @@ kubernetes1.35:
 kubernetes1.36:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
+libevent:
+  # Local version bump ahead of Fedora (2.1.13, HUM-6827): the source
+  # tarball at that version is not in Fedora's lookaside cache, only
+  # Hummingbird's. Use the Hummingbird lookaside cache instead of Fedora.
+  forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
+
 libfabric:
   forked_from: "https://gitlab.com/redhat/hummingbird/rpms"
 
