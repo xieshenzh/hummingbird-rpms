@@ -81,7 +81,7 @@ spec:
     pipelineRef:
       params:
         - name: url
-          value: https://github.com/konflux-ci/release-service-catalog/
+          value: https://github.com/konflux-ci/release-service-catalog.git
         - name: revision
           value: production
         - name: pathInRepo
