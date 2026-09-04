@@ -193,13 +193,44 @@ def split_nvr(nvr: str) -> tuple[str, str, str]:
     return cleaned, "", ""
 
 
-def parse_version_key(value: str) -> tuple[int, ...] | None:
-    """Numeric tuple from a dotted version; None if there are no digits."""
+_PRERELEASE_RE = re.compile(
+    r"(?i)(\d)[-._~]?(dev|alpha|beta|preview|pre|rc)(?![a-zA-Z_])\.?(\d*)"
+)
+_PRERELEASE_RANK = {"dev": 0, "alpha": 1, "beta": 2, "pre": 3, "preview": 3, "rc": 4}
+
+
+def parse_version_key(value: str) -> tuple[tuple[int, ...], tuple[int, ...]] | None:
+    """Comparable key for a dotted version; None if there are no digits.
+
+    Returns (release_numbers, suffix) where suffix sorts a prerelease
+    (rc/alpha/beta/dev/pre) below the corresponding final release, so
+    2.5.0-rc1 compares lower than 2.5.0.
+    """
     text = (value or "").strip().lstrip("vV")
-    parts = re.findall(r"\d+", text)
-    if not parts:
+    if not re.search(r"\d", text):
         return None
-    return tuple(int(p) for p in parts)
+    pre = _PRERELEASE_RE.search(text)
+    suffix: tuple[int, ...]
+    if pre:
+        release_text = text[: pre.start() + 1]
+        rank = _PRERELEASE_RANK[pre.group(2).lower()]
+        pre_num = int(pre.group(3)) if pre.group(3) else 0
+        suffix = (0, rank, pre_num)
+    else:
+        release_text = text
+        suffix = (1,)
+    nums = tuple(int(p) for p in re.findall(r"\d+", release_text))
+    if not nums:
+        return None
+    return (nums, suffix)
+
+
+def version_major(value: str) -> int | None:
+    """Return the leading numeric component of a version, or None."""
+    key = parse_version_key(value)
+    if key is None or not key[0]:
+        return None
+    return key[0][0]
 
 
 def version_cmp(left: str, right: str) -> int | None:
@@ -263,6 +294,9 @@ def version_satisfies(version: str, constraints: list[tuple[str, str]]) -> bool 
     return True
 
 
+_CVE_ID_RE = re.compile(r"(?i)^CVE-\d{4}-\d{4,8}$")
+
+
 def extract_analysis_nvr(block: str) -> str:
     if not block:
         return ""
@@ -274,11 +308,101 @@ def extract_analysis_nvr(block: str) -> str:
         value = extract_vendor_field(block, field)
         if value:
             return normalize_nvr(value)
-    match = re.search(
+    for match in re.finditer(
         r"\b([A-Za-z0-9+_.-]+-\d[\w.+]*-\d[\w.+]*)(?:\.src\.rpm)?\b",
         block,
-    )
-    return normalize_nvr(match.group(1)) if match else ""
+    ):
+        candidate = match.group(1)
+        # Do not treat a CVE id (CVE-2026-12345) as an NVR.
+        if _CVE_ID_RE.match(candidate):
+            continue
+        return normalize_nvr(candidate)
+    return ""
+
+
+# ---- OR-separated affected branches / fixed versions ----
+
+
+def split_or_branches(text: str) -> list[str]:
+    """Split disjoint affected branches on `or`/`;` (keeps `,` within a branch)."""
+    if not text:
+        return []
+    parts = re.split(r"(?i)\s+or\s+|;", text)
+    return [p.strip() for p in parts if p.strip()]
+
+
+def split_fixed_versions(text: str) -> list[str]:
+    """Split a branch-specific fixed-version list on `,`/`;`/`or`/whitespace."""
+    if not text:
+        return []
+    tokens = re.split(r"(?i)\s+or\s+|[,;\s]+", text)
+    return [t.strip() for t in tokens if t.strip() and re.search(r"\d", t)]
+
+
+def version_satisfies_any(
+    version: str, branches: list[list[tuple[str, str]]]
+) -> bool | None:
+    """OR semantics: True if any branch is satisfied, None if all are unknown."""
+    if not branches:
+        return None
+    any_unknown = False
+    for constraints in branches:
+        result = version_satisfies(version, constraints)
+        if result is True:
+            return True
+        if result is None:
+            any_unknown = True
+    return None if any_unknown else False
+
+
+def select_fixed_for_version(fixed: str, version: str) -> str:
+    """Pick the branch-specific fixed version matching `version`'s major line."""
+    versions = split_fixed_versions(fixed)
+    if not versions:
+        return ""
+    if len(versions) == 1:
+        return versions[0]
+    target = version_major(version)
+    for candidate in versions:
+        if target is not None and version_major(candidate) == target:
+            return candidate
+    return ""
+
+
+# ---- Component version resolution ----
+
+
+def resolve_component_version(
+    package: str,
+    component: str,
+    *,
+    analysis_block: str = "",
+) -> tuple[str, str]:
+    """Resolve the affected component version and its evidence source.
+
+    Order: matching bundled Provides in the spec, then the cve_analysis
+    record. Returns ("", "") when no component version is found.
+    """
+    comp = (component or "").strip().lower()
+    if not comp:
+        return "", ""
+    try:
+        hits = probe_spec_deps(package, comp)
+    except RuntimeError:
+        hits = []
+    for hit in hits:
+        name = hit.bundled_name.lower()
+        if hit.kind == "bundled_provides" and hit.bundled_version and comp in name:
+            return hit.bundled_version, "spec_provides"
+    for field in ("Component version", "Bundled version"):
+        # Fuzzy: first whitespace/end-delimited version token in the field value.
+        match = re.search(
+            r"(?<!\w)v?(\d[\w.+~-]*)(?=\s|$)",
+            extract_vendor_field(analysis_block, field),
+        )
+        if match:
+            return match.group(1), "analysis"
+    return "", ""
 
 
 # ---- Version check payload ----
@@ -292,6 +416,8 @@ def version_check_payload(
     affected: str = "",
     fixed: str = "",
     analysis_nvr: str = "",
+    component: str = "",
+    analysis_block: str = "",
 ) -> dict[str, Any]:
     if not local_nvr:
         local_nvr = read_local_spec_nvr(package)
@@ -300,9 +426,34 @@ def version_check_payload(
     _fib_name, fib_version, _fib_rel = split_nvr(fib_nvr) if fib_nvr else ("", "", "")
     analysis_nvr = normalize_nvr(analysis_nvr) if analysis_nvr else ""
 
+    # Choose the version to compare: the affected component's version when a
+    # component is named, otherwise the parent RPM version.
+    component = (component or "").strip()
+    compare_version = local_version
+    version_source = "parent_rpm" if local_version else ""
+    comparable = True
+    if component:
+        resolved, evidence = resolve_component_version(
+            package,
+            component,
+            analysis_block=analysis_block,
+        )
+        if resolved:
+            compare_version = resolved
+            version_source = evidence
+        else:
+            # No component version resolvable: refuse to compare against the
+            # parent RPM version (avoids e.g. grafana 13.x vs fast-uri 3.x).
+            compare_version = ""
+            version_source = ""
+            comparable = False
+
+    # Select the branch-specific fixed version matching the compared major line.
+    selected_fixed = select_fixed_for_version(fixed, compare_version) if fixed else ""
+
     vs_fixed = ""
-    if local_version and fixed:
-        cmp_val = version_cmp(local_version, fixed)
+    if comparable and compare_version and selected_fixed:
+        cmp_val = version_cmp(compare_version, selected_fixed)
         if cmp_val is None:
             vs_fixed = "unknown"
         elif cmp_val < 0:
@@ -310,10 +461,12 @@ def version_check_payload(
         else:
             vs_fixed = "at_or_above"
 
+    # OR-separated affected branches: version is affected if any branch matches.
+    branches = [parse_affected_constraints(b) for b in split_or_branches(affected)]
+    branches = [c for c in branches if c]
     vs_affected = ""
-    constraints = parse_affected_constraints(affected)
-    if local_version and constraints:
-        matched = version_satisfies(local_version, constraints)
+    if comparable and compare_version and branches:
+        matched = version_satisfies_any(compare_version, branches)
         if matched is None:
             vs_affected = "unknown"
         elif matched:
@@ -321,10 +474,15 @@ def version_check_payload(
         else:
             vs_affected = "not_in_range"
 
-    if vs_fixed == "at_or_above" and vs_affected == "in_range":
+    if not comparable:
+        hint = "non_comparable"
+    elif vs_fixed == "at_or_above" and vs_affected == "in_range":
         hint = "conflicting_signals"
     elif vs_fixed == "at_or_above":
         hint = "possibly_at_or_above_fix"
+    elif vs_affected == "in_range" and not selected_fixed:
+        # Affected, but no fix version exists for this major branch.
+        hint = "in_range_no_fix_for_branch"
     elif vs_fixed == "below" or vs_affected == "in_range":
         hint = "possibly_below_fix"
     elif vs_affected == "not_in_range":
@@ -336,7 +494,14 @@ def version_check_payload(
         "Do not conclude Done-Errata from versions alone; "
         "use upstream-fix-age for the fix commit vs tag date."
     )
-    if hint == "conflicting_signals":
+    if not comparable:
+        note = (
+            f"No version resolved for component '{component}'; "
+            "not comparable. Refusing to compare the parent RPM version "
+            "against a component-specific CVE range. Add a bundled Provides "
+            "or confirm the component is not present."
+        )
+    elif hint == "conflicting_signals":
         note = (
             "vs_fixed is at_or_above but vs_affected is still in_range "
             "(broad CVE range that includes the fix version). Do not treat "
@@ -347,11 +512,16 @@ def version_check_payload(
         "package": package,
         "local_nvr": local_nvr,
         "local_version": local_version,
+        "component": component,
+        "compare_version": compare_version,
+        "version_source": version_source,
+        "comparable": comparable,
         "fib": fib_nvr,
         "fib_version": fib_version,
         "analysis_nvr": analysis_nvr,
         "affected": affected,
         "fixed": fixed,
+        "selected_fixed": selected_fixed,
         "vs_fixed": vs_fixed,
         "vs_affected": vs_affected,
         "hint": hint,

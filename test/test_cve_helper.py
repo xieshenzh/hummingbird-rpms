@@ -716,6 +716,157 @@ def test_extract_analysis_nvr() -> None:
     assert helper.extract_analysis_nvr(block) == "foo-1.2-3"
 
 
+def test_extract_analysis_nvr_ignores_cve_ids() -> None:
+    # A bare CVE id must not be parsed as an NVR.
+    assert helper.extract_analysis_nvr("Regarding CVE-2026-12345 impact.") == ""
+    # A real NVR is still found even when a CVE id precedes it.
+    block = "CVE-2026-12345 fixed in foo-1.2-3.src.rpm"
+    assert helper.extract_analysis_nvr(block) == "foo-1.2-3"
+
+
+def test_version_cmp_prerelease() -> None:
+    assert lib_spec.version_cmp("2.5.0-rc1", "2.5.0") == -1
+    assert lib_spec.version_cmp("2.5.0", "2.5.0-rc1") == 1
+    assert lib_spec.version_cmp("2.5.0-rc2", "2.5.0-rc1") == 1
+    assert lib_spec.version_cmp("2.5.0-beta1", "2.5.0-rc1") == -1
+    assert lib_spec.version_cmp("2.5.0-rc1", "2.5.0-rc1") == 0
+
+
+def test_version_cmp_non_prerelease_build_suffix() -> None:
+    # "prebuilt" contains "pre" but is not a prerelease tag.
+    # 2.0.0-prebuilt-1 must compare above 2.0.0, not below it.
+    assert lib_spec.version_cmp("2.0.0-prebuilt-1", "2.0.0") == 1
+    # A genuine prerelease is still below the final release.
+    assert lib_spec.version_cmp("2.0.0-pre1", "2.0.0") == -1
+
+
+def test_resolve_component_version_from_spec_provides(
+    tmp_path: Path, monkeypatch
+) -> None:
+    pkg = "grafana13.1"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "Name: grafana13.1\nVersion: 13.1.1\nRelease: 5%{?dist}\n"
+        "Provides: bundled(fast-uri) = 3.0.6\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    version, evidence = lib_spec.resolve_component_version(pkg, "fast-uri")
+    assert version == "3.0.6"
+    assert evidence == "spec_provides"
+
+
+def test_version_check_component_uses_component_version(
+    tmp_path: Path, monkeypatch
+) -> None:
+    # Grafana 13.x must never be compared against a fast-uri 3.x range.
+    pkg = "grafana13.1"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "Name: grafana13.1\nVersion: 13.1.1\nRelease: 5%{?dist}\n"
+        "Provides: bundled(fast-uri) = 3.0.6\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    payload = helper.version_check_payload(
+        pkg, component="fast-uri", affected="< 3.0.7", fixed="3.0.7"
+    )
+    assert payload["comparable"] is True
+    assert payload["compare_version"] == "3.0.6"
+    assert payload["version_source"] == "spec_provides"
+    assert payload["vs_fixed"] == "below"
+    assert payload["vs_affected"] == "in_range"
+    assert payload["hint"] == "possibly_below_fix"
+
+
+def test_version_check_non_comparable_without_component_version(
+    tmp_path: Path, monkeypatch
+) -> None:
+    pkg = "grafana13.1"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "Name: grafana13.1\nVersion: 13.1.1\nRelease: 5%{?dist}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    payload = helper.version_check_payload(
+        pkg, component="fast-uri", affected="< 3.0.7", fixed="3.0.7"
+    )
+    assert payload["comparable"] is False
+    assert payload["compare_version"] == ""
+    assert payload["vs_fixed"] == ""
+    assert payload["vs_affected"] == ""
+    assert payload["hint"] == "non_comparable"
+    # The parent RPM version (13.x) must not leak into the comparison.
+    assert "13.1.1" not in payload["note"]
+
+
+def test_version_check_or_branches_select_major(
+    tmp_path: Path, monkeypatch
+) -> None:
+    pkg = "foo"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "Name: foo\nVersion: 1.4.0\nRelease: 1%{?dist}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    payload = helper.version_check_payload(
+        pkg,
+        component="foo",
+        analysis_block="  Component version: 1.4.0\n",
+        affected="< 1.5.0 or < 2.3.0",
+        fixed="1.5.0, 2.3.0",
+    )
+    assert payload["compare_version"] == "1.4.0"
+    assert payload["version_source"] == "analysis"
+    assert payload["selected_fixed"] == "1.5.0"
+    assert payload["vs_fixed"] == "below"
+    assert payload["vs_affected"] == "in_range"
+    # A version above every branch: no matching major line, not in range.
+    above = helper.version_check_payload(
+        pkg,
+        component="foo",
+        analysis_block="  Component version: 3.0.0\n",
+        affected="< 1.5.0 or < 2.3.0",
+        fixed="1.5.0, 2.3.0",
+    )
+    assert above["selected_fixed"] == ""  # no branch matches major 3
+    assert above["vs_fixed"] == ""  # therefore no fixed comparison
+    assert above["vs_affected"] == "not_in_range"
+    assert above["hint"] == "possibly_not_in_affected_range"
+
+
+def test_version_check_in_range_but_no_matching_fix_branch(
+    tmp_path: Path, monkeypatch
+) -> None:
+    # version 3.x is affected (< 4.0.0) but no fix exists for the 3.x branch.
+    pkg = "foo"
+    pkg_dir = tmp_path / "rpms" / pkg
+    pkg_dir.mkdir(parents=True)
+    (pkg_dir / f"{pkg}.spec").write_text(
+        "Name: foo\nVersion: 3.0.0\nRelease: 1%{?dist}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(lib_utils, "repo_root", lambda: tmp_path)
+    payload = helper.version_check_payload(
+        pkg,
+        component="foo",
+        analysis_block="  Component version: 3.0.0\n",
+        affected="< 4.0.0 or < 2.3.0",
+        fixed="1.5.0, 2.3.0",
+    )
+    assert payload["vs_affected"] == "in_range"
+    assert payload["selected_fixed"] == ""
+    assert payload["vs_fixed"] == ""
+    # Must NOT claim below-fix — there is no known fix for the major-3 branch.
+    assert payload["hint"] == "in_range_no_fix_for_branch"
+
+
 def test_compare_fix_age_and_parse_github_url() -> None:
     from datetime import datetime, timezone
 
