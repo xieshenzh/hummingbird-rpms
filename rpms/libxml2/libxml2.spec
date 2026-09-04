@@ -1,13 +1,13 @@
 %global soversion 16
 
 Name:           libxml2
-Version:        2.15.3
+Version:        2.15.4
 # Placed after Version: so %{version} is defined when this shell-eval macro
 # runs -- a %global before Version: silently captures the un-truncated
 # version instead of major.minor (see metadata/libxml2.source-pipeline.yaml
 # and HUM-6191 for how this broke Source0).
 %global majorminor %(echo %{version} | cut -d. -f1-2)
-Release:        0.1.4%{?dist}
+Release:        0.1%{?dist}
 Summary:        Library providing XML and HTML support
 
 # list.c, dict.c and few others use ISC-Veillard
@@ -21,8 +21,6 @@ Patch0:         libxml2-multilib.patch
 # Patch from openSUSE.
 # See:  https://bugzilla.gnome.org/show_bug.cgi?id=789714
 Patch1:         libxml2-python3-unicode-errors.patch
-Patch2:         CVE-2026-11979.patch
-Patch3:         CVE-2026-76781.patch
 
 BuildRequires:  cmake-rpm-macros
 BuildRequires:  gcc
@@ -670,4 +668,3 @@ rm -rf example/.deps example/Makefile
 
 * Tue Jun  6 2006 Daniel Veillard <veillard@redhat.com>
 - upstream release 2.6.25 broken, do not ship !
-

@@ -1,3 +1,5 @@
 fetch:
   - type: url
     url: "https://download.gnome.org/sources/libxml2/${VERSION_MAJOR}.${VERSION_MINOR}/libxml2-${VERSION}.tar.xz"
+  - type: url
+    url: "https://www.w3.org/XML/Test/xmlts20080827.tar.gz"
