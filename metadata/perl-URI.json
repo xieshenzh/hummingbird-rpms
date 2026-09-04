@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_status": "clean",
   "release": "1",
-  "sha": "6ca44fdaeb1fd5853f96a1218bbe4d69fbf47148",
+  "sha": "a21bdb48acf1d61b8547e40fdaa2de898642d63b",
   "source": "https://src.fedoraproject.org/rpms/perl-URI.git",
   "upstream_repo": "https://github.com/libwww-perl/URI",
-  "version": "5.36"
+  "version": "5.37"
 }
