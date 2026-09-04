@@ -1090,6 +1090,10 @@ def normalize_release_in_specs(directory: Path) -> None:
     for spec_file in directory.glob('*.spec'):
         content = spec_file.read_text()
         normalized = re.sub(r'^Release:.*$', 'Release: 0%{?dist}', content, flags=re.MULTILINE)
+        normalized = re.sub(
+            r'^(%(?:global|define)\s+(?:portablerelease|rpmrelease|baserelease|gcc_release|specrelease|krb5_release))\s+\S+',
+            r'\1 0', normalized, flags=re.MULTILINE
+        )
         spec_file.write_text(normalized)
 
 
