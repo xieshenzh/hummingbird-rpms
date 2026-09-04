@@ -759,15 +759,36 @@ def cmd_set_fib(args: argparse.Namespace) -> int:
     return 0
 
 
+def _has_nab_evidence(args: argparse.Namespace) -> bool:
+    """Return True when SBOM or spec-deps evidence is present on the CLI."""
+    sbom = str(getattr(args, "sbom_match", "") or "").strip().lower()
+    spec = str(getattr(args, "spec_deps", "") or "").strip().lower()
+    if sbom and sbom != "no hits":
+        return True
+    if spec and spec != "no spec-deps hits":
+        return True
+    return False
+
+
 def cmd_close_nab(args: argparse.Namespace) -> int:
     body = resolve_comment_body(args, default_kind="nab")
     kind = str(getattr(args, "kind", "") or "") or "nab"
     if _skip_jira_write(args):
         _emit_comment_body(args, body, kind)
         return 0
+
     tickets = list(args.tickets or [])
     if not tickets:
         raise RuntimeError("Pass HUM ticket key(s), or --print-only / --json")
+
+    # ---- Evidence gate (before any Jira write) ----
+    if not _has_nab_evidence(args):
+        raise RuntimeError(
+            "Refusing close-nab: no SBOM or spec-deps evidence. "
+            "Search the SBOM for the ticket's Upstream Affected Component "
+            "(customfield_10632) and pass --sbom-match / --spec-deps."
+        )
+
     for raw in tickets:
         ticket = normalize_hum_key(raw)
         close_not_a_bug(ticket, body, args.vex)
