@@ -1,0 +1,35 @@
+From: Hummingbird <hummingbird@redhat.com>
+Subject: [PATCH] Bump fast-uri to 3.1.7 for CVE-2026-84394, CVE-2026-84292
+
+diff --git a/package.json b/package.json
+index a2ca5bb1d3a0..4a50998764c8 100644
+--- a/package.json
++++ b/package.json
+@@ -463,7 +463,7 @@
+     "postcss@npm:^8.4.40": "8.5.19",
+     "postcss@npm:^8.5.1": "8.5.19",
+     "postcss@npm:^8.5.6": "8.5.19",
+-    "fast-uri@npm:^3.0.1": "3.1.6",
++    "fast-uri@npm:^3.0.1": "3.1.7",
+     "underscore": "1.13.7",
+     "@types/slate": "0.47.11",
+     "semver@npm:~7.3.5": "^7.3.5",
+diff --git a/yarn.lock b/yarn.lock
+index 8bf9ee8b3151..00d401ee94de 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -19084,10 +19084,10 @@ __metadata:
+   languageName: node
+   linkType: hard
+ 
+-"fast-uri@npm:3.1.6":
+-  version: 3.1.6
+-  resolution: "fast-uri@npm:3.1.6"
+-  checksum: 10c0/77fa4f966f7d2cf83c34af2d3eb88882872fe90634f27a6bd309551db65377d3ca55616467c7cb4dcc57e33523d149e2fec1952d51cc2f00bfce68a66c3711ea
++"fast-uri@npm:3.1.7":
++  version: 3.1.7
++  resolution: "fast-uri@npm:3.1.7"
++  checksum: 10c0/ca2baa4bde48fc7322bdc692c6636975943ebe4f6dd97e07d70b14e0ab85af2ff30de90f550f5ec2956684fe208e150d85d6cb5f3c74438c8ac1bf86bd435c13
+   languageName: node
+   linkType: hard
+ 
