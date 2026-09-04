@@ -441,6 +441,12 @@ def build_parser() -> argparse.ArgumentParser:
         dest="analysis_nvr",
         help="cve_analysis NVR override.",
     )
+    vchk.add_argument(
+        "--component",
+        default="",
+        help="Affected component name (default: ticket's Upstream Affected "
+        "Component). Compares the component version, not the parent RPM.",
+    )
 
     age = subparsers.add_parser(
         "upstream-fix-age",
@@ -989,6 +995,8 @@ def cmd_version_check(args: argparse.Namespace) -> int:
     affected = args.affected
     fixed = args.fixed
     analysis_nvr = args.analysis_nvr
+    component = args.component
+    analysis_block = ""
     if args.ticket:
         gathered = gather_ticket_reports(
             [args.ticket], find_related=False, max_linked=0
@@ -1000,6 +1008,9 @@ def cmd_version_check(args: argparse.Namespace) -> int:
         affected = affected or report.affected_range
         fixed = fixed or report.fixed_version
         analysis_nvr = analysis_nvr or extract_analysis_nvr(report.cve_analysis_block)
+        analysis_block = report.cve_analysis_block
+        if not component:
+            component = report.upstream_component
     payload = version_check_payload(
         args.package,
         local_nvr=args.nvr,
@@ -1007,6 +1018,8 @@ def cmd_version_check(args: argparse.Namespace) -> int:
         affected=affected,
         fixed=fixed,
         analysis_nvr=analysis_nvr,
+        component=component,
+        analysis_block=analysis_block,
     )
     if args.json:
         print(json.dumps(payload, indent=2, sort_keys=True))
@@ -1014,10 +1027,15 @@ def cmd_version_check(args: argparse.Namespace) -> int:
     print(f"package: {payload['package']}")
     print(f"local_nvr: {payload['local_nvr'] or '(none)'}")
     print(f"local_version: {payload['local_version'] or '(none)'}")
+    print(f"component: {payload['component'] or '(none)'}")
+    print(f"compare_version: {payload['compare_version'] or '(none)'}")
+    print(f"version_source: {payload['version_source'] or '(none)'}")
+    print(f"comparable: {'yes' if payload['comparable'] else 'no'}")
     print(f"fib: {payload['fib'] or '(unset)'}")
     print(f"analysis_nvr: {payload['analysis_nvr'] or '(none)'}")
     print(f"affected: {payload['affected'] or '(none)'}")
     print(f"fixed: {payload['fixed'] or '(none)'}")
+    print(f"selected_fixed: {payload['selected_fixed'] or '(n/a)'}")
     print(f"vs_fixed: {payload['vs_fixed'] or '(n/a)'}")
     print(f"vs_affected: {payload['vs_affected'] or '(n/a)'}")
     print(f"hint: {payload['hint']}")
@@ -1088,7 +1106,7 @@ def cmd_log_message(args: argparse.Namespace) -> int:
             names = "/".join(f"--{n}" for n in selected)
             print(f"error: pass either FILE or {names}, not both", file=sys.stderr)
             return 2
-        (agent, session_id), = selected.items()
+        ((agent, session_id),) = selected.items()
         file_path = export_agent_log(agent, session_id or None)
         print(f"Exported {agent} session -> {file_path}")
     elif file_path is None:
