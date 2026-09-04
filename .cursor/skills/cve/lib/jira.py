@@ -377,7 +377,7 @@ def pulp_has_nvr(package: str, nvr: str) -> tuple[bool, str]:
         if wanted in nvrs or wanted_file in files:
             return True, f"{wanted_file} is in the Pulp listing for {package}"
     latest = pulp.fetch_hummingbird_latest_srpm(package)
-    if latest and (latest == wanted_file or wanted in str(latest)):
+    if latest and latest == wanted_file:
         return True, f"Pulp latest SRPM for {package} is {latest}"
     latest_note = f" (latest {latest})" if latest else ""
     return False, f"{wanted_file} not published in Pulp for {package}{latest_note}"

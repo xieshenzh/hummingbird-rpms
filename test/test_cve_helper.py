@@ -1214,3 +1214,61 @@ def test_log_message_cli(tmp_path: Path) -> None:
         ]
     )
     assert rc == 0
+
+
+# ---- HUM-6847: exact NVR matching and NAB evidence gate ----
+
+
+def test_pulp_has_nvr_no_substring_match(monkeypatch) -> None:
+    """foo-1.2-1 must NOT match foo-1.2-10 (exact NVR only)."""
+    index = SimpleNamespace(nvrs=[], srpm_filenames=set())
+    pulp = SimpleNamespace(
+        fetch_srpm_listing_index=lambda pkg: index,
+        fetch_hummingbird_latest_srpm=lambda pkg: "foo-1.2-10.src.rpm",
+    )
+    monkeypatch.setattr(lib_jira, "pulp_module", lambda: pulp)
+    ok, _ = lib_jira.pulp_has_nvr("foo", "foo-1.2-1.src.rpm")
+    assert not ok, "foo-1.2-1 must not substring-match foo-1.2-10"
+
+
+def test_cmd_close_nab_no_evidence_blocks_jira(monkeypatch) -> None:
+    """Missing evidence must stop before any Jira write."""
+    closed: list[str] = []
+    monkeypatch.setattr(
+        helper, "close_not_a_bug", lambda *a, **k: closed.append("closed")
+    )
+    args = helper.build_parser().parse_args(
+        [
+            "close-nab",
+            "HUM-99",
+            "--vex",
+            "Component not Present",
+            "--package",
+            "foo",
+        ]
+    )
+    with pytest.raises(RuntimeError, match="no SBOM or spec-deps evidence"):
+        helper.cmd_close_nab(args)
+    assert closed == [], "Jira write must not have been called"
+
+
+def test_cmd_close_nab_with_evidence_passes(monkeypatch) -> None:
+    """Valid SBOM or spec-deps evidence passes the gate."""
+    calls: list[str] = []
+    monkeypatch.setattr(
+        helper, "close_not_a_bug", lambda t, b, v: calls.append(t)
+    )
+    args = helper.build_parser().parse_args(
+        [
+            "close-nab",
+            "HUM-99",
+            "--vex",
+            "Component not Present",
+            "--package",
+            "foo",
+            "--sbom-match",
+            "1 hit(s)",
+        ]
+    )
+    assert helper.cmd_close_nab(args) == 0
+    assert calls == ["HUM-99"]
