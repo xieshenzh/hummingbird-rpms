@@ -1,0 +1,101 @@
+From 9c81f4893f23c2fbe066c25f5d389ab5c349b72a Mon Sep 17 00:00:00 2001
+From: Jaroslav Rohel <jrohel@redhat.com>
+Date: Mon, 24 Aug 2026 13:54:13 +0200
+Subject: [PATCH] libdnf5: Fix dangling reference bug in
+ is_vendor_change_allowed
+
+Bug scenario:
+In VendorChangeManager::is_vendor_change_allowed(), two references are
+obtained sequentially:
+1. const auto & outgoing_vendor_mask = get_vendor_change_masks(
+   outgoing_vendor).outgoing_mask;
+2. const auto & incoming_vendor_mask = get_vendor_change_masks(
+   incoming_vendor).incoming_mask;
+
+If incoming_vendor is not cached, get_vendor_change_masks() calls
+vendor_masks.emplace_back() (vendor_masks is std::vector) which may
+reallocate the vector, invalidating the outgoing_vendor_mask reference
+from step 1.
+
+Fix:
+Replace std::vector with std::map. std::map guarantees that references
+to existing elements remain valid after inserting new elements (no
+reallocation like vector).
+Secondary benefit: O(log n) lookup instead of O(n) linear search.
+---
+ libdnf5/solv/vendor_change_manager.cpp | 16 ++++++++--------
+ libdnf5/solv/vendor_change_manager.hpp |  4 ++--
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/libdnf5/solv/vendor_change_manager.cpp b/libdnf5/solv/vendor_change_manager.cpp
+index 430760ada..7b3469623 100644
+--- a/libdnf5/solv/vendor_change_manager.cpp
++++ b/libdnf5/solv/vendor_change_manager.cpp
+@@ -195,20 +195,19 @@ bool VendorChangeManager::is_vendor_change_allowed(Solvable & outgoing, Solvable
+ 
+ const VendorChangeManager::VendorChangeMasks & VendorChangeManager::get_vendor_change_masks(Id vendor) {
+     constexpr int EXTRA_CAPACITY = 7;
+-    static const VendorChangeMasks empty_masks{.vendor = 0};
+-    VendorChangeMasks masks;
++    static const VendorChangeMasks empty_masks;
+ 
+     if (vendor == 0 || vendor_policies_def.empty()) {
+         return empty_masks;
+     }
+ 
+-    for (const auto & vendor_to_classes : vendor_masks) {
+-        if (vendor_to_classes.vendor == vendor) {
+-            return vendor_to_classes;
+-        }
++    // Check if masks for this vendor are already cached
++    if (auto it = vendor_masks.find(vendor); it != vendor_masks.end()) {
++        return it->second;
+     }
+ 
+-    masks.vendor = vendor;
++    // Create new masks for this vendor
++    VendorChangeMasks masks;
+     auto vendor_str = pool.id2str(vendor);
+     for (unsigned int class_idx = 0; class_idx < vendor_policies_def.size(); ++class_idx) {
+         const auto & vendor_class_def = vendor_policies_def[class_idx];
+@@ -240,7 +239,8 @@ const VendorChangeManager::VendorChangeMasks & VendorChangeManager::get_vendor_c
+         }
+     }
+ 
+-    return vendor_masks.emplace_back(masks);
++    // Insert into map and return reference to the inserted value
++    return vendor_masks.emplace(vendor, std::move(masks)).first->second;
+ }
+ 
+ 
+diff --git a/libdnf5/solv/vendor_change_manager.hpp b/libdnf5/solv/vendor_change_manager.hpp
+index ebe53c8ef..9d651b597 100644
+--- a/libdnf5/solv/vendor_change_manager.hpp
++++ b/libdnf5/solv/vendor_change_manager.hpp
+@@ -9,6 +9,7 @@
+ #include "libdnf5/common/sack/query_cmp.hpp"
+ 
+ #include <filesystem>
++#include <map>
+ #include <string>
+ #include <vector>
+ 
+@@ -87,14 +88,13 @@ public:
+ 
+ private:
+     struct VendorChangeMasks {
+-        Id vendor;
+         SolvMap outgoing_mask{0};
+         SolvMap incoming_mask{0};
+     };
+ 
+     const Pool & pool;
+     std::vector<VendorChangePolicy> vendor_policies_def;
+-    std::vector<VendorChangeMasks> vendor_masks;
++    std::map<Id, VendorChangeMasks> vendor_masks;
+     SolvMap incoming_vendor_bypassed_solvables{0};
+ 
+     /// Retrieve or cache masks for a specific vendor
+-- 
+2.55.0
+
