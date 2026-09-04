@@ -1,0 +1,173 @@
+From 009c681d320cbf9f78c3a45be7c652d9698d953b Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Fri, 21 Aug 2026 10:10:47 +0000
+Subject: [PATCH] spec: Fix bcond ordering so plugin_systemd_inhibit is enabled
+
+The %bcond for systemd was declared after plugin_systemd_inhibit
+already checked it, so %{with systemd} evaluated to false and
+the plugin was silently disabled.
+
+Also reorder all bcond declarations into logical groups (toolchain, core
+features, main components, plugins, documentation, language bindings,
+testing).
+
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ dnf5.spec | 129 ++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 66 insertions(+), 63 deletions(-)
+
+diff --git a/dnf5.spec b/dnf5.spec
+index 979ad52d4..4e7904c05 100644
+--- a/dnf5.spec
++++ b/dnf5.spec
+@@ -3,13 +3,77 @@
+ %global project_version_minor 4
+ %global project_version_micro 0
+ 
+-%bcond dnf5_obsoletes_dnf %[0%{?fedora} > 40 || 0%{?rhel} > 10]
++# ========== build options ==========
++
++# Toolchain
++%bcond_with    clang
++%bcond_with    sanitizers
+ 
++# Core features
++%bcond dnf5_obsoletes_dnf %[0%{?fedora} > 40 || 0%{?rhel} > 10]
++%bcond_without acl
++%bcond_without comps
+ %if 0%{?rhel} >= 11
+-%bcond_with modulemd
++%bcond_with    modulemd
+ %else
+ %bcond_without modulemd
+ %endif
++%bcond_without systemd
++# Disable SOLVER_FLAG_FOCUS_NEW only for RHEL
++%if 0%{?rhel} && 0%{?rhel} < 11
++%bcond_with    focus_new
++%else
++%bcond_without focus_new
++%endif
++
++# Main components
++%bcond_without dnf5
++%bcond_without dnf5daemon_client
++%bcond_without dnf5daemon_server
++%bcond_without libdnf_cli
++
++# Plugins
++%bcond_without dnf5_plugins
++%bcond_without plugin_actions
++%bcond_without plugin_appstream
++%bcond_without plugin_expired_pgp_keys
++%if 0%{?rhel} >= 10
++%bcond_with    plugin_local
++%else
++%bcond_without plugin_local
++%endif
++%bcond_without plugin_manifest
++%bcond_without plugin_rhsm
++%if %{with systemd}
++%bcond_without plugin_systemd_inhibit
++%else
++%bcond_with    plugin_systemd_inhibit
++%endif
++%bcond_without python_plugins_loader
++
++# Documentation
++%bcond_with    html
++%if 0%{?rhel} == 8
++%bcond_with    man
++%else
++%bcond_without man
++%endif
++
++# Language bindings
++# TODO Go bindings fail to build, disable for now
++%bcond_with    go
++%bcond_without perl5
++%bcond_without python3
++%bcond_without ruby
++
++# Testing
++%bcond_without tests
++%bcond_with    performance_tests
++%bcond_with    dnf5daemon_tests
++
++%if %{with clang}
++%global toolchain clang
++%endif
+ 
+ Name:           dnf5
+ Version:        %{project_version_prime}.%{project_version_major}.%{project_version_minor}.%{project_version_micro}
+@@ -81,67 +145,6 @@ Provides:       dnf5-command(upgrade)
+ Provides:       dnf5-command(versionlock)
+ 
+ 
+-# ========== build options ==========
+-
+-%bcond_without dnf5daemon_client
+-%bcond_without dnf5daemon_server
+-%bcond_without libdnf_cli
+-%bcond_without dnf5
+-%bcond_without dnf5_plugins
+-%bcond_without plugin_actions
+-%bcond_without plugin_appstream
+-%bcond_without plugin_expired_pgp_keys
+-%bcond_without plugin_rhsm
+-%bcond_without plugin_manifest
+-%bcond_without python_plugins_loader
+-
+-%if 0%{?rhel} >= 10
+-%bcond_with plugin_local
+-%else
+-%bcond_without plugin_local
+-%endif
+-
+-%if %{with systemd}
+-%bcond_without plugin_systemd_inhibit
+-%else
+-%bcond_with plugin_systemd_inhibit
+-%endif
+-
+-%bcond_without acl
+-%bcond_without comps
+-
+-%bcond_without systemd
+-
+-%bcond_with    html
+-%if 0%{?rhel} == 8
+-%bcond_with    man
+-%else
+-%bcond_without man
+-%endif
+-
+-# TODO Go bindings fail to build, disable for now
+-%bcond_with    go
+-%bcond_without perl5
+-%bcond_without python3
+-%bcond_without ruby
+-
+-%bcond_with    clang
+-%bcond_with    sanitizers
+-%bcond_without tests
+-%bcond_with    performance_tests
+-%bcond_with    dnf5daemon_tests
+-
+-# Disable SOLVER_FLAG_FOCUS_NEW only for RHEL
+-%if 0%{?rhel} && 0%{?rhel} < 11
+-%bcond_with    focus_new
+-%else
+-%bcond_without focus_new
+-%endif
+-
+-%if %{with clang}
+-    %global toolchain clang
+-%endif
+-
+ # ========== versions of dependencies ==========
+ 
+ %if %{with modulemd}
+-- 
+2.55.0
+

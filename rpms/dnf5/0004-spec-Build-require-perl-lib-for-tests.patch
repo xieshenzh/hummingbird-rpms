@@ -1,0 +1,30 @@
+From 146b3e55c92bb6f01917f0365747b8d7cc4dd3f9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 31 Aug 2026 13:59:08 +0200
+Subject: [PATCH] spec: Build-require perl(lib) for tests
+
+A new test/perl5/libdnf5/base/test_interaction_callbacks.t file added
+in eaae68a4f450bb90f89fb389f3aaa00b657cfe78 commit ("tests: add unit
+tests for InteractionCallbacks") uses "lib" Perl module, but the spec
+file does not declare the dependecny.
+
+This patch fixes it.
+---
+ dnf5.spec | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dnf5.spec b/dnf5.spec
+index 580cbaa48..89faa0a5e 100644
+--- a/dnf5.spec
++++ b/dnf5.spec
+@@ -260,6 +260,7 @@ BuildRequires:  swig >= %{swig_version}
+ BuildRequires:  perl-devel
+ BuildRequires:  perl-generators
+ %if %{with tests}
++BuildRequires:  perl(lib)
+ BuildRequires:  perl(strict)
+ BuildRequires:  perl(Test::More)
+ BuildRequires:  perl(Test::Exception)
+-- 
+2.55.0
+
