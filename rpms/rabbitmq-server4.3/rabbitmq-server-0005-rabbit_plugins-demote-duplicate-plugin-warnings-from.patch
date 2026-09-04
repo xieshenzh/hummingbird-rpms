@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 22 Jul 2026 21:06:22 +0200
+Subject: [PATCH] rabbit_plugins: demote duplicate plugin warnings from stderr
+ to log
+
+Duplicate plugin entries are an expected and harmless condition in
+packaged deployments where both a versioned plugin directory and a
+convenience symlink/path are scanned. Reporting them via
+io:format(standard_error) alarmed users and operators unnecessarily.
+
+Split duplicate_plugin problems from genuine loading errors: duplicates
+are now reported via ?LOG_WARNING while real loading errors retain the
+stderr treatment.
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+Assisted-by: Claude (Anthropic) <https://claude.ai>
+
+diff --git a/deps/rabbit/src/rabbit_plugins.erl b/deps/rabbit/src/rabbit_plugins.erl
+index 8b2f116ee2..7f3a774c9c 100644
+--- a/deps/rabbit/src/rabbit_plugins.erl
++++ b/deps/rabbit/src/rabbit_plugins.erl
+@@ -190,7 +190,11 @@ list(PluginsPath, IncludeRequiredDeps) ->
+     {UniquePlugins, DuplicateProblems} = remove_duplicate_plugins(AllPlugins),
+     Plugins1 = maybe_keep_required_deps(IncludeRequiredDeps, UniquePlugins),
+     Plugins2 = remove_plugins(Plugins1),
+-    maybe_report_plugin_loading_problems(LoadingProblems ++ DuplicateProblems),
++    case DuplicateProblems of
++        [] -> ok;
++        _  -> ?LOG_WARNING("Duplicate plugins found (harmless): ~tp", [DuplicateProblems])
++    end,
++    maybe_report_plugin_loading_problems(LoadingProblems),
+     ensure_dependencies(Plugins2).
+ 
+ %% @doc Read the list of enabled plugins from the supplied term file.

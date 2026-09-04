@@ -3,9 +3,10 @@
   "modification_reason": "Update to upstream version 4.3.5",
   "modification_status": "modified",
   "release_monitoring_project_id": 5585,
-  "sha": "f394ac7215d764df24b9e728b6e7bb2e8d0e081b",
+  "sha": "49cdc557b217c19f013254189127b6c6345b54b8",
   "source": "https://src.fedoraproject.org/rpms/rabbitmq-server.git",
   "track_upstream": "4.3",
   "upstream_repo": "https://github.com/rabbitmq/rabbitmq-server",
-  "version": "4.3.5"
+  "version": "4.3.5",
+  "release": "1"
 }
