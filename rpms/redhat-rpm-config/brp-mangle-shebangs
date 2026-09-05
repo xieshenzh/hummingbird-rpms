@@ -75,8 +75,8 @@ cd "$RPM_BUILD_ROOT"
 # but run just two of them.
 # (Take care to exclude filenames which would mangle "file" output).
 find -executable -type f ! -path '*:*' ! -path $'*\n*' \
-| file -N --mime-type -f - \
-| grep -P ".+(?=: (text/|application/javascript))" \
+| file -N --mime-encoding -f - \
+| grep -P ".+(?=: (?!binary$))" \
 | {
 fail=0
 while IFS= read -r line; do
