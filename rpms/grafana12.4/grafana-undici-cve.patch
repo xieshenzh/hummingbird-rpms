@@ -1,0 +1,34 @@
+From: Hummingbird <hummingbird@redhat.com>
+Subject: [PATCH] Bump vendored undici to 7.29.1 for nine CVEs
+
+diff --git a/package.json b/package.json
+index 4a509987..89cecb18 100644
+--- a/package.json
++++ b/package.json
+@@ -464,6 +464,7 @@
+     "postcss@npm:^8.5.1": "8.5.19",
+     "postcss@npm:^8.5.6": "8.5.19",
+     "fast-uri@npm:^3.0.1": "3.1.7",
++    "undici@npm:^7.12.0": "7.29.1",
+     "underscore": "1.13.7",
+     "@types/slate": "0.47.11",
+     "semver@npm:~7.3.5": "^7.3.5",
+diff --git a/yarn.lock b/yarn.lock
+index 00d401ee..229c6cbe 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -34838,10 +34838,10 @@ __metadata:
+   languageName: node
+   linkType: hard
+ 
+-"undici@npm:^7.12.0":
+-  version: 7.25.0
+-  resolution: "undici@npm:7.25.0"
+-  checksum: 10c0/02a0b45dc14eb91bc488948750232450fe52f27a6b08086d6ac6736bb47908d600fe3a96d346f12eab24729c782e5c2f693bc8e8eca6696d4e4c09b1ed4cb4ec
++"undici@npm:7.29.1":
++  version: 7.29.1
++  resolution: "undici@npm:7.29.1"
++  checksum: 10c0/5a419b1364531071ebdfd93748f7f2392d4eb6d68dd99814e1020f8fc6a517e3298129004c871516ee204bac68aba93541f587200b04a7449b8d45683a7d86f6
+   languageName: node
+   linkType: hard
+ 
