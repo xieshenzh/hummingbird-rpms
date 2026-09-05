@@ -1,0 +1,127 @@
+From a5094146f22b033cd493e1404c6b6a85087aa5ca Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Fri, 4 Sep 2026 10:31:41 +0000
+Subject: [PATCH] Fix file corruption when re-downloading a completed file with
+ resume
+
+When resume was requested for a file that already existed complete on
+disk but no longer carried the librepo xattr (e.g. a package fully
+downloaded in a previous run - the xattr is removed once a download
+finishes), prepare_next_transfer() determined the offset by seeking to
+the end of the file and then, finding no xattr, truncated the file back
+to zero. The truncation left the stdio stream position at the old end of
+file, so the freshly downloaded data was written after a zero-filled
+hole, doubling the file size and corrupting it.
+
+Rewind the stream to the beginning after truncating so the data is
+written from offset 0.
+
+This manifested in dnf5 as a corrupted cached RPM on a second install of
+a command-line package given by URL.
+
+Fixes: https://github.com/rpm-software-management/librepo/issues/384
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ librepo/downloader.c                          |  6 ++
+ .../tests/test_yum_package_downloading.py     | 69 +++++++++++++++++++
+ 2 files changed, 75 insertions(+)
+
+diff --git a/librepo/downloader.c b/librepo/downloader.c
+index 25562a96..c63b7809 100644
+--- a/librepo/downloader.c
++++ b/librepo/downloader.c
+@@ -1613,6 +1613,12 @@ prepare_next_transfer(LrDownload *dd, gboolean *candidatefound, GError **err)
+                             "ftruncate() failed: %s", g_strerror(errno));
+                 goto fail;
+             }
++            // The stream position was moved to the end of the file while
++            // determining the offset above. After truncating the file back
++            // to zero, rewind the stream so the freshly downloaded data is
++            // written from the beginning instead of leaving a zero-filled
++            // hole (which would corrupt and double the size of the file).
++            fseek(target->f, 0L, SEEK_SET);
+             target->original_offset = 0;
+         } else {
+             gint64 used_offset = target->original_offset;
+diff --git a/tests/python/tests/test_yum_package_downloading.py b/tests/python/tests/test_yum_package_downloading.py
+index 6002f6c7..e95c72f4 100644
+--- a/tests/python/tests/test_yum_package_downloading.py
++++ b/tests/python/tests/test_yum_package_downloading.py
+@@ -814,6 +814,75 @@ def test_download_packages_resume_on_mirror_switch(self):
+         sha256 = hashlib.sha256(data).hexdigest()
+         self.assertEqual(sha256, config.PACKAGE_01_01_SHA256)
+ 
++    def test_download_packages_resume_complete_file_no_xattr(self):
++        # Regression test for
++        # https://github.com/rpm-software-management/librepo/issues/384
++        #
++        # A complete file already exists at the destination but it no longer
++        # carries the librepo xattr - e.g. a package fully downloaded during a
++        # previous run (the xattr is removed once a download finishes).
++        # Downloading it again with resume=True but without a known checksum
++        # or expected size (as libdnf5 does for a command-line package given
++        # by URL on a repeated install) must not corrupt the file. Because no
++        # checksum/size is known, librepo cannot short-circuit as "already
++        # downloaded" and actually re-fetches over the existing file.
++        # Previously the offset was determined by seeking to the end of the
++        # file, and after the file was truncated back to zero the stream
++        # position was left at the old end, so the fresh data was written
++        # after a zero-filled hole, doubling the file size and corrupting it.
++        h = librepo.Handle()
++        h.urls = ["%s%s" % (self.MOCKURL, config.REPO_YUM_01_PATH)]
++        h.repotype = librepo.LR_YUMREPO
++
++        # First download - a normal complete download. On success librepo
++        # removes the "downloadinprogress" xattr, leaving a complete file
++        # with no librepo xattr (the state after any finished download).
++        pkgs = [librepo.PackageTarget(config.PACKAGE_01_01,
++                                      handle=h,
++                                      dest=self.tmpdir,
++                                      checksum_type=librepo.SHA256,
++                                      checksum=config.PACKAGE_01_01_SHA256)]
++        librepo.download_packages(pkgs, failfast=True)
++        first = pkgs[0]
++        self.assertTrue(first.err is None)
++        self.assertTrue(os.path.isfile(first.local_path))
++        local_path = first.local_path
++        expected_size = os.path.getsize(local_path)
++
++        # Sanity check: the xattr must be gone after a finished download,
++        # otherwise the resume branch below would not be exercised.
++        try:
++            xattr.getxattr(local_path,
++                           "user.librepo.downloadinprogress".encode("utf-8"))
++            has_xattr = True
++        except IOError as err:
++            if err.errno == errno.EOPNOTSUPP:
++                self.skipTest('extended attributes are not supported')
++            has_xattr = False
++        except OSError:
++            has_xattr = False
++        self.assertFalse(has_xattr,
++                         "xattr should be removed after a finished download")
++
++        # Second download with resume=True but WITHOUT a checksum or expected
++        # size - librepo re-fetches over the existing complete file.
++        pkgs2 = [librepo.PackageTarget(config.PACKAGE_01_01,
++                                       handle=h,
++                                       dest=self.tmpdir,
++                                       resume=True)]
++        librepo.download_packages(pkgs2, failfast=True)
++        second = pkgs2[0]
++        self.assertTrue(second.err is None)
++        self.assertTrue(os.path.isfile(second.local_path))
++
++        # File must not be corrupted: same size (not doubled) and correct
++        # checksum (not prefixed with a zero-filled hole).
++        self.assertEqual(os.path.getsize(second.local_path), expected_size)
++        with open(second.local_path, 'rb') as f:
++            data = f.read()
++        sha256 = hashlib.sha256(data).hexdigest()
++        self.assertEqual(sha256, config.PACKAGE_01_01_SHA256)
++
+     def test_download_packages_mirror_penalization_01(self):
+ 
+         # This test is useful for mirror penalization testing
