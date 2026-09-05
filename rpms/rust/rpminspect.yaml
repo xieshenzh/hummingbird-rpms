@@ -8,6 +8,11 @@ debuginfo:
         - /usr/lib/debug/usr/bin/*.i386.debug
         - /usr/lib/debug/usr/libexec/*.i386.debug
 
+doc:
+    # Doc inspection generates massive output which crash RHEL CI
+    ignore:
+        - /usr/share/doc/rust/html/*
+
 unicode:
     ignore:
         # These files are known to contain forbidden unicode chars as
