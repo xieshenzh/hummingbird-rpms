@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 # This is a script to select which GCC spec file fragment
 # should be the destination of the redhat-annobin-cc1 symlink.
 
