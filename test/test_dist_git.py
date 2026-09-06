@@ -4871,3 +4871,112 @@ def test_add_private_product_preserves_formatting(workdir: Path, upstream_repos:
     with open(rpa_config_path) as f:
         rpa_config = yaml.safe_load(f)
     assert any(r.get('private_product') == 'testprod' for r in rpa_config['rpas'])
+
+
+def test_normalize_release_in_specs_plain(dist_git_module, tmp_path: Path) -> None:
+    """normalize_release_in_specs normalizes plain Release: lines."""
+    spec = tmp_path / 'foo.spec'
+    spec.write_text('Name: foo\nRelease: 5%{?dist}\nVersion: 1.0\n')
+    dist_git_module.normalize_release_in_specs(tmp_path)
+    assert 'Release: 0%{?dist}' in spec.read_text()
+
+
+def test_normalize_release_in_specs_custom_macros(dist_git_module, tmp_path: Path) -> None:
+    """normalize_release_in_specs normalizes known custom release macros."""
+    spec = tmp_path / 'java.spec'
+    spec.write_text(
+        '%global portablerelease 3\n'
+        '%global rpmrelease 1\n'
+        'Name: java\nRelease: 0%{?dist}\nVersion: 21\n'
+    )
+    dist_git_module.normalize_release_in_specs(tmp_path)
+    content = spec.read_text()
+    assert '%global portablerelease 0' in content
+    assert '%global rpmrelease 0' in content
+
+
+def test_normalize_release_in_specs_baserelease(dist_git_module, tmp_path: Path) -> None:
+    """normalize_release_in_specs normalizes %global baserelease."""
+    spec = tmp_path / 'cmake.spec'
+    spec.write_text('%global baserelease 5\nName: cmake\nRelease: %{baserelease}%{?dist}\n')
+    dist_git_module.normalize_release_in_specs(tmp_path)
+    assert '%global baserelease 0' in spec.read_text()
+
+
+def test_normalize_release_in_specs_gcc_release(dist_git_module, tmp_path: Path) -> None:
+    """normalize_release_in_specs normalizes %global gcc_release."""
+    spec = tmp_path / 'gcc.spec'
+    spec.write_text('%global gcc_release 2\nName: gcc\nRelease: %{gcc_release}%{?dist}\n')
+    dist_git_module.normalize_release_in_specs(tmp_path)
+    assert '%global gcc_release 0' in spec.read_text()
+
+
+def test_normalize_release_in_specs_ignores_prerelease(dist_git_module, tmp_path: Path) -> None:
+    """normalize_release_in_specs must NOT touch %global prerelease (version qualifier, not build release)."""
+    spec = tmp_path / 'pkg.spec'
+    spec.write_text('%global prerelease rc1\nName: pkg\nVersion: 1.0~%{prerelease}\nRelease: 1%{?dist}\n')
+    dist_git_module.normalize_release_in_specs(tmp_path)
+    content = spec.read_text()
+    assert '%global prerelease rc1' in content, "prerelease macro must not be normalized"
+
+
+def test_normalize_release_in_specs_define(dist_git_module, tmp_path: Path) -> None:
+    """normalize_release_in_specs handles %define as well as %global."""
+    spec = tmp_path / 'pkg.spec'
+    spec.write_text('%define baserelease 7\nName: pkg\nRelease: %{baserelease}%{?dist}\n')
+    dist_git_module.normalize_release_in_specs(tmp_path)
+    assert '%define baserelease 0' in spec.read_text()
+
+
+def test_update_merge_clean_custom_release_macro(workdir: Path, upstream_repos: dict[str, Path]) -> None:
+    """Update cleanly merges when upstream bumps a custom release macro like %global baserelease."""
+    vanilla_dir = upstream_repos['vanilla']
+    vanilla_spec_path = vanilla_dir / 'vanilla.spec'
+
+    # Rewrite spec to use %global baserelease before importing
+    vanilla_spec_path.write_text(
+        '%global baserelease 1\n'
+        'Name: vanilla\nVersion: 1.0\nRelease: %{baserelease}%{?dist}\n'
+        'Summary: Test package vanilla\nLicense: MIT\n\n'
+        '%description\nTest package\n\n%files\n'
+    )
+    subprocess.run(['git', 'commit', '-a', '-m', 'Use %global baserelease'], cwd=vanilla_dir, check=True)
+
+    # Import
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'import', f'file://{vanilla_dir}'],
+        cwd=workdir, check=True,
+    )
+
+    # Local modification: bump baserelease (simulating a local rebuild) and add a comment.
+    # This is the key scenario: local has baserelease=1.1, upstream bumps to 2.
+    # Without the normalization fix the 3-way merge sees both sides diverge from 1
+    # and produces conflict markers.
+    local_spec = workdir / 'rpms' / 'vanilla' / 'vanilla.spec'
+    local_spec.write_text(
+        local_spec.read_text()
+        .replace('%global baserelease 1', '%global baserelease 1.1')
+        .replace('%description', '# Local change\n%description')
+    )
+    subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), '--dry-run', 'mark-modified', '--modified',
+         '--reason', 'Local comment', 'vanilla'], cwd=workdir, check=True,
+    )
+    subprocess.run(['git', 'commit', '-a', '-m', 'Local modification'], cwd=workdir, check=True)
+
+    # Upstream bumps %global baserelease from 1 to 2
+    vanilla_spec_path.write_text(
+        vanilla_spec_path.read_text().replace('%global baserelease 1', '%global baserelease 2')
+    )
+    subprocess.run(['git', 'commit', '-a', '-m', 'Bump baserelease to 2'], cwd=vanilla_dir, check=True)
+
+    # update should merge cleanly - no conflict markers
+    result = subprocess.run(
+        [str(workdir / 'ci' / 'dist_git.py'), 'update', '--skip-build-check', 'vanilla'],
+        cwd=workdir, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, f"Merge failed:\n{result.stderr}"
+    merged = local_spec.read_text()
+    assert '<<<<<<' not in merged, "Unexpected conflict markers in merged spec"
+    assert '%global baserelease 2' in merged, "Upstream baserelease bump not applied"
+    assert '# Local change' in merged, "Local modification lost after merge"
