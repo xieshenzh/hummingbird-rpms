@@ -1,7 +1,7 @@
 %bcond check 1
 
 %global goipath github.com/grafana/loki/v3
-Version: 3.6.15
+Version: 3.6.16
 
 %gometa -L
 
@@ -16,6 +16,8 @@ Source1:        go-vendor-tools.toml
 # v0.0.1 declares MIT in README but predates the upstream LICENSE file.
 Source2:        https://raw.githubusercontent.com/mattn/go-localereader/6bae6c923850ab5e0da9f36f69811ffe17064228/LICENSE#/go-localereader-LICENSE
 Patch0:         0001-tests-use-explicit-loopback-addresses.patch
+# Update the encoding/json error text used by Go 1.27.
+Patch1:         0002-tests-update-json-error-for-go1.27.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.26
