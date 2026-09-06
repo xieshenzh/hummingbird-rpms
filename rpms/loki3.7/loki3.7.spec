@@ -1,7 +1,7 @@
 %bcond check 1
 
 %global goipath github.com/grafana/loki/v3
-Version: 3.7.6
+Version: 3.7.7
 
 %gometa -L
 
@@ -14,6 +14,8 @@ URL:            https://github.com/grafana/loki
 Source0:        https://github.com/grafana/loki/archive/refs/tags/v%{version}.tar.gz#/loki-%{version}.tar.gz
 Source1:        go-vendor-tools.toml
 Patch0:         0001-tests-use-explicit-loopback-addresses.patch
+# Update the encoding/json error type name used by Go 1.27.
+Patch1:         0002-tests-update-json-error-for-go1.27.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  golang >= 1.26
