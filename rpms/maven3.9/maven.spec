@@ -1,7 +1,10 @@
 Name:           maven3.9
 Version:        3.9.16
-Release:        0.1%{?dist}
+Release:        0.2%{?dist}
 Summary:        Java project management and comprehension tool
+
+%global homedir %{_datadir}/maven
+%global confdir %{_sysconfdir}/maven
 
 # Maven itself is Apache-2.0. The remaining terms cover the libraries
 # copied from Maven Central into the assembled Maven distribution.
@@ -19,7 +22,15 @@ BuildRequires:  tar
 BuildRequires:  zstd
 Requires:       java-headless >= 1:1.8
 Requires:       bash
+Requires:       maven3.9-lib = %{version}-%{release}
 Provides:       maven = %{version}-%{release}
+
+%description
+Apache Maven command-line tools for Maven 3.9.
+
+
+%package lib
+Summary:        Core libraries for Maven 3.9
 
 # Third-party libraries shipped in lib/ and boot/. Maven modules built by
 # this package are not listed as bundled dependencies.
@@ -65,10 +76,9 @@ Provides: bundled(mvn(org.slf4j:jcl-over-slf4j)) = 1.7.36
 Provides: bundled(mvn(org.slf4j:slf4j-api)) = 1.7.36
 # END generated bundled Maven Provides
 
-%description
-Apache Maven is a project management and build tool based on the Project
-Object Model. This package builds Maven from source with a pinned, offline
-repository of build dependencies from Maven Central.
+%description lib
+Core libraries and the private runtime distribution for Maven 3.9, arranged
+using Fedora's Maven layout for Hummingbird builds.
 
 
 %prep
@@ -87,32 +97,62 @@ mvn \
 
 
 %install
-mkdir -p %{buildroot}%{_datadir}/maven %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{homedir} %{buildroot}%{_bindir}
 tar -xzf apache-maven/target/apache-maven-%{version}-bin.tar.gz \
     --strip-components=1 \
-    -C %{buildroot}%{_datadir}/maven
+    -C %{buildroot}%{homedir}
 
 # The upstream archive contains Windows DLLs from Jansi. Maven uses the pure
 # Java fallback on Linux, so do not turn this noarch RPM into a binary bundle.
-find %{buildroot}%{_datadir}/maven/lib/jansi-native -type f \
+find %{buildroot}%{homedir}/lib/jansi-native -type f \
     ! -name README.txt -delete
-find %{buildroot}%{_datadir}/maven/lib/jansi-native -type d -empty -delete
+find %{buildroot}%{homedir}/lib/jansi-native -type d -empty -delete
 
-ln -s ../share/maven/bin/mvn %{buildroot}%{_bindir}/mvn
-ln -s ../share/maven/bin/mvnDebug %{buildroot}%{_bindir}/mvnDebug
+install -d %{buildroot}%{confdir}
+mv %{buildroot}%{homedir}/bin/m2.conf \
+    %{buildroot}%{_sysconfdir}/m2.conf
+ln -s %{_sysconfdir}/m2.conf \
+    %{buildroot}%{homedir}/bin/m2.conf
+mv %{buildroot}%{homedir}/conf/settings.xml \
+    %{buildroot}%{confdir}/settings.xml
+mv %{buildroot}%{homedir}/conf/logging \
+    %{buildroot}%{confdir}/logging
+ln -s %{confdir}/settings.xml %{buildroot}%{homedir}/conf/settings.xml
+ln -s %{confdir}/logging %{buildroot}%{homedir}/conf/logging
+
+ln -s %{homedir}/bin/mvn %{buildroot}%{_bindir}/mvn
+ln -s %{homedir}/bin/mvnDebug %{buildroot}%{_bindir}/mvnDebug
 
 
 %check
+mv %{buildroot}%{homedir}/conf/logging \
+    %{buildroot}%{homedir}/conf/logging.rpm-link
+cp -a %{buildroot}%{confdir}/logging \
+    %{buildroot}%{homedir}/conf/logging
+ln -sfn %{buildroot}%{_sysconfdir}/m2.conf \
+    %{buildroot}%{homedir}/bin/m2.conf
 MAVEN_USER_HOME="$PWD/test-home" \
-    %{buildroot}%{_datadir}/maven/bin/mvn --version
+    %{buildroot}%{homedir}/bin/mvn --version
+rm -rf %{buildroot}%{homedir}/conf/logging
+mv %{buildroot}%{homedir}/conf/logging.rpm-link \
+    %{buildroot}%{homedir}/conf/logging
+ln -sfn %{_sysconfdir}/m2.conf \
+    %{buildroot}%{homedir}/bin/m2.conf
 
 
-%files
+%files lib
 %license LICENSE NOTICE
 %doc README.md
+%{homedir}
+%exclude %{homedir}/bin/mvn*
+%config(noreplace) %{_sysconfdir}/m2.conf
+%config(noreplace) %{confdir}/settings.xml
+%config(noreplace) %{confdir}/logging/simplelogger.properties
+
+%files
+%{homedir}/bin/mvn*
 %{_bindir}/mvn
 %{_bindir}/mvnDebug
-%{_datadir}/maven
 
 
 %changelog
