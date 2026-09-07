@@ -1,0 +1,175 @@
+From 3ca3ef388cc6593b2b07bc06617e33e48dff9b5e Mon Sep 17 00:00:00 2001
+From: Petr Lautrbach <lautrbach@redhat.com>
+Date: Fri, 4 Sep 2026 14:11:30 +0200
+Subject: [PATCH] Add support for UTF-8 in file context specifications
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Content-type: text/plain
+
+Implement support for UTF-8 symbols in file specifications. Strings
+representing paths are processed as bytes so if users need to use
+wildcards on non-ascii symbols, they need to put them in pcre groups,
+e.g. "/opt/žluťou(č)+"
+
+This brings some overhead and so it's possible to disable UTF-8 support
+build time using DISABLE_UTF=y environment variable.
+
+Fixes:
+    # cat unicode.cil
+    (filecon "/opt/žluťoučký(/.*)?" any (system_u object_r user_home_t ((s0) (s0))))
+
+    # semodule -i unicode.cil
+    /sbin/setfiles: /var/lib/selinux/final/targeted/contexts/files/file_contexts:  line 2145 error due to: Non-ASCII characters found
+    /sbin/setfiles: /var/lib/selinux/final/targeted/contexts/files/file_contexts:  line 2145 error due to: Non-ASCII characters found
+    /var/lib/selinux/final/targeted/contexts/files/file_contexts: Invalid argument
+    libsemanage.semanage_validate_and_compile_fcontexts: setfiles returned error code 1.
+    semodule:  Failed!
+
+    # semanage fcontext --add -t user_home_t "/opt/žluťoučký(/.*)?"
+    /sbin/setfiles: /var/lib/selinux/final/targeted/contexts/files/file_contexts.local:  line 4 error due to: Non-ASCII characters found
+    /sbin/setfiles: /var/lib/selinux/final/targeted/contexts/files/file_contexts.local:  line 4 error due to: Non-ASCII characters found
+    /var/lib/selinux/final/targeted/contexts/files/file_contexts: Invalid argument
+    libsemanage.semanage_validate_and_compile_fcontexts: setfiles returned error code 1.
+    OSError: Error
+
+Signed-off-by: Petr Lautrbach <lautrbach@redhat.com>
+Acked-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+---
+ libselinux/Makefile            |  4 ++
+ libselinux/src/label_support.c | 83 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 87 insertions(+)
+
+diff --git a/libselinux/Makefile b/libselinux/Makefile
+index aeede2b56e8e..0f8412ccf1ea 100644
+--- a/libselinux/Makefile
++++ b/libselinux/Makefile
+@@ -3,6 +3,7 @@ SUBDIRS = include src utils man
+ PKG_CONFIG ?= pkg-config
+ DISABLE_SETRANS ?= n
+ DISABLE_RPM ?= n
++DISABLE_UTF ?= n
+ ANDROID_HOST ?= n
+ LABEL_BACKEND_ANDROID ?= n
+ ifeq ($(ANDROID_HOST),y)
+@@ -21,6 +22,9 @@ endif
+ ifeq ($(DISABLE_X11),y)
+ 	DISABLE_FLAGS+= -DNO_X_BACKEND
+ endif
++ifeq ($(DISABLE_UTF),y)
++	DISABLE_FLAGS+= -DNO_UTF
++endif
+ export DISABLE_SETRANS DISABLE_RPM DISABLE_FLAGS ANDROID_HOST DISABLE_X11 LABEL_BACKEND_ANDROID
+ 
+ USE_PCRE2 ?= y
+diff --git a/libselinux/src/label_support.c b/libselinux/src/label_support.c
+index aea5ed19b45a..a229373af09c 100644
+--- a/libselinux/src/label_support.c
++++ b/libselinux/src/label_support.c
+@@ -13,6 +13,76 @@
+ #include <errno.h>
+ #include "label_internal.h"
+ 
++#ifndef NO_UTF
++
++#define UTF8tail(x) ((x) >= 0x80 && (x) <= 0xBF)
++
++static size_t utf8_char_len(const unsigned char *s)
++{
++	/* rfc3629
++	 *  UTF8-octets = *( UTF8-char )
++	 *  UTF8-char   = UTF8-1 / UTF8-2 / UTF8-3 / UTF8-4
++	 *  UTF8-1      = %x00-7F
++	 *  UTF8-2      = %xC2-DF UTF8-tail
++	 *  UTF8-3      = %xE0 %xA0-BF UTF8-tail / %xE1-EC 2( UTF8-tail ) /
++	 *                %xED %x80-9F UTF8-tail / %xEE-EF 2( UTF8-tail )
++	 *  UTF8-4      = %xF0 %x90-BF 2( UTF8-tail ) / %xF1-F3 3( UTF8-tail ) /
++	 *                %xF4 %x80-8F 2( UTF8-tail )
++	 *  UTF8-tail   = %x80-BF
++	 */
++	if (s[0] == '\0')
++		return 0;
++
++	if (s[0] < 0x80)
++		return 1;
++
++	if (s[0] < 0xC2 || s[1] == '\0')
++		return 0;
++
++	if (s[0] <= 0xDF && UTF8tail(s[1]))
++		return 2;
++
++	if (s[2] == '\0')
++		return 0;
++
++	/* %xE0 %xA0-BF UTF8-tail */
++	if (s[0] == 0xE0 && s[1] >= 0xA0 && s[1] <= 0xBF && UTF8tail(s[2]))
++		return 3;
++
++	/* %xE1-EC 2( UTF8-tail ) */
++	if (s[0] >= 0xE1 && s[0] <= 0xEC && UTF8tail(s[1]) && UTF8tail(s[2]))
++		return 3;
++
++	/* %xED %x80-9F UTF8-tail */
++	if (s[0] == 0xED && s[1] >= 0x80 && s[1] <= 0x9F && UTF8tail(s[2]))
++		return 3;
++
++	/* %xEE-EF 2( UTF8-tail ) */
++	if (s[0] >= 0xEE && s[0] <= 0xEF && UTF8tail(s[1]) && UTF8tail(s[2]))
++		return 3;
++
++	if (s[3] == '\0')
++		return 0;
++
++	/* %xF0 %x90-BF 2( UTF8-tail ) */
++	if (s[0] == 0xF0 && s[1] >= 0x90 && s[1] <= 0xBF && UTF8tail(s[2]) &&
++	    UTF8tail(s[3]))
++		return 4;
++
++	/* %xF1-F3 3( UTF8-tail ) */
++	if (s[0] >= 0xF1 && s[0] <= 0xF3 && UTF8tail(s[1]) && UTF8tail(s[2]) &&
++	    UTF8tail(s[3]))
++		return 4;
++
++	/* %xF4 %x80-8F 2( UTF8-tail ) */
++	if (s[0] == 0xF4 && s[1] >= 0x80 && s[1] <= 0x8F && UTF8tail(s[2]) &&
++	    UTF8tail(s[3]))
++		return 4;
++
++	return 0;
++}
++#endif
++
+ /*
+  * Read an entry from a spec file (e.g. file_contexts)
+  * entry - Buffer to allocate for the entry.
+@@ -36,6 +106,7 @@ static inline int read_spec_entry(char **entry, const char **ptr, size_t *len,
+ 	*len = 0;
+ 
+ 	while (!isspace((unsigned char)**ptr) && **ptr != '\0') {
++#ifdef NO_UTF
+ 		if (!isascii((unsigned char)**ptr)) {
+ 			errno = EINVAL;
+ 			*errbuf = "Non-ASCII characters found";
+@@ -43,6 +114,18 @@ static inline int read_spec_entry(char **entry, const char **ptr, size_t *len,
+ 		}
+ 		(*ptr)++;
+ 		(*len)++;
++#else
++		size_t char_len = utf8_char_len((const unsigned char *)*ptr);
++
++		if (char_len == 0) {
++			errno = EINVAL;
++			*errbuf = "Invalid UTF-8 encoding";
++			return -1;
++		}
++
++		*ptr += char_len;
++		*len += char_len;
++#endif
+ 	}
+ 
+ 	if (*len) {
+-- 
+2.55.0
+
