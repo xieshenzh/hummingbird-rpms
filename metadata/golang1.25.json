@@ -1,4 +1,5 @@
 {
+  "fix_status": 0,
   "branch": "f43",
   "cve_product": "Go ",
   "modification_reason": "Update to upstream version 1.25.14",
