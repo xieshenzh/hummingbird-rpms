@@ -97,7 +97,7 @@ spec:
               requests:
                 cpu: '1'
                 memory: 256Mi
-            name: populate-release-notes-artifacts
+            name: populate-release-notes
       - pipelineTaskName: upload-src-rpm-sbom-attestation
         stepSpecs:
           - computeResources:
