@@ -407,6 +407,10 @@ Patch496: 00496-cve-2026-17084.patch
 # CVE-2026-19672
 # gh-155999: tarfile must not create intermediate directories outside destination
 Patch497: 00497-cve-2026-19672.patch
+
+# CVE-2026-15806
+# gh-155694: scope HTTPPasswordMgr credentials by URL scheme
+Patch498: 00498-cve-2026-15806.patch
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
