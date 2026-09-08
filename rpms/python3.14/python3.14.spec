@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: Python-2.0.1
 
 
@@ -428,6 +428,21 @@ Patch486: 00486-gh-148646-add---enable-prebuilt-jit-stencils-configure-flag.patc
 # Upstream fix: https://github.com/ljharb/qs/commit/21f80b33e5c8b3f7eba1034fff0da4a4a37a1d41
 Patch487: 00487-cve-2026-8723.patch
 
+# CVE-2026-17084
+# gh-155292: Use Unicode 3.2.0 attributes for RFC 3454 stringprep tables
+Patch496: 00496-cve-2026-17084.patch
+
+# CVE-2026-19672
+# gh-155999: tarfile must not create intermediate directories outside destination
+Patch497: 00497-cve-2026-19672.patch
+
+# CVE-2026-15806
+# gh-155694: scope HTTPPasswordMgr credentials by URL scheme
+Patch498: 00498-cve-2026-15806.patch
+
+# CVE-2026-15310
+# gh-156002: bound zipfile bzip2, LZMA, and Zstandard decompression
+Patch499: 00499-cve-2026-15310.patch
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,

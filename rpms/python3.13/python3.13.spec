@@ -49,7 +49,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: Python-2.0.1
 
 
@@ -400,6 +400,21 @@ Patch475: 00475-cve-2025-15367.patch
 # direct call to the check function.
 Patch477: 00477-raise-an-error-when-importing-stdlib-modules-compiled-for-a-different-python-version.patch
 
+# CVE-2026-17084
+# gh-155292: Use Unicode 3.2.0 attributes for RFC 3454 stringprep tables
+Patch496: 00496-cve-2026-17084.patch
+
+# CVE-2026-19672
+# gh-155999: tarfile must not create intermediate directories outside destination
+Patch497: 00497-cve-2026-19672.patch
+
+# CVE-2026-15806
+# gh-155694: scope HTTPPasswordMgr credentials by URL scheme
+Patch498: 00498-cve-2026-15806.patch
+
+# CVE-2026-15310
+# gh-156002: bound zipfile bzip2, LZMA, and Zstandard decompression
+Patch499: 00499-cve-2026-15310.patch
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -2024,4 +2039,3 @@ CheckPython freethreading
 
 * Mon Oct 16 2023 Karolina Surma <ksurma@redhat.com> - 3.13.0~a1-1
 - Initial Python 3.13 package forked from Python 3.12
-
