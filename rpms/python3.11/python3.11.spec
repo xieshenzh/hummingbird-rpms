@@ -419,6 +419,10 @@ Patch497: 00497-cve-2026-19672.patch
 # CVE-2026-15806
 # gh-155694: scope HTTPPasswordMgr credentials by URL scheme
 Patch498: 00498-cve-2026-15806.patch
+
+# CVE-2026-15310
+# gh-156002: bound zipfile bzip2, LZMA, and Zstandard decompression
+Patch499: 00499-cve-2026-15310.patch
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
