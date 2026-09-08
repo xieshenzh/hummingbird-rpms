@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: Python-2.0.1
 
 
@@ -455,6 +455,9 @@ Patch488: 00488-cve-2026-3479.patch
 # gh-90309: Base64-encode cookie values embedded in JS
 Patch489: 00489-cve-2026-6019.patch
 
+# CVE-2026-17084
+# gh-155292: Use Unicode 3.2.0 attributes for RFC 3454 stringprep tables
+Patch496: 00496-cve-2026-17084.patch
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
