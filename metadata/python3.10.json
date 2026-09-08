@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "CVE-2026-4360; CVE-2026-6879; CVE-2026-17084; CVE-2026-19672; CVE-2026-15806",
+  "modification_reason": "CVE-2026-4360; CVE-2026-6879; CVE-2026-17084; CVE-2026-19672; CVE-2026-15806; CVE-2026-15310",
   "modification_status": "modified",
   "release": "1",
   "sha": "daba5b738caf36d3903f98c1c65be5efbcfa658a",
