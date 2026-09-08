@@ -42,6 +42,9 @@ transform:
         # Generated against the post-js-yaml lockfile, so this comes after
         # Patch9 (same order as Patch10 in the spec).
         patch -p1 < "${PACKAGE_DIR}/grafana-fast-uri-3.1.7-cve.patch"
+        # Generated against the post-fast-uri-3.1.7 lockfile, so this comes
+        # after Patch10 (same order as Patch11 in the spec).
+        patch -p1 < "${PACKAGE_DIR}/grafana-undici-cve.patch"
         if [ -n "${HTTP_PROXY-}" ]; then export YARN_HTTP_PROXY="${HTTP_PROXY-}"; fi
         if [ -n "${HTTPS_PROXY-}" ]; then export YARN_HTTPS_PROXY="${HTTPS_PROXY-}"; fi
         CYPRESS_INSTALL_BINARY=0 YARN_ENABLE_GLOBAL_CACHE=false YARN_CACHE_FOLDER=.yarn/cache \
