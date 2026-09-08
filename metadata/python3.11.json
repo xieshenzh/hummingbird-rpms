@@ -1,6 +1,6 @@
 {
   "branch": "f43",
-  "modification_reason": "Add FIPS mode support (00329-fips.patch) - OpenSSL FIPS mode compliance for hashlib and hmac; backport fix for CVE-2026-3479; backport fix for CVE-2026-6019; backport fix for CVE-2026-3446 Base64 decoder",
+  "modification_reason": "Add FIPS mode support (00329-fips.patch) - OpenSSL FIPS mode compliance for hashlib and hmac; backport fix for CVE-2026-3479; backport fix for CVE-2026-6019; backport fix for CVE-2026-3446 Base64 decoder; CVE-2026-17084",
   "modification_status": "modified",
   "release": "1",
   "sha": "278eb3fa417bf138a1cb9c618c718b6b68fe139c",
