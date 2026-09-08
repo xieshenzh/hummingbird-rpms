@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: Python-2.0.1
 
 
@@ -375,6 +375,9 @@ Patch475: 00475-cve-2025-15367.patch
 # It has started to fail randomly when run on s390x architecture.
 Patch494: 00494-increase-the-timeout-of-test_large_content_length_truncated.patch
 
+# CVE-2026-17084
+# gh-155292: Use Unicode 3.2.0 attributes for RFC 3454 stringprep tables
+Patch496: 00496-cve-2026-17084.patch
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
