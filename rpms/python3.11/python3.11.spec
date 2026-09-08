@@ -411,6 +411,10 @@ Patch495: 00495-cve-2026-3446.patch
 # CVE-2026-17084
 # gh-155292: Use Unicode 3.2.0 attributes for RFC 3454 stringprep tables
 Patch496: 00496-cve-2026-17084.patch
+
+# CVE-2026-19672
+# gh-155999: tarfile must not create intermediate directories outside destination
+Patch497: 00497-cve-2026-19672.patch
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
