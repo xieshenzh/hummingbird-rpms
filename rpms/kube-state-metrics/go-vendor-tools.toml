@@ -1,5 +1,8 @@
 [archive]
 
+[archive.dependency_overrides]
+"github.com/go-git/go-git/v5" = "v5.19.2"
+
 [licensing]
 detector = "askalono"
 
