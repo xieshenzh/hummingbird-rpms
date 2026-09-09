@@ -1,0 +1,46 @@
+From ed3001e29f66ce63ccdbd21420c1447522fe2f83 Mon Sep 17 00:00:00 2001
+From: Vit Mojzis <vmojzis@redhat.com>
+Date: Wed, 2 Sep 2026 13:38:29 +0200
+Subject: [PATCH] libsemanage/genhomedircon: reject users with a relative home
+ directory
+Content-type: text/plain
+
+If a user's home directory in the password database is empty or
+otherwise does not start with "/" (e.g. because of a broken NSS lookup
+or a malformed passwd entry), the HOME_DIR template ends up being turned
+into a regular expression such as "/.+", which matches any path on the
+filesystem. This causes genhomedircon to generate a file context that
+relabels far more of the filesystem than intended. Skip such users
+instead of using their home directory to build the regex.
+
+Signed-off-by: Vit Mojzis <vmojzis@redhat.com>
+Acked-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+---
+ libsemanage/src/genhomedircon.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/libsemanage/src/genhomedircon.c b/libsemanage/src/genhomedircon.c
+index ce7ea16722d8..e3f55f68b358 100644
+--- a/libsemanage/src/genhomedircon.c
++++ b/libsemanage/src/genhomedircon.c
+@@ -1110,6 +1110,17 @@ retry:
+ 		pwent->pw_dir[len] = '\0';
+ 	}
+ 
++	if (pwent->pw_dir[0] != '/') {
++		/* an empty (or otherwise relative) home directory would
++		 * turn the HOME_DIR template into a regex that matches
++		 * everything, e.g. "/.+", so refuse to use it */
++		WARN(s->h_semanage,
++		     "user %s has an invalid home directory \"%s\", ignoring",
++		     name, pwent->pw_dir);
++		retval = STATUS_SUCCESS;
++		goto cleanup;
++	}
++
+ 	if (strcmp(pwent->pw_dir, "/") == 0) {
+ 		/* don't relabel / genhomdircon checked to see if root
+ 		 * was the user and if so, set his home directory to
+-- 
+2.55.0
+

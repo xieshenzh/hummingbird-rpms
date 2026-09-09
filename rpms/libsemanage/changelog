@@ -1,3 +1,12 @@
+* Tue Sep 08 2026 Petr Lautrbach <lautrbach@redhat.com> - 3.11-4
+- Optionally sort file_contexts.local by specificity
+
+* Wed Jul 22 2026 Python Maint <python-maint@redhat.com> - 3.11-3
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Wed Jul 01 2026 Petr Lautrbach <lautrbach@redhat.com> - 3.11-1
 - SELinux userspace 3.11 release
 
