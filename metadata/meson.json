@@ -2,8 +2,8 @@
   "branch": "rawhide",
   "modification_reason": "Exclude gcc-objc/gcc-objc++, qt5-qtbase-devel, gnustep-base-devel BuildRequires (gcc-objc disabled in Hummingbird gcc build; qt5-qtbase conflicts with libicu 78)",
   "modification_status": "modified",
-  "release": "1",
-  "sha": "73f845ebc524ebca6454571a6fcf0408efa6fc12",
+  "release": "2",
+  "sha": "80d8cbfe21ead64ca11ad98edee55ed72d65e1f0",
   "source": "https://src.fedoraproject.org/rpms/meson.git",
   "upstream_repo": "https://github.com/mesonbuild/meson",
   "version": "1.12.0"
