@@ -6,3 +6,8 @@ fetch:
   - type: vendor
     ecosystem: go
     archive_name: "${PACKAGE}-${VERSION}-vendor.tar.bz2"
+
+accepted-checksums:
+  - file: "kube-state-metrics-2.20.0-vendor.tar.bz2"
+    checksum: "84f7a5bbe19bcc0306bf961463943b1147f06028542745118536c0974ab8c09c645ce545274d10834302b6b4e91b27a13ae5fdf27cd39aa3716c4d567295dcd9"
+    reason: "go-vendor-tools.toml dependency_overrides bumps github.com/go-git/go-git/v5 to v5.19.2 for CVE-2026-71556; vendor archive regenerated to include the patched dependency (transitively upgrades go-git's own go-billy, circl, filepath-securejoin, sha1cd, and x/exp)"
