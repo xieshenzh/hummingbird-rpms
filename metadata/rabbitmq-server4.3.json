@@ -1,6 +1,6 @@
 {
   "branch": "rawhide",
-  "modification_reason": "Update to upstream version 4.3.5",
+  "modification_reason": "Update to upstream version 4.3.5; backport cowlib fix for CVE-2026-43971",
   "modification_status": "modified",
   "release_monitoring_project_id": 5585,
   "sha": "49cdc557b217c19f013254189127b6c6345b54b8",
