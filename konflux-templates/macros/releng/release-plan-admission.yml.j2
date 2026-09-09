@@ -109,6 +109,16 @@ spec:
                 cpu: '1'
                 memory: 1Gi
             name: upload
+        # filter needs additional memory to process Rust's large RPM artifact
+      - pipelineTaskName: filter-already-released-advisory-rpms
+        stepSpecs:
+          - computeResources:
+              limits:
+                memory: 2Gi
+              requests:
+                cpu: '1'
+                memory: 2Gi
+            name: filter
         # increase limits for verify-conforma to 8Gi memory and 2 cpu
         # that is needed for rust
       - pipelineTaskName: verify-conforma
