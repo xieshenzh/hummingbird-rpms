@@ -1,2 +1,6 @@
+* Thu Sep 11 2026 Xieshen Zhang <xiezhang@redhat.com> - 2.5.6-2
+- Add runtime Requires on ros-jazzy-ament-cmake-include-directories and
+  ros-jazzy-ament-cmake-libraries (buildtool_export_depend)
+
 * Thu Sep 10 2026 Xieshen Zhang <xiezhang@redhat.com> - 2.5.6-1
 - Initial Hummingbird package of ROS 2 Jazzy ament_cmake_target_dependencies

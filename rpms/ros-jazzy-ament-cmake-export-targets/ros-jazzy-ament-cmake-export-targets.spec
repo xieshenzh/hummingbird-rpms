@@ -1,6 +1,6 @@
 Name:           ros-jazzy-ament-cmake-export-targets
 Version:        2.5.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Export targets to downstream ament packages
 
 License:        Apache-2.0
@@ -21,6 +21,7 @@ BuildRequires:  python-unversioned-command
 BuildRequires:  ros-jazzy-ament-cmake-core
 
 Requires:       ros-jazzy-ament-cmake-core
+Requires:       ros-jazzy-ament-cmake-export-libraries
 
 %description
 Export targets to downstream ament packages. Part of the ament buildsystem for ROS 2 Jazzy, installed under
