@@ -1,0 +1,2 @@
+* Fri Sep 12 2026 Xieshen Zhang <xiezhang@redhat.com> - 8.4.4-1
+- Initial Hummingbird package of ROS 2 Jazzy rmw_fastrtps_shared_cpp
