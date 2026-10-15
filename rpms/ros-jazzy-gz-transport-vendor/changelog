@@ -1,0 +1,2 @@
+* Wed Oct 15 2026 Xieshen Zhang <xiezhang@redhat.com> - 0.0.9-1
+- Initial Hummingbird gz vendor package (offline VCS_TYPE path build).
