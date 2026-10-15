@@ -1,0 +1,3 @@
+* Wed Oct 15 2026 Xieshen Zhang <xiezhang@redhat.com> - 0.0.12-1
+- Initial Hummingbird package: gz-cmake 3.6.0 (Gazebo Harmonic) vendor, built
+  offline from upstream source via ament_vendor VCS_TYPE path.
