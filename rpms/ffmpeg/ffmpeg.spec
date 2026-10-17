@@ -227,7 +227,11 @@ BuildRequires:  pkgconfig(lilv-0)
 BuildRequires:  pkgconfig(lv2)
 BuildRequires:  pkgconfig(oapv)
 BuildRequires:  pkgconfig(ogg)
-BuildRequires:  pkgconfig(openal)
+# OpenAL disabled (Hummingbird rebuild, 2026-10-16): Fedora's openal-soft
+# links fmt-11, conflicting with the base's fmt-12 (spdlog 1.17 pulls it in
+# via the ROS rcl stack) whenever libavdevice-free is co-installed. gz-common
+# uses av for video ENCODING only — the openal audio-input backend is unused.
+# BuildRequires:  pkgconfig(openal)
 BuildRequires:  pkgconfig(opencore-amrnb)
 BuildRequires:  pkgconfig(OpenCL)
 BuildRequires:  pkgconfig(openh264)
@@ -878,7 +882,7 @@ cp -a doc/examples/{*.c,Makefile,README} _doc/examples/
     --enable-nvdec \
     --enable-nvenc \
 %endif
-    --enable-openal \
+    --disable-openal \
     --disable-openssl \
     --enable-pthreads \
     --enable-sdl2 \
